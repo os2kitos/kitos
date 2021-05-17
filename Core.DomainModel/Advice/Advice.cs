@@ -14,6 +14,7 @@ namespace Core.DomainModel.Advice
         itInterface = 3,
         dataProcessingRegistration = 4
     }
+
     public enum Scheduling
     {
        Immediate = 0,
@@ -21,9 +22,17 @@ namespace Core.DomainModel.Advice
        Day = 2,
        Week = 3,
        Month = 4,
-       Year = 5
-
+       Year = 5,
+       Quarter = 6,
+       Semiannual = 7
     }
+
+    public enum AdviceType
+    {
+        Immediate = 0,
+        Repeat = 1
+    }
+    
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
@@ -148,5 +157,10 @@ namespace Core.DomainModel.Advice
         /// Gets or sets the job id.
         /// </summary>
         public string JobId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the advice type
+        /// </summary>
+        public AdviceType AdviceType { get; set; }
     }
 }

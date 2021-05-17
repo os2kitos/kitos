@@ -347,6 +347,7 @@
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
+    <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
@@ -520,6 +521,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
@@ -880,6 +882,7 @@
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\AdviceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingRegistrationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\GetDateHelper.ts" />
@@ -905,6 +908,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\LocalAdmin.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Tabs\Advice.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
@@ -932,6 +936,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Tabs\ItSystemAdvice.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
@@ -1090,8 +1095,6 @@
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
-    <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
-    <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
