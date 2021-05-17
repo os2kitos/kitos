@@ -53,7 +53,7 @@ namespace Core.DomainServices.SystemUsage
         {
             destination.SourceEntityId = source.Id;
             destination.OrganizationId = source.OrganizationId;
-            destination.Name = source.ItSystem.Name;
+            destination.SystemName = source.ItSystem.Name;
             destination.ItSystemDisabled = source.ItSystem.Disabled;
             destination.IsActive = source.IsActive;
             destination.Version = source.Version;

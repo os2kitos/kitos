@@ -31,5 +31,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
+
+        public static async Task<HttpResponseMessage> SendDeleteConfigurationRequestAsync(int orgId, OverviewType overviewType, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/kendo-organizational-configuration?organizationId={orgId}&overviewType={overviewType}");
+
+            return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
     }
 }

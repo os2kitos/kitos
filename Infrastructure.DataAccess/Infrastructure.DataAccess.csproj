@@ -698,13 +698,13 @@
     <Compile Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.designer.cs">
       <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105101437124_Fix_Advice_IsActive.cs" />
-    <Compile Include="Migrations\202105101437124_Fix_Advice_IsActive.designer.cs">
-      <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
+    <Compile Include="Migrations\202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.cs" />
+    <Compile Include="Migrations\202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.designer.cs">
+      <DependentUpon>202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105120831331_Added_Advicetype_To_Advice.cs" />
-    <Compile Include="Migrations\202105120831331_Added_Advicetype_To_Advice.designer.cs">
-      <DependentUpon>202105120831331_Added_Advicetype_To_Advice.cs</DependentUpon>
+    <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.cs" />
+    <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.designer.cs">
+      <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1145,11 +1145,11 @@
     <EmbeddedResource Include="Migrations\202104281135550_Add_KendoOverviewConfiguration.resx">
       <DependentUpon>202104281135550_Add_KendoOverviewConfiguration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105101437124_Fix_Advice_IsActive.resx">
-      <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.resx">
+      <DependentUpon>202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105120831331_Added_Advicetype_To_Advice.resx">
-      <DependentUpon>202105120831331_Added_Advicetype_To_Advice.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105171042142_Added_Advicetype_To_Advice.resx">
+      <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

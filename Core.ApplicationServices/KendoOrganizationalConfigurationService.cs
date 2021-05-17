@@ -56,5 +56,24 @@ namespace Core.ApplicationServices
                 return created;
             }
         }
+
+        public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId, OverviewType overviewType)
+        {
+            var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
+
+            if (currentConfig.HasValue)
+            {
+                var configToBeDeleted = currentConfig.Value;
+                if (!_authorizationContext.AllowDelete(configToBeDeleted))
+                    return new OperationError(OperationFailure.Forbidden);
+
+                _kendoOrganizationRepository.Delete(configToBeDeleted);
+                return configToBeDeleted;
+            }
+            else
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+        }
     }
 }

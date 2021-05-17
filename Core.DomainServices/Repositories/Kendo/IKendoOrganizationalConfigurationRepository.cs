@@ -9,5 +9,6 @@ namespace Core.DomainServices.Repositories.Kendo
         public Maybe<KendoOrganizationalConfiguration> Get(int organizationId, OverviewType overviewType);
         public void Update(KendoOrganizationalConfiguration modifiedConfig);
         public KendoOrganizationalConfiguration Add(KendoOrganizationalConfiguration createdConfig);
+        void Delete(KendoOrganizationalConfiguration configToDelete);
     }
 }
