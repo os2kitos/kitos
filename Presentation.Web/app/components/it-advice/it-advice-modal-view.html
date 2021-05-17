@@ -23,8 +23,7 @@
 
                 <div class="form-group">
                     <label for="contract-note" class="control-label">Til modtager via email</label>
-                    <input id="toExternal" type="email" name="toExternal" data-ng-disabled="!isEditable()" placeholder="Skriv email" class="form-control" data-ng-model="externalTo">
-
+                    <input id="toExternal" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex">
                 </div>
 
                 <!--CC('ere)-->
@@ -42,7 +41,7 @@
                 <div class="form-group">
                     <div>
                         <label for="contract-note" class="control-label">CC modtager via email</label>
-                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalCC">
+                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalCC" ng-pattern="multipleEmailValidationRegex">
                     </div>
                 </div>
             </div>

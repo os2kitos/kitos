@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.Advice;
@@ -23,6 +24,8 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
+        private readonly Regex emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
@@ -37,6 +40,11 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
+            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !emailValidationRegex.IsMatch(x.Name)))
+            {
+                return BadRequest("Invalid email exists among receivers or CCs");
+            }
+
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
