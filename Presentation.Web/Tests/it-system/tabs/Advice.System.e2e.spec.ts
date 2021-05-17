@@ -10,7 +10,7 @@ var waitUpTo = new WaitTimers();
 var testFixture = new TestFixtureWrapper();
 
 
-describe("Is able to create advice and edit advice",
+describe("Is able to create advice",
     () => {
         var loginHelper = new login();
         var itSystemName = createItSystemName();
