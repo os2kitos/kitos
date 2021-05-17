@@ -23,6 +23,10 @@ class LocalItSystemNavigation {
     public static openGDPRPage() {
         return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.GPDRSref);
     }
+
+    public static openAdvicePage() {
+        return LocalItSystemNavigation.navigation.goToSubMenuElement(LocalItSystemNavigationSrefs.adviceSref);
+    }
 }
 
 export = LocalItSystemNavigation;
@@ -33,4 +37,5 @@ class LocalItSystemNavigationSrefs {
     static relationsSref = "it-system.usage.relation";
     static archivingSref = "it-system.usage.archiving";
     static GPDRSref = "it-system.usage.GDPR";
+    static adviceSref = "it-system.usage.advice";
 }

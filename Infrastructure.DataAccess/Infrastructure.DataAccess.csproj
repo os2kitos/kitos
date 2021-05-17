@@ -703,6 +703,10 @@
     <Compile Include="Migrations\202105101437124_Fix_Advice_IsActive.designer.cs">
       <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105120831331_Added_Advicetype_To_Advice.cs" />
+    <Compile Include="Migrations\202105120831331_Added_Advicetype_To_Advice.designer.cs">
+      <DependentUpon>202105120831331_Added_Advicetype_To_Advice.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\202105141131577_Add_OversightDates_To_DPR.cs" />
     <Compile Include="Migrations\202105141131577_Add_OversightDates_To_DPR.designer.cs">
       <DependentUpon>202105141131577_Add_OversightDates_To_DPR.cs</DependentUpon>
@@ -1148,6 +1152,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202105101437124_Fix_Advice_IsActive.resx">
       <DependentUpon>202105101437124_Fix_Advice_IsActive.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105120831331_Added_Advicetype_To_Advice.resx">
+      <DependentUpon>202105120831331_Added_Advicetype_To_Advice.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202105141131577_Add_OversightDates_To_DPR.resx">
       <DependentUpon>202105141131577_Add_OversightDates_To_DPR.cs</DependentUpon>
