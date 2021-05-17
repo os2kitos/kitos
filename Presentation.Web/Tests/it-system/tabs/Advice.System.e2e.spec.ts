@@ -36,7 +36,6 @@ describe("Is able to create advice and delete advice",
 
         it("Is able to create a new instant and repetition advice and delete a advice",
             () => {
-
                 adviceHelper.goToSpecificItSystemAdvice(itSystemName)
                     .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectText1, "Uge"))
                     .then(() => verifyAdviceWasCreated(subjectText1))
