@@ -208,7 +208,7 @@
                                         $scope.name = adviceData.Name;
                                         $scope.subject = adviceData.Subject;
                                         $scope.emailBody = adviceData.Body;
-                                        $scope.repitionPattern = adviceData.Scheduling;
+                                        $scope.scheduling = adviceData.Scheduling;
                                         $scope.startDate = adviceData.AlarmDate;
                                         $scope.stopDate = adviceData.StopDate;
                                         $scope.hiddenForjob = adviceData.JobId;
@@ -248,13 +248,14 @@
                                     var url = "";
                                     var payload = createPayload();
                                     payload.Name = $scope.name;
-                                    payload.Scheduling = $scope.repitionPattern;
+                                    payload.Scheduling = $scope.scheduling;
                                     payload.AlarmDate = dateString2Date($scope.startDate);
                                     payload.StopDate = dateString2Date($scope.stopDate);
                                     payload.StopDate.setHours(23, 59, 59, 99);
                                     if (action === "POST") {
                                         url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                                         httpCall(payload, action, url);
+
                                     } else if (action === "PATCH") {
                                         payload.Reciepients = undefined;
                                         url = `Odata/advice(${id})`;
@@ -291,8 +292,15 @@
                                     }
                                 };
 
-                                $scope.isEditable = () => {
-                                    return $scope.hasWriteAccess && $scope.isActive;
+                                $scope.isEditable = (context = "") => {
+                                    const editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
+                                    if (editableInGeneral) {
+                                        if (context === "Name" || context === "Subject" || context === "StopDate") {
+                                            return true;
+                                        }
+                                        return false;
+                                    }
+                                    return editableInGeneral;
                                 };
 
                                 $scope.checkErrStart = (startDate, endDate) => {
