@@ -31,7 +31,7 @@ namespace Core.ApplicationServices
         /// Sends the specified mail.
         /// </summary>
         /// <param name="message">The message.</param>
-        public void Send(MailMessage message)
+        public virtual void Send(MailMessage message)
         {
             _client.Send(message);
         }

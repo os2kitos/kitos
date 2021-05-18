@@ -18,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             //Arrange
             var recipient = new Core.DomainModel.Advice.AdviceUserRelation
             {
-                Name = $"{A<string>()}@test.dk",
+                Name = createWellformedEmail(),
                 RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
                 RecpientType = Core.DomainModel.Advice.RecieverType.USER
             };
@@ -49,19 +49,19 @@ namespace Tests.Integration.Presentation.Web.Advice
             //Arrange
             var recipient1 = new Core.DomainModel.Advice.AdviceUserRelation
             {
-                Name = $"{A<string>()}@test.dk",
+                Name = createWellformedEmail(),
                 RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
                 RecpientType = Core.DomainModel.Advice.RecieverType.USER
             };
             var recipient2 = new Core.DomainModel.Advice.AdviceUserRelation
             {
-                Name = $"{A<string>()}@test.dk",
+                Name = createWellformedEmail(),
                 RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
                 RecpientType = Core.DomainModel.Advice.RecieverType.USER
             };
             var recipient3 = new Core.DomainModel.Advice.AdviceUserRelation
             {
-                Name = $"{A<string>()}@test.dk",
+                Name = createWellformedEmail(),
                 RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
                 RecpientType = Core.DomainModel.Advice.RecieverType.USER
             };
@@ -116,6 +116,11 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        private string createWellformedEmail()
+        {
+            return $"{A<string>()}@test.dk";
         }
     }
 }

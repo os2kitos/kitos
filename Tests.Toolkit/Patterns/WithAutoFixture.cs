@@ -23,6 +23,11 @@ namespace Tests.Toolkit.Patterns
             return _fixture.Create<T>();
         }
 
+        protected T Freeze<T>()
+        {
+            return _fixture.Freeze<T>();
+        }
+
         protected IEnumerable<T> Many<T>(int? howMany = null)
         {
             return howMany.HasValue ? _fixture.CreateMany<T>(howMany.Value) : _fixture.CreateMany<T>();

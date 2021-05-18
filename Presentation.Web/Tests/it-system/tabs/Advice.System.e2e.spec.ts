@@ -10,7 +10,7 @@ var waitUpTo = new WaitTimers();
 var testFixture = new TestFixtureWrapper();
 
 
-describe("Is able to create advice",
+describe("Is able to create advice and delete advice",
     () => {
         var loginHelper = new login();
         var itSystemName = createItSystemName();
@@ -34,14 +34,15 @@ describe("Is able to create advice",
             testFixture.cleanupState();
         });
 
-        it("Is able to create a new instant and repetition advice",
+        it("Is able to create a new instant and repetition advice and delete a advice",
             () => {
-
                 adviceHelper.goToSpecificItSystemAdvice(itSystemName)
-                    .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectText1,"Uge"))
+                    .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectText1, "Uge"))
                     .then(() => verifyAdviceWasCreated(subjectText1))
-                    .then(() => adviceHelper.createNewInstantAdvice(email,subjectText2))
-                    .then(() => verifyAdviceWasCreated(subjectText2));
+                    .then(() => adviceHelper.createNewInstantAdvice(email, subjectText2))
+                    .then(() => verifyAdviceWasCreated(subjectText2))
+                    .then(() => adviceHelper.deleteAdvice(subjectText2))
+                    .then(() => verifyAdviceWasDeleted(subjectText2));
             });
     });
 
@@ -65,4 +66,11 @@ function verifyAdviceWasCreated(subjectName: string) {
     console.log(`waiting for ${subjectName} to appear`);
     return browser.wait(element(by.xpath(`.//*[@id="mainGrid"]//span[text() = ${subjectName}]//text()`)).isPresent(),
         waitUpTo.twentySeconds);
+}
+
+function verifyAdviceWasDeleted(subjectName: string) {
+    console.log(`verifying that ${subjectName} has been deleted`);
+    return expect(browser.wait(
+        element(by.xpath(`.//*[@id="mainGrid"]//span[text() = ${subjectName}]//text()`)).isPresent(),
+        waitUpTo.oneSecond)).toBe(false);
 }
