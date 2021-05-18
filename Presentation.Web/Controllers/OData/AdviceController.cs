@@ -85,52 +85,53 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
-            var response = base.Patch(key, delta);
-
-            if (response.GetType() == typeof(UpdatedODataResult<Advice>))
+            try
             {
-                try
+                var advice = delta.GetInstance();
+
+                if (!advice.IsActive)
                 {
-                    var advice = delta.GetInstance();
+                    throw new ArgumentException(
+                        "Cannot update inactive advice ");
+                }
 
-                    var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
-                    if (advice.Scheduling == Scheduling.Immediate)
+                var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
+                if (advice.Scheduling == Scheduling.Immediate)
+                {
+                    if (changedPropertyNames.All(IsImmediateEditableProperty))
                     {
-                        if (changedPropertyNames.All(IsImmediateEditableProperty))
-                        {
-                            throw new ArgumentException(
-                                "For immediate advices editing is only allowed for name and subject");
-                        }
-                    } 
-                    if (advice.Scheduling != Scheduling.Immediate) 
+                        throw new ArgumentException(
+                            "For immediate advices editing is only allowed for name and subject");
+                    }
+                } 
+                if (advice.Scheduling != Scheduling.Immediate) 
+                {
+                    if (changedPropertyNames.All(IsRecurringEditableProperty))
                     {
-                        if (changedPropertyNames.All(IsRecurringEditableProperty))
-                        {
-                            throw new ArgumentException(
-                                "For recurring advices editing is only allowed for name, subject and stop date");
-                        }
-
-                        if (changedPropertyNames.Contains("StopDate"))
-                        {
-                            if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
-                            {
-                                throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
-                            }
-                        }
+                        throw new ArgumentException(
+                            "For recurring advices editing is only allowed for name, subject and stop date");
                     }
 
-                    DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
+                    if (changedPropertyNames.Contains("StopDate"))
+                    {
+                        if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
+                        {
+                            throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
+                        }
+                    }
+                }
 
-                    BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorException("Failed to update advice", e);
-                    return InternalServerError(e);
-                }
+                var response = base.Patch(key, delta);
+                DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
+                BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+
+                return response;
             }
-
-            return response;
+            catch (Exception e)
+            {
+                Logger.ErrorException("Failed to update advice", e);
+                return InternalServerError(e);
+            }
         }
 
         public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
