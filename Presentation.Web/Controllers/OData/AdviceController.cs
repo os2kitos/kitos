@@ -37,6 +37,19 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
+            if (advice.AdviceType == AdviceType.Immediate)
+            {
+
+            }
+            else if (advice.AdviceType == AdviceType.Repeat)
+            {
+                if (advice.AlarmDate.Value.Date < DateTime.Now.Date)
+                {
+                    return BadRequest("Start date is set before today");
+                }
+            }
+
+
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
@@ -70,6 +83,7 @@ namespace Presentation.Web.Controllers.OData
             }
             else if(advice.AdviceType == AdviceType.Repeat)
             {
+
                 BackgroundJob.Schedule(
                     () => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value,
                         advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
