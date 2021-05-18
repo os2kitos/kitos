@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 Id = A<int>(), 
                 Subject = A<string>(),
-                Scheduling = Scheduling.Immediate
+                AdviceType = AdviceType.Immediate
             };
             SetupAdviceRepository(immediateAdvice);
             var mailClient = Freeze<Mock<MailClient>>();
@@ -48,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 Id = A<int>(), 
                 Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
                 StopDate = DateTime.Now.AddDays(-1)
