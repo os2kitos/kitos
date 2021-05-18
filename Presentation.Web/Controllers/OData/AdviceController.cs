@@ -94,22 +94,16 @@ namespace Presentation.Web.Controllers.OData
                     throw new ArgumentException(
                         "Cannot update inactive advice ");
                 }
-
-                var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
                 if (advice.AdviceType == AdviceType.Immediate)
                 {
-                    if (changedPropertyNames.All(IsImmediateEditableProperty))
-                    {
-                        throw new ArgumentException(
-                            "For immediate advices editing is only allowed for name and subject");
-                    }
+                    throw new ArgumentException("Editing is not allowed for immediate advice");
                 } 
                 if (advice.AdviceType == AdviceType.Repeat) 
                 {
+                    var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
                     if (changedPropertyNames.All(IsRecurringEditableProperty))
                     {
-                        throw new ArgumentException(
-                            "For recurring advices editing is only allowed for name, subject and stop date");
+                        throw new ArgumentException("For recurring advices editing is only allowed for name, subject and stop date");
                     }
 
                     if (changedPropertyNames.Contains("StopDate"))
@@ -139,14 +133,9 @@ namespace Presentation.Web.Controllers.OData
             RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
 
-        private static bool IsImmediateEditableProperty(string name)
-        {
-            return name.Equals("Name") || name.Equals("Subject");
-        }
-
         private static bool IsRecurringEditableProperty(string name)
         {
-            return IsImmediateEditableProperty(name) || name.Equals("StopDate");
+            return name.Equals("Name") || name.Equals("Subject") || name.Equals("StopDate");
         }
 
         [EnableQuery]
