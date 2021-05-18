@@ -16,12 +16,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Can_Add_Advice()
         {
             //Arrange
-            var recipient = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = createWellformedEmail(),
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
+            var recipient = createDefaultEmailRecipient();
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Body = A<string>(),
@@ -47,24 +42,9 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Can_Add_Advice_With_Multiple_Email_Receievers()
         {
             //Arrange
-            var recipient1 = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = createWellformedEmail(),
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
-            var recipient2 = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = createWellformedEmail(),
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
-            var recipient3 = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = createWellformedEmail(),
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
+            var recipient1 = createDefaultEmailRecipient();
+            var recipient2 = createDefaultEmailRecipient();
+            var recipient3 = createDefaultEmailRecipient();
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Body = A<string>(),
@@ -92,12 +72,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Advice_When_Emails_Are_Malformed()
         {
             //Arrange
-            var recipient = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = A<string>(), //Malformed email
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
+            var recipient = createDefaultEmailRecipient();
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Body = A<string>(),
@@ -116,6 +91,16 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        private Core.DomainModel.Advice.AdviceUserRelation createDefaultEmailRecipient()
+        {
+            return new Core.DomainModel.Advice.AdviceUserRelation
+            {
+                Name = A<string>(), //Malformed email
+                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
+                RecpientType = Core.DomainModel.Advice.RecieverType.USER
+            };
         }
 
         private string createWellformedEmail()
