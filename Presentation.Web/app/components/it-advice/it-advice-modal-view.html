@@ -23,8 +23,8 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="contract-note" class="control-label  small">Til modtager via email</label>
-                    <input id="toExternal" type="email" name="toExternal" data-ng-disabled="!isEditable('ToEmail')" placeholder="Skriv email" class="form-control input-sm" data-ng-model="externalTo" data-element-type="adviceEmailToInput">
+                    <label for="toExternal" class="control-label small">Til modtager via email</label>
+                    <input id="toExternal" type="text" data-ng-disabled="!isEditable('ToEmail')" placeholder="Skriv email" class="form-control input-sm" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailToInput">
                 </div>
 
                 <!--CC('ere)-->
