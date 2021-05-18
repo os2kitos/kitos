@@ -95,7 +95,7 @@
                                 if (hasWriteAccess) {
                                     return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
                                     <i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button class="btn-link" ng-disabled="${!canDelete}" data-ng-click="deleteAdvice(${dataItem.Id})"><i class="glyphicon glyphicon-trash"></i></button>`;
+                                    <button class="btn-link" ng-disabled="${!canDelete}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
                                 } else {
                                     return "Ingen rettigheder";
                                 }
@@ -424,12 +424,12 @@
 
                                 function createPayload() {
                                     const payload = {
-                                        Name: "",
+                                        Name: "Straks afsendt",
                                         Subject: $scope.subject,
                                         Body: $scope.emailBody,
                                         RelationId: object.id,
                                         Type: type,
-                                        Scheduling: "",
+                                        Scheduling: null,
                                         AdviceType: $scope.adviceTypeData.id,
                                         Reciepients: [],
                                         AlarmDate: null,
