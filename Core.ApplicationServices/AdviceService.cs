@@ -68,7 +68,6 @@ namespace Core.ApplicationServices
         {
             try
             {
-                var result = false;
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
                 if (advice != null)
                 {
@@ -96,7 +95,7 @@ namespace Core.ApplicationServices
                     AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                     AdviceSentRepository.Save();
                 }
-                return result;
+                return true;
             }
             catch (Exception e)
             {

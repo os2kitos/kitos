@@ -29,6 +29,8 @@
                     $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
+                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+"
+
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
                         $scope.receiverRoles = select2Roles;
@@ -59,14 +61,14 @@
                             $scope.preSelectedReceivers = [];
                             $scope.preSelectedCCs = [];
 
+                            const receivers = [];
                             const ccs = [];
                             for (let i = 0; i < adviceData.Reciepients.length; i++) {
                                 let recpientType = adviceData.Reciepients[i].RecpientType;
                                 let recieverType = adviceData.Reciepients[i].RecieverType;
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
                                     var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
-                                    var selectedReceiver = _.find(select2Roles,
-                                        x => x.text === nameOfRoleReceiver);
+                                    var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
                                     if (selectedReceiver !== undefined) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
                                     }
@@ -77,12 +79,13 @@
                                         $scope.preSelectedCCs.push(selectedCC);
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
-                                    $scope.externalTo = adviceData.Reciepients[i].Name;
+                                    receivers.push(adviceData.Reciepients[i].Name);
                                 } else if (recpientType === "USER" &&
                                     recieverType === "CC") {
                                     ccs.push(adviceData.Reciepients[i].Name);
                                 }
                             }
+                            $scope.externalTo = receivers.join(", ");
                             $scope.externalCC = ccs.join(", ");
                         }
                     }
@@ -281,7 +284,7 @@
 
                     function createPayload() {
                         const payload = {
-                            Name: "",
+                            Name: "Straks afsendt",
                             Subject: $scope.subject,
                             Body: $scope.emailBody,
                             RelationId: object.id,
