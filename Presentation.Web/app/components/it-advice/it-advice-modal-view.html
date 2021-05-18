@@ -77,7 +77,7 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
                     <input id="fromDate" type="text" name="fromDate" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!isEditable()" data-element-type="adviceStartDate">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable()" data-element-type="adviceStartDate">
                     <span>{{startDateErrMessage}}</span>
                 </div>
 
@@ -85,9 +85,8 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="toDate">Til dato</label>
                     <input id="toDate" type="text" name="toDate" placeholder="Stop dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
                     <span>{{stopDateErrMessage}}</span>
-                    <span>{{errMessage}}</span>
                 </div>
             </div>
 
@@ -111,6 +110,6 @@
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
         <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="validateInputs()">Gem</button>
-        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable('Deactivate')">Deaktiver</button>
+        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>
