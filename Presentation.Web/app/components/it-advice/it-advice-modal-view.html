@@ -75,16 +75,16 @@
 
                 <!--Dato-->
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
-                    <label class="control-label small" for="date">Fra dato <span class="text-danger">*</span></label>
-                    <input id="date" type="text" name="date" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
+                    <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
+                    <input id="fromDate" type="text" name="fromDate" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkErrStart(startDate,stopDate)' data-ng-disabled="!isEditable()" data-element-type="adviceStartDate">
                     <span>{{startDateErrMessage}}</span>
                 </div>
 
                 <!--Dato-->
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
-                    <label class="control-label small" for="stopDate">Til dato</label>
-                    <input id="date" type="text" name="stopDate" placeholder="Stop dato" class="form-control input-sm" data-kendo-date-picker
+                    <label class="control-label small" for="toDate">Til dato</label>
+                    <input id="toDate" type="text" name="toDate" placeholder="Stop dato" class="form-control input-sm" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkErrEnd(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
                     <span>{{stopDateErrMessage}}</span>
                     <span>{{errMessage}}</span>

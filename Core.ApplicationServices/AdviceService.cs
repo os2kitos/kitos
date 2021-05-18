@@ -68,31 +68,54 @@ namespace Core.ApplicationServices
         {
             try
             {
+                var result = false;
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
                 if (advice != null)
                 {
-                    if (advice.Scheduling == Scheduling.Immediate || 
-                        advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date)
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        return DispatchEmails(id, advice);
+                        try
+                        {
+                            DispatchEmails(advice);
+                        }
+                        catch (Exception e)
+                        {
+                            Logger?.Error(e, "Error sending emails in advice service");
+                        }
                     }
 
-                    if (advice.StopDate < DateTime.Now)
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
                     {
+                        advice.IsActive = false;
                         HangfireHelper.RemoveFromHangfire(advice);
-                        return false;
                     }
+
+                    AdviceRepository.Update(advice);
+                    AdviceRepository.Save();
+
+                    AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+                    AdviceSentRepository.Save();
                 }
-                return false;
+                return result;
             }
             catch (Exception e)
             {
-                Logger?.Error(e, "Error sending emails in advice service");
+                Logger?.Error(e, "General error sending emails in advice service");
                 return false;
             }
         }
 
-        private bool DispatchEmails(int id, Advice advice)
+        private static bool IsAdviceExpired(Advice advice)
+        {
+            return advice.StopDate < DateTime.Now;
+        }
+
+        private static bool IsAdviceInScope(Advice advice)
+        {
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date;
+        }
+
+        private void DispatchEmails(Advice advice)
         {
             var message = new MailMessage
             {
@@ -106,39 +129,32 @@ namespace Core.ApplicationServices
             {
                 switch (r.RecieverType)
                 {
-                    case RecieverType.RECIEVER when r.RecpientType == RecieverType.USER:
-                        AddRecipientByName(r, message, message.To);
+                    case RecieverType.RECIEVER:
+                        switch (r.RecpientType)
+                        {
+                            case RecieverType.USER:
+                                AddRecipientByName(r, message, message.To);
+                                break;
+                            case RecieverType.ROLE:
+                                AddRecipientByRole(advice, r, message, message.To);
+                                break;
+                        }
                         break;
-                    case RecieverType.CC when r.RecpientType == RecieverType.USER:
-                        AddRecipientByName(r, message, message.CC);
-                        break;
-                }
-
-                switch (r.RecieverType)
-                {
-                    case RecieverType.RECIEVER when r.RecpientType == RecieverType.ROLE:
-                        AddRecipientByRole(advice, r, message, message.To);
-                        break;
-                    case RecieverType.CC when r.RecpientType == RecieverType.ROLE:
-                        AddRecipientByRole(advice, r, message, message.CC);
+                    case RecieverType.CC:
+                        switch (r.RecpientType)
+                        {
+                            case RecieverType.USER:
+                                AddRecipientByName(r, message, message.CC);
+                                break;
+                            case RecieverType.ROLE:
+                                AddRecipientByRole(advice, r, message, message.CC);
+                                break;
+                        }
                         break;
                 }
             }
-
             MailClient.Send(message);
             advice.SentDate = DateTime.Now;
-            
-            AdviceRepository.Update(advice);
-            AdviceRepository.Save();
-
-            AdviceSentRepository.Insert(new AdviceSent
-            {
-                AdviceId = id,
-                AdviceSentDate = DateTime.Now
-            });
-            AdviceSentRepository.Save();
-
-            return true;
         }
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)

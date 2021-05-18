@@ -91,7 +91,7 @@
                         var url = "";
                         var payload = createPayload();
                         payload.Name = $scope.name;
-                        if ($scope.adviceTypeData.id === "1") {
+                        if (isCurrentAdviceRecurring()) {
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
@@ -105,19 +105,20 @@
                             payload.Reciepients = undefined;
                             url = `Odata/advice(${id})`;
                             $http.patch(url, JSON.stringify(payload))
-                                .then(() => {
-                                        notify.addSuccessMessage("Advisen er opdateret!");
-                                        $("#mainGrid").data("kendoGrid").dataSource.read();
-                                        $scope.$close(true);
-                                    },
-                                    () => {
-                                        () => {
-                                            notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!");
-                                        };
-                                    }
-                                );
+                                .then(() => { notify.addSuccessMessage("Advisen er opdateret!"); },
+                                      () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!"); });
+                            $("#mainGrid").data("kendoGrid").dataSource.read();
+                            $scope.$close(true);
                         }
                     };
+
+                    function isCurrentAdviceImmediate() {
+                        return $scope.adviceTypeData.id === "0";
+                    }
+
+                    function isCurrentAdviceRecurring() {
+                        return $scope.adviceTypeData.id === "1";
+                    }
 
                     $scope.send = () => {
                         var url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
@@ -139,7 +140,7 @@
 
                     $scope.isEditable = (context = "") => {
                         var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
-                        if (editableInGeneral && action === "PATCH") {
+                        if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" || context === "Subject" || context === "StopDate" || context === "Deactivate") {
                                 return true;
                             }
@@ -160,7 +161,7 @@
                         if ($scope.startDate && $scope.stopDate) {
                             if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
                                 $scope.errMessage =
-                                    "'Til Dato' skal være senere end eller samme som 'Fra dato'!";
+                                    "'Til Dato' skal være senere end eller samme som 'Fra Dato'!";
                                 return false;
                             }
                         } else {
@@ -179,7 +180,7 @@
                         $scope.curDate = new Date();
                         if (!moment($scope.stopDate, "dd-MM-yyyy").isValid() ||
                             $scope.stopDate == undefined) {
-                            $scope.stopDateErrMessage = "Til Dato er ugyldig!";
+                            $scope.stopDateErrMessage = "'Til Dato' er ugyldig!";
                             return false;
                         }
                         if ($scope.startDate && $scope.stopDate) {
@@ -215,33 +216,33 @@
                         if ($scope.adviceTypeData == null) {
                             return true;
                         }
-                        switch ($scope.adviceTypeData.id) {
-                            case "0":
-                                if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                    $scope.subject &&
-                                    $scope.isEditable()) {
-                                    return false;
-                                }
-                                else {
-                                    return true;
-                                }
-                            case "1":
-                                if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                    $scope.subject &&
-                                    $scope.adviceRepetitionData &&
-                                    $scope.stopDate &&
-                                    $scope.startDate &&
-                                    $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
-                                    $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
-                                    $scope.isEditable()) {
-                                    return false;
-                                }
-                                else {
-                                    return true;
-                                }
-                            default:
+
+                        if (isCurrentAdviceImmediate()) {
+                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                $scope.subject &&
+                                $scope.isEditable()) {
+                                return false;
+                            }
+                            else {
                                 return true;
+                            }
                         }
+                        if (isCurrentAdviceRecurring()) {
+                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                                $scope.subject &&
+                                $scope.adviceRepetitionData &&
+                                $scope.stopDate &&
+                                $scope.startDate &&
+                                $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
+                                $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
+                                $scope.isEditable()) {
+                                return false;
+                            }
+                            else {
+                                return true;
+                            }
+                        }
+                        return true;
                     }
 
                     function dateString2Date(dateString) {
@@ -285,7 +286,7 @@
                             Body: $scope.emailBody,
                             RelationId: object.id,
                             Type: type,
-                            Scheduling: "",
+                            Scheduling: null,
                             AdviceType: $scope.adviceTypeData.id,
                             Reciepients: [],
                             AlarmDate: null,
@@ -297,7 +298,7 @@
                         const writtenCCEmail = $scope.externalCC;
 
                         if ($scope.selectedReceivers != undefined) {
-                            for (var i = 0; i < $scope.selectedReceivers.length; i++) {
+                            for (let i = 0; i < $scope.selectedReceivers.length; i++) {
                                 payload.Reciepients.push(
                                     {
                                         Name: $scope.selectedReceivers[i].text,
@@ -309,7 +310,7 @@
                         }
 
                         if ($scope.selectedCCs != undefined) {
-                            for (var i = 0; i < $scope.selectedCCs.length; i++) {
+                            for (let i = 0; i < $scope.selectedCCs.length; i++) {
                                 payload.Reciepients.push(
                                     {
                                         Name: $scope.selectedCCs[i].text,
@@ -320,7 +321,7 @@
                             }
                         }
                         if (writtenEmail != undefined) {
-                            for (var i = 0; i < writtenEmail.split(",").length; i++) {
+                            for (let i = 0; i < writtenEmail.split(",").length; i++) {
                                 payload.Reciepients.push(
                                     {
                                         Name: writtenEmail.split(",")[i],
@@ -331,7 +332,7 @@
                             }
                         }
                         if (writtenCCEmail != undefined) {
-                            for (var i = 0; i < writtenCCEmail.split(",").length; i++) {
+                            for (let i = 0; i < writtenCCEmail.split(",").length; i++) {
                                 payload.Reciepients.push(
                                     {
                                         Name: writtenCCEmail.split(",")[i],

@@ -96,7 +96,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
-                if (advice.Scheduling == Scheduling.Immediate)
+                if (advice.AdviceType == AdviceType.Immediate)
                 {
                     if (changedPropertyNames.All(IsImmediateEditableProperty))
                     {
@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.OData
                             "For immediate advices editing is only allowed for name and subject");
                     }
                 } 
-                if (advice.Scheduling != Scheduling.Immediate) 
+                if (advice.AdviceType == AdviceType.Repeat) 
                 {
                     if (changedPropertyNames.All(IsRecurringEditableProperty))
                     {

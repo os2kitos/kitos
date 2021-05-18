@@ -161,20 +161,20 @@
                         () => notify.addErrorMessage("Fejl! Kunne ikke slette!"));
                 };
 
-                $scope.newAdvice = (action, id) => {
+            $scope.newAdvice = (action, id) => {
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.action = action;
-                    var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
-                    modalInstance.result.then(angular.noop, angular.noop);
-                };
+                var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
+                modalInstance.result.then(angular.noop, angular.noop);
+            };
 
-                function onChange(arg) {
-                    const grid = $("#mainGrid").data("kendoGrid");
-                    const selectedItem = grid.dataItem(grid.select());
-                    $("#detailGrid").data("kendoGrid").dataSource.transport.options.read.url =
-                        `/Odata/adviceSent?$filter=AdviceId eq ${selectedItem.Id}`;
-                    $("#detailGrid").data("kendoGrid").dataSource.read();
-                };
-                }
-        ]);
+            function onChange(arg) {
+                const grid = $("#mainGrid").data("kendoGrid");
+                const selectedItem = grid.dataItem(grid.select());
+                $("#detailGrid").data("kendoGrid").dataSource.transport.options.read.url =
+                    `/Odata/adviceSent?$filter=AdviceId eq ${selectedItem.Id}`;
+                $("#detailGrid").data("kendoGrid").dataSource.read();
+            };
+        }
+    ]);
 })(angular, app);
