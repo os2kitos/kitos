@@ -5,25 +5,22 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Hangfire;
 using Ninject;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Core.ApplicationServices.Helpers;
 using Core.DomainModel.GDPR;
-using Core.DomainServices.Extensions;
+using Core.DomainModel.ItSystemUsage;
+using Ninject.Extensions.Logging;
 
 namespace Core.ApplicationServices
 {
-    using DomainModel.ItSystemUsage;
-    using Ninject.Extensions.Logging;
-
     public class AdviceService : IAdviceService
     {
         [Inject]
-        public MailClient MailClient { get; set; }
+        public IMailClient MailClient { get; set; }
 
         [Inject]
         public IGenericRepository<User> UserRepository { get; set; }
@@ -64,149 +61,100 @@ namespace Core.ApplicationServices
         [Inject]
         public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
-        public AdviceService() { }
+        [Inject]
+        public IHangfireHelper HangfireHelper { get; set; }
 
         public bool SendAdvice(int id)
         {
-
-            var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
-
-            if (advice != null)
+            try
             {
-                if (advice.Scheduling == Scheduling.Immediate)
+                var result = false;
+                var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+                if (advice != null)
                 {
-                    try
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        //Setup mail
-                        MailMessage message = new MailMessage()
+                        try
                         {
-                            Body = advice.Body,
-                            Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8,
-                            IsBodyHtml = true
-                        };
-
-
-
-                        //Add recivers for Email
-                        foreach (var r in advice.Reciepients)
+                            DispatchEmails(advice);
+                        }
+                        catch (Exception e)
                         {
-                            //add To's
-                            if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.USER)
-                            {
+                            Logger?.Error(e, "Error sending emails in advice service");
+                        }
+                    }
+
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
+                    {
+                        advice.IsActive = false;
+                        HangfireHelper.RemoveFromHangfire(advice);
+                    }
+
+                    AdviceRepository.Update(advice);
+                    AdviceRepository.Save();
+
+                    AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+                    AdviceSentRepository.Save();
+                }
+                return result;
+            }
+            catch (Exception e)
+            {
+                Logger?.Error(e, "General error sending emails in advice service");
+                return false;
+            }
+        }
+
+        private static bool IsAdviceExpired(Advice advice)
+        {
+            return advice.StopDate < DateTime.Now;
+        }
+
+        private static bool IsAdviceInScope(Advice advice)
+        {
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date;
+        }
+
+        private void DispatchEmails(Advice advice)
+        {
+            var message = new MailMessage
+            {
+                Body = advice.Body,
+                Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
+                BodyEncoding = Encoding.UTF8,
+                IsBodyHtml = true
+            };
+
+            foreach (var r in advice.Reciepients)
+            {
+                switch (r.RecieverType)
+                {
+                    case RecieverType.RECIEVER:
+                        switch (r.RecpientType)
+                        {
+                            case RecieverType.USER:
                                 AddRecipientByName(r, message, message.To);
-                            }
-                            if (r.RecieverType == RecieverType.RECIEVER && r.RecpientType == RecieverType.ROLE)
-                            {
+                                break;
+                            case RecieverType.ROLE:
                                 AddRecipientByRole(advice, r, message, message.To);
-                            }
-
-                            //ADD Role receivers
-                            if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.USER)
-                            {
+                                break;
+                        }
+                        break;
+                    case RecieverType.CC:
+                        switch (r.RecpientType)
+                        {
+                            case RecieverType.USER:
                                 AddRecipientByName(r, message, message.CC);
-                            }
-                            if (r.RecieverType == RecieverType.CC && r.RecpientType == RecieverType.ROLE)
-                            {
+                                break;
+                            case RecieverType.ROLE:
                                 AddRecipientByRole(advice, r, message, message.CC);
-                            }
+                                break;
                         }
-
-                        //Send Mail.
-                        MailClient.Send(message);
-                        advice.SentDate = DateTime.Now;
-
-                        AdviceRepository.Update(advice);
-                        AdviceRepository.Save();
-
-
-                        AdviceSentRepository.Insert(new AdviceSent()
-                        {
-                            AdviceId = id,
-                            AdviceSentDate = DateTime.Now
-                        });
-
-                        AdviceSentRepository.Save();
-
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        this.Logger?.Error(e, "Error in Advis service");
-                        return false;
-                    }
-                }
-
-                if (advice.StopDate < DateTime.Now)
-                {
-                    RecurringJob.RemoveIfExists(advice.JobId);
-                    return false;
-                }
-                if (advice.AlarmDate.Value.Date <= DateTime.Now.Date)
-                {
-                    try
-                    {
-                        //Setup mail//Setup mail
-                        var message = new MailMessage()
-                        {
-                            Body = advice.Body,
-                            Subject = (advice.Subject).Replace('\r', ' ').Replace('\n', ' '),
-                            BodyEncoding = Encoding.UTF8,
-                            IsBodyHtml = true
-                        };
-                        //  message.From = new MailAddress("no_reply@kitos.dk");
-
-                        //Add recivers for Email
-                        foreach (var r in advice.Reciepients)
-                        {
-                            switch (r.RecieverType)
-                            {
-                                case RecieverType.RECIEVER when r.RecpientType == RecieverType.USER:
-                                    AddRecipientByName(r, message, message.To);
-                                    break;
-                                case RecieverType.CC when r.RecpientType == RecieverType.USER:
-                                    AddRecipientByName(r, message, message.CC);
-                                    break;
-                            }
-
-                            switch (r.RecieverType)
-                            {
-                                case RecieverType.RECIEVER when r.RecpientType == RecieverType.ROLE:
-                                    AddRecipientByRole(advice, r, message, message.To);
-                                    break;
-                                case RecieverType.CC when r.RecpientType == RecieverType.ROLE:
-                                    AddRecipientByRole(advice, r, message, message.CC);
-                                    break;
-                            }
-                        }
-
-                        //Send Mail.
-                        MailClient.Send(message);
-                        advice.SentDate = DateTime.Now;
-
-                        AdviceRepository.Update(advice);
-                        AdviceRepository.Save();
-
-
-                        AdviceSentRepository.Insert(new AdviceSent()
-                        {
-                            AdviceId = id,
-                            AdviceSentDate = DateTime.Now
-                        });
-
-                        AdviceSentRepository.Save();
-
-                        return true;
-                    }
-                    catch (Exception e)
-                    {
-                        this.Logger?.Error(e, "Error in Advis service");
-                        return false;
-                    }
+                        break;
                 }
             }
-
-            return false;
+            MailClient.Send(message);
+            advice.SentDate = DateTime.Now;
         }
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)

@@ -44,8 +44,11 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoFixture, Version=4.13.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoFixture.4.13.0\lib\net452\AutoFixture.dll</HintPath>
+    <Reference Include="AutoFixture, Version=4.17.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.4.17.0\lib\net452\AutoFixture.dll</HintPath>
+    </Reference>
+    <Reference Include="AutoFixture.AutoMoq, Version=4.17.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoFixture.AutoMoq.4.17.0\lib\net452\AutoFixture.AutoMoq.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\packages\Castle.Core.4.4.1\lib\net45\Castle.Core.dll</HintPath>
@@ -161,6 +164,7 @@
     <Compile Include="..\Tests.Unit.Presentation.Web\Helpers\UserMock.cs">
       <Link>UserMock.cs</Link>
     </Compile>
+    <Compile Include="ApplicationServices\AdviceServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
