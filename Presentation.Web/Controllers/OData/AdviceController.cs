@@ -82,8 +82,9 @@ namespace Presentation.Web.Controllers.OData
             _repository.Save();
         }
 
+        [HttpPatch]
         [EnableQuery]
-        public override IHttpActionResult Patch(int key, Delta<Advice> delta)
+        public override IHttpActionResult Patch(int key, [FromBody] Delta<Advice> delta)
         {
             try
             {
