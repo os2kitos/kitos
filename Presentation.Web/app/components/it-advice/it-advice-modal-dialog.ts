@@ -155,10 +155,14 @@
                     $scope.checkErrStart = (startDate, endDate) => {
                         $scope.errMessage = "";
                         $scope.startDateErrMessage = "";
-                        $scope.curDate = new Date();
+                        $scope.curDate = getCurrentDate();
                         if (!moment($scope.startDate, "dd-MM-yyyy").isValid() ||
                             $scope.startDate == undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                            return false;
+                        }
+                        if (dateString2Date($scope.startDate) < $scope.curDate) {
+                            $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
                             return false;
                         }
                         if ($scope.startDate && $scope.stopDate) {
@@ -180,12 +184,12 @@
                     $scope.checkErrEnd = (startDate, endDate) => {
                         $scope.errMessage = "";
                         $scope.stopDateErrMessage = "";
-                        $scope.curDate = new Date();
                         if (!moment($scope.stopDate, "dd-MM-yyyy").isValid() ||
                             $scope.stopDate == undefined) {
                             $scope.stopDateErrMessage = "'Til Dato' er ugyldig!";
                             return false;
                         }
+
                         if ($scope.startDate && $scope.stopDate) {
                             if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
                                 $scope.errMessage =
@@ -251,9 +255,15 @@
                     function dateString2Date(dateString) {
                         const dt = dateString.split("-");
                         if (dt[2].length > 4) {
-                            return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2));
+                            return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2)).toLocaleDateString(
+                                'en-GB');
+
                         }
-                        return new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2));
+                        return new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2)).toLocaleDateString('en-GB');
+                    }
+
+                    function getCurrentDate() {
+                        return new Date().toLocaleDateString('en-GB');
                     }
 
                     function httpCall(payload, action, url) {
