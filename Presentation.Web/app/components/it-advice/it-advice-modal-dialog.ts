@@ -33,6 +33,8 @@
 
                     $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+"
 
+                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
+
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
                         $scope.receiverRoles = select2Roles;
@@ -40,15 +42,16 @@
                         $scope.showRoleFields = false;
                     }
                     if (action === "POST") {
+                        $scope.showDeactivate = false;
                         $scope.advisName = "Opret advis";
-                        $scope.hideSend = false;
                         $scope.isActive = true;
                         $scope.emailBody =
                             `<a href='${$window.location.href.replace("advice", "main")}'>Link til ${type
                             }</a>`;
                     }
                     if (action === "PATCH") {
-                        $scope.hideSend = true;
+                        $scope.newAdvice = false;
+                        $scope.showDeactivate = true;
                         $scope.advisName = "Rediger advis";
                         if (id != undefined) {
                             $scope.name = adviceData.Name;
@@ -86,7 +89,7 @@
                                     ccs.push(adviceData.Reciepients[i].Name);
                                 }
                             }
-                            $scope.externalTo = receivers.join(", ");
+                            $scope.externalTo = receivers.length === 0 ? undefined : receivers.join(", ");
                             $scope.externalCC = ccs.length === 0 ? undefined : ccs.join(", ");
                         }
                     }
@@ -177,53 +180,41 @@
                         return editableInGeneral;
                     };
 
-                    $scope.checkErrStart = (startDate, endDate) => {
-                        $scope.errMessage = "";
+                    $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
+                        $scope.stopDateErrMessage = "";
                         $scope.curDate = new Date();
-                        if (!moment($scope.startDate, allowedDateFormats, true).isValid() ||
-                            $scope.startDate == undefined) {
+
+                        if ($scope.startDate === undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
                             return false;
                         }
-                        if ($scope.startDate && $scope.stopDate) {
-                            if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
-                                $scope.errMessage =
-                                    "'Til Dato' skal være senere end eller samme som 'Fra Dato'!";
+
+                        var start = moment($scope.startDate, allowedDateFormats, true);
+
+                        if (!start.isValid()) {
+                            $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                            return false;
+                        }
+
+                        if ($scope.stopDate !== undefined) {
+
+                            var stop = moment($scope.stopDate, allowedDateFormats, true);
+
+                            if (!stop.isValid()) {
+                                $scope.stopDateErrMessage = "Til Dato er ugyldig!";
                                 return false;
                             }
-                        } else {
-                            $scope.errMessage = "Begge dato felter skal udfyldes!";
-                            return false;
+
+                            if (start.isAfter(stop)) {
+                                $scope.stopDateErrMessage = "Til Dato skal være samme eller senere end Fra dato!";
+                                return false;
+                            }
+
                         }
 
                         $scope.startDateErrMessage = "";
-                        $scope.errMessage = "";
-                        return true;
-                    };
-
-                    $scope.checkErrEnd = (startDate, endDate) => {
-                        $scope.errMessage = "";
                         $scope.stopDateErrMessage = "";
-                        $scope.curDate = new Date();
-                        if (!moment($scope.stopDate, allowedDateFormats, true).isValid() ||
-                            $scope.stopDate == undefined) {
-                            $scope.stopDateErrMessage = "'Til Dato' er ugyldig!";
-                            return false;
-                        }
-                        if ($scope.startDate && $scope.stopDate) {
-                            if ((dateString2Date($scope.startDate) > dateString2Date($scope.stopDate))) {
-                                $scope.errMessage =
-                                    "'Til Dato' skal være senere end eller samme som 'Fra dato'!";
-                                return false;
-                            }
-                        } else {
-                            $scope.errMessage = "Begge dato felter skal udfyldes!";
-                            return false;
-                        }
-
-                        $scope.stopDateErrMessage = "";
-                        $scope.errMessage = "";
                         return true;
                     };
 
@@ -259,11 +250,8 @@
                             if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
                                 $scope.subject &&
                                 $scope.adviceRepetitionData &&
-                                $scope.stopDate &&
-                                $scope.startDate &&
-                                $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
-                                $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
-                                $scope.isEditable('Save')) {
+                                $scope.checkDates($scope.startDate, $scope.stopDate) &&
+                                $scope.isEditable('Deactivate')) {
                                 return false;
                             }
                             else {
