@@ -147,7 +147,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 Scheduling = Core.DomainModel.Advice.Scheduling.Day,
                 AdviceType = AdviceType.Repeat,
                 Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
-
+                {
                     recipient
                 },
                 RelationId = A<int>(),
@@ -160,7 +160,23 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        
 
+
+        }
+
+        private Core.DomainModel.Advice.AdviceUserRelation createDefaultEmailRecipient(string name)
+        {
+            return new Core.DomainModel.Advice.AdviceUserRelation
+            {
+                Name = name,
+                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
+                RecpientType = Core.DomainModel.Advice.RecieverType.USER
+            };
+        }
+
+        private string createWellformedEmail()
+        {
+            return $"{A<string>()}@test.dk";
+        }
     }
 }
