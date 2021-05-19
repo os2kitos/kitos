@@ -2,6 +2,8 @@
     "use strict";
 
     export function createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess) {
+        var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
+        
         return $modal.open({
             windowClass: "modal fade in",
             templateUrl: "app/components/it-advice/it-advice-modal-view.html",
@@ -80,13 +82,12 @@
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
                                     receivers.push(adviceData.Reciepients[i].Name);
-                                } else if (recpientType === "USER" &&
-                                    recieverType === "CC") {
+                                } else if (recpientType === "USER" && recieverType === "CC") {
                                     ccs.push(adviceData.Reciepients[i].Name);
                                 }
                             }
                             $scope.externalTo = receivers.join(", ");
-                            $scope.externalCC = ccs.join(", ");
+                            $scope.externalCC = ccs.length === 0 ? undefined : ccs.join(", ");
                         }
                     }
 
@@ -105,15 +106,31 @@
                             httpCall(payload, action, url);
 
                         } else if (action === "PATCH") {
-                            payload.Reciepients = undefined;
                             url = `Odata/advice(${id})`;
+                            // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
+                            patchAdviceUserRelation(id, payload);
+                            payload.Reciepients = undefined;
                             $http.patch(url, JSON.stringify(payload))
-                                .then(() => { notify.addSuccessMessage("Advisen er opdateret!"); },
-                                      () => { notify.addErrorMessage("Fejl! Kunne ikke opdatere modalen!"); });
-                            $("#mainGrid").data("kendoGrid").dataSource.read();
-                            $scope.$close(true);
+                                .then(
+                                    () => {
+                                        notify.addSuccessMessage("Advisen er opdateret!");
+                                        $("#mainGrid").data("kendoGrid").dataSource.read();
+                                        $scope.$close(true);
+                                    }, 
+                                    () => {
+                                        notify.addErrorMessage("Fejl! Kunne ikke opdatere advisen!");
+                                    }
+                                );
                         }
                     };
+
+                    function patchAdviceUserRelation(id, payload) {
+                        $http.delete('/api/AdviceUserRelation/DeleteByAdviceId?adviceId=' + id);
+                        for (var i = 0; i < payload.Reciepients.length; i++) {
+                            payload.Reciepients[i].adviceId = id;
+                            $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, payload.Reciepients[i]);
+                        }
+                    }
 
                     function isCurrentAdviceImmediate() {
                         return $scope.adviceTypeData.id === "0";
@@ -144,7 +161,15 @@
                     $scope.isEditable = (context = "") => {
                         var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
-                            if (context === "Name" || context === "Subject" || context === "StopDate" || context === "Deactivate") {
+                            if (context === "Name" || 
+                                context === "Subject" || 
+                                context === "StopDate" || 
+                                context === "Deactivate" ||
+                                context === "ToEmail" ||
+                                context === "ToRole" ||
+                                context === "CcEmail" ||
+                                context === "CcRole" ||
+                                context === "Save") {
                                 return true;
                             }
                             return false;
@@ -156,7 +181,7 @@
                         $scope.errMessage = "";
                         $scope.startDateErrMessage = "";
                         $scope.curDate = new Date();
-                        if (!moment($scope.startDate, "dd-MM-yyyy").isValid() ||
+                        if (!moment($scope.startDate, allowedDateFormats, true).isValid() ||
                             $scope.startDate == undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
                             return false;
@@ -181,7 +206,7 @@
                         $scope.errMessage = "";
                         $scope.stopDateErrMessage = "";
                         $scope.curDate = new Date();
-                        if (!moment($scope.stopDate, "dd-MM-yyyy").isValid() ||
+                        if (!moment($scope.stopDate, allowedDateFormats, true).isValid() ||
                             $scope.stopDate == undefined) {
                             $scope.stopDateErrMessage = "'Til Dato' er ugyldig!";
                             return false;
@@ -215,7 +240,7 @@
                         parseFormats: ["yyyy-MM-dd"]
                     };
                     
-                    $scope.validateInputs = () => {
+                    $scope.hasInputErrors = () => {
                         if ($scope.adviceTypeData == null) {
                             return true;
                         }
@@ -238,7 +263,7 @@
                                 $scope.startDate &&
                                 $scope.checkErrStart($scope.startDate, $scope.stopDate) &&
                                 $scope.checkErrEnd($scope.startDate, $scope.stopDate) &&
-                                $scope.isEditable()) {
+                                $scope.isEditable('Save')) {
                                 return false;
                             }
                             else {
@@ -284,6 +309,7 @@
 
                     function createPayload() {
                         const payload = {
+                            IsActive: $scope.isActive,
                             Name: "Straks afsendt",
                             Subject: $scope.subject,
                             Body: $scope.emailBody,

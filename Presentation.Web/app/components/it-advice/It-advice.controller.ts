@@ -163,7 +163,7 @@
                 $scope.newAdvice = (action, id) => {
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.action = action;
-                var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
+                    var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
                     modalInstance.result.then(angular.noop, angular.noop);
                 };
 
