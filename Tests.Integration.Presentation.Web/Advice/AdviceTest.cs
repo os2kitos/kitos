@@ -29,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = A<DateTime>()
+                AlarmDate = getRandomDate()
             };
 
             //Act
@@ -60,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient3
                 },
                 RelationId = A<int>(),
-                AlarmDate = A<DateTime>()
+                AlarmDate = getRandomDate()
             };
 
             //Act
@@ -87,7 +87,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = A<DateTime>()
+                AlarmDate = getRandomDate()
             };
 
             //Act
@@ -115,7 +115,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now,
-                StopDate = DateTime.Now.AddDays(7)
+                StopDate = getRandomDate()
             };
 
             //Act
@@ -142,7 +142,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = DateTime.Now.AddDays(7)
+                StopDate = getRandomDate()
             };
 
             //Act
@@ -150,9 +150,89 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-
-
         }
+
+        [Fact]
+        public async Task Cannot_Add_Repeatable_Advice_With_StartDate_Set_To_Null()
+        {
+            //Arrange
+            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var createAdvice = new Core.DomainModel.Advice.Advice
+            {
+                Body = A<string>(),
+                Subject = A<string>(),
+                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                AdviceType = AdviceType.Repeat,
+                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                {
+                    recipient
+                },
+                RelationId = A<int>(),
+                AlarmDate = null,
+                StopDate = getRandomDate()
+            };
+
+            //Act
+            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Add_Repeatable_Advice_With_StopDate_Set_To_Null()
+        {
+            //Arrange
+            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var createAdvice = new Core.DomainModel.Advice.Advice
+            {
+                Body = A<string>(),
+                Subject = A<string>(),
+                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                AdviceType = AdviceType.Repeat,
+                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                {
+                    recipient
+                },
+                RelationId = A<int>(),
+                AlarmDate = DateTime.Now,
+                StopDate = null
+            };
+
+            //Act
+            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Add_Repeatable_Advice_With_StopDate_Before_StartDate()
+        {
+            //Arrange
+            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var createAdvice = new Core.DomainModel.Advice.Advice
+            {
+                Body = A<string>(),
+                Subject = A<string>(),
+                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                AdviceType = AdviceType.Repeat,
+                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                {
+                    recipient
+                },
+                RelationId = A<int>(),
+                AlarmDate = DateTime.Now,
+                StopDate = DateTime.Now.AddDays(-1),
+            };
+
+            //Act
+            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
 
         private Core.DomainModel.Advice.AdviceUserRelation createDefaultEmailRecipient(string name)
         {
@@ -167,6 +247,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         private string createWellformedEmail()
         {
             return $"{A<string>()}@test.dk";
+        }
+
+        private DateTime getRandomDate()
+        {
+            return DateTime.Now.AddDays(A<int>());
         }
     }
 }

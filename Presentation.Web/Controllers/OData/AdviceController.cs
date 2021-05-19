@@ -51,9 +51,24 @@ namespace Presentation.Web.Controllers.OData
             }
             else if (advice.AdviceType == AdviceType.Repeat)
             {
+                if (advice.AlarmDate == null || advice.StopDate == null)
+                {
+                    return BadRequest("Start date is not set!");
+                }
+
+                if (advice.StopDate == null)
+                {
+                    return BadRequest("Stop date is not set!");
+                }
+
                 if (advice.AlarmDate.Value.Date < DateTime.Now.Date)
                 {
                     return BadRequest("Start date is set before today");
+                }
+
+                if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date)
+                {
+                    return BadRequest("Stop date is set before Start date");
                 }
             }
 
