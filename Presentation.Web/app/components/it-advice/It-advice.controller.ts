@@ -92,11 +92,10 @@
                         },
                         {
                             template: (dataItem) => {
-                                var canDelete = dataItem.AdviceSent.length === 0;
                                 if (hasWriteAccess) {
                                     return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
                                     <i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button class="btn-link" ng-disabled="${!canDelete}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
+                                    <button class="btn-link" ng-if="${!dataItem.IsActive}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
                                 } else {
                                     return "Ingen rettigheder";
                                 }
@@ -163,7 +162,7 @@
                 $scope.newAdvice = (action, id) => {
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.action = action;
-                var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
+                    var modalInstance = Kitos.ItAdvice.Modal.Create.createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess);
                     modalInstance.result.then(angular.noop, angular.noop);
                 };
 
