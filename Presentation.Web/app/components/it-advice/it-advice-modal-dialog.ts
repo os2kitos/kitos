@@ -275,7 +275,7 @@
                     }
 
                     function getCurrentDate() {
-                        return new moment(new Date()).format('DD-MM-YYYY');
+                        return moment(new Date()).format('DD-MM-YYYY');
                     }
 
                     function httpCall(payload, action, url) {
