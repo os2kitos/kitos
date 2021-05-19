@@ -267,11 +267,10 @@
                     function dateString2Date(dateString) {
                         const dt = dateString.split("-");
                         if (dt[2].length > 4) {
-                            return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2)).toLocaleDateString(
-                                'en-GB');
+                            return moment(new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2))).format('DD-MM-YYYY');
 
                         }
-                        return new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2)).toLocaleDateString('en-GB');
+                        return moment(new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2))).format('DD-MM-YYYY');
                     }
 
                     function getCurrentDate() {
