@@ -22,7 +22,7 @@ namespace Core.ApplicationServices.Notification
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
-            var userNotification = new UserNotification
+            var notification = new UserNotification
             {
                 Name = name,
                 NotificationMessage = message,
@@ -31,7 +31,8 @@ namespace Core.ApplicationServices.Notification
                 ObjectOwnerId = userToNotifyId
             };
 
-            var dataProcessingRegistration = _userNotificationRepository.Insert(userNotification);
+            var userNotification = _userNotificationRepository.Insert(notification);
+            _userNotificationRepository.Save();
             transaction.Commit();
             return userNotification;
         }
