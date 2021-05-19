@@ -18,13 +18,13 @@
                                              options="receiverRoles"
                                              selected="preSelectedReceivers"
                                              ng-model="selectedReceivers"
-                                             ng-disabled="!isEditable()">
+                                             ng-disabled="!isEditable('ToRole')">
                     </select2-multiple-option>
                 </div>
 
                 <div class="form-group">
                     <label for="toExternal" class="control-label small">Til modtager via email</label>
-                    <input id="toExternal" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailToInput">
+                    <input id="toExternal" type="text" data-ng-disabled="!isEditable('ToEmail')" placeholder="Skriv email" class="form-control input-sm" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailToInput">
                 </div>
 
                 <!--CC('ere)-->
@@ -35,14 +35,14 @@
                                              options="receiverRoles"
                                              selected="preSelectedCCs"
                                              ng-model="selectedCCs"
-                                             ng-disabled="!isEditable()">
+                                             ng-disabled="!isEditable('CcRole')">
                     </select2-multiple-option>
                 </div>
 
                 <div class="form-group">
                     <div>
                         <label for="cc" class="control-label small">CC modtager via email</label>
-                        <input id="cc" type="text" placeholder="Skriv email" class="form-control" data-ng-disabled="!isEditable()" data-ng-model="externalCC" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailCCToInput">
+                        <input id="cc" type="text" placeholder="Skriv email" class="form-control input-sm" data-ng-disabled="!isEditable('CcEmail')" data-ng-model="externalCC" data-element-type="adviceEmailCCToInput">
                     </div>
                 </div>
             </div>
@@ -109,7 +109,7 @@
     <div class="modal-footer">
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-        <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="validateInputs()">Gem</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
         <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>
