@@ -22,6 +22,7 @@ namespace Core.DomainServices.Model.EventHandlers
             {
                 _adviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
             }
+            _adviceRepository.Save();
         }
     }
 }
