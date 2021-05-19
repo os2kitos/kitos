@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.GDPR
 {
     public class CreateDataProcessingRegistrationOversightDateDTO
     {
-        public DateTime OversightDate { get; set; }
+        public DateTime? OversightDate { get; set; }
         public string OversightRemark { get; set; }
     }
 }

@@ -475,12 +475,12 @@ namespace Core.ApplicationServices.GDPR
             });
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime? oversightDate, string oversightRemark)
         {
             return Modify(id, registration => _oversightDateAssignmentService.Assign(registration, oversightDate, oversightRemark));
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime? oversightDate, string oversightRemark)
         {
             return Modify(id, registration => _oversightDateAssignmentService.Modify(registration, oversightDateId, oversightDate, oversightRemark));
         }

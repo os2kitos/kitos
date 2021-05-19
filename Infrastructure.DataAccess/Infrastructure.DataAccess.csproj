@@ -707,9 +707,9 @@
     <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.designer.cs">
       <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105171130585_Add_OversightDates_To_DPR.cs" />
-    <Compile Include="Migrations\202105171130585_Add_OversightDates_To_DPR.designer.cs">
-      <DependentUpon>202105171130585_Add_OversightDates_To_DPR.cs</DependentUpon>
+    <Compile Include="Migrations\202105190901085_Add_OversightDates_To_DPR.cs" />
+    <Compile Include="Migrations\202105190901085_Add_OversightDates_To_DPR.designer.cs">
+      <DependentUpon>202105190901085_Add_OversightDates_To_DPR.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1156,8 +1156,8 @@
     <EmbeddedResource Include="Migrations\202105171042142_Added_Advicetype_To_Advice.resx">
       <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105171130585_Add_OversightDates_To_DPR.resx">
-      <DependentUpon>202105171130585_Add_OversightDates_To_DPR.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105190901085_Add_OversightDates_To_DPR.resx">
+      <DependentUpon>202105190901085_Add_OversightDates_To_DPR.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

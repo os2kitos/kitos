@@ -7,7 +7,7 @@ namespace Core.DomainModel.GDPR
     {
         public int Id { get; set; }
 
-        public DateTime OversightDate { get; set; }
+        public DateTime? OversightDate { get; set; }
         public string OversightRemark { get; set; }
 
         public int ParentId { get; set; }

@@ -52,8 +52,8 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistration, OperationError> UpdateOversightOptionRemark(int id, string remark);
         Result<DataProcessingRegistration, OperationError> UpdateIsOversightCompleted(int id, YesNoUndecidedOption completed);
         Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark);
-        Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark);
-        Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
+        Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime? oversightDate, string oversightRemark);
+        Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime? oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
     }
 }

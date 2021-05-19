@@ -1,9 +1,9 @@
 ﻿namespace Infrastructure.DataAccess.Migrations
 {
+    using Infrastructure.DataAccess.Tools;
     using System;
     using System.Data.Entity.Migrations;
-    using Infrastructure.DataAccess.Tools;
-
+    
     public partial class Add_OversightDates_To_DPR : DbMigration
     {
         public override void Up()
@@ -13,7 +13,7 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        OversightDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
+                        OversightDate = c.DateTime(precision: 7, storeType: "datetime2"),
                         OversightRemark = c.String(),
                         ParentId = c.Int(nullable: false),
                     })
