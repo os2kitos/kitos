@@ -267,14 +267,19 @@
                     function dateString2Date(dateString) {
                         const dt = dateString.split("-");
                         if (dt[2].length > 4) {
-                            return moment(new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2))).format('DD-MM-YYYY');
+                            return formatDate(new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2)));
 
                         }
-                        return moment(new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2))).format('DD-MM-YYYY');
+                        return formatDate(new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2)));
                     }
 
                     function getCurrentDate() {
-                        return moment(new Date()).format('DD-MM-YYYY');
+                        return formatDate(new Date());
+
+                    }
+
+                    function formatDate(dateToFormat) {
+                        return moment(dateToFormat).format('DD-MM-YYYY');
                     }
 
                     function httpCall(payload, action, url) {
