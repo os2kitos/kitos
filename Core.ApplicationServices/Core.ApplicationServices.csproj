@@ -125,6 +125,8 @@
     <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
     <Compile Include="KLE\IKLEApplicationService.cs" />
+    <Compile Include="Notification\IUserNotificationService.cs" />
+    <Compile Include="Notification\UserNotificationService.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportService.cs" />
     <Compile Include="Qa\IBrokenExternalReferencesReportService.cs" />
     <Compile Include="KLE\KLEApplicationService.cs" />

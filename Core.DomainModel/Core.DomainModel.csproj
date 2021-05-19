@@ -120,6 +120,7 @@
     <Compile Include="LocalOptions\LocalDataProcessingBasisForTransferOption.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
+    <Compile Include="Notification\UserNotification.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />

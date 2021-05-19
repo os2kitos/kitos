@@ -1,0 +1,15 @@
+﻿using Core.DomainModel.Advice;
+
+namespace Core.DomainModel.Notification
+{
+    public class UserNotification : Entity
+    {
+        public const int MaxNameLength = 100;
+        public const int MaxMessageLength = 200;
+
+        public string Name { get; set; }
+        public string NotificationMessage { get; set; }
+        public int RelatedEntityId { get; set; }
+        public ObjectType RelatedEntityType { get; set; }
+    }
+}

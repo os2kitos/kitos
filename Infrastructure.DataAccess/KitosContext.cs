@@ -19,6 +19,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
+using Core.DomainModel.Notification;
 
 namespace Infrastructure.DataAccess
 {
@@ -170,6 +171,7 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewItSystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
         public DbSet<KendoOrganizationalConfiguration> KendoOrganizationalConfigurations { get; set; }
         public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -275,6 +277,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewItSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new KendoOrganizationalConfigurationMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
+            modelBuilder.Configurations.Add(new UserNotificationMap());
         }
     }
 }

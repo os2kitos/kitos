@@ -14,6 +14,7 @@ using Core.ApplicationServices.Helpers;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Ninject.Extensions.Logging;
+using Core.ApplicationServices.Notification;
 
 namespace Core.ApplicationServices
 {
@@ -64,13 +65,17 @@ namespace Core.ApplicationServices
         [Inject]
         public IHangfireHelper HangfireHelper { get; set; }
 
+        [Inject]
+        public IUserNotificationService UserNotificationService { get; set; }
+
         public bool SendAdvice(int id)
         {
-            try
+            var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+            if (advice != null)
             {
-                var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
-                if (advice != null)
+                try
                 {
+                
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
                         try
@@ -80,6 +85,10 @@ namespace Core.ApplicationServices
                         catch (Exception e)
                         {
                             Logger?.Error(e, "Error sending emails in advice service");
+                            if(advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
+                            {
+                                UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value);
+                            }
                         }
                     }
 
@@ -94,14 +103,25 @@ namespace Core.ApplicationServices
 
                     AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                     AdviceSentRepository.Save();
+
+                    return true;
                 }
-                return true;
+                catch (Exception e)
+                {
+                    Logger?.Error(e, "General error sending emails in advice service");
+                    if (advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
+                    {
+                        UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Der skete en fejl under afsendelsen af advis. Tjek venligst efter om den er blevet sendt eller ej.", advice.RelationId.Value, advice.Type.Value);
+                    }
+                    return false;
+                }
             }
-            catch (Exception e)
+            else
             {
-                Logger?.Error(e, "General error sending emails in advice service");
+                Logger?.Error($"Could not find advice with Id: {id}");
                 return false;
             }
+
         }
 
         private static bool IsAdviceExpired(Advice advice)
