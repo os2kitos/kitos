@@ -115,7 +115,9 @@
     <Compile Include="GDPR\IDataProcessingRegistrationOptionsApplicationService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
+    <Compile Include="Helpers\HangfireHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Helpers\IHangfireHelper.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />

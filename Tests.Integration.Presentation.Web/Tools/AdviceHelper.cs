@@ -7,7 +7,7 @@ using Core.DomainModel.Organization;
 namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class AdviceHelper
-    {
+    { 
         public static async Task<HttpResponseMessage> PostAdviceAsync(Core.DomainModel.Advice.Advice advice, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

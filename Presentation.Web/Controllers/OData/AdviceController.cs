@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel.Advice;
@@ -23,6 +24,8 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
+        private readonly Regex emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
@@ -37,6 +40,11 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
+            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !emailValidationRegex.IsMatch(x.Name)))
+            {
+                return BadRequest("Invalid email exists among receivers or CCs");
+            }
+
             if (advice.AdviceType == AdviceType.Immediate)
             {
 
@@ -99,28 +107,57 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
-            var response = base.Patch(key, delta);
-
-            if (response.GetType() == typeof(UpdatedODataResult<Advice>))
+            try
             {
-                try
-                {
-                    var advice = delta.GetInstance();
-                    BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
-                }
-                catch (Exception e)
-                {
-                    Logger.ErrorException("Failed to update advice", e);
-                    return InternalServerError(e);
-                }
-            }
+                var advice = delta.GetInstance();
 
-            return response;
+                if (!advice.IsActive)
+                {
+                    throw new ArgumentException(
+                        "Cannot update inactive advice ");
+                }
+                if (advice.AdviceType == AdviceType.Immediate)
+                {
+                    throw new ArgumentException("Editing is not allowed for immediate advice");
+                } 
+                if (advice.AdviceType == AdviceType.Repeat) 
+                {
+                    var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
+                    if (changedPropertyNames.All(IsRecurringEditableProperty))
+                    {
+                        throw new ArgumentException("For recurring advices editing is only allowed for name, subject and stop date");
+                    }
+
+                    if (changedPropertyNames.Contains("StopDate"))
+                    {
+                        if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
+                        {
+                            throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
+                        }
+                    }
+                }
+
+                var response = base.Patch(key, delta);
+                DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
+                BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+
+                return response;
+            }
+            catch (Exception e)
+            {
+                Logger.ErrorException("Failed to update advice", e);
+                return InternalServerError(e);
+            }
         }
 
         public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
         {
             RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
+        }
+
+        private static bool IsRecurringEditableProperty(string name)
+        {
+            return name.Equals("Name") || name.Equals("Subject") || name.Equals("StopDate");
         }
 
         [EnableQuery]
@@ -166,11 +203,11 @@ namespace Presentation.Web.Controllers.OData
 
         private static void DeleteJobFromHangfire(int key, Advice entity)
         {
-            DeletePostponedRecurringJob(entity.JobId);
+            DeletePostponedRecurringJobFromHangfire(entity.JobId);
             RecurringJob.RemoveIfExists("Advice: " + key);
         }
 
-        private static void DeletePostponedRecurringJob(string textId)
+        private static void DeletePostponedRecurringJobFromHangfire(string jobIdText)
         {
             var monitor = JobStorage.Current.GetMonitoringApi();
             var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
@@ -178,7 +215,7 @@ namespace Presentation.Web.Controllers.OData
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(textId))
+                if (t.Contains(jobIdText))
                 {
                     BackgroundJob.Delete(j.Key);
                 }
