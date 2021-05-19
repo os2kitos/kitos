@@ -181,7 +181,7 @@
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
-                        $scope.curDate = new Date();
+                        $scope.curDate = getCurrentDate();
 
                         if ($scope.startDate === undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
@@ -192,6 +192,11 @@
 
                         if (!start.isValid()) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                            return false;
+                        }
+
+                        if ($scope.startDate < $scope.curDate) {
+                            $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
                             return false;
                         }
 
@@ -270,7 +275,7 @@
                     }
 
                     function getCurrentDate() {
-                        return new Date().toLocaleDateString('en-GB');
+                        return new moment(new Date()).format('DD-MM-YYYY');
                     }
 
                     function httpCall(payload, action, url) {
