@@ -2,7 +2,7 @@
     "use strict";
 
     export function createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess) {
-        var allowedDateFormats = ["dd-MM-yyyy", "YYYY-MM-DDTHH:mm:ss.SSS"];
+        var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
         
         return $modal.open({
             windowClass: "modal fade in",
@@ -181,7 +181,7 @@
                         $scope.errMessage = "";
                         $scope.startDateErrMessage = "";
                         $scope.curDate = new Date();
-                        if (!moment($scope.startDate, allowedDateFormats).isValid() ||
+                        if (!moment($scope.startDate, allowedDateFormats, true).isValid() ||
                             $scope.startDate == undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
                             return false;
@@ -206,7 +206,7 @@
                         $scope.errMessage = "";
                         $scope.stopDateErrMessage = "";
                         $scope.curDate = new Date();
-                        if (!moment($scope.stopDate, allowedDateFormats).isValid() ||
+                        if (!moment($scope.stopDate, allowedDateFormats, true).isValid() ||
                             $scope.stopDate == undefined) {
                             $scope.stopDateErrMessage = "'Til Dato' er ugyldig!";
                             return false;
