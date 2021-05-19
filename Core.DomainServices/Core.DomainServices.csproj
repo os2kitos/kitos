@@ -84,6 +84,11 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Model\EventHandlers\ContractDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandlers\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandlers\InterfaceDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandlers\SystemUsageDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandlers\ProjectDeletedAdvicesHandler.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
@@ -92,7 +97,7 @@
     <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
     <Compile Include="SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="GDPR\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />
-    <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\ContractDeletedSystemRelationsHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />
