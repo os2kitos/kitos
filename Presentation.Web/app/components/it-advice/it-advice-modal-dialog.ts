@@ -19,8 +19,6 @@
                     entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
                     adviceData) => {
                     $scope.showRoleFields = true;
-                    $scope.collapsed = true;
-                    $scope.CCcollapsed = true;
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
