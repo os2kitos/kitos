@@ -102,12 +102,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Can_Add_Repeatable_Advice_With_StartDate_Today()
         {
             //Arrange
-            var recipient = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = $"{A<string>()}@test.dk",
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
+            var recipient = createDefaultEmailRecipient(createWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Body = A<string>(),
@@ -134,12 +129,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Repeatable_Advice_With_StartDate_Before_Today()
         {
             //Arrange
-            var recipient = new Core.DomainModel.Advice.AdviceUserRelation
-            {
-                Name = $"{A<string>()}@test.dk",
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
-            };
+            var recipient = createDefaultEmailRecipient(createWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Body = A<string>(),
