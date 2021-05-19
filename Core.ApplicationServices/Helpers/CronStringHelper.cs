@@ -1,7 +1,7 @@
 ﻿using System;
 using Core.DomainModel.Advice;
 
-namespace Presentation.Web.Helpers
+namespace Core.ApplicationServices.Helpers
 {
     public class CronStringHelper
     {

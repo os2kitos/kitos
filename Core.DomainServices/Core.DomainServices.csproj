@@ -84,11 +84,6 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
-    <Compile Include="Model\EventHandlers\ContractDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandlers\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandlers\InterfaceDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandlers\SystemUsageDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandlers\ProjectDeletedAdvicesHandler.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
