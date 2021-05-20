@@ -34,6 +34,10 @@
                         {
                             field: "Name",
                             title: "Navn",
+                            template: data => {
+                                const name = data.Name || "Ikke navngivet";
+                                return name;
+                            },
                             attributes: { "class": "might-overflow" }
                         },
                         {
