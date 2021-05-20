@@ -10,6 +10,7 @@
         {
             SqlResource(SqlMigrationScriptRepository.GetResourceName("FixAdviceIsActive.sql"));
             AddColumn("dbo.Advice", "AdviceType", c => c.Int(nullable: false));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Advice_Scheduling_To_AdviceType.sql"));
         }
         
         public override void Down()
