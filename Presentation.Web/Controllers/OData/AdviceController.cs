@@ -89,27 +89,6 @@ namespace Presentation.Web.Controllers.OData
             return response;
         }
 
-        private void ScheduleAdvice(Advice advice, CreatedODataResult<Advice> createdResponse, string name)
-        {
-            if (advice.AdviceType == AdviceType.Immediate)
-            {
-                BackgroundJob.Enqueue(() => _adviceService.SendAdvice(createdResponse.Entity.Id));
-            }
-            else if (advice.AdviceType == AdviceType.Repeat)
-            {
-
-                BackgroundJob.Schedule(
-                    () => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value,
-                        advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
-            }
-        }
-
-        private void UpdateRepository(Advice advice)
-        {
-            _repository.Update(advice);
-            _repository.Save();
-        }
-
         [EnableQuery]
         public override IHttpActionResult Patch(int key, Delta<Advice> delta)
         {
