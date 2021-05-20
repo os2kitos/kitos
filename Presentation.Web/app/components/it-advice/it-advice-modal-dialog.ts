@@ -29,9 +29,11 @@
                     $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
-                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+"
+                    $scope.multipleEmailValidationRegex =
+                        "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+";
 
-                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
+                    var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
+                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
@@ -98,9 +100,8 @@
                         payload.Name = $scope.name;
                         if (isCurrentAdviceRecurring()) {
                             payload.Scheduling = $scope.adviceRepetitionData.id;
-                            payload.AlarmDate = dateString2Date($scope.startDate);
-                            payload.StopDate = dateString2Date($scope.stopDate);
-                            payload.StopDate.setHours(23, 59, 59, 99);
+                            payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
+                            payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
@@ -181,7 +182,6 @@
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
-                        $scope.curDate = getCurrentDate();
 
                         if ($scope.startDate === undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
@@ -195,7 +195,7 @@
                             return false;
                         }
 
-                        if ($scope.startDate < $scope.curDate) {
+                        if (moment().isAfter(start,'day')) {
                             $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
                             return false;
                         }
@@ -264,18 +264,8 @@
                         return true;
                     }
 
-                    function dateString2Date(dateString) {
-                        const dt = dateString.split("-");
-                        if (dt[2].length > 4) {
-                            return formatDate(new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2)));
-
-                        }
-                        return formatDate(new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2)));
-                    }
-
                     function getCurrentDate() {
-                        return formatDate(new Date());
-
+                        return moment().format('DD-MM-YYYY');
                     }
 
                     function formatDate(dateToFormat) {

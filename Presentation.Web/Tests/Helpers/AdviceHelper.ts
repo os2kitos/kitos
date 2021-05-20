@@ -2,11 +2,13 @@
 import localSystemNavigation = require("./SideNavigation/LocalItSystemNavigation");
 import systemUsageHelper = require("./SystemUsageHelper");
 import Select2 = require("./Select2Helper");
+import WaitTimers = require("../Utility/WaitTimers");
 import Constants = require("../Utility/Constants");
 
 class AdviceHelper {
     private cssLocator = new CSSLocator();
     private constants = new Constants();
+    private waitUpTo = new WaitTimers();
 
     public goToSpecificItSystemAdvice(name: string) {   
         return systemUsageHelper.openLocalSystem(name)
@@ -43,7 +45,10 @@ class AdviceHelper {
     }
 
     public deleteAdvice(subjectName: string) {
-        return this.getDeleteButton(subjectName).click()
+        //return this.getDeleteButton(subjectName).click()
+        //    .then(() => browser.switchTo().alert().accept());
+        return browser.wait(this.getDeleteButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
+            .then(() => this.getDeleteButton(subjectName).click())
             .then(() => browser.switchTo().alert().accept());
     }
 
