@@ -97,8 +97,8 @@
                     $scope.save = () => {
                         var url = "";
                         var payload = createPayload();
-                        payload.Name = $scope.name;
                         if (isCurrentAdviceRecurring()) {
+                            payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = dateString2Date($scope.startDate);
                             payload.StopDate = dateString2Date($scope.stopDate);
