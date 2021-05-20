@@ -124,7 +124,6 @@
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
     <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
-    <Compile Include="Model\EventHandler\InterfaceDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />
     <Compile Include="Model\EventHandler\SystemUsageDeletedAdvicesHandler.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationOptions.cs" />

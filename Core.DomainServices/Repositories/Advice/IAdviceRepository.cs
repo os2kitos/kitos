@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using Core.DomainModel.Advice;
 
 namespace Core.DomainServices.Repositories.Advice
 {
     public interface IAdviceRepository
     {
-        IQueryable<DomainModel.Advice.Advice> GetOrphans();
-        void Delete(DomainModel.Advice.Advice advice);
+        IEnumerable<DomainModel.Advice.Advice> GetByRelationIdAndType(int relationId, ObjectType objectType);
     }
 }

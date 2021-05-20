@@ -237,9 +237,14 @@ namespace Core.ApplicationServices
 
         public void Delete(Advice advice)
         {
+            RemoveAdviceAndItsRelatedEntities(advice);
+            AdviceRepository.Save();
+        }
+
+        private void RemoveAdviceAndItsRelatedEntities(Advice advice)
+        {
             DeleteJobFromHangfire(advice);
             AdviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
-            AdviceRepository.Save();
         }
 
         private void DeleteJobFromHangfire(Advice advice)
@@ -252,7 +257,7 @@ namespace Core.ApplicationServices
         {
             var monitor = JobStorage.Current.GetMonitoringApi();
             var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == "CreateDelayedRecurringJob");
+                Where(x => x.Value.Job.Method.Name == nameof(CreateDelayedRecurringJob));
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
@@ -268,8 +273,7 @@ namespace Core.ApplicationServices
             using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
             foreach (var advice in toBeDeleted)
             {
-                DeleteJobFromHangfire(advice);
-                AdviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
+                RemoveAdviceAndItsRelatedEntities(advice);
             }
             AdviceRepository.Save();
             transaction.Commit();

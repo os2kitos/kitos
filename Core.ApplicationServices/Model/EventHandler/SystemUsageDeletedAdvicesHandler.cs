@@ -1,17 +1,17 @@
 ﻿using System.Linq;
 using Core.DomainModel.Advice;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainServices;
+using Core.DomainServices.Repositories.Advice;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
     public class SystemUsageDeletedAdvicesHandler : IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>
     {
-        private readonly IGenericRepository<Advice> _adviceRepository;
+        private readonly IAdviceRepository _adviceRepository;
         private readonly IAdviceService _adviceService;
 
-        public SystemUsageDeletedAdvicesHandler(IGenericRepository<Advice> adviceRepository, IAdviceService adviceService)
+        public SystemUsageDeletedAdvicesHandler(IAdviceRepository adviceRepository, IAdviceService adviceService)
         {
             _adviceRepository = adviceRepository;
             _adviceService = adviceService;
@@ -20,7 +20,7 @@ namespace Core.ApplicationServices.Model.EventHandler
         public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
         {
             var systemUsageDeleted = domainEvent.Entity;
-            var toBeDeleted = _adviceRepository.Get(a => a.RelationId == systemUsageDeleted.Id && a.Type == ObjectType.itSystemUsage).ToList();
+            var toBeDeleted = _adviceRepository.GetByRelationIdAndType(systemUsageDeleted.Id, ObjectType.itSystemUsage).ToList();
             _adviceService.BulkDeleteAdvice(toBeDeleted);
         }
     }

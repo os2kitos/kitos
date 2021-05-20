@@ -143,11 +143,11 @@ namespace Tests.Integration.Presentation.Web.Contract
         }
 
         [Fact]
-        public async Task Can_Delete_Contract_Advices()
+        public async Task Delete_Contract_Removes_Associated_Advices()
         {
+            // Arrange
             const int organizationId = TestEnvironment.DefaultOrganizationId;
             var contract = await ItContractHelper.CreateContract(A<string>(), OrganizationId);
-            
             var advice = new Core.DomainModel.Advice.Advice
             {
                 Id = A<int>(),
@@ -157,12 +157,14 @@ namespace Tests.Integration.Presentation.Web.Contract
                 Subject = "Can_Delete_Contract_Advices",
                 RelationId = contract.Id
             };
-            
             using var createResponse = await AdviceHelper.PostAdviceAsync(advice, organizationId);
             Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
+
+            // Act
             using var deleteResponse = await ItContractHelper.SendDeleteContractRequestAsync(contract.Id);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
 
+            // Assert
             using var advicesResponse = AdviceHelper.GetContractAdvicesAsync(contract.Id);
             var deletedContractAdvices = await advicesResponse.Result.ReadOdataListResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
             Assert.True(deletedContractAdvices.Count == 0);
