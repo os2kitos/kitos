@@ -79,10 +79,8 @@
                                             field: "Name",
                                             title: "Navn",
                                             template: data => {
-                                                if (data.Name != null) {
-                                                    return `<a ng-click="$dismiss()" href="${stateUrl}/${data.RelationId}/advice">${data.Name}</a>`;
-                                                }
-                                                return `<a ng-click="$dismiss()" href="${stateUrl}/${data.RelationId}/advice">Ikke navngivet</a>`;
+                                                const name = data.Name || "Ikke navngivet";
+                                                return `<a ng-click="$dismiss()" href="${stateUrl}/${data.RelationId}/advice">${name}</a>`;
                                             },
                                             attributes: { "class": "might-overflow" }
                                         },
