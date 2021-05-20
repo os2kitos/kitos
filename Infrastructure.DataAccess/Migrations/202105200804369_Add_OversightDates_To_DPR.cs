@@ -13,7 +13,7 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
-                        OversightDate = c.DateTime(precision: 7, storeType: "datetime2"),
+                        OversightDate = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         OversightRemark = c.String(),
                         ParentId = c.Int(nullable: false),
                     })

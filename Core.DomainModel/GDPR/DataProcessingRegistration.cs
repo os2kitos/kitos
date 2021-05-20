@@ -354,7 +354,7 @@ namespace Core.DomainModel.GDPR
 
         public virtual ICollection<ItContract.ItContract> AssociatedContracts { get; set; }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime? oversightDate, string oversightRemark)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
         {
             if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
             if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
@@ -371,7 +371,7 @@ namespace Core.DomainModel.GDPR
             return newOversightDate;
         }
 
-        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int oversightId, DateTime? oversightDate, string oversightRemark)
+        public Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int oversightId, DateTime oversightDate, string oversightRemark)
         {
             if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
             if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
