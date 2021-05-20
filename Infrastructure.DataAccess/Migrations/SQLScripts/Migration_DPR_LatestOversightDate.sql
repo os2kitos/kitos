@@ -9,4 +9,5 @@ BEGIN
 	INSERT INTO DataProcessingRegistrationOversightDates(ParentId, OversightRemark, OversightDate)
 	SELECT Id, OversightCompletedRemark, LatestOversightDate
 	FROM DataProcessingRegistrations
+	WHERE LatestOversightDate IS NOT NULL
 END

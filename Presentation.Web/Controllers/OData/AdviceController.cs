@@ -12,7 +12,6 @@ using Hangfire;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
-using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -24,7 +23,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
-        private readonly Regex emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
@@ -40,7 +39,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
-            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !emailValidationRegex.IsMatch(x.Name)))
+            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Name)))
             {
                 return BadRequest("Invalid email exists among receivers or CCs");
             }
@@ -79,8 +78,7 @@ namespace Presentation.Web.Controllers.OData
 
                 try
                 {
-                    UpdateRepository(advice);
-                    ScheduleAdvice(advice, createdResponse, name);
+                    _adviceService.CreateAdvice(advice);
                 }
                 catch (Exception e)
                 {
@@ -146,8 +144,8 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-                DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
-                BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+
+                _adviceService.RescheduleRecurringJob(advice);
 
                 return response;
             }
@@ -156,11 +154,6 @@ namespace Presentation.Web.Controllers.OData
                 Logger.ErrorException("Failed to update advice", e);
                 return InternalServerError(e);
             }
-        }
-
-        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
-        {
-            RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
 
         private static bool IsRecurringEditableProperty(string name)
@@ -191,8 +184,7 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                DeleteJobFromHangfire(key, entity);
-                DeleteFromRepository(key);
+                _adviceService.Delete(entity);
             }
             catch (Exception e)
             {
@@ -201,33 +193,6 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        private void DeleteFromRepository(int key)
-        {
-            Repository.DeleteByKey(key);
-            Repository.Save();
-        }
-
-        private static void DeleteJobFromHangfire(int key, Advice entity)
-        {
-            DeletePostponedRecurringJobFromHangfire(entity.JobId);
-            RecurringJob.RemoveIfExists("Advice: " + key);
-        }
-
-        private static void DeletePostponedRecurringJobFromHangfire(string jobIdText)
-        {
-            var monitor = JobStorage.Current.GetMonitoringApi();
-            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == "CreateDelayedRecurringJob");
-            foreach (var j in jobsScheduled)
-            {
-                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(jobIdText))
-                {
-                    BackgroundJob.Delete(j.Key);
-                }
-            }
         }
 
         [HttpPatch]
@@ -240,9 +205,7 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                DeleteJobFromHangfire(key, entity);
-                entity.IsActive = false;
-                UpdateRepository(entity);
+                _adviceService.Deactivate(entity);
             }
             catch (Exception e)
             {

@@ -11,13 +11,13 @@ using Serilog;
 
 namespace Core.DomainServices.Model.EventHandlers
 {
-    public class ContractDeletedHandler : IDomainEventHandler<ContractDeleted>
+    public class ContractDeletedSystemRelationsHandler : IDomainEventHandler<ContractDeleted>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly ILogger _logger;
 
-        public ContractDeletedHandler(
+        public ContractDeletedSystemRelationsHandler(
             IGenericRepository<ItSystemUsage> systemUsageRepository,
             ITransactionManager transactionManager,
             ILogger logger

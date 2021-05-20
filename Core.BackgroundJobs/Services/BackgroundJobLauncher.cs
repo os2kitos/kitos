@@ -3,7 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model;
-using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.DomainModel.Result;
@@ -16,7 +15,6 @@ namespace Core.BackgroundJobs.Services
     {
         private readonly ILogger _logger;
         private readonly CheckExternalLinksBackgroundJob _checkExternalLinksJob;
-        private readonly PurgeOrphanedAdviceBackgroundJob _purgeOrphanedAdviceBackgroundJob;
         private readonly RebuildDataProcessingRegistrationReadModelsBatchJob _rebuildDataProcessingRegistrationReadModels;
         private readonly ScheduleDataProcessingRegistrationReadModelUpdates _scheduleDataProcessingRegistrationReadModelUpdates;
         private readonly RebuildItSystemUsageOverviewReadModelsBatchJob _rebuildItSystemUsageOverviewReadModels;
@@ -27,7 +25,6 @@ namespace Core.BackgroundJobs.Services
         public BackgroundJobLauncher(
             ILogger logger,
             CheckExternalLinksBackgroundJob checkExternalLinksJob,
-            PurgeOrphanedAdviceBackgroundJob purgeOrphanedAdviceBackgroundJob,
             RebuildDataProcessingRegistrationReadModelsBatchJob rebuildDataProcessingRegistrationReadModels,
             ScheduleDataProcessingRegistrationReadModelUpdates scheduleDataProcessingRegistrationReadModelUpdates,
             RebuildItSystemUsageOverviewReadModelsBatchJob rebuildItSystemUsageOverviewReadModels,
@@ -43,17 +40,11 @@ namespace Core.BackgroundJobs.Services
             _scheduleItSystemUsageOverviewReadModelUpdates = scheduleItSystemUsageOverviewReadModelUpdates;
             _rebuildReadModelsJobFactory = rebuildReadModelsJobFactory;
             _purgeDuplicatePendingReadModelUpdates = purgeDuplicatePendingReadModelUpdates;
-            _purgeOrphanedAdviceBackgroundJob = purgeOrphanedAdviceBackgroundJob;
         }
 
         public async Task LaunchLinkCheckAsync(CancellationToken token = default)
         {
             await Launch(_checkExternalLinksJob, token);
-        }
-
-        public async Task LaunchAdviceCleanupAsync(CancellationToken token = default)
-        {
-            await Launch(_purgeOrphanedAdviceBackgroundJob, token);
         }
 
         public async Task LaunchUpdateDataProcessingRegistrationReadModels(CancellationToken token = default)

@@ -29,5 +29,12 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice?organizationId={organizationId}"), cookie, body);
         }
+
+        public static async Task<HttpResponseMessage> GetContractAdvicesAsync(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"/Odata/advice?$filter=type eq '0' and RelationId eq {contractId}"), cookie);
+        }
     }
 }

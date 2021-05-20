@@ -23,7 +23,6 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Factories;
-using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
@@ -236,35 +235,33 @@ namespace Presentation.Web.Ninject
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
-            RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
 
-            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
-            RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
-
-            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
-            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
-            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
-            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityCreatedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingDataResponsibleOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, ContractDeletedSystemRelationsHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, ContractDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
+            RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
 
             //Itsystem overview updates
             RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
@@ -430,7 +427,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
-            kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
 
             //DPR
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);

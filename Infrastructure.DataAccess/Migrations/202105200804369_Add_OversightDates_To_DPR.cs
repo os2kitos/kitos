@@ -1,9 +1,9 @@
 ﻿namespace Infrastructure.DataAccess.Migrations
 {
+    using Infrastructure.DataAccess.Tools;
     using System;
     using System.Data.Entity.Migrations;
-    using Infrastructure.DataAccess.Tools;
-
+    
     public partial class Add_OversightDates_To_DPR : DbMigration
     {
         public override void Up()

@@ -96,8 +96,8 @@
                     $scope.save = () => {
                         var url = "";
                         var payload = createPayload();
-                        payload.Name = $scope.name;
                         if (isCurrentAdviceRecurring()) {
+                            payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
                             // Time is added to allow the use of the full day
