@@ -263,6 +263,10 @@
                     }
 
                     this.dataProcessingRegistration.oversightCompleted.value = isOversightCompleted.optionalObjectContext;
+                    if (this.dataProcessingRegistration.oversightCompleted.value !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
+                        this.dataProcessingRegistration.oversightDates = []; //Empty local array as it has been emptied in the database when the value is not "Yes"
+                    }
+
                     this.bindOversightCompleted();
                     this.bindOversightDates();
                     return success;

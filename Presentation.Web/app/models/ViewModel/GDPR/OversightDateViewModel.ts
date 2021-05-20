@@ -11,7 +11,7 @@
         oversightRemark: string;
 
         constructor(id: number, oversightDate: string, oversightRemark: string) {
-            if (id === null || oversightDate === null || oversightRemark === null) {
+            if (id === null) {
                 throw new Error("inputs cannot be null");
             }
             this.id = id;
