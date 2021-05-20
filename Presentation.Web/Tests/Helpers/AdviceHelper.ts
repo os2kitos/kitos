@@ -45,8 +45,6 @@ class AdviceHelper {
     }
 
     public deleteAdvice(subjectName: string) {
-        //return this.getDeleteButton(subjectName).click()
-        //    .then(() => browser.switchTo().alert().accept());
         return browser.wait(this.getDeleteButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
             .then(() => this.getDeleteButton(subjectName).click())
             .then(() => browser.switchTo().alert().accept());

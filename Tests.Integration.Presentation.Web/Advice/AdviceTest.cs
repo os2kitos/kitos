@@ -29,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDate()
+                AlarmDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -60,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient3
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDate()
+                AlarmDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -87,7 +87,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDate()
+                AlarmDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -115,7 +115,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now,
-                StopDate = getRandomDate()
+                StopDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -142,7 +142,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = getRandomDate()
+                StopDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -169,7 +169,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = null,
-                StopDate = getRandomDate()
+                StopDate = getRandomDateAfterToday()
             };
 
             //Act
@@ -222,7 +222,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             return $"{A<string>()}@test.dk";
         }
 
-        private DateTime getRandomDate()
+        private DateTime getRandomDateAfterToday()
         {
             return DateTime.Now.AddDays(A<int>());
         }

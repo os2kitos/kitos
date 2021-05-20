@@ -45,11 +45,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest("Invalid email exists among receivers or CCs");
             }
 
-            if (advice.AdviceType == AdviceType.Immediate)
-            {
-
-            }
-            else if (advice.AdviceType == AdviceType.Repeat)
+            if (advice.AdviceType == AdviceType.Repeat)
             {
                 if (advice.AlarmDate == null)
                 {

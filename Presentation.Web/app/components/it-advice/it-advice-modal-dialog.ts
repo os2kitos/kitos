@@ -20,7 +20,6 @@
                     currentUser: Kitos.Services.IUser,
                     entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
                     adviceData) => {
-                    $scope.showRoleFields = true;
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
@@ -101,6 +100,7 @@
                         if (isCurrentAdviceRecurring()) {
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
+                            // Time is added to allow the use of the full day
                             payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
@@ -262,14 +262,6 @@
                             }
                         }
                         return true;
-                    }
-
-                    function getCurrentDate() {
-                        return moment().format('DD-MM-YYYY');
-                    }
-
-                    function formatDate(dateToFormat) {
-                        return moment(dateToFormat).format('DD-MM-YYYY');
                     }
 
                     function httpCall(payload, action, url) {
