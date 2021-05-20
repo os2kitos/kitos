@@ -17,13 +17,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new
             {
                 Scheduling = advice.Scheduling.Value.ToString(),
-                Subject = advice.Subject,
-                Body = advice.Body,
+                advice.Subject,
+                advice.Body,
                 AlarmDate = advice.AlarmDate.Value.ToString(HttpApi.OdataDateTimeFormat),
                 Reciepients = recipients
             };
 
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice?organizationId={organizationId}"), cookie, body);
+        }
+
+        public static async Task<HttpResponseMessage> GetContractAdvicesAsync(int contractId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"/Odata/advice?$filter=type eq '0' and RelationId eq {contractId}"), cookie);
         }
     }
 }
