@@ -16,7 +16,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
 {
     public class ContractDeletedHandlerTest : WithAutoFixture
     {
-        private readonly ContractDeletedHandler _sut;
+        private readonly ContractDeletedSystemRelationsHandler _sut;
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
 
@@ -24,7 +24,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
         {
             _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _sut = new ContractDeletedHandler(_systemUsageRepository.Object, _transactionManager.Object, Mock.Of<ILogger>());
+            _sut = new ContractDeletedSystemRelationsHandler(_systemUsageRepository.Object, _transactionManager.Object, Mock.Of<ILogger>());
         }
 
         [Fact]

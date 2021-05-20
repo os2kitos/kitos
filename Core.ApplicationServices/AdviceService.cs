@@ -7,18 +7,24 @@ using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Ninject;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Helpers;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
+using Hangfire;
+using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 
 namespace Core.ApplicationServices
 {
     public class AdviceService : IAdviceService
     {
+        #region Properties
+
         [Inject]
         public IMailClient MailClient { get; set; }
 
@@ -63,6 +69,24 @@ namespace Core.ApplicationServices
 
         [Inject]
         public IHangfireHelper HangfireHelper { get; set; }
+
+        [Inject]
+        public ITransactionManager TransactionManager { get; set; }
+
+        #endregion
+
+        public void CreateAdvice(Advice advice)
+        {
+            ScheduleAdvice(advice);
+            AdviceRepository.Update(advice);
+            AdviceRepository.Save();
+        }
+
+        public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
+        {
+            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
+            return result.AsQueryable();
+        }
 
         public bool SendAdvice(int id)
         {
@@ -156,12 +180,6 @@ namespace Core.ApplicationServices
             advice.SentDate = DateTime.Now;
         }
 
-        public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
-        {
-            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
-            return result.AsQueryable();
-        }
-
         private static void AddRecipientByName(AdviceUserRelation r, MailMessage message, MailAddressCollection mailAddressCollection)
         {
             if (!string.IsNullOrEmpty(r.Name))
@@ -215,6 +233,83 @@ namespace Core.ApplicationServices
 
                     break;
             }
+        }
+
+        public void Delete(Advice advice)
+        {
+            RemoveAdviceAndItsRelatedEntities(advice);
+            AdviceRepository.Save();
+        }
+
+        private void RemoveAdviceAndItsRelatedEntities(Advice advice)
+        {
+            DeleteJobFromHangfire(advice);
+            AdviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
+        }
+
+        private void DeleteJobFromHangfire(Advice advice)
+        {
+            DeletePostponedRecurringJobFromHangfire(advice.JobId);
+            RecurringJob.RemoveIfExists("Advice: " + advice.Id);
+        }
+
+        private void DeletePostponedRecurringJobFromHangfire(string jobIdText)
+        {
+            var monitor = JobStorage.Current.GetMonitoringApi();
+            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
+                Where(x => x.Value.Job.Method.Name == nameof(CreateDelayedRecurringJob));
+            foreach (var j in jobsScheduled)
+            {
+                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
+                if (t.Contains(jobIdText))
+                {
+                    BackgroundJob.Delete(j.Key);
+                }
+            }
+        }
+
+        public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
+        {
+            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
+            foreach (var advice in toBeDeleted)
+            {
+                RemoveAdviceAndItsRelatedEntities(advice);
+            }
+            AdviceRepository.Save();
+            transaction.Commit();
+        }
+
+        public void Deactivate(Advice advice)
+        {
+            DeleteJobFromHangfire(advice);
+            advice.IsActive = false;
+            AdviceRepository.Update(advice);
+            AdviceRepository.Save();
+        }
+
+        private void ScheduleAdvice(Advice advice)
+        {
+            if (advice.AdviceType == AdviceType.Immediate)
+            {
+                BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
+            }
+            else if(advice.AdviceType == AdviceType.Repeat)
+            {
+                BackgroundJob.Schedule(
+                    () => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value,
+                        advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+            }
+        }
+
+        public void RescheduleRecurringJob(Advice advice)
+        {
+            DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
+            BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+        }
+
+        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        {
+            RecurringJob.AddOrUpdate(name, () => SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
     }
 }
