@@ -7,6 +7,7 @@
                 $scope.type = type;
                 $scope.object = object;
                 $scope.advicename = advicename;
+                $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.mainGridOptions = {
                     dataSource: {
