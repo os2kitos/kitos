@@ -180,33 +180,6 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
         [Fact]
-        public async Task Cannot_Add_Repeatable_Advice_With_StopDate_Set_To_Null()
-        {
-            //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
-            var createAdvice = new Core.DomainModel.Advice.Advice
-            {
-                Body = A<string>(),
-                Subject = A<string>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
-                AdviceType = AdviceType.Repeat,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
-                {
-                    recipient
-                },
-                RelationId = A<int>(),
-                AlarmDate = DateTime.Now,
-                StopDate = null
-            };
-
-            //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
-        }
-
-        [Fact]
         public async Task Cannot_Add_Repeatable_Advice_With_StopDate_Before_StartDate()
         {
             //Arrange
