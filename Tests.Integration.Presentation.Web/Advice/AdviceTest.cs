@@ -224,7 +224,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         private DateTime getRandomDateAfterToday()
         {
-            return DateTime.Now.AddDays(A<int>());
+            return DateTime.Now.AddDays(Math.Abs(A<int>()));
         }
     }
 }
