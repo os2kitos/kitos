@@ -128,27 +128,12 @@
                     };
 
                     function patchAdviceUserRelation(adviceId, payload) {
-                        return $http
-                            .delete('/api/AdviceUserRelation/DeleteByAdviceId?adviceId=' + adviceId)
-                            .then(deleteResult => {
-                                var headPromise = null;
-                                var tailPromise = null;
-                                for (var i = 0; i < payload.Reciepients.length; i++) {
-                                    let currentRelation = payload.Reciepients[i];
-                                    currentRelation.adviceId = adviceId;
-
-                                    const addRelationCommand = () => $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, currentRelation);
-                                    if (tailPromise != null) {
-                                        tailPromise = tailPromise.then(addResult => addRelationCommand());
-                                    } else {
-                                        tailPromise = addRelationCommand();
-                                    }
-
-                                    //Make sure the head is initialized since that will be the start of the chain
-                                    headPromise = headPromise || tailPromise;
-                                }
-                                return headPromise;
-                            });
+                        return payload.Reciepients.reduce((previousPromise, recipient) => {
+                            recipient.adviceId = adviceId;
+                            return previousPromise.then(() => $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, recipient));
+                        },
+                            $http.delete(`/api/AdviceUserRelation/DeleteByAdviceId?adviceId=${adviceId}`)
+                        );
                     }
 
                     function isCurrentAdviceImmediate() {
