@@ -16,11 +16,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var body = new
             {
-                Scheduling = advice.Scheduling.Value.ToString(),
-                advice.Subject,
-                advice.Body,
-                AlarmDate = advice.AlarmDate.Value.ToString(HttpApi.OdataDateTimeFormat),
-                Reciepients = recipients
+                Scheduling = advice.Scheduling?.ToString(),
+                Subject = advice.Subject,
+                Body = advice.Body,
+                AlarmDate = advice.AlarmDate?.ToString(HttpApi.OdataDateTimeFormat),
+                Reciepients = recipients,
+                AdviceType = advice.AdviceType.ToString(),
+                StopDate = advice.StopDate?.ToString(HttpApi.OdataDateTimeFormat)
             };
 
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice?organizationId={organizationId}"), cookie, body);

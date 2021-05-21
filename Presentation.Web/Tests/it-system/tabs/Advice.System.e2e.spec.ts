@@ -4,6 +4,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
 import AdviceHelper = require("../../Helpers/AdviceHelper");
 import WaitTimers = require("../../Utility/WaitTimers");
+import DateHelper = require("../../Helpers/GetDateHelper");
 
 var adviceHelper = new AdviceHelper();
 var waitUpTo = new WaitTimers();
@@ -14,11 +15,11 @@ describe("Is able to create advice and delete advice",
     () => {
         var loginHelper = new login();
         var itSystemName = createItSystemName();
-        var startDate = getDateNow();
-        var endDate = getDateNow();
+        var startDate = DateHelper.getTodayAsString();
+        var endDate = DateHelper.getTodayAsString();
         var email = getRandomEmail();
-        var subjectText1 = getRandomText();
-        var subjectText2 = getRandomText();
+        var subjectText1 = getRandomText("1");
+        var subjectText2 = getRandomText("2");
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
@@ -40,11 +41,11 @@ describe("Is able to create advice and delete advice",
                     .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectText1, "Uge"))
                     .then(() => verifyAdviceWasCreated(subjectText1))
                     .then(() => adviceHelper.createNewInstantAdvice(email, subjectText2))
-                    .then(() => verifyAdviceWasCreated(subjectText2));
-                // TODO
-                //.then(() => adviceHelper.deactivateAdvice(subjectText1))
-                //.then(() => adviceHelper.deleteAdvice(subjectText1))
-                //.then(() => verifyAdviceWasDeleted(subjectText1));
+                    .then(() => verifyAdviceWasCreated(subjectText2))
+                    .then(() => browser.refresh())
+                    .then(() => adviceHelper.deactivateAdvice(subjectText1))
+                    .then(() => adviceHelper.deleteAdvice(subjectText1))
+                    .then(() => verifyAdviceWasDeleted(subjectText1));
             });
     });
 
@@ -52,16 +53,12 @@ function createItSystemName() {
     return `ItSystemAdviceTest${new Date().getTime()}`;
 }
 
-function getDateNow() {
-    return new Date().getDay() + "-" + new Date().getMonth() + "-" + new Date().getFullYear();
-}
-
 function getRandomEmail() {
     return `ItSystemAdviceTest@${new Date().getTime()}.com`;
 }
 
-function getRandomText() {
-    return `ItSystemAdviceText${new Date().getTime()}`;
+function getRandomText(text: string) {
+    return `ItSystemAdviceText${new Date().getTime()}-${text}`;
 }
 
 function verifyAdviceWasCreated(subjectName: string) {
@@ -74,5 +71,5 @@ function verifyAdviceWasDeleted(subjectName: string) {
     console.log(`verifying that ${subjectName} has been deleted`);
     return expect(browser.wait(
         element(by.xpath(`.//*[@id="mainGrid"]//span[text() = ${subjectName}]//text()`)).isPresent(),
-        waitUpTo.oneSecond)).toBe(false);
+        waitUpTo.twentySeconds)).toBe(false);
 }

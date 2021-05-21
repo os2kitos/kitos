@@ -44,11 +44,32 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest("Invalid email exists among receivers or CCs");
             }
 
+            if (advice.AdviceType == AdviceType.Repeat)
+            {
+                if (advice.AlarmDate == null)
+                {
+                    return BadRequest("Start date is not set!");
+                }
+
+                if (advice.AlarmDate.Value.Date < DateTime.Now.Date)
+                {
+                    return BadRequest("Start date is set before today");
+                }
+
+                if (advice.StopDate != null)
+                {
+                    if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date)
+                    {
+                        return BadRequest("Stop date is set before Start date");
+                    }
+                }
+            }
+
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
             {
-                var createdResponse = (CreatedODataResult<Advice>) response;
+                var createdResponse = (CreatedODataResult<Advice>)response;
                 var name = "Advice: " + createdResponse.Entity.Id;
 
                 advice = createdResponse.Entity;
@@ -83,8 +104,8 @@ namespace Presentation.Web.Controllers.OData
                 if (advice.AdviceType == AdviceType.Immediate)
                 {
                     throw new ArgumentException("Editing is not allowed for immediate advice");
-                } 
-                if (advice.AdviceType == AdviceType.Repeat) 
+                }
+                if (advice.AdviceType == AdviceType.Repeat)
                 {
                     var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
                     if (changedPropertyNames.All(IsRecurringEditableProperty))

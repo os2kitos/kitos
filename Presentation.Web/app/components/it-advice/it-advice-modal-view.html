@@ -11,7 +11,7 @@
             <div class="col-md-6">
 
                 <!--Modtager(e)-->
-                <div class="form-group" data-ng-show="{{showRoleFields}}">
+                <div class="form-group">
                     <select2-multiple-option id="role-receivers"
                                              label="Til modtager via rolle"
                                              placeholder="Vælg rolle(r)"
@@ -28,7 +28,7 @@
                 </div>
 
                 <!--CC('ere)-->
-                <div class="form-group" data-ng-show="{{showRoleFields}}">
+                <div class="form-group">
                     <select2-multiple-option id="role-ccs"
                                              label="CC modtager via rolle"
                                              placeholder="Vælg rolle(r)"
@@ -50,8 +50,8 @@
             <!--Afsendelsestype-->
             <div class="col-md-6">
                 <div class="form-group">
-                    <label for="advisType" class="control-label small">Afsendelsestype <span class="text-danger">*</span></label>
-                    <select-simple data-id="advisType"
+                    <label for="adviceType" class="control-label small">Afsendelsestype <span class="text-danger">*</span></label>
+                    <select-simple data-id="adviceType"
                                    data-options="adviceTypeOptions"
                                    data-ng-model="adviceTypeData"
                                    data-ng-disabled="!isEditable()">
@@ -110,6 +110,6 @@
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
         <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
-        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
+        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>

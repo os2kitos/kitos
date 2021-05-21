@@ -18,9 +18,6 @@
                     currentUser: Kitos.Services.IUser,
                     entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
                     adviceData) => {
-                    $scope.showRoleFields = true;
-                    $scope.collapsed = true;
-                    $scope.CCcollapsed = true;
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
@@ -29,9 +26,11 @@
                     $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
-                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+"
+                    $scope.multipleEmailValidationRegex =
+                        "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+";
 
-                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
+                    var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
+                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
@@ -98,15 +97,19 @@
                         if (isCurrentAdviceRecurring()) {
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
-                            payload.AlarmDate = dateString2Date($scope.startDate);
-                            payload.StopDate = dateString2Date($scope.stopDate);
-                            payload.StopDate.setHours(23, 59, 59, 99);
+                            payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
+                            // Time is added to allow the use of the full day
+                            payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                             httpCall(payload, action, url);
 
                         } else if (action === "PATCH") {
+                            // If stopDate have not been changed it already has the backend format required and adding 23:59:59 result in the current payload.StopDate being invalid date 
+                            if (payload.StopDate === "Invalid date") {
+                                payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
+                            }
                             url = `Odata/advice(${id})`;
                             // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
                             patchAdviceUserRelation(id, payload)
@@ -184,7 +187,6 @@
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
-                        $scope.curDate = new Date();
 
                         if ($scope.startDate === undefined) {
                             $scope.startDateErrMessage = "Fra Dato er ugyldig!";
@@ -198,12 +200,22 @@
                             return false;
                         }
 
+                        if (moment().isAfter(start, 'day') && action === "POST") {
+                            $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
+                            return false;
+                        }
+
                         if ($scope.stopDate !== undefined) {
 
                             var stop = moment($scope.stopDate, allowedDateFormats, true);
 
                             if (!stop.isValid()) {
                                 $scope.stopDateErrMessage = "Til Dato er ugyldig!";
+                                return false;
+                            }
+
+                            if (moment().isAfter(stop, 'day')) {
+                                $scope.stopDateErrMessage = "Til Dato må ikke være før idag!";
                                 return false;
                             }
 
@@ -260,14 +272,6 @@
                             }
                         }
                         return true;
-                    }
-
-                    function dateString2Date(dateString) {
-                        const dt = dateString.split("-");
-                        if (dt[2].length > 4) {
-                            return new Date(dt[0] + "/" + dt[1] + "/" + dt[2].substring(0, 2));
-                        }
-                        return new Date(dt[2] + "/" + dt[1] + "/" + dt[0].substring(0, 2));
                     }
 
                     function httpCall(payload, action, url) {
