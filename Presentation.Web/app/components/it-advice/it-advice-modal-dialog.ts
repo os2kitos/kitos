@@ -98,18 +98,18 @@
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
+                            // Time is added to allow the use of the full day
+                            payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
-                            // Time is added to allow the use of the full day
-                            if (isCurrentAdviceRecurring()) {
-                                payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true)
-                                    .format(payloadDateFormat);
-                            }
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                             httpCall(payload, action, url);
 
                         } else if (action === "PATCH") {
-                            payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
+                            // If stopDate have not been changed it already has the backend format required and adding 23:59:59 result in the current payload.StopDate being invalid date 
+                            if (payload.StopDate === "Invalid date") {
+                                payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
+                            }
                             url = `Odata/advice(${id})`;
                             // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
                             patchAdviceUserRelation(id, payload)
@@ -211,6 +211,11 @@
 
                             if (!stop.isValid()) {
                                 $scope.stopDateErrMessage = "Til Dato er ugyldig!";
+                                return false;
+                            }
+
+                            if (moment().isAfter(stop, 'day')) {
+                                $scope.stopDateErrMessage = "Til Dato må ikke være før idag!";
                                 return false;
                             }
 
