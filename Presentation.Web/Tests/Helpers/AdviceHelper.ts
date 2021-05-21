@@ -45,13 +45,25 @@ class AdviceHelper {
     }
 
     public deleteAdvice(subjectName: string) {
+        console.log(`Deleting ${subjectName}`);
         return browser.wait(this.getDeleteButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
             .then(() => this.getDeleteButton(subjectName).click())
             .then(() => browser.switchTo().alert().accept());
     }
 
+    public deactivateAdvice(subjectName: string) {
+        console.log(`Deactivating ${subjectName}`);
+        return browser.wait(this.getEditAdviceButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
+            .then(() => this.getEditAdviceButton(subjectName).click())
+            .then(() => element(this.cssLocator.byDataElementType('adviceDeactivateButton')).click());
+    }
+
     private getDeleteButton(subjectName: string) {
         return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='deleteAdviceButton']`));
+    }
+
+    private getEditAdviceButton(subjectName: string) {
+        return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='editAdviceButton']`));
     }
 }
 export = AdviceHelper;

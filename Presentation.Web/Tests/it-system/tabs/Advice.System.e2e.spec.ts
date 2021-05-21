@@ -18,8 +18,8 @@ describe("Is able to create advice and delete advice",
         var startDate = DateHelper.getTodayAsString();
         var endDate = DateHelper.getTodayAsString();
         var email = getRandomEmail();
-        var subjectText1 = getRandomText();
-        var subjectText2 = getRandomText();
+        var subjectText1 = getRandomText("1");
+        var subjectText2 = getRandomText("2");
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
@@ -43,8 +43,9 @@ describe("Is able to create advice and delete advice",
                     .then(() => adviceHelper.createNewInstantAdvice(email, subjectText2))
                     .then(() => verifyAdviceWasCreated(subjectText2))
                     .then(() => browser.refresh())
-                    .then(() => adviceHelper.deleteAdvice(subjectText2))
-                    .then(() => verifyAdviceWasDeleted(subjectText2));
+                    .then(() => adviceHelper.deactivateAdvice(subjectText1))
+                    .then(() => adviceHelper.deleteAdvice(subjectText1))
+                    .then(() => verifyAdviceWasDeleted(subjectText1));
             });
     });
 
@@ -56,8 +57,8 @@ function getRandomEmail() {
     return `ItSystemAdviceTest@${new Date().getTime()}.com`;
 }
 
-function getRandomText() {
-    return `ItSystemAdviceText${new Date().getTime()}`;
+function getRandomText(text: string) {
+    return `ItSystemAdviceText${new Date().getTime()}-${text}`;
 }
 
 function verifyAdviceWasCreated(subjectName: string) {

@@ -98,7 +98,7 @@
                         {
                             template: (dataItem) => {
                                 if (hasWriteAccess) {
-                                    return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
+                                    return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})" data-element-type="editAdviceButton">
                                     <i class="glyphicon glyphicon-pencil"></i></button>
                                     <button class="btn-link" ng-if="${!dataItem.IsActive}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
                                 } else {
