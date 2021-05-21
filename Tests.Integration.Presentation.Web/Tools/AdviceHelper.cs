@@ -25,8 +25,6 @@ namespace Tests.Integration.Presentation.Web.Tools
                 StopDate = advice.StopDate?.ToString(HttpApi.OdataDateTimeFormat)
             };
 
-            var test = body;
-
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice?organizationId={organizationId}"), cookie, body);
         }
 
