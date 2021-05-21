@@ -117,7 +117,7 @@
     //advice
     readonly adviceSelectReceivers = "s2id_role-receivers";
     readonly adviceSelectRoleCss = "s2id_role-ccs";
-    readonly adviceSelectType = "s2id_advisType";
+    readonly adviceSelectType = "s2id_adviceType";
     readonly adviceSelectRepetition = "s2id_adviceRepetition";
     readonly adviceEmailInput = "adviceEmailToInput";
     readonly adviceEmailCCInput = "adviceEmailCCToInput";
