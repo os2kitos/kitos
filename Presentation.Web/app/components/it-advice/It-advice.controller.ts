@@ -81,14 +81,14 @@
                             field: "Reciepients.Name",
                             title: "Modtager",
                             template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
                             attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Reciepients.Name",
                             title: "CC",
                             template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
                             attributes: { "class": "might-overflow" }
                         },
                         {

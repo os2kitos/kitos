@@ -1184,6 +1184,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migration_DPR_LatestOversightDate.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Advice_Scheduling_To_AdviceType.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

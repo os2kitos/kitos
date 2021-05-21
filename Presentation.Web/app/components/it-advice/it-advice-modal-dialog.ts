@@ -2,8 +2,6 @@
     "use strict";
 
     export function createModalInstance(_, $, $modal, $scope, notify, $http, type, action, id, hasWriteAccess) {
-        var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", "YYYY-MM-DDTHH:mm:ss.SSSZ"];
-        
         return $modal.open({
             windowClass: "modal fade in",
             templateUrl: "app/components/it-advice/it-advice-modal-view.html",
@@ -23,8 +21,8 @@
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
-                    $scope.adviceTypeData = null; 
-                    $scope.adviceRepetitionData;
+                    $scope.adviceTypeData = null;
+                    $scope.adviceRepetitionData = null;
                     $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
@@ -114,28 +112,31 @@
                             payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
                             url = `Odata/advice(${id})`;
                             // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
-                            patchAdviceUserRelation(id, payload);
-                            payload.Reciepients = undefined;
-                            $http.patch(url, JSON.stringify(payload))
-                                .then(
-                                    () => {
-                                        notify.addSuccessMessage("Advisen er opdateret!");
-                                        $("#mainGrid").data("kendoGrid").dataSource.read();
-                                        $scope.$close(true);
-                                    }, 
-                                    () => {
-                                        notify.addErrorMessage("Fejl! Kunne ikke opdatere advisen!");
-                                    }
-                                );
+                            patchAdviceUserRelation(id, payload)
+                                .then(result => {
+                                    delete payload.Reciepients;
+                                    $http.patch(url, JSON.stringify(payload))
+                                        .then(
+                                            () => {
+                                                notify.addSuccessMessage("Advisen er opdateret!");
+                                                $("#mainGrid").data("kendoGrid").dataSource.read();
+                                                $scope.$close(true);
+                                            },
+                                            () => {
+                                                notify.addErrorMessage("Fejl! Kunne ikke opdatere advisen!");
+                                            }
+                                        );
+                                });
                         }
                     };
 
-                    function patchAdviceUserRelation(id, payload) {
-                        $http.delete('/api/AdviceUserRelation/DeleteByAdviceId?adviceId=' + id);
-                        for (var i = 0; i < payload.Reciepients.length; i++) {
-                            payload.Reciepients[i].adviceId = id;
-                            $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, payload.Reciepients[i]);
-                        }
+                    function patchAdviceUserRelation(adviceId, payload) {
+                        return payload.Reciepients.reduce((previousPromise, recipient) => {
+                            recipient.adviceId = adviceId;
+                            return previousPromise.then(() => $http.post(`/api/AdviceUserRelation?organizationId=${currentUser.currentOrganizationId}`, recipient));
+                        },
+                            $http.delete(`/api/AdviceUserRelation/DeleteByAdviceId?adviceId=${adviceId}`)
+                        );
                     }
 
                     function isCurrentAdviceImmediate() {
@@ -167,9 +168,9 @@
                     $scope.isEditable = (context = "") => {
                         var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
-                            if (context === "Name" || 
-                                context === "Subject" || 
-                                context === "StopDate" || 
+                            if (context === "Name" ||
+                                context === "Subject" ||
+                                context === "StopDate" ||
                                 context === "Deactivate" ||
                                 context === "ToEmail" ||
                                 context === "ToRole" ||
@@ -237,7 +238,7 @@
                         format: "dd-MM-yyyy",
                         parseFormats: ["yyyy-MM-dd"]
                     };
-                    
+
                     $scope.hasInputErrors = () => {
                         if ($scope.adviceTypeData == null) {
                             return true;
@@ -275,15 +276,15 @@
                             data: payload,
                             type: "application/json"
                         }).then(function onSuccess(result) {
-                                if (action === "POST") {
-                                    notify.addSuccessMessage("Advisen er oprettet!");
-                                    $scope.$close(true);
-                                    $("#mainGrid").data("kendoGrid").dataSource.read();
-                                }
-                                if (action === "PATCH") {
-                                    notify.addSuccessMessage("Advisen er opdateret!");
-                                }
-                            },
+                            if (action === "POST") {
+                                notify.addSuccessMessage("Advisen er oprettet!");
+                                $scope.$close(true);
+                                $("#mainGrid").data("kendoGrid").dataSource.read();
+                            }
+                            if (action === "PATCH") {
+                                notify.addSuccessMessage("Advisen er opdateret!");
+                            }
+                        },
                             function onError(result) {
                                 if (action === "POST") {
                                     notify.addErrorMessage("Fejl! Kunne ikke oprette advis!");
