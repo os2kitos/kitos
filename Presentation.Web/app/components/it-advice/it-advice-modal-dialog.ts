@@ -15,19 +15,19 @@
                     type,
                     action,
                     object,
-                    currentUser: Kitos.Services.IUser,
-                    entityMapper: Kitos.Services.LocalOptions.IEntityMapper,
+                    currentUser: Services.IUser,
+                    entityMapper: Services.LocalOptions.IEntityMapper,
                     adviceData) => {
                     $scope.hasWriteAccess = hasWriteAccess;
                     $scope.selectedReceivers = [];
                     $scope.selectedCCs = [];
                     $scope.adviceTypeData = null;
                     $scope.adviceRepetitionData = null;
-                    $scope.adviceTypeOptions = Kitos.Models.ViewModel.Advice.AdviceTypeOptions.options;
-                    $scope.adviceRepetitionOptions = Kitos.Models.ViewModel.Advice.AdviceRepetitionOptions.options;
+                    $scope.adviceTypeOptions = Models.ViewModel.Advice.AdviceTypeOptions.options;
+                    $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
-                    $scope.multipleEmailValidationRegex =
-                        "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)(, )*)+";
+                    //Format {email1},{email2}. Space between , and {email2} is ok but not required
+                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)((,)( )*)*)+";
 
                     var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
                     var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
@@ -86,8 +86,8 @@
                                     ccs.push(adviceData.Reciepients[i].Name);
                                 }
                             }
-                            $scope.externalTo = receivers.length === 0 ? undefined : receivers.join(", ");
-                            $scope.externalCC = ccs.length === 0 ? undefined : ccs.join(", ");
+                            $scope.externalTo = receivers.length === 0 ? null : receivers.join(", ");
+                            $scope.externalCC = ccs.length === 0 ? null : ccs.join(", ");
                         }
                     }
 
@@ -319,45 +319,42 @@
                         const writtenEmail = $scope.externalTo;
                         const writtenCCEmail = $scope.externalCC;
 
-                        if ($scope.selectedReceivers != undefined) {
-                            for (let i = 0; i < $scope.selectedReceivers.length; i++) {
-                                payload.Reciepients.push(
-                                    {
-                                        Name: $scope.selectedReceivers[i].text,
-                                        RecpientType: "ROLE",
-                                        RecieverType: "RECIEVER"
-                                    }
-                                );
-                            }
+                        for (let i = 0; i < $scope.selectedReceivers.length; i++) {
+                            payload.Reciepients.push(
+                                {
+                                    Name: $scope.selectedReceivers[i].text,
+                                    RecpientType: "ROLE",
+                                    RecieverType: "RECIEVER"
+                                }
+                            );
                         }
 
-                        if ($scope.selectedCCs != undefined) {
-                            for (let i = 0; i < $scope.selectedCCs.length; i++) {
-                                payload.Reciepients.push(
-                                    {
-                                        Name: $scope.selectedCCs[i].text,
-                                        RecieverType: "CC",
-                                        RecpientType: "ROLE"
-                                    }
-                                );
-                            }
+                        for (let i = 0; i < $scope.selectedCCs.length; i++) {
+                            payload.Reciepients.push(
+                                {
+                                    Name: $scope.selectedCCs[i].text,
+                                    RecieverType: "CC",
+                                    RecpientType: "ROLE"
+                                }
+                            );
                         }
-                        if (writtenEmail != undefined) {
+
+                        if (writtenEmail != null) {
                             for (let i = 0; i < writtenEmail.split(",").length; i++) {
                                 payload.Reciepients.push(
                                     {
-                                        Name: writtenEmail.split(",")[i],
+                                        Name: writtenEmail.split(",")[i].trim(), //Remove leading and trailing whitespace
                                         RecpientType: "USER",
                                         RecieverType: "RECIEVER"
                                     }
                                 );
                             }
                         }
-                        if (writtenCCEmail != undefined) {
+                        if (writtenCCEmail != null) {
                             for (let i = 0; i < writtenCCEmail.split(",").length; i++) {
                                 payload.Reciepients.push(
                                     {
-                                        Name: writtenCCEmail.split(",")[i],
+                                        Name: writtenCCEmail.split(",")[i].trim(), //Remove leading and trailing whitespace
                                         RecieverType: "CC",
                                         RecpientType: "USER"
                                     }
