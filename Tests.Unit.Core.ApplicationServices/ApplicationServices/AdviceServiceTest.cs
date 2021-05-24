@@ -32,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Immediate
             };
             SetupAdviceRepository(immediateAdvice);
-            var mailClient = Freeze<Mock<MailClient>>();
+            var mailClient = Freeze<Mock<SingleThreadedMailClient>>();
             mailClient.Setup(m => m.Send(A<MailMessage>()));
             var hangfireHelper = Freeze<Mock<HangfireHelper>>();
             hangfireHelper.Setup(h => h.RemoveFromHangfire(immediateAdvice)).Throws(new ApplicationException("Should not be called"));
@@ -54,7 +54,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = DateTime.Now.AddDays(-1)
             };
             SetupAdviceRepository(recurringAdvice);
-            var mailClient = Freeze<Mock<MailClient>>();
+            var mailClient = Freeze<Mock<SingleThreadedMailClient>>();
             mailClient.Setup(m => m.Send(A<MailMessage>()));
             var hangfireHelper = Freeze <Mock<HangfireHelper>>();
             hangfireHelper.Setup(h => h.RemoveFromHangfire(recurringAdvice));

@@ -154,7 +154,7 @@ namespace Presentation.Web.Ninject
             RegisterDataAccess(kernel);
             kernel.Bind<IObjectCache>().To<AspNetObjectCache>().InSingletonScope();
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
-            kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
+            kernel.Bind<IMailClient>().To<SingleThreadedMailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InCommandScope(Mode)
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
