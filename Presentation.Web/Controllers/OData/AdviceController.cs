@@ -46,6 +46,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Get()
         {
+            //TODO: Brug GetAdvicesForOrg på IAdviceService og læg sammen alle de orgs som brugeren er i
             //TODO: Must not fallback to standard access control since that is not enough without global read access
             return base.Get();
         }
