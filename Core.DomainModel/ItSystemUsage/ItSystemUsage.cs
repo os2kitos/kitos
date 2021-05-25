@@ -22,7 +22,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;

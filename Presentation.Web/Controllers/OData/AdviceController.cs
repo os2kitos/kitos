@@ -4,14 +4,24 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.SystemUsage;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -20,17 +30,96 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IAdviceService _adviceService;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
+        private readonly IItSystemUsageRepository _itSystemUsageRepository;
+        private readonly IItProjectRepository _itProjectRepository;
+        private readonly IItContractRepository _itContractRepository;
+        private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
-            IGenericRepository<AdviceSent> sentRepository)
+            IGenericRepository<AdviceSent> sentRepository,
+            IItSystemUsageRepository itSystemUsageRepository,
+            IItProjectRepository itProjectRepository,
+            IItContractRepository itContractRepository,
+            IDataProcessingRegistrationRepository dataProcessingRegistrationRepository
+            )
             : base(repository)
         {
             _adviceService = adviceService;
             _sentRepository = sentRepository;
+            _itSystemUsageRepository = itSystemUsageRepository;
+            _itProjectRepository = itProjectRepository;
+            _itContractRepository = itContractRepository;
+            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+        }
+
+        //TODO: To helpers
+        private IEntityWithAdvices ResolveRoot(Advice advice)
+        {
+            if (advice.Type != null && advice.RelationId != null)
+            {
+                var adviceRelationId = advice.RelationId.Value;
+
+                switch (advice.Type)
+                {
+                    case ObjectType.itContract:
+                        return _itContractRepository.GetById(adviceRelationId);
+                    case ObjectType.itSystemUsage:
+                        return _itSystemUsageRepository.GetSystemUsage(adviceRelationId);
+                    case ObjectType.itProject:
+                        return _itProjectRepository.GetById(adviceRelationId);
+                    case ObjectType.dataProcessingRegistration:
+                        return _dataProcessingRegistrationRepository.GetById(adviceRelationId).GetValueOrDefault();
+                    case ObjectType.itInterface: //Intended fallthrough
+                    default:
+                        throw new NotSupportedException("Unsupported object type:" + advice.Type);
+                }
+            }
+
+            return null;
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
+        }
+
+        protected override void RaiseCreatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+        //TODO: To helpers
+
+        private void RaiseAsRootModification(Advice entity)
+        {
+            switch (ResolveRoot(entity))
+            {
+                case ItContract root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
+                    break;
+                case ItSystemUsage root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
+                    break;
+                case ItProject root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
+                    break;
+                case DataProcessingRegistration root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
+                    break;
+            }
         }
 
         [EnableQuery]
@@ -120,7 +209,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-                
+
                 if (response is UpdatedODataResult<Advice>)
                 {
                     _adviceService.RescheduleRecurringJob(advice);

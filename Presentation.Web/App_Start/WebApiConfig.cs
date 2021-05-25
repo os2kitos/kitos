@@ -15,7 +15,6 @@ using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Models;

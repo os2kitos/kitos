@@ -15,8 +15,8 @@ namespace Core.DomainModel.GDPR
         IHasName,
         IOwnedByOrganization,
         IDataProcessingModule,
-        IEntityWithExternalReferences
-
+        IEntityWithExternalReferences,
+        IEntityWithAdvices
     {
         public DataProcessingRegistration()
         {

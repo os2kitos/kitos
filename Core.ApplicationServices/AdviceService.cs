@@ -1,6 +1,5 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
