@@ -27,7 +27,7 @@
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
-                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)((,)( )*)*)+";
+                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)((,)( )*){0,1})+";
 
                     var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
                     var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
