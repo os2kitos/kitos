@@ -11,11 +11,8 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Repositories.Contract;
-using Core.DomainServices.Repositories.GDPR;
-using Core.DomainServices.Repositories.Project;
-using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
@@ -30,10 +27,7 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IAdviceService _adviceService;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
-        private readonly IItSystemUsageRepository _itSystemUsageRepository;
-        private readonly IItProjectRepository _itProjectRepository;
-        private readonly IItContractRepository _itContractRepository;
-        private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
+        private readonly IAdviceRootResolution _adviceRootResolution;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
@@ -41,45 +35,24 @@ namespace Presentation.Web.Controllers.OData
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
             IGenericRepository<AdviceSent> sentRepository,
-            IItSystemUsageRepository itSystemUsageRepository,
-            IItProjectRepository itProjectRepository,
-            IItContractRepository itContractRepository,
-            IDataProcessingRegistrationRepository dataProcessingRegistrationRepository
+            IAdviceRootResolution adviceRootResolution
             )
             : base(repository)
         {
             _adviceService = adviceService;
             _sentRepository = sentRepository;
-            _itSystemUsageRepository = itSystemUsageRepository;
-            _itProjectRepository = itProjectRepository;
-            _itContractRepository = itContractRepository;
-            _dataProcessingRegistrationRepository = dataProcessingRegistrationRepository;
+            _adviceRootResolution = adviceRootResolution;
         }
 
-        //TODO: To helpers
+        public override IHttpActionResult Get()
+        {
+            //TODO: Must not fallback to standard access control since that is not enough without global read access
+            return base.Get();
+        }
+
         private IEntityWithAdvices ResolveRoot(Advice advice)
         {
-            if (advice.Type != null && advice.RelationId != null)
-            {
-                var adviceRelationId = advice.RelationId.Value;
-
-                switch (advice.Type)
-                {
-                    case ObjectType.itContract:
-                        return _itContractRepository.GetById(adviceRelationId);
-                    case ObjectType.itSystemUsage:
-                        return _itSystemUsageRepository.GetSystemUsage(adviceRelationId);
-                    case ObjectType.itProject:
-                        return _itProjectRepository.GetById(adviceRelationId);
-                    case ObjectType.dataProcessingRegistration:
-                        return _dataProcessingRegistrationRepository.GetById(adviceRelationId).GetValueOrDefault();
-                    case ObjectType.itInterface: //Intended fallthrough
-                    default:
-                        throw new NotSupportedException("Unsupported object type:" + advice.Type);
-                }
-            }
-
-            return null;
+            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
@@ -101,7 +74,6 @@ namespace Presentation.Web.Controllers.OData
         {
             RaiseAsRootModification(entity);
         }
-        //TODO: To helpers
 
         private void RaiseAsRootModification(Advice entity)
         {

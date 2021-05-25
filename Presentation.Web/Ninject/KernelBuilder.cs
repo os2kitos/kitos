@@ -85,6 +85,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
 using Core.DomainModel.ItProject;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 
 namespace Presentation.Web.Ninject
@@ -367,6 +368,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
+
+            kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
