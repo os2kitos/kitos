@@ -8,7 +8,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Hangfire;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
