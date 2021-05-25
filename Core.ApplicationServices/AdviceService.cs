@@ -11,6 +11,7 @@ using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Helpers;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -72,6 +73,9 @@ namespace Core.ApplicationServices
         [Inject]
         public ITransactionManager TransactionManager { get; set; }
 
+        [Inject]
+        public IOrganizationalUserContext OrganizationalUserContext { get; set; }
+
         #endregion
 
         public void CreateAdvice(Advice advice)
@@ -85,6 +89,19 @@ namespace Core.ApplicationServices
         {
             var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
             return result.AsQueryable();
+        }
+
+        public IQueryable<Advice> GetAllForCurrentUser()
+        {
+            IQueryable<Advice> combinedQuery = null;
+
+            foreach (var organizationId in OrganizationalUserContext.OrganizationIds)
+            {
+                var current = GetAdvicesForOrg(organizationId);
+                combinedQuery = combinedQuery == null ? current : combinedQuery.Concat(current);
+            }
+
+            return combinedQuery;
         }
 
         public bool SendAdvice(int id)
@@ -292,7 +309,7 @@ namespace Core.ApplicationServices
             {
                 BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
             }
-            else if(advice.AdviceType == AdviceType.Repeat)
+            else if (advice.AdviceType == AdviceType.Repeat)
             {
                 BackgroundJob.Schedule(
                     () => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value,
