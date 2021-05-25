@@ -123,8 +123,11 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-
-                _adviceService.RescheduleRecurringJob(advice);
+                
+                if (response is UpdatedODataResult<Advice>)
+                {
+                    _adviceService.RescheduleRecurringJob(advice);
+                }
 
                 return response;
             }
@@ -157,9 +160,15 @@ namespace Presentation.Web.Controllers.OData
 
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
-            if (anySents) return Forbidden();
+            if (anySents)
+            {
+                return BadRequest("Cannot delete advice which has been sent");
+            }
 
-            if (!AllowDelete(entity)) return Forbidden();
+            if (!AllowDelete(entity))
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -184,6 +193,10 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                if (!AllowModify(entity))
+                {
+                    return Forbidden();
+                }
                 _adviceService.Deactivate(entity);
             }
             catch (Exception e)
