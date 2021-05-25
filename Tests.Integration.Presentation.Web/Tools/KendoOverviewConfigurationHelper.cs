@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Controllers.API;
+using Presentation.Web.Models;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {
