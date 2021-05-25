@@ -913,7 +913,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\LocalAdmin.System.e2e.spec.ts" />
-    <TypeScriptCompile Include="Tests\It-System\Tabs\Advice.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Advice.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />

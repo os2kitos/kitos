@@ -1,10 +1,10 @@
 ﻿
-import login = require("../../Helpers/LoginHelper");
-import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
-import ItSystemHelper = require("../../Helpers/SystemCatalogHelper");
-import AdviceHelper = require("../../Helpers/AdviceHelper");
-import WaitTimers = require("../../Utility/WaitTimers");
-import DateHelper = require("../../Helpers/GetDateHelper");
+import login = require("../../../Helpers/LoginHelper");
+import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
+import ItSystemHelper = require("../../../Helpers/SystemCatalogHelper");
+import AdviceHelper = require("../../../Helpers/AdviceHelper");
+import WaitTimers = require("../../../Utility/WaitTimers");
+import DateHelper = require("../../../Helpers/GetDateHelper");
 
 var adviceHelper = new AdviceHelper();
 var waitUpTo = new WaitTimers();
