@@ -20,11 +20,9 @@ namespace Core.ApplicationServices
         public Result<KendoOrganizationalConfiguration, OperationError> Get(int organizationId, OverviewType overviewType)
         {
             var config = _kendoOrganizationRepository.Get(organizationId, overviewType);
-            if (config.HasValue)
-            { 
-                return config.Value;
-            }
-            return Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
+            return config.HasValue
+                ? config.Value
+                : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
         }
 
         public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string configuration)
@@ -41,20 +39,18 @@ namespace Core.ApplicationServices
                 _kendoOrganizationRepository.Update(modifiedConfig);
                 return modifiedConfig;
             }
-            else
-            {
-                if (!_authorizationContext.AllowCreate<KendoOrganizationalConfiguration>(organizationId))
-                    return new OperationError(OperationFailure.Forbidden);
 
-                var createdConfig = new KendoOrganizationalConfiguration
-                {
-                    OrganizationId = organizationId,
-                    OverviewType = overviewType,
-                    Configuration = configuration
-                };
-                var created = _kendoOrganizationRepository.Add(createdConfig);
-                return created;
-            }
+            if (!_authorizationContext.AllowCreate<KendoOrganizationalConfiguration>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
+
+            var createdConfig = new KendoOrganizationalConfiguration
+            {
+                OrganizationId = organizationId,
+                OverviewType = overviewType,
+                Configuration = configuration
+            };
+            var created = _kendoOrganizationRepository.Add(createdConfig);
+            return created;
         }
 
         public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId, OverviewType overviewType)
@@ -70,10 +66,8 @@ namespace Core.ApplicationServices
                 _kendoOrganizationRepository.Delete(configToBeDeleted);
                 return configToBeDeleted;
             }
-            else
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
+
+            return new OperationError(OperationFailure.NotFound);
         }
     }
 }

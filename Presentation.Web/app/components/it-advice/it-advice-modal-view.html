@@ -42,7 +42,7 @@
                 <div class="form-group">
                     <div>
                         <label for="cc" class="control-label small">CC modtager via email</label>
-                        <input id="cc" type="text" placeholder="Skriv email" class="form-control input-sm" data-ng-disabled="!isEditable('CcEmail')" data-ng-model="externalCC" data-element-type="adviceEmailCCToInput">
+                        <input id="cc" type="text" placeholder="Skriv email" class="form-control input-sm" data-ng-disabled="!isEditable('CcEmail')" data-ng-model="externalCC" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailCCToInput">
                     </div>
                 </div>
             </div>

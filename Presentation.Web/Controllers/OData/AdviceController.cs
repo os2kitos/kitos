@@ -8,7 +8,6 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Hangfire;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
@@ -20,7 +19,6 @@ namespace Presentation.Web.Controllers.OData
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
-        private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
@@ -32,7 +30,6 @@ namespace Presentation.Web.Controllers.OData
             : base(repository)
         {
             _adviceService = adviceService;
-            _repository = repository;
             _sentRepository = sentRepository;
         }
 
@@ -123,8 +120,11 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-
-                _adviceService.RescheduleRecurringJob(advice);
+                
+                if (response is UpdatedODataResult<Advice>)
+                {
+                    _adviceService.RescheduleRecurringJob(advice);
+                }
 
                 return response;
             }
@@ -157,9 +157,15 @@ namespace Presentation.Web.Controllers.OData
 
             var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
 
-            if (anySents) return Forbidden();
+            if (anySents)
+            {
+                return BadRequest("Cannot delete advice which has been sent");
+            }
 
-            if (!AllowDelete(entity)) return Forbidden();
+            if (!AllowDelete(entity))
+            {
+                return Forbidden();
+            }
 
             try
             {
@@ -184,6 +190,10 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
+                if (!AllowModify(entity))
+                {
+                    return Forbidden();
+                }
                 _adviceService.Deactivate(entity);
             }
             catch (Exception e)
