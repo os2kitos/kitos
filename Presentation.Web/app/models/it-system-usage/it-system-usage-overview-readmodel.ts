@@ -53,7 +53,7 @@
         LocalReferenceTitle: string | null;
         ObjectOwnerName: string | null;
         LastChangedByName: string | null;
-        LastChanged: Date | null;
+        LastChangedAt: Date | null;
         Concluded: Date | null;
         MainContractSupplierName: string | null;
         MainContractIsActive: boolean | null;

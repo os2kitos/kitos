@@ -64,7 +64,7 @@ namespace Core.DomainServices.SystemUsage
             destination.ObjectOwnerName = GetUserFullName(source.ObjectOwner);
             destination.LastChangedById = source.LastChangedByUserId;
             destination.LastChangedByName = GetUserFullName(source.LastChangedByUser);
-            destination.LastChanged = source.LastChanged;
+            destination.LastChangedAt = source.LastChanged;
             destination.Concluded = source.Concluded;
             destination.ArchiveDuty = source.ArchiveDuty;
             destination.IsHoldingDocument = source.Registertype.GetValueOrDefault(false);
