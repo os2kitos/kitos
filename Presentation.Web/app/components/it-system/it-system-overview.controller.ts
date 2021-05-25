@@ -542,14 +542,14 @@
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
-                        .withDataSourceName("LastChanged")
+                        .withDataSourceName("LastChangedAt")
                         .withTitle("Sidste redigeret: Dato")
                         .withId("changed")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                         .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
                         .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChanged))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChanged)))
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("Concluded")

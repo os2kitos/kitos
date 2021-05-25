@@ -79,7 +79,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ObjectOwnerName { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
-        public DateTime LastChanged { get; set; }
+        public DateTime LastChangedAt { get; set; } //Notice - not using LastChanged since we don't want update-by-naming-convention to hit this field
         public DateTime? Concluded { get; set; }
 
         public int? MainContractId { get; set; }
