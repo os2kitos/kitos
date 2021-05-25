@@ -20,7 +20,6 @@ namespace Presentation.Web.Controllers.OData
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
-        private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
@@ -32,7 +31,6 @@ namespace Presentation.Web.Controllers.OData
             : base(repository)
         {
             _adviceService = adviceService;
-            _repository = repository;
             _sentRepository = sentRepository;
         }
 
