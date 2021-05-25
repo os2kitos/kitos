@@ -27,7 +27,8 @@
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
-                    $scope.multipleEmailValidationRegex = "(([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)((,)( )*){0,1})+";
+                    const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
+                    $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
                     var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
                     var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
@@ -340,25 +341,33 @@
                         }
 
                         if (writtenEmail != null) {
-                            for (let i = 0; i < writtenEmail.split(",").length; i++) {
-                                payload.Reciepients.push(
-                                    {
-                                        Name: writtenEmail.split(",")[i].trim(), //Remove leading and trailing whitespace
-                                        RecpientType: "USER",
-                                        RecieverType: "RECIEVER"
-                                    }
-                                );
+                            const writtenToEmails = writtenEmail.split(",");
+                            for (let i = 0; i < writtenToEmails.length; i++) {
+                                const toEmail = writtenToEmails[i].trim();//Remove leading and trailing whitespace
+                                if (toEmail && toEmail.length > 0) {
+                                    payload.Reciepients.push(
+                                        {
+                                            Name: toEmail,
+                                            RecpientType: "USER",
+                                            RecieverType: "RECIEVER"
+                                        }
+                                    );
+                                }
                             }
                         }
                         if (writtenCCEmail != null) {
-                            for (let i = 0; i < writtenCCEmail.split(",").length; i++) {
-                                payload.Reciepients.push(
-                                    {
-                                        Name: writtenCCEmail.split(",")[i].trim(), //Remove leading and trailing whitespace
-                                        RecieverType: "CC",
-                                        RecpientType: "USER"
-                                    }
-                                );
+                            const writtenCCEmails = writtenCCEmail.split(",");
+                            for (let i = 0; i < writtenCCEmails.length; i++) {
+                                const ccEmail = writtenCCEmails[i].trim();//Remove leading and trailing whitespace
+                                if (ccEmail && ccEmail.length > 0) {
+                                    payload.Reciepients.push(
+                                        {
+                                            Name: ccEmail,
+                                            RecieverType: "CC",
+                                            RecpientType: "USER"
+                                        }
+                                    );
+                                }
                             }
                         }
                         return payload;
