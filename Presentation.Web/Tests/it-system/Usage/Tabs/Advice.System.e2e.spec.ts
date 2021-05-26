@@ -39,7 +39,6 @@ describe("Is able to create advice and delete advice",
                     .then(() => verifyAdviceWasCreated(subjectText1))
                     .then(() => adviceHelper.createNewInstantAdvice(email, subjectText2))
                     .then(() => verifyAdviceWasCreated(subjectText2))
-                    .then(() => browser.refresh())
                     .then(() => adviceHelper.deactivateAdvice(subjectText1))
                     .then(() => adviceHelper.deleteAdvice(subjectText1))
                     .then(() => verifyAdviceWasDeleted(subjectText1));

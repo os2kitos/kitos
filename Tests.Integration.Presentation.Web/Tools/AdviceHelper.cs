@@ -35,6 +35,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice?organizationId={organizationId}"), cookie, body);
         }
 
+        public static async Task<HttpResponseMessage> DeleteAdviceAsync(int adviceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"odata/advice({adviceId})"), cookie);
+        }
+        public static async Task<HttpResponseMessage> DeactivateAdviceAsync(int adviceId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/DeactivateAdvice?key={adviceId}"), cookie, null);
+        }
+
         public static async Task<HttpResponseMessage> GetContractAdvicesAsync(int contractId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

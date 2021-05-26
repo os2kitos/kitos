@@ -219,15 +219,14 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
-            if (entity == null) return NotFound();
-
-            var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
-
-            if (anySents)
+            if (entity == null)
             {
-                return BadRequest("Cannot delete advice which has been sent");
+                return NotFound();
             }
-
+            if (!entity.CanBeDeleted)
+            {
+                return BadRequest("Cannot delete advice which is active or has been sent");
+            }
             if (!AllowDelete(entity))
             {
                 return Forbidden();

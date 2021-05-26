@@ -203,6 +203,7 @@
     <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
+    <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />
     <Compile Include="Model\ResultTest.cs" />
