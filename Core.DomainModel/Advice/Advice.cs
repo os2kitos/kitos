@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -162,5 +163,28 @@ namespace Core.DomainModel.Advice
         /// Gets or sets the advice type
         /// </summary>
         public AdviceType AdviceType { get; set; }
+
+        /// <summary>
+        ///     Whether the advice can be deleted
+        ///     Is false if the advice has been sent at least once or if it is active.
+        /// </summary>
+        public bool CanBeDeleted
+        {
+            get
+            {
+                if (AdviceSent.Any())
+                {
+                    return false;
+                }
+                if (IsActive)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
     }
 }
