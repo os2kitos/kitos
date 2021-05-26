@@ -302,6 +302,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return response;
         }
 
-        public static readonly string OdataDateTimeFormat = "yyyy-MM-ddTHH:mm:ssZ";
+        public static readonly string OdataDateTimeFormat = "O"; //ISO 8601
     }
 }

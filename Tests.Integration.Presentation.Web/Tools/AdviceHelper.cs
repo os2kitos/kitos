@@ -22,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var body = new
             {
                 RelationId = advice.RelationId,
-                Type = advice.Type.ToString(),
+                Type = advice.Type?.ToString("G"),
                 Scheduling = advice.Scheduling?.ToString(),
                 Subject = advice.Subject,
                 Body = advice.Body,

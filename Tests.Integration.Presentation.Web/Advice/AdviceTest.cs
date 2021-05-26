@@ -41,7 +41,6 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
-
         }
 
         [Fact]
@@ -130,6 +129,59 @@ namespace Tests.Integration.Presentation.Web.Advice
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Add_Advice_Without_RelationId()
+        {
+            //Arrange
+
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
+            var createAdvice = new Core.DomainModel.Advice.Advice
+            {
+                Type = ObjectType.itProject,
+                Body = A<string>(),
+                Subject = A<string>(),
+                AdviceType = A<AdviceType>(),
+                Scheduling = Scheduling.Day,
+                Reciepients = new List<AdviceUserRelation>()
+                {
+                    recipient
+                },
+                AlarmDate = GetRandomDateAfterToday()
+            };
+
+            //Act
+            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+        [Fact]
+        public async Task Cannot_Add_Advice_Without_Type()
+        {
+            //Arrange
+
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
+            var createAdvice = new Core.DomainModel.Advice.Advice
+            {
+                RelationId = _root.Id,
+                Body = A<string>(),
+                Subject = A<string>(),
+                AdviceType = A<AdviceType>(),
+                Scheduling = Scheduling.Day,
+                Reciepients = new List<AdviceUserRelation>()
+                {
+                    recipient
+                },
+                AlarmDate = GetRandomDateAfterToday()
+            };
+
+            //Act
+            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
         [Fact]
