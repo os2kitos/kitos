@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
-using AutoFixture;
-using AutoFixture.AutoMoq;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Jobs;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
@@ -15,39 +12,53 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices
 {
-    public class AdviceServiceTest: WithAutoFixture
+    public class AdviceServiceTest : WithAutoFixture
     {
-        protected override void OnFixtureCreated(Fixture fixture)
+        private readonly AdviceService _sut;
+        private readonly Mock<IMailClient> _mailClientMock;
+        private readonly Mock<IAdviceScheduler> _adviceSchedulerMock;
+        private readonly Mock<IGenericRepository<Advice>> _adviceRepositoryMock;
+
+        public AdviceServiceTest()
         {
-            base.OnFixtureCreated(fixture);
-            fixture.Customize(new AutoMoqCustomization());
+            _sut = new AdviceService();
+            _mailClientMock = new Mock<IMailClient>();
+            _sut.MailClient = _mailClientMock.Object;
+            _adviceSchedulerMock = new Mock<IAdviceScheduler>();
+            _sut.AdviceScheduler = _adviceSchedulerMock.Object;
+            _adviceRepositoryMock = new Mock<IGenericRepository<Advice>>();
+            _sut.AdviceRepository = _adviceRepositoryMock.Object;
+            _sut.AdviceSentRepository = Mock.Of<IGenericRepository<AdviceSent>>();
         }
 
         [Fact]
         public void SendAdvice_GivenImmediateActiveAdvice_AdviceIsSentImmediately()
         {
+            //Arrange
             var immediateAdvice = new Advice
             {
-                Id = A<int>(), 
+                Id = A<int>(),
                 Subject = A<string>(),
                 AdviceType = AdviceType.Immediate
             };
             SetupAdviceRepository(immediateAdvice);
-            var mailClient = Freeze<Mock<SingleThreadedMailClient>>();
-            mailClient.Setup(m => m.Send(A<MailMessage>()));
-            var hangfireHelper = Freeze<Mock<AdviceScheduler>>();
-            hangfireHelper.Setup(h => h.Remove(immediateAdvice)).Throws(new ApplicationException("Should not be called"));
-            var sut = A<AdviceService>();
-            var result = sut.SendAdvice(immediateAdvice.Id);
+
+            //Act
+            var result = _sut.SendAdvice(immediateAdvice.Id);
+
+            //Assert
             Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _adviceSchedulerMock.Verify(x => x.Remove(immediateAdvice), Times.Never);
         }
 
         [Fact]
         public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsSentAndJobIsCancelled()
         {
+            //Arrange
             var recurringAdvice = new Advice
             {
-                Id = A<int>(), 
+                Id = A<int>(),
                 Subject = A<string>(),
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
@@ -55,22 +66,22 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = DateTime.Now.AddDays(-1)
             };
             SetupAdviceRepository(recurringAdvice);
-            var mailClient = Freeze<Mock<SingleThreadedMailClient>>();
-            mailClient.Setup(m => m.Send(A<MailMessage>()));
-            var hangfireHelper = Freeze <Mock<AdviceScheduler>>();
-            hangfireHelper.Setup(h => h.Remove(recurringAdvice));
-            var sut = A<AdviceService>();
-            var result = sut.SendAdvice(recurringAdvice.Id);
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert
             Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Once);
         }
 
         private void SetupAdviceRepository(Advice recurringAdvice)
         {
-            var advices = new List<Advice> {recurringAdvice};
-            var adviceRepository = Freeze<Mock<IGenericRepository<Advice>>>();
-            adviceRepository.Setup(r => r.AsQueryable()).Returns(advices.AsQueryable);
-            adviceRepository.Setup(r => r.Update(recurringAdvice));
-            adviceRepository.Setup(r => r.Save());
+            var advices = new List<Advice> { recurringAdvice };
+            _adviceRepositoryMock.Setup(r => r.AsQueryable()).Returns(advices.AsQueryable);
+            _adviceRepositoryMock.Setup(r => r.Update(recurringAdvice));
+            _adviceRepositoryMock.Setup(r => r.Save());
         }
     }
 }

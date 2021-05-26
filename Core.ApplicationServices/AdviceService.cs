@@ -123,7 +123,7 @@ namespace Core.ApplicationServices
                         }
                     }
 
-                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
+                    if (advice.AdviceType != AdviceType.Immediate || IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
