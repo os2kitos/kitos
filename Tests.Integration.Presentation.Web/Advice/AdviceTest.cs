@@ -3,23 +3,28 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
+using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Advice
 {
-    public class AdviceTest : WithAutoFixture
+    public class AdviceTest : WithAutoFixture, IAsyncLifetime
     {
+        private ItProjectDTO _root;
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
         [Fact]
         public async Task Can_Add_Advice()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
@@ -29,7 +34,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDateAfterToday()
+                AlarmDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -44,11 +49,13 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Can_Add_Advice_With_Multiple_Email_Receievers()
         {
             //Arrange
-            var recipient1 = createDefaultEmailRecipient(createWellformedEmail());
-            var recipient2 = createDefaultEmailRecipient(createWellformedEmail());
-            var recipient3 = createDefaultEmailRecipient(createWellformedEmail());
+            var recipient1 = CreateDefaultEmailRecipient(CreateWellformedEmail());
+            var recipient2 = CreateDefaultEmailRecipient(CreateWellformedEmail());
+            var recipient3 = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
@@ -60,7 +67,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient3
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDateAfterToday()
+                AlarmDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -75,9 +82,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Advice_When_Emails_Are_Malformed()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(A<string>()); // Malformed email
+            var recipient = CreateDefaultEmailRecipient(A<string>()); // Malformed email
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
@@ -87,7 +96,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                     recipient
                 },
                 RelationId = A<int>(),
-                AlarmDate = getRandomDateAfterToday()
+                AlarmDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -102,9 +111,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Can_Add_Repeatable_Advice_With_StartDate_Today()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = Core.DomainModel.Advice.Scheduling.Day,
@@ -115,7 +126,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now,
-                StopDate = getRandomDateAfterToday()
+                StopDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -129,9 +140,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Repeatable_Advice_With_StartDate_Before_Today()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = Core.DomainModel.Advice.Scheduling.Day,
@@ -142,7 +155,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = getRandomDateAfterToday()
+                StopDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -156,9 +169,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Repeatable_Advice_With_StartDate_Set_To_Null()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = Core.DomainModel.Advice.Scheduling.Day,
@@ -169,7 +184,7 @@ namespace Tests.Integration.Presentation.Web.Advice
                 },
                 RelationId = A<int>(),
                 AlarmDate = null,
-                StopDate = getRandomDateAfterToday()
+                StopDate = GetRandomDateAfterToday()
             };
 
             //Act
@@ -183,9 +198,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         public async Task Cannot_Add_Repeatable_Advice_With_StopDate_Before_StartDate()
         {
             //Arrange
-            var recipient = createDefaultEmailRecipient(createWellformedEmail());
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
+                Type = ObjectType.itProject,
+                ReceiverId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = Core.DomainModel.Advice.Scheduling.Day,
@@ -207,24 +224,34 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
 
-        private Core.DomainModel.Advice.AdviceUserRelation createDefaultEmailRecipient(string name)
+        private static AdviceUserRelation CreateDefaultEmailRecipient(string name)
         {
-            return new Core.DomainModel.Advice.AdviceUserRelation
+            return new AdviceUserRelation
             {
                 Name = name,
-                RecieverType = Core.DomainModel.Advice.RecieverType.RECIEVER,
-                RecpientType = Core.DomainModel.Advice.RecieverType.USER
+                RecieverType = RecieverType.RECIEVER,
+                RecpientType = RecieverType.USER
             };
         }
 
-        private string createWellformedEmail()
+        private string CreateWellformedEmail()
         {
             return $"{A<string>()}@test.dk";
         }
 
-        private DateTime getRandomDateAfterToday()
+        private DateTime GetRandomDateAfterToday()
         {
             return DateTime.Now.AddDays(Math.Abs(A<int>()));
+        }
+
+        public async Task InitializeAsync()
+        {
+            _root = await ItProjectHelper.CreateProject(A<string>(), TestEnvironment.DefaultOrganizationId);
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
         }
     }
 }

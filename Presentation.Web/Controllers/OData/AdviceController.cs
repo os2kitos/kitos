@@ -47,7 +47,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            return Ok(_adviceService.GetAllAvailableToCurrentUser());
+            return Ok(_adviceService.GetAdvicesFromCurrentUsersOrganizationMemberships());
         }
 
         private IEntityWithAdvices ResolveRoot(Advice advice)
@@ -97,6 +97,11 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
+            if (advice.RelationId == null || advice.Type == null)
+            {
+                //Advice cannot be an orphan - it must belong to a root
+                return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
+            }
             if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Name)))
             {
                 return BadRequest("Invalid email exists among receivers or CCs");

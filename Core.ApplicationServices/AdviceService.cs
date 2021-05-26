@@ -92,7 +92,7 @@ namespace Core.ApplicationServices
             return result.AsQueryable();
         }
 
-        public IQueryable<Advice> GetAllAvailableToCurrentUser()
+        public IQueryable<Advice> GetAdvicesFromCurrentUsersOrganizationMemberships()
         {
             return OrganizationalUserContext
                 .OrganizationIds
