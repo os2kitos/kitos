@@ -24,16 +24,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                AdviceType = A<AdviceType>(),
+                Scheduling = Scheduling.Day,
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = GetRandomDateAfterToday()
             };
 
@@ -55,18 +54,17 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                AdviceType = A<AdviceType>(),
+                Scheduling = Scheduling.Day,
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient1,
                     recipient2,
                     recipient3
                 },
-                RelationId = A<int>(),
                 AlarmDate = GetRandomDateAfterToday()
             };
 
@@ -86,16 +84,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                AdviceType = A<Core.DomainModel.Advice.AdviceType>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                AdviceType = A<AdviceType>(),
+                Scheduling = Scheduling.Day,
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = GetRandomDateAfterToday()
             };
 
@@ -115,16 +112,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                Scheduling = Scheduling.Day,
                 AdviceType = AdviceType.Repeat,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = DateTime.Now,
                 StopDate = GetRandomDateAfterToday()
             };
@@ -144,16 +140,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                Scheduling = Scheduling.Day,
                 AdviceType = AdviceType.Repeat,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = DateTime.Now.AddDays(-1),
                 StopDate = GetRandomDateAfterToday()
             };
@@ -173,16 +168,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                Scheduling = Scheduling.Day,
                 AdviceType = AdviceType.Repeat,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = null,
                 StopDate = GetRandomDateAfterToday()
             };
@@ -202,16 +196,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = new Core.DomainModel.Advice.Advice
             {
                 Type = ObjectType.itProject,
-                ReceiverId = _root.Id,
+                RelationId = _root.Id,
                 Body = A<string>(),
                 Subject = A<string>(),
-                Scheduling = Core.DomainModel.Advice.Scheduling.Day,
+                Scheduling = Scheduling.Day,
                 AdviceType = AdviceType.Repeat,
-                Reciepients = new List<Core.DomainModel.Advice.AdviceUserRelation>()
+                Reciepients = new List<AdviceUserRelation>()
                 {
                     recipient
                 },
-                RelationId = A<int>(),
                 AlarmDate = DateTime.Now,
                 StopDate = DateTime.Now.AddDays(-1),
             };
@@ -226,7 +219,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         private static AdviceUserRelation CreateDefaultEmailRecipient(string name)
         {
-            return new AdviceUserRelation
+            return new()
             {
                 Name = name,
                 RecieverType = RecieverType.RECIEVER,
