@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -18,6 +19,8 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
+        private static readonly ConcurrentDictionary<OrganizationRole, Cookie> CookiesCache = new ConcurrentDictionary<OrganizationRole, Cookie>();
+        private static readonly ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO> TokenCache = new ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO>();
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
@@ -105,10 +108,8 @@ namespace Tests.Integration.Presentation.Web.Tools
                 cookieContainer.Add(authCookie);
             }
             cookieContainer.Add(csrfToken.CookieToken);
-            using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
-            {
-                return await client.SendAsync(requestMessage);
-            }
+            using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
+            return await client.SendAsync(requestMessage);
         }
 
         public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
@@ -119,19 +120,15 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             if (authCookie == null)
             {
-                using (var client = new HttpClient())
-                {
-                    csrfResponse = await client.SendAsync(csrfRequest);
-                }
+                using var client = new HttpClient();
+                csrfResponse = await client.SendAsync(csrfRequest);
             }
             else
             {
                 var cookieContainer = new CookieContainer();
                 cookieContainer.Add(authCookie);
-                using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
-                {
-                    csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
-                }
+                using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
+                csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
             }
 
             Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
@@ -188,32 +185,31 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
             var requestMessage = CreatePostMessage(url, loginDto);
-            using (var client = new HttpClient())
-            {
-                return await client.SendAsync(requestMessage);
-            }
+            using var client = new HttpClient();
+            return await client.SendAsync(requestMessage);
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
+            if (TokenCache.TryGetValue(role, out var cachedToken))
+                return cachedToken;
+
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
             var userCredentials = TestEnvironment.GetCredentials(role, true);
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
-            {
-                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
-            }
+            using var httpResponseMessage = await PostForKitosToken(url, loginDto);
+            var tokenResponseDtoAsync = await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
+            TokenCache.TryAdd(role, tokenResponseDtoAsync);
+            return tokenResponseDtoAsync;
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(LoginDTO loginDto)
         {
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
 
-            using (var httpResponseMessage = await PostForKitosToken(url, loginDto))
-            {
-                return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
-            }
+            using var httpResponseMessage = await PostForKitosToken(url, loginDto);
+            return await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
         }
 
         private static async Task<GetTokenResponseDTO> GetTokenResponseDtoAsync(LoginDTO loginDto, HttpResponseMessage httpResponseMessage)
@@ -234,6 +230,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
         {
+            if (CookiesCache.TryGetValue(role, out var cachedCookie))
+                return cachedCookie;
+
             var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
@@ -247,10 +246,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookieName = cookieParts[0];
             var cookieValue = cookieParts[1].Split(';')[0];
 
-            return new Cookie(cookieName, cookieValue)
+            var cookie = new Cookie(cookieName, cookieValue)
             {
                 Domain = url.Host
             };
+            CookiesCache.TryAdd(role, cookie);
+            return cookie;
         }
 
         public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
@@ -287,11 +288,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            using (var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto))
-            {
-                Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
-                return patch;
-            };
+            using var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto);
+            Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
+            return patch;
+            ;
         }
 
         public static async Task<HttpResponseMessage> DeleteUserAsync(int id)

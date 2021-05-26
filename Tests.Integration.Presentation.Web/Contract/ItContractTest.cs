@@ -155,7 +155,8 @@ namespace Tests.Integration.Presentation.Web.Contract
                 StopDate = DateTime.Now.AddDays(365),
                 Scheduling = Scheduling.Quarter,
                 Subject = "Can_Delete_Contract_Advices",
-                RelationId = contract.Id
+                RelationId = contract.Id,
+                Type = ObjectType.itProject
             };
             using var createResponse = await AdviceHelper.PostAdviceAsync(advice, organizationId);
             Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
