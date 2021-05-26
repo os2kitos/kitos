@@ -271,7 +271,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         private static AdviceUserRelation CreateDefaultEmailRecipient(string name)
         {
-            return new()
+            return new AdviceUserRelation()
             {
                 Name = name,
                 RecieverType = RecieverType.RECIEVER,
