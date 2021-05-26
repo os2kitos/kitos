@@ -392,6 +392,7 @@ namespace Presentation.Web
             deactivateAdvice.Returns<IHttpActionResult>();
 
             BindEntitySet<Advice, AdviceController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(Advice)).AddProperty(typeof(Advice).GetProperty(nameof(Advice.CanBeDeleted)));
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
 
