@@ -32,6 +32,13 @@
                     change: onChange,
                     columns: [
                         {
+                            field: "IsActive",
+                            title: "Aktiv",
+                            template: data => data.IsActive ? "<i class='fa fa-check'></i> " : "",
+                            width: 45,
+                            attributes: { "class": "centeredContent" }
+                        },
+                        {
                             field: "Name",
                             title: "Navn",
                             template: data => {
