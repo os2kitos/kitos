@@ -19,7 +19,10 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public IHttpActionResult Get()
         {
-            var sentFromAll = _adviceService.GetAllAvailableToCurrentUser().SelectMany(x => x.AdviceSent);
+            var sentFromAll = _adviceService
+                .GetAllAvailableToCurrentUser()
+                .SelectMany(x => x.AdviceSent);
+
             return Ok(sentFromAll);
         }
     }
