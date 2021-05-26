@@ -30,8 +30,8 @@
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
-                    var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
-                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
+                    var payloadDateFormat = "YYYY-MM-DD";
+                    var allowedDateFormats = ["DD-MM-YYYY", payloadDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
@@ -57,8 +57,8 @@
                             $scope.emailBody = adviceData.Body;
                             $scope.adviceTypeData = Models.ViewModel.Advice.AdviceTypeOptions.getOptionFromEnumString(adviceData.AdviceType);
                             $scope.adviceRepetitionData = Models.ViewModel.Advice.AdviceRepetitionOptions.getOptionFromEnumString(adviceData.Scheduling);
-                            $scope.startDate = adviceData.AlarmDate;
-                            $scope.stopDate = adviceData.StopDate;
+                            $scope.startDate = convertDateTimeStringToDateString(adviceData.AlarmDate);
+                            $scope.stopDate = convertDateTimeStringToDateString(adviceData.StopDate);
                             $scope.hiddenForjob = adviceData.JobId;
                             $scope.isActive = adviceData.IsActive;
                             $scope.preSelectedReceivers = [];
@@ -99,18 +99,13 @@
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
-                            // Time is added to allow the use of the full day
-                            payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
+                            payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                             httpCall(payload, action, url);
 
                         } else if (action === "PATCH") {
-                            // If stopDate have not been changed it already has the backend format required and adding 23:59:59 result in the current payload.StopDate being invalid date 
-                            if (payload.StopDate === "Invalid date") {
-                                payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
-                            }
                             url = `Odata/advice(${id})`;
                             // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
                             patchAdviceUserRelation(id, payload)
@@ -371,6 +366,10 @@
                             }
                         }
                         return payload;
+                    };
+
+                    function convertDateTimeStringToDateString(dateTime: string): string {
+                        return dateTime.split("T")[0];
                     };
                 }
             ],

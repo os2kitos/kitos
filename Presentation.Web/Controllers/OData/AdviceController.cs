@@ -8,6 +8,7 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.AdviceSent;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Time;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
@@ -112,7 +113,7 @@ namespace Presentation.Web.Controllers.OData
 
                     if (changedPropertyNames.Contains("StopDate"))
                     {
-                        if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
+                        if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date  || advice.StopDate.Value.Date < DateTime.Now.Date)
                         {
                             throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
                         }

@@ -95,29 +95,29 @@ namespace Core.ApplicationServices
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
                 if (advice != null)
                 {
-                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
-                    {
-                        try
-                        {
-                            DispatchEmails(advice);
-                        }
-                        catch (Exception e)
-                        {
-                            Logger?.Error(e, "Error sending emails in advice service");
-                        }
-                    }
-
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         HangfireHelper.RemoveFromHangfire(advice);
                     }
 
-                    AdviceRepository.Update(advice);
-                    AdviceRepository.Save();
+                    else if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                    {
+                        try
+                        {
+                            DispatchEmails(advice);
 
-                    AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-                    AdviceSentRepository.Save();
+                            AdviceRepository.Update(advice);
+                            AdviceRepository.Save();
+
+                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+                            AdviceSentRepository.Save();
+                        }
+                        catch (Exception e)
+                        {
+                            Logger?.Error(e, "Error sending emails in advice service");
+                        }
+                    }
                 }
                 return true;
             }
@@ -130,7 +130,7 @@ namespace Core.ApplicationServices
 
         private static bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate < DateTime.Now;
+            return advice.StopDate.Value.Date < DateTime.Now.Date;
         }
 
         private static bool IsAdviceInScope(Advice advice)
