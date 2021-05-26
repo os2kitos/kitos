@@ -291,7 +291,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto);
             Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
             return patch;
-            ;
         }
 
         public static async Task<HttpResponseMessage> DeleteUserAsync(int id)
