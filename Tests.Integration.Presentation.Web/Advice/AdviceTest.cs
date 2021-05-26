@@ -246,7 +246,7 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         public async Task InitializeAsync()
         {
-            _root = await ItProjectHelper.CreateProject(A<string>(), TestEnvironment.DefaultOrganizationId);
+            _root = await ItProjectHelper.CreateProject(A<string>(), OrganizationId);
         }
 
         public Task DisposeAsync()
