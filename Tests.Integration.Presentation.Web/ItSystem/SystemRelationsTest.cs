@@ -401,7 +401,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Assert - second page with 1 item since there are only 3 in total
             const int expectedSecondPageSize = 1;
-            Assert.Equal(expectedSequence.Skip(pageSize).Take(expectedSecondPageSize), secondPage.Select(x => x.Id));
+            Assert.Equal(expectedSequence.Skip(pageSize).Take(expectedSecondPageSize).ToList(), secondPage.Select(x => x.Id).ToList());
         }
 
         #region Helpers
