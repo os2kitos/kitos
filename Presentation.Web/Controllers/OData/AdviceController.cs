@@ -44,6 +44,7 @@ namespace Presentation.Web.Controllers.OData
             _adviceRootResolution = adviceRootResolution;
         }
 
+        [EnableQuery]
         public override IHttpActionResult Get()
         {
             return Ok(_adviceService.GetAllAvailableToCurrentUser());

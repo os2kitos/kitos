@@ -305,28 +305,32 @@ namespace Core.ApplicationServices
 
         private void ScheduleAdvice(Advice advice)
         {
-            if(advice.AlarmDate == null)
-                throw new ArgumentException(nameof(advice.AlarmDate) + " must be defined");
-
             if (advice.AdviceType == AdviceType.Immediate)
             {
                 BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
             }
             else if (advice.AdviceType == AdviceType.Repeat)
             {
+                var alarmDate = advice.AlarmDate;
+
+                if (alarmDate == null)
+                    throw new ArgumentException(nameof(alarmDate) + " must be defined");
+
                 BackgroundJob.Schedule(
                     () => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value,
-                        advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+                        alarmDate.Value), new DateTimeOffset(alarmDate.Value));
             }
         }
 
         public void RescheduleRecurringJob(Advice advice)
         {
-            if (advice.AlarmDate == null)
-                throw new ArgumentException(nameof(advice.AlarmDate) + " must be defined");
+            var alarmDate = advice.AlarmDate;
+
+            if (alarmDate == null)
+                throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
             DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
-            BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+            BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, alarmDate.Value), new DateTimeOffset(alarmDate.Value));
         }
 
         public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)

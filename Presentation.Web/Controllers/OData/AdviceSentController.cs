@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Microsoft.AspNet.OData;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
@@ -15,6 +16,7 @@ namespace Presentation.Web.Controllers.OData
             _adviceService = adviceService;
         }
 
+        [EnableQuery]
         public IHttpActionResult Get()
         {
             var sentFromAll = _adviceService.GetAllAvailableToCurrentUser().SelectMany(x => x.AdviceSent);
