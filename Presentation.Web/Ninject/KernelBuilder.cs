@@ -10,6 +10,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Jobs;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Organizations;
@@ -198,7 +199,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
-            kernel.Bind<IHangfireHelper>().To<HangfireHelper>().InCommandScope(Mode);
+            kernel.Bind<IAdviceScheduler>().To<AdviceScheduler>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs

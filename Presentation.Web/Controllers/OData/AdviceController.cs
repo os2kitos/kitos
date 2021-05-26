@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.OData
 
         public override IHttpActionResult Get()
         {
-            return Ok(_adviceService.GetAllForCurrentUser());
+            return Ok(_adviceService.GetAllAvailableToCurrentUser());
         }
 
         private IEntityWithAdvices ResolveRoot(Advice advice)

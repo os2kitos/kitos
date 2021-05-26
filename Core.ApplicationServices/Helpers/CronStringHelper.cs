@@ -3,7 +3,7 @@ using Core.DomainModel.Advice;
 
 namespace Core.ApplicationServices.Helpers
 {
-    public class CronStringHelper
+    public static class CronStringHelper
     {
         // ┌───────────── minute (0 - 59)
         // │ ┌───────────── hour (0 - 23)

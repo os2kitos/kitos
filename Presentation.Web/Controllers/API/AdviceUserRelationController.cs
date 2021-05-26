@@ -12,6 +12,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Advice;
 using Infrastructure.Services.DomainEvents;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
@@ -35,12 +36,14 @@ namespace Presentation.Web.Controllers.API
             _adviceRootResolution = adviceRootResolution;
         }
 
-        public override HttpResponseMessage GetAll(PagingModel<AdviceUserRelation> paging)
-        {
-            //TODO: Must not fallback to standard access control since that is not enough without global read access
+        [NonAction]
+        public override HttpResponseMessage GetAll(PagingModel<AdviceUserRelation> paging) => throw new NotSupportedException();
 
-            return base.GetAll(paging);
-        }
+        [NonAction]
+        public override HttpResponseMessage GetSingle(int id) => throw new NotSupportedException();
+
+        [NonAction]
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj) => throw new NotSupportedException();
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {

@@ -8,7 +8,7 @@ namespace Core.ApplicationServices
     {
         void CreateAdvice(Advice advice);
         IQueryable<Advice> GetAdvicesForOrg(int orgKey);
-        IQueryable<Advice> GetAllForCurrentUser();
+        IQueryable<Advice> GetAllAvailableToCurrentUser();
         bool SendAdvice(int id);
         void RescheduleRecurringJob(Advice advice);
         void Delete(Advice key);

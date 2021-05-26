@@ -13,6 +13,7 @@ using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Helpers;
+using Core.ApplicationServices.Jobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Hangfire;
@@ -32,7 +33,7 @@ namespace Core.ApplicationServices
         public IGenericRepository<User> UserRepository { get; set; }
 
         [Inject]
-        public IGenericRepository<Advice> AdviceRepository { get; set; }
+        public IGenericRepository<DomainModel.Advice.Advice> AdviceRepository { get; set; }
 
         [Inject]
         public IGenericRepository<AdviceSent> AdviceSentRepository { get; set; }
@@ -68,7 +69,7 @@ namespace Core.ApplicationServices
         public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
         [Inject]
-        public IHangfireHelper HangfireHelper { get; set; }
+        public IAdviceScheduler AdviceScheduler { get; set; }
 
         [Inject]
         public ITransactionManager TransactionManager { get; set; }
@@ -91,17 +92,16 @@ namespace Core.ApplicationServices
             return result.AsQueryable();
         }
 
-        public IQueryable<Advice> GetAllForCurrentUser()
+        public IQueryable<Advice> GetAllAvailableToCurrentUser()
         {
-            IQueryable<Advice> combinedQuery = null;
-
-            foreach (var organizationId in OrganizationalUserContext.OrganizationIds)
-            {
-                var current = GetAdvicesForOrg(organizationId);
-                combinedQuery = combinedQuery == null ? current : combinedQuery.Concat(current);
-            }
-
-            return combinedQuery;
+            return OrganizationalUserContext
+                .OrganizationIds
+                .Select(GetAdvicesForOrg)
+                .Aggregate<IQueryable<Advice>, IQueryable<Advice>>
+                (
+                    null,
+                    (acc, next) => acc == null ? next : acc.Concat(next)
+                );
         }
 
         public bool SendAdvice(int id)
@@ -126,7 +126,7 @@ namespace Core.ApplicationServices
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
-                        HangfireHelper.RemoveFromHangfire(advice);
+                        AdviceScheduler.Remove(advice);
                     }
 
                     AdviceRepository.Update(advice);
@@ -172,10 +172,10 @@ namespace Core.ApplicationServices
                         switch (r.RecpientType)
                         {
                             case RecieverType.USER:
-                                AddRecipientByName(r, message, message.To);
+                                AddRecipientByName(r, message.To);
                                 break;
                             case RecieverType.ROLE:
-                                AddRecipientByRole(advice, r, message, message.To);
+                                AddRecipientByRole(advice, r, message.To);
                                 break;
                         }
                         break;
@@ -183,10 +183,10 @@ namespace Core.ApplicationServices
                         switch (r.RecpientType)
                         {
                             case RecieverType.USER:
-                                AddRecipientByName(r, message, message.CC);
+                                AddRecipientByName(r, message.CC);
                                 break;
                             case RecieverType.ROLE:
-                                AddRecipientByRole(advice, r, message, message.CC);
+                                AddRecipientByRole(advice, r, message.CC);
                                 break;
                         }
                         break;
@@ -196,7 +196,7 @@ namespace Core.ApplicationServices
             advice.SentDate = DateTime.Now;
         }
 
-        private static void AddRecipientByName(AdviceUserRelation r, MailMessage message, MailAddressCollection mailAddressCollection)
+        private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
         {
             if (!string.IsNullOrEmpty(r.Name))
             {
@@ -204,7 +204,7 @@ namespace Core.ApplicationServices
             }
         }
 
-        private void AddRecipientByRole(Advice advice, AdviceUserRelation r, MailMessage message, MailAddressCollection mailAddressCollection)
+        private void AddRecipientByRole(Advice advice, AdviceUserRelation r, MailAddressCollection mailAddressCollection)
         {
             switch (advice.Type)
             {
@@ -305,6 +305,9 @@ namespace Core.ApplicationServices
 
         private void ScheduleAdvice(Advice advice)
         {
+            if(advice.AlarmDate == null)
+                throw new ArgumentException(nameof(advice.AlarmDate) + " must be defined");
+
             if (advice.AdviceType == AdviceType.Immediate)
             {
                 BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
@@ -319,6 +322,9 @@ namespace Core.ApplicationServices
 
         public void RescheduleRecurringJob(Advice advice)
         {
+            if (advice.AlarmDate == null)
+                throw new ArgumentException(nameof(advice.AlarmDate) + " must be defined");
+
             DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
             BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
         }
