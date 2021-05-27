@@ -115,12 +115,14 @@ namespace Core.ApplicationServices
                     {
                         try
                         {
+                            using var transaction = TransactionManager.Begin(IsolationLevel.Serializable);
                             DispatchEmails(advice);
 
                             AdviceRepository.Update(advice);
 
                             AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                             AdviceSentRepository.Save();
+                            transaction.Commit();
                         }
                         catch (Exception e)
                         {

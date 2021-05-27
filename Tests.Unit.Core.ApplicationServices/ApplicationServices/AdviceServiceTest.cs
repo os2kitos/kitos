@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Jobs;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -18,6 +20,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IMailClient> _mailClientMock;
         private readonly Mock<IAdviceScheduler> _adviceSchedulerMock;
         private readonly Mock<IGenericRepository<Advice>> _adviceRepositoryMock;
+        private readonly Mock<ITransactionManager> _transactionManager;
 
         public AdviceServiceTest()
         {
@@ -29,6 +32,8 @@ namespace Tests.Unit.Core.ApplicationServices
             _adviceRepositoryMock = new Mock<IGenericRepository<Advice>>();
             _sut.AdviceRepository = _adviceRepositoryMock.Object;
             _sut.AdviceSentRepository = Mock.Of<IGenericRepository<AdviceSent>>();
+            _transactionManager = new Mock<ITransactionManager>();
+            _sut.TransactionManager = _transactionManager.Object;
         }
 
         [Fact]
@@ -42,6 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Immediate
             };
             SetupAdviceRepository(immediateAdvice);
+            SetupTransactionManager();
 
             //Act
             var result = _sut.SendAdvice(immediateAdvice.Id);
@@ -66,6 +72,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = DateTime.Now.AddDays(1)
             };
             SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
 
             //Act
             var result = _sut.SendAdvice(recurringAdvice.Id);
@@ -130,6 +137,12 @@ namespace Tests.Unit.Core.ApplicationServices
             _adviceRepositoryMock.Setup(r => r.AsQueryable()).Returns(advices.AsQueryable);
             _adviceRepositoryMock.Setup(r => r.Update(advice));
             _adviceRepositoryMock.Setup(r => r.Save());
+        }
+
+        private void SetupTransactionManager()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
         }
     }
 }
