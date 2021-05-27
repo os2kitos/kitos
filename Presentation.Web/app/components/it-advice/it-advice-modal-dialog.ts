@@ -25,6 +25,7 @@
                     $scope.adviceRepetitionData = null;
                     $scope.adviceTypeOptions = Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
+                    $scope.startDateInfoMessage = null;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
@@ -220,6 +221,21 @@
                                 return false;
                             }
 
+                        }
+
+                        const repetition = $scope.adviceRepetitionData;
+                        if (isCurrentAdviceRecurring() &&
+                            repetition &&
+                            parseInt(start.format("DD")) >= 29 &&
+                            (
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Quarter ||
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Month ||
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Semiannual
+                            )
+                        ) {
+                            $scope.startDateInfoMessage = "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den 1. i den efterfølgende måned.";
+                        } else {
+                            $scope.startDateInfoMessage = null;
                         }
 
                         $scope.startDateErrMessage = "";
