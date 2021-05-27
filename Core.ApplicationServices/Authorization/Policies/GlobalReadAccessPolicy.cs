@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
-using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Authorization.Policies
@@ -20,11 +17,8 @@ namespace Core.ApplicationServices.Authorization.Policies
             var typesWithGlobalRead =
                 new HashSet<Type>
                 {
-                    typeof(Advice),
-                    typeof(AdviceUserRelation),
                     typeof(Text),
                     typeof(HelpText),
-                    typeof(AdviceSent),
                     typeof(GlobalConfig),
                     typeof(ExternalReference),
                     typeof(TaskRef)

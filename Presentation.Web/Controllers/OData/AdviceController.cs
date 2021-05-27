@@ -4,14 +4,21 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -20,22 +27,81 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IAdviceService _adviceService;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
+        private readonly IAdviceRootResolution _adviceRootResolution;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
-            IGenericRepository<AdviceSent> sentRepository)
+            IGenericRepository<AdviceSent> sentRepository,
+            IAdviceRootResolution adviceRootResolution
+            )
             : base(repository)
         {
             _adviceService = adviceService;
             _sentRepository = sentRepository;
+            _adviceRootResolution = adviceRootResolution;
+        }
+
+        [EnableQuery]
+        public override IHttpActionResult Get()
+        {
+            return Ok(_adviceService.GetAdvicesFromCurrentUsersOrganizationMemberships());
+        }
+
+        private IEntityWithAdvices ResolveRoot(Advice advice)
+        {
+            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
+        }
+
+        protected override void RaiseCreatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        private void RaiseAsRootModification(Advice entity)
+        {
+            switch (ResolveRoot(entity))
+            {
+                case ItContract root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
+                    break;
+                case ItSystemUsage root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
+                    break;
+                case ItProject root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
+                    break;
+                case DataProcessingRegistration root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
+                    break;
+            }
         }
 
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
+            if (advice.RelationId == null || advice.Type == null)
+            {
+                //Advice cannot be an orphan - it must belong to a root
+                return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
+            }
             if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Name)))
             {
                 return BadRequest("Invalid email exists among receivers or CCs");
@@ -120,7 +186,7 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-                
+
                 if (response is UpdatedODataResult<Advice>)
                 {
                     _adviceService.RescheduleRecurringJob(advice);

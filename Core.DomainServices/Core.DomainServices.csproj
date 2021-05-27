@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\IAdviceRootResolution.cs" />
+    <Compile Include="Advice\AdviceRootResolution.cs" />
     <Compile Include="Authorization\CrossOrganizationDataReadAccessLevel.cs" />
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />

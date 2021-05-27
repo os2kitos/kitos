@@ -12,16 +12,23 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var recipients = advice.Reciepients.Select(x => new { Name = x.Name, RecpientType = x.RecpientType.ToString(), RecieverType = x.RecieverType.ToString() });
+            var recipients = advice.Reciepients.Select(x => new
+            {
+                Name = x.Name, 
+                RecpientType = x.RecpientType.ToString(), 
+                RecieverType = x.RecieverType.ToString()
+            }).ToList();
 
             var body = new
             {
+                RelationId = advice.RelationId,
+                Type = advice.Type?.ToString("G"),
                 Scheduling = advice.Scheduling?.ToString(),
                 Subject = advice.Subject,
                 Body = advice.Body,
                 AlarmDate = advice.AlarmDate?.ToString(HttpApi.OdataDateTimeFormat),
                 Reciepients = recipients,
-                AdviceType = advice.AdviceType.ToString(),
+                AdviceType = advice.AdviceType.ToString("D"),
                 StopDate = advice.StopDate?.ToString(HttpApi.OdataDateTimeFormat)
             };
 
