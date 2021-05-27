@@ -1,9 +1,16 @@
 Function Prepare-Package([String] $environmentName, $packageDirectory) {
 
+    Write-Host "Environment is $environmentName"
+
 	if($environmentName -eq "integration"){
+
+        Write-Host "Unzipping $packageDirectory to is TEMP_PresentationWeb"
+
         Expand-Archive -Path $packageDirectory -DestinationPath .\TEMP_PresentationWeb
 
         Remove-Item -Path $packageDirectory
+
+        Write-Host "Updating Web.config"
 
         $filePathToTask = (Resolve-Path ".\TEMP_PresentationWeb\Content\C_C\kitos_tmp\app\Web.config")
         $xml = New-Object XML
@@ -23,10 +30,14 @@ Function Prepare-Package([String] $environmentName, $packageDirectory) {
         $element.AppendChild($smtpChildNode)
 
         $xml.Save($filePathToTask)
+
+        Write-Host "Update of Web.config complete"
         
         Compress-Archive -Path (Resolve-Path ".\TEMP_PresentationWeb\*") -Update -DestinationPath $packageDirectory
 
-        Remove-Item -Path (Resolve-Path ".\TEMP_PresentationWeb") -Recurse -Force        
+        Remove-Item -Path (Resolve-Path ".\TEMP_PresentationWeb") -Recurse -Force      
+        
+        Write-Host "Zipping file back complete" 
 	}
 
 }
