@@ -95,20 +95,13 @@ namespace Core.ApplicationServices
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
                 if (advice != null)
                 {
-                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
-                    {
-                        advice.IsActive = false;
-                        HangfireHelper.RemoveFromHangfire(advice);
-                    }
-
-                    else if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
                         try
                         {
                             DispatchEmails(advice);
 
                             AdviceRepository.Update(advice);
-                            AdviceRepository.Save();
 
                             AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                             AdviceSentRepository.Save();
@@ -117,6 +110,12 @@ namespace Core.ApplicationServices
                         {
                             Logger?.Error(e, "Error sending emails in advice service");
                         }
+                    }
+
+                    if (advice.AdviceType == AdviceType.Immediate || IsAdviceExpired(advice))
+                    {
+                        advice.IsActive = false;
+                        HangfireHelper.RemoveFromHangfire(advice);
                     }
                 }
                 return true;
@@ -135,7 +134,7 @@ namespace Core.ApplicationServices
 
         private static bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date;
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date && !IsAdviceExpired(advice);
         }
 
         private void DispatchEmails(Advice advice)

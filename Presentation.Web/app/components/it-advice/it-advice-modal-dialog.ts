@@ -369,7 +369,7 @@
                     };
 
                     function convertDateTimeStringToDateString(dateTime: string): string {
-                        return dateTime.split("T")[0];
+                        return dateTime.substring(0, 10); //Take only the Date part of the DateTime string
                     };
                 }
             ],
