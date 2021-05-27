@@ -40,11 +40,11 @@ namespace Core.DomainModel.Advice
     public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
     {
         public Advice() {
-            AdviceSent = new List<AdviceSent.AdviceSent>();
+            AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
         }
 
-        public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
+        public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
         public ObjectType? Type { get; set; }

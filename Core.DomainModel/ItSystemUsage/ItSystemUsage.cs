@@ -22,7 +22,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
@@ -509,11 +509,11 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return relation
                 .SetRelationTo(toSystemUsage)
-                .Select(_ => _.SetDescription(changedDescription))
-                .Select(_ => _.SetRelationInterface(relationInterface))
-                .Select(_ => _.SetContract(toContract))
-                .Select(_ => _.SetFrequency(toFrequency))
-                .Select(_ => _.SetReference(changedReference));
+                .Bind(_ => _.SetDescription(changedDescription))
+                .Bind(_ => _.SetRelationInterface(relationInterface))
+                .Bind(_ => _.SetContract(toContract))
+                .Bind(_ => _.SetFrequency(toFrequency))
+                .Bind(_ => _.SetReference(changedReference));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(

@@ -10,6 +10,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Jobs;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Organizations;
@@ -85,6 +86,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
 using Core.DomainModel.ItProject;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 
 namespace Presentation.Web.Ninject
@@ -197,7 +199,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
-            kernel.Bind<IHangfireHelper>().To<HangfireHelper>().InCommandScope(Mode);
+            kernel.Bind<IAdviceScheduler>().To<AdviceScheduler>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -367,6 +369,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
+
+            kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

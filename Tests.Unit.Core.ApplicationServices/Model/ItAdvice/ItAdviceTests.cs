@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using System;
 using Tests.Toolkit.Patterns;
 using Xunit;

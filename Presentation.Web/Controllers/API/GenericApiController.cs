@@ -167,7 +167,7 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var savedItem = PostQuery(item);
-                DomainEvents.Raise(new EntityCreatedEvent<TModel>(savedItem));
+                RaiseNewObjectCreated(savedItem);
                 return NewObjectCreated(savedItem);
             }
             catch (ConflictException e)
@@ -188,6 +188,11 @@ namespace Presentation.Web.Controllers.API
         protected HttpResponseMessage NewObjectCreated(TModel savedItem)
         {
             return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+        }
+
+        protected virtual void RaiseNewObjectCreated(TModel savedItem)
+        {
+            DomainEvents.Raise(new EntityCreatedEvent<TModel>(savedItem));
         }
 
         protected virtual void PrepareNewObject(TModel item)
@@ -218,9 +223,14 @@ namespace Presentation.Web.Controllers.API
 
         protected virtual void DeleteQuery(TModel entity)
         {
+            RaiseDeleted(entity);
             Repository.DeleteByKey(entity.Id);
-            DomainEvents.Raise(new EntityDeletedEvent<TModel>(entity));
             Repository.Save();
+        }
+
+        protected virtual void RaiseDeleted(TModel entity)
+        {
+            DomainEvents.Raise(new EntityDeletedEvent<TModel>(entity));
         }
 
         // DELETE api/T
@@ -353,10 +363,15 @@ namespace Presentation.Web.Controllers.API
                 }
             }
             Repository.Update(item);
-            DomainEvents.Raise(new EntityUpdatedEvent<TModel>(item));
+            RaiseUpdated(item);
             Repository.Save();
 
             return item;
+        }
+
+        protected virtual void RaiseUpdated(TModel item)
+        {
+            DomainEvents.Raise(new EntityUpdatedEvent<TModel>(item));
         }
 
         // PATCH api/T
