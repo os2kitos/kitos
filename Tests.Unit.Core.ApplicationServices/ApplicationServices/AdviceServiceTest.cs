@@ -32,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void SendAdvice_GivenImmediateActiveAdvice_AdviceIsSentImmediately()
+        public void SendAdvice_GivenImmediateActiveAdvice_AdviceIsSentImmediatelyAndJobIsNotRemovedAsThereIsNoJob()
         {
             //Arrange
             var immediateAdvice = new Advice
@@ -53,7 +53,31 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsSentAndJobIsCancelled()
+        public void SendAdvice_GivenRecurringActiveAdvice_AdviceIsSentAndJobIsNotCancelled()
+        {
+            //Arrange
+            var recurringAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
+                Scheduling = Scheduling.Quarter,
+                AlarmDate = DateTime.Now.AddDays(-1),
+                StopDate = DateTime.Now.AddDays(1)
+            };
+            SetupAdviceRepository(recurringAdvice);
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Never);
+        }
+
+        [Fact]
+        public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsNotSentAndJobIsCancelled()
         {
             //Arrange
             var recurringAdvice = new Advice
@@ -72,15 +96,39 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result);
-            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
             _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Once);
         }
 
-        private void SetupAdviceRepository(Advice recurringAdvice)
+        [Fact]
+        public void SendAdvice_GivenRecurringActiveAdviceWithLaterThanTodayAlarmDate_AdviceIsNotSentAndJobIsNotCancelled()
         {
-            var advices = new List<Advice> { recurringAdvice };
+            //Arrange
+            var recurringAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
+                Scheduling = Scheduling.Quarter,
+                AlarmDate = DateTime.Now.AddDays(1),
+                StopDate = DateTime.Now.AddDays(2)
+            };
+            SetupAdviceRepository(recurringAdvice);
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
+            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Never);
+        }
+
+        private void SetupAdviceRepository(Advice advice)
+        {
+            var advices = new List<Advice> { advice };
             _adviceRepositoryMock.Setup(r => r.AsQueryable()).Returns(advices.AsQueryable);
-            _adviceRepositoryMock.Setup(r => r.Update(recurringAdvice));
+            _adviceRepositoryMock.Setup(r => r.Update(advice));
             _adviceRepositoryMock.Setup(r => r.Save());
         }
     }

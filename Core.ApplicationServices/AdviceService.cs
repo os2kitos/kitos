@@ -128,7 +128,11 @@ namespace Core.ApplicationServices
                         }
                     }
 
-                    if (advice.AdviceType != AdviceType.Immediate || IsAdviceExpired(advice))
+                    if (advice.AdviceType == AdviceType.Immediate)
+                    {
+                        advice.IsActive = false;
+                    }
+                    else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
@@ -145,7 +149,7 @@ namespace Core.ApplicationServices
 
         private static bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate.Value.Date < DateTime.Now.Date;
+            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
         }
 
         private static bool IsAdviceInScope(Advice advice)
