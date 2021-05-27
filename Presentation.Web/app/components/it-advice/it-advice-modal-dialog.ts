@@ -58,8 +58,8 @@
                             $scope.emailBody = adviceData.Body;
                             $scope.adviceTypeData = Models.ViewModel.Advice.AdviceTypeOptions.getOptionFromEnumString(adviceData.AdviceType);
                             $scope.adviceRepetitionData = Models.ViewModel.Advice.AdviceRepetitionOptions.getOptionFromEnumString(adviceData.Scheduling);
-                            $scope.startDate = convertDateTimeStringToDateString(adviceData.AlarmDate);
-                            $scope.stopDate = convertDateTimeStringToDateString(adviceData.StopDate);
+                            $scope.startDate = adviceData.AlarmDate && convertDateTimeStringToDateString(adviceData.AlarmDate);
+                            $scope.stopDate = adviceData.StopDate && convertDateTimeStringToDateString(adviceData.StopDate);
                             $scope.hiddenForjob = adviceData.JobId;
                             $scope.isActive = adviceData.IsActive;
                             $scope.preSelectedReceivers = [];
@@ -162,7 +162,7 @@
                         }
                     };
 
-                    $scope.isEditable = (context = "") => {
+                    function isEditable(context: string) {
                         var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" ||
@@ -179,30 +179,37 @@
                             return false;
                         }
                         return editableInGeneral;
+                    }
+
+                    $scope.isEditable = (context = "") => {
+                        return isEditable(context);
                     };
 
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
 
-                        if ($scope.startDate === undefined) {
-                            $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                        const performStartDateValidation = isEditable("StartDate");
+                        const performStopDateValidation = isEditable("StopDate");
+
+                        if (!$scope.startDate) {
                             return false;
                         }
 
                         var start = moment($scope.startDate, allowedDateFormats, true);
+                        if (performStartDateValidation) {
+                            if (!start.isValid()) {
+                                $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                                return false;
+                            }
 
-                        if (!start.isValid()) {
-                            $scope.startDateErrMessage = "Fra Dato er ugyldig!";
-                            return false;
+                            if (moment().isAfter(start, 'day') && action === "POST") {
+                                $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
+                                return false;
+                            }
                         }
 
-                        if (moment().isAfter(start, 'day') && action === "POST") {
-                            $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
-                            return false;
-                        }
-
-                        if ($scope.stopDate !== undefined) {
+                        if ($scope.stopDate && performStopDateValidation) {
 
                             var stop = moment($scope.stopDate, allowedDateFormats, true);
 

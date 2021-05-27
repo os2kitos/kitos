@@ -78,7 +78,7 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
                     <input id="fromDate" type="text" name="fromDate" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable()" data-element-type="adviceStartDate">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StartDate')" data-element-type="adviceStartDate">
                     <span class="help-block" ng-if="startDateErrMessage">{{startDateErrMessage}}</span>
                     <span ng-if="startDateInfoMessage" class="help-block small">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
