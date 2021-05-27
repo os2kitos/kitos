@@ -4,9 +4,9 @@ namespace Core.DomainModel.Result
 {
     public sealed class Result<TSuccess, TFailure>
     {
-        private readonly IResultPath<TSuccess, TFailure> _state;
+        private readonly IWithResult<TSuccess, TFailure> _state;
 
-        private Result(IResultPath<TSuccess, TFailure> state)
+        private Result(IWithResult<TSuccess, TFailure> state)
         {
             _state = state;
         }
@@ -26,11 +26,11 @@ namespace Core.DomainModel.Result
         public TFailure Error => _state.ErrorValue;
 
         public static Result<TSuccess, TFailure> Success(TSuccess value) =>
-            new Result<TSuccess, TFailure>(new SuccessPath<TSuccess, TFailure>(value));
+            new Result<TSuccess, TFailure>(new WithSuccessfulWithResult<TSuccess, TFailure>(value));
 
 
         public static Result<TSuccess, TFailure> Failure(TFailure value) =>
-            new Result<TSuccess, TFailure>(new ErrorPath<TSuccess, TFailure>(value));
+            new Result<TSuccess, TFailure>(new WithFailure<TSuccess, TFailure>(value));
 
         /// <summary>
         /// Transform the success result to a new result where the <typeparam name="TSuccess" /> is transformed into <typeparam name="T" /> using <paramref name="onSuccess"/>
@@ -42,7 +42,7 @@ namespace Core.DomainModel.Result
             Match(value => Result<T, TFailure>.Success(onSuccess(value)), failure => failure);
 
         /// <summary>
-        /// Bind the result of the current Result with that of another. <typeparam name="TFailure" /> is shared between the two and <typeparam name="TSuccess" /> is input to the computation of the other result with <typeparam name="T" />
+        /// Bind the result of the current Result to a function which computes it's next state. <typeparam name="TFailure" /> is shared between the two and <typeparam name="TSuccess" /> is input to the computation of the other result with <typeparam name="T" />
         /// If you wish to select on the current state, just use <see cref="Select{T}"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -57,46 +57,46 @@ namespace Core.DomainModel.Result
             Match(_ => "SUCCESS", error => $"FAILED:'{Error}'");
 
         #region private state classes
-        private interface IResultPath<out TSuccessPath, out TErrorPath>
+        private interface IWithResult<out TSuccessValue, out TErrorValue>
         {
             bool Success { get; }
-            TSuccessPath SuccessValue { get; }
-            TErrorPath ErrorValue { get; }
-            T Match<T>(Func<TSuccessPath, T> onSuccess, Func<TErrorPath, T> onFailure);
+            TSuccessValue SuccessValue { get; }
+            TErrorValue ErrorValue { get; }
+            T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure);
         }
 
-        private sealed class ErrorPath<TSuccessPath, TErrorPath> : IResultPath<TSuccessPath, TErrorPath>
+        private sealed class WithFailure<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
         {
-            public ErrorPath(TErrorPath error)
+            public WithFailure(TErrorValue error)
             {
                 ErrorValue = error;
             }
 
             public bool Success => false;
 
-            public TSuccessPath SuccessValue =>
+            public TSuccessValue SuccessValue =>
                 throw new InvalidOperationException("Success value is invalid in this state");
 
-            public TErrorPath ErrorValue { get; }
+            public TErrorValue ErrorValue { get; }
 
-            public T Match<T>(Func<TSuccessPath, T> onSuccess, Func<TErrorPath, T> onFailure) =>
+            public T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure) =>
                 onFailure(ErrorValue);
         }
 
-        private sealed class SuccessPath<TSuccessPath, TErrorPath> : IResultPath<TSuccessPath, TErrorPath>
+        private sealed class WithSuccessfulWithResult<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
         {
-            public SuccessPath(TSuccessPath result)
+            public WithSuccessfulWithResult(TSuccessValue result)
             {
                 SuccessValue = result;
             }
 
             public bool Success => true;
 
-            public TSuccessPath SuccessValue { get; }
+            public TSuccessValue SuccessValue { get; }
 
-            public TErrorPath ErrorValue => throw new InvalidOperationException("Error value is invalid in this state");
+            public TErrorValue ErrorValue => throw new InvalidOperationException("Error value is invalid in this state");
 
-            public T Match<T>(Func<TSuccessPath, T> onSuccess, Func<TErrorPath, T> onFailure) =>
+            public T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure) =>
                 onSuccess(SuccessValue);
         }
         #endregion
