@@ -20,10 +20,16 @@ BEGIN
 
     UPDATE [kitos].[dbo].[Advice]
     SET AdviceType=1
-    WHERE Scheduling!=0
+    WHERE Scheduling is not NULL and Scheduling!=0
 
     UPDATE [kitos].[dbo].[Advice]
-    SET AdviceType=0
+    SET 
+        AdviceType=0, 
+        Scheduling=0
     WHERE Scheduling IS NULL
+
+    UPDATE [kitos].[dbo].[Advice]
+    SET IsActive=0
+    WHERE IsActive = 1 and AdviceType = 0 and AlarmDate is NULL and StopDate is NULL
 
 END
