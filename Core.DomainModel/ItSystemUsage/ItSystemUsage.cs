@@ -509,11 +509,11 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return relation
                 .SetRelationTo(toSystemUsage)
-                .Select(_ => _.SetDescription(changedDescription))
-                .Select(_ => _.SetRelationInterface(relationInterface))
-                .Select(_ => _.SetContract(toContract))
-                .Select(_ => _.SetFrequency(toFrequency))
-                .Select(_ => _.SetReference(changedReference));
+                .Bind(_ => _.SetDescription(changedDescription))
+                .Bind(_ => _.SetRelationInterface(relationInterface))
+                .Bind(_ => _.SetContract(toContract))
+                .Bind(_ => _.SetFrequency(toFrequency))
+                .Bind(_ => _.SetReference(changedReference));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(
