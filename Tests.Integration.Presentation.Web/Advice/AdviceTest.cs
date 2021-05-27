@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -26,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, A<AdviceType>(), recipient);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
@@ -34,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.Advice
         }
 
         [Fact]
-        public async Task Can_Add_Advice_With_Multiple_Email_Receievers()
+        public async Task Can_Add_Advice_With_Multiple_Email_Receivers()
         {
             //Arrange
             var recipient1 = CreateDefaultEmailRecipient(CreateWellformedEmail());
@@ -46,7 +49,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.Reciepients.Add(recipient3);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
@@ -61,7 +64,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, A<AdviceType>(), recipient);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -76,7 +79,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
@@ -92,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.StopDate = createAdvice.AlarmDate.Value.AddDays(1);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
@@ -107,7 +110,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.AlarmDate = DateTime.Now.AddDays(-1);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -123,7 +126,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.Type = null;
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -139,7 +142,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.RelationId = null;
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -155,7 +158,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.AlarmDate = null;
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -170,7 +173,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             createAdvice.StopDate = DateTime.Now.AddDays(-1);
 
             //Act
-            var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var result = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -183,15 +186,15 @@ namespace Tests.Integration.Presentation.Web.Advice
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
-            var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
-            var deactivateResult = await AdviceHelper.DeactivateAdviceAsync(createdAdvice.Id);
+            using var deactivateResult = await AdviceHelper.DeactivateAdviceAsync(createdAdvice.Id);
             Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
 
             //Act
-            var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
+            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
@@ -204,12 +207,12 @@ namespace Tests.Integration.Presentation.Web.Advice
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
-            var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
             //Act
-            var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
+            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
@@ -221,7 +224,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             //Arrange
 
             //Act
-            var deleteResult = await AdviceHelper.DeleteAdviceAsync(0);
+            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(0);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
@@ -234,14 +237,16 @@ namespace Tests.Integration.Presentation.Web.Advice
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Immediate, recipient);
 
-            var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
-            Thread.Sleep(3000); //Sleep for 3 seconds to allow the immediate advis to be sent.
+            //Wait for the advice to have been sent
+            await WaitForAsync(() => Task.FromResult(DatabaseAccess.MapFromEntitySet<Core.DomainModel.Advice.Advice, bool>(advices => advices.AsQueryable().ById(createdAdvice.Id).AdviceSent.Any())), TimeSpan.FromSeconds(10));
+
 
             //Act
-            var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
+            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
@@ -254,20 +259,60 @@ namespace Tests.Integration.Presentation.Web.Advice
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
-            var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
-            var deactivateResult = await AdviceHelper.DeactivateAdviceAsync(createdAdvice.Id);
+            using var deactivateResult = await AdviceHelper.DeactivateAdviceAsync(createdAdvice.Id);
             Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
 
             var regularUserCookie = await HttpApi.GetCookieAsync(OrganizationRole.User);
 
             //Act
-            var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id, regularUserCookie);
+            using var deleteResult = await AdviceHelper.DeleteAdviceAsync(createdAdvice.Id, regularUserCookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Write_Access_Business_Role_To_Owner_Root_Provides_Write_Access_To_Advices()
+        {
+            //Arrange
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var businessRoleDtos = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(registration.Id);
+            var writeAccessRole = businessRoleDtos.First(x => x.HasWriteAccess);
+            var availableUsers = await DataProcessingRegistrationHelper.GetAvailableUsersAsync(registration.Id, writeAccessRole.Id);
+            var readOnlyUserCredentials = TestEnvironment.GetCredentials(OrganizationRole.User);
+            var readOnlyUser = availableUsers.First(x => x.Email.Equals(readOnlyUserCredentials.Username, StringComparison.OrdinalIgnoreCase));
+            var readOnlyUserCookie = await HttpApi.GetCookieAsync(OrganizationRole.User);
+            var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
+            var advice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
+            advice.RelationId = registration.Id;
+            advice.Type = ObjectType.dataProcessingRegistration;
+
+            // ****************************************
+            // ************* Act + assert ************* 
+            // ****************************************
+            // Before role has been assigned the user has no write access to the root
+            await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Forbidden);
+
+            using var assignResponse = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, writeAccessRole.Id, readOnlyUser.Id);
+
+            // With the write-access role assigned, the user should be allowed to create advices (modify the root)
+            await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Created);
+
+            using var response = await DataProcessingRegistrationHelper.SendRemoveRoleRequestAsync(registration.Id, writeAccessRole.Id, readOnlyUser.Id);
+
+            //Removing the role should revert the assigned write access
+            await AssertAdviceCreationReturns(advice, readOnlyUserCookie, HttpStatusCode.Forbidden);
+
+        }
+
+        private static async Task AssertAdviceCreationReturns(Core.DomainModel.Advice.Advice advice, Cookie readOnlyUserCookie, HttpStatusCode expectedResult)
+        {
+            using var createResultBeforeRoleAssignment = await AdviceHelper.PostAdviceAsync(advice, OrganizationId, readOnlyUserCookie);
+            Assert.Equal(expectedResult, createResultBeforeRoleAssignment.StatusCode);
         }
 
         private Core.DomainModel.Advice.Advice CreateDefaultAdvice(Scheduling schedule, AdviceType type, AdviceUserRelation recipient)
@@ -318,6 +363,20 @@ namespace Tests.Integration.Presentation.Web.Advice
         public Task DisposeAsync()
         {
             return Task.CompletedTask;
+        }
+
+        private static async Task WaitForAsync(Func<Task<bool>> check, TimeSpan howLong)
+        {
+            bool conditionMet;
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            do
+            {
+                Thread.Sleep(TimeSpan.FromMilliseconds(250));
+                conditionMet = await check();
+            } while (conditionMet == false && stopwatch.Elapsed <= howLong);
+
+            Assert.True(conditionMet, $"Failed to meet required condition within {howLong.TotalMilliseconds} milliseconds");
         }
     }
 }
