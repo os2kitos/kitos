@@ -145,7 +145,7 @@ namespace Core.ApplicationServices
 
         private static bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate.Value.Date < DateTime.Now.Date;
+            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
         }
 
         private static bool IsAdviceInScope(Advice advice)

@@ -53,7 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsSentAndJobIsCancelled()
+        public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsNotSentAndJobIsCancelled()
         {
             //Arrange
             var recurringAdvice = new Advice
@@ -72,7 +72,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result);
-            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
             _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Once);
         }
 
