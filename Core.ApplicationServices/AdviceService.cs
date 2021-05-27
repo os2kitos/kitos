@@ -106,6 +106,7 @@ namespace Core.ApplicationServices
 
         public bool SendAdvice(int id)
         {
+            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
@@ -120,7 +121,7 @@ namespace Core.ApplicationServices
                             AdviceRepository.Update(advice);
 
                             AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-                            AdviceSentRepository.Save();
+
                         }
                         catch (Exception e)
                         {
@@ -128,17 +129,26 @@ namespace Core.ApplicationServices
                         }
                     }
 
-                    if (advice.AdviceType != AdviceType.Immediate || IsAdviceExpired(advice))
+                    if (advice.AdviceType == AdviceType.Immediate)
+                    {
+                        advice.IsActive = false;
+                    }
+                    else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
                     }
+
+                    AdviceRepository.Save();
+                    AdviceSentRepository.Save();
+                    transaction.Commit();
                 }
                 return true;
             }
             catch (Exception e)
             {
                 Logger?.Error(e, "General error sending emails in advice service");
+                transaction.Rollback();
                 return false;
             }
         }
