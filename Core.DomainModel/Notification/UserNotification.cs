@@ -2,7 +2,7 @@
 
 namespace Core.DomainModel.Notification
 {
-    public class UserNotification : Entity
+    public class UserNotification : Entity, IOwnedByOrganization
     {
         public const int MaxNameLength = 100;
         public const int MaxMessageLength = 200;
@@ -12,6 +12,8 @@ namespace Core.DomainModel.Notification
         public int RelatedEntityId { get; set; }
         public ObjectType RelatedEntityType { get; set; }
         public NotificationType NotificationType { get; set; }
+        public int OrganizationId { get; set; }
+        public Organization.Organization Organization { get; set; }
     }
 
     public enum NotificationType
