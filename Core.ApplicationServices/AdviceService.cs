@@ -111,17 +111,22 @@ namespace Core.ApplicationServices
 
         public bool SendAdvice(int id)
         {
-            var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
-            if (advice != null)
+            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
             {
-                try
+                var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+                if (advice != null)
                 {
-                
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
                         try
                         {
                             DispatchEmails(advice);
+
+                            AdviceRepository.Update(advice);
+
+                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+
                         }
                         catch (Exception e)
                         {
@@ -133,46 +138,38 @@ namespace Core.ApplicationServices
                         }
                     }
 
-                    if (advice.AdviceType != AdviceType.Immediate || IsAdviceExpired(advice))
+                    if (advice.AdviceType == AdviceType.Immediate)
+                    {
+                        advice.IsActive = false;
+                    }
+                    else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
                     }
 
-                    AdviceRepository.Update(advice);
                     AdviceRepository.Save();
-
-                    AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                     AdviceSentRepository.Save();
-
-                    return true;
+                    transaction.Commit();
                 }
-                catch (Exception e)
-                {
-                    Logger?.Error(e, "General error sending emails in advice service");
-                    if (advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
-                    {
-                        UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Der skete en fejl under afsendelsen af advis. Tjek venligst efter om den er blevet sendt eller ej.", advice.RelationId.Value, advice.Type.Value, NotificationType.advice);
-                    }
-                    return false;
-                }
+                return true;
             }
-            else
+            catch (Exception e)
             {
-                Logger?.Error($"Could not find advice with Id: {id}");
+                Logger?.Error(e, "General error sending emails in advice service");
+                transaction.Rollback();
                 return false;
             }
-
         }
 
         private static bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate < DateTime.Now;
+            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
         }
 
         private static bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date;
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date && !IsAdviceExpired(advice);
         }
 
         private void DispatchEmails(Advice advice)

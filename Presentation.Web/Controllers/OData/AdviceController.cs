@@ -126,6 +126,20 @@ namespace Presentation.Web.Controllers.OData
                         return BadRequest("Stop date is set before Start date");
                     }
                 }
+
+                if (advice.Scheduling == null || advice.Scheduling == Scheduling.Immediate)
+                {
+                    return BadRequest($"Scheduling must be defined and cannot be {nameof(Scheduling.Immediate)} when creating advice of type {nameof(AdviceType.Repeat)}");
+                }
+            }
+
+            //Prepare new advice
+            advice.IsActive = true;
+            if (advice.AdviceType == AdviceType.Immediate)
+            {
+                advice.Scheduling = Scheduling.Immediate;
+                advice.StopDate = null;
+                advice.AlarmDate = null;
             }
 
             var response = base.Post(organizationId, advice);
@@ -178,7 +192,7 @@ namespace Presentation.Web.Controllers.OData
 
                     if (changedPropertyNames.Contains("StopDate"))
                     {
-                        if (advice.StopDate <= advice.AlarmDate || advice.StopDate <= DateTime.Now)
+                        if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date || advice.StopDate.Value.Date < DateTime.Now.Date)
                         {
                             throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
                         }

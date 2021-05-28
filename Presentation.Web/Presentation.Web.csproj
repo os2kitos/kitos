@@ -344,6 +344,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Controllers\OData\UserNotificationsController.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />

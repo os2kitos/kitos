@@ -89,14 +89,16 @@
                             title: "Modtager",
                             template: () =>
                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                            attributes: { "class": "might-overflow" }
+                            attributes: { "class": "might-overflow" },
+                            sortable: false //Not possible on collection field
                         },
                         {
                             field: "Reciepients.Name",
                             title: "CC",
                             template: () =>
                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                            attributes: { "class": "might-overflow" }
+                            attributes: { "class": "might-overflow" },
+                            sortable: false //Not possible on collection field
                         },
                         {
                             field: "Subject",
@@ -122,6 +124,9 @@
                                 "<button data-element-type=\"NewAdviceButton\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
                         }
                     ],
+                    sortable: {
+                        mode: "single"
+                    },
                     pageable: {
                         refresh: true,
                         pageSizes: [10, 25, 50, 100, 200],

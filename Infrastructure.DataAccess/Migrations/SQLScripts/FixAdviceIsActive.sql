@@ -22,10 +22,10 @@ BEGIN
         SELECT 
             [Id] As AdviceId, 
             [JobId] As JobId
-        FROM [kitos].[dbo].[Advice]
+        FROM [Advice]
         WHERE IsActive=1 AND StopDate<=GETUTCDATE()
 
-    UPDATE [kitos].[dbo].[Advice]
+    UPDATE [Advice]
         SET IsActive=0
     FROM @MigrationContext WHERE Id=AdviceId
 
@@ -38,7 +38,7 @@ BEGIN
 		     WHERE JobId LIKE Value)
 
     /* Future advice patch */
-    UPDATE [kitos].[dbo].[Advice]
+    UPDATE [Advice]
         SET IsActive=1
     WHERE IsActive=0 AND StopDate>GETUTCDATE()
 END

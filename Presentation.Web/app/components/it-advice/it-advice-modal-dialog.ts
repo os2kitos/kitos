@@ -25,13 +25,14 @@
                     $scope.adviceRepetitionData = null;
                     $scope.adviceTypeOptions = Models.ViewModel.Advice.AdviceTypeOptions.options;
                     $scope.adviceRepetitionOptions = Models.ViewModel.Advice.AdviceRepetitionOptions.options;
+                    $scope.startDateInfoMessage = null;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
                     const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
-                    var payloadDateFormat = "YYYY-MM-DDTHH:mm:ss.SSSZ";
-                    var allowedDateFormats = ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ", payloadDateFormat, "DD-MM-YYYY HH:mm:ss"];
+                    var payloadDateFormat = "YYYY-MM-DD";
+                    var allowedDateFormats = ["DD-MM-YYYY", payloadDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {
@@ -57,8 +58,8 @@
                             $scope.emailBody = adviceData.Body;
                             $scope.adviceTypeData = Models.ViewModel.Advice.AdviceTypeOptions.getOptionFromEnumString(adviceData.AdviceType);
                             $scope.adviceRepetitionData = Models.ViewModel.Advice.AdviceRepetitionOptions.getOptionFromEnumString(adviceData.Scheduling);
-                            $scope.startDate = adviceData.AlarmDate;
-                            $scope.stopDate = adviceData.StopDate;
+                            $scope.startDate = adviceData.AlarmDate && convertDateTimeStringToDateString(adviceData.AlarmDate);
+                            $scope.stopDate = adviceData.StopDate && convertDateTimeStringToDateString(adviceData.StopDate);
                             $scope.hiddenForjob = adviceData.JobId;
                             $scope.isActive = adviceData.IsActive;
                             $scope.preSelectedReceivers = [];
@@ -99,18 +100,13 @@
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
-                            // Time is added to allow the use of the full day
-                            payload.StopDate = moment($scope.stopDate + ' 23:59:59', allowedDateFormats, true).format(payloadDateFormat);
+                            payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
                             httpCall(payload, action, url);
 
                         } else if (action === "PATCH") {
-                            // If stopDate have not been changed it already has the backend format required and adding 23:59:59 result in the current payload.StopDate being invalid date 
-                            if (payload.StopDate === "Invalid date") {
-                                payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
-                            }
                             url = `Odata/advice(${id})`;
                             // HACK: Reintroducing frontend logic for maintaining AdviceUserRelation -- Microsoft implementation of Odata PATCH flawed
                             patchAdviceUserRelation(id, payload)
@@ -166,7 +162,7 @@
                         }
                     };
 
-                    $scope.isEditable = (context = "") => {
+                    function isEditable(context: string) {
                         var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" ||
@@ -183,30 +179,37 @@
                             return false;
                         }
                         return editableInGeneral;
+                    }
+
+                    $scope.isEditable = (context = "") => {
+                        return isEditable(context);
                     };
 
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
 
-                        if ($scope.startDate === undefined) {
-                            $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                        const performStartDateValidation = isEditable("StartDate");
+                        const performStopDateValidation = isEditable("StopDate");
+
+                        if (!$scope.startDate) {
                             return false;
                         }
 
                         var start = moment($scope.startDate, allowedDateFormats, true);
+                        if (performStartDateValidation) {
+                            if (!start.isValid()) {
+                                $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                                return false;
+                            }
 
-                        if (!start.isValid()) {
-                            $scope.startDateErrMessage = "Fra Dato er ugyldig!";
-                            return false;
+                            if (moment().isAfter(start, 'day') && action === "POST") {
+                                $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
+                                return false;
+                            }
                         }
 
-                        if (moment().isAfter(start, 'day') && action === "POST") {
-                            $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
-                            return false;
-                        }
-
-                        if ($scope.stopDate !== undefined) {
+                        if ($scope.stopDate && performStopDateValidation) {
 
                             var stop = moment($scope.stopDate, allowedDateFormats, true);
 
@@ -225,6 +228,21 @@
                                 return false;
                             }
 
+                        }
+
+                        const repetition = $scope.adviceRepetitionData;
+                        if (isCurrentAdviceRecurring() &&
+                            repetition &&
+                            parseInt(start.format("DD")) >= 29 &&
+                            (
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Quarter ||
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Month ||
+                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Semiannual
+                            )
+                        ) {
+                            $scope.startDateInfoMessage = "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den 1. i den efterfølgende måned.";
+                        } else {
+                            $scope.startDateInfoMessage = null;
                         }
 
                         $scope.startDateErrMessage = "";
@@ -371,6 +389,10 @@
                             }
                         }
                         return payload;
+                    };
+
+                    function convertDateTimeStringToDateString(dateTime: string): string {
+                        return dateTime.substring(0, 10); //Take only the Date part of the DateTime string
                     };
                 }
             ],
