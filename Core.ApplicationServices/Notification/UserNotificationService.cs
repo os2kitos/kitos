@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Notification
             _transactionManager = transactionManager;
         }
 
-        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int relatedEntityId, ObjectType relatedEntityType)
+        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int relatedEntityId, ObjectType relatedEntityType, NotificationType notificationType)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
@@ -28,7 +28,8 @@ namespace Core.ApplicationServices.Notification
                 NotificationMessage = message,
                 RelatedEntityId = relatedEntityId,
                 RelatedEntityType = relatedEntityType,
-                ObjectOwnerId = userToNotifyId
+                ObjectOwnerId = userToNotifyId,
+                NotificationType = notificationType
             };
 
             var userNotification = _userNotificationRepository.Insert(notification);

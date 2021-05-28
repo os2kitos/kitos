@@ -7,6 +7,6 @@ namespace Core.ApplicationServices.Notification
 {
     public interface IUserNotificationService
     {
-        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int RelatedEntityId, ObjectType RelatedEntityType);
+        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int RelatedEntityId, ObjectType RelatedEntityType, NotificationType notificationType);
     }
 }

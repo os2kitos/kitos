@@ -20,6 +20,7 @@ using Hangfire;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Notification;
+using Core.DomainModel.Notification;
 
 namespace Core.ApplicationServices
 {
@@ -127,7 +128,7 @@ namespace Core.ApplicationServices
                             Logger?.Error(e, "Error sending emails in advice service");
                             if(advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
                             {
-                                UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value);
+                                UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value, NotificationType.advice);
                             }
                         }
                     }
@@ -151,7 +152,7 @@ namespace Core.ApplicationServices
                     Logger?.Error(e, "General error sending emails in advice service");
                     if (advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
                     {
-                        UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Der skete en fejl under afsendelsen af advis. Tjek venligst efter om den er blevet sendt eller ej.", advice.RelationId.Value, advice.Type.Value);
+                        UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Der skete en fejl under afsendelsen af advis. Tjek venligst efter om den er blevet sendt eller ej.", advice.RelationId.Value, advice.Type.Value, NotificationType.advice);
                     }
                     return false;
                 }
