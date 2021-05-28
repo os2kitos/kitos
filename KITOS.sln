@@ -76,6 +76,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DeploymentScripts", "Deploy
 		DeploymentScripts\PrepareCleanDeveloperDatabase.ps1 = DeploymentScripts\PrepareCleanDeveloperDatabase.ps1
 		DeploymentScripts\PrepareIntegrationDatabase.ps1 = DeploymentScripts\PrepareIntegrationDatabase.ps1
 		DeploymentScripts\PrepareLocalDatabase.ps1 = DeploymentScripts\PrepareLocalDatabase.ps1
+		DeploymentScripts\PreparePackage.ps1 = DeploymentScripts\PreparePackage.ps1
 		DeploymentScripts\PrepareProductionDatabase.ps1 = DeploymentScripts\PrepareProductionDatabase.ps1
 		DeploymentScripts\PrepareTestDatabase.ps1 = DeploymentScripts\PrepareTestDatabase.ps1
 		DeploymentScripts\RunE2ETests.ps1 = DeploymentScripts\RunE2ETests.ps1

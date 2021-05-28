@@ -115,7 +115,14 @@ namespace Core.ApplicationServices
                     {
                         try
                         {
+                            using var transaction = TransactionManager.Begin(IsolationLevel.Serializable);
                             DispatchEmails(advice);
+
+                            AdviceRepository.Update(advice);
+
+                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+                            AdviceSentRepository.Save();
+                            transaction.Commit();
                         }
                         catch (Exception e)
                         {
@@ -123,17 +130,15 @@ namespace Core.ApplicationServices
                         }
                     }
 
-                    if (advice.AdviceType != AdviceType.Immediate || IsAdviceExpired(advice))
+                    if (advice.AdviceType == AdviceType.Immediate)
+                    {
+                        advice.IsActive = false;
+                    }
+                    else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
                     }
-
-                    AdviceRepository.Update(advice);
-                    AdviceRepository.Save();
-
-                    AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-                    AdviceSentRepository.Save();
                 }
                 return true;
             }
@@ -146,12 +151,12 @@ namespace Core.ApplicationServices
 
         private static bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate < DateTime.Now;
+            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
         }
 
         private static bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date;
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date && !IsAdviceExpired(advice);
         }
 
         private void DispatchEmails(Advice advice)
