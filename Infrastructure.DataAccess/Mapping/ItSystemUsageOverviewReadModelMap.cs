@@ -137,6 +137,7 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.DependsOnInterfacesNamesAsCsv).IsOptional();
             Property(x => x.IncomingRelatedItSystemUsagesNamesAsCsv).IsOptional();
+            Property(x => x.OutgoingRelatedItSystemUsagesNamesAsCsv).IsOptional();
 
             HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsageOverviewReadModels)

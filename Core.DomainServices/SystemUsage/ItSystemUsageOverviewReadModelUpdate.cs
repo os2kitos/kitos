@@ -11,6 +11,7 @@ using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SystemUsage
 {
@@ -25,7 +26,7 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
-        private readonly IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> _itSystemUsageReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> _itSystemUsageReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
@@ -35,7 +36,7 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
-            IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel> itSystemUsageReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
@@ -87,73 +88,85 @@ namespace Core.DomainServices.SystemUsage
             PatchDataProcessingRegistrations(source, destination);
             PatchGeneralPurposeRegistrations(source, destination);
             PatchDependsOnInterfaces(source, destination);
-            PatchRelatedItSystemUsages(source, destination);
+            PatchRelatedItSystemUsages(
+                source,
+                destination,
+                x => x.UsedByRelations,
+                x => x.FromSystemUsage,
+                csv => destination.IncomingRelatedItSystemUsagesNamesAsCsv = csv,
+                x => x.IncomingRelatedItSystemUsages
+                );
+            //TODO: Add the reversed one after the test goes green
         }
 
-        private void PatchRelatedItSystemUsages(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
+        private void PatchRelatedItSystemUsages(
+            ItSystemUsage source,
+            ItSystemUsageOverviewReadModel destination,
+            Func<ItSystemUsage, ICollection<SystemRelation>> pickSourceCollection,
+            Func<SystemRelation, ItSystemUsage> pickUsageFromRelation,
+            Action<string> setCsv,
+            Func<ItSystemUsageOverviewReadModel, ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel>> pickDestinationCollection)
         {
-            destination.IncomingRelatedItSystemUsagesNamesAsCsv = string.Join(", ", 
-                source
-                .UsedByRelations
-                .Where(x => x.FromSystemUsage != null)
-                .Select(x => x.FromSystemUsage)
-                .Where(x => x.ItSystem != null)
+            var usagesFromSource = pickSourceCollection(source)
+                .Select(pickUsageFromRelation)
+                .Where(itSystemUsage => itSystemUsage != null)
+                .Where(itSystemUsage => itSystemUsage.ItSystem != null)
+                .ToList();
+            var destinationCollection = pickDestinationCollection(destination);
+
+            setCsv(string.Join(", ",
+                usagesFromSource
                 .Select(x => x.ItSystem)
-                .Select(x => x.Name));
+                .Select(x => x.Name)));
 
             static string CreateRelatedItSystemUsageKey(int Id) => $"I:{Id}";
 
-            var incomingRelatedItSystemUsages = source
-                .UsedByRelations
-                .Where(x => x.FromSystemUsage != null)
-                .Select(x => x.FromSystemUsage)
-                .Where(x => x.ItSystem != null)
-                .GroupBy(x => CreateRelatedItSystemUsageKey(x.Id))
-                .ToDictionary(x => x.Key, x => x.First());
+            var usagesFromSourceByKey =
+                usagesFromSource
+                .GroupBy(itSystemUsage => CreateRelatedItSystemUsageKey(itSystemUsage.Id))
+                .ToDictionary(itSystemUsages => itSystemUsages.Key, x => x.First());
 
             // Remove RelatedItSystemUsages which were removed
             var relatedItSystemUsagesToBeRemoved =
-                destination.IncomingRelatedItSystemUsages
-                    .Where(x => incomingRelatedItSystemUsages.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId)) == false).ToList();
+                destinationCollection
+                    .Where(x => usagesFromSourceByKey.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId)) == false)
+                    .ToList();
 
-            RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved);
+            RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved, pickDestinationCollection);
 
-            var existingRelatedItSystemUsages = destination
-                .IncomingRelatedItSystemUsages
+            var existingRelatedItSystemUsagesByKey = destinationCollection
                 .GroupBy(x => CreateRelatedItSystemUsageKey(x.ItSystemUsageId))
                 .ToDictionary(x => x.Key, x => x.First());
 
-            foreach (var incomingRelatedItSystemUsage in source.UsedByRelations.Where(x => x.FromSystemUsage != null).Select(x => x.FromSystemUsage).Where(x => x.ItSystem != null).ToList())
+            foreach (var usageFromSource in usagesFromSource)
             {
-                if (!existingRelatedItSystemUsages.TryGetValue(CreateRelatedItSystemUsageKey(incomingRelatedItSystemUsage.Id), out var relatedItSystemUsage))
+                if (!existingRelatedItSystemUsagesByKey.TryGetValue(CreateRelatedItSystemUsageKey(usageFromSource.Id), out var relatedItSystemUsage))
                 {
                     //Append the RelatedItSystemUsage if it is not already present
-                    relatedItSystemUsage = new ItSystemUsageOverviewItSystemUsageReadModel
+                    relatedItSystemUsage = new ItSystemUsageOverviewUsedBySystemUsageReadModel
                     {
                         Parent = destination
                     };
-                    destination.IncomingRelatedItSystemUsages.Add(relatedItSystemUsage);
+                    destinationCollection.Add(relatedItSystemUsage);
                 }
-                relatedItSystemUsage.ItSystemUsageId = incomingRelatedItSystemUsage.Id;
-                relatedItSystemUsage.ItSystemUsageName = incomingRelatedItSystemUsage.ItSystem?.Name;
+                relatedItSystemUsage.ItSystemUsageId = usageFromSource.Id;
+                relatedItSystemUsage.ItSystemUsageName = usageFromSource.ItSystem?.Name;
             }
         }
 
         private void PatchDependsOnInterfaces(ItSystemUsage source, ItSystemUsageOverviewReadModel destination)
         {
-            destination.DependsOnInterfacesNamesAsCsv = string.Join(", ", 
-                source
+            var dependsOnInterfaces = source
                 .UsageRelations
                 .Where(x => x.RelationInterface != null)
                 .Select(x => x.RelationInterface)
-                .Select(x => x.Name));
+                .ToList();
+
+            destination.DependsOnInterfacesNamesAsCsv = string.Join(", ", dependsOnInterfaces.Select(x => x.Name));
 
             static string CreateDependsOnInterfaceKey(int Id) => $"I:{Id}";
 
-            var incomingDependsOnInterfaces = source
-                .UsageRelations
-                .Where(x => x.RelationInterface != null)
-                .Select(x => x.RelationInterface)
+            var incomingDependsOnInterfaces = dependsOnInterfaces
                 .GroupBy(x => CreateDependsOnInterfaceKey(x.Id))
                 .ToDictionary(x => x.Key, x => x.First());
 
@@ -169,7 +182,7 @@ namespace Core.DomainServices.SystemUsage
                 .GroupBy(x => CreateDependsOnInterfaceKey(x.InterfaceId))
                 .ToDictionary(x => x.Key, x => x.First());
 
-            foreach (var incomingDependsOnInterface in source.UsageRelations.Where(x => x.RelationInterface != null).Select(x => x.RelationInterface).ToList())
+            foreach (var incomingDependsOnInterface in dependsOnInterfaces.ToList())
             {
                 if (!existingDependsOnInterfaces.TryGetValue(CreateDependsOnInterfaceKey(incomingDependsOnInterface.Id), out var dependsOnInterface))
                 {
@@ -523,11 +536,15 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private void RemoveRelatedItSystemUsages(ItSystemUsageOverviewReadModel destination, List<ItSystemUsageOverviewItSystemUsageReadModel> relatedItSystemUsagesToBeRemoved)
+        private void RemoveRelatedItSystemUsages(
+            ItSystemUsageOverviewReadModel destination,
+            List<ItSystemUsageOverviewUsedBySystemUsageReadModel> relatedItSystemUsagesToBeRemoved,
+            Func<ItSystemUsageOverviewReadModel, ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel>> pickDestinationCollection)
         {
+            var destinationCollection = pickDestinationCollection(destination);
             relatedItSystemUsagesToBeRemoved.ForEach(relatedItSystemUsageToBeRemoved =>
             {
-                destination.IncomingRelatedItSystemUsages.Remove(relatedItSystemUsageToBeRemoved);
+                destinationCollection.Remove(relatedItSystemUsageToBeRemoved);
                 _itSystemUsageReadModelRepository.Delete(relatedItSystemUsageToBeRemoved);
             });
         }

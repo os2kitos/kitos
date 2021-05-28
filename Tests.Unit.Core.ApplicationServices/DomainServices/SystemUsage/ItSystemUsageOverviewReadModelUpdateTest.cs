@@ -34,7 +34,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
-        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>> _itSystemUsageReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>> _itSystemUsageReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -47,7 +47,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
             _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
-            _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>>();
+            _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
