@@ -240,7 +240,7 @@
                                 repetition.id === Models.ViewModel.Advice.AdviceRepetition.Semiannual
                             )
                         ) {
-                            $scope.startDateInfoMessage = "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den 1. i den efterfølgende måned.";
+                            $scope.startDateInfoMessage = "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt sidste dag i den aktuelle måned.";
                         } else {
                             $scope.startDateInfoMessage = null;
                         }

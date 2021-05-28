@@ -17,14 +17,15 @@ namespace Core.ApplicationServices.Helpers
 
         public static string CronPerInterval(Scheduling interval, DateTime zeroTime)
         {
+            var dayComponent = zeroTime.Day == 31 ? "L" : $"{zeroTime.Day}"; //L is extended cron syntax and results in last day of the month for all months.
             switch (interval)
             {
-                case Scheduling.Hour: return "0 * * * *"; 
-                case Scheduling.Day: return "0 8 * * *"; 
+                case Scheduling.Hour: return "0 * * * *";
+                case Scheduling.Day: return "0 8 * * *";
                 case Scheduling.Week: return $"0 8 * * {zeroTime.DayOfWeek:D}";
-                case Scheduling.Month: return $"0 8 {zeroTime.Day} * *";
-                case Scheduling.Quarter: return $"0 8 {zeroTime.Day} {zeroTime.Month % 3}-12/3 *";
-                case Scheduling.Semiannual: return $"0 8 {zeroTime.Day} {zeroTime.Month % 6}-12/6 *";
+                case Scheduling.Month: return $"0 8 {dayComponent} * *";
+                case Scheduling.Quarter: return $"0 8 {dayComponent} {zeroTime.Month % 3}-12/3 *";
+                case Scheduling.Semiannual: return $"0 8 {dayComponent} {zeroTime.Month % 6}-12/6 *";
                 case Scheduling.Year: return $"0 8 {zeroTime.Day} {zeroTime.Month} *";
                 case Scheduling.Immediate: // Fallthrough intended
                 default:

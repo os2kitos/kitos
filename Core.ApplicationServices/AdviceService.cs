@@ -138,6 +138,34 @@ namespace Core.ApplicationServices
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
                     }
+                    else if (advice.AlarmDate?.Day > 28 && advice.AlarmDate?.Day < 31) //31 is handled as "last day of month" but 29 and 30 may be tricky
+                    {
+                        //TODO: Call the advice scheduler -> place the code there, not here!
+                        switch (advice.Scheduling)
+                        {
+                            case Scheduling.Month:
+                                //TODO: Requires definite reschedhuling
+                                /*
+                                 * Determine the trigger month (where it SHOULD have succeeded) based on alarm data
+                                 * From the intended trigger month, schedule next job
+                                 *
+                                 */
+                                break;
+                            case Scheduling.Quarter:
+                                //TODO: No resheduling on odd months
+                                if (advice.AlarmDate.Value.Month % 2 == 1) //No issues if the schedule runs on odd months - pattern will be ok
+                                {
+
+                                }
+                                break;
+                            case Scheduling.Semiannual:
+                                if (advice.AlarmDate.Value.Date.Month == 8 || advice.AlarmDate.Value.Date.Month == 2) // Will conflict with (non leap year) february so we must compute the next execution and update the cron 
+                                {
+
+                                }
+                                break;
+                        }
+                    }
 
                     AdviceRepository.Save();
                     AdviceSentRepository.Save();
@@ -274,23 +302,21 @@ namespace Core.ApplicationServices
 
         private void DeleteJobFromHangfire(Advice advice)
         {
-            DeletePostponedRecurringJobFromHangfire(advice.JobId);
-            RecurringJob.RemoveIfExists("Advice: " + advice.Id);
-        }
-
-        private void DeletePostponedRecurringJobFromHangfire(string jobIdText)
-        {
+            //Remove pending shcedules if any
             var monitor = JobStorage.Current.GetMonitoringApi();
             var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == nameof(CreateDelayedRecurringJob));
+                Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(jobIdText))
+                if (t.Equals(advice.JobId))
                 {
                     BackgroundJob.Delete(j.Key);
                 }
             }
+
+            //Remove the job
+            AdviceScheduler.Remove(advice);
         }
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
@@ -326,7 +352,7 @@ namespace Core.ApplicationServices
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
                 BackgroundJob.Schedule(
-                    () => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value,
+                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.Value,
                         alarmDate.Value), new DateTimeOffset(alarmDate.Value));
             }
         }
@@ -338,12 +364,14 @@ namespace Core.ApplicationServices
             if (alarmDate == null)
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-            DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
-            BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            DeleteJobFromHangfire(advice); // Remove existing hangfire job
+            BackgroundJob.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.Value, alarmDate.Value), new DateTimeOffset(alarmDate.Value));
         }
 
-        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
         {
+            //TODO: For the "messy" situations, create multiple jobs OR do the match when an advice has been sent
+
             RecurringJob.AddOrUpdate(name, () => SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
     }
