@@ -1,14 +1,14 @@
-Function Prepare-Package([String] $environmentName, $packageDirectory) {
+Function Prepare-Package([String] $environmentName, $pathToArchive) {
 
     Write-Host "Environment is $environmentName"
 
 	if($environmentName -eq "integration"){
 
-        Write-Host "Unzipping $packageDirectory to is TEMP_PresentationWeb"
+        Write-Host "Unzipping $pathToArchive to is TEMP_PresentationWeb"
 
-        Expand-Archive -Path $packageDirectory -DestinationPath .\TEMP_PresentationWeb
+        Expand-Archive -Path $pathToArchive -DestinationPath .\TEMP_PresentationWeb
 
-        #Remove-Item -Path $packageDirectory
+        Remove-Item -Path $pathToArchive
 
         Write-Host "Updating Web.config"
 
@@ -42,7 +42,7 @@ Function Prepare-Package([String] $environmentName, $packageDirectory) {
         Set-Alias 7zip $7zipPath
 
         $Source = (Resolve-Path ".\TEMP_PresentationWeb\*")
-        $Target = $packageDirectory
+        $Target = $pathToArchive
 
         7zip a -mx=9 $Target $Source
 
