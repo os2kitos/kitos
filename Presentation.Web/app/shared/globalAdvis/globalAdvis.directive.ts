@@ -61,7 +61,7 @@
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
+                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND IsActive eq true&$expand=Reciepients, Advicesent`,
                                                     dataType: "json"
                                                 },
                                             },
