@@ -1,11 +1,18 @@
-﻿using Core.DomainModel.Advice;
+﻿using System.Collections.Generic;
+using Core.DomainModel.Advice;
 using System.Linq;
 
 namespace Core.ApplicationServices
 {
     public interface IAdviceService
     {
-        bool SendAdvice(int id);
+        void CreateAdvice(Advice advice);
         IQueryable<Advice> GetAdvicesForOrg(int orgKey);
+        IQueryable<Advice> GetAdvicesFromCurrentUsersOrganizationMemberships();
+        bool SendAdvice(int id);
+        void RescheduleRecurringJob(Advice advice);
+        void Delete(Advice key);
+        void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted);
+        void Deactivate(Advice advice);
     }
 }

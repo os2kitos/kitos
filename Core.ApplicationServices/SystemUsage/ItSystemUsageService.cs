@@ -173,11 +173,11 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedModificationAccess)
-                    .Select(LoadFrequency)
-                    .Select(LoadInterface)
-                    .Select(LoadContract)
+                    .Bind(LoadToSystemUsage)
+                    .Bind(WithAuthorizedModificationAccess)
+                    .Bind(LoadFrequency)
+                    .Bind(LoadInterface)
+                    .Bind(LoadContract)
                     .Match
                     (
                         onSuccess: context =>
@@ -228,11 +228,11 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedModificationAccess)
-                    .Select(LoadFrequency)
-                    .Select(LoadInterface)
-                    .Select(LoadContract)
+                    .Bind(LoadToSystemUsage)
+                    .Bind(WithAuthorizedModificationAccess)
+                    .Bind(LoadFrequency)
+                    .Bind(LoadInterface)
+                    .Bind(LoadContract)
                     .Match
                     (
                         onSuccess: context =>
@@ -306,7 +306,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Bind(WithAuthorizedReadAccess)
                     .Match<Result<IEnumerable<SystemRelation>, OperationError>>
                     (
                         onSuccess: context => context
@@ -327,7 +327,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Bind(WithAuthorizedReadAccess)
                     .Match<Result<IEnumerable<SystemRelation>, OperationError>>
                     (
                         onSuccess: context => context
@@ -347,7 +347,7 @@ namespace Core.ApplicationServices.SystemUsage
 
                 return
                     LoadFromSystemUsage(operationContext)
-                        .Select(WithAuthorizedModificationAccess)
+                        .Bind(WithAuthorizedModificationAccess)
                         .Match
                         (
                             onSuccess: context => context
@@ -384,7 +384,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Bind(WithAuthorizedReadAccess)
                     .Match
                     (
                         onSuccess: context => context
@@ -409,7 +409,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(WithAuthorizedReadAccess)
+                    .Bind(WithAuthorizedReadAccess)
                     .Match<Result<IEnumerable<ItSystemUsage>, OperationError>>
                     (
                         onSuccess: context =>
@@ -447,8 +447,8 @@ namespace Core.ApplicationServices.SystemUsage
 
             return
                 LoadFromSystemUsage(operationContext)
-                    .Select(LoadToSystemUsage)
-                    .Select(WithAuthorizedReadAccess)
+                    .Bind(LoadToSystemUsage)
+                    .Bind(WithAuthorizedReadAccess)
                     .Match<Result<RelationOptionsDTO, OperationError>>
                     (
                         onSuccess: context =>

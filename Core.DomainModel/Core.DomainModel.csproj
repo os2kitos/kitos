@@ -76,6 +76,7 @@
     <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithAdvices.cs" />
     <Compile Include="IEntityWithEnabledStatus.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />

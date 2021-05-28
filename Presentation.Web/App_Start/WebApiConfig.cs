@@ -15,7 +15,6 @@ using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Models;
@@ -392,6 +391,7 @@ namespace Presentation.Web
             deactivateAdvice.Returns<IHttpActionResult>();
 
             BindEntitySet<Advice, AdviceController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(Advice)).AddProperty(typeof(Advice).GetProperty(nameof(Advice.CanBeDeleted)));
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
 

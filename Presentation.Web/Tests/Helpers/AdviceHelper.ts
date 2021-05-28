@@ -2,11 +2,13 @@
 import localSystemNavigation = require("./SideNavigation/LocalItSystemNavigation");
 import systemUsageHelper = require("./SystemUsageHelper");
 import Select2 = require("./Select2Helper");
+import WaitTimers = require("../Utility/WaitTimers");
 import Constants = require("../Utility/Constants");
 
 class AdviceHelper {
     private cssLocator = new CSSLocator();
     private constants = new Constants();
+    private waitUpTo = new WaitTimers();
 
     public goToSpecificItSystemAdvice(name: string) {   
         return systemUsageHelper.openLocalSystem(name)
@@ -43,12 +45,25 @@ class AdviceHelper {
     }
 
     public deleteAdvice(subjectName: string) {
-        return this.getDeleteButton(subjectName).click()
+        console.log(`Deleting ${subjectName}`);
+        return browser.wait(this.getDeleteButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
+            .then(() => this.getDeleteButton(subjectName).click())
             .then(() => browser.switchTo().alert().accept());
+    }
+
+    public deactivateAdvice(subjectName: string) {
+        console.log(`Deactivating ${subjectName}`);
+        return browser.wait(this.getEditAdviceButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
+            .then(() => this.getEditAdviceButton(subjectName).click())
+            .then(() => element(this.cssLocator.byDataElementType('adviceDeactivateButton')).click());
     }
 
     private getDeleteButton(subjectName: string) {
         return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='deleteAdviceButton']`));
+    }
+
+    private getEditAdviceButton(subjectName: string) {
+        return element(by.xpath(`.//*[@id='mainGrid']//span[text() = '${subjectName}']/../../*//button[@data-element-type='editAdviceButton']`));
     }
 }
 export = AdviceHelper;

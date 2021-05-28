@@ -383,25 +383,25 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 repository.Save();
             });
 
-            var relation1 = await SystemRelationHelper.PostRelationAsync(input1);
-            var relation2 = await SystemRelationHelper.PostRelationAsync(input2);
-            var relation3 = await SystemRelationHelper.PostRelationAsync(input3);
+            await SystemRelationHelper.PostRelationAsync(input1);
+            await SystemRelationHelper.PostRelationAsync(input2);
+            await SystemRelationHelper.PostRelationAsync(input3);
 
-            var expectedSequence = new[] { relation1.Id, relation2.Id, relation3.Id }.OrderBy(id => id).ToList();
             const int pageSize = 2;
             const int firstPageNumber = 0;
             const int secondPageNumber = firstPageNumber + 1;
+            var twoPages = (await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize * 2)).ToList();
 
             //Act
             var firstPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize);
             var secondPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, secondPageNumber, pageSize);
 
             //Assert - first page with 2 items
-            Assert.Equal(expectedSequence.Take(pageSize), firstPage.Select(x => x.Id));
+            Assert.Equal(twoPages.Take(pageSize).Select(x => x.Id), firstPage.Select(x => x.Id));
 
             //Assert - second page with 1 item since there are only 3 in total
             const int expectedSecondPageSize = 1;
-            Assert.Equal(expectedSequence.Skip(pageSize).Take(expectedSecondPageSize), secondPage.Select(x => x.Id));
+            Assert.Equal(twoPages.Skip(pageSize).Take(expectedSecondPageSize).Select(x => x.Id).ToList(), secondPage.Select(x => x.Id).ToList());
         }
 
         #region Helpers

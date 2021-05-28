@@ -4,16 +4,21 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web.Http;
 using Core.ApplicationServices;
+using Core.DomainModel;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
-using Hangfire;
+using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
-using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -21,35 +26,113 @@ namespace Presentation.Web.Controllers.OData
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
-        private readonly IGenericRepository<Advice> _repository;
         private readonly IGenericRepository<AdviceSent> _sentRepository;
+        private readonly IAdviceRootResolution _adviceRootResolution;
 
-        private readonly Regex emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
-            IGenericRepository<AdviceSent> sentRepository)
+            IGenericRepository<AdviceSent> sentRepository,
+            IAdviceRootResolution adviceRootResolution
+            )
             : base(repository)
         {
             _adviceService = adviceService;
-            _repository = repository;
             _sentRepository = sentRepository;
+            _adviceRootResolution = adviceRootResolution;
+        }
+
+        [EnableQuery]
+        public override IHttpActionResult Get()
+        {
+            return Ok(_adviceService.GetAdvicesFromCurrentUsersOrganizationMemberships());
+        }
+
+        private IEntityWithAdvices ResolveRoot(Advice advice)
+        {
+            return _adviceRootResolution.Resolve(advice).GetValueOrDefault();
+        }
+
+        protected override IControllerCrudAuthorization GetCrudAuthorization()
+        {
+            return new ChildEntityCrudAuthorization<Advice, IEntityWithAdvices>(ResolveRoot, base.GetCrudAuthorization());
+        }
+
+        protected override void RaiseCreatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(Advice entity)
+        {
+            RaiseAsRootModification(entity);
+        }
+
+        private void RaiseAsRootModification(Advice entity)
+        {
+            switch (ResolveRoot(entity))
+            {
+                case ItContract root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
+                    break;
+                case ItSystemUsage root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
+                    break;
+                case ItProject root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
+                    break;
+                case DataProcessingRegistration root:
+                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
+                    break;
+            }
         }
 
         [EnableQuery]
         public override IHttpActionResult Post(int organizationId, Advice advice)
         {
-            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !emailValidationRegex.IsMatch(x.Name)))
+            if (advice.RelationId == null || advice.Type == null)
+            {
+                //Advice cannot be an orphan - it must belong to a root
+                return BadRequest($"Both {nameof(advice.RelationId)} AND {nameof(advice.Type)} MUST be defined");
+            }
+            if (advice.Reciepients.Where(x => x.RecpientType == RecieverType.USER).Any(x => !_emailValidationRegex.IsMatch(x.Name)))
             {
                 return BadRequest("Invalid email exists among receivers or CCs");
+            }
+
+            if (advice.AdviceType == AdviceType.Repeat)
+            {
+                if (advice.AlarmDate == null)
+                {
+                    return BadRequest("Start date is not set!");
+                }
+
+                if (advice.AlarmDate.Value.Date < DateTime.Now.Date)
+                {
+                    return BadRequest("Start date is set before today");
+                }
+
+                if (advice.StopDate != null)
+                {
+                    if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date)
+                    {
+                        return BadRequest("Stop date is set before Start date");
+                    }
+                }
             }
 
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
             {
-                var createdResponse = (CreatedODataResult<Advice>) response;
+                var createdResponse = (CreatedODataResult<Advice>)response;
                 var name = "Advice: " + createdResponse.Entity.Id;
 
                 advice = createdResponse.Entity;
@@ -58,8 +141,7 @@ namespace Presentation.Web.Controllers.OData
 
                 try
                 {
-                    UpdateRepository(advice);
-                    ScheduleAdvice(advice, createdResponse, name);
+                    _adviceService.CreateAdvice(advice);
                 }
                 catch (Exception e)
                 {
@@ -68,26 +150,6 @@ namespace Presentation.Web.Controllers.OData
                 }
             }
             return response;
-        }
-
-        private void ScheduleAdvice(Advice advice, CreatedODataResult<Advice> createdResponse, string name)
-        {
-            if (advice.AdviceType == AdviceType.Immediate)
-            {
-                BackgroundJob.Enqueue(() => _adviceService.SendAdvice(createdResponse.Entity.Id));
-            }
-            else if(advice.AdviceType == AdviceType.Repeat)
-            {
-                BackgroundJob.Schedule(
-                    () => CreateDelayedRecurringJob(createdResponse.Entity.Id, name, advice.Scheduling.Value,
-                        advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
-            }
-        }
-
-        private void UpdateRepository(Advice advice)
-        {
-            _repository.Update(advice);
-            _repository.Save();
         }
 
         [EnableQuery]
@@ -105,8 +167,8 @@ namespace Presentation.Web.Controllers.OData
                 if (advice.AdviceType == AdviceType.Immediate)
                 {
                     throw new ArgumentException("Editing is not allowed for immediate advice");
-                } 
-                if (advice.AdviceType == AdviceType.Repeat) 
+                }
+                if (advice.AdviceType == AdviceType.Repeat)
                 {
                     var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
                     if (changedPropertyNames.All(IsRecurringEditableProperty))
@@ -124,8 +186,11 @@ namespace Presentation.Web.Controllers.OData
                 }
 
                 var response = base.Patch(key, delta);
-                DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
-                BackgroundJob.Schedule(() => CreateDelayedRecurringJob(key, advice.JobId, advice.Scheduling.Value, advice.AlarmDate.Value), new DateTimeOffset(advice.AlarmDate.Value));
+
+                if (response is UpdatedODataResult<Advice>)
+                {
+                    _adviceService.RescheduleRecurringJob(advice);
+                }
 
                 return response;
             }
@@ -134,11 +199,6 @@ namespace Presentation.Web.Controllers.OData
                 Logger.ErrorException("Failed to update advice", e);
                 return InternalServerError(e);
             }
-        }
-
-        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
-        {
-            RecurringJob.AddOrUpdate(name, () => _adviceService.SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
         }
 
         private static bool IsRecurringEditableProperty(string name)
@@ -159,18 +219,22 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Delete(int key)
         {
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
-            if (entity == null) return NotFound();
-
-            var anySents = _sentRepository.AsQueryable().Any(m => m.AdviceId == key);
-
-            if (anySents) return Forbidden();
-
-            if (!AllowDelete(entity)) return Forbidden();
+            if (entity == null)
+            {
+                return NotFound();
+            }
+            if (!entity.CanBeDeleted)
+            {
+                return BadRequest("Cannot delete advice which is active or has been sent");
+            }
+            if (!AllowDelete(entity))
+            {
+                return Forbidden();
+            }
 
             try
             {
-                DeleteJobFromHangfire(key, entity);
-                DeleteFromRepository(key);
+                _adviceService.Delete(entity);
             }
             catch (Exception e)
             {
@@ -179,33 +243,6 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        private void DeleteFromRepository(int key)
-        {
-            Repository.DeleteByKey(key);
-            Repository.Save();
-        }
-
-        private static void DeleteJobFromHangfire(int key, Advice entity)
-        {
-            DeletePostponedRecurringJobFromHangfire(entity.JobId);
-            RecurringJob.RemoveIfExists("Advice: " + key);
-        }
-
-        private static void DeletePostponedRecurringJobFromHangfire(string jobIdText)
-        {
-            var monitor = JobStorage.Current.GetMonitoringApi();
-            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == "CreateDelayedRecurringJob");
-            foreach (var j in jobsScheduled)
-            {
-                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(jobIdText))
-                {
-                    BackgroundJob.Delete(j.Key);
-                }
-            }
         }
 
         [HttpPatch]
@@ -218,9 +255,11 @@ namespace Presentation.Web.Controllers.OData
 
             try
             {
-                DeleteJobFromHangfire(key, entity);
-                entity.IsActive = false;
-                UpdateRepository(entity);
+                if (!AllowModify(entity))
+                {
+                    return Forbidden();
+                }
+                _adviceService.Deactivate(entity);
             }
             catch (Exception e)
             {

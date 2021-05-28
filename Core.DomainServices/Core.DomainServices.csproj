@@ -49,6 +49,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\IAdviceRootResolution.cs" />
+    <Compile Include="Advice\AdviceRootResolution.cs" />
     <Compile Include="Authorization\CrossOrganizationDataReadAccessLevel.cs" />
     <Compile Include="Authorization\DataAccessLevel.cs" />
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
@@ -92,7 +94,7 @@
     <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
     <Compile Include="SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="GDPR\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />
-    <Compile Include="Model\EventHandlers\ContractDeletedHandler.cs" />
+    <Compile Include="Model\EventHandlers\ContractDeletedSystemRelationsHandler.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandler.cs" />
     <Compile Include="Model\EventHandlers\UpdateRelationsOnSystemUsageDeletedHandler.cs" />
     <Compile Include="Model\EventHandlers\UnbindBrokenReferenceReportsOnSourceDeletedHandler.cs" />

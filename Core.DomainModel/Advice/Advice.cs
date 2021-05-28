@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -39,11 +40,11 @@ namespace Core.DomainModel.Advice
     public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
     {
         public Advice() {
-            AdviceSent = new List<AdviceSent.AdviceSent>();
+            AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
         }
 
-        public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
+        public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
         public ObjectType? Type { get; set; }
@@ -162,5 +163,28 @@ namespace Core.DomainModel.Advice
         /// Gets or sets the advice type
         /// </summary>
         public AdviceType AdviceType { get; set; }
+
+        /// <summary>
+        ///     Whether the advice can be deleted
+        ///     Is false if the advice has been sent at least once or if it is active.
+        /// </summary>
+        public bool CanBeDeleted
+        {
+            get
+            {
+                if (AdviceSent.Any())
+                {
+                    return false;
+                }
+                if (IsActive)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
+            }
+        }
     }
 }

@@ -7,6 +7,7 @@
                 $scope.type = type;
                 $scope.object = object;
                 $scope.advicename = advicename;
+                $scope.hasWriteAccess = hasWriteAccess;
 
                 $scope.mainGridOptions = {
                     dataSource: {
@@ -31,8 +32,19 @@
                     change: onChange,
                     columns: [
                         {
+                            field: "IsActive",
+                            title: "Aktiv",
+                            template: data => data.IsActive ? "<i class='fa fa-check'></i> " : "",
+                            width: 45,
+                            attributes: { "class": "centeredContent" }
+                        },
+                        {
                             field: "Name",
                             title: "Navn",
+                            template: data => {
+                                const name = data.Name || "Ikke navngivet";
+                                return name;
+                            },
                             attributes: { "class": "might-overflow" }
                         },
                         {
@@ -76,14 +88,14 @@
                             field: "Reciepients.Name",
                             title: "Modtager",
                             template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
                             attributes: { "class": "might-overflow" }
                         },
                         {
                             field: "Reciepients.Name",
                             title: "CC",
                             template: () =>
-                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
+                                `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-if="dataItem.Reciepients && dataItem.Reciepients.length > 0" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
                             attributes: { "class": "might-overflow" }
                         },
                         {
@@ -93,9 +105,9 @@
                         {
                             template: (dataItem) => {
                                 if (hasWriteAccess) {
-                                    return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})">
+                                    return `<button class="btn-link" data-ng-click="newAdvice('PATCH',${dataItem.Id})" data-element-type="editAdviceButton">
                                     <i class="glyphicon glyphicon-pencil"></i></button>
-                                    <button class="btn-link" ng-if="${!dataItem.IsActive}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
+                                    <button class="btn-link" ng-if="${dataItem.CanBeDeleted}" data-confirm-click="Er du sikker på at du vil slette?" data-confirmed-click="deleteAdvice(${dataItem.Id})" data-element-type="deleteAdviceButton"><i class="glyphicon glyphicon-trash"></i></button>`;
                                 } else {
                                     return "Ingen rettigheder";
                                 }

@@ -300,7 +300,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(user.GetFullName(), readModel.ObjectOwnerName);
             Assert.Equal(user.Id, readModel.LastChangedById);
             Assert.Equal(user.GetFullName(), readModel.LastChangedByName);
-            Assert.Equal(systemUsage.LastChanged, readModel.LastChanged);
+            Assert.Equal(systemUsage.LastChanged, readModel.LastChangedAt);
             Assert.Equal(systemUsage.Concluded, readModel.Concluded);
             Assert.Equal(systemUsage.ArchiveDuty, readModel.ArchiveDuty);
             Assert.Equal(systemUsage.Registertype, readModel.IsHoldingDocument);
