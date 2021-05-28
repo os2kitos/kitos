@@ -68,13 +68,15 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
-                //TODO: Are we missing all of the updates to systems used in relations? -test it to validate
-
-                //System id is not stored in read model so search the source model
+                
                 var systemIds = _itSystemUsageRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
                 var parentSystemIds = _itSystemUsageRepository.GetByParentSystemId(update.SourceId).Select(x => x.Id);
-                var ids = systemIds.Concat(parentSystemIds).Distinct();
+                var usedInRelationsIds = _itSystemUsageRepository.GetBySystemIdInSystemRelations(update.SourceId).Select(x => x.Id);
+
+                var ids = systemIds
+                    .Concat(parentSystemIds)
+                    .Concat(usedInRelationsIds)
+                    .Distinct();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }

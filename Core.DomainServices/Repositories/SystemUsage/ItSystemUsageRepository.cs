@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.DomainServices.Repositories.SystemUsage
 {
@@ -38,6 +39,23 @@ namespace Core.DomainServices.Repositories.SystemUsage
         public IQueryable<ItSystemUsage> GetByParentSystemId(int systemId)
         {
             return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
+        }
+
+        public IQueryable<ItSystemUsage> GetBySystemIdInSystemRelations(int systemId)
+        {
+            var allRelationsQuery = _itSystemUsageRepository
+                .AsQueryable()
+                .SelectMany(x => x.UsedByRelations.Concat(x.UsageRelations));
+
+            var allFromSystemUsages = allRelationsQuery
+                .Where(x => x.FromSystemUsage.ItSystemId == systemId)
+                .Select(x => x.FromSystemUsage);
+
+            var allToSystemUsages = allRelationsQuery
+                .Where(x => x.ToSystemUsage.ItSystemId == systemId)
+                .Select(x => x.ToSystemUsage);
+
+            return allFromSystemUsages.Concat(allToSystemUsages).Distinct();
         }
 
         public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
