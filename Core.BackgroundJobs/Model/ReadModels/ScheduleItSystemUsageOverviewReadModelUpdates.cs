@@ -69,6 +69,8 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
+                //TODO: Are we missing all of the updates to systems used in relations? -test it to validate
+
                 //System id is not stored in read model so search the source model
                 var systemIds = _itSystemUsageRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
                 var parentSystemIds = _itSystemUsageRepository.GetByParentSystemId(update.SourceId).Select(x => x.Id);
