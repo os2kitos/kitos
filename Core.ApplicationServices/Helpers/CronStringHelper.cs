@@ -23,8 +23,8 @@ namespace Core.ApplicationServices.Helpers
                 case Scheduling.Day: return "0 8 * * *"; 
                 case Scheduling.Week: return $"0 8 * * {zeroTime.DayOfWeek:D}";
                 case Scheduling.Month: return $"0 8 {zeroTime.Day} * *";
-                case Scheduling.Quarter: return $"0 8 {zeroTime.Day} */3 *";
-                case Scheduling.Semiannual: return $"0 8 {zeroTime.Day} */6 *";
+                case Scheduling.Quarter: return $"0 8 {zeroTime.Day} {zeroTime.Month % 3}-12/3 *";
+                case Scheduling.Semiannual: return $"0 8 {zeroTime.Day} {zeroTime.Month % 6}-12/6 *";
                 case Scheduling.Year: return $"0 8 {zeroTime.Day} {zeroTime.Month} *";
                 case Scheduling.Immediate: // Fallthrough intended
                 default:

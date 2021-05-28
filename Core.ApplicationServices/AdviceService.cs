@@ -106,6 +106,7 @@ namespace Core.ApplicationServices
 
         public bool SendAdvice(int id)
         {
+            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
                 var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
@@ -115,14 +116,12 @@ namespace Core.ApplicationServices
                     {
                         try
                         {
-                            using var transaction = TransactionManager.Begin(IsolationLevel.Serializable);
                             DispatchEmails(advice);
 
                             AdviceRepository.Update(advice);
 
                             AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-                            AdviceSentRepository.Save();
-                            transaction.Commit();
+
                         }
                         catch (Exception e)
                         {
@@ -139,12 +138,17 @@ namespace Core.ApplicationServices
                         advice.IsActive = false;
                         AdviceScheduler.Remove(advice);
                     }
+
+                    AdviceRepository.Save();
+                    AdviceSentRepository.Save();
+                    transaction.Commit();
                 }
                 return true;
             }
             catch (Exception e)
             {
                 Logger?.Error(e, "General error sending emails in advice service");
+                transaction.Rollback();
                 return false;
             }
         }

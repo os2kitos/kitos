@@ -97,6 +97,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = DateTime.Now.AddDays(-1)
             };
             SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
 
             //Act
             var result = _sut.SendAdvice(recurringAdvice.Id);
@@ -121,6 +122,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = DateTime.Now.AddDays(2)
             };
             SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
 
             //Act
             var result = _sut.SendAdvice(recurringAdvice.Id);
@@ -142,7 +144,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private void SetupTransactionManager()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
         }
     }
 }
