@@ -45,12 +45,12 @@ Function Prepare-Package([String] $environmentName, $packageDirectory) {
         $Target = $packageDirectory
 
         7zip a -mx=9 $Target $Source
-        
-        #Compress-Archive -Path (Resolve-Path ".\TEMP_PresentationWeb\*") -CompressionLevel NoCompression -DestinationPath $packageDirectory
 
+        Write-Host "Zipping file back complete"
+        
         Remove-Item -Path (Resolve-Path ".\TEMP_PresentationWeb") -Recurse -Force      
         
-        Write-Host "Zipping file back complete" 
+        Write-Host "Clean up done"
 	}
 
 }
