@@ -11,5 +11,12 @@ namespace Core.DomainModel.Notification
         public string NotificationMessage { get; set; }
         public int RelatedEntityId { get; set; }
         public ObjectType RelatedEntityType { get; set; }
+        public NotificationType NotificationType { get; set; }
     }
+
+    public enum NotificationType
+    {
+        advice = 0
+    }
+
 }
