@@ -77,7 +77,7 @@
                 <!--Dato-->
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
-                    <input id="fromDate" type="text" name="fromDate" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
+                    <input id="fromDate" type="text" name="fromDate" placeholder="Vælg dato" class="form-control input-sm" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StartDate')" data-element-type="adviceStartDate">
                     <span class="help-block" ng-if="startDateErrMessage">{{startDateErrMessage}}</span>
                     <span ng-if="startDateInfoMessage" class="help-block small">
@@ -89,9 +89,13 @@
                 <!--Dato-->
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="toDate">Til dato</label>
-                    <input id="toDate" type="text" name="toDate" placeholder="Stop dato" class="form-control input-sm" data-kendo-date-picker
+                    <input id="toDate" type="text" name="toDate" placeholder="Vælg dato" class="form-control input-sm" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
                     <span class="help-block" ng-if="stopDateErrMessage">{{stopDateErrMessage}}</span>
+                    <span ng-if="startDate && !stopDate" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Når der ikke er valgt slutdato vil advis fortsætte indtil den deaktiveres. Det er muligt at tilføje en slutdato ved at redigere den aktive advis.
+                    </span>
                 </div>
             </div>
 
