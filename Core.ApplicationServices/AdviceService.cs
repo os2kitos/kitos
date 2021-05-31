@@ -197,7 +197,7 @@ namespace Core.ApplicationServices
                 //Perhaps this would qualify as a custom error message for the owner of the adis
                 MailClient.Send(message);
             }
-            
+
             advice.SentDate = DateTime.Now;
         }
 
@@ -271,14 +271,18 @@ namespace Core.ApplicationServices
         private void DeleteJobFromHangfire(Advice advice)
         {
             //Remove pending shcedules if any
-            var jobsScheduled = HangfireApi.GetScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
+            var jobsScheduled =
+                HangfireApi
+                    .GetScheduledJobs(0, int.MaxValue)
+                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
+
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
                 if (t.Equals(advice.JobId))
                 {
                     HangfireApi.DeleteScheduledJob(j.Key);
+                    break;
                 }
             }
 
