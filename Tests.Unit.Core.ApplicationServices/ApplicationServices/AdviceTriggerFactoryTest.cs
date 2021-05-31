@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Helpers;
-using Core.ApplicationServices.Triggers;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Advice;
 using Tests.Toolkit.Patterns;
 using Xunit;

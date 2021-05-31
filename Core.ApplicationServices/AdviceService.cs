@@ -12,10 +12,9 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Triggers;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
-using Hangfire;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 
@@ -73,6 +72,8 @@ namespace Core.ApplicationServices
         [Inject]
         public IOrganizationalUserContext OrganizationalUserContext { get; set; }
 
+        [Inject] public IHangfireApi HangfireApi { get; set; }
+
         #endregion
 
         public void CreateAdvice(Advice advice)
@@ -110,19 +111,11 @@ namespace Core.ApplicationServices
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        try
-                        {
-                            DispatchEmails(advice);
+                        DispatchEmails(advice);
 
-                            AdviceRepository.Update(advice);
+                        AdviceRepository.Update(advice);
 
-                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-
-                        }
-                        catch (Exception e)
-                        {
-                            Logger?.Error(e, "Error sending emails in advice service");
-                        }
+                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
                     }
 
                     if (advice.AdviceType == AdviceType.Immediate)
@@ -145,7 +138,7 @@ namespace Core.ApplicationServices
             {
                 Logger?.Error(e, "General error sending emails in advice service");
                 transaction.Rollback();
-                return false;
+                throw;
             }
         }
 
@@ -197,7 +190,14 @@ namespace Core.ApplicationServices
                         break;
                 }
             }
-            MailClient.Send(message);
+
+            if (message.To.Any() == false && message.CC.Any() == false)
+            {
+                //No recipients (maybe no one with assigned role anymore)
+                //Perhaps this would qualify as a custom error message for the owner of the adis
+                MailClient.Send(message);
+            }
+            
             advice.SentDate = DateTime.Now;
         }
 
@@ -271,23 +271,22 @@ namespace Core.ApplicationServices
         private void DeleteJobFromHangfire(Advice advice)
         {
             //Remove pending shcedules if any
-            var monitor = JobStorage.Current.GetMonitoringApi();
-            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
+            var jobsScheduled = HangfireApi.GetScheduledJobs(0, int.MaxValue).
                 Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
                 if (t.Equals(advice.JobId))
                 {
-                    BackgroundJob.Delete(j.Key);
+                    HangfireApi.DeleteScheduledJob(j.Key);
                 }
             }
 
             //Remove the job by main job id + any partitions (max 12 - one pr. month)
-            RecurringJob.RemoveIfExists(advice.JobId);
+            HangfireApi.RemoveRecurringJobIfExists(advice.JobId);
             for (var i = 0; i < 12; i++)
             {
-                RecurringJob.RemoveIfExists(CreatePartitionJobId(advice.JobId, i));
+                HangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
             }
         }
 
@@ -314,7 +313,7 @@ namespace Core.ApplicationServices
         {
             if (advice.AdviceType == AdviceType.Immediate)
             {
-                BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
+                HangfireApi.Schedule(() => SendAdvice(advice.Id));
             }
             else if (advice.AdviceType == AdviceType.Repeat)
             {
@@ -323,7 +322,7 @@ namespace Core.ApplicationServices
                 if (alarmDate == null)
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-                BackgroundJob.Schedule(
+                HangfireApi.Schedule(
                     () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
             }
         }
@@ -336,7 +335,7 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
             DeleteJobFromHangfire(advice); // Remove existing hangfire job
-            BackgroundJob.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
         }
 
         public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
@@ -350,7 +349,7 @@ namespace Core.ApplicationServices
             foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(alarmDate, schedule))
             {
                 var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(name, partitionId), () => name);
-                RecurringJob.AddOrUpdate(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
+                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
             }
         }
 

@@ -6,6 +6,9 @@ using System.Net.Mail;
 using Core.ApplicationServices;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
+using Hangfire;
+using Hangfire.Storage;
+using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -81,14 +84,22 @@ namespace Tests.Unit.Core.ApplicationServices
         public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsNotSentAndJobIsCancelled()
         {
             //Arrange
+            var jobStorageMock = new Mock<JobStorage>();
+            var monitorApiMock = new Mock<IMonitoringApi>();
+            jobStorageMock.Setup(x => x.GetMonitoringApi()).Returns(monitorApiMock.Object);
+            monitorApiMock.Setup(x => x.ScheduledJobs(0, int.MaxValue)).Returns(new JobList<ScheduledJobDto>(Enumerable.Empty<KeyValuePair<string, ScheduledJobDto>>()));
+            JobStorage.Current = jobStorageMock.Object;
+
+            var id = A<int>();
             var recurringAdvice = new Advice
             {
-                Id = A<int>(),
+                Id = id,
                 Subject = A<string>(),
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = DateTime.Now.AddDays(-1)
+                StopDate = DateTime.Now.AddDays(-1),
+                JobId = "Advice: " + id
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();

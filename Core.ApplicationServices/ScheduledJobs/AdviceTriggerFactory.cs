@@ -4,7 +4,7 @@ using Core.ApplicationServices.Helpers;
 using Core.DomainModel.Advice;
 using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices.Triggers
+namespace Core.ApplicationServices.ScheduledJobs
 {
     public static class AdviceTriggerFactory
     {

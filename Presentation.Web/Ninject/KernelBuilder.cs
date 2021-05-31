@@ -15,6 +15,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
@@ -198,6 +199,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IHangfireApi>().To<HangfireApi>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

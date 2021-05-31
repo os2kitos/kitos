@@ -1,6 +1,6 @@
 ﻿using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices.Triggers
+namespace Core.ApplicationServices.ScheduledJobs
 {
     public class AdviceTrigger
     {
