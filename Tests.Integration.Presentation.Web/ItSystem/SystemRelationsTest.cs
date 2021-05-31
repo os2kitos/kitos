@@ -374,6 +374,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input1 = await PrepareFullRelationAsync(false, false, false);
             var input2 = await PrepareFullRelationAsync(false, false, false);
             var input3 = await PrepareFullRelationAsync(false, false, false);
+            var input4 = await PrepareFullRelationAsync(false, false, false);
 
             //Make sure there are not relations before performing the paging test
             DatabaseAccess.MutateEntitySet<SystemRelation>(repository =>
@@ -386,6 +387,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await SystemRelationHelper.PostRelationAsync(input1);
             await SystemRelationHelper.PostRelationAsync(input2);
             await SystemRelationHelper.PostRelationAsync(input3);
+            await SystemRelationHelper.PostRelationAsync(input4);
 
             const int pageSize = 2;
             const int firstPageNumber = 0;
