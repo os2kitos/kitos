@@ -180,10 +180,8 @@ namespace Core.DomainModel.Advice
                 {
                     return false;
                 }
-                else
-                {
-                    return true;
-                }
+
+                return true;
             }
         }
     }

@@ -198,9 +198,9 @@ namespace Presentation.Web.Controllers.OData
                         throw new ArgumentException("For recurring advices editing is only allowed for name, subject and stop date");
                     }
 
-                    if (changedPropertyNames.Contains("StopDate"))
+                    if (changedPropertyNames.Contains("StopDate") && deltaAdvice.StopDate != null)
                     {
-                        if (deltaAdvice.StopDate.GetValueOrDefault().Date < deltaAdvice.AlarmDate.GetValueOrDefault().Date || deltaAdvice.StopDate.GetValueOrDefault().Date < DateTime.Now.Date)
+                        if (deltaAdvice.StopDate.Value.Date < deltaAdvice.AlarmDate.GetValueOrDefault().Date || deltaAdvice.StopDate.Value.Date < DateTime.Now.Date)
                         {
                             throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
                         }
