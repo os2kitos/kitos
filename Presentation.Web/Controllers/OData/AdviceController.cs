@@ -211,7 +211,8 @@ namespace Presentation.Web.Controllers.OData
 
                 if (response is UpdatedODataResult<Advice>)
                 {
-                    _adviceService.RescheduleRecurringJob(deltaAdvice);
+                    var updatedAdvice = Repository.GetByKey(key); //Re-load
+                    _adviceService.RescheduleRecurringJob(updatedAdvice);
                 }
 
                 return response;

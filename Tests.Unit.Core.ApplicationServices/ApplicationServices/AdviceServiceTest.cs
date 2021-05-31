@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Jobs;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
@@ -18,7 +17,6 @@ namespace Tests.Unit.Core.ApplicationServices
     {
         private readonly AdviceService _sut;
         private readonly Mock<IMailClient> _mailClientMock;
-        private readonly Mock<IAdviceScheduler> _adviceSchedulerMock;
         private readonly Mock<IGenericRepository<Advice>> _adviceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManager;
 
@@ -27,8 +25,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _sut = new AdviceService();
             _mailClientMock = new Mock<IMailClient>();
             _sut.MailClient = _mailClientMock.Object;
-            _adviceSchedulerMock = new Mock<IAdviceScheduler>();
-            _sut.AdviceScheduler = _adviceSchedulerMock.Object;
             _adviceRepositoryMock = new Mock<IGenericRepository<Advice>>();
             _sut.AdviceRepository = _adviceRepositoryMock.Object;
             _sut.AdviceSentRepository = Mock.Of<IGenericRepository<AdviceSent>>();
@@ -55,7 +51,6 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
-            _adviceSchedulerMock.Verify(x => x.Remove(immediateAdvice), Times.Never);
         }
 
         [Fact]
@@ -80,7 +75,6 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
-            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Never);
         }
 
         [Fact]
@@ -105,7 +99,6 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
-            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Once);
         }
 
         [Fact]
@@ -130,7 +123,6 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
-            _adviceSchedulerMock.Verify(x => x.Remove(recurringAdvice), Times.Never);
         }
 
         private void SetupAdviceRepository(Advice advice)

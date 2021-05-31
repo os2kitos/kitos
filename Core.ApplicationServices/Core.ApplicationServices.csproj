@@ -116,9 +116,7 @@
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
-    <Compile Include="Jobs\AdviceScheduler.cs" />
     <Compile Include="IAdviceService.cs" />
-    <Compile Include="Jobs\IAdviceScheduler.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
@@ -140,6 +138,8 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="Triggers\AdviceTrigger.cs" />
+    <Compile Include="Triggers\AdviceTriggerFactory.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />

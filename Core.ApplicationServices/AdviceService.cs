@@ -12,8 +12,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Helpers;
-using Core.ApplicationServices.Jobs;
+using Core.ApplicationServices.Triggers;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Hangfire;
@@ -67,9 +66,6 @@ namespace Core.ApplicationServices
 
         [Inject]
         public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
-
-        [Inject]
-        public IAdviceScheduler AdviceScheduler { get; set; }
 
         [Inject]
         public ITransactionManager TransactionManager { get; set; }
@@ -136,35 +132,7 @@ namespace Core.ApplicationServices
                     else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
-                        AdviceScheduler.Remove(advice);
-                    }
-                    else if (advice.AlarmDate?.Day > 28 && advice.AlarmDate?.Day < 31) //31 is handled as "last day of month" but 29 and 30 may be tricky
-                    {
-                        //TODO: Call the advice scheduler -> place the code there, not here!
-                        switch (advice.Scheduling)
-                        {
-                            case Scheduling.Month:
-                                //TODO: Requires definite reschedhuling
-                                /*
-                                 * Determine the trigger month (where it SHOULD have succeeded) based on alarm data
-                                 * From the intended trigger month, schedule next job
-                                 *
-                                 */
-                                break;
-                            case Scheduling.Quarter:
-                                //TODO: No resheduling on odd months
-                                if (advice.AlarmDate.Value.Month % 2 == 1) //No issues if the schedule runs on odd months - pattern will be ok
-                                {
-
-                                }
-                                break;
-                            case Scheduling.Semiannual:
-                                if (advice.AlarmDate.Value.Date.Month == 8 || advice.AlarmDate.Value.Date.Month == 2) // Will conflict with (non leap year) february so we must compute the next execution and update the cron 
-                                {
-
-                                }
-                                break;
-                        }
+                        DeleteJobFromHangfire(advice);
                     }
 
                     AdviceRepository.Save();
@@ -315,8 +283,12 @@ namespace Core.ApplicationServices
                 }
             }
 
-            //Remove the job
-            AdviceScheduler.Remove(advice);
+            //Remove the job by main job id + any partitions (max 12 - one pr. month)
+            RecurringJob.RemoveIfExists(advice.JobId);
+            for (var i = 0; i < 12; i++)
+            {
+                RecurringJob.RemoveIfExists(CreatePartitionJobId(advice.JobId, i));
+            }
         }
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
@@ -352,8 +324,7 @@ namespace Core.ApplicationServices
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
                 BackgroundJob.Schedule(
-                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.Value,
-                        alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
             }
         }
 
@@ -365,14 +336,27 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
             DeleteJobFromHangfire(advice); // Remove existing hangfire job
-            BackgroundJob.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.Value, alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            BackgroundJob.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
         }
 
         public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
         {
-            //TODO: For the "messy" situations, create multiple jobs OR do the match when an advice has been sent
+            var advice = AdviceRepository.GetByKey(entityId);
+            if (advice == null)
+            {
+                throw new ArgumentException(nameof(entityId) + " does not point to a valid id");
+            }
 
-            RecurringJob.AddOrUpdate(name, () => SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
+            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(alarmDate, schedule))
+            {
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(name, partitionId), () => name);
+                RecurringJob.AddOrUpdate(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
+            }
+        }
+
+        private static string CreatePartitionJobId(string prefix, int partitionIndex)
+        {
+            return $"{prefix}_part_{partitionIndex}";
         }
     }
 }
