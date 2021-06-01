@@ -15,6 +15,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Extensions;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 
@@ -106,7 +107,7 @@ namespace Core.ApplicationServices
             using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
-                var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+                var advice = AdviceRepository.AsQueryable().ById(id);
                 if (advice != null)
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
