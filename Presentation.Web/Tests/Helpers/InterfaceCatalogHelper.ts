@@ -1,8 +1,13 @@
 ﻿import InterfaceCatalogPage = require("../PageObjects/it-system/Interfaces/itSystemInterface.po");
 import Select2 = require("./Select2Helper");
+import WaitTimers = require("../Utility/WaitTimers");
+import Constants = require("../Utility/Constants");
 
 class InterfaceCatalogHelper {
     private static interfacePage = new InterfaceCatalogPage();
+    private static waitUpTo = new WaitTimers();
+    private static ec = protractor.ExpectedConditions;
+    private static constants = new Constants();
 
     public static createInterface(name: string) {
         console.log(`Creating interface with name ${name}`);
@@ -10,6 +15,7 @@ class InterfaceCatalogHelper {
             .then(() => this.interfacePage.getCreateInterfaceButton().click())
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
+            .then(() => browser.wait(this.ec.elementToBeClickable(this.interfacePage.getSaveInterfaceButton()), this.waitUpTo.twentySeconds))
             .then(() => this.interfacePage.getSaveInterfaceButton().click())
             .then(() => console.log("Interface created"));
     }
@@ -19,6 +25,7 @@ class InterfaceCatalogHelper {
         return this.gotoSpecificInterface(interfaceName)
             .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
             .then(() => Select2.waitForDataAndSelect())
+            .then(() => browser.wait((this.exposingSystemHasBeenUpdatedTo(interfaceName)) as any, this.waitUpTo.twentySeconds))
             .then(() => console.log("Interface bound to system"));;
     }
 
@@ -37,6 +44,12 @@ class InterfaceCatalogHelper {
     private static findSpecificInterfaceInNameColumn(name: string) {
         console.log(`Finding interface with name : ${name}`);
         return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '" and @data-element-type="InterfaceName"]'));
+    }
+
+    static exposingSystemHasBeenUpdatedTo(interfaceName: string) {
+        const exposedByLocator = element(by.id(this.constants.interfaceSelectExhibit)).element(by.className("select2-chosen"));
+
+        return this.ec.textToBePresentInElement(exposedByLocator, interfaceName);
     }
 }
 export = InterfaceCatalogHelper;

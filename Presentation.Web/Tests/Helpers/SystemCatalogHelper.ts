@@ -12,6 +12,7 @@ class SystemCatalogHelper {
     private static systemPage = new SystemPage();
     private static waitUpTo = new WaitTimers();
     private static readonly visibilitySelect2 = "s2id_system-access";
+    private static ec = protractor.ExpectedConditions;
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
@@ -19,7 +20,9 @@ class SystemCatalogHelper {
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogVisible(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
+            .then(() => browser.wait(this.ec.elementToBeClickable(element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton))), this.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click())
             .then(() => console.log("System created"));
     }
