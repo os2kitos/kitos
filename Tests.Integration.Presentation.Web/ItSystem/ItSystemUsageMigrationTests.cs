@@ -300,7 +300,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var migrateToItSystem = await CreateSystemAsync();
 
-            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(),exhibit.ItInterfaceId, null, null);
+            await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), exhibit.ItInterfaceId, null, null);
 
             //Act
             using (var response = await GetMigration(fromItSystemUsage, migrateToItSystem))
@@ -485,7 +485,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var contract = await CreateContractAsync();
             await AddItSystemUsageToContractAsync(contract, fromItSystemUsage);
             var createdContract = await GetItContractAsync(contract.Id);
-            
+
             var usageExhibit = await CreateExhibitAsync(createdInterface, toItSystem);
             var usageRelation = await CreateSystemRelation(fromItSystemUsage.Id, toItSystemUsage.Id, A<string>(), usageExhibit.ItInterfaceId, GetValidFrequencyTypeId(), contract.Id);
 
@@ -501,7 +501,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 AssertMigrationSucceeded(response);
                 await AssertSystemUsageAssociationExistsInContract(createdContract, fromItSystemUsage);
                 await AssertAssociatedProjectExists(fromItSystemUsage, project);
-                
+
                 await AssertRelationExists(usageRelation, fromItSystemUsage, true, true, true);
 
             }
@@ -739,10 +739,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         private static async Task<SystemRelationDTO> CreateSystemRelation(
-            int fromSystemId, 
-            int toSystemId, 
+            int fromSystemId,
+            int toSystemId,
             string description,
-            int? interfaceId, 
+            int? interfaceId,
             int? frequencyTypeId,
             int? contractId)
         {
