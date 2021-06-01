@@ -100,7 +100,9 @@
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
-                            payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
+
+                            //Stopdate is optional so only parse it if present
+                            payload.StopDate = $scope.stopDate ? moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat) : null;
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
