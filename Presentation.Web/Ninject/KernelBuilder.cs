@@ -200,6 +200,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IHangfireApi>().To<HangfireApi>().InCommandScope(Mode);
+            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -335,7 +336,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InCommandScope(Mode);
-            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
         }
 
         private void RegisterDataAccess(IKernel kernel)

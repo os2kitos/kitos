@@ -13,6 +13,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
@@ -27,18 +28,21 @@ namespace Presentation.Web.Controllers.OData
     {
         private readonly IAdviceService _adviceService;
         private readonly IAdviceRootResolution _adviceRootResolution;
+        private readonly IOperationClock _operationClock;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
-            IAdviceRootResolution adviceRootResolution
+            IAdviceRootResolution adviceRootResolution,
+            IOperationClock operationClock
             )
             : base(repository)
         {
             _adviceService = adviceService;
             _adviceRootResolution = adviceRootResolution;
+            _operationClock = operationClock;
         }
 
         [EnableQuery]
@@ -111,7 +115,7 @@ namespace Presentation.Web.Controllers.OData
                     return BadRequest("Start date is not set!");
                 }
 
-                if (advice.AlarmDate.Value.Date < DateTime.Now.Date)
+                if (advice.AlarmDate.Value.Date < _operationClock.Now.Date)
                 {
                     return BadRequest("Start date is set before today");
                 }
@@ -198,9 +202,9 @@ namespace Presentation.Web.Controllers.OData
                         throw new ArgumentException("For recurring advices editing is only allowed for name, subject and stop date");
                     }
 
-                    if (changedPropertyNames.Contains("StopDate"))
+                    if (changedPropertyNames.Contains("StopDate") && deltaAdvice.StopDate != null)
                     {
-                        if (deltaAdvice.StopDate.GetValueOrDefault().Date < deltaAdvice.AlarmDate.GetValueOrDefault().Date || deltaAdvice.StopDate.GetValueOrDefault().Date < DateTime.Now.Date)
+                        if (deltaAdvice.StopDate.Value.Date < deltaAdvice.AlarmDate.GetValueOrDefault().Date || deltaAdvice.StopDate.Value.Date < _operationClock.Now.Date)
                         {
                             throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
                         }

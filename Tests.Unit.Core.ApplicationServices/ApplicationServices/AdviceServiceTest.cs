@@ -7,6 +7,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Advice;
 using Core.DomainServices;
+using Core.DomainServices.Time;
 using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
 using Moq;
@@ -35,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _sut.TransactionManager = _transactionManager.Object;
             _hangfireApiMock = new Mock<IHangfireApi>();
             _sut.HangfireApi = _hangfireApiMock.Object;
+            _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.Now);
         }
 
         [Fact]
@@ -78,6 +80,31 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.SendAdvice(recurringAdvice.Id);
 
             //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+        }
+
+        [Fact]
+        public void SendAdvice_GivenRecurringActiveAdvice_And_No_StopDate_At_Worlds_End_AdviceIsSentAndJobIsNotCancelled()
+        {
+            //Arrange
+            var recurringAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
+                Scheduling = Scheduling.Quarter,
+                AlarmDate = DateTime.Now.AddDays(-1),
+                StopDate = null
+            };
+            _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.MaxValue);
+            SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert - even at end of days, if no expiration is set, we continue to send the advice
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
         }
@@ -130,16 +157,16 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result);
-            
+
             //No email sent for expired advice
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
-            
+
             //Removed by main job id
             _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists(recurringAdvice.JobId), Times.Once);
             for (int i = 0; i < 12; i++)
             {
                 //Possible partitions are also removed
-                _hangfireApiMock.Verify(x=>x.RemoveRecurringJobIfExists($"{recurringAdvice.JobId}_part_{i}"),Times.Once);
+                _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists($"{recurringAdvice.JobId}_part_{i}"), Times.Once);
             }
         }
 
