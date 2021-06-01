@@ -32,7 +32,8 @@ class ContractHelper {
         console.log(`open details for contract: ${name}`);
         return this.contractPage.getPage()
             .then(() => this.waitForEconomyPageKendoGrid())
-            .then(() => this.findCatalogColumnsFor(name).first().click());
+            .then(() => this.findCatalogColumnsFor(name).first().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static getRelationCountFromContractName(name: string) {

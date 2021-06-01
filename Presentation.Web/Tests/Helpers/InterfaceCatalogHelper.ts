@@ -28,7 +28,7 @@ class InterfaceCatalogHelper {
             .then(() => browser.waitForAngular())
             .then(() => {
                 console.log(`Waiting for binding of ${interfaceName} to update to system with name ${systemName}`);
-                return browser.wait((this.exposingSystemHasBeenUpdatedTo(interfaceName)) as any, this.waitUpTo.tenSeconds)
+                return browser.wait((this.exposingSystemHasBeenUpdatedTo(systemName)) as any, this.waitUpTo.tenSeconds)
                     .then(() => console.log(`FINISHED Waiting for binding of ${interfaceName} to update to system with name ${systemName}`));
             })
             .then(() => console.log("Interface bound to system"));;
@@ -51,10 +51,10 @@ class InterfaceCatalogHelper {
         return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '" and @data-element-type="InterfaceName"]'));
     }
 
-    static exposingSystemHasBeenUpdatedTo(interfaceName: string) {
+    static exposingSystemHasBeenUpdatedTo(exposingSystemName: string) {
         const exposedByLocator = element(by.id(this.constants.interfaceSelectExhibit)).element(by.className("select2-chosen"));
 
-        return this.ec.textToBePresentInElement(exposedByLocator, interfaceName);
+        return this.ec.textToBePresentInElement(exposedByLocator, exposingSystemName);
     }
 }
 export = InterfaceCatalogHelper;
