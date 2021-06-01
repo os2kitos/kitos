@@ -83,6 +83,30 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void SendAdvice_GivenRecurringActiveAdvice_Not_Yet_InScope_NoAdviceIsSentAndJobIsNotCancelled()
+        {
+            //Arrange
+            var recurringAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Repeat,
+                Scheduling = Scheduling.Quarter,
+                AlarmDate = DateTime.Now.AddYears(4),
+                StopDate = DateTime.Now.AddYears(5)
+            };
+            SetupAdviceRepository(recurringAdvice);
+            SetupTransactionManager();
+
+            //Act
+            var result = _sut.SendAdvice(recurringAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
+        }
+
+        [Fact]
         public void SendAdvice_GivenRecurringExpiringAdvice_AdviceIsNotSentAndJobIsCancelled()
         {
             //Arrange

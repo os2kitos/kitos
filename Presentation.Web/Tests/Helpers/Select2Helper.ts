@@ -13,30 +13,39 @@ class Select2Helper {
     static waitForDataAndSelect() {
         console.log(`waitForSelect2DataAndSelect`);
         return browser.wait(this.ec.visibilityOf(element(by.className(Select2Helper.selectResult))), this.waitUpTo.twentySeconds)
-            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(protractor.Key.ENTER));
+            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(protractor.Key.ENTER))
+            .then(() => browser.waitForAngular());
     }
 
     static searchFor(name: string, elementId: string) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId}`);
         return element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).click())
-            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
+            .then(() => browser.waitForAngular())
+            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name))
+            .then(() => browser.waitForAngular());
     }
 
     static searchForByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
         console.log(`select2SearchFor: ${name}, in element with id: ${elementId} under parent: ${parent.getTagName().toString()}`);
         parent.element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).click())
-            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name));
+            .then(() => browser.waitForAngular())
+            .then(() => element(by.id(Select2Helper.selectDrop)).element(by.className(Select2Helper.selectInput)).sendKeys(name))
+            .then(() => browser.waitForAngular());
     }
 
     static selectNoSearchByParent(name: string, elementId: string, parent: protractor.ElementFinder) {
         console.log(`selectNoSearchByParent: ${name}, in element with id: ${elementId} under parent: ${parent.getTagName().toString()}`);
         parent.element(by.id(elementId)).element(by.className(Select2Helper.selectChoice))
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => this.findResult(name).first().click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log(`Selected ${name}`));
     }
 
@@ -50,7 +59,9 @@ class Select2Helper {
         return element(by.id(elementId))
             .element(by.className(Select2Helper.selectChoice))
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => this.findResult(name).first().click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log(`Selected ${name}`));
     }
 
@@ -58,7 +69,9 @@ class Select2Helper {
         return element(by.id(elementId))
             .element(by.className(Select2Helper.selectChoices))
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => this.findResult(name).first().click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log(`Selected ${name}`));
     }
 

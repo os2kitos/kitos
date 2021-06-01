@@ -6,6 +6,10 @@ using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.ScheduledJobs
 {
+    /// <summary>
+    /// Helper class which creates the necessary triggers to fulfill requirements in the advice domain.
+    /// This class deals with the complexities in leap year / non-leap year + normal issues with intervals which initiate at days above 28
+    /// </summary>
     public static class AdviceTriggerFactory
     {
         public static IEnumerable<AdviceTrigger> CreateFrom(DateTime alarmDate, Scheduling scheduling)
@@ -14,6 +18,13 @@ namespace Core.ApplicationServices.ScheduledJobs
             {
                 switch (scheduling)
                 {
+                    case Scheduling.Year:
+                        if (alarmDate.Month == 2) //Start month is leap year so we must adjust
+                            foreach (var adviceTrigger in ScheduleAdviceInPartsOf(alarmDate, 1))
+                                yield return adviceTrigger;
+                        else
+                            yield return SetupAdviceTrigger(scheduling, alarmDate, Maybe<int>.None);
+                        break;
                     case Scheduling.Month:
                         //12 yearly triggers
                         foreach (var adviceTrigger in ScheduleAdviceInPartsOf(alarmDate, 12))

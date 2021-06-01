@@ -50,9 +50,9 @@ describe("ITSystem Catalog accessibility tests", () => {
             });
     });
 
-        it("Global Admin can create and delete It-system catalog", () => {
-            const systemName = createSystemName();
-             loginHelper.loginAsGlobalAdmin()
+    it("Global Admin can create and delete It-system catalog", () => {
+        const systemName = createSystemName();
+        loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
             .then(() => waitForKendoGrid())
             .then(() => expectCreateButtonVisibility(true))
@@ -73,13 +73,13 @@ describe("ITSystem Catalog accessibility tests", () => {
             .then(() => expectNoSystemWithName(systemName));
     });
 
-    function expectCreateButtonVisibility(expectedEnabledState: boolean){
+    function expectCreateButtonVisibility(expectedEnabledState: boolean) {
         console.log(`Expecting createCatalog visibility to be:${expectedEnabledState}`);
         return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
     }
 
     function waitForKendoGrid() {
-        return SystemCatalogHelper.waitForKendoGrid();
+        return browser.waitForAngular().then(() => SystemCatalogHelper.waitForKendoGrid());
     }
 
     function loadPage() {
