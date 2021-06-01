@@ -49,12 +49,18 @@ namespace Core.ApplicationServices.Notification
             var result = _userNotificationRepository.GetById(id);
 
             if (result.IsNone)
+            {
+                transaction.Rollback();
                 return new OperationError(OperationFailure.NotFound);
+            }
 
             var notificationToDelete = result.Value;
 
             if (!_authorizationContext.AllowDelete(notificationToDelete))
+            {
+                transaction.Rollback();
                 return new OperationError(OperationFailure.Forbidden);
+            }
 
             _userNotificationRepository.DeleteById(id);
             transaction.Commit();
@@ -64,6 +70,11 @@ namespace Core.ApplicationServices.Notification
         public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId)
         {
             return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).ToList();
+        }
+
+        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId)
+        {
+            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).Count();
         }
     }
 }

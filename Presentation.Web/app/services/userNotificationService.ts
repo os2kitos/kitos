@@ -1,6 +1,7 @@
 ﻿module Kitos.Services.UserNotification {
     export interface IUserNotificationService {
         delete(userNotificationId: number): angular.IPromise<IUserNotificationDeletedResult>;
+        getNumberOfUnresolvedNotifications(organizationId: number, userId: number): angular.IPromise<number>;
     }
 
     export interface IUserNotificationDeletedResult {
@@ -19,6 +20,18 @@
                             deletedObjectId: response.data.response.id,
                         };
                     },
+                    error => this.handleServerError(error)
+                );
+        }
+
+
+        getNumberOfUnresolvedNotifications(organizationId: number, userId: number): ng.IPromise<number> {
+            return this
+                .$http
+                .get<API.Models.IApiWrapper<number>>(`api/v1/user-notification/unresolved/organization/${organizationId}/user/${userId}`)
+                .then(
+                    response => response.data.response,
+
                     error => this.handleServerError(error)
                 );
         }

@@ -16,9 +16,9 @@ namespace Core.DomainServices.Repositories.Notification
 
         public UserNotification Add(UserNotification newNotification)
         {
-            var registration = _repository.Insert(newNotification);
+            var notification = _repository.Insert(newNotification);
             _repository.Save();
-            return registration;
+            return notification;
         }
 
         public bool DeleteById(int id)

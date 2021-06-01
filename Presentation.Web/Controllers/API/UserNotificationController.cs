@@ -47,6 +47,18 @@ namespace Presentation.Web.Controllers.API
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("unresolved/organization/{organizationId}/user/{userId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId)
+        {
+            return _userNotificationService
+                .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId)
+                .Match(value => Ok(value), FromOperationError);
+        }
+
         private List<UserNotificationDTO> ToDTOs(IEnumerable<UserNotification> value)
         {
             return value.Select(x => ToDTO(x)).ToList();
