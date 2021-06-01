@@ -16,6 +16,7 @@ using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 
@@ -75,6 +76,8 @@ namespace Core.ApplicationServices
 
         [Inject] public IHangfireApi HangfireApi { get; set; }
 
+        [Inject] public IOperationClock OperationClock { get; set; }
+
         #endregion
 
         public void CreateAdvice(Advice advice)
@@ -116,7 +119,7 @@ namespace Core.ApplicationServices
 
                         AdviceRepository.Update(advice);
 
-                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
+                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
                     }
 
                     if (advice.AdviceType == AdviceType.Immediate)
@@ -143,14 +146,14 @@ namespace Core.ApplicationServices
             }
         }
 
-        private static bool IsAdviceExpired(Advice advice)
+        private bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
+            return advice.StopDate != null && advice.StopDate.Value.Date < OperationClock.Now.Date;
         }
 
-        private static bool IsAdviceInScope(Advice advice)
+        private bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date && !IsAdviceExpired(advice);
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= OperationClock.Now.Date && !IsAdviceExpired(advice);
         }
 
         private void DispatchEmails(Advice advice)
@@ -199,7 +202,7 @@ namespace Core.ApplicationServices
                 MailClient.Send(message);
             }
 
-            advice.SentDate = DateTime.Now;
+            advice.SentDate = OperationClock.Now;
         }
 
         private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
