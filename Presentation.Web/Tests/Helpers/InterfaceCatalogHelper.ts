@@ -25,6 +25,7 @@ class InterfaceCatalogHelper {
         return this.gotoSpecificInterface(interfaceName)
             .then(() => Select2.searchFor(systemName, "s2id_interface-exposed-by"))
             .then(() => Select2.waitForDataAndSelect())
+            .then(() => browser.waitForAngular())
             .then(() => {
                 console.log(`Waiting for binding of ${interfaceName} to update to system with name ${systemName}`);
                 return browser.wait((this.exposingSystemHasBeenUpdatedTo(interfaceName)) as any, this.waitUpTo.tenSeconds)
