@@ -380,14 +380,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input3 = await PrepareFullRelationAsync(false, false, false);
             var input4 = await PrepareFullRelationAsync(false, false, false);
 
-            //Make sure there are not relations before performing the paging test
-            DatabaseAccess.MutateEntitySet<SystemRelation>(repository =>
-            {
-                var systemRelations = repository.AsQueryable().ToList();
-                repository.RemoveRange(systemRelations);
-                repository.Save();
-            });
-
             await SystemRelationHelper.PostRelationAsync(input1);
             await SystemRelationHelper.PostRelationAsync(input2);
             await SystemRelationHelper.PostRelationAsync(input3);
@@ -397,6 +389,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int firstPageNumber = 0;
             const int secondPageNumber = firstPageNumber + 1;
             var twoPages = (await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize * 2)).ToList();
+            Assert.Equal(pageSize * 2, twoPages.Count); //We expect all 4 to be there
 
             //Act
             var firstPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize);
