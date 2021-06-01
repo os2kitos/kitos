@@ -15,7 +15,7 @@ class InterfaceCatalogHelper {
             .then(() => this.interfacePage.getCreateInterfaceButton().click())
             .then(() => expect(this.interfacePage.getInterfaceNameInputField().isPresent()))
             .then(() => this.interfacePage.getInterfaceNameInputField().sendKeys(name))
-            .then(() => browser.wait(this.ec.elementToBeClickable(this.interfacePage.getSaveInterfaceButton()), this.waitUpTo.twentySeconds))
+            .then(() => browser.wait(this.ec.elementToBeClickable(this.interfacePage.getSaveInterfaceButton()), this.waitUpTo.tenSeconds))
             .then(() => this.interfacePage.getSaveInterfaceButton().click())
             .then(() => console.log("Interface created"));
     }
