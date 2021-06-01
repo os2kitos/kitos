@@ -23,6 +23,10 @@ class ItSystemCatalog implements IPageObject {
     createCatalogForm = element(this.byDataElementType(this.consts.catalogCreateForm));
 
     isCreateCatalogAvailable(): webdriver.until.Condition<boolean> {
+        return this.ec.presenceOf(this.createCatalogForm);
+    }
+
+    isCreateCatalogVisible(): webdriver.until.Condition<boolean> {
         return this.ec.visibilityOf(this.createCatalogForm);
     }
 

@@ -26,7 +26,6 @@ namespace Presentation.Web.Controllers.OData
     public class AdviceController : BaseEntityController<Advice>
     {
         private readonly IAdviceService _adviceService;
-        private readonly IGenericRepository<AdviceSent> _sentRepository;
         private readonly IAdviceRootResolution _adviceRootResolution;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
@@ -34,13 +33,11 @@ namespace Presentation.Web.Controllers.OData
         public AdviceController(
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
-            IGenericRepository<AdviceSent> sentRepository,
             IAdviceRootResolution adviceRootResolution
             )
             : base(repository)
         {
             _adviceService = adviceService;
-            _sentRepository = sentRepository;
             _adviceRootResolution = adviceRootResolution;
         }
 
@@ -160,7 +157,7 @@ namespace Presentation.Web.Controllers.OData
                 catch (Exception e)
                 {
                     Logger.ErrorException("Failed to add advice", e);
-                    return InternalServerError(e);
+                    return StatusCode(HttpStatusCode.InternalServerError);
                 }
             }
             return response;
@@ -171,18 +168,29 @@ namespace Presentation.Web.Controllers.OData
         {
             try
             {
-                var advice = delta.GetInstance();
+                var existingAdvice = Repository.GetByKey(key);
+                var deltaAdvice = delta.GetInstance();
 
-                if (!advice.IsActive)
+                if (existingAdvice == null)
+                {
+                    return NotFound();
+                }
+
+                if (existingAdvice.Type != deltaAdvice.Type)
+                {
+                    return BadRequest("Cannot change advice type");
+                }
+
+                if (!existingAdvice.IsActive)
                 {
                     throw new ArgumentException(
                         "Cannot update inactive advice ");
                 }
-                if (advice.AdviceType == AdviceType.Immediate)
+                if (existingAdvice.AdviceType == AdviceType.Immediate)
                 {
                     throw new ArgumentException("Editing is not allowed for immediate advice");
                 }
-                if (advice.AdviceType == AdviceType.Repeat)
+                if (existingAdvice.AdviceType == AdviceType.Repeat)
                 {
                     var changedPropertyNames = delta.GetChangedPropertyNames().ToList();
                     if (changedPropertyNames.All(IsRecurringEditableProperty))
@@ -192,7 +200,7 @@ namespace Presentation.Web.Controllers.OData
 
                     if (changedPropertyNames.Contains("StopDate"))
                     {
-                        if (advice.StopDate.Value.Date < advice.AlarmDate.Value.Date || advice.StopDate.Value.Date < DateTime.Now.Date)
+                        if (deltaAdvice.StopDate.GetValueOrDefault().Date < deltaAdvice.AlarmDate.GetValueOrDefault().Date || deltaAdvice.StopDate.GetValueOrDefault().Date < DateTime.Now.Date)
                         {
                             throw new ArgumentException("For recurring advices only future stop dates after the set alarm date is allowed");
                         }
@@ -203,7 +211,8 @@ namespace Presentation.Web.Controllers.OData
 
                 if (response is UpdatedODataResult<Advice>)
                 {
-                    _adviceService.RescheduleRecurringJob(advice);
+                    var updatedAdvice = Repository.GetByKey(key); //Re-load
+                    _adviceService.RescheduleRecurringJob(updatedAdvice);
                 }
 
                 return response;
@@ -211,7 +220,7 @@ namespace Presentation.Web.Controllers.OData
             catch (Exception e)
             {
                 Logger.ErrorException("Failed to update advice", e);
-                return InternalServerError(e);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
         }
 
@@ -253,7 +262,7 @@ namespace Presentation.Web.Controllers.OData
             catch (Exception e)
             {
                 Logger.ErrorException("Failed to delete advice", e);
-                return InternalServerError(e);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -278,7 +287,7 @@ namespace Presentation.Web.Controllers.OData
             catch (Exception e)
             {
                 Logger.ErrorException("Failed to delete advice", e);
-                return InternalServerError(e);
+                return StatusCode(HttpStatusCode.InternalServerError);
             }
             return Updated(entity);
         }
