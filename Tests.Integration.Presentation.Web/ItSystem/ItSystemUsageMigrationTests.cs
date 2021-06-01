@@ -16,7 +16,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    //[CollectionDefinition("Migration tests", DisableParallelization = true)]
+    [CollectionDefinition("Migration tests", DisableParallelization = true)]
     public class ItSystemUsageMigrationTests : WithAutoFixture, IAsyncLifetime
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");
