@@ -12,15 +12,14 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Helpers;
-using Core.ApplicationServices.Jobs;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
-using Hangfire;
+using Core.DomainServices.Extensions;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Notification;
-using Core.DomainModel.Notification;
 
 namespace Core.ApplicationServices
 {
@@ -71,13 +70,16 @@ namespace Core.ApplicationServices
         public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 
         [Inject]
-        public IAdviceScheduler AdviceScheduler { get; set; }
-
-        [Inject]
         public ITransactionManager TransactionManager { get; set; }
 
         [Inject]
         public IOrganizationalUserContext OrganizationalUserContext { get; set; }
+
+        [Inject] public IHangfireApi HangfireApi { get; set; }
+
+        [Inject] public IOperationClock OperationClock { get; set; }
+
+        [Inject] public IUserNotificationService UserNotificationService { get; set; }
 
         #endregion
 
@@ -106,36 +108,21 @@ namespace Core.ApplicationServices
                 );
         }
 
-        [Inject]
-        public IUserNotificationService UserNotificationService { get; set; }
-
         public bool SendAdvice(int id)
         {
             using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
-                var advice = AdviceRepository.AsQueryable().FirstOrDefault(a => a.Id == id);
+                var advice = AdviceRepository.AsQueryable().ById(id);
                 if (advice != null)
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        try
-                        {
-                            DispatchEmails(advice);
+                        DispatchEmails(advice);
 
-                            AdviceRepository.Update(advice);
+                        AdviceRepository.Update(advice);
 
-                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = DateTime.Now });
-
-                        }
-                        catch (Exception e)
-                        {
-                            Logger?.Error(e, "Error sending emails in advice service");
-                            if(advice.ObjectOwnerId.HasValue && advice.RelationId.HasValue && advice.Type.HasValue)
-                            {
-                                UserNotificationService.AddUserNotification(advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value, NotificationType.advice);
-                            }
-                        }
+                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
                     }
 
                     if (advice.AdviceType == AdviceType.Immediate)
@@ -145,7 +132,7 @@ namespace Core.ApplicationServices
                     else if (IsAdviceExpired(advice))
                     {
                         advice.IsActive = false;
-                        AdviceScheduler.Remove(advice);
+                        DeleteJobFromHangfire(advice);
                     }
 
                     AdviceRepository.Save();
@@ -157,19 +144,20 @@ namespace Core.ApplicationServices
             catch (Exception e)
             {
                 Logger?.Error(e, "General error sending emails in advice service");
+                // TODO: Create user notification
                 transaction.Rollback();
-                return false;
+                throw;
             }
         }
 
-        private static bool IsAdviceExpired(Advice advice)
+        private bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate != null && advice.StopDate.Value.Date < DateTime.Now.Date;
+            return advice.StopDate != null && advice.StopDate.Value.Date < OperationClock.Now.Date;
         }
 
-        private static bool IsAdviceInScope(Advice advice)
+        private bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= DateTime.Now.Date && !IsAdviceExpired(advice);
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= OperationClock.Now.Date && !IsAdviceExpired(advice);
         }
 
         private void DispatchEmails(Advice advice)
@@ -210,8 +198,15 @@ namespace Core.ApplicationServices
                         break;
                 }
             }
-            MailClient.Send(message);
-            advice.SentDate = DateTime.Now;
+
+            if (message.To.Any() == false && message.CC.Any() == false)
+            {
+                //No recipients (maybe no one with assigned role anymore)
+                //Perhaps this would qualify as a custom error message for the owner of the adis
+                MailClient.Send(message);
+            }
+
+            advice.SentDate = OperationClock.Now;
         }
 
         private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
@@ -283,22 +278,27 @@ namespace Core.ApplicationServices
 
         private void DeleteJobFromHangfire(Advice advice)
         {
-            DeletePostponedRecurringJobFromHangfire(advice.JobId);
-            RecurringJob.RemoveIfExists("Advice: " + advice.Id);
-        }
+            //Remove pending shcedules if any
+            var jobsScheduled =
+                HangfireApi
+                    .GetScheduledJobs(0, int.MaxValue)
+                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
 
-        private void DeletePostponedRecurringJobFromHangfire(string jobIdText)
-        {
-            var monitor = JobStorage.Current.GetMonitoringApi();
-            var jobsScheduled = monitor.ScheduledJobs(0, int.MaxValue).
-                Where(x => x.Value.Job.Method.Name == nameof(CreateDelayedRecurringJob));
             foreach (var j in jobsScheduled)
             {
                 var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Contains(jobIdText))
+                if (t.Equals(advice.JobId))
                 {
-                    BackgroundJob.Delete(j.Key);
+                    HangfireApi.DeleteScheduledJob(j.Key);
+                    break;
                 }
+            }
+
+            //Remove the job by main job id + any partitions (max 12 - one pr. month)
+            HangfireApi.RemoveRecurringJobIfExists(advice.JobId);
+            for (var i = 0; i < 12; i++)
+            {
+                HangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
             }
         }
 
@@ -325,7 +325,7 @@ namespace Core.ApplicationServices
         {
             if (advice.AdviceType == AdviceType.Immediate)
             {
-                BackgroundJob.Enqueue(() => SendAdvice(advice.Id));
+                HangfireApi.Schedule(() => SendAdvice(advice.Id));
             }
             else if (advice.AdviceType == AdviceType.Repeat)
             {
@@ -334,9 +334,8 @@ namespace Core.ApplicationServices
                 if (alarmDate == null)
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-                BackgroundJob.Schedule(
-                    () => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value,
-                        alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+                HangfireApi.Schedule(
+                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
             }
         }
 
@@ -347,13 +346,28 @@ namespace Core.ApplicationServices
             if (alarmDate == null)
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-            DeletePostponedRecurringJobFromHangfire(advice.JobId); // Remove existing hangfire job
-            BackgroundJob.Schedule(() => CreateDelayedRecurringJob(advice.Id, advice.JobId, advice.Scheduling.Value, alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            DeleteJobFromHangfire(advice); // Remove existing hangfire job
+            HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
         }
 
-        public void CreateDelayedRecurringJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
         {
-            RecurringJob.AddOrUpdate(name, () => SendAdvice(entityId), CronStringHelper.CronPerInterval(schedule, alarmDate));
+            var advice = AdviceRepository.GetByKey(entityId);
+            if (advice == null)
+            {
+                throw new ArgumentException(nameof(entityId) + " does not point to a valid id");
+            }
+
+            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(alarmDate, schedule))
+            {
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(name, partitionId), () => name);
+                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
+            }
+        }
+
+        private static string CreatePartitionJobId(string prefix, int partitionIndex)
+        {
+            return $"{prefix}_part_{partitionIndex}";
         }
     }
 }

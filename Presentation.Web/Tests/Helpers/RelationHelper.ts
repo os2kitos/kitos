@@ -28,7 +28,8 @@ class RelationHelper {
             .then(() => Select2.select(contractName, this.relationContractSelectId))
             .then(() => relationPage.getReferenceInputField().sendKeys(referenceText))
             .then(() => relationPage.getDescriptionInputField().sendKeys(descriptionText))
-            .then(() => relationPage.getSaveButton().click());
+            .then(() => relationPage.getSaveButton().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static editRelation(

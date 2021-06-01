@@ -100,7 +100,9 @@
                             payload.Name = $scope.name;
                             payload.Scheduling = $scope.adviceRepetitionData.id;
                             payload.AlarmDate = moment($scope.startDate, allowedDateFormats, true).format(payloadDateFormat);
-                            payload.StopDate = moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat);
+
+                            //Stopdate is optional so only parse it if present
+                            payload.StopDate = $scope.stopDate ? moment($scope.stopDate, allowedDateFormats, true).format(payloadDateFormat) : null;
                         }
                         if (action === "POST") {
                             url = `Odata/advice?organizationId=${currentUser.currentOrganizationId}`;
@@ -188,6 +190,7 @@
                     $scope.checkDates = (startDate, endDate) => {
                         $scope.startDateErrMessage = "";
                         $scope.stopDateErrMessage = "";
+                        $scope.startDateInfoMessage = null;
 
                         const performStartDateValidation = isEditable("StartDate");
                         const performStopDateValidation = isEditable("StopDate");
@@ -231,18 +234,32 @@
                         }
 
                         const repetition = $scope.adviceRepetitionData;
-                        if (isCurrentAdviceRecurring() &&
-                            repetition &&
-                            parseInt(start.format("DD")) >= 29 &&
-                            (
-                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Quarter ||
-                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Month ||
-                                repetition.id === Models.ViewModel.Advice.AdviceRepetition.Semiannual
-                            )
-                        ) {
-                            $scope.startDateInfoMessage = "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den 1. i den efterfølgende måned.";
-                        } else {
-                            $scope.startDateInfoMessage = null;
+                        const dayInMonth = parseInt(start.format("DD"));
+                        const month = parseInt(start.format("MM")); 
+                        var showIntervalWarning = false;
+                        if (isCurrentAdviceRecurring() && repetition && dayInMonth > 28) {
+                            switch (repetition.id) {
+                                case Models.ViewModel.Advice.AdviceRepetition.Quarter:
+                                    showIntervalWarning =
+                                        dayInMonth === 31 ||
+                                        month % 3 ===
+                                        2; //February is in the interval OR 31 is selected as start date (then months with 30 will be hit -> show the warning)
+                                    break;
+                                case Models.ViewModel.Advice.AdviceRepetition.Month:
+                                    showIntervalWarning = true; //Always relevant for monthly intervals
+                                    break;
+                                case Models.ViewModel.Advice.AdviceRepetition.Semiannual:
+                                    showIntervalWarning = month % 6 === 2; //February is in the interval
+                                    break;
+                                default:
+                                    showIntervalWarning = false;
+                                    break;
+                            }
+                        }
+
+                        if (showIntervalWarning) {
+                            $scope.startDateInfoMessage =
+                                "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den sidste dag i den aktuelle måned.";
                         }
 
                         $scope.startDateErrMessage = "";

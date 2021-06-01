@@ -131,7 +131,8 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         function expectSystemWithName(name: string) {
             console.log("Making sure " + name + " does exist");
-            return expect(findCatalogColumnsFor(name).first().getText()).toEqual(name);
+            return CatalogHelper.waitForKendoGrid()
+                .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
         }
 
         function toggleSystemInUse(name: string) {
@@ -143,7 +144,8 @@ describe("Getting the correct message when there is a conflict deleting a system
         }
 
         function waitForToastMessageToAppear(msg: string) {
-            return browser.wait(getToastElement().isPresent(), waitTimer.twentySeconds)
+            return browser.waitForAngular()
+                .then(() => browser.wait(getToastElement().isPresent(), waitTimer.twentySeconds))
                 .then(() => browser.wait(EC.textToBePresentInElement(getToastElement(), msg), waitTimer.twentySeconds));
         }
     });

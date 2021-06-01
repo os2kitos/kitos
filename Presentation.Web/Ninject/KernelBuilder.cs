@@ -8,15 +8,14 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.GDPR;
-using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.Interface;
-using Core.ApplicationServices.Jobs;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.EventHandler;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
@@ -201,8 +200,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
-            kernel.Bind<IAdviceScheduler>().To<AdviceScheduler>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IHangfireApi>().To<HangfireApi>().InCommandScope(Mode);
+            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
@@ -339,7 +339,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InCommandScope(Mode);
-            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
         }
 
         private void RegisterDataAccess(IKernel kernel)
