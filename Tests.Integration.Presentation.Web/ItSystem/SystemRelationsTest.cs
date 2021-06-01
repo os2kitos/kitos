@@ -18,6 +18,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class SystemRelationsTest : WithAutoFixture
     {
+        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static long _nameCounter = 0;
+        private static readonly object NameCounterLock = new object();
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
         [Theory]
@@ -461,7 +464,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private string CreateName()
         {
-            return $"Relations_{A<Guid>():N}";
+            lock (NameCounterLock)
+            {
+                var name = $"Relations_{NameSessionPart}_{_nameCounter}";
+                _nameCounter++;
+                return name;
+            }
         }
 
         #endregion

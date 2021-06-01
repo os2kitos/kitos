@@ -18,6 +18,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class ItSystemUsageMigrationTests : WithAutoFixture, IAsyncLifetime
     {
+        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static long _nameCounter = 0;
+        private static readonly object NameCounterLock = new object();
+
         private ItSystemDTO _oldSystemInUse;
         private ItSystemUsageDTO _oldSystemUsage;
         private ItSystemDTO _newSystem;
@@ -805,7 +809,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static string CreateName()
         {
-            return $"{Guid.NewGuid():N}";
+            lock (NameCounterLock)
+            {
+                var name = $"Migration_{NameSessionPart}_{_nameCounter}";
+                _nameCounter++;
+                return name;
+            }
         }
 
         private static int GetValidFrequencyTypeId()
