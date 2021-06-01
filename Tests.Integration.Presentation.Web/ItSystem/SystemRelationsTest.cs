@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
@@ -16,7 +15,6 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    [CollectionDefinition("Relations test", DisableParallelization = true)]
     public class SystemRelationsTest : WithAutoFixture
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");
