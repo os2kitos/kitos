@@ -399,8 +399,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(twoPages.Take(pageSize).Select(x => x.Id), firstPage.Select(x => x.Id));
 
             //Assert - second page with 1 item since there are only 3 in total
-            const int expectedSecondPageSize = 1;
-            Assert.Equal(twoPages.Skip(pageSize).Take(expectedSecondPageSize).Select(x => x.Id).ToList(), secondPage.Select(x => x.Id).ToList());
+            Assert.Equal(twoPages.Skip(pageSize).Take(pageSize).Select(x => x.Id).ToList(), secondPage.Select(x => x.Id).ToList());
         }
 
         #region Helpers
