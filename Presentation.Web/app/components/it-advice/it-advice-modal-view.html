@@ -69,7 +69,8 @@
                     <select-simple data-id="adviceRepetition"
                                    data-options="adviceRepetitionOptions"
                                    data-ng-model="adviceRepetitionData"
-                                   data-ng-disabled="!isEditable()">
+                                   data-ng-disabled="!isEditable()"
+                                   data-ng-changed="checkDates(startDate,stopDate)"> <!-- Re-Triggering validation for dates which depend on the repetition type -->
                     </select-simple>
                 </div>
 
@@ -77,8 +78,12 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
                     <input id="fromDate" type="text" name="fromDate" placeholder="Dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable()" data-element-type="adviceStartDate">
-                    <span>{{startDateErrMessage}}</span>
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StartDate')" data-element-type="adviceStartDate">
+                    <span class="help-block" ng-if="startDateErrMessage">{{startDateErrMessage}}</span>
+                    <span ng-if="startDateInfoMessage" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        {{startDateInfoMessage}}
+                    </span>
                 </div>
 
                 <!--Dato-->
@@ -86,7 +91,7 @@
                     <label class="control-label small" for="toDate">Til dato</label>
                     <input id="toDate" type="text" name="toDate" placeholder="Stop dato" class="form-control input-sm" data-kendo-date-picker
                            data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
-                    <span>{{stopDateErrMessage}}</span>
+                    <span class="help-block" ng-if="stopDateErrMessage">{{stopDateErrMessage}}</span>
                 </div>
             </div>
 

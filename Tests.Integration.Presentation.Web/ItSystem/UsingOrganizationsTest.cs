@@ -15,6 +15,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class UsingOrganizationsTest
     {
+        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static long _nameCounter = 0;
+        private static readonly object NameCounterLock = new object();
+
         [Theory]
         [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.LocalAdmin)]
@@ -115,7 +119,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static string CreateName()
         {
-            return $"{Guid.NewGuid():N}";
+            lock (NameCounterLock)
+            {
+                var name = $"UsingOrg_{NameSessionPart}_{_nameCounter}";
+                _nameCounter++;
+                return name;
+            }
         }
     }
 }

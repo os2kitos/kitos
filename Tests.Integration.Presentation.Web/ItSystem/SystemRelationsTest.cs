@@ -5,7 +5,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
@@ -18,6 +17,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class SystemRelationsTest : WithAutoFixture
     {
+        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static long _nameCounter = 0;
+        private static readonly object NameCounterLock = new object();
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;
 
         [Theory]
@@ -376,14 +378,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var input3 = await PrepareFullRelationAsync(false, false, false);
             var input4 = await PrepareFullRelationAsync(false, false, false);
 
-            //Make sure there are not relations before performing the paging test
-            DatabaseAccess.MutateEntitySet<SystemRelation>(repository =>
-            {
-                var systemRelations = repository.AsQueryable().ToList();
-                repository.RemoveRange(systemRelations);
-                repository.Save();
-            });
-
             await SystemRelationHelper.PostRelationAsync(input1);
             await SystemRelationHelper.PostRelationAsync(input2);
             await SystemRelationHelper.PostRelationAsync(input3);
@@ -393,6 +387,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int firstPageNumber = 0;
             const int secondPageNumber = firstPageNumber + 1;
             var twoPages = (await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize * 2)).ToList();
+            Assert.Equal(pageSize * 2, twoPages.Count); //We expect all 4 to be there
 
             //Act
             var firstPage = await SystemRelationHelper.GetRelationsDefinedInOrganization(TestEnvironment.DefaultOrganizationId, firstPageNumber, pageSize);
@@ -402,8 +397,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             Assert.Equal(twoPages.Take(pageSize).Select(x => x.Id), firstPage.Select(x => x.Id));
 
             //Assert - second page with 1 item since there are only 3 in total
-            const int expectedSecondPageSize = 1;
-            Assert.Equal(twoPages.Skip(pageSize).Take(expectedSecondPageSize).Select(x => x.Id).ToList(), secondPage.Select(x => x.Id).ToList());
+            Assert.Equal(twoPages.Skip(pageSize).Take(pageSize).Select(x => x.Id).ToList(), secondPage.Select(x => x.Id).ToList());
         }
 
         #region Helpers
@@ -461,7 +455,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private string CreateName()
         {
-            return $"Relations_{A<Guid>():N}";
+            lock (NameCounterLock)
+            {
+                var name = $"Relations_{NameSessionPart}_{_nameCounter}";
+                _nameCounter++;
+                return name;
+            }
         }
 
         #endregion
