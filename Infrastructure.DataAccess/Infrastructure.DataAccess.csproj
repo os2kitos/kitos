@@ -716,9 +716,9 @@
     <Compile Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202105192118586_test.cs" />
-    <Compile Include="Migrations\202105192118586_test.designer.cs">
-      <DependentUpon>202105192118586_test.cs</DependentUpon>
+    <Compile Include="Migrations\202105310654212_Added_UserNotifications.cs" />
+    <Compile Include="Migrations\202105310654212_Added_UserNotifications.designer.cs">
+      <DependentUpon>202105310654212_Added_UserNotifications.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1171,8 +1171,8 @@
     <EmbeddedResource Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202105192118586_test.resx">
-      <DependentUpon>202105192118586_test.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202105310654212_Added_UserNotifications.resx">
+      <DependentUpon>202105310654212_Added_UserNotifications.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

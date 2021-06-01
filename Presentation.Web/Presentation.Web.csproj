@@ -345,7 +345,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
-    <Compile Include="Controllers\OData\UserNotificationsController.cs" />
+    <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
@@ -379,6 +379,8 @@
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
+    <Content Include="app\components\user-notification\user-notification-modal.view.html" />
+    <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
@@ -519,6 +521,7 @@
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-data-processing-registration-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\user-notification\user-notification-modal.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
@@ -527,6 +530,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
@@ -605,6 +609,7 @@
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
+    <TypeScriptCompile Include="app\services\userNotificationService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />

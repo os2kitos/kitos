@@ -89,6 +89,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
+using Core.DomainServices.Repositories.Notification;
 
 namespace Presentation.Web.Ninject
 {
@@ -373,6 +374,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
 
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

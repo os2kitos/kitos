@@ -1,4 +1,5 @@
 ﻿using Core.ApplicationServices.Notification;
+using Core.DomainModel.Notification;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using System;
@@ -32,6 +33,37 @@ namespace Presentation.Web.Controllers.API
             return _userNotificationService
                 .Delete(id)
                 .Match(value => Ok(), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("organization/{organizationId}/user/{userId}")]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId)
+        {
+            return _userNotificationService
+                .GetNotificationsForUser(organizationId, userId)
+                .Match(value => Ok(ToDTOs(value)), FromOperationError);
+        }
+
+        private List<UserNotificationDTO> ToDTOs(IEnumerable<UserNotification> value)
+        {
+            return value.Select(x => ToDTO(x)).ToList();
+        }
+
+        private UserNotificationDTO ToDTO(UserNotification x)
+        {
+            return new UserNotificationDTO
+            {
+                Id = x.Id,
+                Name = x.Name,
+                NotificationMessage = x.NotificationMessage,
+                NotificationType = x.NotificationType,
+                RelatedEntityId = x.RelatedEntityId,
+                RelatedEntityType = x.RelatedEntityType,
+                LastChanged = x.LastChanged
+            };
         }
     }
 }
