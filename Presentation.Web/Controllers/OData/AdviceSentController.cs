@@ -20,7 +20,7 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult Get()
         {
             var sentFromAll = _adviceService
-                .GetAccessibleCurrentToUser()
+                .GetAdvicesAccessibleToCurrentUser()
                 .SelectMany(x => x.AdviceSent);
 
             return Ok(sentFromAll);

@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.OData
         [EnableQuery]
         public override IHttpActionResult Get()
         {
-            return Ok(_adviceService.GetAccessibleCurrentToUser());
+            return Ok(_adviceService.GetAdvicesAccessibleToCurrentUser());
         }
 
         private IEntityWithAdvices ResolveRoot(Advice advice)

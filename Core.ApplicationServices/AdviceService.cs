@@ -93,7 +93,7 @@ namespace Core.ApplicationServices
             return result.AsQueryable();
         }
 
-        public IQueryable<Advice> GetAccessibleCurrentToUser()
+        public IQueryable<Advice> GetAdvicesAccessibleToCurrentUser()
         {
             return OrganizationalUserContext.IsGlobalAdmin()
                 ? AdviceRepository.AsQueryable()
