@@ -25,13 +25,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var url = TestEnvironment.CreateUrl($"odata/ItSystems({TestEnvironment.DefaultItSystemId})");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotNull(response.Name);
-            }
+            using var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token);
+            var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            Assert.NotNull(response.Name);
         }
 
         [Theory]
