@@ -10,21 +10,22 @@
             "$scope",
             "notify",
             "$uibModalInstance",
-            "userNotificationService"
+            "userNotificationService",
+            "contextType"
         ];
 
         constructor(
             private readonly $scope,
             private readonly notify,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private readonly userNotificationService: Services.UserNotification.IUserNotificationService
+            private readonly userNotificationService: Services.UserNotification.IUserNotificationService,
+            private readonly contextType: Models.UserNotification.ObjectType
         ) {
-
             this.mainGridOptions = {
                 dataSource: {
                     transport: {
                         read: {
-                            url: `/api/v1/user-notification/organization/${this.$scope.user.currentOrganizationId}/user/${this.$scope.user.id}`,
+                            url: `/api/v1/user-notification/organization/${this.$scope.user.currentOrganizationId}/context/${this.contextType}/user/${this.$scope.user.id}`,
                             dataType: "json",
                             contentType: "application/json"
                         },
@@ -157,8 +158,51 @@
             () => {
                 return {
                     templateUrl: "app/components/user-notification/user-notification.view.html",
+                    scope: {
+                        stateName: "@"
+                    },
                     controller: [
-                        '$scope', '$uibModal', function ($scope, $uibModal) {
+                        '$scope', '$uibModal', 'userNotificationService', 'userService', function ($scope, $uibModal, userNotificationService: Services.UserNotification.IUserNotificationService, userService: Services.IUserService) {
+
+                            $scope.$watch("stateName", function (newValue, oldValue) {
+                                if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview" || $scope.stateName === "it-contract.plan" || $scope.stateName === "data-processing.overview") {
+
+                                    userService
+                                        .getUser()
+                                        .then(user => {
+                                            var contextType = resolveContextType($scope.stateName);
+                                            userNotificationService
+                                                .getNumberOfUnresolvedNotifications(user.currentOrganizationId, user.id, contextType)
+                                                .then(
+                                                    numberOfNotifications => {
+                                                        $scope.numberOfUserNotifications = numberOfNotifications;
+                                                        if (numberOfNotifications > 0) {
+                                                            $scope.hasNotifications = true;
+
+                                                            if (numberOfNotifications > 9) { // Used to handle styling of many notifications.
+                                                                $scope.hasManyNotifications = true;
+                                                            }
+                                                            else {
+                                                                $scope.hasManyNotifications = false;
+                                                            }
+
+                                                        }
+                                                        else {
+                                                            $scope.hasNotifications = false;
+                                                            $scope.hasManyNotifications = false;
+                                                        }
+                                                    });
+                                        });
+
+                                    $scope.enableUserNotifications = true;
+                                }
+
+                                else {
+                                    $scope.enableUserNotifications = false;
+                                    $scope.hasNotifications = false;
+                                    $scope.hasManyNotifications = false;
+                                }
+                            });
 
                             $scope.showUserNotifications = () => {
                                 var modalInstance = $uibModal.open({
@@ -166,9 +210,31 @@
                                     templateUrl: "app/components/user-notification/user-notification-modal.view.html",
                                     controller: UserNotifications.UserNotificationsModalController,
                                     controllerAs: "vm",
-                                    size: 'lg'
+                                    size: 'lg',
+                                    resolve: {
+                                        contextType: [() => resolveContextType($scope.stateName)]
+                                    }
                                 });
                             }
+
+                            function resolveContextType(contextAsString: string): Models.UserNotification.ObjectType {
+                                switch (contextAsString) {
+                                    case "it-contract.overview":
+                                        return Models.UserNotification.ObjectType.itContract;
+                                    case "it-contract.plan":
+                                        return Models.UserNotification.ObjectType.itContract;
+                                    case "it-system.overview":
+                                        return Models.UserNotification.ObjectType.itSystemUsage;
+                                    case "it-project.overview":
+                                        return Models.UserNotification.ObjectType.itProject;
+                                    case "data-processing.overview":
+                                        return Models.UserNotification.ObjectType.dataProcessingRegistration;
+                                    default:
+                                        return null;
+                                }
+                            }
+
+
                         }]
                 };
             }

@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.Notification;
+﻿using Core.DomainModel.Advice;
+using Core.DomainModel.Notification;
 using Infrastructure.Services.Types;
 using System.Linq;
 
@@ -9,6 +10,6 @@ namespace Core.DomainServices.Repositories.Notification
         UserNotification Add(UserNotification newNotification);
         bool DeleteById(int id);
         Maybe<UserNotification> GetById(int id);
-        IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId);
+        IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, ObjectType relatedEntityType);
     }
 }

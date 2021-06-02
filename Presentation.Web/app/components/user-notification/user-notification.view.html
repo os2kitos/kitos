@@ -1,2 +1,7 @@
-﻿<span ng-if="true"><a data-ng-click="showUserNotifications()"><i class="fa fa-exclamation-triangle fa-stack-1x"></i><i class="fa fa-circle user-notification-icon"></i><strong class="user-notification-number">1</strong></a></span>
-<span ng-if="false"><a data-ng-click="showUserNotifications()"><i class="fa fa-exclamation-triangle fa-stack-1x"></i></a></span>
+﻿<span ng-if="enableUserNotifications && hasNotifications && hasManyNotifications"><a data-ng-click="showUserNotifications()"><i class="fa fa-exclamation-triangle"></i><i class="fa fa-circle user-notification-icon"></i><strong class="user-notification-many">9+</strong></a></span>
+
+<span ng-if="enableUserNotifications && hasNotifications && !hasManyNotifications"><a data-ng-click="showUserNotifications()"><i class="fa fa-exclamation-triangle"></i><i class="fa fa-circle user-notification-icon"></i><strong class="user-notification-number">{{numberOfUserNotifications}}</strong></a></span>
+
+<span ng-if="enableUserNotifications && !hasNotifications"><a data-ng-click="showUserNotifications()"><i class="fa fa-exclamation-triangle"></i></a></span>
+
+<span ng-if="!enableUserNotifications" class="disable-advis-link"><a><i class="fa fa-exclamation-triangle"></i></a></span>

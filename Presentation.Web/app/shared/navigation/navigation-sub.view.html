@@ -5,6 +5,6 @@
 </ul>
 <ul class="icons" data-ng-if="user.isAuth"> 
     <li><global-advis data-user="user" data-state-name="{{$state.current.name}}"></global-advis></li>
-    <li><user-notifications></user-notifications></li>
+    <li><user-notifications data-state-name="{{$state.current.name}}"></user-notifications></li>
     <li><help-text data-no-button-layout="true" data-key="{{$state.current.name}}" data-default-title="{{$state.current.name}}"></help-text></li>
 </ul>

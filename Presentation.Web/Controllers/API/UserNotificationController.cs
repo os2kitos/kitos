@@ -1,4 +1,5 @@
 ﻿using Core.ApplicationServices.Notification;
+using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
@@ -36,26 +37,26 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("organization/{organizationId}/user/{userId}")]
+        [Route("organization/{organizationId}/context/{relatedEntityType}/user/{userId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId)
+        public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId, ObjectType relatedEntityType)
         {
             return _userNotificationService
-                .GetNotificationsForUser(organizationId, userId)
+                .GetNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
 
         [HttpGet]
-        [Route("unresolved/organization/{organizationId}/user/{userId}")]
+        [Route("unresolved/organization/{organizationId}/context/{relatedEntityType}/user/{userId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId)
+        public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, ObjectType relatedEntityType)
         {
             return _userNotificationService
-                .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId)
+                .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Match(value => Ok(value), FromOperationError);
         }
 

@@ -67,14 +67,14 @@ namespace Core.ApplicationServices.Notification
             return notificationToDelete;
         }
 
-        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId)
+        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, ObjectType relatedEntityType)
         {
-            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).ToList();
+            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList();
         }
 
-        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId)
+        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, ObjectType relatedEntityType)
         {
-            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).ToList().Count();
+            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList().Count();
         }
     }
 }
