@@ -11,6 +11,7 @@ using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
+using Infrastructure.Services.Delegates;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SystemUsage
@@ -26,7 +27,8 @@ namespace Core.DomainServices.SystemUsage
         private readonly IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> _archivePeriodReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> _dataProcessingRegistrationReadModelRepository;
         private readonly IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> _dependsOnInterfaceReadModelRepository;
-        private readonly IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> _itSystemUsageReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> _itSystemUsageUsedByRelationReadModelRepository;
+        private readonly IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> _itSystemUsageUsingRelationReadModelRepository;
 
         public ItSystemUsageOverviewReadModelUpdate(
             IGenericRepository<ItSystemUsageOverviewRoleAssignmentReadModel> roleAssignmentRepository,
@@ -36,7 +38,8 @@ namespace Core.DomainServices.SystemUsage
             IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel> archivePeriodReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel> dataProcessingRegistrationReadModelRepository,
             IGenericRepository<ItSystemUsageOverviewInterfaceReadModel> dependsOnInterfaceReadModelRepository,
-            IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel> itSystemUsageUsedByRelationReadModelRepository,
+            IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel> itSystemUsageUsingRelationReadModelRepository,
             IOptionsService<ItSystem, BusinessType> businessTypeService)
         {
             _roleAssignmentRepository = roleAssignmentRepository;
@@ -46,7 +49,8 @@ namespace Core.DomainServices.SystemUsage
             _archivePeriodReadModelRepository = archivePeriodReadModelRepository;
             _dataProcessingRegistrationReadModelRepository = dataProcessingRegistrationReadModelRepository;
             _dependsOnInterfaceReadModelRepository = dependsOnInterfaceReadModelRepository;
-            _itSystemUsageReadModelRepository = itSystemUsageReadModelRepository;
+            _itSystemUsageUsedByRelationReadModelRepository = itSystemUsageUsedByRelationReadModelRepository;
+            _itSystemUsageUsingRelationReadModelRepository = itSystemUsageUsingRelationReadModelRepository;
             _businessTypeService = businessTypeService;
         }
 
@@ -89,23 +93,35 @@ namespace Core.DomainServices.SystemUsage
             PatchGeneralPurposeRegistrations(source, destination);
             PatchDependsOnInterfaces(source, destination);
             PatchRelatedItSystemUsages(
+                () => new ItSystemUsageOverviewUsedBySystemUsageReadModel(),
                 source,
                 destination,
                 x => x.UsedByRelations,
                 x => x.FromSystemUsage,
                 csv => destination.IncomingRelatedItSystemUsagesNamesAsCsv = csv,
-                x => x.IncomingRelatedItSystemUsages
-                );
-            //TODO: Add the reversed one after the test goes green
+                x => x.IncomingRelatedItSystemUsages,
+                _itSystemUsageUsedByRelationReadModelRepository);
+            PatchRelatedItSystemUsages(
+                () => new ItSystemUsageOverviewUsingSystemUsageReadModel(),
+                source,
+                destination,
+                x => x.UsageRelations,
+                x => x.ToSystemUsage,
+                csv => destination.OutgoingRelatedItSystemUsagesNamesAsCsv = csv,
+                x => x.OutgoingRelatedItSystemUsages,
+                _itSystemUsageUsingRelationReadModelRepository);
         }
 
-        private void PatchRelatedItSystemUsages(
+        private static void PatchRelatedItSystemUsages<T>(
+            Factory<T> readModelFactory,
             ItSystemUsage source,
             ItSystemUsageOverviewReadModel destination,
             Func<ItSystemUsage, ICollection<SystemRelation>> pickSourceCollection,
             Func<SystemRelation, ItSystemUsage> pickUsageFromRelation,
             Action<string> setCsv,
-            Func<ItSystemUsageOverviewReadModel, ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel>> pickDestinationCollection)
+            Func<ItSystemUsageOverviewReadModel, ICollection<T>> pickDestinationCollection,
+            IGenericRepository<T> usageRepository)
+            where T : class, IItSystemUsageOverviewItSystemUsageReadModel
         {
             var usagesFromSource = pickSourceCollection(source)
                 .Select(pickUsageFromRelation)
@@ -132,7 +148,7 @@ namespace Core.DomainServices.SystemUsage
                     .Where(x => usagesFromSourceByKey.ContainsKey(CreateRelatedItSystemUsageKey(x.ItSystemUsageId)) == false)
                     .ToList();
 
-            RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved, pickDestinationCollection);
+            RemoveRelatedItSystemUsages(destination, relatedItSystemUsagesToBeRemoved, usageRepository, pickDestinationCollection);
 
             var existingRelatedItSystemUsagesByKey = destinationCollection
                 .GroupBy(x => CreateRelatedItSystemUsageKey(x.ItSystemUsageId))
@@ -143,10 +159,8 @@ namespace Core.DomainServices.SystemUsage
                 if (!existingRelatedItSystemUsagesByKey.TryGetValue(CreateRelatedItSystemUsageKey(usageFromSource.Id), out var relatedItSystemUsage))
                 {
                     //Append the RelatedItSystemUsage if it is not already present
-                    relatedItSystemUsage = new ItSystemUsageOverviewUsedBySystemUsageReadModel
-                    {
-                        Parent = destination
-                    };
+                    relatedItSystemUsage = readModelFactory();
+                    relatedItSystemUsage.Parent = destination;
                     destinationCollection.Add(relatedItSystemUsage);
                 }
                 relatedItSystemUsage.ItSystemUsageId = usageFromSource.Id;
@@ -536,16 +550,19 @@ namespace Core.DomainServices.SystemUsage
             });
         }
 
-        private void RemoveRelatedItSystemUsages(
+        private static void RemoveRelatedItSystemUsages<T>(
             ItSystemUsageOverviewReadModel destination,
-            List<ItSystemUsageOverviewUsedBySystemUsageReadModel> relatedItSystemUsagesToBeRemoved,
-            Func<ItSystemUsageOverviewReadModel, ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel>> pickDestinationCollection)
+            List<T> relatedItSystemUsagesToBeRemoved,
+            IGenericRepository<T> repository,
+            Func<ItSystemUsageOverviewReadModel, ICollection<T>> pickDestinationCollection
+            )
+            where T : class, IItSystemUsageOverviewItSystemUsageReadModel
         {
             var destinationCollection = pickDestinationCollection(destination);
             relatedItSystemUsagesToBeRemoved.ForEach(relatedItSystemUsageToBeRemoved =>
             {
                 destinationCollection.Remove(relatedItSystemUsageToBeRemoved);
-                _itSystemUsageReadModelRepository.Delete(relatedItSystemUsageToBeRemoved);
+                repository.Delete(relatedItSystemUsageToBeRemoved);
             });
         }
 

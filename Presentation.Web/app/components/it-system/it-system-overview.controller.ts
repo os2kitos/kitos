@@ -35,7 +35,7 @@
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
             gridStateService: Services.IGridStateFactory
-            ) {
+        ) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
@@ -77,8 +77,7 @@
                     const commonQuery =
                         "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages";
                     const baseUrl =
-                        `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${
-                            commonQuery}`;
+                        `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
                     const selectedOrgId: number | null = options.currentOrgUnit;
                     if (selectedOrgId !== null) {
@@ -199,7 +198,7 @@
                 //        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
                 //            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
                 //        }
-                        
+
                 //    },
                 //    show: user.isLocalAdmin,
                 //} as Utility.KendoGrid.IKendoToolbarEntry)
@@ -263,7 +262,7 @@
                         .withTitle("Gyldig/Ikke gyldig")
                         .withId("isActive")
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange([ 
+                        .withFixedValueRange([
                             {
                                 textValue: "Gyldig",
                                 remoteValue: true
@@ -682,11 +681,7 @@
                             .filter(registration => agreementConcludedIsDefined(registration))
                             .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded])))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withExcelOutput(dataItem => dataItem
-                            .DataProcessingRegistrations
-                            .filter(registration => agreementConcludedIsDefined(registration))
-                            .map(registration => Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded]))
-                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DataProcessingRegistrationNamesAsCsv")
@@ -699,10 +694,7 @@
                             .DataProcessingRegistrations
                             .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, registration.DataProcessingRegistrationName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withExcelOutput(dataItem => dataItem
-                            .DataProcessingRegistrations
-                            .map(registration => registration.DataProcessingRegistrationName)
-                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DependsOnInterfacesNamesAsCsv")
@@ -713,12 +705,22 @@
                         .withContentOverflow()
                         .withRendering(dataItem => dataItem
                             .DependsOnInterfaces
-                            .map(dependsOnInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.interface-edit.main", dependsOnInterface.InterfaceId, dependsOnInterface.InterfaceName))
+                            .map(dependsOnInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-interface-link`, "it-system.interface-edit.main", dependsOnInterface.InterfaceId, dependsOnInterface.InterfaceName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withExcelOutput(dataItem => dataItem
-                            .DependsOnInterfaces
-                            .map(dependsOnInterface => dependsOnInterface.InterfaceName)
-                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")))
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
+                        .withDataSourceName("OutgoingRelatedItSystemUsagesNamesAsCsv")
+                        .withTitle("Systemet anvender")
+                        .withId("outgoingRelatedItSystemUsages")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .OutgoingRelatedItSystemUsages
+                            .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("IncomingRelatedItSystemUsagesNamesAsCsv")
@@ -729,18 +731,12 @@
                         .withContentOverflow()
                         .withRendering(dataItem => dataItem
                             .IncomingRelatedItSystemUsages
-                            .map(incomingRelatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "it-system.usage.main", incomingRelatedItSystemUsage.ItSystemUsageId, incomingRelatedItSystemUsage.ItSystemUsageName))
+                            .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withExcelOutput(dataItem => dataItem
-                            .IncomingRelatedItSystemUsages
-                            .map(incomingRelatedItSystemUsage => incomingRelatedItSystemUsage.ItSystemUsageName)
-                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, "")));
-
-
+                        .withSourceValueEchoExcelOutput());
 
             //Launch kendo grid
             launcher.launch();
-            
         }
     }
 

@@ -57,6 +57,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _dataProcessingReadModelRepository.Object,
                 _interfacesReadModelRepository.Object,
                 _itSystemUsageReadModelRepository.Object,
+                Mock.Of<IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel>>(),
                 _businessTypeService.Object);
         }
 
@@ -207,9 +208,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
-                ItProjects = new List<ItProject> 
-                { 
-                    project 
+                ItProjects = new List<ItProject>
+                {
+                    project
                 },
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
