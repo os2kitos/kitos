@@ -76,5 +76,7 @@
         DependsOnInterfaces: IItSystemUsageOverviewInterfaceReadModel[];
         IncomingRelatedItSystemUsagesNamesAsCsv: string | null;
         IncomingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
+        OutgoingRelatedItSystemUsagesNamesAsCsv: string | null;
+        OutgoingRelatedItSystemUsages: IItSystemUsageOverviewItSystemUsageReadModel[];
     }
 }

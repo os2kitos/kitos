@@ -141,7 +141,6 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static string GetEnvironmentVariable(string name, bool mandatory = true, string defaultValue = null)
         {
             var variableName = name;
-            Console.Out.WriteLine($"Reading '{variableName}' from environment");
 
             var variable = Environment.GetEnvironmentVariable(variableName, EnvironmentVariableTarget.Process);
             if (string.IsNullOrWhiteSpace(variable))

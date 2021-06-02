@@ -77,7 +77,8 @@
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
-    <Compile Include="Mapping\ItSystemUsageOverviewItSystemUsageReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewUsingSystemUsageReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewUsedBySystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
@@ -715,6 +716,14 @@
     <Compile Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.designer.cs">
       <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs" />
+    <Compile Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.designer.cs">
+      <DependentUpon>202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs" />
+    <Compile Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.designer.cs">
+      <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1165,6 +1174,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.resx">
       <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.resx">
+      <DependentUpon>202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.resx">
+      <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

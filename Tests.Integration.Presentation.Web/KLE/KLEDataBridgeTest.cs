@@ -8,7 +8,7 @@ namespace Tests.Integration.Presentation.Web.KLE
     public class KLEDataBridgeTest
     {
         [Fact]
-        private void GetKLEXMLData_Returns_Valid_XML()
+        public void GetKLEXMLData_Returns_Valid_XML()
         {
             var sut = new KLEDataBridge();
             var result = sut.GetAllActiveKleNumbers();

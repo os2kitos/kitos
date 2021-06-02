@@ -57,7 +57,8 @@
             storageKey = user.id+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
             var orgStorageKey = storageKey + "-OrgProfile";
-            getOrgFilterOptions(overviewType);
+            // Consider this in: https://os2web.atlassian.net/browse/KITOSUDV-1674. Notice. This is an async method and is not handled as such. Do not make async call in the factory
+            //getOrgFilterOptions(overviewType);
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,

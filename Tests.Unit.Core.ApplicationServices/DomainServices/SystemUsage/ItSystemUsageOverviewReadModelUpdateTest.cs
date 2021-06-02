@@ -34,7 +34,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>> _archivePeriodReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>> _dataProcessingReadModelRepository;
         private readonly Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>> _interfacesReadModelRepository;
-        private readonly Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>> _itSystemUsageReadModelRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>> _itSystemUsageReadModelRepository;
         private readonly ItSystemUsageOverviewReadModelUpdate _sut;
 
         public ItSystemUsageOverviewReadModelUpdateTest()
@@ -47,7 +47,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             _archivePeriodReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewArchivePeriodReadModel>>();
             _dataProcessingReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewDataProcessingRegistrationReadModel>>();
             _interfacesReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewInterfaceReadModel>>();
-            _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewItSystemUsageReadModel>>();
+            _itSystemUsageReadModelRepository = new Mock<IGenericRepository<ItSystemUsageOverviewUsedBySystemUsageReadModel>>();
             _sut = new ItSystemUsageOverviewReadModelUpdate(
                 _roleAssignmentRepository.Object,
                 _taskRefRepository.Object,
@@ -57,6 +57,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 _dataProcessingReadModelRepository.Object,
                 _interfacesReadModelRepository.Object,
                 _itSystemUsageReadModelRepository.Object,
+                Mock.Of<IGenericRepository<ItSystemUsageOverviewUsingSystemUsageReadModel>>(),
                 _businessTypeService.Object);
         }
 
@@ -91,7 +92,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var outgoingRelation = new SystemRelation(outgoingRelationItSystemUsage)
             {
                 Id = A<int>(),
-                RelationInterface = outgoingRelationInterface
+                RelationInterface = outgoingRelationInterface,
+                ToSystemUsage = outgoingRelationItSystemUsage
             };
 
             var incomingRelationItSystem = new ItSystem
@@ -207,9 +209,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 LastChangedByUser = user,
                 LastChanged = A<DateTime>(),
                 Concluded = A<DateTime>(),
-                ItProjects = new List<ItProject> 
-                { 
-                    project 
+                ItProjects = new List<ItProject>
+                {
+                    project
                 },
                 ArchiveDuty = A<ArchiveDutyTypes>(),
                 Registertype = A<bool>(),
@@ -379,11 +381,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(dataProcessingRegistration.Name, rmDataProcessingRegistration.DataProcessingRegistrationName);
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
 
-            //Outgoing Relations
+            //Outgoing Relation interfaces
             Assert.Equal(outgoingRelationInterface.Name, readModel.DependsOnInterfacesNamesAsCsv);
             var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(outgoingRelationInterface.Id, rmDependsOnInterface.InterfaceId);
             Assert.Equal(outgoingRelationInterface.Name, rmDependsOnInterface.InterfaceName);
+
+            //Outgoing Relation systems
+            Assert.Equal(outgoingRelationItSystem.Name, readModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
+            var rmDependsOnSystem = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
+            Assert.Equal(outgoingRelationItSystemUsage.Id, rmDependsOnSystem.ItSystemUsageId);
+            Assert.Equal(outgoingRelationItSystem.Name, rmDependsOnSystem.ItSystemUsageName);
 
             //Incoming Relations
             Assert.Equal(incomingRelationItSystem.Name, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);

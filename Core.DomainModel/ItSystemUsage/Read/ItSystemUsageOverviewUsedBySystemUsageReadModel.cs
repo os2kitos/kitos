@@ -1,6 +1,6 @@
 ﻿namespace Core.DomainModel.ItSystemUsage.Read
 {
-    public class ItSystemUsageOverviewItSystemUsageReadModel
+    public class ItSystemUsageOverviewUsedBySystemUsageReadModel : IItSystemUsageOverviewItSystemUsageReadModel
     {
         public int Id { get; set; }
 
