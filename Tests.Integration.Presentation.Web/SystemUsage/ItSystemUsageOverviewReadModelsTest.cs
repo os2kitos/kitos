@@ -907,6 +907,117 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Empty(newRelationSystemReadModel.DependsOnInterfaces);
         }
 
+        [Fact]
+        public async Task ReadModels_Relations_Are_Is_Updated_When_AffectedSystemUsageIsRemoved()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var relationSystemName = A<string>();
+            var relationInterfaceName = A<string>();
+            var relationInterfaceId = A<string>();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var relationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(relationSystemName, organizationId, AccessModifier.Public);
+            var relationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(relationSystem.Id, organizationId);
+
+            var relationInterfaceDTO = InterfaceHelper.CreateInterfaceDto(relationInterfaceName, relationInterfaceId, organizationId, AccessModifier.Public);
+            var relationInterface = await InterfaceHelper.CreateInterface(relationInterfaceDTO);
+            await InterfaceExhibitHelper.CreateExhibit(relationSystem.Id, relationInterface.Id);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = relationSystemUsage.Id,
+                InterfaceId = relationInterface.Id
+            };
+
+            var incomingRelationDto = new CreateSystemRelationDTO
+            {
+                FromUsageId = relationSystemUsage.Id,
+                ToUsageId = systemUsage.Id
+            };
+            await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+            await SystemRelationHelper.PostRelationAsync(incomingRelationDto);
+
+            //Await first update
+            await WaitForReadModelQueueDepletion();
+
+            //Act - Second update should blank out the relation fields since the affected usage has been killed
+            using var removeUsage = await ItSystemHelper.SendRemoveUsageAsync(relationSystemUsage.Id, organizationId);
+            Assert.Equal(HttpStatusCode.OK, removeUsage.StatusCode);
+
+            //Assert
+            await WaitForReadModelQueueDepletion();
+            var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            var mainSystemReadModel = Assert.Single(mainSystemReadModels);
+            Console.Out.WriteLine("Read model found");
+
+            Assert.Equal(string.Empty, mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Equal(string.Empty, mainSystemReadModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Empty(mainSystemReadModel.OutgoingRelatedItSystemUsages);
+            Assert.Empty(mainSystemReadModel.IncomingRelatedItSystemUsages);
+        }
+
+        [Fact]
+        public async Task ReadModels_Relations_Are_Updated_When_Participating_Systems_Change_Name()
+        {
+            //Arrange
+            var systemName = A<string>();
+            var outgoingRelationSystemName_initial = A<string>();
+            var outgoingRelationSystemName_changed = $"{outgoingRelationSystemName_initial}_1";
+            var incomingRelationSystemName_initial = A<string>();
+            var incomingRelationSystemName_changed = $"{incomingRelationSystemName_initial}_1";
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            var outGoingRelationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(outgoingRelationSystemName_initial, organizationId, AccessModifier.Public);
+            var outGoingRelationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(outGoingRelationSystem.Id, organizationId);
+
+            var incomingRelationSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(incomingRelationSystemName_initial, organizationId, AccessModifier.Public);
+            var incomingRelationSystemUsage = await ItSystemHelper.TakeIntoUseAsync(incomingRelationSystem.Id, organizationId);
+
+            var outgoingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = systemUsage.Id,
+                ToUsageId = outGoingRelationSystemUsage.Id,
+            };
+
+            var incomingRelationDTO = new CreateSystemRelationDTO
+            {
+                FromUsageId = incomingRelationSystemUsage.Id,
+                ToUsageId = systemUsage.Id,
+            };
+
+
+            await SystemRelationHelper.PostRelationAsync(outgoingRelationDTO);
+            await SystemRelationHelper.PostRelationAsync(incomingRelationDTO);
+
+            //Await first update
+            await WaitForReadModelQueueDepletion();
+
+            //Act + assert - Rename the system used in incoming relation and verify that the readmodel is updated
+            using var renameIncomingSystem = await ItSystemHelper.SendSetNameRequestAsync(incomingRelationSystem.Id, incomingRelationSystemName_changed, organizationId);
+            Assert.Equal(HttpStatusCode.OK,renameIncomingSystem.StatusCode);
+
+            await WaitForReadModelQueueDepletion();
+            var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            var mainSystemReadModel = Assert.Single(mainSystemReadModels);
+            Assert.Equal(incomingRelationSystemName_changed,mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+
+            //Act + assert - Rename the system used in outgoing relation and verify that the readmodel is updated
+            using var renameOutgoingSystem = await ItSystemHelper.SendSetNameRequestAsync(outGoingRelationSystem.Id, outgoingRelationSystemName_changed, organizationId);
+            Assert.Equal(HttpStatusCode.OK, renameOutgoingSystem.StatusCode);
+            await WaitForReadModelQueueDepletion();
+
+            mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            mainSystemReadModel = Assert.Single(mainSystemReadModels);
+            Assert.Equal(outgoingRelationSystemName_changed, mainSystemReadModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
+        }
 
         private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)
         {
