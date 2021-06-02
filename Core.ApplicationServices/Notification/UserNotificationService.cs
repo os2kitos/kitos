@@ -74,7 +74,7 @@ namespace Core.ApplicationServices.Notification
 
         public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId)
         {
-            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).Count();
+            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId).ToList().Count();
         }
     }
 }
