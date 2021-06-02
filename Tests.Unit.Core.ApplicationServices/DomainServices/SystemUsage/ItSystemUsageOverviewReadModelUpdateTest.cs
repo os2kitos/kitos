@@ -92,7 +92,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var outgoingRelation = new SystemRelation(outgoingRelationItSystemUsage)
             {
                 Id = A<int>(),
-                RelationInterface = outgoingRelationInterface
+                RelationInterface = outgoingRelationInterface,
+                ToSystemUsage = outgoingRelationItSystemUsage
             };
 
             var incomingRelationItSystem = new ItSystem
@@ -380,11 +381,17 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             Assert.Equal(dataProcessingRegistration.Name, rmDataProcessingRegistration.DataProcessingRegistrationName);
             Assert.Equal(dataProcessingRegistration.IsAgreementConcluded, rmDataProcessingRegistration.IsAgreementConcluded);
 
-            //Outgoing Relations
+            //Outgoing Relation interfaces
             Assert.Equal(outgoingRelationInterface.Name, readModel.DependsOnInterfacesNamesAsCsv);
             var rmDependsOnInterface = Assert.Single(readModel.DependsOnInterfaces);
             Assert.Equal(outgoingRelationInterface.Id, rmDependsOnInterface.InterfaceId);
             Assert.Equal(outgoingRelationInterface.Name, rmDependsOnInterface.InterfaceName);
+
+            //Outgoing Relation systems
+            Assert.Equal(outgoingRelationItSystem.Name, readModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
+            var rmDependsOnSystem = Assert.Single(readModel.OutgoingRelatedItSystemUsages);
+            Assert.Equal(outgoingRelationItSystemUsage.Id, rmDependsOnSystem.ItSystemUsageId);
+            Assert.Equal(outgoingRelationItSystem.Name, rmDependsOnSystem.ItSystemUsageName);
 
             //Incoming Relations
             Assert.Equal(incomingRelationItSystem.Name, readModel.IncomingRelatedItSystemUsagesNamesAsCsv);
