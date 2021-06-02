@@ -42,19 +42,20 @@ namespace Core.DomainServices.Repositories.SystemUsage
 
         public IQueryable<ItSystemUsage> GetBySystemIdInSystemRelations(int systemId)
         {
+            //Select all outgoing relations as baseline
             var allRelationsQuery = _itSystemUsageRepository
                 .AsQueryable()
-                .SelectMany(x => x.UsedByRelations.Concat(x.UsageRelations));
+                .SelectMany(x => x.UsageRelations);
 
-            var allFromSystemUsages = allRelationsQuery
+            var allIncomingRelationsFromSystem = allRelationsQuery
                 .Where(x => x.FromSystemUsage.ItSystemId == systemId)
-                .Select(x => x.FromSystemUsage);
-
-            var allToSystemUsages = allRelationsQuery
-                .Where(x => x.ToSystemUsage.ItSystemId == systemId)
                 .Select(x => x.ToSystemUsage);
 
-            return allFromSystemUsages.Concat(allToSystemUsages).Distinct();
+            var allOutgoingRelationsToSystem = allRelationsQuery
+                .Where(x => x.ToSystemUsage.ItSystemId == systemId)
+                .Select(x => x.FromSystemUsage);
+
+            return allIncomingRelationsFromSystem.Concat(allOutgoingRelationsToSystem).Distinct();
         }
 
         public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
