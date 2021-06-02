@@ -41,33 +41,32 @@ describe("Global Administrator is able to see changes to KLE and update to the n
         checkIfButtonIsDisplayed(consts.kleUpdateButton);
     });
 
-    //TODO: https://os2web.atlassian.net/browse/KITOSUDV-1862
-    //it("Is able to check,download and execute a KLE update", () => {
-    //    console.log("Timeout is " + jasmine.DEFAULT_TIMEOUT_INTERVAL);
-    //    waitForNewUpdateAvailable().then(() => {
-    //        console.log("Clicking the view changes button");
-    //        return  clickOnButton(consts.kleChangesButton);
-    //    }).then(() => {
-    //        console.log("Waiting for download link to appear");
-    //        return  waitForUpdateButtonToBeClickAble(consts.KleDownloadAnchor);
-    //    }).then(() => {
-    //        console.log("Checking if Update KLE button is clickable");
-    //        return  waitForUpdateButtonToBeClickAble(consts.kleUpdateButton);
-    //    }).then(() => {
-    //        console.log("Clicking the update KLE button");
-    //        return  clickOnButton(consts.kleUpdateButton);
-    //    }).then(() => {
-    //        console.log("Confirming update");
-    //        return  navHelper.acceptAlertBox();
-    //    }).then(() => {
-    //        console.log("Waiting for update to be completed");
-    //        return pageObject.waitForStatusText("KITOS baserer sig på den seneste KLE version, udgivet");
-    //    }).then(() => {
-    //        console.log("Checking Button status");
-    //        expectButtonEnableToBe(consts.kleChangesButton,false);
-    //        expectButtonEnableToBe(consts.kleUpdateButton, false);
-    //    });
-    //});
+    it("Is able to check,download and execute a KLE update", () => {
+        console.log("Timeout is " + jasmine.DEFAULT_TIMEOUT_INTERVAL);
+        waitForNewUpdateAvailable().then(() => {
+            console.log("Clicking the view changes button");
+            return  clickOnButton(consts.kleChangesButton);
+        }).then(() => {
+            console.log("Waiting for download link to appear");
+            return  waitForUpdateButtonToBeClickAble(consts.KleDownloadAnchor);
+        }).then(() => {
+            console.log("Checking if Update KLE button is clickable");
+            return  waitForUpdateButtonToBeClickAble(consts.kleUpdateButton);
+        }).then(() => {
+            console.log("Clicking the update KLE button");
+            return  clickOnButton(consts.kleUpdateButton);
+        }).then(() => {
+            console.log("Confirming update");
+            return  navHelper.acceptAlertBox();
+        }).then(() => {
+            console.log("Waiting for update to be completed");
+            return pageObject.waitForStatusText("KITOS baserer sig på den seneste KLE version, udgivet");
+        }).then(() => {
+            console.log("Checking Button status");
+            expectButtonEnableToBe(consts.kleChangesButton,false);
+            expectButtonEnableToBe(consts.kleUpdateButton, false);
+        });
+    });
 
     function waitForNewUpdateAvailable() {
         console.log("Waiting for new update status to return");
