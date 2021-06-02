@@ -93,16 +93,18 @@ namespace Core.ApplicationServices
             return result.AsQueryable();
         }
 
-        public IQueryable<Advice> GetAdvicesFromCurrentUsersOrganizationMemberships()
+        public IQueryable<Advice> GetAccessibleCurrentToUser()
         {
-            return OrganizationalUserContext
-                .OrganizationIds
-                .Select(GetAdvicesForOrg)
-                .Aggregate<IQueryable<Advice>, IQueryable<Advice>>
-                (
-                    null,
-                    (acc, next) => acc == null ? next : acc.Concat(next)
-                );
+            return OrganizationalUserContext.IsGlobalAdmin()
+                ? AdviceRepository.AsQueryable()
+                : OrganizationalUserContext
+                    .OrganizationIds
+                    .Select(GetAdvicesForOrg)
+                    .Aggregate<IQueryable<Advice>, IQueryable<Advice>>
+                    (
+                        null,
+                        (acc, next) => acc == null ? next : acc.Concat(next)
+                    );
         }
 
         public bool SendAdvice(int id)
