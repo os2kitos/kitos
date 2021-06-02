@@ -12,7 +12,6 @@ using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Infrastructure.Services.Delegates;
-using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.SystemUsage
 {

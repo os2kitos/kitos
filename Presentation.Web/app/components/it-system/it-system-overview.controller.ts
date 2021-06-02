@@ -75,7 +75,7 @@
                 .withStorageKey(this.storageKey)
                 .withUrlFactory(options => {
                     const commonQuery =
-                        "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages";
+                        "?$expand=RoleAssignments,DataProcessingRegistrations,DependsOnInterfaces,IncomingRelatedItSystemUsages,OutgoingRelatedItSystemUsages";
                     const baseUrl =
                         `/odata/Organizations(${user.currentOrganizationId})/ItSystemUsageOverviewReadModels${commonQuery}`;
                     var additionalQuery = "";
