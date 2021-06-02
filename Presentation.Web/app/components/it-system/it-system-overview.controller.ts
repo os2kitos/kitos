@@ -49,7 +49,8 @@
                     registration.IsAgreementConcluded !==
                     Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
-            var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
+            // Re-enable as part of: https://os2web.atlassian.net/browse/KITOSUDV-1674
+            //var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
