@@ -464,7 +464,6 @@ namespace Tests.Integration.Presentation.Web.KLE
 
             for (var i = 0; i < actualTaskRefs.Count; i++)
             {
-                Console.Out.WriteLine($"Checking at index: {i}");
                 var expected = expectedTaskRefs[i];
                 var actual = actualTaskRefs[i];
                 expected.ToExpectedObject().ShouldMatch(actual);
@@ -478,7 +477,6 @@ namespace Tests.Integration.Presentation.Web.KLE
 
             for (var i = 0; i < actualTaskRefs.Count; i++)
             {
-                Console.Out.WriteLine($"Checking at index: {i}");
                 var expected = expectedUsages[i];
                 var actual = actualTaskRefs[i];
                 expected.ToExpectedObject().ShouldMatch(actual);
