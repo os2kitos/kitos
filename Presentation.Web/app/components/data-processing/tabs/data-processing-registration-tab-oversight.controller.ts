@@ -43,6 +43,8 @@
         oversigthOptions: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
         isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+        oldIsOversightCompletedValue: Models.Api.Shared.YesNoUndecidedOption;
+        yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options[1];
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
 
@@ -157,6 +159,8 @@
                 elementSelected: (newElement) => this.changeIsOversightCompleted(newElement)
             }
 
+            this.oldIsOversightCompletedValue = this.isOversightCompleted.selectedElement.id;
+
             this.shouldShowLatestOversightCompletedDate =
                 this.isOversightCompleted.selectedElement !== null &&
                 this.isOversightCompleted.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoUndecidedOption.Yes;
@@ -255,6 +259,20 @@
         }
 
         private changeIsOversightCompleted(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
+            if (this.oldIsOversightCompletedValue === Models.Api.Shared.YesNoUndecidedOption.Yes && isOversightCompleted.id !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
+                if (confirm("Er du sikker på du vil skifte væk fra 'Ja' og derved slette alle oprettede tilsyn?")) {
+                    this.performIsOversightCompletedChange(isOversightCompleted);
+                }
+                else {
+                    this.isOversightCompleted.selectedElement = this.yesIsOversightCompletedValue;
+                }
+            }
+            else {
+                this.performIsOversightCompletedChange(isOversightCompleted);
+            }
+        }
+
+        private performIsOversightCompletedChange(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
             this.apiUseCaseFactory
                 .createUpdate("Gennemført tilsyn", () => this.dataProcessingRegistrationService.updateOversightCompleted(this.dataProcessingRegistrationId, isOversightCompleted.optionalObjectContext))
                 .executeAsync(success => {
