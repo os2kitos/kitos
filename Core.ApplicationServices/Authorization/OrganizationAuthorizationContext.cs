@@ -48,14 +48,17 @@ namespace Core.ApplicationServices.Authorization
 
             return IsUserInMunicipality() ?
                 CrossOrganizationDataReadAccessLevel.Public :
-                CrossOrganizationDataReadAccessLevel.None;
+                (CrossOrganizationDataReadAccessLevel.None);
         }
 
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
             if (HasRoleIn(organizationId))
             {
-                return OrganizationDataReadAccessLevel.All;
+                //Rights holders can ONLY access data scoped for rights holder access
+                return HasRightsHolderAccessIn(organizationId)
+                    ? OrganizationDataReadAccessLevel.RightsHolder
+                    : OrganizationDataReadAccessLevel.All;
             }
 
             switch (GetCrossOrganizationReadAccess())
@@ -67,6 +70,11 @@ namespace Core.ApplicationServices.Authorization
                 default:
                     return OrganizationDataReadAccessLevel.None;
             }
+        }
+
+        private bool HasRightsHolderAccessIn(int organizationId)
+        {
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.RightsHolderAccess);
         }
 
         public EntityReadAccessLevel GetReadAccessLevel<T>()
@@ -95,7 +103,7 @@ namespace Core.ApplicationServices.Authorization
                 case EntityReadAccessLevel.None:
                     return false;
                 case EntityReadAccessLevel.OrganizationOnly:
-                    return HasRoleInSameOrganizationAs(entity);
+                    return HasRoleInSameOrganizationAs(entity) || (IsRightsHolderFor(entity));
                 case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
                     return HasRoleInSameOrganizationAs(entity) || EntityIsShared(entity);
                 case EntityReadAccessLevel.All:
@@ -103,6 +111,11 @@ namespace Core.ApplicationServices.Authorization
                 default:
                     throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level");
             }
+        }
+
+        private bool IsRightsHolderFor(IEntity entity)
+        {
+            throw new NotImplementedException("Yet");
         }
 
         public bool AllowCreate<T>(int organizationId)
@@ -129,7 +142,9 @@ namespace Core.ApplicationServices.Authorization
 
             if (IsOrganizationSpecificData(entityType))
             {
-                return GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public
+                var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccess();
+                
+                return crossOrganizationDataReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public
                     ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
                     : EntityReadAccessLevel.OrganizationOnly;
             }

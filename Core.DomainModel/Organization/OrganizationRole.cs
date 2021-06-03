@@ -34,7 +34,11 @@
         /// <summary>
         /// God mode
         /// </summary>
-        GlobalAdmin = 7
+        GlobalAdmin = 7,
+        /// <summary>
+        /// Access based on the rightsholder of the entity.
+        /// </summary>
+        RightsHolderAccess = 7
 
     }
 }

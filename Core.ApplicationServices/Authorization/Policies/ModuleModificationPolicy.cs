@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -33,15 +34,22 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
-            if (target is KendoOrganizationalConfiguration)
+            if (target is ItInterface itInterface)
             {
-                // Global admin are not allowed to modify KendoOrganizationalConfigurations
-                return IsLocalAdmin(target);
+                var belongsToId = itInterface.ExhibitedBy?.ItSystem?.BelongsToId ??
+                                  itInterface.ExhibitedBy?.ItSystem?.BelongsTo?.Id;
+
+                return IsGlobalAdmin() || belongsToId.HasValue && IsRightsHolder(belongsToId.Value);
             }
 
-            if (target is ItInterface)
+            if (target is ItSystem system && (system.BelongsToId.HasValue || system.BelongsTo != null))
             {
-                return IsGlobalAdmin();
+                var belongsToId = system.BelongsToId ?? system.BelongsTo?.Id;
+                if (IsRightsHolder(belongsToId.Value))
+                {
+                    // Rights holders bypass the regular rules
+                    return true;
+                }
             }
 
             if (_onlyGlobalAdminMayEditReports && target is IReportModule)
@@ -57,7 +65,7 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return false;
             }
 
-            //Global or local admin overrides any of the other conditinos
+            //Global or local admin overrides any of the other conditions
             if (IsGlobalAdmin() || IsLocalAdmin(target))
             {
                 return true;
@@ -110,12 +118,12 @@ namespace Core.ApplicationServices.Authorization.Policies
 
             if (MatchType<ItSystem>(target))
             {
-                return false; //Only global admin so far
+                return IsRightsHolder(organizationId); //Only global admin or rights holders
             }
 
             if (MatchType<ItInterface>(target))
             {
-                return false; //Only global admin so far
+                return IsRightsHolder(organizationId); //Only global admin or rights holders
             }
 
             if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)
@@ -167,6 +175,11 @@ namespace Core.ApplicationServices.Authorization.Policies
 
             //NOTE: Other types are yet to be restricted by this policy. In the end a child of e.g. Itsystem should not hit this policy since it is a modification to the root ..> it system
             return true;
+        }
+
+        private bool IsRightsHolder(int organizationId)
+        {
+            return _userContext.HasRole(organizationId, OrganizationRole.RightsHolderAccess);
         }
 
         private bool IsReportModuleAdmin(int organizationId)

@@ -18,6 +18,10 @@
         /** Has write access to organization reports. */
         ReportModuleAdmin,
         /** Has read access only */
-        ReadOnly
+        ReadOnly,
+        /**Not used as org right but is present in the enum */
+        GlobalAdmin,
+        /* RightsHolder  */
+        RightsHolderAccess
     }
 }
