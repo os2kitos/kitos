@@ -53,8 +53,8 @@ namespace Presentation.Web
 
             GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
-            GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel)); //TODO
-            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 2, DelaysInSeconds = new[] { 1, 2 } }); //TODO
+            GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel));
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 3 });
 
             app.UseHangfireDashboard();
             app.UseHangfireServer(new KeepReadModelsInSyncProcess());

@@ -2,10 +2,11 @@
 
 namespace Core.DomainModel.Notification
 {
+    //TODO Build like ExternalReference where the db prevents accidental leaks of data
     public class UserNotification : Entity, IOwnedByOrganization
     {
-        public const int MaxNameLength = 100;
-        public const int MaxMessageLength = 200;
+        public const int MaxNameLength = 100; //TODO: Do we need to restrict it?
+        public const int MaxMessageLength = 200; //TODO: Do we need to restrict it?
 
         public string Name { get; set; }
         public string NotificationMessage { get; set; }

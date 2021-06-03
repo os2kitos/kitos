@@ -35,6 +35,7 @@ namespace Presentation.Web.Infrastructure.Attributes
 
                     using (new HangfireNinjectResolutionScope(_kernel))
                     {
+                        //TOD: JMO
                         var advisService = _kernel.GetService<IAdviceService>();
                         //var failedAdvice = _adviceService.GetAdviceByJobId(jobId);
                         //if (failedAdvice.IsNone)
@@ -61,6 +62,6 @@ namespace Presentation.Web.Infrastructure.Attributes
         }
 
         public bool AllowMultiple => false;
-        public int Order => 0;
+        public int Order => 10;
     }
 }
