@@ -698,6 +698,19 @@
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
                     builder
+                        .withDataSourceName("OutgoingRelatedItSystemUsagesNamesAsCsv")
+                        .withTitle("Anvendte systemer")
+                        .withId("outgoingRelatedItSystemUsages")
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withInitialVisibility(false)
+                        .withContentOverflow()
+                        .withRendering(dataItem => dataItem
+                            .OutgoingRelatedItSystemUsages
+                            .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
+                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
+                        .withSourceValueEchoExcelOutput())
+                .withColumn(builder =>
+                    builder
                         .withDataSourceName("DependsOnInterfacesNamesAsCsv")
                         .withTitle("Anvendte snitflader")
                         .withId("dependsOnInterfaces")
@@ -707,19 +720,6 @@
                         .withRendering(dataItem => dataItem
                             .DependsOnInterfaces
                             .map(dependsOnInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-interface-link`, "it-system.interface-edit.main", dependsOnInterface.InterfaceId, dependsOnInterface.InterfaceName))
-                            .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput())
-                .withColumn(builder =>
-                    builder
-                        .withDataSourceName("OutgoingRelatedItSystemUsagesNamesAsCsv")
-                        .withTitle("Systemet anvender")
-                        .withId("outgoingRelatedItSystemUsages")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withInitialVisibility(false)
-                        .withContentOverflow()
-                        .withRendering(dataItem => dataItem
-                            .OutgoingRelatedItSystemUsages
-                            .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
                         .withSourceValueEchoExcelOutput())
                 .withColumn(builder =>
