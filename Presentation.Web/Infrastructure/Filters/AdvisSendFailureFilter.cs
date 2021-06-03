@@ -65,7 +65,7 @@ namespace Presentation.Web.Infrastructure.Filters
                         }
                     }
                 }
-                else if (context.GetJobParameter<int>("RetryCount") >= 3)
+                else if (context.GetJobParameter<int>("RetryCount") >= 2)
                 {
                     context.SetJobParameter<bool>("NoMoreRetries", true);
                 }

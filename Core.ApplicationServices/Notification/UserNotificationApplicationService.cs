@@ -2,13 +2,13 @@
 using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Notifications;
 using System;
 using System.Collections.Generic;
 
 namespace Core.ApplicationServices.Notification
 {
-    //TODO: Add authorization
     public class UserNotificationApplicationService : IUserNotificationApplicationService
     {
         private readonly IAuthorizationContext _authorizationContext;
@@ -47,11 +47,17 @@ namespace Core.ApplicationServices.Notification
 
         public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+
             return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType);
         }
 
         public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+
             return _userNotificationService.GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType);
         }
     }
