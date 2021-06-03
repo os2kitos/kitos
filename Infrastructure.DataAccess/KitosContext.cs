@@ -168,7 +168,8 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewDataProcessingRegistrationReadModel> ItSystemUsageOverviewDataProcessingRegistrationReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewInterfaceReadModel> ItSystemUsageOverviewInterfaceReadModels { get; set; }
-        public DbSet<ItSystemUsageOverviewItSystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewUsedBySystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewUsingSystemUsageReadModel> ItSystemUsageOverviewUsingSystemUsageReadModels { get; set; }
         public DbSet<KendoOrganizationalConfiguration> KendoOrganizationalConfigurations { get; set; }
         public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
@@ -274,9 +275,10 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
             modelBuilder.Configurations.Add(new PendingReadModelUpdateMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewInterfaceReadModelMap());
-            modelBuilder.Configurations.Add(new ItSystemUsageOverviewItSystemUsageReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsedBySystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new KendoOrganizationalConfigurationMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsingSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new UserNotificationMap());
         }
     }

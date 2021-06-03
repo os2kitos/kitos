@@ -40,7 +40,7 @@ describe("Global Administrator is able to see changes to KLE and update to the n
     it("Is able to see the button for importing KLE changes", () => {
         checkIfButtonIsDisplayed(consts.kleUpdateButton);
     });
-     
+
     it("Is able to check,download and execute a KLE update", () => {
         console.log("Timeout is " + jasmine.DEFAULT_TIMEOUT_INTERVAL);
         waitForNewUpdateAvailable().then(() => {

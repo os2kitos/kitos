@@ -4,9 +4,9 @@ using Core.DomainModel.ItSystemUsage.Read;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class ItSystemUsageOverviewItSystemUsageReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewItSystemUsageReadModel>
+    public class ItSystemUsageOverviewUsedBySystemUsageReadModelMap : EntityTypeConfiguration<ItSystemUsageOverviewUsedBySystemUsageReadModel>
     {
-        public ItSystemUsageOverviewItSystemUsageReadModelMap()
+        public ItSystemUsageOverviewUsedBySystemUsageReadModelMap()
         {
             HasKey(x => x.Id);
             HasRequired(x => x.Parent)

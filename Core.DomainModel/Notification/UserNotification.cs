@@ -11,12 +11,20 @@ namespace Core.DomainModel.Notification
             NotificationMessage = notificationMessage;
             NotificationType = notificationType;
             OrganizationId = organizationId;
-            ObjectOwnerId = userId;
+            NotificationRecipientId = userId;
+        }
+
+        public UserNotification()
+        {
         }
 
         public string Name { get; set; }
         public string NotificationMessage { get; set; }
         public NotificationType NotificationType { get; set; }
+
+        public User NotificationRecipient { get; set; }
+        public int NotificationRecipientId { get; set; }
+
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
 

@@ -45,7 +45,7 @@ namespace Core.DomainServices.Repositories.Notification
             var query = _repository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
-                .Where(x => x.ObjectOwnerId == userId);
+                .Where(x => x.NotificationRecipientId == userId);
             switch (relatedEntityType)
             {
                 case RelatedEntityType.itContract:

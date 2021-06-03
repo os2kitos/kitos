@@ -60,6 +60,17 @@ namespace Core.DomainServices.SystemUsage
         public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
         {
             _readModelRepository.DeleteBySourceId(domainEvent.Entity.Id);
+         
+            //Related overview models are also affected
+            foreach (var entityUsageRelation in domainEvent.Entity.UsageRelations)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(entityUsageRelation.ToSystemUsageId, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
+
+            foreach (var entityUsedByRelation in domainEvent.Entity.UsedByRelations)
+            {
+                _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(entityUsedByRelation.FromSystemUsageId, PendingReadModelUpdateSourceCategory.ItSystemUsage));
+            }
         }
 
         public void Handle(EntityCreatedEvent<ItSystemUsage> domainEvent)
