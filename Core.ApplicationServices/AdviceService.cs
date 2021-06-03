@@ -20,7 +20,6 @@ using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Notification;
-using Core.ApplicationServices.ScheduledJobs.Attributes;
 using Infrastructure.Services.Types;
 using Core.DomainModel.Shared;
 
@@ -111,7 +110,6 @@ namespace Core.ApplicationServices
                 );
         }
 
-        [AdvisSendFailure]
         public bool SendAdvice(int id)
         {
             using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);

@@ -18,7 +18,7 @@ namespace Core.DomainModel.Notification
 
     public enum NotificationType
     {
-        advice = 0
+        Advice = 0
     }
 
 }

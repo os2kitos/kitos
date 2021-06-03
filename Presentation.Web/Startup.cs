@@ -9,10 +9,10 @@ using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Hangfire;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
-using Core.ApplicationServices.ScheduledJobs.Attributes;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -53,6 +53,8 @@ namespace Presentation.Web
 
             GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
+            GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel)); //TODO
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 2, DelaysInSeconds = new[] { 1, 2 } }); //TODO
 
             app.UseHangfireDashboard();
             app.UseHangfireServer(new KeepReadModelsInSyncProcess());

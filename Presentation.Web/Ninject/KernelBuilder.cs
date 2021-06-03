@@ -89,9 +89,6 @@ using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
 using Core.DomainServices.Repositories.Notification;
-using Core.ApplicationServices.ScheduledJobs.Attributes;
-using Ninject.Web.Mvc.FilterBindingSyntax;
-using Ninject.Web.WebApi.FilterBindingSyntax;
 
 namespace Presentation.Web.Ninject
 {
@@ -223,9 +220,6 @@ namespace Presentation.Web.Ninject
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
-
-            kernel.BindFilter<AdvisSendFailureFilter>(System.Web.Mvc.FilterScope.Action, 0)
-                .WhenActionMethodHas<AdvisSendFailureAttribute>();
         }
 
         private void RegisterSSO(IKernel kernel)

@@ -348,6 +348,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Infrastructure\Attributes\UserNotificationOnAdvisSendFailure.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />

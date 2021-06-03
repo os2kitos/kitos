@@ -117,7 +117,6 @@
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
-    <Compile Include="ScheduledJobs\Attributes\UserNotificationOnAdvisSendFailure.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
@@ -223,6 +222,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Model\TaskRefs\" />
+    <Folder Include="ScheduledJobs\Attributes\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
