@@ -235,10 +235,13 @@
 
                         const repetition = $scope.adviceRepetitionData;
                         const dayInMonth = parseInt(start.format("DD"));
-                        const month = parseInt(start.format("MM")); 
+                        const month = parseInt(start.format("MM"));
                         var showIntervalWarning = false;
                         if (isCurrentAdviceRecurring() && repetition && dayInMonth > 28) {
                             switch (repetition.id) {
+                                case Models.ViewModel.Advice.AdviceRepetition.Year:
+                                    showIntervalWarning = month === 2; //Start data on feb 29 in leap year? then we show the warning even for annual repetition
+                                    break;
                                 case Models.ViewModel.Advice.AdviceRepetition.Quarter:
                                     showIntervalWarning =
                                         dayInMonth === 31 ||
@@ -249,7 +252,7 @@
                                     showIntervalWarning = true; //Always relevant for monthly intervals
                                     break;
                                 case Models.ViewModel.Advice.AdviceRepetition.Semiannual:
-                                    showIntervalWarning = month % 6 === 2; //February is in the interval
+                                    showIntervalWarning = dayInMonth === 31 || month % 6 === 2; //February is in the interval
                                     break;
                                 default:
                                     showIntervalWarning = false;
