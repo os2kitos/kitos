@@ -12,6 +12,7 @@ using Presentation.Web.Hangfire;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
+using Core.ApplicationServices.ScheduledJobs.Attributes;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web

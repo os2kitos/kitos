@@ -30,6 +30,7 @@ using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web
 {
@@ -81,7 +82,7 @@ namespace Presentation.Web
             accessMod.Namespace = kitosNamespace;
             var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
             orgRoles.Namespace = kitosNamespace;
-            var objectTypes = builder.AddEnumType(typeof(ObjectType));
+            var objectTypes = builder.AddEnumType(typeof(RelatedEntityType));
             objectTypes.Namespace = kitosNamespace;
             var schedulings = builder.AddEnumType(typeof(Scheduling));
             schedulings.Namespace = kitosNamespace;

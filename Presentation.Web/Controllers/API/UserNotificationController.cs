@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices.Notification;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using System;
@@ -41,7 +42,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId, ObjectType relatedEntityType)
+        public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationService
                 .GetNotificationsForUser(organizationId, userId, relatedEntityType)
@@ -53,7 +54,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, ObjectType relatedEntityType)
+        public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationService
                 .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType)

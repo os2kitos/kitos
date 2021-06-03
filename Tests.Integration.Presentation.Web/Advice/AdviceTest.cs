@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
@@ -289,7 +290,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
             var advice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
             advice.RelationId = registration.Id;
-            advice.Type = ObjectType.dataProcessingRegistration;
+            advice.Type = RelatedEntityType.dataProcessingRegistration;
 
             // ****************************************
             // ************* Act + assert ************* 
@@ -320,7 +321,7 @@ namespace Tests.Integration.Presentation.Web.Advice
             return new Core.DomainModel.Advice.Advice
             {
                 RelationId = _root.Id,
-                Type = ObjectType.itProject,
+                Type = RelatedEntityType.itProject,
                 Body = A<string>(),
                 Subject = A<string>(),
                 Scheduling = schedule,

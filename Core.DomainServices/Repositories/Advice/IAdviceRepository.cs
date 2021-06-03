@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
-using Core.DomainModel.Advice;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainServices.Repositories.Advice
 {
     public interface IAdviceRepository
     {
-        IEnumerable<DomainModel.Advice.Advice> GetByRelationIdAndType(int relationId, ObjectType objectType);
+        IEnumerable<DomainModel.Advice.Advice> GetByRelationIdAndType(int relationId, RelatedEntityType objectType);
     }
 }

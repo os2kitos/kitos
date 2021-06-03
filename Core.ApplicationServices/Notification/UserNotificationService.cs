@@ -1,7 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Notification;
 using Infrastructure.Services.DataAccess;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace Core.ApplicationServices.Notification
             _authorizationContext = authorizationContext;
         }
 
-        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int relatedEntityId, ObjectType relatedEntityType, NotificationType notificationType)
+        public Result<UserNotification, OperationError> AddUserNotification(int userToNotifyId, string name, string message, int relatedEntityId, RelatedEntityType relatedEntityType, NotificationType notificationType)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
@@ -67,12 +67,12 @@ namespace Core.ApplicationServices.Notification
             return notificationToDelete;
         }
 
-        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, ObjectType relatedEntityType)
+        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList();
         }
 
-        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, ObjectType relatedEntityType)
+        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList().Count();
         }

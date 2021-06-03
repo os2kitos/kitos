@@ -20,6 +20,9 @@ using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.ScheduledJobs.Attributes;
+using Infrastructure.Services.Types;
+using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices
 {
@@ -108,6 +111,7 @@ namespace Core.ApplicationServices
                 );
         }
 
+        [AdvisSendFailure]
         public bool SendAdvice(int id)
         {
             using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
@@ -221,7 +225,7 @@ namespace Core.ApplicationServices
         {
             switch (advice.Type)
             {
-                case ObjectType.itContract:
+                case RelatedEntityType.itContract:
 
                     var itContractRoles = ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
@@ -231,7 +235,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.itProject:
+                case RelatedEntityType.itProject:
                     var projectRoles = ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in projectRoles)
@@ -240,7 +244,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.itSystemUsage:
+                case RelatedEntityType.itSystemUsage:
 
                     var systemRoles = ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                                                                               && I.Role.Name == r.Name);
@@ -250,7 +254,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.dataProcessingRegistration:
+                case RelatedEntityType.dataProcessingRegistration:
 
                     var dpaRoles = DataProcessingRegistrationRights.AsQueryable().Where(I =>
                         I.ObjectId == advice.RelationId
@@ -368,6 +372,16 @@ namespace Core.ApplicationServices
         private static string CreatePartitionJobId(string prefix, int partitionIndex)
         {
             return $"{prefix}_part_{partitionIndex}";
+        }
+
+        public Maybe<Advice> GetAdviceByJobId(string jobId)
+        {
+            var advice = AdviceRepository.AsQueryable().Where(x => x.JobId == jobId).FirstOrDefault();
+            if(advice == null)
+            {
+                return Maybe<Advice>.None;
+            }
+            return advice;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using Core.DomainModel.Advice;
-using Core.DomainModel.Notification;
+﻿using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using System.Linq;
@@ -40,7 +40,7 @@ namespace Core.DomainServices.Repositories.Notification
             return _repository.GetByKey(id);
         }
 
-        public IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, ObjectType relatedEntityType)
+        public IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _repository
                 .AsQueryable()

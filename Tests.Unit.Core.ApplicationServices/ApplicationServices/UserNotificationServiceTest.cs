@@ -1,8 +1,8 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Notification;
-using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Notification;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
@@ -38,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 OrganizationId = A<int>(),
                 NotificationMessage = A<string>(),
                 RelatedEntityId = A<int>(),
-                RelatedEntityType = A<ObjectType>(),
+                RelatedEntityType = A<RelatedEntityType>(),
                 ObjectOwnerId = A<int>(),
                 NotificationType = A<NotificationType>()
             };

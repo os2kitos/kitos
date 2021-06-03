@@ -1,4 +1,4 @@
-﻿using Core.DomainModel.Advice;
+﻿using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Notification
 {
@@ -10,7 +10,7 @@ namespace Core.DomainModel.Notification
         public string Name { get; set; }
         public string NotificationMessage { get; set; }
         public int RelatedEntityId { get; set; }
-        public ObjectType RelatedEntityType { get; set; }
+        public RelatedEntityType RelatedEntityType { get; set; }
         public NotificationType NotificationType { get; set; }
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
