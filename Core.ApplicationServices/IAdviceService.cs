@@ -15,6 +15,6 @@ namespace Core.ApplicationServices
         void Delete(Advice key);
         void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted);
         void Deactivate(Advice advice);
-        Maybe<Advice> GetAdviceByJobId(string jobId);
+        Maybe<Advice> GetAdviceById(int id);
     }
 }

@@ -13,6 +13,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
+using Presentation.Web.Infrastructure.Filters;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web

@@ -89,6 +89,7 @@ using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
 using Core.DomainServices.Repositories.Notification;
+using Core.DomainServices.Notifications;
 
 namespace Presentation.Web.Ninject
 {

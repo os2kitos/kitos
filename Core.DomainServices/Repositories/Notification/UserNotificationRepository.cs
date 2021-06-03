@@ -42,11 +42,23 @@ namespace Core.DomainServices.Repositories.Notification
 
         public IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            return _repository
+            var query = _repository
                 .AsQueryable()
                 .ByOrganizationId(organizationId)
-                .Where(x => x.ObjectOwnerId == userId)
-                .Where(x => x.RelatedEntityType == relatedEntityType);
+                .Where(x => x.ObjectOwnerId == userId);
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.itContract:
+                    return query.Where(x => x.Itcontract_Id != null);
+                case RelatedEntityType.itProject:
+                    return query.Where(x => x.ItProject_Id != null);
+                case RelatedEntityType.itSystemUsage:
+                    return query.Where(x => x.ItSystemUsage_Id != null);
+                case RelatedEntityType.dataProcessingRegistration:
+                    return query.Where(x => x.DataProcessingRegistration_Id != null);
+                default:
+                    return null;
+            }
         }
     }
 }

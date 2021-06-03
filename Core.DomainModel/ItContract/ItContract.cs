@@ -8,6 +8,7 @@ using Core.DomainModel.Result;
 using Core.DomainModel.GDPR;
 using System.Linq;
 using Infrastructure.Services.Types;
+using Core.DomainModel.Notification;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -28,6 +29,7 @@ namespace Core.DomainModel.ItContract
             ExternEconomyStreams = new List<EconomyStream>();
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
+            UserNotifications = new List<UserNotification>();
         }
 
         /// <summary>
@@ -71,6 +73,8 @@ namespace Core.DomainModel.ItContract
         public int? ReferenceId { get; set; }
 
         public virtual ExternalReference Reference { get; set; }
+
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
         #region Master
 

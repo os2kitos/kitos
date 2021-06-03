@@ -13,6 +13,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
 {
+    using Core.DomainModel.Notification;
     using ItSystem.DataTypes;
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
@@ -43,6 +44,7 @@ namespace Core.DomainModel.ItSystemUsage
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
+            UserNotifications = new List<UserNotification>();
         }
 
         public bool IsActive
@@ -280,6 +282,9 @@ namespace Core.DomainModel.ItSystemUsage
         /// Associated it projects.
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
+
+
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public ReferenceRootType GetRootType()

@@ -2,6 +2,7 @@
 using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Notifications;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
 using System;
@@ -18,11 +19,11 @@ namespace Presentation.Web.Controllers.API
     [RoutePrefix("api/v1/user-notification")]
     public class UserNotificationController : BaseApiController
     {
-        private readonly IUserNotificationService _userNotificationService;
+        private readonly IUserNotificationApplicationService _userNotificationApplicationService;
 
-        public UserNotificationController(IUserNotificationService userNotificationService)
+        public UserNotificationController(IUserNotificationApplicationService userNotificationApplicationService)
         {
-            _userNotificationService = userNotificationService;
+            _userNotificationApplicationService = userNotificationApplicationService;
         }
 
         [HttpDelete]
@@ -32,7 +33,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage Delete(int id)
         {
-            return _userNotificationService
+            return _userNotificationApplicationService
                 .Delete(id)
                 .Match(value => Ok(), FromOperationError);
         }
@@ -44,7 +45,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetByOrganizationAndUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            return _userNotificationService
+            return _userNotificationApplicationService
                 .GetNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
@@ -56,7 +57,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            return _userNotificationService
+            return _userNotificationApplicationService
                 .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Match(value => Ok(value), FromOperationError);
         }
@@ -68,14 +69,13 @@ namespace Presentation.Web.Controllers.API
 
         private UserNotificationDTO ToDTO(UserNotification x)
         {
+            //TODO fix DTO
             return new UserNotificationDTO
             {
                 Id = x.Id,
                 Name = x.Name,
                 NotificationMessage = x.NotificationMessage,
                 NotificationType = x.NotificationType,
-                RelatedEntityId = x.RelatedEntityId,
-                RelatedEntityType = x.RelatedEntityType,
                 LastChanged = x.LastChanged
             };
         }

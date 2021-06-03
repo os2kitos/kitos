@@ -19,9 +19,9 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
-using Core.ApplicationServices.Notification;
 using Infrastructure.Services.Types;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Notifications;
 
 namespace Core.ApplicationServices
 {
@@ -146,7 +146,6 @@ namespace Core.ApplicationServices
             catch (Exception e)
             {
                 Logger?.Error(e, "General error sending emails in advice service");
-                // TODO: Create user notification
                 transaction.Rollback();
                 throw;
             }
@@ -372,9 +371,9 @@ namespace Core.ApplicationServices
             return $"{prefix}_part_{partitionIndex}";
         }
 
-        public Maybe<Advice> GetAdviceByJobId(string jobId)
+        public Maybe<Advice> GetAdviceById(int id)
         {
-            var advice = AdviceRepository.AsQueryable().Where(x => x.JobId == jobId).FirstOrDefault();
+            var advice = AdviceRepository.GetByKey(id);
             if(advice == null)
             {
                 return Maybe<Advice>.None;

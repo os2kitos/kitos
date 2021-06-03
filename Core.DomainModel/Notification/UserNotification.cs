@@ -1,20 +1,36 @@
-﻿using Core.DomainModel.Shared;
+﻿using Core.DomainModel.GDPR;
 
 namespace Core.DomainModel.Notification
 {
-    //TODO Build like ExternalReference where the db prevents accidental leaks of data
+
     public class UserNotification : Entity, IOwnedByOrganization
     {
-        public const int MaxNameLength = 100; //TODO: Do we need to restrict it?
-        public const int MaxMessageLength = 200; //TODO: Do we need to restrict it?
+        public UserNotification(string name, string notificationMessage, NotificationType notificationType, int organizationId, int userId)
+        {
+            Name = name;
+            NotificationMessage = notificationMessage;
+            NotificationType = notificationType;
+            OrganizationId = organizationId;
+            ObjectOwnerId = userId;
+        }
 
         public string Name { get; set; }
         public string NotificationMessage { get; set; }
-        public int RelatedEntityId { get; set; }
-        public RelatedEntityType RelatedEntityType { get; set; }
         public NotificationType NotificationType { get; set; }
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
+
+        public int? ItProject_Id { get; set; }
+        public virtual ItProject.ItProject ItProject { get; set; }
+
+        public int? Itcontract_Id { get; set; }
+        public virtual ItContract.ItContract ItContract { get; set; }
+
+        public int? ItSystemUsage_Id { get; set; }
+        public virtual ItSystemUsage.ItSystemUsage ItSystemUsage { get; set; }
+
+        public int? DataProcessingRegistration_Id { get; set; }
+        public virtual DataProcessingRegistration DataProcessingRegistration { get; set; }
     }
 
     public enum NotificationType

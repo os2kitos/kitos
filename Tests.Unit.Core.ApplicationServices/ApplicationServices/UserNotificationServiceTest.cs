@@ -1,8 +1,6 @@
-﻿using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Notification;
-using Core.DomainModel.Notification;
-using Core.DomainModel.Result;
+﻿using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Notifications;
 using Core.DomainServices.Repositories.Notification;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
@@ -18,27 +16,25 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly UserNotificationService _sut;
         private readonly Mock<IUserNotificationRepository> _userNotificationRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<IAuthorizationContext> _authorizationContext;
 
         public UserNotificationServiceTest()
         {
             _userNotificationRepository = new Mock<IUserNotificationRepository>();
             _transactionManager = new Mock<ITransactionManager>();
-            _authorizationContext = new Mock<IAuthorizationContext>();
-            _sut = new UserNotificationService(_userNotificationRepository.Object, _transactionManager.Object, _authorizationContext.Object);
+            _sut = new UserNotificationService(_userNotificationRepository.Object, _transactionManager.Object);
         }
 
         [Fact]
         public void Can_Create()
         {
             //Arrange
+            var relatedEntityType = RelatedEntityType.itSystemUsage;
             var notification = new UserNotification
             {
                 Name = A<string>(),
                 OrganizationId = A<int>(),
                 NotificationMessage = A<string>(),
-                RelatedEntityId = A<int>(),
-                RelatedEntityType = A<RelatedEntityType>(),
+                ItSystemUsage_Id = A<int>(),
                 ObjectOwnerId = A<int>(),
                 NotificationType = A<NotificationType>()
             };
@@ -48,7 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _userNotificationRepository.Setup(x => x.Add(notification)).Returns(notification);
 
             //Act
-            var result = _sut.AddUserNotification(notification.ObjectOwnerId.Value, notification.Name, notification.NotificationMessage, notification.RelatedEntityId, notification.RelatedEntityType, notification.NotificationType);
+            var result = _sut.AddUserNotification(notification.OrganizationId, notification.ObjectOwnerId.Value, notification.Name, notification.NotificationMessage, notification.ItSystemUsage_Id.Value, relatedEntityType, notification.NotificationType);
 
             //Assert
             Assert.True(result.Ok);
@@ -67,13 +63,12 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
             _userNotificationRepository.Setup(x => x.GetById(notification.Id)).Returns(notification);
-            _authorizationContext.Setup(x => x.AllowDelete(notification)).Returns(true);
 
             //Act
             var result = _sut.Delete(notification.Id);
 
             //Assert
-            Assert.True(result.Ok);
+            Assert.True(result);
             transaction.Verify(x => x.Commit());
         }
 
@@ -89,14 +84,12 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
             _userNotificationRepository.Setup(x => x.GetById(notification.Id)).Returns(notification);
-            _authorizationContext.Setup(x => x.AllowDelete(notification)).Returns(false);
 
             //Act
             var result = _sut.Delete(notification.Id);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.False(result);
             transaction.Verify(x => x.Rollback());
         }
 
@@ -112,14 +105,12 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
             _userNotificationRepository.Setup(x => x.GetById(notification.Id)).Returns(Maybe<UserNotification>.None);
-            _authorizationContext.Setup(x => x.AllowDelete(notification)).Returns(true);
 
             //Act
             var result = _sut.Delete(notification.Id);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error);
+            Assert.False(result);
             transaction.Verify(x => x.Rollback());
         }
     }

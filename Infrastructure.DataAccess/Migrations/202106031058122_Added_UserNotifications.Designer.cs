@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202105310654212_Added_UserNotifications"; }
+            get { return "202106031058122_Added_UserNotifications"; }
         }
         
         string IMigrationMetadata.Source
