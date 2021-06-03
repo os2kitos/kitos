@@ -197,12 +197,11 @@ namespace Core.ApplicationServices
                 }
             }
 
-            if (message.To.Any() == false && message.CC.Any() == false)
+            if (message.To.Any() || message.CC.Any())
             {
-                //No recipients (maybe no one with assigned role anymore)
-                //Perhaps this would qualify as a custom error message for the owner of the adis
                 MailClient.Send(message);
             }
+            //TODO: JMO - consider if this should be a custom error because if someone expected an email to be sent but no receivers (roles removed) then what?
 
             advice.SentDate = OperationClock.Now;
         }
