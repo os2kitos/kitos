@@ -81,6 +81,7 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result);
             _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists(It.IsAny<string>()), Times.Never);
         }
 
 
