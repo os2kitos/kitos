@@ -40,7 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void SendAdvice_GivenImmediateActiveAdvice_AdviceIsSentImmediatelyAndJobIsNotRemovedAsThereIsNoJob()
+        public void SendAdvice_GivenNoReceivers_EmailIsNotSent()
         {
             //Arrange
             var immediateAdvice = new Advice
@@ -57,8 +57,33 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result);
-            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Never);
         }
+
+
+        [Fact]
+        public void SendAdvice_GivenImmediateActiveAdvice_AdviceIsSentImmediatelyAndJobIsNotRemovedAsThereIsNoJob()
+        {
+            //Arrange
+            var immediateAdvice = new Advice
+            {
+                Id = A<int>(),
+                Subject = A<string>(),
+                AdviceType = AdviceType.Immediate,
+                Reciepients = CreateDefaultReceivers()
+            };
+            SetupAdviceRepository(immediateAdvice);
+            SetupTransactionManager();
+
+            //Act
+            var result = _sut.SendAdvice(immediateAdvice.Id);
+
+            //Assert
+            Assert.True(result);
+            _mailClientMock.Verify(x => x.Send(It.IsAny<MailMessage>()), Times.Once);
+            _hangfireApiMock.Verify(x => x.RemoveRecurringJobIfExists(It.IsAny<string>()), Times.Never);
+        }
+
 
         [Fact]
         public void SendAdvice_GivenRecurringActiveAdvice_AdviceIsSentAndJobIsNotCancelled()
@@ -71,7 +96,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = DateTime.Now.AddDays(1)
+                StopDate = DateTime.Now.AddDays(1),
+                Reciepients = CreateDefaultReceivers()
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -95,7 +121,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
-                StopDate = null
+                StopDate = null,
+                Reciepients = CreateDefaultReceivers()
             };
             _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.MaxValue);
             SetupAdviceRepository(recurringAdvice);
@@ -120,7 +147,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddYears(4),
-                StopDate = DateTime.Now.AddYears(5)
+                StopDate = DateTime.Now.AddYears(5),
+                Reciepients = CreateDefaultReceivers()
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -146,7 +174,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(-1),
                 StopDate = DateTime.Now.AddDays(-1),
-                JobId = "Advice: " + id
+                JobId = "Advice: " + id,
+                Reciepients = CreateDefaultReceivers()
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -181,7 +210,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 AdviceType = AdviceType.Repeat,
                 Scheduling = Scheduling.Quarter,
                 AlarmDate = DateTime.Now.AddDays(1),
-                StopDate = DateTime.Now.AddDays(2)
+                StopDate = DateTime.Now.AddDays(2),
+                Reciepients = CreateDefaultReceivers()
             };
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
@@ -198,14 +228,17 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             var advices = new List<Advice> { advice };
             _adviceRepositoryMock.Setup(r => r.AsQueryable()).Returns(advices.AsQueryable);
-            _adviceRepositoryMock.Setup(r => r.Update(advice));
-            _adviceRepositoryMock.Setup(r => r.Save());
         }
 
         private void SetupTransactionManager()
         {
             var transaction = new Mock<IDatabaseTransaction>();
             _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+        }
+
+        private static List<AdviceUserRelation> CreateDefaultReceivers()
+        {
+            return new List<AdviceUserRelation> { new() { RecieverType = RecieverType.RECIEVER, RecpientType = RecieverType.USER, Name = "test@kitos.dk" } };
         }
     }
 }
