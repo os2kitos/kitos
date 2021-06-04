@@ -45,9 +45,9 @@ namespace Core.ApplicationServices.Authorization
             {
                 return CrossOrganizationDataReadAccessLevel.All;
             }
-            
+
             //If rightsholder access is selected for the user it overrides the default calculation
-            if(_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
+            if (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
                 return CrossOrganizationDataReadAccessLevel.RightsHolder;
 
             return IsUserInMunicipality()
@@ -105,8 +105,10 @@ namespace Core.ApplicationServices.Authorization
             {
                 case EntityReadAccessLevel.None:
                     return false;
+                case EntityReadAccessLevel.OrganizationAndRightsHolderAccess:
+                    return HasRoleInSameOrganizationAs(entity) || IsRightsHolderFor(entity);
                 case EntityReadAccessLevel.OrganizationOnly:
-                    return HasRoleInSameOrganizationAs(entity) || (IsRightsHolderFor(entity));
+                    return HasRoleInSameOrganizationAs(entity);
                 case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
                     return HasRoleInSameOrganizationAs(entity) || EntityIsShared(entity);
                 case EntityReadAccessLevel.All:
@@ -155,9 +157,16 @@ namespace Core.ApplicationServices.Authorization
             {
                 var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccess();
 
-                return crossOrganizationDataReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public
-                    ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
-                    : EntityReadAccessLevel.OrganizationOnly;
+                switch (crossOrganizationDataReadAccessLevel)
+                {
+                    case CrossOrganizationDataReadAccessLevel.RightsHolder:
+                        return EntityReadAccessLevel.OrganizationAndRightsHolderAccess;
+                    case CrossOrganizationDataReadAccessLevel.All:
+                    case CrossOrganizationDataReadAccessLevel.Public:
+                        return EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations;
+                    default:
+                        return EntityReadAccessLevel.OrganizationOnly;
+                }
             }
 
             return EntityReadAccessLevel.None;
@@ -211,6 +220,10 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = true;
             }
+            else if (IsRightsHolderFor(entity))
+            {
+                result = true;
+            }
             else if (IsOrganizationSpecificData(entity))
             {
                 if (HasRoleInSameOrganizationAs(entity))
@@ -235,7 +248,12 @@ namespace Core.ApplicationServices.Authorization
             {
                 switch (entity)
                 {
+                    case ItInterface itInterface:
+                        //Even rightsholders are not allowed to delete interfaces
+                        result = IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId);
+                        break;
                     case ItSystem system:
+                        //Even rightsholders are not allowed to delete systems
                         result = IsGlobalAdmin() || IsLocalAdmin(system.OrganizationId);
                         break;
                     case OrganizationRight right:
