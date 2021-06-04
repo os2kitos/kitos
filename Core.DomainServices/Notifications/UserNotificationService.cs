@@ -1,11 +1,11 @@
-﻿using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Notification;
+﻿using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using System.Collections.Generic;
 using System.Data;
@@ -15,7 +15,7 @@ namespace Core.DomainServices.Notifications
 {
     public class UserNotificationService : IUserNotificationService
     {
-        private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
+        private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItContractRepository _contractRepository; 
         private readonly IItProjectRepository _projectRepository; 
         private readonly IDataProcessingRegistrationRepository _dataProcessingRepository;
@@ -25,8 +25,8 @@ namespace Core.DomainServices.Notifications
 
         public UserNotificationService(
             IUserNotificationRepository userNotificationRepository, 
-            ITransactionManager transactionManager, 
-            IGenericRepository<ItSystemUsage> systemUsageRepository,
+            ITransactionManager transactionManager,
+            IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IItProjectRepository projectRepository,
             IDataProcessingRegistrationRepository dataProcessingRepository)
@@ -115,7 +115,7 @@ namespace Core.DomainServices.Notifications
                     var projectExists = _projectRepository.GetById(relatedEntityId);
                     return projectExists != null;
                 case RelatedEntityType.itSystemUsage:
-                    var systemUsageExists = _systemUsageRepository.GetByKey(relatedEntityId);
+                    var systemUsageExists = _systemUsageRepository.GetSystemUsage(relatedEntityId);
                     return systemUsageExists != null;
                 case RelatedEntityType.dataProcessingRegistration:
                     var dataProcessingRegistrationExists = _dataProcessingRepository.GetById(relatedEntityId);

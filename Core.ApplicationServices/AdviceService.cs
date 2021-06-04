@@ -22,6 +22,7 @@ using Ninject.Extensions.Logging;
 using Infrastructure.Services.Types;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
+using Core.DomainModel.Notification;
 
 namespace Core.ApplicationServices
 {
@@ -122,11 +123,12 @@ namespace Core.ApplicationServices
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        DispatchEmails(advice);
+                        if (DispatchEmails(advice))
+                        {
+                            AdviceRepository.Update(advice);
 
-                        AdviceRepository.Update(advice);
-
-                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
+                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
+                        }
                     }
 
                     if (advice.AdviceType == AdviceType.Immediate)
@@ -163,7 +165,7 @@ namespace Core.ApplicationServices
             return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= OperationClock.Now.Date && !IsAdviceExpired(advice);
         }
 
-        private void DispatchEmails(Advice advice)
+        private bool DispatchEmails(Advice advice)
         {
             var message = new MailMessage
             {
@@ -205,10 +207,26 @@ namespace Core.ApplicationServices
             if (message.To.Any() || message.CC.Any())
             {
                 MailClient.Send(message);
+                advice.SentDate = OperationClock.Now;
+                return true;
             }
-            //TODO: JMO - consider if this should be a custom error because if someone expected an email to be sent but no receivers (roles removed) then what?
-
-            advice.SentDate = OperationClock.Now;
+            else
+            {
+                var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
+                if(organizationIdOfRelatedEntityId == 0)
+                {
+                    throw new Exception("Advis doesn't have valid/correct related entity (RelationId and Type mismatch)");
+                }
+                else
+                {
+                    if (advice.ObjectOwnerId == null || advice.RelationId == null || advice.Type == null)
+                    {
+                        throw new Exception("Advis is missing critical function information");
+                    }
+                    UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId, advice.ObjectOwnerId.Value, advice.Name, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                }
+                return false;
+            }
         }
 
         private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
@@ -374,12 +392,45 @@ namespace Core.ApplicationServices
 
         public Maybe<Advice> GetAdviceById(int id)
         {
-            var advice = AdviceRepository.GetByKey(id);
-            if(advice == null)
+            return AdviceRepository.GetByKey(id);
+        }
+
+        private int GetRelatedEntityOrganizationId(Advice advice)
+        {
+            switch (advice.Type)
             {
-                return Maybe<Advice>.None;
+                case RelatedEntityType.itContract:
+                    var contractExists = ItContractRepository.GetByKey(advice.RelationId);
+                    if(contractExists != null)
+                    {
+                        return contractExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.itProject:
+                    var projectExists = ItProjectRepository.GetByKey(advice.RelationId);
+                    if (projectExists != null)
+                    {
+                        return projectExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.itSystemUsage:
+                    var systemUsageExists = ItSystemUsageRepository.GetByKey(advice.RelationId);
+                    if (systemUsageExists != null)
+                    {
+                        return systemUsageExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.dataProcessingRegistration:
+                    var dataProcessingRegistrationExists = DataProcessingRegistrations.GetByKey(advice.RelationId);
+                    if (dataProcessingRegistrationExists != null)
+                    {
+                        return dataProcessingRegistrationExists.OrganizationId;
+                    }
+                    break;
+                default:
+                    return 0;
             }
-            return advice;
+            return 0;
         }
     }
 }

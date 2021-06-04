@@ -11,13 +11,13 @@ namespace Core.ApplicationServices.Notification
 {
     public class UserNotificationApplicationService : IUserNotificationApplicationService
     {
-        private readonly IAuthorizationContext _authorizationContext;
+        private readonly IOrganizationalUserContext _activeUserContext;
         private readonly IUserNotificationService _userNotificationService;
 
-        public UserNotificationApplicationService(IUserNotificationService userNotificationService, IAuthorizationContext authorizationContext)
+        public UserNotificationApplicationService(IUserNotificationService userNotificationService, IOrganizationalUserContext activeUserContext)
         {
             _userNotificationService = userNotificationService;
-            _authorizationContext = authorizationContext;
+            _activeUserContext = activeUserContext;
         }
 
         public Result<UserNotification, OperationError> Delete(int id)
@@ -31,7 +31,7 @@ namespace Core.ApplicationServices.Notification
 
             var notificationToDelete = getResult.Value;
 
-            if (!_authorizationContext.AllowDelete(notificationToDelete))
+            if(notificationToDelete.NotificationRecipientId != _activeUserContext.UserId)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
@@ -47,7 +47,7 @@ namespace Core.ApplicationServices.Notification
 
         public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+            if (userId != _activeUserContext.UserId)
                 return new OperationError(OperationFailure.Forbidden);
 
             return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType);
@@ -55,7 +55,7 @@ namespace Core.ApplicationServices.Notification
 
         public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+            if (userId != _activeUserContext.UserId)
                 return new OperationError(OperationFailure.Forbidden);
 
             return _userNotificationService.GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType);

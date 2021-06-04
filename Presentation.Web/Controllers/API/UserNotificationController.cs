@@ -69,15 +69,62 @@ namespace Presentation.Web.Controllers.API
 
         private UserNotificationDTO ToDTO(UserNotification x)
         {
-            //TODO fix DTO
-            return new UserNotificationDTO
+            if(x.Itcontract_Id != null)
             {
-                Id = x.Id,
-                Name = x.Name,
-                NotificationMessage = x.NotificationMessage,
-                NotificationType = x.NotificationType,
-                LastChanged = x.LastChanged
-            };
+                return new UserNotificationDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    NotificationMessage = x.NotificationMessage,
+                    NotificationType = x.NotificationType,
+                    LastChanged = x.LastChanged,
+                    RelatedEntityType = RelatedEntityType.itContract,
+                    RelatedEntityId = x.Itcontract_Id.Value
+                };
+            }
+            if (x.ItProject_Id != null)
+            {
+                return new UserNotificationDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    NotificationMessage = x.NotificationMessage,
+                    NotificationType = x.NotificationType,
+                    LastChanged = x.LastChanged,
+                    RelatedEntityType = RelatedEntityType.itProject,
+                    RelatedEntityId = x.ItProject_Id.Value
+                };
+            }
+            if (x.ItSystemUsage_Id != null)
+            {
+                return new UserNotificationDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    NotificationMessage = x.NotificationMessage,
+                    NotificationType = x.NotificationType,
+                    LastChanged = x.LastChanged,
+                    RelatedEntityType = RelatedEntityType.itSystemUsage,
+                    RelatedEntityId = x.ItSystemUsage_Id.Value
+                };
+            }
+            if (x.DataProcessingRegistration_Id != null)
+            {
+                return new UserNotificationDTO
+                {
+                    Id = x.Id,
+                    Name = x.Name,
+                    NotificationMessage = x.NotificationMessage,
+                    NotificationType = x.NotificationType,
+                    LastChanged = x.LastChanged,
+                    RelatedEntityType = RelatedEntityType.dataProcessingRegistration,
+                    RelatedEntityId = x.DataProcessingRegistration_Id.Value
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

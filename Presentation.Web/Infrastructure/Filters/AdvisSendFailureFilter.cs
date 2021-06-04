@@ -1,8 +1,14 @@
 ﻿using System;
 using System.Linq;
 using Core.ApplicationServices;
+using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
+using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
+using Core.DomainServices.Repositories.Project;
+using Core.DomainServices.Repositories.SystemUsage;
 using Hangfire.Common;
 using Hangfire.States;
 using Microsoft.Extensions.DependencyInjection;
@@ -59,8 +65,8 @@ namespace Presentation.Web.Infrastructure.Filters
                                 {
                                     return;
                                 }
-
-                                userNotificationService.AddUserNotification(1, advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                                var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
+                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId, advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
                             }
                         }
                     }
@@ -76,6 +82,48 @@ namespace Presentation.Web.Infrastructure.Filters
         {
             return context.BackgroundJob?.Job?.Type?.FullName?.Equals(MatchType) == true &&
                    context.BackgroundJob?.Job?.Method?.Name?.Equals(MatchMethod) == true;
+        }
+
+        private int GetRelatedEntityOrganizationId(Advice advice)
+        {
+            switch (advice.Type)
+            {
+                case RelatedEntityType.itContract:
+                    var contractRepository = _kernel.GetService<IItContractRepository>();
+                    var contractExists = contractRepository.GetById(advice.RelationId.Value);
+                    if (contractExists != null)
+                    {
+                        return contractExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.itProject:
+                    var projectRepository = _kernel.GetService<IItProjectRepository>();
+                    var projectExists = projectRepository.GetById(advice.RelationId.Value);
+                    if (projectExists != null)
+                    {
+                        return projectExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.itSystemUsage:
+                    var systemUsageRepository = _kernel.GetService<IItSystemUsageRepository>();
+                    var systemUsageExists = systemUsageRepository.GetSystemUsage(advice.RelationId.Value);
+                    if (systemUsageExists != null)
+                    {
+                        return systemUsageExists.OrganizationId;
+                    }
+                    break;
+                case RelatedEntityType.dataProcessingRegistration:
+                    var dataProcessingRepository = _kernel.GetService<IDataProcessingRegistrationRepository>();
+                    var dataProcessingRegistrationExists = dataProcessingRepository.GetById(advice.RelationId.Value);
+                    if (dataProcessingRegistrationExists.HasValue)
+                    {
+                        return dataProcessingRegistrationExists.Value.OrganizationId;
+                    }
+                    break;
+                default:
+                    return 0;
+            }
+            return 0;
         }
 
         public bool AllowMultiple => false;
