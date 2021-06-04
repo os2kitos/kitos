@@ -7,7 +7,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItInterface : ItSystemBase
+    public class ItInterface : ItSystemBase, IHasRightsHolder
     {
         public static int MaxNameLength = 100;
         public ItInterface()
@@ -87,6 +87,12 @@ namespace Core.DomainModel.ItSystem
             }
 
             return ExhibitedBy;
+        }
+
+        public Maybe<int> GetRightsHolderOrganizationId()
+        {
+            var id = ExhibitedBy?.ItSystem?.BelongsToId ?? ExhibitedBy?.ItSystem?.BelongsTo?.Id;
+            return id ?? Maybe<int>.None;
         }
     }
 }

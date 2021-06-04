@@ -115,7 +115,15 @@ namespace Core.ApplicationServices.Authorization
 
         private bool IsRightsHolderFor(IEntity entity)
         {
-            throw new NotImplementedException("Yet");
+            if (entity is IHasRightsHolder withRightsHolder)
+            {
+                return withRightsHolder
+                    .GetRightsHolderOrganizationId()
+                    .Select(HasRightsHolderAccessIn)
+                    .GetValueOrFallback(false);
+            }
+
+            return false;
         }
 
         public bool AllowCreate<T>(int organizationId)
@@ -143,7 +151,7 @@ namespace Core.ApplicationServices.Authorization
             if (IsOrganizationSpecificData(entityType))
             {
                 var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccess();
-                
+
                 return crossOrganizationDataReadAccessLevel >= CrossOrganizationDataReadAccessLevel.Public
                     ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
                     : EntityReadAccessLevel.OrganizationOnly;

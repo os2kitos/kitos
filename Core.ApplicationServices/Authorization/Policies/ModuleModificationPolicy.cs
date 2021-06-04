@@ -34,18 +34,10 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowModification(IEntity target)
         {
-            if (target is ItInterface itInterface)
+            if (target is IHasRightsHolder withRightsHolder)
             {
-                var belongsToId = itInterface.ExhibitedBy?.ItSystem?.BelongsToId ??
-                                  itInterface.ExhibitedBy?.ItSystem?.BelongsTo?.Id;
-
-                return IsGlobalAdmin() || belongsToId.HasValue && IsRightsHolder(belongsToId.Value);
-            }
-
-            if (target is ItSystem system && (system.BelongsToId.HasValue || system.BelongsTo != null))
-            {
-                var belongsToId = system.BelongsToId ?? system.BelongsTo?.Id;
-                if (IsRightsHolder(belongsToId.Value))
+                var rightsHolderOrganizationId = withRightsHolder.GetRightsHolderOrganizationId();
+                if (rightsHolderOrganizationId.Select(IsRightsHolder).GetValueOrFallback(false))
                 {
                     // Rights holders bypass the regular rules
                     return true;
