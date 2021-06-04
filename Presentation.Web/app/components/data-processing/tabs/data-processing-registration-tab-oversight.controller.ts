@@ -44,11 +44,11 @@
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
         isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
         oldIsOversightCompletedValue: Models.Api.Shared.YesNoUndecidedOption;
-        yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options[1];
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
-
         oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+
+        private yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x => x.id === Models.Api.Shared.YesNoUndecidedOption.Yes)[0];
 
         createOversightDate() {
             this.modal.open({
@@ -159,7 +159,7 @@
                 elementSelected: (newElement) => this.changeIsOversightCompleted(newElement)
             }
 
-            this.oldIsOversightCompletedValue = this.isOversightCompleted.selectedElement.id;
+            this.oldIsOversightCompletedValue = this.isOversightCompleted.selectedElement?.id;
 
             this.shouldShowLatestOversightCompletedDate =
                 this.isOversightCompleted.selectedElement !== null &&
