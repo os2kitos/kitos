@@ -108,14 +108,19 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return true;
             }
 
+            if (typeof(IHasRightsHolder).IsAssignableFrom(target))
+            {
+                return IsRightsHolder(organizationId);
+            }
+
             if (MatchType<ItSystem>(target))
             {
-                return IsRightsHolder(organizationId); //Only global admin or rights holders
+                return false; //Only global admin
             }
 
             if (MatchType<ItInterface>(target))
             {
-                return IsRightsHolder(organizationId); //Only global admin or rights holders
+                return false; //Only global admin
             }
 
             if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)
