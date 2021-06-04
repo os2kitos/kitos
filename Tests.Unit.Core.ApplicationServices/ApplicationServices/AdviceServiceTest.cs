@@ -6,7 +6,14 @@ using System.Net.Mail;
 using Core.ApplicationServices;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Advice;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Notification;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
+using Core.DomainServices.Notifications;
 using Core.DomainServices.Time;
 using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
@@ -23,6 +30,11 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<Advice>> _adviceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IHangfireApi> _hangfireApiMock;
+        private readonly Mock<IGenericRepository<ItContract>> _contractRepository;
+        private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
+        private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
+        private readonly Mock<IGenericRepository<DataProcessingRegistration>> _dataProcessingRepository;
+        private readonly Mock<IUserNotificationService> _userNotificationService;
 
         public AdviceServiceTest()
         {
@@ -37,6 +49,18 @@ namespace Tests.Unit.Core.ApplicationServices
             _hangfireApiMock = new Mock<IHangfireApi>();
             _sut.HangfireApi = _hangfireApiMock.Object;
             _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.Now);
+
+            _contractRepository = new Mock<IGenericRepository<ItContract>>();
+            _sut.ItContractRepository = _contractRepository.Object;
+            _projectRepository = new Mock<IGenericRepository<ItProject>>();
+            _sut.ItProjectRepository = _projectRepository.Object;
+            _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
+            _sut.ItSystemUsageRepository = _systemUsageRepository.Object;
+            _dataProcessingRepository = new Mock<IGenericRepository<DataProcessingRegistration>>();
+            _sut.DataProcessingRegistrations = _dataProcessingRepository.Object;
+            _userNotificationService = new Mock<IUserNotificationService>();
+            _sut.UserNotificationService = _userNotificationService.Object;
+
         }
 
         [Fact]
@@ -47,10 +71,15 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 Id = A<int>(),
                 Subject = A<string>(),
-                AdviceType = AdviceType.Immediate
+                AdviceType = AdviceType.Immediate,
+                ObjectOwnerId = A<int>(),
+                Type = A<RelatedEntityType>(),
+                RelationId = A<int>()
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
+            SetupRelatedEntityResolve(immediateAdvice.Type.Value, immediateAdvice.RelationId.Value);
+            _userNotificationService.Setup(x => x.AddUserNotification(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), immediateAdvice.Type.Value, NotificationType.Advice)).Returns(new UserNotification());
 
             //Act
             var result = _sut.SendAdvice(immediateAdvice.Id);
@@ -239,6 +268,25 @@ namespace Tests.Unit.Core.ApplicationServices
         private static List<AdviceUserRelation> CreateDefaultReceivers()
         {
             return new List<AdviceUserRelation> { new() { RecieverType = RecieverType.RECIEVER, RecpientType = RecieverType.USER, Name = "test@kitos.dk" } };
+        }
+
+        private void SetupRelatedEntityResolve(RelatedEntityType relatedEntityType, int relatedEntityId)
+        {
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.itContract:
+                    _contractRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItContract() { OrganizationId = A<int>() });
+                    break;
+                case RelatedEntityType.itProject:
+                    _projectRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItProject() { OrganizationId = A<int>() });
+                    break;
+                case RelatedEntityType.itSystemUsage:
+                    _systemUsageRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItSystemUsage() { OrganizationId = A<int>() });
+                    break;
+                case RelatedEntityType.dataProcessingRegistration:
+                    _dataProcessingRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new DataProcessingRegistration() { OrganizationId = A<int>() });
+                    break;
+            }
         }
     }
 }
