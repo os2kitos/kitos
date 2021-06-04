@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -49,6 +48,11 @@ namespace Core.ApplicationServices.Authorization
         {
             return _roles.TryGetValue(organizationId, out var rolesInOrganization) &&
                    rolesInOrganization.Contains(role);
+        }
+
+        public bool HasRoleInAnyOrganization(OrganizationRole role)
+        {
+            return _roles.Keys.Any(org => HasRole(org, role));
         }
 
         public bool HasRoleIn(int organizationId)

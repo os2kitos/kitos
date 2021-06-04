@@ -46,19 +46,18 @@ namespace Core.ApplicationServices.Authorization
                 return CrossOrganizationDataReadAccessLevel.All;
             }
 
-            return IsUserInMunicipality() ?
-                CrossOrganizationDataReadAccessLevel.Public :
-                (CrossOrganizationDataReadAccessLevel.None);
+            return IsUserInMunicipality()
+                ? CrossOrganizationDataReadAccessLevel.Public
+                : (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess)
+                    ? CrossOrganizationDataReadAccessLevel.RightsHolder
+                    : CrossOrganizationDataReadAccessLevel.None);
         }
 
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
         {
             if (HasRoleIn(organizationId))
             {
-                //Rights holders can ONLY access data scoped for rights holder access
-                return HasRightsHolderAccessIn(organizationId)
-                    ? OrganizationDataReadAccessLevel.RightsHolder
-                    : OrganizationDataReadAccessLevel.All;
+                return OrganizationDataReadAccessLevel.All;
             }
 
             switch (GetCrossOrganizationReadAccess())
@@ -67,6 +66,8 @@ namespace Core.ApplicationServices.Authorization
                     return OrganizationDataReadAccessLevel.Public;
                 case CrossOrganizationDataReadAccessLevel.All:
                     return OrganizationDataReadAccessLevel.All;
+                case CrossOrganizationDataReadAccessLevel.RightsHolder:
+                    return OrganizationDataReadAccessLevel.RightsHolder;
                 default:
                     return OrganizationDataReadAccessLevel.None;
             }
