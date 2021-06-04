@@ -45,12 +45,14 @@ namespace Core.ApplicationServices.Authorization
             {
                 return CrossOrganizationDataReadAccessLevel.All;
             }
+            
+            //If rightsholder access is selected for the user it overrides the default calculation
+            if(_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
+                return CrossOrganizationDataReadAccessLevel.RightsHolder;
 
             return IsUserInMunicipality()
                 ? CrossOrganizationDataReadAccessLevel.Public
-                : (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess)
-                    ? CrossOrganizationDataReadAccessLevel.RightsHolder
-                    : CrossOrganizationDataReadAccessLevel.None);
+                : CrossOrganizationDataReadAccessLevel.None;
         }
 
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
