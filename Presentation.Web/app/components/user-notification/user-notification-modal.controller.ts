@@ -7,25 +7,25 @@
         mainGrid; // We don't set the grid. It is being set by the options that we define. But we need access to this in order to manually force a refresh of the data.
 
         static $inject: Array<string> = [
-            "$scope",
             "notify",
             "$uibModalInstance",
             "userNotificationService",
-            "contextType"
+            "contextType",
+            "user"
         ];
 
         constructor(
-            private readonly $scope,
             private readonly notify,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly userNotificationService: Services.UserNotification.IUserNotificationService,
-            private readonly contextType: Models.UserNotification.ObjectType
+            private readonly contextType: Models.UserNotification.RelatedEntityType,
+            private readonly user
         ) {
             this.mainGridOptions = {
                 dataSource: {
                     transport: {
                         read: {
-                            url: `/api/v1/user-notification/organization/${this.$scope.user.currentOrganizationId}/context/${this.contextType}/user/${this.$scope.user.id}`,
+                            url: `/api/v1/user-notification/organization/${this.user.currentOrganizationId}/context/${this.contextType}/user/${this.user.id}`,
                             dataType: "json",
                             contentType: "application/json"
                         },
@@ -35,14 +35,13 @@
                             return apiResponse.response;
                         }
                     },
-                    pageSize: 10,
                     serverPaging: false,
                     serverFiltering: false,
                     serverSorting: false
                 },
                 columns: [
                     {
-                        field: "NotificationType", // It's not odata so this field doesn't work to provide the data.
+                        field: "NotificationType", 
                         title: "Type",
                         width: 30,
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
@@ -54,22 +53,22 @@
                         sortable: false
                     },
                     {
-                        field: "Name", // It's not odata so this field doesn't work to provide the data.
+                        field: "Name",
                         title: "Navn",
                         width: 50,
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
-                            var pathToItem;
+                            var pathToItem = null;
                             switch (dataItem.relatedEntityType) {
-                                case Models.UserNotification.ObjectType.itContract:
+                                case Models.UserNotification.RelatedEntityType.itContract:
                                     pathToItem = `#/contract/edit/${dataItem.relatedEntityId}`;
                                     break;
-                                case Models.UserNotification.ObjectType.itSystemUsage:
+                                case Models.UserNotification.RelatedEntityType.itSystemUsage:
                                     pathToItem = `#/system/usage/${dataItem.relatedEntityId}`;
                                     break;
-                                case Models.UserNotification.ObjectType.itProject:
+                                case Models.UserNotification.RelatedEntityType.itProject:
                                     pathToItem = `#/project/edit/${dataItem.relatedEntityId}`;
                                     break;
-                                case Models.UserNotification.ObjectType.dataProcessingRegistration:
+                                case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
                                     pathToItem = `#/data-processing/edit/${dataItem.relatedEntityId}`;
                                     break;
                                 default:
@@ -100,16 +99,16 @@
                         sortable: false
                     },
                     {
-                        field: "LastChanged", // It's not odata so this field doesn't work to provide the data.
+                        field: "Created", 
                         title: "Dato",
                         width: 50,
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
-                            return moment(dataItem.lastChanged).format("DD-MM-YYYY");
+                            return moment(dataItem.created).format("DD-MM-YYYY");
                         },
                         sortable: false
                     },
                     {
-                        field: "NotificationMessage", // It's not odata so this field doesn't work to provide the data.
+                        field: "NotificationMessage", 
                         title: "Besked",
                         width: 150,
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
@@ -165,8 +164,11 @@
                         '$scope', '$uibModal', 'userNotificationService', 'userService', function ($scope, $uibModal, userNotificationService: Services.UserNotification.IUserNotificationService, userService: Services.IUserService) {
 
                             $scope.$watch("stateName", function (newValue, oldValue) {
-                                if ($scope.stateName === "it-project.overview" || $scope.stateName === "it-system.overview" || $scope.stateName === "it-contract.overview" || $scope.stateName === "it-contract.plan" || $scope.stateName === "data-processing.overview") {
-
+                                if ($scope.stateName === Constants.SRef.ContractOverview ||
+                                    $scope.stateName === Constants.SRef.ContractPlanOverview ||
+                                    $scope.stateName === Constants.SRef.ProjectOverview ||
+                                    $scope.stateName === Constants.SRef.SystemUsageOverview ||
+                                    $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
                                     userService
                                         .getUser()
                                         .then(user => {
@@ -176,21 +178,6 @@
                                                 .then(
                                                     numberOfNotifications => {
                                                         $scope.numberOfUserNotifications = numberOfNotifications;
-                                                        if (numberOfNotifications > 0) {
-                                                            $scope.hasNotifications = true;
-
-                                                            if (numberOfNotifications > 9) { // Used to handle styling of many notifications.
-                                                                $scope.hasManyNotifications = true;
-                                                            }
-                                                            else {
-                                                                $scope.hasManyNotifications = false;
-                                                            }
-
-                                                        }
-                                                        else {
-                                                            $scope.hasNotifications = false;
-                                                            $scope.hasManyNotifications = false;
-                                                        }
                                                     });
                                         });
 
@@ -212,23 +199,24 @@
                                     controllerAs: "vm",
                                     size: 'lg',
                                     resolve: {
-                                        contextType: [() => resolveContextType($scope.stateName)]
+                                        contextType: [() => resolveContextType($scope.stateName)],
+                                        user: ["userService", (userService: Services.IUserService) => userService.getUser()]
                                     }
                                 });
                             }
 
-                            function resolveContextType(contextAsString: string): Models.UserNotification.ObjectType {
+                            function resolveContextType(contextAsString: string): Models.UserNotification.RelatedEntityType {
                                 switch (contextAsString) {
-                                    case "it-contract.overview":
-                                        return Models.UserNotification.ObjectType.itContract;
-                                    case "it-contract.plan":
-                                        return Models.UserNotification.ObjectType.itContract;
-                                    case "it-system.overview":
-                                        return Models.UserNotification.ObjectType.itSystemUsage;
-                                    case "it-project.overview":
-                                        return Models.UserNotification.ObjectType.itProject;
-                                    case "data-processing.overview":
-                                        return Models.UserNotification.ObjectType.dataProcessingRegistration;
+                                    case Constants.SRef.ContractOverview:
+                                        return Models.UserNotification.RelatedEntityType.itContract;
+                                    case Constants.SRef.ContractPlanOverview:
+                                        return Models.UserNotification.RelatedEntityType.itContract;
+                                    case Constants.SRef.SystemUsageOverview:
+                                        return Models.UserNotification.RelatedEntityType.itSystemUsage;
+                                    case Constants.SRef.ProjectOverview:
+                                        return Models.UserNotification.RelatedEntityType.itProject;
+                                    case Constants.SRef.DataProcessingRegistrationOverview:
+                                        return Models.UserNotification.RelatedEntityType.dataProcessingRegistration;
                                     default:
                                         return null;
                                 }

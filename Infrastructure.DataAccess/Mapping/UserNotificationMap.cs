@@ -17,6 +17,11 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.NotificationType)
                 .IsRequired();
 
+            HasRequired(x => x.Organization)
+                .WithMany(x => x.UserNotifications);
+
+            HasIndex(x => x.NotificationRecipientId);
+
             HasOptional(x => x.ItProject)
                 .WithMany(x => x.UserNotifications)
                 .HasForeignKey(x => x.ItProject_Id);

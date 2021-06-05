@@ -4,6 +4,7 @@ using Core.ApplicationServices;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Notifications;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -11,6 +12,7 @@ using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Hangfire.Common;
 using Hangfire.States;
+using Infrastructure.Services.Types;
 using Microsoft.Extensions.DependencyInjection;
 using Ninject;
 using Presentation;
@@ -19,11 +21,15 @@ using Presentation.Web.Infrastructure;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Filters;
 using Presentation.Web.Ninject;
+using Serilog;
 
 namespace Presentation.Web.Infrastructure.Filters
 {
     public class AdvisSendFailureFilter : IElectStateFilter, IJobFilter
     {
+        private static readonly string HangfireRetryCountKey = "RetryCount";
+        private static readonly string HangfireNoMoreRetriesKey = "NoMoreRetries";
+
         private static readonly string MatchType = typeof(AdviceService).FullName;
         protected static readonly string MatchMethod = typeof(AdviceService)
             .GetMethods()
@@ -41,13 +47,14 @@ namespace Presentation.Web.Infrastructure.Filters
         {
             if (context.CandidateState is FailedState failedState)
             {
-                if(context.GetJobParameter<bool>("NoMoreRetries"))
+                if(context.GetJobParameter<bool>(HangfireNoMoreRetriesKey))
                 {
                     if (IsSendAdvice(context))
                     {
                         // Get argument input to method. In this case it's only one argument and it is the Id of the advice.
                         int adviceId = Convert.ToInt32(context.BackgroundJob.Job.Args.First());
-                        if(adviceId > 0)
+                        var logger = _kernel.GetService<ILogger>();
+                        try
                         {
                             using (new HangfireNinjectResolutionScope(_kernel))
                             {
@@ -57,23 +64,35 @@ namespace Presentation.Web.Infrastructure.Filters
                                 var failedAdvice = advisService.GetAdviceById(adviceId);
                                 if (failedAdvice.IsNone)
                                 {
+                                    logger.Error($"Failed to create user notification for advis with Id: {adviceId} as it could not be found.");
                                     return;
                                 }
                                 var advice = failedAdvice.Value;
 
-                                if (advice.ObjectOwnerId == null || advice.RelationId == null || advice.Type == null)
+                                if (advice.HasInvalidState())
                                 {
+                                    logger.Error($"Failed to create user notification for advis with Id: {adviceId} as it has an invalid state.");
                                     return;
                                 }
                                 var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
-                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId, advice.ObjectOwnerId.Value, advice.Name, "Afsendelse af advis fejlede", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                                if (organizationIdOfRelatedEntityId.IsNone)
+                                {
+                                    logger.Error($"Failed to create user notification as get root resolution for advis with Id: {adviceId} failed to resolve root.");
+                                    return;
+                                }
+
+                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, advice.Name, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
                             }
+                        }
+                        catch(Exception e)
+                        {
+                            logger.Error(e, $"Failed to create user notification for failed advis with Id: {adviceId}");
                         }
                     }
                 }
-                else if (context.GetJobParameter<int>("RetryCount") >= 2)
+                else if (context.GetJobParameter<int>(HangfireRetryCountKey) >= (KitosConstants.MaxHangfireRetries - 1))
                 {
-                    context.SetJobParameter<bool>("NoMoreRetries", true);
+                    context.SetJobParameter<bool>(HangfireNoMoreRetriesKey, true);
                 }
             }
         }
@@ -84,46 +103,10 @@ namespace Presentation.Web.Infrastructure.Filters
                    context.BackgroundJob?.Job?.Method?.Name?.Equals(MatchMethod) == true;
         }
 
-        private int GetRelatedEntityOrganizationId(Advice advice)
+        private Maybe<int> GetRelatedEntityOrganizationId(Advice advice)
         {
-            switch (advice.Type)
-            {
-                case RelatedEntityType.itContract:
-                    var contractRepository = _kernel.GetService<IItContractRepository>();
-                    var contractExists = contractRepository.GetById(advice.RelationId.Value);
-                    if (contractExists != null)
-                    {
-                        return contractExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.itProject:
-                    var projectRepository = _kernel.GetService<IItProjectRepository>();
-                    var projectExists = projectRepository.GetById(advice.RelationId.Value);
-                    if (projectExists != null)
-                    {
-                        return projectExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.itSystemUsage:
-                    var systemUsageRepository = _kernel.GetService<IItSystemUsageRepository>();
-                    var systemUsageExists = systemUsageRepository.GetSystemUsage(advice.RelationId.Value);
-                    if (systemUsageExists != null)
-                    {
-                        return systemUsageExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.dataProcessingRegistration:
-                    var dataProcessingRepository = _kernel.GetService<IDataProcessingRegistrationRepository>();
-                    var dataProcessingRegistrationExists = dataProcessingRepository.GetById(advice.RelationId.Value);
-                    if (dataProcessingRegistrationExists.HasValue)
-                    {
-                        return dataProcessingRegistrationExists.Value.OrganizationId;
-                    }
-                    break;
-                default:
-                    return 0;
-            }
-            return 0;
+            var advisRootResolution = _kernel.GetService<IAdviceRootResolution>();
+            return advisRootResolution.Resolve(advice).Select(x => x.OrganizationId);
         }
 
         public bool AllowMultiple => false;

@@ -46,7 +46,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
 
             //Assert
             _repository.Verify(x => x.Delete(notification), Times.Once);
-            Assert.True(deleted);
+            Assert.True(deleted.IsNone);
             VerifySaved();
         }
 

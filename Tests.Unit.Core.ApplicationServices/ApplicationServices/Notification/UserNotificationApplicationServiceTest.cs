@@ -4,7 +4,9 @@ using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
+using Infrastructure.Services.Types;
 using Moq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Tests.Toolkit.Patterns;
@@ -36,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             };
 
             _userNotificationService.Setup(x => x.GetUserNotification(notificationId)).Returns(notification);
-            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(true);
+            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(Maybe<OperationError>.None);
             _activeUserContext.Setup(x => x.UserId).Returns(notification.NotificationRecipientId);
 
             //Act
@@ -44,8 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             var result = _sut.Delete(notificationId);
 
             //Assert
-            Assert.True(result.Ok);
-            Assert.Equal(notification, result.Value);
+            Assert.True(result.IsNone);
         }
 
         [Fact]
@@ -60,14 +61,15 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             };
 
             _userNotificationService.Setup(x => x.GetUserNotification(notificationId)).Returns(Result<UserNotification, OperationError>.Failure(OperationFailure.NotFound));
-            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(true);
+            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(Maybe<OperationError>.Some(new OperationError(OperationFailure.NotFound)));
             _activeUserContext.Setup(x => x.UserId).Returns(notification.NotificationRecipientId);
 
             //Act
             var result = _sut.Delete(notification.Id);
 
             //Assert
-            Assert.True(result.Failed);
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
         [Fact]
@@ -82,74 +84,48 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             };
 
             _userNotificationService.Setup(x => x.GetUserNotification(notificationId)).Returns(notification);
-            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(true);
+            _userNotificationService.Setup(x => x.Delete(notificationId)).Returns(Maybe<OperationError>.None);
             _activeUserContext.Setup(x => x.UserId).Returns(A<int>());
 
             //Act
             var result = _sut.Delete(notification.Id);
 
             //Assert
-            Assert.True(result.Failed);
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
 
         [Fact]
         public void Can_GetNotificationsForUser()
         {
             //Arrange
+            var numberOfNotifications = Math.Abs(A<int>());
             var userId = A<int>();
             var orgId = A<int>();
             var relatedEntityType = A<RelatedEntityType>();
 
-            var notification1 = new UserNotification
-            {
-                Id = A<int>()
-            };
-            var notification2 = new UserNotification
-            {
-                Id = A<int>()
-            };
+            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
 
-            var notificationsList = new List<UserNotification>()
-            {
-                notification1,
-                notification2
-            };
-
-            _userNotificationService.Setup(x => x.GetNotificationsForUser(orgId, userId, relatedEntityType)).Returns(notificationsList);
-            _activeUserContext.Setup(x => x.UserId).Returns(userId);
+             _activeUserContext.Setup(x => x.UserId).Returns(userId);
 
             //Act
             var result = _sut.GetNotificationsForUser(orgId, userId, relatedEntityType);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(2, result.Value.ToList().Count());
+            Assert.Equal(numberOfNotifications, result.Value.ToList().Count());
         }
 
         [Fact]
         public void Can_Not_GetNotificationsForUser_When_Using_Other_UserId()
         {
             //Arrange
+            var numberOfNotifications = Math.Abs(A<int>());
             var userId = A<int>();
             var orgId = A<int>();
             var relatedEntityType = A<RelatedEntityType>();
 
-            var notification1 = new UserNotification
-            {
-                Id = A<int>()
-            };
-            var notification2 = new UserNotification
-            {
-                Id = A<int>()
-            };
-
-            var notificationsList = new List<UserNotification>()
-            {
-                notification1,
-                notification2
-            };
-
-            _userNotificationService.Setup(x => x.GetNotificationsForUser(orgId, userId, relatedEntityType)).Returns(notificationsList);
+            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType); 
             _activeUserContext.Setup(x => x.UserId).Returns(A<int>());
 
             //Act
@@ -164,13 +140,12 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         public void Can_GetNumberOfUnresolvedNotificationsForUser()
         {
             //Arrange
+            var numberOfNotifications = Math.Abs(A<int>());
             var userId = A<int>();
             var orgId = A<int>();
             var relatedEntityType = A<RelatedEntityType>();
 
-            var listLength = A<int>();
-
-            _userNotificationService.Setup(x => x.GetNumberOfUnresolvedNotificationsForUser(orgId, userId, relatedEntityType)).Returns(listLength);
+            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
             _activeUserContext.Setup(x => x.UserId).Returns(userId);
 
             //Act
@@ -178,20 +153,19 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(listLength, result.Value);
+            Assert.Equal(numberOfNotifications, result.Value);
         }
 
         [Fact]
         public void Can_Not_GetNumberOfUnresolvedNotificationsForUser_When_Using_Other_UserId()
         {
             //Arrange
+            var numberOfNotifications = Math.Abs(A<int>());
             var userId = A<int>();
             var orgId = A<int>();
             var relatedEntityType = A<RelatedEntityType>();
 
-            var listLength = A<int>();
-
-            _userNotificationService.Setup(x => x.GetNumberOfUnresolvedNotificationsForUser(orgId, userId, relatedEntityType)).Returns(listLength);
+            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
             _activeUserContext.Setup(x => x.UserId).Returns(A<int>());
 
             //Act
@@ -200,6 +174,16 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        private void SetupUserNotificationService(int numberOfNotifications, int orgId, int userId, RelatedEntityType relatedEntityType)
+        {
+            var notificationsList = new List<UserNotification>();
+            for (int i = 0; i >= numberOfNotifications; i++)
+            {
+                notificationsList.Add(new UserNotification() { Id = A<int>() });
+            }
+            _userNotificationService.Setup(x => x.GetNotificationsForUser(orgId, userId, relatedEntityType)).Returns(Result<IQueryable<UserNotification>, OperationError>.Success(notificationsList.AsQueryable()));
         }
     }
 }

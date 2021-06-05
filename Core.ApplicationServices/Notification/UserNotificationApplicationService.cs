@@ -2,10 +2,9 @@
 using Core.DomainModel.Notification;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Notifications;
-using System;
-using System.Collections.Generic;
+using Infrastructure.Services.Types;
+using System.Linq;
 
 namespace Core.ApplicationServices.Notification
 {
@@ -20,34 +19,28 @@ namespace Core.ApplicationServices.Notification
             _activeUserContext = activeUserContext;
         }
 
-        public Result<UserNotification, OperationError> Delete(int id)
+        public Maybe<OperationError> Delete(int id)
         {
             var getResult = _userNotificationService.GetUserNotification(id);
 
-            if (!getResult.Ok)
+            if (getResult.Failed)
             {
-                return getResult;
+                return getResult.Error;
             }
 
             var notificationToDelete = getResult.Value;
 
-            if(notificationToDelete.NotificationRecipientId != _activeUserContext.UserId)
+            if(IsActiveUser(notificationToDelete.NotificationRecipientId))
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            var deleteResult = _userNotificationService.Delete(id);
-            if (!deleteResult)
-            {
-                return new OperationError(OperationFailure.UnknownError);
-            }
-
-            return notificationToDelete;
+            return _userNotificationService.Delete(id);
         }
 
-        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
+        public Result<IQueryable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            if (userId != _activeUserContext.UserId)
+            if (IsActiveUser(userId))
                 return new OperationError(OperationFailure.Forbidden);
 
             return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType);
@@ -55,10 +48,15 @@ namespace Core.ApplicationServices.Notification
 
         public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            if (userId != _activeUserContext.UserId)
+            if (IsActiveUser(userId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            return _userNotificationService.GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType);
+            return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType).Select(x => x.Count());
+        }
+
+        private bool IsActiveUser(int userId)
+        {
+            return userId != _activeUserContext.UserId;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿module Kitos.Services.UserNotification {
     export interface IUserNotificationService {
         delete(userNotificationId: number): angular.IPromise<IUserNotificationDeletedResult>;
-        getNumberOfUnresolvedNotifications(organizationId: number, userId: number, relatedEntityType: Models.UserNotification.ObjectType): angular.IPromise<number>;
+        getNumberOfUnresolvedNotifications(organizationId: number, userId: number, relatedEntityType: Models.UserNotification.RelatedEntityType): angular.IPromise<number>;
     }
 
     export interface IUserNotificationDeletedResult {
@@ -25,7 +25,7 @@
         }
 
 
-        getNumberOfUnresolvedNotifications(organizationId: number, userId: number, relatedEntityType: Models.UserNotification.ObjectType): ng.IPromise<number> {
+        getNumberOfUnresolvedNotifications(organizationId: number, userId: number, relatedEntityType: Models.UserNotification.RelatedEntityType): ng.IPromise<number> {
             return this
                 .$http
                 .get<API.Models.IApiWrapper<number>>(`api/v1/user-notification/unresolved/organization/${organizationId}/context/${relatedEntityType}/user/${userId}`)
@@ -36,7 +36,7 @@
                 );
         }
 
-        private handleServerError(error) {
+        private handleServerError(error): Models.Api.ApiResponseErrorCategory{
             console.log("Request failed with:", error);
             let errorCategory: Models.Api.ApiResponseErrorCategory;
             switch (error.status) {

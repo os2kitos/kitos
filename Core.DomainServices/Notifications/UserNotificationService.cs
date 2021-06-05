@@ -6,7 +6,10 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -22,14 +25,16 @@ namespace Core.DomainServices.Notifications
 
         private readonly IUserNotificationRepository _userNotificationRepository;
         private readonly ITransactionManager _transactionManager;
+        private readonly IOperationClock _operationClock;
 
         public UserNotificationService(
-            IUserNotificationRepository userNotificationRepository, 
+            IUserNotificationRepository userNotificationRepository,
             ITransactionManager transactionManager,
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IItProjectRepository projectRepository,
-            IDataProcessingRegistrationRepository dataProcessingRepository)
+            IDataProcessingRegistrationRepository dataProcessingRepository, 
+            IOperationClock operationClock)
         {
             _userNotificationRepository = userNotificationRepository;
             _transactionManager = transactionManager;
@@ -37,19 +42,28 @@ namespace Core.DomainServices.Notifications
             _contractRepository = contractRepository;
             _projectRepository = projectRepository;
             _dataProcessingRepository = dataProcessingRepository;
+            _operationClock = operationClock;
         }
 
         public Result<UserNotification, OperationError> AddUserNotification(int organizationId, int userToNotifyId, string name, string message, int relatedEntityId, RelatedEntityType relatedEntityType, NotificationType notificationType)
         {
+            if(message == null)
+            {
+                throw new ArgumentNullException(nameof(message));
+            }
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
+            if (name == null)
+            {
+                name = "Ikke navngivet"; // If no name is set we set the name to "Ikke navngivet".
+            }
             if (!RelatedEntityExists(relatedEntityId, relatedEntityType))
             {
+                transaction.Rollback();
                 return new OperationError(OperationFailure.NotFound);
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
-            var notification = new UserNotification(name, message, notificationType, organizationId, userToNotifyId);
+            var notification = new UserNotification(name, message, notificationType, organizationId, userToNotifyId, _operationClock.Now);
 
             switch (relatedEntityType)
             {
@@ -75,7 +89,7 @@ namespace Core.DomainServices.Notifications
             return userNotification;
         }
 
-        public bool Delete(int id)
+        public Maybe<OperationError> Delete(int id)
         {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             var deleted = _userNotificationRepository.DeleteById(id);
@@ -85,22 +99,12 @@ namespace Core.DomainServices.Notifications
 
         public Result<UserNotification, OperationError> GetUserNotification(int id)
         {
-            var result = _userNotificationRepository.GetById(id);
-            if (result.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
-            return result.Value;
+            return _userNotificationRepository.GetById(id).Match<Result<UserNotification, OperationError>>(result => result, () => new OperationError(OperationFailure.NotFound));
         }
 
-        public Result<IEnumerable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
+        public Result<IQueryable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList();
-        }
-
-        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
-        {
-            return _userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType).ToList().Count();
+            return Result<IQueryable<UserNotification>, OperationError>.Success(_userNotificationRepository.GetNotificationFromOrganizationByUserId(organizationId, userId, relatedEntityType));
         }
 
 

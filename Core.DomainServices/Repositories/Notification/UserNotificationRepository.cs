@@ -1,7 +1,9 @@
 ﻿using Core.DomainModel.Notification;
+using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
+using System;
 using System.Linq;
 
 namespace Core.DomainServices.Repositories.Notification
@@ -22,17 +24,17 @@ namespace Core.DomainServices.Repositories.Notification
             return notification;
         }
 
-        public bool DeleteById(int id)
+        public Maybe<OperationError> DeleteById(int id)
         {
             var notification = _repository.GetByKey(id);
             if (notification != null)
             {
                 _repository.Delete(notification);
                 _repository.Save();
-                return true;
+                return Maybe<OperationError>.None;
             }
 
-            return false;
+            return new OperationError(OperationFailure.UnknownError);
         }
 
         public Maybe<UserNotification> GetById(int id)
@@ -57,7 +59,7 @@ namespace Core.DomainServices.Repositories.Notification
                 case RelatedEntityType.dataProcessingRegistration:
                     return query.Where(x => x.DataProcessingRegistration_Id != null);
                 default:
-                    return null;
+                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType));
             }
         }
     }

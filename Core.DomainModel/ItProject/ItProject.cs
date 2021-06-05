@@ -9,7 +9,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification
     {
         public ItProject()
         {

@@ -16,6 +16,7 @@
                         NotificationMessage = c.String(nullable: false),
                         NotificationType = c.Int(nullable: false),
                         NotificationRecipientId = c.Int(nullable: false),
+                        Created = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         OrganizationId = c.Int(nullable: false),
                         ItProject_Id = c.Int(),
                         Itcontract_Id = c.Int(),

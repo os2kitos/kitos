@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.API
         {
             return _userNotificationApplicationService
                 .Delete(id)
-                .Match(value => Ok(), FromOperationError);
+                .Match(FromOperationError, Ok);
         }
 
         [HttpGet]
@@ -47,6 +47,7 @@ namespace Presentation.Web.Controllers.API
         {
             return _userNotificationApplicationService
                 .GetNotificationsForUser(organizationId, userId, relatedEntityType)
+                .Select(x => x.OrderBy(y => y.Created))
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
 
@@ -54,7 +55,6 @@ namespace Presentation.Web.Controllers.API
         [Route("unresolved/organization/{organizationId}/context/{relatedEntityType}/user/{userId}")]
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationApplicationService
@@ -69,62 +69,16 @@ namespace Presentation.Web.Controllers.API
 
         private UserNotificationDTO ToDTO(UserNotification x)
         {
-            if(x.Itcontract_Id != null)
+            return new UserNotificationDTO
             {
-                return new UserNotificationDTO
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    NotificationMessage = x.NotificationMessage,
-                    NotificationType = x.NotificationType,
-                    LastChanged = x.LastChanged,
-                    RelatedEntityType = RelatedEntityType.itContract,
-                    RelatedEntityId = x.Itcontract_Id.Value
-                };
-            }
-            if (x.ItProject_Id != null)
-            {
-                return new UserNotificationDTO
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    NotificationMessage = x.NotificationMessage,
-                    NotificationType = x.NotificationType,
-                    LastChanged = x.LastChanged,
-                    RelatedEntityType = RelatedEntityType.itProject,
-                    RelatedEntityId = x.ItProject_Id.Value
-                };
-            }
-            if (x.ItSystemUsage_Id != null)
-            {
-                return new UserNotificationDTO
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    NotificationMessage = x.NotificationMessage,
-                    NotificationType = x.NotificationType,
-                    LastChanged = x.LastChanged,
-                    RelatedEntityType = RelatedEntityType.itSystemUsage,
-                    RelatedEntityId = x.ItSystemUsage_Id.Value
-                };
-            }
-            if (x.DataProcessingRegistration_Id != null)
-            {
-                return new UserNotificationDTO
-                {
-                    Id = x.Id,
-                    Name = x.Name,
-                    NotificationMessage = x.NotificationMessage,
-                    NotificationType = x.NotificationType,
-                    LastChanged = x.LastChanged,
-                    RelatedEntityType = RelatedEntityType.dataProcessingRegistration,
-                    RelatedEntityId = x.DataProcessingRegistration_Id.Value
-                };
-            }
-            else
-            {
-                return null;
-            }
+                Id = x.Id,
+                Name = x.Name,
+                NotificationMessage = x.NotificationMessage,
+                NotificationType = x.NotificationType,
+                Created = x.Created,
+                RelatedEntityType = x.GetRelatedEntityType(),
+                RelatedEntityId = x.GetRelatedEntityId()
+            };
         }
     }
 }

@@ -5,12 +5,12 @@
         name: string;
         notificationMessage: string;
         relatedEntityId: number;
-        relatedEntityType: ObjectType;
+        relatedEntityType: RelatedEntityType;
         notificationType: NotificationType;
-        lastChanged: string;
+        created: string;
     }
 
-    export enum ObjectType {
+    export enum RelatedEntityType {
         itContract = 0,
         itSystemUsage = 1,
         itProject = 2,

@@ -13,6 +13,6 @@ namespace Presentation.Web.Controllers.API
         public int RelatedEntityId { get; set; }
         public RelatedEntityType RelatedEntityType { get; set; }
         public NotificationType NotificationType { get; set; }
-        public DateTime LastChanged { get; set; }
+        public DateTime Created { get; set; }
     }
 }

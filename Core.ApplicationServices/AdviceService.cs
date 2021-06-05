@@ -23,6 +23,7 @@ using Infrastructure.Services.Types;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainModel.Notification;
+using Core.DomainServices.Advice;
 
 namespace Core.ApplicationServices
 {
@@ -83,6 +84,8 @@ namespace Core.ApplicationServices
         [Inject] public IOperationClock OperationClock { get; set; }
 
         [Inject] public IUserNotificationService UserNotificationService { get; set; }
+
+        [Inject] public IAdviceRootResolution AdviceRootResolution { get; set; }
 
         #endregion
 
@@ -213,17 +216,17 @@ namespace Core.ApplicationServices
             else
             {
                 var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
-                if(organizationIdOfRelatedEntityId == 0)
+                if(organizationIdOfRelatedEntityId.IsNone)
                 {
-                    throw new Exception("Advis doesn't have valid/correct related entity (RelationId and Type mismatch)");
+                    Logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
                 }
                 else
                 {
-                    if (advice.ObjectOwnerId == null || advice.RelationId == null || advice.Type == null)
+                    if (advice.HasInvalidState())
                     {
-                        throw new Exception("Advis is missing critical function information");
+                        Logger?.Error($"Advis is missing critical function information. Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}, Advice ownerId: {advice.ObjectOwnerId}");
                     }
-                    UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId, advice.ObjectOwnerId.Value, advice.Name, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                    UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, advice.Name, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
                 }
                 return false;
             }
@@ -395,42 +398,9 @@ namespace Core.ApplicationServices
             return AdviceRepository.GetByKey(id);
         }
 
-        private int GetRelatedEntityOrganizationId(Advice advice)
+        private Maybe<int> GetRelatedEntityOrganizationId(Advice advice)
         {
-            switch (advice.Type)
-            {
-                case RelatedEntityType.itContract:
-                    var contractExists = ItContractRepository.GetByKey(advice.RelationId);
-                    if(contractExists != null)
-                    {
-                        return contractExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.itProject:
-                    var projectExists = ItProjectRepository.GetByKey(advice.RelationId);
-                    if (projectExists != null)
-                    {
-                        return projectExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.itSystemUsage:
-                    var systemUsageExists = ItSystemUsageRepository.GetByKey(advice.RelationId);
-                    if (systemUsageExists != null)
-                    {
-                        return systemUsageExists.OrganizationId;
-                    }
-                    break;
-                case RelatedEntityType.dataProcessingRegistration:
-                    var dataProcessingRegistrationExists = DataProcessingRegistrations.GetByKey(advice.RelationId);
-                    if (dataProcessingRegistrationExists != null)
-                    {
-                        return dataProcessingRegistrationExists.OrganizationId;
-                    }
-                    break;
-                default:
-                    return 0;
-            }
-            return 0;
+            return AdviceRootResolution.Resolve(advice).Select(x => x.OrganizationId);
         }
     }
 }

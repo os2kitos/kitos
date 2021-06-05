@@ -177,5 +177,10 @@ namespace Core.DomainModel.Advice
                 return true;
             }
         }
+
+        public bool HasInvalidState()
+        {
+            return ObjectOwnerId == null || RelationId == null || Type == null;
+        }
     }
 }

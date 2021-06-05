@@ -725,9 +725,9 @@
     <Compile Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.designer.cs">
       <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202106032046067_Added_UserNotifications.cs" />
-    <Compile Include="Migrations\202106032046067_Added_UserNotifications.designer.cs">
-      <DependentUpon>202106032046067_Added_UserNotifications.cs</DependentUpon>
+    <Compile Include="Migrations\202106051508000_Added_UserNotifications.cs" />
+    <Compile Include="Migrations\202106051508000_Added_UserNotifications.designer.cs">
+      <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1186,8 +1186,8 @@
     <EmbeddedResource Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.resx">
       <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106032046067_Added_UserNotifications.resx">
-      <DependentUpon>202106032046067_Added_UserNotifications.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106051508000_Added_UserNotifications.resx">
+      <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
