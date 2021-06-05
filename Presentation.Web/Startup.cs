@@ -14,6 +14,7 @@ using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
 using Presentation.Web.Infrastructure.Filters;
+using Presentation.Web.Infrastructure;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -55,7 +56,7 @@ namespace Presentation.Web
             GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
             GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel));
-            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = 3 });
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = KitosConstants.MaxHangfireRetries });
 
             app.UseHangfireDashboard();
             app.UseHangfireServer(new KeepReadModelsInSyncProcess());
