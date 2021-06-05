@@ -179,7 +179,7 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
         private void SetupUserNotificationService(int numberOfNotifications, int orgId, int userId, RelatedEntityType relatedEntityType)
         {
             var notificationsList = new List<UserNotification>();
-            for (int i = 0; i >= numberOfNotifications; i++)
+            for (int i = 0; i < numberOfNotifications; i++)
             {
                 notificationsList.Add(new UserNotification() { Id = A<int>() });
             }

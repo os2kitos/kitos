@@ -83,7 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
-            _adviceRootResolution.Setup(x => x.Resolve(immediateAdvice).Select(x => x.OrganizationId)).Returns(A<int>());
+            _adviceRootResolution.Setup(x => x.Resolve(immediateAdvice)).Returns(new ItSystemUsage { OrganizationId = A<int>()});
             _userNotificationService.Setup(x => x.AddUserNotification(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), immediateAdvice.Type.Value, NotificationType.Advice)).Returns(new UserNotification());
 
             //Act
