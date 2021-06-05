@@ -13,10 +13,12 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Notifications;
 using Core.DomainServices.Time;
 using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -35,6 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
         private readonly Mock<IGenericRepository<DataProcessingRegistration>> _dataProcessingRepository;
         private readonly Mock<IUserNotificationService> _userNotificationService;
+        private readonly Mock<IAdviceRootResolution> _adviceRootResolution;
 
         public AdviceServiceTest()
         {
@@ -60,6 +63,8 @@ namespace Tests.Unit.Core.ApplicationServices
             _sut.DataProcessingRegistrations = _dataProcessingRepository.Object;
             _userNotificationService = new Mock<IUserNotificationService>();
             _sut.UserNotificationService = _userNotificationService.Object;
+            _adviceRootResolution = new Mock<IAdviceRootResolution>();
+            _sut.AdviceRootResolution = _adviceRootResolution.Object;
 
         }
 
@@ -78,7 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
-            SetupRelatedEntityResolve(immediateAdvice.Type.Value, immediateAdvice.RelationId.Value);
+            _adviceRootResolution.Setup(x => x.Resolve(immediateAdvice).Select(x => x.OrganizationId)).Returns(A<int>());
             _userNotificationService.Setup(x => x.AddUserNotification(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), immediateAdvice.Type.Value, NotificationType.Advice)).Returns(new UserNotification());
 
             //Act
@@ -268,25 +273,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private static List<AdviceUserRelation> CreateDefaultReceivers()
         {
             return new List<AdviceUserRelation> { new() { RecieverType = RecieverType.RECIEVER, RecpientType = RecieverType.USER, Name = "test@kitos.dk" } };
-        }
-
-        private void SetupRelatedEntityResolve(RelatedEntityType relatedEntityType, int relatedEntityId)
-        {
-            switch (relatedEntityType)
-            {
-                case RelatedEntityType.itContract:
-                    _contractRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItContract() { OrganizationId = A<int>() });
-                    break;
-                case RelatedEntityType.itProject:
-                    _projectRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItProject() { OrganizationId = A<int>() });
-                    break;
-                case RelatedEntityType.itSystemUsage:
-                    _systemUsageRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new ItSystemUsage() { OrganizationId = A<int>() });
-                    break;
-                case RelatedEntityType.dataProcessingRegistration:
-                    _dataProcessingRepository.Setup(x => x.GetByKey(relatedEntityId)).Returns(new DataProcessingRegistration() { OrganizationId = A<int>() });
-                    break;
-            }
         }
     }
 }
