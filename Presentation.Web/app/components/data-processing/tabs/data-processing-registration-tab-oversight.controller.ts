@@ -180,10 +180,10 @@
             ));
 
             this.oversightDates.sort((a, b) => {
-                if (moment(a.oversightDate).isBefore(b.oversightDate)) {
+                if (moment(a.oversightDate, "DD-MM-YYYY").isBefore(moment(b.oversightDate, "DD-MM-YYYY"))) {
                     return 1;
                 }
-                if (moment(a.oversightDate).isAfter(b.oversightDate)) {
+                if (moment(a.oversightDate, "DD-MM-YYYY").isAfter(moment(b.oversightDate, "DD-MM-YYYY"))) {
                     return -1;
                 }
                 return 0;

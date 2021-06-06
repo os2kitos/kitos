@@ -115,7 +115,7 @@
                 <tbody>
                     <tr data-ng-repeat="oversightDate in vm.oversightDates">
                         <td>
-                            <input id="date" 
+                            <input data-element-type="oversight-date"
                                    type="text" 
                                    class="form-control input-sm"
                                    ng-disabled="true"
@@ -123,7 +123,7 @@
                         </td>
                         <td>
                             <div class="form-group">
-                                <textarea id="remark"
+                                <textarea data-element-type="oversight-remark"
                                           class="form-control input-sm resize-vertical"
                                           rows="1"
                                           ng-disabled="true"
