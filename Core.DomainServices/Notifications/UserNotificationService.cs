@@ -9,6 +9,7 @@ using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,6 +27,7 @@ namespace Core.DomainServices.Notifications
         private readonly IUserNotificationRepository _userNotificationRepository;
         private readonly ITransactionManager _transactionManager;
         private readonly IOperationClock _operationClock;
+        private readonly ILogger _logger;
 
         public UserNotificationService(
             IUserNotificationRepository userNotificationRepository,
@@ -33,8 +35,9 @@ namespace Core.DomainServices.Notifications
             IItSystemUsageRepository systemUsageRepository,
             IItContractRepository contractRepository,
             IItProjectRepository projectRepository,
-            IDataProcessingRegistrationRepository dataProcessingRepository, 
-            IOperationClock operationClock)
+            IDataProcessingRegistrationRepository dataProcessingRepository,
+            IOperationClock operationClock, 
+            ILogger logger)
         {
             _userNotificationRepository = userNotificationRepository;
             _transactionManager = transactionManager;
@@ -43,6 +46,7 @@ namespace Core.DomainServices.Notifications
             _projectRepository = projectRepository;
             _dataProcessingRepository = dataProcessingRepository;
             _operationClock = operationClock;
+            _logger = logger;
         }
 
         public Result<UserNotification, OperationError> AddUserNotification(int organizationId, int userToNotifyId, string name, string message, int relatedEntityId, RelatedEntityType relatedEntityType, NotificationType notificationType)
@@ -127,6 +131,21 @@ namespace Core.DomainServices.Notifications
                 default:
                     return false;
             }
+        }
+
+        public void BulkDeleteUserNotification(IEnumerable<UserNotification> toBeDeleted)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            foreach (var userNotification in toBeDeleted)
+            {
+                var deleteResult = _userNotificationRepository.DeleteById(userNotification.Id);
+                if (deleteResult.HasValue)
+                {
+                    transaction.Rollback();
+                    _logger.Error($"Failed to do bulk user notification deletion. Failed on user notification with Id: {userNotification.Id}");
+                }
+            }
+            transaction.Commit();
         }
     }
 }

@@ -272,6 +272,11 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
 
+            RegisterDomainEvent<ContractDeleted, ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
+
             //Itsystem overview updates
             RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);

@@ -2,6 +2,7 @@
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Core.DomainServices.Repositories.Notification
@@ -12,5 +13,6 @@ namespace Core.DomainServices.Repositories.Notification
         Maybe<OperationError> DeleteById(int id);
         Maybe<UserNotification> GetById(int id);
         IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, RelatedEntityType relatedEntityType);
+        IEnumerable<UserNotification> GetByRelatedEntityIdAndType(int relatedEntityId, RelatedEntityType relatedEntityType);
     }
 }

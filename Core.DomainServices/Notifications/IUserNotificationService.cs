@@ -2,6 +2,7 @@
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Core.DomainServices.Notifications
@@ -12,5 +13,6 @@ namespace Core.DomainServices.Notifications
         public Result<IQueryable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType);
         public Maybe<OperationError> Delete(int id);
         public Result<UserNotification, OperationError> GetUserNotification(int id);
+        void BulkDeleteUserNotification(IEnumerable<UserNotification> toBeDeleted);
     }
 }

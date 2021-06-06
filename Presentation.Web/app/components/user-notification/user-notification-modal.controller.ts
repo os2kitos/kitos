@@ -60,35 +60,23 @@
                             var pathToItem = null;
                             switch (dataItem.relatedEntityType) {
                                 case Models.UserNotification.RelatedEntityType.itContract:
-                                    pathToItem = `#/contract/edit/${dataItem.relatedEntityId}`;
+                                    pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "it-contract.edit.advice-generic", dataItem.relatedEntityId, dataItem.name);
                                     break;
                                 case Models.UserNotification.RelatedEntityType.itSystemUsage:
-                                    pathToItem = `#/system/usage/${dataItem.relatedEntityId}`;
+                                    pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "it-system.usage.advice", dataItem.relatedEntityId, dataItem.name);
                                     break;
                                 case Models.UserNotification.RelatedEntityType.itProject:
-                                    pathToItem = `#/project/edit/${dataItem.relatedEntityId}`;
+                                    pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "it-project.edit.advice-generic", dataItem.relatedEntityId, dataItem.name);
                                     break;
                                 case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
-                                    pathToItem = `#/data-processing/edit/${dataItem.relatedEntityId}`;
+                                    pathToItem = Helpers.RenderFieldsHelper.renderInternalReferenceFromModal(`kendo-user-notification-rendering`, "data-processing.edit-registration.advice", dataItem.relatedEntityId, dataItem.name);
                                     break;
                                 default:
                                     // Do nothing to path so there is not created a link as we don't know where we should link to.
                                     break;
                             }
-
-                            if (pathToItem != null) {
-                                switch (dataItem.notificationType) {
-                                    case Models.UserNotification.NotificationType.advice:
-                                        pathToItem += "/advice";
-                                        break;
-                                    default:
-                                        pathToItem = null;
-                                        break;
-                                }
-                            }
-
-                            if (pathToItem != null) {
-                                return `<a ng-click="$dismiss()" href="${window.location.origin}/${pathToItem}">${dataItem.name}</a>`;
+                            if (pathToItem != null && pathToItem !== "") {
+                                return pathToItem;
                             }
                             else {
                                 return dataItem.name;

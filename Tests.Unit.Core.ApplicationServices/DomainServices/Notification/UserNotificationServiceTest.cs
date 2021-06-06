@@ -19,6 +19,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Time;
 using System;
+using Serilog;
 
 namespace Tests.Unit.Core.DomainServices.Notification
 {
@@ -32,6 +33,7 @@ namespace Tests.Unit.Core.DomainServices.Notification
         private readonly Mock<IItProjectRepository> _projectRepository;
         private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRepository;
         private readonly Mock<IOperationClock> _operationClock;
+        private readonly Mock<ILogger> _logger;
 
         public UserNotificationServiceTest()
         {
@@ -42,6 +44,7 @@ namespace Tests.Unit.Core.DomainServices.Notification
             _projectRepository = new Mock<IItProjectRepository>();
             _dataProcessingRepository = new Mock<IDataProcessingRegistrationRepository>();
             _operationClock = new Mock<IOperationClock>();
+            _logger = new Mock<ILogger>();
             _sut = new UserNotificationService(
                 _userNotificationRepository.Object,
                 _transactionManager.Object,
@@ -49,7 +52,8 @@ namespace Tests.Unit.Core.DomainServices.Notification
                 _contractRepository.Object,
                 _projectRepository.Object,
                 _dataProcessingRepository.Object,
-                _operationClock.Object);
+                _operationClock.Object,
+                _logger.Object);
         }
 
         [Fact]

@@ -4,6 +4,7 @@ using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Core.DomainServices.Repositories.Notification
@@ -40,6 +41,23 @@ namespace Core.DomainServices.Repositories.Notification
         public Maybe<UserNotification> GetById(int id)
         {
             return _repository.GetByKey(id);
+        }
+
+        public IEnumerable<UserNotification> GetByRelatedEntityIdAndType(int relatedEntityId, RelatedEntityType relatedEntityType)
+        {
+            switch (relatedEntityType)
+            {
+                case RelatedEntityType.itContract:
+                    return _repository.Get(x => x.Itcontract_Id == relatedEntityId);
+                case RelatedEntityType.itProject:
+                    return _repository.Get(x => x.ItProject_Id == relatedEntityId);
+                case RelatedEntityType.itSystemUsage:
+                    return _repository.Get(x => x.ItSystemUsage_Id == relatedEntityId);
+                case RelatedEntityType.dataProcessingRegistration:
+                    return _repository.Get(x => x.DataProcessingRegistration_Id == relatedEntityId);
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(relatedEntityType));
+            }
         }
 
         public IQueryable<UserNotification> GetNotificationFromOrganizationByUserId(int organizationId, int userId, RelatedEntityType relatedEntityType)
