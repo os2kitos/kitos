@@ -178,6 +178,16 @@
                 moment(oversightDate.oversightDate).format("DD-MM-YYYY"),
                 oversightDate.oversightRemark
             ));
+
+            this.oversightDates.sort((a, b) => {
+                if (moment(a.oversightDate).isBefore(b.oversightDate)) {
+                    return 1;
+                }
+                if (moment(a.oversightDate).isAfter(b.oversightDate)) {
+                    return -1;
+                }
+                return 0;
+            })
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
