@@ -365,7 +365,7 @@ namespace Core.ApplicationServices
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
                 //Only postpone the trigger creation if the alarm date has not been passed yet
-                var runAt = OperationClock.Now.Date >= alarmDate.Value.Date ? default : new DateTimeOffset(alarmDate.Value.Date);
+                var runAt = OperationClock.Now.Date >= alarmDate.Value.Date ? default(DateTimeOffset?) : new DateTimeOffset(alarmDate.Value.Date);
                 HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id), runAt);
             }
         }
