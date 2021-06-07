@@ -81,7 +81,7 @@
                 }
 
                 $scope.patchDate = (field, value) => {
-                    var date = moment(value, "DD-MM-YYYY");
+                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                     var payload = {};
                     if (value === "" || value == undefined) {
                         payload[field] = null;

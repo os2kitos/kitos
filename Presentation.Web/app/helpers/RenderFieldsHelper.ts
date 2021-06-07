@@ -57,7 +57,7 @@
 
         static renderDate(date: Date | undefined | null) {
             if (!!date) {
-                return moment(date).format("DD-MM-YYYY");
+                return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return RenderFieldsHelper.noValueFallback;
         }
