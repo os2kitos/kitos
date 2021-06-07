@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.Advice;
 using System.Linq;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices
 {
@@ -14,5 +15,6 @@ namespace Core.ApplicationServices
         void Delete(Advice key);
         void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted);
         void Deactivate(Advice advice);
+        Maybe<Advice> GetAdviceById(int id);
     }
 }

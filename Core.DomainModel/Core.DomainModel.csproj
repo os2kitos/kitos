@@ -52,6 +52,9 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Notification\IEntityWithUserNotification.cs" />
+    <Compile Include="Notification\NotificationType.cs" />
+    <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
@@ -123,6 +126,7 @@
     <Compile Include="LocalOptions\LocalDataProcessingBasisForTransferOption.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
+    <Compile Include="Notification\UserNotification.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />

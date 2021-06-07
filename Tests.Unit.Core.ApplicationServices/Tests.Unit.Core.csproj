@@ -184,7 +184,9 @@
     <Compile Include="ApplicationServices\KLE\KLEUpdateHistoryItemRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
+    <Compile Include="ApplicationServices\Notification\UserNotificationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataProcessorAssignmentServiceTest.cs" />
@@ -198,6 +200,7 @@
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\Kendo\KendoOrganizationalConfigurationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
+    <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
     <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />

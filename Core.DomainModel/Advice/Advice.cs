@@ -4,17 +4,10 @@ using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Advice
 {
-    public enum ObjectType
-    {
-        itContract = 0,
-        itSystemUsage = 1,
-        itProject = 2,
-        itInterface = 3,
-        dataProcessingRegistration = 4
-    }
 
     public enum Scheduling
     {
@@ -47,7 +40,7 @@ namespace Core.DomainModel.Advice
         public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
-        public ObjectType? Type { get; set; }
+        public RelatedEntityType? Type { get; set; }
 
         public Scheduling? Scheduling { get; set; }
 
@@ -183,6 +176,11 @@ namespace Core.DomainModel.Advice
 
                 return true;
             }
+        }
+
+        public bool HasInvalidState()
+        {
+            return ObjectOwnerId == null || RelationId == null || Type == null;
         }
     }
 }

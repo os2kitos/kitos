@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.Notification;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
 
@@ -35,6 +36,7 @@ namespace Core.DomainModel.Organization
             Reports = new List<Report>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
+            UserNotifications = new List<UserNotification>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -69,6 +71,9 @@ namespace Core.DomainModel.Organization
 
         //KITOS term - which organization was this interface created under in KITOS
         public virtual ICollection<ItSystem.ItInterface> ItInterfaces { get; set; }
+
+
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
         /// <summary>
         /// Organization is marked as supplier in these contracts

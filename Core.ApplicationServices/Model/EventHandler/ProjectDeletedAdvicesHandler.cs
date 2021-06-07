@@ -1,6 +1,6 @@
 ﻿using System.Linq;
-using Core.DomainModel.Advice;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Advice;
 using Infrastructure.Services.DomainEvents;
 
@@ -20,7 +20,7 @@ namespace Core.ApplicationServices.Model.EventHandler
         public void Handle(EntityDeletedEvent<ItProject> domainEvent)
         {
             var projectDeleted = domainEvent.Entity;
-            var toBeDeleted = _adviceRepository.GetByRelationIdAndType(projectDeleted.Id, ObjectType.itProject).ToList();
+            var toBeDeleted = _adviceRepository.GetByRelationIdAndType(projectDeleted.Id, RelatedEntityType.itProject).ToList();
             _adviceService.BulkDeleteAdvice(toBeDeleted);
         }
     }

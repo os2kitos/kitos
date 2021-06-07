@@ -118,6 +118,12 @@
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\SystemUsageDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\ProjectDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\ContractDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Notification\IUserNotificationApplicationService.cs" />
+    <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />

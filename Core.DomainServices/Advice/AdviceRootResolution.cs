@@ -1,6 +1,6 @@
 ﻿using System;
 using Core.DomainModel;
-using Core.DomainModel.Advice;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Project;
@@ -37,15 +37,15 @@ namespace Core.DomainServices.Advice
 
                 switch (advice.Type)
                 {
-                    case ObjectType.itContract:
+                    case RelatedEntityType.itContract:
                         return _itContractRepository.GetById(adviceRelationId);
-                    case ObjectType.itSystemUsage:
+                    case RelatedEntityType.itSystemUsage:
                         return _itSystemUsageRepository.GetSystemUsage(adviceRelationId);
-                    case ObjectType.itProject:
+                    case RelatedEntityType.itProject:
                         return _itProjectRepository.GetById(adviceRelationId);
-                    case ObjectType.dataProcessingRegistration:
+                    case RelatedEntityType.dataProcessingRegistration:
                         return _dataProcessingRegistrationRepository.GetById(adviceRelationId).GetValueOrDefault();
-                    case ObjectType.itInterface: //Intended fallthrough
+                    case RelatedEntityType.itInterface: //Intended fallthrough
                     default:
                         throw new NotSupportedException("Unsupported object type:" + advice.Type);
                 }
