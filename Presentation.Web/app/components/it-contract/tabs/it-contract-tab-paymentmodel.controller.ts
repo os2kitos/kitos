@@ -30,7 +30,7 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
             $scope.patchDate = (field, value) => {
-                var date = moment(value, "DD-MM-YYYY");
+                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 if (value === "") {
                     var payload = {};
                     payload[field] = null;

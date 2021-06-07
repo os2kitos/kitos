@@ -175,9 +175,19 @@
         private bindOversightDates() {
             this.oversightDates = _.map(this.dataProcessingRegistration.oversightDates, (oversightDate) => new Models.ViewModel.GDPR.OversightDateViewModel(
                 oversightDate.id,
-                moment(oversightDate.oversightDate).format("DD-MM-YYYY"),
+                moment(oversightDate.oversightDate).format(Constants.DateFormat.DanishDateFormat),
                 oversightDate.oversightRemark
             ));
+
+            this.oversightDates.sort((a, b) => {
+                if (moment(a.oversightDate, Constants.DateFormat.DanishDateFormat).isBefore(moment(b.oversightDate, Constants.DateFormat.DanishDateFormat))) {
+                    return 1;
+                }
+                if (moment(a.oversightDate, Constants.DateFormat.DanishDateFormat).isAfter(moment(b.oversightDate, Constants.DateFormat.DanishDateFormat))) {
+                    return -1;
+                }
+                return 0;
+            })
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {

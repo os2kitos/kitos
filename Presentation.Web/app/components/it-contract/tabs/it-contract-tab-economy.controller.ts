@@ -186,7 +186,7 @@
                     postStream("InternPaymentForId", "OrganizationId");
                 };
                 $scope.patchDate = (field, value, id) => {
-                    var date = moment(value, "DD-MM-YYYY");
+                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (value === "") {
                         var payload = {};
                         payload[field] = null;

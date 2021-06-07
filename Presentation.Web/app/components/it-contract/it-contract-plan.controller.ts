@@ -621,7 +621,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.Concluded).format("DD-MM-YYYY");
+                            return this.moment(dataItem.Concluded).format(Constants.DateFormat.DanishDateFormat);
                         },
                         filterable: {
                             cell: {
@@ -682,7 +682,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.ExpirationDate).format("DD-MM-YYYY");
+                            return this.moment(dataItem.ExpirationDate).format(Constants.DateFormat.DanishDateFormat);
                         },
                         filterable: {
                             cell: {
@@ -747,7 +747,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.IrrevocableTo).format("DD-MM-YYYY");
+                            return this.moment(dataItem.IrrevocableTo).format(Constants.DateFormat.DanishDateFormat);
                         },
                         hidden: true,
                         filterable: {
@@ -768,7 +768,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.Terminated).format("DD-MM-YYYY");
+                            return this.moment(dataItem.Terminated).format(Constants.DateFormat.DanishDateFormat);
                         },
                         hidden: true,
                         filterable: {
