@@ -55,7 +55,8 @@ class AdviceHelper {
         console.log(`Deactivating ${subjectName}`);
         return browser.wait(this.getEditAdviceButton(subjectName).isPresent(), this.waitUpTo.twentySeconds)
             .then(() => this.getEditAdviceButton(subjectName).click())
-            .then(() => element(this.cssLocator.byDataElementType('adviceDeactivateButton')).click());
+            .then(() => element(this.cssLocator.byDataElementType('adviceDeactivateButton')).click())
+            .then(() => browser.switchTo().alert().accept());
     }
 
     private getDeleteButton(subjectName: string) {
