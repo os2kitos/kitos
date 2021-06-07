@@ -185,9 +185,11 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             //Arrange
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
+            var advice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
+            advice.AlarmDate = DateTime.Now.AddDays(2);
+            advice.StopDate = DateTime.Now.AddDays(3);
 
-            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(advice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 
@@ -258,9 +260,9 @@ namespace Tests.Integration.Presentation.Web.Advice
         {
             //Arrange
             var recipient = CreateDefaultEmailRecipient(CreateWellformedEmail());
-            var createAdvice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
+            var advice = CreateDefaultAdvice(Scheduling.Day, AdviceType.Repeat, recipient);
 
-            using var createResult = await AdviceHelper.PostAdviceAsync(createAdvice, OrganizationId);
+            using var createResult = await AdviceHelper.PostAdviceAsync(advice, OrganizationId);
             Assert.Equal(HttpStatusCode.Created, createResult.StatusCode);
             var createdAdvice = await createResult.ReadResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
 

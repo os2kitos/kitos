@@ -250,15 +250,15 @@ namespace Presentation.Web.Controllers.OData
             {
                 return NotFound();
             }
-            if (!entity.CanBeDeleted)
-            {
-                return BadRequest("Cannot delete advice which is active or has been sent");
-            }
             if (!AllowDelete(entity))
             {
                 return Forbidden();
             }
 
+            if (!entity.CanBeDeleted)
+            {
+                return BadRequest("Cannot delete advice which is active or has been sent");
+            }
             try
             {
                 _adviceService.Delete(entity);
