@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Core.DomainModel.Advice;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainServices.Repositories.Advice
 {
@@ -12,7 +12,7 @@ namespace Core.DomainServices.Repositories.Advice
             _advicesRepository = advicesRepository;
         }
 
-        public IEnumerable<DomainModel.Advice.Advice> GetByRelationIdAndType(int relationId, ObjectType objectType)
+        public IEnumerable<DomainModel.Advice.Advice> GetByRelationIdAndType(int relationId, RelatedEntityType objectType)
         {
             return _advicesRepository.Get(a => a.RelationId == relationId && a.Type == objectType);
         }
