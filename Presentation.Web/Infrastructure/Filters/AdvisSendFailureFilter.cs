@@ -87,7 +87,7 @@ namespace Presentation.Web.Infrastructure.Filters
                         }
                         catch(Exception e)
                         {
-                            logger.Error(e, $"Failed to create user notification for failed advis with Id: {adviceId}");
+                            logger.Error(e, $"Failed to create user notification for failed hangfire job: {context.BackgroundJob.Job}");
                         }
                     }
                 }

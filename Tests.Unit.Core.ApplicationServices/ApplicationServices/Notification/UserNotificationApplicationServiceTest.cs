@@ -136,46 +136,6 @@ namespace Tests.Unit.Core.ApplicationServices.Notification
             Assert.Equal(OperationFailure.Forbidden, result.Error);
         }
 
-        [Fact]
-        public void Can_GetNumberOfUnresolvedNotificationsForUser()
-        {
-            //Arrange
-            var numberOfNotifications = Math.Abs(A<int>());
-            var userId = A<int>();
-            var orgId = A<int>();
-            var relatedEntityType = A<RelatedEntityType>();
-
-            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
-            _activeUserContext.Setup(x => x.UserId).Returns(userId);
-
-            //Act
-            var result = _sut.GetNumberOfUnresolvedNotificationsForUser(orgId, userId, relatedEntityType);
-
-            //Assert
-            Assert.True(result.Ok);
-            Assert.Equal(numberOfNotifications, result.Value);
-        }
-
-        [Fact]
-        public void Can_Not_GetNumberOfUnresolvedNotificationsForUser_When_Using_Other_UserId()
-        {
-            //Arrange
-            var numberOfNotifications = Math.Abs(A<int>());
-            var userId = A<int>();
-            var orgId = A<int>();
-            var relatedEntityType = A<RelatedEntityType>();
-
-            SetupUserNotificationService(numberOfNotifications, orgId, userId, relatedEntityType);
-            _activeUserContext.Setup(x => x.UserId).Returns(A<int>());
-
-            //Act
-            var result = _sut.GetNumberOfUnresolvedNotificationsForUser(orgId, userId, relatedEntityType);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
-        }
-
         private void SetupUserNotificationService(int numberOfNotifications, int orgId, int userId, RelatedEntityType relatedEntityType)
         {
             var notificationsList = new List<UserNotification>();

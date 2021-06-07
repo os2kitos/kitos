@@ -49,7 +49,7 @@
                                 return "Advis";
                             }
                         },
-                        attributes: { "class": "might-overflow" },
+                        attributes: { "class": "might-overflow fixed-grid-left-padding" },
                         sortable: false
                     },
                     {
@@ -83,7 +83,7 @@
                             }
 
                         },
-                        attributes: { "class": "might-overflow" },
+                        attributes: { "class": "might-overflow fixed-grid-left-padding" },
                         sortable: false
                     },
                     {
@@ -93,6 +93,7 @@
                         template: (dataItem: Models.UserNotification.UserNotificationDTO) => {
                             return moment(dataItem.created).format("DD-MM-YYYY");
                         },
+                        attributes: { "class": "fixed-grid-left-padding" },
                         sortable: false
                     },
                     {
@@ -190,6 +191,18 @@
                                         contextType: [() => resolveContextType($scope.stateName)],
                                         user: ["userService", (userService: Services.IUserService) => userService.getUser()]
                                     }
+                                }).closed.then(() => {
+                                    userService
+                                        .getUser()
+                                        .then(user => {
+                                            var contextType = resolveContextType($scope.stateName);
+                                            userNotificationService
+                                                .getNumberOfUnresolvedNotifications(user.currentOrganizationId, user.id, contextType)
+                                                .then(
+                                                    numberOfNotifications => {
+                                                        $scope.numberOfUserNotifications = numberOfNotifications;
+                                                    });
+                                        });
                                 });
                             }
 
