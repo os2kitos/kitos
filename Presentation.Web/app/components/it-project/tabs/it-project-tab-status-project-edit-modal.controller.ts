@@ -48,7 +48,7 @@
                         Created: obj.Created,
                         LastChanged: moment()
                     };
-                    var created = moment(payload.Created, "DD-MM-YYYY");
+                    var created = moment(payload.Created, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (!created.isValid() || isNaN(created.valueOf()) || created.year() < 1000 || created.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
                     } else {

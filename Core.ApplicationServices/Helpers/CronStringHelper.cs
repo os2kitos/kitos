@@ -24,13 +24,19 @@ namespace Core.ApplicationServices.Helpers
                 case Scheduling.Day: return "0 8 * * *";
                 case Scheduling.Week: return $"0 8 * * {zeroTime.DayOfWeek:D}";
                 case Scheduling.Month: return $"0 8 {dayComponent} * *";
-                case Scheduling.Quarter: return $"0 8 {dayComponent} {zeroTime.Month % 3}-12/3 *";
-                case Scheduling.Semiannual: return $"0 8 {dayComponent} {zeroTime.Month % 6}-12/6 *";
+                case Scheduling.Quarter: return $"0 8 {dayComponent} {ComputeOffsetMonth(zeroTime, 4)}-12/3 *";
+                case Scheduling.Semiannual: return $"0 8 {dayComponent} {ComputeOffsetMonth(zeroTime, 2)}-12/6 *";
                 case Scheduling.Year: return $"0 8 {dayComponent} {zeroTime.Month} *";
                 case Scheduling.Immediate: // Fallthrough intended
                 default:
                     throw new ArgumentOutOfRangeException(nameof(interval), interval, null);
             }
+        }
+
+        private static int ComputeOffsetMonth(DateTime zeroTime, int partitions)
+        {
+            //Months are 1-based so we adjust for that in the offset calculation
+            return ((zeroTime.Month - 1) % (12/partitions)) + 1;
         }
     }
 }

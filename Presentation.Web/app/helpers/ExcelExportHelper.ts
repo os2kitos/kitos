@@ -106,7 +106,7 @@
 
         static renderDate(date: Date) {
             if (!!date) {
-                return moment(date).format("DD-MM-YYYY");
+                return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return ExcelExportHelper.noValueFallback;
         }

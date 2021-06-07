@@ -41,7 +41,7 @@
 
                         if (newValue !== oldValue) {
                             if (ctrl.$valid) {
-                                var dateObject = moment(newValue, "DD-MM-YYYY");
+                                var dateObject = moment(newValue, Kitos.Constants.DateFormat.DanishDateFormat);
                                 var payload = {};
                                 if (dateObject.isValid()) {
                                     payload[attrs.field] = dateObject.format("YYYY-MM-DD");

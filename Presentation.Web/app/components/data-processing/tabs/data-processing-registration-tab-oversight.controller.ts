@@ -43,10 +43,12 @@
         oversigthOptions: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         oversightOptionsRemark: Models.ViewModel.Generic.IEditTextViewModel;
         isOversightCompleted: Models.ViewModel.Generic.ISingleSelectionWithFixedOptionsViewModel<Models.Api.Shared.YesNoUndecidedOption>;
+        oldIsOversightCompletedValue: Models.Api.Shared.YesNoUndecidedOption;
         oversightCompletedRemark: Models.ViewModel.Generic.IEditTextViewModel;
         shouldShowLatestOversightCompletedDate: boolean;
-
         oversightDates: Models.ViewModel.GDPR.IOversightDateViewModel[];
+
+        private yesIsOversightCompletedValue = new Models.ViewModel.Shared.YesNoUndecidedOptions().options.filter(x => x.id === Models.Api.Shared.YesNoUndecidedOption.Yes)[0];
 
         createOversightDate() {
             this.modal.open({
@@ -157,6 +159,8 @@
                 elementSelected: (newElement) => this.changeIsOversightCompleted(newElement)
             }
 
+            this.oldIsOversightCompletedValue = this.isOversightCompleted.selectedElement?.id;
+
             this.shouldShowLatestOversightCompletedDate =
                 this.isOversightCompleted.selectedElement !== null &&
                 this.isOversightCompleted.selectedElement.optionalObjectContext === Models.Api.Shared.YesNoUndecidedOption.Yes;
@@ -171,9 +175,19 @@
         private bindOversightDates() {
             this.oversightDates = _.map(this.dataProcessingRegistration.oversightDates, (oversightDate) => new Models.ViewModel.GDPR.OversightDateViewModel(
                 oversightDate.id,
-                moment(oversightDate.oversightDate).format("DD-MM-YYYY"),
+                moment(oversightDate.oversightDate).format(Constants.DateFormat.DanishDateFormat),
                 oversightDate.oversightRemark
             ));
+
+            this.oversightDates.sort((a, b) => {
+                if (moment(a.oversightDate, Constants.DateFormat.DanishDateFormat).isBefore(moment(b.oversightDate, Constants.DateFormat.DanishDateFormat))) {
+                    return 1;
+                }
+                if (moment(a.oversightDate, Constants.DateFormat.DanishDateFormat).isAfter(moment(b.oversightDate, Constants.DateFormat.DanishDateFormat))) {
+                    return -1;
+                }
+                return 0;
+            })
         }
 
         private getYearMonthIntervalOptionFromId(id?: number): Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YearMonthUndecidedIntervalOption> {
@@ -255,6 +269,20 @@
         }
 
         private changeIsOversightCompleted(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
+            if (this.oldIsOversightCompletedValue === Models.Api.Shared.YesNoUndecidedOption.Yes && isOversightCompleted.id !== Models.Api.Shared.YesNoUndecidedOption.Yes) {
+                if (confirm("Er du sikker på du vil skifte væk fra 'Ja' og derved slette alle oprettede tilsyn?")) {
+                    this.performIsOversightCompletedChange(isOversightCompleted);
+                }
+                else {
+                    this.isOversightCompleted.selectedElement = this.yesIsOversightCompletedValue;
+                }
+            }
+            else {
+                this.performIsOversightCompletedChange(isOversightCompleted);
+            }
+        }
+
+        private performIsOversightCompletedChange(isOversightCompleted: Models.ViewModel.Generic.Select2OptionViewModel<Models.Api.Shared.YesNoUndecidedOption>) {
             this.apiUseCaseFactory
                 .createUpdate("Gennemført tilsyn", () => this.dataProcessingRegistrationService.updateOversightCompleted(this.dataProcessingRegistrationId, isOversightCompleted.optionalObjectContext))
                 .executeAsync(success => {

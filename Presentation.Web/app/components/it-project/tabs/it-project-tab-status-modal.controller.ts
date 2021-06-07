@@ -73,13 +73,13 @@
 
                 if (activity) {
                     if (activity.startDate) {
-                        activity.startDate = moment(activity.startDate, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        activity.startDate = moment(activity.startDate, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                     if (activity.endDate) {
-                        activity.endDate = moment(activity.endDate, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        activity.endDate = moment(activity.endDate, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                     if (activity.date) {
-                        activity.date = moment(activity.date, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        activity.date = moment(activity.date, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                 }
 
@@ -103,21 +103,21 @@
                     var payload = $scope.activity;
                     payload.associatedItProjectId = project.id;
 
-                    var startDate = moment(payload.startDate, "DD-MM-YYYY");
+                    var startDate = moment(payload.startDate, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (startDate.isValid()) {
                         payload.startDate = startDate.format("YYYY-MM-DD");
                     } else {
                         payload.startDate = null;
                     }
 
-                    var endDate = moment(payload.endDate, "DD-MM-YYYY");
+                    var endDate = moment(payload.endDate, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (endDate.isValid()) {
                         payload.endDate = endDate.format("YYYY-MM-DD");
                     } else {
                         payload.endDate = null;
                     }
 
-                    var date = moment(payload.date, "DD-MM-YYYY");
+                    var date = moment(payload.date, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (date.isValid()) {
                         payload.date = date.format("YYYY-MM-DD");
                     } else {

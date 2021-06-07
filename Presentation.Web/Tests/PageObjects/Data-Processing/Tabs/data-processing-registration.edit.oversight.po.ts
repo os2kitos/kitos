@@ -62,11 +62,11 @@ class DataProcessingRegistrationEditOversightPageObject {
     }
 
     getOversightDateRowDate() {
-        return element(by.xpath(this.getOversightDateRowExpression())).element(by.id("date"));
+        return element(by.xpath(this.getOversightDateRowExpression())).element(this.cssHelper.byDataElementType("oversight-date"));
     }
 
     getOversightDateRowRemark() {
-        return element(by.xpath(this.getOversightDateRowExpression())).element(by.id("remark"));
+        return element(by.xpath(this.getOversightDateRowExpression())).element(this.cssHelper.byDataElementType("oversight-remark"));
     }
 
     getOversightDateModalDateField() {
@@ -82,7 +82,7 @@ class DataProcessingRegistrationEditOversightPageObject {
     }
 
     private getOversightDateRowExpression() {
-        return `//*/table[@id="oversightDatesTable"]//*/input[@id="date"]/../..`;
+        return `//*/table[@id="oversightDatesTable"]//*/input[@data-element-type="oversight-date"]/../..`;
     }
 
     getDpaMainNameHeader() {

@@ -66,7 +66,7 @@
 
                 if ($scope.commForm.$invalid) { return; }
 
-                var dueDate = moment($scope.comm.dueDate, "DD-MM-YYYY");
+                var dueDate = moment($scope.comm.dueDate, Kitos.Constants.DateFormat.DanishDateFormat);
                 if (dueDate.isValid()) {
                     $scope.comm.dueDate = dueDate.format("YYYY-MM-DD");
                 } else {
@@ -91,7 +91,7 @@
             };
 
             $scope.checkDate = (value) => {
-                var date = moment(value, "DD-MM-YYYY");
+                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 $scope.DateFailed = false;
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");

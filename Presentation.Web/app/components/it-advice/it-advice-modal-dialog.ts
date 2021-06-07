@@ -32,7 +32,7 @@
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
                     var payloadDateFormat = "YYYY-MM-DD";
-                    var allowedDateFormats = ["DD-MM-YYYY", payloadDateFormat];
+                    var allowedDateFormats = [Constants.DateFormat.DanishDateFormat, payloadDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
                     if (select2Roles) {

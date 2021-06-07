@@ -302,15 +302,35 @@ namespace Core.ApplicationServices
         private void DeleteJobFromHangfire(Advice advice)
         {
             //Remove pending shcedules if any
-            var jobsScheduled =
-                HangfireApi
-                    .GetScheduledJobs(0, int.MaxValue)
-                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
+            var allScheduledJobs = HangfireApi
+                .GetScheduledJobs(0, int.MaxValue)
+                .ToList();
 
-            foreach (var j in jobsScheduled)
+            //Remove all pending calls to CreateOrUpdateJob
+            var allScheduledCreateOrUpdate =
+                allScheduledJobs
+                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob))
+                    .ToList();
+
+            foreach (var j in allScheduledCreateOrUpdate)
             {
-                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Equals(advice.JobId))
+                var adviceIdAsString = j.Value.Job.Args[0].ToString();
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
+                {
+                    HangfireApi.DeleteScheduledJob(j.Key);
+                    break;
+                }
+            }
+
+            //Remove all pending calls to CreateOrUpdateJob
+            var allScheduledDeactivations =
+                allScheduledJobs
+                    .Where(x => x.Value.Job.Method.Name == nameof(DeactivateById));
+
+            foreach (var j in allScheduledDeactivations)
+            {
+                var adviceIdAsString = j.Value.Job.Args[0].ToString();
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
                 {
                     HangfireApi.DeleteScheduledJob(j.Key);
                     break;
@@ -344,6 +364,19 @@ namespace Core.ApplicationServices
             AdviceRepository.Save();
         }
 
+        /// <summary>
+        /// Public only to allow HangFire to access it
+        /// </summary>
+        /// <param name="adviceId"></param>
+        public void DeactivateById(int adviceId)
+        {
+            var advice = AdviceRepository.AsQueryable().ById(adviceId);
+            if (advice != null)
+            {
+                Deactivate(advice);
+            }
+        }
+
         private void ScheduleAdvice(Advice advice)
         {
             if (advice.AdviceType == AdviceType.Immediate)
@@ -357,12 +390,13 @@ namespace Core.ApplicationServices
                 if (alarmDate == null)
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-                HangfireApi.Schedule(
-                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+                //Only postpone the trigger creation if the alarm date has not been passed yet
+                var runAt = OperationClock.Now.Date >= alarmDate.Value.Date ? default : new DateTimeOffset(alarmDate.Value.Date);
+                HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id), runAt);
             }
         }
 
-        public void RescheduleRecurringJob(Advice advice)
+        public void UpdateSchedule(Advice advice)
         {
             var alarmDate = advice.AlarmDate;
 
@@ -370,21 +404,32 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
             DeleteJobFromHangfire(advice); // Remove existing hangfire job
-            HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            ScheduleAdvice(advice);
         }
 
-        public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        /// <summary>
+        /// Public only to allow HangFire to access it
+        /// </summary>
+        /// <param name="adviceId"></param>
+        public void CreateOrUpdateJob(int adviceId)
         {
-            var advice = AdviceRepository.GetByKey(entityId);
-            if (advice == null)
+            var advice = AdviceRepository.GetByKey(adviceId);
+            if (advice == null || advice.Scheduling == null || advice.AlarmDate == null)
             {
-                throw new ArgumentException(nameof(entityId) + " does not point to a valid id");
+                throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
             }
 
-            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(alarmDate, schedule))
+            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(advice.AlarmDate.Value, advice.Scheduling.Value))
             {
-                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(name, partitionId), () => name);
-                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
+                var prefix = advice.JobId;
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
+                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
+            }
+
+            if (advice.StopDate.HasValue)
+            {
+                //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
+                HangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
             }
         }
 

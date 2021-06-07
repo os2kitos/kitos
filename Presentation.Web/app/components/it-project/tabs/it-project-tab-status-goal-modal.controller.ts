@@ -58,13 +58,13 @@
 
                 if (goal) {
                     if (goal.subGoalDate1) {
-                        goal.subGoalDate1 = moment(goal.subGoalDate1, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        goal.subGoalDate1 = moment(goal.subGoalDate1, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                     if (goal.subGoalDate2) {
-                        goal.subGoalDate2 = moment(goal.subGoalDate2, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        goal.subGoalDate2 = moment(goal.subGoalDate2, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                     if (goal.subGoalDate3) {
-                        goal.subGoalDate3 = moment(goal.subGoalDate3, "YYYY-MM-DD").format("DD-MM-YYYY");
+                        goal.subGoalDate3 = moment(goal.subGoalDate3, "YYYY-MM-DD").format(Kitos.Constants.DateFormat.DanishDateFormat);
                     }
                     $scope.goalType = goal.goalTypeId;
                 }
@@ -84,7 +84,7 @@
                     $scope.$dismiss();
                 };
                 $scope.checkDate = (field, value) => {
-                    var date = moment(value, "DD-MM-YYYY");
+                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (value === "" || value == undefined) {
                         switch (field) {
                             case "subGoalDate1":
@@ -130,21 +130,21 @@
                     payload.goalStatusId = project.goalStatus.id;
                     payload.goalTypeId = $scope.goalType.id;
 
-                    var subGoalDate1 = moment(payload.subGoalDate1, "DD-MM-YYYY");
+                    var subGoalDate1 = moment(payload.subGoalDate1, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (subGoalDate1.isValid()) {
                         payload.subGoalDate1 = subGoalDate1.format("YYYY-MM-DD");
                     } else {
                         payload.subGoalDate1 = null;
                     }
 
-                    var subGoalDate2 = moment(payload.subGoalDate2, "DD-MM-YYYY");
+                    var subGoalDate2 = moment(payload.subGoalDate2, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (subGoalDate2.isValid()) {
                         payload.subGoalDate2 = subGoalDate2.format("YYYY-MM-DD");
                     } else {
                         payload.subGoalDate2 = null;
                     }
 
-                    var subGoalDate3 = moment(payload.subGoalDate3, "DD-MM-YYYY");
+                    var subGoalDate3 = moment(payload.subGoalDate3, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (subGoalDate3.isValid()) {
                         payload.subGoalDate3 = subGoalDate3.format("YYYY-MM-DD");
                     } else {
