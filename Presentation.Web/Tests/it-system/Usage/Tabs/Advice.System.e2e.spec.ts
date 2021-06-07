@@ -9,11 +9,11 @@ describe("Is able to create advice and delete advice",
     () => {
         var loginHelper = new login();
         var itSystemName = createItSystemName();
-        var startDate = DateHelper.getTodayAsString();
-        var endDate = DateHelper.getTodayAsString();
+        var startDate = DateHelper.getDateWithOffsetFromTodayAsString(1);
+        var endDate = DateHelper.getDateWithOffsetFromTodayAsString(2);
         var email = getRandomEmail();
-        var subjectText1 = getRandomText("1");
-        var subjectText2 = getRandomText("2");
+        var subjectOfAdviceToBeDeleted = getRandomText("1");
+        var subjectOfImmediateAdvice = getRandomText("2");
         var adviceHelper = new AdviceHelper();
         var waitUpTo = new WaitTimers();
         var testFixture = new TestFixtureWrapper();
@@ -35,13 +35,13 @@ describe("Is able to create advice and delete advice",
         it("Is able to create a new instant and repetition advice and delete a advice",
             () => {
                 adviceHelper.goToSpecificItSystemAdvice(itSystemName)
-                    .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectText1, "Uge"))
-                    .then(() => verifyAdviceWasCreated(subjectText1))
-                    .then(() => adviceHelper.createNewInstantAdvice(email, subjectText2))
-                    .then(() => verifyAdviceWasCreated(subjectText2))
-                    .then(() => adviceHelper.deactivateAdvice(subjectText1))
-                    .then(() => adviceHelper.deleteAdvice(subjectText1))
-                    .then(() => verifyAdviceWasDeleted(subjectText1));
+                    .then(() => adviceHelper.createNewRepetitionAdvice(email, startDate, endDate, subjectOfAdviceToBeDeleted, "Uge"))
+                    .then(() => verifyAdviceWasCreated(subjectOfAdviceToBeDeleted))
+                    .then(() => adviceHelper.createNewInstantAdvice(email, subjectOfImmediateAdvice))
+                    .then(() => verifyAdviceWasCreated(subjectOfImmediateAdvice))
+                    .then(() => adviceHelper.deactivateAdvice(subjectOfAdviceToBeDeleted))
+                    .then(() => adviceHelper.deleteAdvice(subjectOfAdviceToBeDeleted))
+                    .then(() => verifyAdviceWasDeleted(subjectOfAdviceToBeDeleted));
             });
 
         function createItSystemName() {
