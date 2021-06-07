@@ -289,7 +289,7 @@
                         }
 
                         if (isCurrentAdviceImmediate()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                            if (validateReceiversAndCC() &&
                                 $scope.subject &&
                                 $scope.isEditable()) {
                                 return false;
@@ -299,7 +299,7 @@
                             }
                         }
                         if (isCurrentAdviceRecurring()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
+                            if (validateReceiversAndCC() &&
                                 $scope.subject &&
                                 $scope.adviceRepetitionData &&
                                 $scope.checkDates($scope.startDate, $scope.stopDate) &&
@@ -311,6 +311,18 @@
                             }
                         }
                         return true;
+                    }
+
+                    function validateReceiversAndCC(){
+                        if ($scope.createForm.externalEmail.$invalid || $scope.createForm.ccEmail.$invalid) { //Make sure email inputs are valid. (No input is valid).
+                            return false;
+                        }
+                        if ($scope.externalTo || $scope.selectedReceivers.length > 0) {
+                            return true;
+                        }
+                        else { // No need to check if CC has been assigned as there is no requirement for them and the email part has been validated. 
+                            return false;
+                        }
                     }
 
                     function httpCall(payload, action, url) {
