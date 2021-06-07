@@ -167,6 +167,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
+            kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
