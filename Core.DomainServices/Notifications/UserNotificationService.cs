@@ -127,14 +127,7 @@ namespace Core.DomainServices.Notifications
                     return systemUsageExists != null;
                 case RelatedEntityType.dataProcessingRegistration:
                     var dataProcessingRegistrationExists = _dataProcessingRepository.GetById(relatedEntityId);
-                    if (dataProcessingRegistrationExists.HasValue)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
+                    return dataProcessingRegistrationExists.HasValue;
                 default:
                     return false;
             }
