@@ -20,13 +20,13 @@ namespace Core.ApplicationServices.Helpers
             var dayComponent = (zeroTime.Day == 31 || enforceLastDayInMonth) ? "L" : $"{zeroTime.Day}"; //L is extended cron syntax and results in last day of the month for all months.
             switch (interval)
             {
-                case Scheduling.Hour: return "0 * * * *";
-                case Scheduling.Day: return "0 8 * * *";
-                case Scheduling.Week: return $"0 8 * * {zeroTime.DayOfWeek:D}";
-                case Scheduling.Month: return $"0 8 {dayComponent} * *";
-                case Scheduling.Quarter: return $"0 8 {dayComponent} {ComputeOffsetMonth(zeroTime, 4)}-12/3 *";
-                case Scheduling.Semiannual: return $"0 8 {dayComponent} {ComputeOffsetMonth(zeroTime, 2)}-12/6 *";
-                case Scheduling.Year: return $"0 8 {dayComponent} {zeroTime.Month} *";
+                case Scheduling.Hour: return $"{CronPatternDefaults.TriggerMinute} * * * *";
+                case Scheduling.Day: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} * * *";
+                case Scheduling.Week: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} * * {zeroTime.DayOfWeek:D}";
+                case Scheduling.Month: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} * *";
+                case Scheduling.Quarter: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {ComputeOffsetMonth(zeroTime, 4)}-12/3 *";
+                case Scheduling.Semiannual: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {ComputeOffsetMonth(zeroTime, 2)}-12/6 *";
+                case Scheduling.Year: return $"{CronPatternDefaults.TriggerMinute} {CronPatternDefaults.TriggerHourUTC} {dayComponent} {zeroTime.Month} *";
                 case Scheduling.Immediate: // Fallthrough intended
                 default:
                     throw new ArgumentOutOfRangeException(nameof(interval), interval, null);

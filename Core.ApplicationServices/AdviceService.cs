@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -393,7 +394,12 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
             }
 
-            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(advice.AlarmDate.Value, advice.Scheduling.Value))
+            var adviceAlarmDate = advice.AlarmDate.Value;
+            var adviceScheduling = advice.Scheduling.Value;
+
+            var adviceTriggers = AdviceTriggerFactory.CreateFrom(adviceAlarmDate, adviceScheduling);
+
+            foreach (var adviceTrigger in adviceTriggers)
             {
                 var prefix = advice.JobId;
                 var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
@@ -405,6 +411,42 @@ namespace Core.ApplicationServices
                 //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
                 HangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
             }
+
+            //If time has passed the trigger time, Hangfire will not fire until the next trigger data so we must force it.
+            if (adviceAlarmDate.Date.Equals(OperationClock.Now.Date))
+            {
+                switch (adviceScheduling)
+                {
+                    case Scheduling.Day:
+                    case Scheduling.Week:
+                    case Scheduling.Month:
+                    case Scheduling.Year:
+                    case Scheduling.Quarter:
+                    case Scheduling.Semiannual:
+                        var mustScheduleAdviceToday = 
+                            advice.AdviceSent.Where(x=>x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false && 
+                            WillTriggerInvokeToday() == false;
+                        if (mustScheduleAdviceToday)
+                        {
+                            //Send the first advice now
+                            HangfireApi.Schedule(() => SendAdvice(adviceId));
+                        }
+                        break;
+                    //Intentional fallthrough - no corrections here
+                    case Scheduling.Hour:
+                    case Scheduling.Immediate:
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private bool WillTriggerInvokeToday()
+        {
+            var utcNow = OperationClock.Now.ToUniversalTime();
+            return 
+                utcNow.Hour < CronPatternDefaults.TriggerHourUTC || 
+                (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
         }
 
         private static string CreatePartitionJobId(string prefix, int partitionIndex)
