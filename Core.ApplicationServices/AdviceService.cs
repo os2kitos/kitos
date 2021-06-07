@@ -226,7 +226,11 @@ namespace Core.ApplicationServices
                     {
                         Logger?.Error($"Advis is missing critical function information. Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}, Advice ownerId: {advice.ObjectOwnerId}");
                     }
-                    UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, advice.Name, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                    else
+                    {
+                        var nameForNotification = advice.Name ?? "Ikke navngivet";
+                        UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                    }
                 }
                 return false;
             }

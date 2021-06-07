@@ -58,7 +58,8 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetNumberOfUnresolvedNotifications(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
             return _userNotificationApplicationService
-                .GetNumberOfUnresolvedNotificationsForUser(organizationId, userId, relatedEntityType)
+                .GetNotificationsForUser(organizationId, userId, relatedEntityType)
+                .Select(x => x.Count())
                 .Match(value => Ok(value), FromOperationError);
         }
 

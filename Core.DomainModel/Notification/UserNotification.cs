@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
+using Infrastructure.Services.Types;
 using System;
 
 namespace Core.DomainModel.Notification
@@ -51,45 +52,44 @@ namespace Core.DomainModel.Notification
                 ItSystemUsage ??
                 ItContract ??
                 ItProject ??
-                (IEntityWithUserNotification) DataProcessingRegistration;
+                (IEntityWithUserNotification)DataProcessingRegistration;
         }
 
         public int GetRelatedEntityId()
         {
-            return
-                ItProject_Id ??
-                Itcontract_Id ??
-                ItSystemUsage_Id ??
-                DataProcessingRegistration_Id ??
-                throw new InvalidOperationException($"Cannot find any RelatedEntityId for advis with Id: {Id}");
+            return ResolveRelatedEntityInfo()
+                .Select(x => x.Item1)
+                .Match(relatedEntityType => relatedEntityType, () => throw new InvalidOperationException($"Cannot find any RelatedEntityId for advis with Id: {Id}"));
         }
 
         public RelatedEntityType GetRelatedEntityType()
         {
-            if(ItProject_Id != null)
+            return ResolveRelatedEntityInfo()
+                .Select(x => x.Item2)
+                .Match(relatedEntityType => relatedEntityType, () => throw new InvalidOperationException($"Cannot find any RelatedEntityId to created RelatedEntityType from for advis with Id: {Id}"));
+        }
+
+        private Maybe<(int, RelatedEntityType)> ResolveRelatedEntityInfo()
+        {
+            if (ItProject_Id != null)
             {
-                return RelatedEntityType.itProject;
+                return Maybe<(int, RelatedEntityType)>.Some((ItProject_Id.Value, RelatedEntityType.itProject));
             }
             if (Itcontract_Id != null)
             {
-                return RelatedEntityType.itContract;
+                return Maybe<(int, RelatedEntityType)>.Some((Itcontract_Id.Value, RelatedEntityType.itContract));
             }
             if (ItSystemUsage_Id != null)
             {
-                return RelatedEntityType.itSystemUsage;
+                return Maybe<(int, RelatedEntityType)>.Some((ItSystemUsage_Id.Value, RelatedEntityType.itSystemUsage));
             }
             if (DataProcessingRegistration_Id != null)
             {
-                return RelatedEntityType.dataProcessingRegistration;
+                return Maybe<(int, RelatedEntityType)>.Some((DataProcessingRegistration_Id.Value, RelatedEntityType.dataProcessingRegistration));
             }
-            throw new InvalidOperationException($"Cannot find any RelatedEntityId to created RelatedEntityType from for advis with Id: {Id}");
+            return Maybe<(int, RelatedEntityType)>.None;
         }
 
-    }
-
-    public enum NotificationType
-    {
-        Advice = 0
     }
 
 }

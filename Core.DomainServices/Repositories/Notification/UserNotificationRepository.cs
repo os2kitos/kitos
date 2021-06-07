@@ -43,18 +43,18 @@ namespace Core.DomainServices.Repositories.Notification
             return _repository.GetByKey(id);
         }
 
-        public IEnumerable<UserNotification> GetByRelatedEntityIdAndType(int relatedEntityId, RelatedEntityType relatedEntityType)
+        public IQueryable<UserNotification> GetByRelatedEntityIdAndType(int relatedEntityId, RelatedEntityType relatedEntityType)
         {
             switch (relatedEntityType)
             {
                 case RelatedEntityType.itContract:
-                    return _repository.Get(x => x.Itcontract_Id == relatedEntityId);
+                    return _repository.AsQueryable().Where(x => x.Itcontract_Id == relatedEntityId);
                 case RelatedEntityType.itProject:
-                    return _repository.Get(x => x.ItProject_Id == relatedEntityId);
+                    return _repository.AsQueryable().Where(x => x.ItProject_Id == relatedEntityId);
                 case RelatedEntityType.itSystemUsage:
-                    return _repository.Get(x => x.ItSystemUsage_Id == relatedEntityId);
+                    return _repository.AsQueryable().Where(x => x.ItSystemUsage_Id == relatedEntityId);
                 case RelatedEntityType.dataProcessingRegistration:
-                    return _repository.Get(x => x.DataProcessingRegistration_Id == relatedEntityId);
+                    return _repository.AsQueryable().Where(x => x.DataProcessingRegistration_Id == relatedEntityId);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(relatedEntityType));
             }

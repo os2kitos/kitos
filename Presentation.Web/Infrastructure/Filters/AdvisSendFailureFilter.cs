@@ -51,11 +51,12 @@ namespace Presentation.Web.Infrastructure.Filters
                 {
                     if (IsSendAdvice(context))
                     {
-                        // Get argument input to method. In this case it's only one argument and it is the Id of the advice.
-                        int adviceId = Convert.ToInt32(context.BackgroundJob.Job.Args.First());
                         var logger = _kernel.GetService<ILogger>();
                         try
                         {
+                            // Get argument input to method. In this case it's only one argument and it is the Id of the advice.
+                            int adviceId = Convert.ToInt32(context.BackgroundJob.Job.Args.First());
+
                             using (new HangfireNinjectResolutionScope(_kernel))
                             {
                                 var advisService = _kernel.GetService<IAdviceService>();
@@ -80,8 +81,8 @@ namespace Presentation.Web.Infrastructure.Filters
                                     logger.Error($"Failed to create user notification as get root resolution for advis with Id: {adviceId} failed to resolve root.");
                                     return;
                                 }
-
-                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, advice.Name, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                                var nameForNotification = advice.Name ?? "Ikke navngivet";
+                                userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, $"Afsendelse af advis fejlede efter {KitosConstants.MaxHangfireRetries} forsøg. Undersøg gerne nærmere og rapportér evt. fejlen.", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
                             }
                         }
                         catch(Exception e)

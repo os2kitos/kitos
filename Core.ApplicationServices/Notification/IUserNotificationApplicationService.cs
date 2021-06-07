@@ -10,6 +10,5 @@ namespace Core.ApplicationServices.Notification
     {
         public Maybe<OperationError> Delete(int id);
         public Result<IQueryable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType);
-        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType);
     }
 }

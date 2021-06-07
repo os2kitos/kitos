@@ -55,12 +55,12 @@ namespace Core.DomainServices.Notifications
             {
                 throw new ArgumentNullException(nameof(message));
             }
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-
             if (name == null)
             {
-                name = "Ikke navngivet"; // If no name is set we set the name to "Ikke navngivet".
+                throw new ArgumentNullException(nameof(name));
             }
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             if (!RelatedEntityExists(relatedEntityId, relatedEntityType))
             {
                 transaction.Rollback();
@@ -127,7 +127,14 @@ namespace Core.DomainServices.Notifications
                     return systemUsageExists != null;
                 case RelatedEntityType.dataProcessingRegistration:
                     var dataProcessingRegistrationExists = _dataProcessingRepository.GetById(relatedEntityId);
-                    return dataProcessingRegistrationExists != null;
+                    if (dataProcessingRegistrationExists.HasValue)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 default:
                     return false;
             }
@@ -142,7 +149,7 @@ namespace Core.DomainServices.Notifications
                 if (deleteResult.HasValue)
                 {
                     transaction.Rollback();
-                    _logger.Error($"Failed to do bulk user notification deletion. Failed on user notification with Id: {userNotification.Id}");
+                    _logger.Error($"Failed to do bulk user notification deletion. Failed on user notification with Id: {userNotification.Id}. With failure: {deleteResult.Value}");
                 }
             }
             transaction.Commit();

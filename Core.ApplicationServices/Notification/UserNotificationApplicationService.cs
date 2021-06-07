@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.Notification
 
             var notificationToDelete = getResult.Value;
 
-            if(IsActiveUser(notificationToDelete.NotificationRecipientId))
+            if(!IsActiveUser(notificationToDelete.NotificationRecipientId))
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
@@ -40,23 +40,15 @@ namespace Core.ApplicationServices.Notification
 
         public Result<IQueryable<UserNotification>, OperationError> GetNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
         {
-            if (IsActiveUser(userId))
+            if (!IsActiveUser(userId))
                 return new OperationError(OperationFailure.Forbidden);
 
             return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType);
         }
 
-        public Result<int, OperationError> GetNumberOfUnresolvedNotificationsForUser(int organizationId, int userId, RelatedEntityType relatedEntityType)
-        {
-            if (IsActiveUser(userId))
-                return new OperationError(OperationFailure.Forbidden);
-
-            return _userNotificationService.GetNotificationsForUser(organizationId, userId, relatedEntityType).Select(x => x.Count());
-        }
-
         private bool IsActiveUser(int userId)
         {
-            return userId != _activeUserContext.UserId;
+            return userId == _activeUserContext.UserId;
         }
     }
 }
