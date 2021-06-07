@@ -202,12 +202,12 @@
                         var start = moment($scope.startDate, allowedDateFormats, true);
                         if (performStartDateValidation) {
                             if (!start.isValid()) {
-                                $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                                $scope.startDateErrMessage = "'Fra dato' er ugyldig!";
                                 return false;
                             }
 
                             if (moment().isAfter(start, 'day') && action === "POST") {
-                                $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
+                                $scope.startDateErrMessage = "'Fra dato' må ikke være før idag!";
                                 return false;
                             }
                         }
@@ -217,17 +217,17 @@
                             var stop = moment($scope.stopDate, allowedDateFormats, true);
 
                             if (!stop.isValid()) {
-                                $scope.stopDateErrMessage = "Til Dato er ugyldig!";
+                                $scope.stopDateErrMessage = "'Til dato' er ugyldig!";
                                 return false;
                             }
 
                             if (moment().isAfter(stop, 'day')) {
-                                $scope.stopDateErrMessage = "Til Dato må ikke være før idag!";
+                                $scope.stopDateErrMessage = "'Til dato' må ikke være før idag!";
                                 return false;
                             }
 
                             if (start.isAfter(stop)) {
-                                $scope.stopDateErrMessage = "Til Dato skal være samme eller senere end Fra dato!";
+                                $scope.stopDateErrMessage = "'Til dato' skal være samme eller senere end 'Fra dato'!";
                                 return false;
                             }
 
@@ -262,7 +262,7 @@
 
                         if (showIntervalWarning) {
                             $scope.startDateInfoMessage =
-                                "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den sidste dag i den aktuelle måned.";
+                                "OBS: Du har valgt en 'Fra dato' større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den sidste dag i den aktuelle måned.";
                         }
 
                         $scope.startDateErrMessage = "";

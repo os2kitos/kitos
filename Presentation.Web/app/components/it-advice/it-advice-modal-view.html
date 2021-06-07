@@ -94,7 +94,7 @@
                     <span class="help-block" ng-if="stopDateErrMessage">{{stopDateErrMessage}}</span>
                     <span ng-if="startDate && !stopDate" class="help-block small">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
-                        Når der ikke er valgt slutdato, vil advis fortsætte indtil den deaktiveres eller ved efterfølgende at tilføje en slutdato til den aktive advis.
+                        Når der ikke er valgt 'Til dato', vil advis fortsætte indtil den deaktiveres eller ved efterfølgende at tilføje en 'Til dato' til den aktive advis.
                     </span>
                 </div>
             </div>
@@ -119,6 +119,6 @@
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
         <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
-        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
+        <button type="button" class="pull-left btn btn-primary" data-confirm-click="Er du sikker på at du vil deaktivere advis?" data-confirmed-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>
