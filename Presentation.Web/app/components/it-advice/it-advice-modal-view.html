@@ -119,6 +119,6 @@
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
         <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
-        <button type="button" class="pull-left btn btn-primary" ng-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
+        <button type="button" class="pull-left btn btn-primary" data-confirm-click="Er du sikker på at du vil deaktivere advis?" data-confirmed-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>
