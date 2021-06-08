@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             var config = A<string>();
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -40,7 +40,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
+            using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -61,7 +61,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
+            using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -71,11 +71,11 @@ namespace Tests.Integration.Presentation.Web.Kendo
         public async Task Can_Not_Get_Configuration_If_None_Exists()
         {
             //Arrange
-            var orgId = A<int>();
+            var orgId = int.MaxValue;
             var overviewType = A<OverviewType>();
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(orgId, overviewType);
+            using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(orgId, overviewType);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -92,7 +92,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             var cookie = await HttpApi.GetCookieAsync(orgRole);
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config, cookie);
+            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -102,11 +102,11 @@ namespace Tests.Integration.Presentation.Web.Kendo
         public async Task Can_Not_Delete_Configuration_If_None_Exists()
         {
             //Arrange
-            var orgId = A<int>();
+            var orgId = int.MaxValue;
             var overviewType = A<OverviewType>();
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(orgId, overviewType);
+            using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(orgId, overviewType);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
