@@ -82,9 +82,8 @@ namespace Tests.Integration.Presentation.Web.Kendo
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Can_Not_Save_Configuration_If_Not_Local_Admin(OrganizationRole orgRole)
+        public async Task Can_Not_Save_Configuration_If_Not_Allowed(OrganizationRole orgRole)
         {
             //Arrange
             var overviewType = A<OverviewType>();
@@ -113,9 +112,8 @@ namespace Tests.Integration.Presentation.Web.Kendo
         }
 
         [Theory]
-        [InlineData(OrganizationRole.GlobalAdmin)]
         [InlineData(OrganizationRole.User)]
-        public async Task Can_Not_Delete_Configuration_If_Not_Local_Admin(OrganizationRole orgRole)
+        public async Task Can_Not_Delete_Configuration_If_Not_Allowed(OrganizationRole orgRole)
         {
             //Arrange
             var overviewType = A<OverviewType>();
