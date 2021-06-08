@@ -7,6 +7,7 @@
         mainGrid; // We don't set the grid. It is being set by the options that we define. But we need access to this in order to manually force a refresh of the data.
 
         static $inject: Array<string> = [
+            "$scope",
             "notify",
             "$uibModalInstance",
             "userNotificationService",
@@ -15,12 +16,14 @@
         ];
 
         constructor(
+            private readonly $scope,
             private readonly notify,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly userNotificationService: Services.UserNotification.IUserNotificationService,
             private readonly contextType: Models.UserNotification.RelatedEntityType,
             private readonly user
         ) {
+            this.getTitleSuffixFromContext(contextType);
             this.mainGridOptions = {
                 dataSource: {
                     transport: {
@@ -117,6 +120,29 @@
             }
         }
 
+        getTitleSuffixFromContext(context: Models.UserNotification.RelatedEntityType) {
+        switch (context) {
+            case Models.UserNotification.RelatedEntityType.itContract:
+                this.$scope.showItPrefix = this.user.currentConfig.showItContractPrefix;
+                this.$scope.titleSuffix = "Kontrakter";
+                break;
+            case Models.UserNotification.RelatedEntityType.itSystemUsage:
+                this.$scope.showItPrefix = this.user.currentConfig.showItSystemPrefix;
+                this.$scope.titleSuffix = "Systemer";
+                break;
+            case Models.UserNotification.RelatedEntityType.itProject:
+                this.$scope.showItPrefix = this.user.currentConfig.showItProjectPrefix;
+                this.$scope.titleSuffix = "Projekter";
+                break;
+            case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
+                this.$scope.showItPrefix = false; //There is no IT prefix for DataProcessingRegistration
+                this.$scope.titleSuffix = "Databehandling";
+                break;
+            default:
+                //Nothing to do on default
+        }
+    }
+
         deleteNotification(notificationId: number) {
             var self = this;
             this.userNotificationService.delete(notificationId)
@@ -158,6 +184,7 @@
                                     $scope.stateName === Constants.SRef.ProjectOverview ||
                                     $scope.stateName === Constants.SRef.SystemUsageOverview ||
                                     $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
+
                                     userService
                                         .getUser()
                                         .then(user => {
@@ -223,7 +250,7 @@
                                 }
                             }
 
-
+                            
                         }]
                 };
             }
