@@ -28,7 +28,7 @@
                     $scope.startDateInfoMessage = null;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
-                    const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
+                    const emailMatchRegex = "([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
                     var payloadDateFormat = "YYYY-MM-DD";

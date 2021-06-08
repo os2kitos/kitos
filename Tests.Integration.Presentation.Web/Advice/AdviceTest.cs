@@ -350,7 +350,8 @@ namespace Tests.Integration.Presentation.Web.Advice
 
         private string CreateWellformedEmail()
         {
-            return $"{A<string>()}@test.dk";
+            //Make sure special chars are part of the test email
+            return $"{A<string>()}_a.b-c@test.dk";
         }
 
         private DateTime GetRandomDateAfterToday()
