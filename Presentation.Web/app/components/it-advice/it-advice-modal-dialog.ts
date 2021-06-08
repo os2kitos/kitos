@@ -139,11 +139,11 @@
                     }
 
                     function isCurrentAdviceImmediate() {
-                        return $scope.adviceTypeData.id === "0";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "0";
                     }
 
                     function isCurrentAdviceRecurring() {
-                        return $scope.adviceTypeData.id === "1";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "1";
                     }
 
                     $scope.send = () => {
@@ -164,8 +164,12 @@
                         }
                     };
 
+                    function isEditableInGeneral() {
+                        return $scope.hasWriteAccess && $scope.isActive;
+                    }
+
                     function isEditable(context: string) {
-                        var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
+                        var editableInGeneral = isEditableInGeneral();
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" ||
                                 context === "Subject" ||
@@ -283,34 +287,36 @@
                         parseFormats: ["yyyy-MM-dd"]
                     };
 
-                    $scope.hasInputErrors = () => {
-                        if ($scope.adviceTypeData == null) {
+                    $scope.formHasErrors = () => {
+                        if ($scope.adviceTypeData != null &&
+                            isEditableInGeneral() &&
+                            validateReceiversAndCC() &&
+                            $scope.subject) {
+
+                            if (isCurrentAdviceImmediate()) {
+                                return false;
+                            }
+
+                            if (isCurrentAdviceRecurring()) {
+                                if ($scope.adviceRepetitionData && $scope.checkDates($scope.startDate, $scope.stopDate)) {
+                                    return false;
+                                }
+                            }
+                        }
+                        
+                        return true;
+                    }
+
+                    function validateReceiversAndCC(){
+                        if ($scope.createForm.externalEmail.$invalid || $scope.createForm.ccEmail.$invalid) { //Make sure email inputs are valid. (No input is valid).
+                            return false;
+                        }
+                        if ($scope.externalTo || $scope.selectedReceivers.length > 0) {
                             return true;
                         }
-
-                        if (isCurrentAdviceImmediate()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                $scope.subject &&
-                                $scope.isEditable()) {
-                                return false;
-                            }
-                            else {
-                                return true;
-                            }
+                        else { // No need to check if CC has been assigned as there is no requirement for them and the email part has been validated. 
+                            return false;
                         }
-                        if (isCurrentAdviceRecurring()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                $scope.subject &&
-                                $scope.adviceRepetitionData &&
-                                $scope.checkDates($scope.startDate, $scope.stopDate) &&
-                                $scope.isEditable('Deactivate')) {
-                                return false;
-                            }
-                            else {
-                                return true;
-                            }
-                        }
-                        return true;
                     }
 
                     function httpCall(payload, action, url) {
