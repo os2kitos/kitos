@@ -225,8 +225,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allowUpdates);
         }
 
-        //TODO: DELETE + MODIFY + CREATE test
-
         [Theory]
         [InlineData(true, false, false, true)]
         [InlineData(false, true, false, true)]
@@ -249,6 +247,63 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false)]
+        [InlineData(true, true, true, false, false, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, true, false, true, false, false)]
+        [InlineData(true, false, false, true, true, true)]
+        [InlineData(true, false, false, true, false, false)]
+        [InlineData(false, true, true, true, true, false)] //If type creation policy denies, it's denied
+        public void AllowCreate_With_Entity_For_RightsHolder(bool typeCreationPolicyResponse, bool isRightsHolderInAnyOrganization, bool isRightsholderForEntity, bool isInSameOrg, bool hasModuleLevelAccess, bool expectedResult)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var idOfRightsHoldingOrganization = organizationId + 1;
+            var anotherRightsHolder = idOfRightsHoldingOrganization + 1;
+
+            var entityMock = new Mock<IRightsHolderOwnedObject>();
+            entityMock.Setup(x => x.OrganizationId).Returns(organizationId);
+            entityMock.Setup(x => x.GetRightsHolderOrganizationId()).Returns(isRightsholderForEntity
+                ? Maybe<int>.Some(idOfRightsHoldingOrganization)
+                : Maybe<int>.Some(anotherRightsHolder));
+
+            var entity = entityMock.Object;
+
+            _creationPolicy.Setup(x => x.AllowCreation(organizationId, typeof(IRightsHolderOwnedObject))).Returns(typeCreationPolicyResponse);
+            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(entity)).Returns(hasModuleLevelAccess);
+            ExpectUserIsGlobalAdmin(false);
+            ExpectHasRoleInSameOrganizationAsReturns(entity, isInSameOrg);
+            ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolderInAnyOrganization);
+            ExpectHasRoleReturns(idOfRightsHoldingOrganization, OrganizationRole.RightsHolderAccess, isRightsholderForEntity);
+
+            //Act
+            var result = _sut.AllowCreate<IRightsHolderOwnedObject>(organizationId, entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(typeof(IRightsHolderOwnedObject))]
+        [InlineData(typeof(ItSystemUsage))]
+        [InlineData(typeof(ItInterface))]
+        public void AllowCreate_Without_Entity_For_RightsHolder(Type type)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var expectedResult = A<bool>();
+
+            _creationPolicy.Setup(x => x.AllowCreation(organizationId, type)).Returns(expectedResult);
+
+            //Act
+            var result = _sut.AllowCreate<IRightsHolderOwnedObject>(organizationId);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
 
         public interface ISimpleEntityWithAccessModifier : IEntity, IHasAccessModifier, IOwnedByOrganization { }
