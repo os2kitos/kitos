@@ -17,8 +17,6 @@
         ContractModuleAdmin,
         /** Has write access to organization reports. */
         ReportModuleAdmin,
-        /** Has read access only */
-        ReadOnly,
         /**Not used as org right but is present in the enum */
         GlobalAdmin,
         /* RightsHolder  */

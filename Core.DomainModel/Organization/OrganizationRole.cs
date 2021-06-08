@@ -38,7 +38,7 @@
         /// <summary>
         /// Access based on the rightsholder of the entity.
         /// </summary>
-        RightsHolderAccess = 7
+        RightsHolderAccess = 8
 
     }
 }
