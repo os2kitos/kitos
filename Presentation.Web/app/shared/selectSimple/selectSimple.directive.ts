@@ -21,7 +21,8 @@
                     autoSaveUrl: "@",
                     field: "@",
                     disabled: "=ngDisabled",
-                    required: "@"
+                    required: "@",
+                    changed: "=ngChanged"
                 },
                 controller: "selectSimpleController",
                 link: function (scope, element, attr, ctrl) {

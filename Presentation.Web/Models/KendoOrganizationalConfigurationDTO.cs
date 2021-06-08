@@ -1,6 +1,6 @@
 ﻿using Core.DomainModel;
 
-namespace Presentation.Web.Controllers.API
+namespace Presentation.Web.Models
 {
     public class KendoOrganizationalConfigurationDTO
     {

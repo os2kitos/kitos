@@ -641,7 +641,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.OperationRemunerationBegun).format("DD-MM-YYYY");
+                            return self.moment(dataItem.OperationRemunerationBegun).format(Constants.DateFormat.DanishDateFormat);
                         },
                         hidden: true,
                         filterable: {
@@ -687,7 +687,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.AuditDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.AuditDate).format(Constants.DateFormat.DanishDateFormat);
                         },
                         sortable: false,
                         filterable: false

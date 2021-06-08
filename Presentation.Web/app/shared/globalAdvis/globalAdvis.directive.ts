@@ -61,22 +61,29 @@
                                             type: "odata-v4",
                                             transport: {
                                                 read: {
-                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND StopDate gt ${today}&$expand=Reciepients, Advicesent`,
+                                                    url: `/Odata/GetAdvicesByOrganizationId(organizationId=${$scope.user.currentOrganizationId})?$filter=${moduleTypeFilter} AND IsActive eq true&$expand=Reciepients, Advicesent`,
                                                     dataType: "json"
                                                 },
+                                            },
+                                            sort: {
+                                                field: "AlarmDate",
+                                                dir: "asc"
                                             },
                                             pageSize: 10,
                                             serverPaging: true,
                                             serverFiltering: true,
+                                            serverSorting: true
                                         },
                                         selectable: true,
                                         columns: [{
                                             field: "Name",
                                             title: "Navn",
                                             template: data => {
-                                                return `<a ng-click="$dismiss()" href="${stateUrl}/${data.RelationId}/advice">${data.Name}</a>`;
+                                                const name = data.Name || "Ikke navngivet";
+                                                return `<a ng-click="$dismiss()" href="${stateUrl}/${data.RelationId}/advice">${name}</a>`;
                                             },
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: true
                                         },
                                         {
                                             field: "SentDate",
@@ -87,7 +94,8 @@
                                                 }
                                                 return "";
                                             },
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: true
                                         },
                                         {
                                             field: "Id",
@@ -96,44 +104,52 @@
 
                                         {
                                             field: "AlarmDate",
-                                            title: "Start dato",
+                                            title: "Fra dato",
                                             template: x => {
                                                 if (x.AlarmDate != null) {
                                                     return kendo.toString(new Date(x.AlarmDate), "d");
                                                 }
                                                 return "";
                                             },
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: true
                                         },
                                         {
                                             field: "StopDate",
-                                            title: "Slut dato",
+                                            title: "Til dato",
                                             template: x => {
                                                 if (x.StopDate != null) {
                                                     return kendo.toString(new Date(x.StopDate), "d");
                                                 }
                                                 return "";
                                             },
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: true
                                         },
                                         {
                                             field: "Reciepients.Name", title: "Modtager",
                                             template: () =>
                                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'RECIEVER'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: false //Not possible on collection field
                                         },
                                         {
                                             field: "Reciepients.Name",
                                             title: "CC",
                                             template: () =>
                                                 `<span data-ng-model="dataItem.Reciepients" value="cc.Name" ng-repeat="cc in dataItem.Reciepients | filter: { RecieverType: 'CC'}"> {{cc.Name}}{{$last ? '' : ', '}}</span>`,
-                                            attributes: { "class": "might-overflow" }
+                                            attributes: { "class": "might-overflow" },
+                                            sortable: false //Not possible on collection field
                                         },
                                         {
                                             field: "Subject",
-                                            title: "Emne"
-                                        },                                        
-                                        ],                                        
+                                            title: "Emne",
+                                            sortable: true
+                                        }                                        
+                                        ],
+                                        sortable: {
+                                            mode: "single"
+                                        },
                                         pageable: {
                                             refresh: true,
                                             pageSizes: [10, 25, 50, 100, 200],

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Core.DomainModel.Notification;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -8,7 +9,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification
     {
         public ItProject()
         {
@@ -34,6 +35,7 @@ namespace Core.DomainModel.ItProject
             PriorityPf = ItProjectPriority.None;
             AccessModifier = AccessModifier.Local;
             ExternalReferences = new List<ExternalReference>();
+            UserNotifications = new List<UserNotification>();
         }
 
 
@@ -177,6 +179,7 @@ namespace Core.DomainModel.ItProject
         /// </value>
         public virtual Organization.Organization Organization { get; set; }
 
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public ReferenceRootType GetRootType()

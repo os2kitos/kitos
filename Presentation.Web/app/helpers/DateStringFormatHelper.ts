@@ -8,7 +8,7 @@
     export class DateStringFormat {
 
         static fromDDMMYYYYToYYYYMMDD(dateString: string): IConvertedDateString {
-            var asMoment = moment(dateString, "DD-MM-YYYY", true);
+            var asMoment = moment(dateString, Constants.DateFormat.DanishDateFormat, true);
             if (asMoment.isValid()) {
                 return { convertedValue: asMoment.format("YYYY-MM-DD") };
             }

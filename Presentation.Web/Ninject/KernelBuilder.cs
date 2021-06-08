@@ -15,6 +15,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.Qa;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.ScheduledJobs;
 using Core.ApplicationServices.SSO;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.System;
@@ -22,7 +23,6 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Core.ApplicationServices.SystemUsage.Migration;
 using Core.BackgroundJobs.Factories;
-using Core.BackgroundJobs.Model.Advice;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
 using Core.BackgroundJobs.Services;
@@ -85,7 +85,11 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.SystemUsage;
 using Core.DomainModel.ItProject;
+using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
+using Core.ApplicationServices.Notification;
+using Core.DomainServices.Repositories.Notification;
+using Core.DomainServices.Notifications;
 
 namespace Presentation.Web.Ninject
 {
@@ -154,7 +158,7 @@ namespace Presentation.Web.Ninject
             RegisterDataAccess(kernel);
             kernel.Bind<IObjectCache>().To<AspNetObjectCache>().InSingletonScope();
             kernel.Bind<KitosUrl>().ToMethod(_ => new KitosUrl(new Uri(Settings.Default.BaseUrl))).InSingletonScope();
-            kernel.Bind<IMailClient>().To<MailClient>().InCommandScope(Mode);
+            kernel.Bind<IMailClient>().To<SingleThreadedMailClient>().InCommandScope(Mode);
             kernel.Bind<ICryptoService>().To<CryptoService>();
             kernel.Bind<IUserService>().To<UserService>().InCommandScope(Mode)
                 .WithConstructorArgument("ttl", Settings.Default.ResetPasswordTTL)
@@ -166,6 +170,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
+            kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
@@ -197,6 +202,11 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItsystemUsageOverviewReadModelsService>().To<ItsystemUsageOverviewReadModelsService>().InCommandScope(Mode);
             kernel.Bind<IReadModelUpdate<ItSystemUsage, ItSystemUsageOverviewReadModel>>().To<ItSystemUsageOverviewReadModelUpdate>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationService>().To<KendoOrganizationalConfigurationService>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
+            kernel.Bind<IHangfireApi>().To<HangfireApi>().InCommandScope(Mode);
+            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -235,15 +245,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedHandler>(kernel);
-
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
             RegisterDomainEvent<AccessRightsChanged, ClearCacheOnAccessRightsChangedHandler>(kernel);
-
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, UpdateRelationsOnSystemUsageDeletedHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
-
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityCreatedEvent<DataProcessingRegistration>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
@@ -262,6 +267,16 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, ContractDeletedSystemRelationsHandler>(kernel);
+            RegisterDomainEvent<ContractDeleted, ContractDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
+
+            RegisterDomainEvent<ContractDeleted, ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
 
             //Itsystem overview updates
             RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
@@ -332,7 +347,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKLEParentHelper>().To<KLEParentHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEConverterHelper>().To<KLEConverterHelper>().InCommandScope(Mode);
             kernel.Bind<IKLEUpdateHistoryItemRepository>().To<KLEUpdateHistoryItemRepository>().InCommandScope(Mode);
-            kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
         }
 
         private void RegisterDataAccess(IKernel kernel)
@@ -365,6 +379,9 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOptionRepository>().To<DataProcessingRegistrationOptionRepository>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageOverviewReadModelRepository>().To<ItSystemUsageOverviewReadModelRepository>().InCommandScope(Mode);
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
+
+            kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
@@ -427,7 +444,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IBackgroundJobLauncher>().To<BackgroundJobLauncher>().InCommandScope(Mode);
             kernel.Bind<IBackgroundJobScheduler>().To<BackgroundJobScheduler>().InCommandScope(Mode);
             kernel.Bind<CheckExternalLinksBackgroundJob>().ToSelf().InCommandScope(Mode);
-            kernel.Bind<PurgeOrphanedAdviceBackgroundJob>().ToSelf().InCommandScope(Mode);
 
             //DPR
             kernel.Bind<RebuildDataProcessingRegistrationReadModelsBatchJob>().ToSelf().InCommandScope(Mode);

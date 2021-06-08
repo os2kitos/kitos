@@ -52,6 +52,9 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Notification\IEntityWithUserNotification.cs" />
+    <Compile Include="Notification\NotificationType.cs" />
+    <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
     <Compile Include="AttachedOption.cs" />
@@ -66,6 +69,7 @@
     <Compile Include="GDPR\DataProcessingDataResponsibleOption.cs" />
     <Compile Include="GDPR\DataProcessingOversightOption.cs" />
     <Compile Include="GDPR\DataProcessingBasisForTransferOption.cs" />
+    <Compile Include="GDPR\DataProcessingRegistrationOversightDate.cs" />
     <Compile Include="GDPR\Read\DataProcessingRegistrationReadModel.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRight.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationRole.cs" />
@@ -75,6 +79,7 @@
     <Compile Include="GlobalConfigKeys.cs" />
     <Compile Include="HelpText.cs" />
     <Compile Include="IEntity.cs" />
+    <Compile Include="IEntityWithAdvices.cs" />
     <Compile Include="IEntityWithEnabledStatus.cs" />
     <Compile Include="IEntityWithExternalReferences.cs" />
     <Compile Include="IHasAttachedOptions.cs" />
@@ -91,11 +96,13 @@
     <Compile Include="ItSystemUsage\GDPR\GDPRExportReport.cs" />
     <Compile Include="ItSystemUsage\GDPR\SensitiveDataLevel.cs" />
     <Compile Include="ItSystemUsage\GDPR\ItSystemUsageSensitiveDataLevel.cs" />
+    <Compile Include="ItSystemUsage\Read\IItSystemUsageOverviewItSystemUsageReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewArchivePeriodReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewDataProcessingRegistrationReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewInterfaceReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItProjectReadModel.cs" />
-    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewItSystemUsageReadModel.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewUsingSystemUsageReadModel.cs" />
+    <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewUsedBySystemUsageReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewRoleAssignmentReadModel.cs" />
     <Compile Include="ItSystemUsage\Read\ItSystemUsageOverviewSensitiveDataLevelReadModel.cs" />
@@ -119,6 +126,7 @@
     <Compile Include="LocalOptions\LocalDataProcessingBasisForTransferOption.cs" />
     <Compile Include="LocalOptions\LocalRegisterType.cs" />
     <Compile Include="LocalOptions\LocalRelationFrequencyType.cs" />
+    <Compile Include="Notification\UserNotification.cs" />
     <Compile Include="OptionHasChecked.cs" />
     <Compile Include="IHasReference.cs" />
     <Compile Include="IOptionReference.cs" />

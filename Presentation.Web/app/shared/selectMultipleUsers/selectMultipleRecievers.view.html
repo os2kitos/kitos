@@ -1,9 +1,0 @@
-﻿<label for="{{ id }}" class="control-label small">{{ label }}</label>
-<select id="{{ id }}" class="form-control input-sm"
-        data-ui-select2="{ allowClear: true }"
-        data-placeholder="{{ placeholder }}"
-        data-ng-model="selectedIds"
-        data-field="{{ field }}"
-        multiple>
-    <option data-ng-repeat="option in roles() | filter: $select.search" value="{{ option.Name }}">{{option.Name}} </option>
-</select>

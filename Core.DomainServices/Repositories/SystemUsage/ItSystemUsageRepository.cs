@@ -40,6 +40,24 @@ namespace Core.DomainServices.Repositories.SystemUsage
             return _itSystemUsageRepository.AsQueryable().Where(x => x.ItSystem.ParentId == systemId);
         }
 
+        public IQueryable<ItSystemUsage> GetBySystemIdInSystemRelations(int systemId)
+        {
+            //Select all outgoing relations as baseline
+            var allRelationsQuery = _itSystemUsageRepository
+                .AsQueryable()
+                .SelectMany(x => x.UsageRelations);
+
+            var allIncomingRelationsFromSystem = allRelationsQuery
+                .Where(x => x.FromSystemUsage.ItSystemId == systemId)
+                .Select(x => x.ToSystemUsage);
+
+            var allOutgoingRelationsToSystem = allRelationsQuery
+                .Where(x => x.ToSystemUsage.ItSystemId == systemId)
+                .Select(x => x.FromSystemUsage);
+
+            return allIncomingRelationsFromSystem.Concat(allOutgoingRelationsToSystem).Distinct();
+        }
+
         public IQueryable<ItSystemUsage> GetBySystemIds(IEnumerable<int> systemIds)
         {
             var ids = systemIds.ToList();

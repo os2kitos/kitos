@@ -1,19 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.Shared;
 
 namespace Core.DomainModel.Advice
 {
-    public enum ObjectType
-    {
-        itContract = 0,
-        itSystemUsage = 1,
-        itProject = 2,
-        itInterface = 3,
-        dataProcessingRegistration = 4
-    }
+
     public enum Scheduling
     {
        Immediate = 0,
@@ -21,23 +16,31 @@ namespace Core.DomainModel.Advice
        Day = 2,
        Week = 3,
        Month = 4,
-       Year = 5
-
+       Year = 5,
+       Quarter = 6,
+       Semiannual = 7
     }
+
+    public enum AdviceType
+    {
+        Immediate = 0,
+        Repeat = 1
+    }
+    
     /// <summary>
     /// Contains info about Advices on a contract.
     /// </summary>
     public class Advice : Entity, IProjectModule, ISystemModule, IContractModule
     {
         public Advice() {
-            AdviceSent = new List<AdviceSent.AdviceSent>();
+            AdviceSent = new List<AdviceSent>();
             Reciepients = new List<AdviceUserRelation>();
         }
 
-        public virtual ICollection<AdviceSent.AdviceSent> AdviceSent { get; set; }
+        public virtual ICollection<AdviceSent> AdviceSent { get; set; }
         public virtual ICollection<AdviceUserRelation> Reciepients { get; set; }
         public int? RelationId { get; set; }
-        public ObjectType? Type { get; set; }
+        public RelatedEntityType? Type { get; set; }
 
         public Scheduling? Scheduling { get; set; }
 
@@ -148,5 +151,36 @@ namespace Core.DomainModel.Advice
         /// Gets or sets the job id.
         /// </summary>
         public string JobId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the advice type
+        /// </summary>
+        public AdviceType AdviceType { get; set; }
+
+        /// <summary>
+        ///     Whether the advice can be deleted
+        ///     Is false if the advice has been sent at least once or if it is active.
+        /// </summary>
+        public bool CanBeDeleted
+        {
+            get
+            {
+                if (AdviceSent.Any())
+                {
+                    return false;
+                }
+                if (IsActive)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+        }
+
+        public bool HasInvalidState()
+        {
+            return ObjectOwnerId == null || RelationId == null || Type == null;
+        }
     }
 }

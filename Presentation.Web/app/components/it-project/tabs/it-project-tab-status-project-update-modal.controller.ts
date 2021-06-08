@@ -53,7 +53,7 @@
                     $scope.$dismiss();
                 };
                 $scope.checkDate = (value) => {
-                    var date = moment(value, "DD-MM-YYYY");
+                    var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
                     if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                         notify.addErrorMessage("Den indtastede dato er ugyldig.");
@@ -63,7 +63,7 @@
                     var payload = $scope.update;
                     payload.AssociatedItProjectId = project.id;
 
-                    var created = moment(payload.Created, "DD-MM-YYYY");
+                    var created = moment(payload.Created, Kitos.Constants.DateFormat.DanishDateFormat);
                     if (created.isValid()) {
                         payload.Created = created.format("YYYY-MM-DD");
                     } else {

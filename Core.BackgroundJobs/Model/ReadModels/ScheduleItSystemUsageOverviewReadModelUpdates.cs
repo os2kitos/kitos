@@ -68,11 +68,16 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                
+                var systemIds = _itSystemUsageRepository.GetBySystemId(update.SourceId).Select(x => x.Id).ToList();
+                var parentSystemIds = _itSystemUsageRepository.GetByParentSystemId(update.SourceId).Select(x => x.Id).ToList();
+                var usedInRelationsIds = _itSystemUsageRepository.GetBySystemIdInSystemRelations(update.SourceId).Select(x => x.Id).ToList();
 
-                //System id is not stored in read model so search the source model
-                var systemIds = _itSystemUsageRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
-                var parentSystemIds = _itSystemUsageRepository.GetByParentSystemId(update.SourceId).Select(x => x.Id);
-                var ids = systemIds.Concat(parentSystemIds).Distinct();
+                var ids = systemIds
+                    .Concat(parentSystemIds)
+                    .Concat(usedInRelationsIds)
+                    .Distinct()
+                    .ToList();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }

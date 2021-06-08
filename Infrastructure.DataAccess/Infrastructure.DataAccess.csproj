@@ -64,6 +64,7 @@
     <Compile Include="KitosContext.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
+    <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRightMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationRoleAssignmentReadModelMap.cs" />
@@ -76,7 +77,8 @@
     <Compile Include="Mapping\ItSystemUsageOverviewDataProcessingRegistrationReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewInterfaceReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewItProjectReadModelMap.cs" />
-    <Compile Include="Mapping\ItSystemUsageOverviewItSystemUsageReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewUsingSystemUsageReadModelMap.cs" />
+    <Compile Include="Mapping\ItSystemUsageOverviewUsedBySystemUsageReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewRoleAssignmentReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Mapping\TextMap.cs" />
     <Compile Include="Mapping\UserMap.cs" />
     <Compile Include="Mapping\ArchivePeriodMap.cs" />
+    <Compile Include="Mapping\UserNotificationMap.cs" />
     <Compile Include="Migrations\201607110712126_Initial.cs" />
     <Compile Include="Migrations\201607110712126_Initial.Designer.cs">
       <DependentUpon>201607110712126_Initial.cs</DependentUpon>
@@ -702,6 +705,30 @@
     <Compile Include="Migrations\202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.designer.cs">
       <DependentUpon>202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.cs" />
+    <Compile Include="Migrations\202105171042142_Added_Advicetype_To_Advice.designer.cs">
+      <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105200804369_Add_OversightDates_To_DPR.cs" />
+    <Compile Include="Migrations\202105200804369_Add_OversightDates_To_DPR.designer.cs">
+      <DependentUpon>202105200804369_Add_OversightDates_To_DPR.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs" />
+    <Compile Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.designer.cs">
+      <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs" />
+    <Compile Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.designer.cs">
+      <DependentUpon>202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs" />
+    <Compile Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.designer.cs">
+      <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106051508000_Added_UserNotifications.cs" />
+    <Compile Include="Migrations\202106051508000_Added_UserNotifications.designer.cs">
+      <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1144,6 +1171,24 @@
     <EmbeddedResource Include="Migrations\202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.resx">
       <DependentUpon>202105120815518_Rename_ItSystemUsageReadModels_Name_To_Enable_Backward_Compatability.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105171042142_Added_Advicetype_To_Advice.resx">
+      <DependentUpon>202105171042142_Added_Advicetype_To_Advice.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105200804369_Add_OversightDates_To_DPR.resx">
+      <DependentUpon>202105200804369_Add_OversightDates_To_DPR.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.resx">
+      <DependentUpon>202105251013363_Change_LastChanged_To_LastChangedAt_On_ItSystemUsageOverviewReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.resx">
+      <DependentUpon>202105280555437_ItSystemUsageOverviewItSystemUsageReadModel_Rename_ToItSystemUsageOverviewUsedBySystemUsageReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.resx">
+      <DependentUpon>202105280602562_ItSystemUsageOverviewUsingSystemUsageReadModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106051508000_Added_UserNotifications.resx">
+      <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1162,6 +1207,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Migrations\SQLScripts\Manually run scripts to fix prod DB\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\FixAdviceIsActive.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migration_DPR_LatestOversightDate.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Advice_Scheduling_To_AdviceType.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

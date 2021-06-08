@@ -20,8 +20,15 @@
         dataResponsible: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
         oversightInterval: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YearMonthUndecidedIntervalOption>;
         oversightOptions: Models.Generic.ValueWithOptionalRemarkDTO<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO[]>;
-        oversightCompleted: Models.Generic.ValueWithOptionalDateAndRemarkDTO<Models.Api.Shared.YesNoUndecidedOption>;
+        oversightCompleted: Models.Generic.ValueWithOptionalRemarkDTO<Models.Api.Shared.YesNoUndecidedOption>;
         associatedContracts: Models.Generic.NamedEntity.NamedEntityDTO[];
+        oversightDates: IDataProcessingRegistrationOversightDateDTO[];
+    }
+
+    export interface IDataProcessingRegistrationOversightDateDTO {
+        id: number;
+        oversightDate: string;
+        oversightRemark: string;
     }
 
     export interface IDataProcessingReferenceDTO extends BaseReference {

@@ -344,6 +344,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
+    <Compile Include="Infrastructure\KitosConstants.cs" />
+    <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
@@ -371,11 +375,14 @@
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-contracts.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
+    <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
+    <Content Include="app\components\user-notification\user-notification-modal.view.html" />
+    <Content Include="app\components\user-notification\user-notification.view.html" />
     <Content Include="app\shared\datePicker\datePicker.view.html" />
     <Content Include="app\shared\remarkField\remarkField.view.html" />
     <Content Include="app\shared\select-it-systems\generic-tab-it-systems.view.html" />
@@ -427,8 +434,10 @@
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\CreateDataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingOptionsDTO.cs" />
     <Compile Include="Models\GDPR\DataProcessingRegistrationDTO.cs" />
+    <Compile Include="Models\GDPR\DataProcessingRegistrationOversightDateDTO.cs" />
     <Compile Include="Models\HierachyNodeDTO.cs" />
     <Compile Include="Models\ItSystemUsageMigration\RelationMigrationDTO.cs" />
     <Compile Include="Models\ItSystemUsageOptionsDTO.cs" />
@@ -493,6 +502,7 @@
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-modal-create.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-overview.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-subnav.controller.ts" />
+    <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference-edit-modal.state.ts" />
@@ -501,6 +511,7 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
+    <TypeScriptCompile Include="app\components\it-advice\it-advice-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-reference\generic-tab-it-reference-modal-create.controller.ts" />
@@ -512,6 +523,7 @@
     <TypeScriptCompile Include="app\components\org\basicInformation\org-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-GDPR.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-data-processing-registration-rights.directive.ts" />
+    <TypeScriptCompile Include="app\components\user-notification\user-notification-modal.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
@@ -520,6 +532,8 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntitiesAccessRightsDTO.ts" />
@@ -550,6 +564,7 @@
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemUsageSensitiveDataLevelDTO.ts" />
     <TypeScriptCompile Include="app\models\Odata\it-system-usage\SystemRelationDTO.ts" />
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
@@ -596,6 +611,7 @@
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
+    <TypeScriptCompile Include="app\services\userNotificationService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />
     <TypeScriptCompile Include="app\shared\EntityMapper.ts" />
     <TypeScriptCompile Include="app\shared\remarkField\remarkField.directive.ts" />
@@ -880,6 +896,7 @@
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\Global-admin\GlobalAdmin.KLE.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\AdviceHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\ContractHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\DataProcessingRegistrationHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\GetDateHelper.ts" />
@@ -905,6 +922,7 @@
     <TypeScriptCompile Include="Tests\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Catalog\ErrorHandling.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\LocalAdmin.System.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Advice.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Tabs\Main.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\Archiving.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\It-System\Usage\Tabs\GDPR.System.e2e.spec.ts" />
@@ -932,6 +950,7 @@
     <TypeScriptCompile Include="Tests\PageObjects\It-project\ItProjectOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Catalog\ItSystemCatalog.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Interfaces\itSystemInterface.po.ts" />
+    <TypeScriptCompile Include="Tests\PageObjects\it-system\Tabs\ItSystemAdvice.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\ItSystemUsageOverview.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageArchiving.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\it-system\Usage\Tabs\ItSystemUsageCommon.po.ts" />
@@ -1090,8 +1109,6 @@
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
     <Content Include="app\components\reports\reports-overview.html" />
-    <TypeScriptCompile Include="app\shared\selectMultipleUsers\selectMultipleRecievers.directive.ts" />
-    <Content Include="app\shared\selectMultipleUsers\selectMultipleRecievers.view.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />

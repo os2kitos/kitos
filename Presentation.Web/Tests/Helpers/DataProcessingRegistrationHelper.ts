@@ -188,9 +188,24 @@ class DataProcessingRegistrationHelper {
         return Select2Helper.selectWithNoSearch(changeToCompleted, "s2id_oversightCompleted_config");
     }
 
-    public static changeOversightCompletedLatestDate(changeToDate: string) {
-        console.log("Changing Oversight Completed Latest Date to date: " + changeToDate);
-        return this.editOversightPo.getLatestOversightCompletedDate().sendKeys(changeToDate);
+    public static assignOversightDateAndRemark(date: string, remark: string) {
+        console.log(`Assigning oversight date to {date} and remark to {remark}`);
+        return this.editOversightPo.getAssignOversightDateButton().click()
+            .then(() => this.editOversightPo.getOversightDateModalDateField().sendKeys(date))
+            .then(() => this.editOversightPo.getOversightDateModalRemarkField().sendKeys(remark))
+            .then(() => this.editOversightPo.getOversightDateModalSaveButton().click());
+    }
+
+    public static verifyOversightDateAndRemark(date: string, remark: string) {
+        console.log(`Verifying oversight date set to {date} and remark set to {remark}`);
+        expect(this.editOversightPo.getOversightDateRowDate().getAttribute("value")).toEqual(date);
+        expect(this.editOversightPo.getOversightDateRowRemark().getAttribute("value")).toEqual(remark);
+    }
+
+    public static removeOversightDateAndRemark() {
+        console.log(`Removing oversight date`);
+        return this.editOversightPo.getRemoveOversightDateButton().click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

@@ -13,6 +13,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystemUsage
 {
+    using Core.DomainModel.Notification;
     using ItSystem.DataTypes;
     using System;
     using System.ComponentModel.DataAnnotations.Schema;
@@ -22,7 +23,7 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices, IEntityWithUserNotification
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
@@ -43,6 +44,7 @@ namespace Core.DomainModel.ItSystemUsage
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
+            UserNotifications = new List<UserNotification>();
         }
 
         public bool IsActive
@@ -281,6 +283,9 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual ICollection<ItProject.ItProject> ItProjects { get; set; }
 
+
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
+
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public ReferenceRootType GetRootType()
         {
@@ -509,11 +514,11 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return relation
                 .SetRelationTo(toSystemUsage)
-                .Select(_ => _.SetDescription(changedDescription))
-                .Select(_ => _.SetRelationInterface(relationInterface))
-                .Select(_ => _.SetContract(toContract))
-                .Select(_ => _.SetFrequency(toFrequency))
-                .Select(_ => _.SetReference(changedReference));
+                .Bind(_ => _.SetDescription(changedDescription))
+                .Bind(_ => _.SetRelationInterface(relationInterface))
+                .Bind(_ => _.SetContract(toContract))
+                .Bind(_ => _.SetFrequency(toFrequency))
+                .Bind(_ => _.SetReference(changedReference));
         }
 
         public Result<ItSystemUsageSensitiveDataLevel, OperationError> AddSensitiveDataLevel(

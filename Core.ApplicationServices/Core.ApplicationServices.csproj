@@ -115,10 +115,24 @@
     <Compile Include="GDPR\IDataProcessingRegistrationOptionsApplicationService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
+    <Compile Include="Helpers\CronPatternDefaults.cs" />
+    <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\SystemUsageDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\ProjectDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Model\EventHandler\ContractDeletedUserNotificationsHandler.cs" />
+    <Compile Include="Notification\IUserNotificationApplicationService.cs" />
+    <Compile Include="Notification\UserNotificationApplicationService.cs" />
+    <Compile Include="ScheduledJobs\HangfireApi.cs" />
+    <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
     <Compile Include="KendoOrganizationalConfigurationService.cs" />
     <Compile Include="Model\EventHandler\ClearCacheOnAccessRightsChangedHandler.cs" />
+    <Compile Include="Model\EventHandler\ContractDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandler\ProjectDeletedAdvicesHandler.cs" />
+    <Compile Include="Model\EventHandler\SystemUsageDeletedAdvicesHandler.cs" />
     <Compile Include="Model\GDPR\DataProcessingRegistrationOptions.cs" />
     <Compile Include="Model\Shared\ChangedValue.cs" />
     <Compile Include="Model\SystemUsage\RelationOptionsDTO.cs" />
@@ -133,6 +147,8 @@
     <Compile Include="Organizations\IOrganizationService.cs" />
     <Compile Include="Organizations\OrganizationRightsService.cs" />
     <Compile Include="Project\IItProjectService.cs" />
+    <Compile Include="ScheduledJobs\AdviceTrigger.cs" />
+    <Compile Include="ScheduledJobs\AdviceTriggerFactory.cs" />
     <Compile Include="Shared\PagingContraints.cs" />
     <Compile Include="SSO\Factories\ISsoStateFactory.cs" />
     <Compile Include="SSO\Factories\SsoStateFactory.cs" />
@@ -183,7 +199,7 @@
     <Compile Include="Organizations\OrganizationService.cs" />
     <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="MailClient.cs" />
+    <Compile Include="SingleThreadedMailClient.cs" />
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="UserService.cs" />
   </ItemGroup>

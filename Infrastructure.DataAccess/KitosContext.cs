@@ -7,10 +7,10 @@ using Core.DomainModel.ItSystemUsage;
 using Infrastructure.DataAccess.Mapping;
 using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
+using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
-using Core.DomainModel.AdviceSent;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
@@ -19,6 +19,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
+using Core.DomainModel.Notification;
 
 namespace Infrastructure.DataAccess
 {
@@ -167,8 +168,11 @@ namespace Infrastructure.DataAccess
         public DbSet<ItSystemUsageOverviewArchivePeriodReadModel> ItSystemUsageOverviewArchivePeriodReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewDataProcessingRegistrationReadModel> ItSystemUsageOverviewDataProcessingRegistrationReadModels { get; set; }
         public DbSet<ItSystemUsageOverviewInterfaceReadModel> ItSystemUsageOverviewInterfaceReadModels { get; set; }
-        public DbSet<ItSystemUsageOverviewItSystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewUsedBySystemUsageReadModel> ItSystemUsageOverviewItSystemUsageReadModels { get; set; }
+        public DbSet<ItSystemUsageOverviewUsingSystemUsageReadModel> ItSystemUsageOverviewUsingSystemUsageReadModels { get; set; }
         public DbSet<KendoOrganizationalConfiguration> KendoOrganizationalConfigurations { get; set; }
+        public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
+        public DbSet<UserNotification> UserNotifications { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -271,8 +275,11 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewDataProcessingRegistrationReadModelMap());
             modelBuilder.Configurations.Add(new PendingReadModelUpdateMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewInterfaceReadModelMap());
-            modelBuilder.Configurations.Add(new ItSystemUsageOverviewItSystemUsageReadModelMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsedBySystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new KendoOrganizationalConfigurationMap());
+            modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
+            modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsingSystemUsageReadModelMap());
+            modelBuilder.Configurations.Add(new UserNotificationMap());
         }
     }
 }

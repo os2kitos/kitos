@@ -10,7 +10,7 @@
         });
 
         _.forEach(selectedNoLongerAvailable, (selected) => {
-            availableOptions.splice(0, 0, { id: selected.id, text: selected.text + " (Slettes)", optionalObjectContext: null });
+            availableOptions.splice(0, 0, { id: selected.id, text: selected.text + " (slettes)", optionalObjectContext: null });
             addToBeDeleted(selectedOptions, selected.id);
         });
 

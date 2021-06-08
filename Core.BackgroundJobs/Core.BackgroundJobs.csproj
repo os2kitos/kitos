@@ -69,7 +69,6 @@
   <ItemGroup>
     <Compile Include="Factories\IRebuildReadModelsJobFactory.cs" />
     <Compile Include="Factories\RebuildReadModelsJobFactory.cs" />
-    <Compile Include="Model\Advice\PurgeOrphanedAdviceBackgroundJob.cs" />
     <Compile Include="Model\ExternalLinks\CheckExternalLinksBackgroundJob.cs" />
     <Compile Include="Model\IAsyncBackgroundJob.cs" />
     <Compile Include="Model\ReadModels\PurgeDuplicatePendingReadModelUpdates.cs" />

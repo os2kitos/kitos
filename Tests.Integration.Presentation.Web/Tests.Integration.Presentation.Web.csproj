@@ -108,6 +108,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Swagger\SwaggerDocumentationTest.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelsTest.cs" />
     <Compile Include="TestEnvironmentValidation\TestEnvironmentTest.cs" />
+    <Compile Include="Tools\AdviceHelper.cs" />
     <Compile Include="Tools\AuthorizationHelper.cs" />
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
@@ -197,7 +199,6 @@
       <Name>Tests.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

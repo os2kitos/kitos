@@ -15,7 +15,6 @@ using Core.DomainModel.LocalOptions;
 using Presentation.Web.Controllers.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
-using Core.DomainModel.AdviceSent;
 using System.Linq;
 using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Models;
@@ -31,6 +30,7 @@ using Microsoft.AspNet.OData.Routing.Conventions;
 using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web
 {
@@ -82,7 +82,7 @@ namespace Presentation.Web
             accessMod.Namespace = kitosNamespace;
             var orgRoles = builder.AddEnumType(typeof(OrganizationRole));
             orgRoles.Namespace = kitosNamespace;
-            var objectTypes = builder.AddEnumType(typeof(ObjectType));
+            var objectTypes = builder.AddEnumType(typeof(RelatedEntityType));
             objectTypes.Namespace = kitosNamespace;
             var schedulings = builder.AddEnumType(typeof(Scheduling));
             schedulings.Namespace = kitosNamespace;
@@ -383,12 +383,16 @@ namespace Presentation.Web
             var config = BindEntitySet<Config, ConfigsController>(builder);
             config.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-
             var getAdvicesByOrg = builder.Function("GetAdvicesByOrganizationId");
             getAdvicesByOrg.Parameter<int>("organizationId").Required();
             getAdvicesByOrg.ReturnsCollectionFromEntitySet<Advice>("Advice");
 
+            var deactivateAdvice = builder.Function("DeactivateAdvice");
+            deactivateAdvice.Parameter<int>("key").Required();
+            deactivateAdvice.Returns<IHttpActionResult>();
+
             BindEntitySet<Advice, AdviceController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(Advice)).AddProperty(typeof(Advice).GetProperty(nameof(Advice.CanBeDeleted)));
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
 

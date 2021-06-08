@@ -18,7 +18,8 @@ namespace Core.DomainModel.ItSystemUsage.Read
             ArchivePeriods = new List<ItSystemUsageOverviewArchivePeriodReadModel>();
             DataProcessingRegistrations = new List<ItSystemUsageOverviewDataProcessingRegistrationReadModel>();
             DependsOnInterfaces = new List<ItSystemUsageOverviewInterfaceReadModel>();
-            IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewItSystemUsageReadModel>();
+            IncomingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsedBySystemUsageReadModel>();
+            OutgoingRelatedItSystemUsages = new List<ItSystemUsageOverviewUsingSystemUsageReadModel>();
         }
 
 
@@ -79,7 +80,7 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public string ObjectOwnerName { get; set; }
         public int? LastChangedById { get; set; }
         public string LastChangedByName { get; set; }
-        public DateTime LastChanged { get; set; }
+        public DateTime LastChangedAt { get; set; } //Notice - not using LastChanged since we don't want update-by-naming-convention to hit this field
         public DateTime? Concluded { get; set; }
 
         public int? MainContractId { get; set; }
@@ -115,6 +116,10 @@ namespace Core.DomainModel.ItSystemUsage.Read
         public virtual ICollection<ItSystemUsageOverviewInterfaceReadModel> DependsOnInterfaces { get; set; }
 
         public string IncomingRelatedItSystemUsagesNamesAsCsv { get; set; }
-        public virtual ICollection<ItSystemUsageOverviewItSystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewUsedBySystemUsageReadModel> IncomingRelatedItSystemUsages { get; set; }
+
+
+        public string OutgoingRelatedItSystemUsagesNamesAsCsv { get; set; }
+        public virtual ICollection<ItSystemUsageOverviewUsingSystemUsageReadModel> OutgoingRelatedItSystemUsages { get; set; }
     }
 }

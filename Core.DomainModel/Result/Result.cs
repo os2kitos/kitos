@@ -1,83 +1,104 @@
 ﻿using System;
-using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.Result
 {
-    public class Result<TSuccess, TFailure>
+    public sealed class Result<TSuccess, TFailure>
     {
-        private readonly Maybe<TFailure> _failure;
-        private readonly Maybe<TSuccess> _value;
+        private readonly IWithResult<TSuccess, TFailure> _state;
 
-        public static implicit operator Result<TSuccess, TFailure>(TFailure failure)
+        private Result(IWithResult<TSuccess, TFailure> state)
         {
-            return Failure(failure);
+            _state = state;
         }
 
-        public static implicit operator Result<TSuccess, TFailure>(TSuccess successValue)
-        {
-            return Success(successValue);
-        }
+        public static implicit operator Result<TSuccess, TFailure>(TFailure failure) =>
+            Failure(failure);
 
-        protected Result(Maybe<TSuccess> successResult, Maybe<TFailure> failureResult)
-        {
-            if (successResult.HasValue == failureResult.HasValue)
-            {
-                throw new ArgumentException($"{nameof(successResult)} cannot return the same value of {nameof(successResult.HasValue)} as {nameof(failureResult)}");
-            }
-            Ok = successResult.HasValue;
-            _value = successResult;
-            _failure = failureResult;
-        }
+        public static implicit operator Result<TSuccess, TFailure>(TSuccess successValue) =>
+            Success(successValue);
 
-        public bool Ok { get; }
+        public bool Ok => _state.Success;
 
         public bool Failed => !Ok;
 
-        public TSuccess Value => _value.Value;
+        public TSuccess Value => _state.SuccessValue;
 
-        public TFailure Error => _failure.Value;
+        public TFailure Error => _state.ErrorValue;
 
-        /// <summary>
-        /// Consider using implicit ctor in stead
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static Result<TSuccess, TFailure> Success(TSuccess value)
-        {
-            return new Result<TSuccess, TFailure>(Maybe<TSuccess>.Some(value), Maybe<TFailure>.None);
-        }
+        public static Result<TSuccess, TFailure> Success(TSuccess value) =>
+            new Result<TSuccess, TFailure>(new WithSuccessfulWithResult<TSuccess, TFailure>(value));
+
+
+        public static Result<TSuccess, TFailure> Failure(TFailure value) =>
+            new Result<TSuccess, TFailure>(new WithFailure<TSuccess, TFailure>(value));
 
         /// <summary>
-        /// Consider using the implicit ctor in stead
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static Result<TSuccess, TFailure> Failure(TFailure value)
-        {
-            return new Result<TSuccess, TFailure>(Maybe<TSuccess>.None, Maybe<TFailure>.Some(value));
-        }
-
-        /// <summary>
-        /// Applies the provided <paramref name="transform"/> to the successful value if present
-        /// If the current state of the result is "error", the error is returned.
-        /// Applies state-based decision logic on how to build the next result.
+        /// Transform the success result to a new result where the <typeparam name="TSuccess" /> is transformed into <typeparam name="T" /> using <paramref name="onSuccess"/>
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="transform"></param>
+        /// <param name="onSuccess"></param>
         /// <returns></returns>
-        public Result<T, TFailure> Select<T>(Func<TSuccess, Result<T, TFailure>> transform)
+        public Result<T, TFailure> Select<T>(Func<TSuccess, T> onSuccess) =>
+            Match(value => Result<T, TFailure>.Success(onSuccess(value)), failure => failure);
+
+        /// <summary>
+        /// Bind the result of the current Result to a function which computes it's next state. <typeparam name="TFailure" /> is shared between the two and <typeparam name="TSuccess" /> is input to the computation of the other result with <typeparam name="T" />
+        /// If you wish to select on the current state, just use <see cref="Select{T}"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="onSuccess"></param>
+        /// <returns></returns>
+        public Result<T, TFailure> Bind<T>(Func<TSuccess, Result<T, TFailure>> onSuccess) => Match(onSuccess, failure => failure);
+
+        public T Match<T>(Func<TSuccess, T> onSuccess, Func<TFailure, T> onFailure) =>
+            _state.Match(onSuccess, onFailure);
+
+        public override string ToString() =>
+            Match(_ => "SUCCESS", error => $"FAILED:'{Error}'");
+
+        #region private state classes
+        private interface IWithResult<out TSuccessValue, out TErrorValue>
         {
-            return Match(transform, failure => failure);
+            bool Success { get; }
+            TSuccessValue SuccessValue { get; }
+            TErrorValue ErrorValue { get; }
+            T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure);
         }
 
-        public T Match<T>(Func<TSuccess, T> onSuccess, Func<TFailure, T> onFailure)
+        private sealed class WithFailure<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
         {
-            return Ok ? onSuccess(Value) : onFailure(Error);
+            public WithFailure(TErrorValue error)
+            {
+                ErrorValue = error;
+            }
+
+            public bool Success => false;
+
+            public TSuccessValue SuccessValue =>
+                throw new InvalidOperationException("Success value is invalid in this state");
+
+            public TErrorValue ErrorValue { get; }
+
+            public T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure) =>
+                onFailure(ErrorValue);
         }
 
-        public override string ToString()
+        private sealed class WithSuccessfulWithResult<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
         {
-            return Ok ? "RESULT: SUCCESS" : $"RESULT: ERROR '{Error}'";
+            public WithSuccessfulWithResult(TSuccessValue result)
+            {
+                SuccessValue = result;
+            }
+
+            public bool Success => true;
+
+            public TSuccessValue SuccessValue { get; }
+
+            public TErrorValue ErrorValue => throw new InvalidOperationException("Error value is invalid in this state");
+
+            public T Match<T>(Func<TSuccessValue, T> onSuccess, Func<TErrorValue, T> onFailure) =>
+                onSuccess(SuccessValue);
         }
+        #endregion
     }
 }

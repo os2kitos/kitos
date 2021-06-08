@@ -9,9 +9,12 @@ using Infrastructure.Services.BackgroundJobs;
 using Infrastructure.Services.Http;
 using Microsoft.IdentityModel.Tokens;
 using Presentation.Web.Hangfire;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Middleware;
 using Presentation.Web.Infrastructure.Model.Authentication;
 using Presentation.Web.Ninject;
+using Presentation.Web.Infrastructure.Filters;
+using Presentation.Web.Infrastructure;
 
 [assembly: OwinStartup(typeof(Presentation.Web.Startup))]
 namespace Presentation.Web
@@ -52,6 +55,8 @@ namespace Presentation.Web
 
             GlobalConfiguration.Configuration.UseNinjectActivator(standardKernel);
             GlobalConfiguration.Configuration.UseSqlServerStorage("kitos_HangfireDB");
+            GlobalJobFilters.Filters.Add(new AdvisSendFailureFilter(standardKernel));
+            GlobalJobFilters.Filters.Add(new AutomaticRetryAttribute { Attempts = KitosConstants.MaxHangfireRetries });
 
             app.UseHangfireDashboard();
             app.UseHangfireServer(new KeepReadModelsInSyncProcess());
@@ -64,12 +69,6 @@ namespace Presentation.Web
                 recurringJobId: StandardJobIds.CheckExternalLinks,
                 job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchLinkCheckAsync(CancellationToken.None)),
                 cronExpression: Cron.Weekly(DayOfWeek.Sunday, 0),
-                timeZone: TimeZoneInfo.Local);
-
-            new RecurringJobManager().AddOrUpdate(
-                recurringJobId: StandardJobIds.PurgeOrphanedAdvice,
-                job: Job.FromExpression((IBackgroundJobLauncher launcher) => launcher.LaunchAdviceCleanupAsync(CancellationToken.None)),
-                cronExpression: Cron.Hourly(),
                 timeZone: TimeZoneInfo.Local);
 
             new RecurringJobManager().AddOrUpdate(

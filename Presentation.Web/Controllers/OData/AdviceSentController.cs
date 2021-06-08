@@ -1,13 +1,29 @@
-﻿using Core.DomainModel.AdviceSent;
-using Core.DomainServices;
+﻿using System.Linq;
+using System.Web.Http;
+using Core.ApplicationServices;
+using Microsoft.AspNet.OData;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [InternalApi]
-    public class AdviceSentController : BaseEntityController<AdviceSent>
+    public class AdviceSentController : BaseOdataController
     {
-        public AdviceSentController(IGenericRepository<AdviceSent> repository): 
-        base(repository){ }
+        private readonly IAdviceService _adviceService;
+
+        public AdviceSentController(IAdviceService adviceService)
+        {
+            _adviceService = adviceService;
+        }
+
+        [EnableQuery]
+        public IHttpActionResult Get()
+        {
+            var sentFromAll = _adviceService
+                .GetAdvicesAccessibleToCurrentUser()
+                .SelectMany(x => x.AdviceSent);
+
+            return Ok(sentFromAll);
+        }
     }
 }
