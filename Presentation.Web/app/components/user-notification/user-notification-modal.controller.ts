@@ -6,6 +6,10 @@
         mainGridOptions;
         mainGrid; // We don't set the grid. It is being set by the options that we define. But we need access to this in order to manually force a refresh of the data.
 
+        showItPrefix: boolean;
+        titleSuffix: string;
+
+
         static $inject: Array<string> = [
             "notify",
             "$uibModalInstance",
@@ -21,6 +25,7 @@
             private readonly contextType: Models.UserNotification.RelatedEntityType,
             private readonly user
         ) {
+            this.getTitleSuffixFromContext(contextType);
             this.mainGridOptions = {
                 dataSource: {
                     transport: {
@@ -117,6 +122,29 @@
             }
         }
 
+        getTitleSuffixFromContext(context: Models.UserNotification.RelatedEntityType) {
+        switch (context) {
+            case Models.UserNotification.RelatedEntityType.itContract:
+                this.showItPrefix = this.user.currentConfig.showItContractPrefix;
+                this.titleSuffix = "Kontrakter";
+                break;
+            case Models.UserNotification.RelatedEntityType.itSystemUsage:
+                this.showItPrefix = this.user.currentConfig.showItSystemPrefix;
+                this.titleSuffix = "Systemer";
+                break;
+            case Models.UserNotification.RelatedEntityType.itProject:
+                this.showItPrefix = this.user.currentConfig.showItProjectPrefix;
+                this.titleSuffix = "Projekter";
+                break;
+            case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
+                this.showItPrefix = false; //There is no IT prefix for DataProcessingRegistration
+                this.titleSuffix = "Databehandling";
+                break;
+            default:
+                //Nothing to do on default
+        }
+    }
+
         deleteNotification(notificationId: number) {
             var self = this;
             this.userNotificationService.delete(notificationId)
@@ -158,6 +186,7 @@
                                     $scope.stateName === Constants.SRef.ProjectOverview ||
                                     $scope.stateName === Constants.SRef.SystemUsageOverview ||
                                     $scope.stateName === Constants.SRef.DataProcessingRegistrationOverview) {
+
                                     userService
                                         .getUser()
                                         .then(user => {
@@ -223,7 +252,7 @@
                                 }
                             }
 
-
+                            
                         }]
                 };
             }
