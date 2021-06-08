@@ -10,7 +10,7 @@
                 "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper",
                 "adviceData",
                 ($scope,
-                    roles,
+                    roles: Models.IRoleEntity[],
                     $window,
                     type,
                     action,
@@ -35,7 +35,7 @@
                     var allowedDateFormats = [Constants.DateFormat.DanishDateFormat, payloadDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
-                    if (select2Roles) {
+                    if (select2Roles.length > 0) {
                         $scope.receiverRoles = select2Roles;
                     } else {
                         $scope.showRoleFields = false;
@@ -73,14 +73,24 @@
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
                                     var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
                                     var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
-                                    if (selectedReceiver !== undefined) {
+                                    if (selectedReceiver) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
+                                    } else {
+                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
+                                        $scope.preSelectedReceivers.push({
+                                            text: nameOfRoleReceiver
+                                        });
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
                                     var nameOfRoleCC = adviceData.Reciepients[i].Name;
                                     var selectedCC = _.find(select2Roles, x => x.text === nameOfRoleCC);
-                                    if (selectedCC !== undefined) {
+                                    if (selectedCC) {
                                         $scope.preSelectedCCs.push(selectedCC);
+                                    } else {
+                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
+                                        $scope.preSelectedCCs.push({
+                                            text: nameOfRoleCC
+                                        });
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
                                     receivers.push(adviceData.Reciepients[i].Name);
@@ -303,11 +313,11 @@
                                 }
                             }
                         }
-                        
+
                         return true;
                     }
 
-                    function validateReceiversAndCC(){
+                    function validateReceiversAndCC() {
                         if ($scope.createForm.externalEmail.$invalid || $scope.createForm.ccEmail.$invalid) { //Make sure email inputs are valid. (No input is valid).
                             return false;
                         }
@@ -428,7 +438,8 @@
                     (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
                         if (type === "itSystemUsage") {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll();
+                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles)
+                                .getAll();
                         }
                         if (type === "itContract") {
                             return localOptionServiceFactory
@@ -442,11 +453,10 @@
                         }
                         if (type === "dataProcessingRegistration") {
                             return localOptionServiceFactory.create(Kitos.Services.LocalOptions
-                                .LocalOptionType.DataProcessingRegistrationRoles).getAll();
+                                .LocalOptionType.DataProcessingRegistrationRoles)
+                                .getAll();
                         }
-                        if (type === "itInterface") {
-                            return [];
-                        }
+                        return [];
                     }
                 ],
                 type: [() => $scope.type],
