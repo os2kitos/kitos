@@ -24,7 +24,7 @@
 
                 <div class="form-group">
                     <label for="toExternal" class="control-label small">Til modtager via email</label>
-                    <input id="toExternal" name="externalEmail" type="text" data-ng-disabled="!isEditable('ToEmail')" placeholder="Skriv email" class="form-control input-sm" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailToInput">
+                    <input id="toExternal" name="externalEmail" type="text" data-ng-disabled="!isEditable('ToEmail')" placeholder="Skriv email" class="form-control input-sm" data-ng-model="externalTo" ng-pattern="multipleEmailValidationRegex">
                 </div>
 
                 <!--CC('ere)-->
@@ -42,7 +42,7 @@
                 <div class="form-group">
                     <div>
                         <label for="cc" class="control-label small">CC modtager via email</label>
-                        <input id="cc" name="ccEmail" type="text" placeholder="Skriv email" class="form-control input-sm" data-ng-disabled="!isEditable('CcEmail')" data-ng-model="externalCC" ng-pattern="multipleEmailValidationRegex" data-element-type="adviceEmailCCToInput">
+                        <input id="cc" name="ccEmail" type="text" placeholder="Skriv email" class="form-control input-sm" data-ng-disabled="!isEditable('CcEmail')" data-ng-model="externalCC" ng-pattern="multipleEmailValidationRegex">
                     </div>
                 </div>
             </div>
@@ -78,7 +78,7 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="fromDate">Fra dato <span class="text-danger">*</span></label>
                     <input id="fromDate" type="text" name="fromDate" placeholder="Vælg dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StartDate')" data-element-type="adviceStartDate">
+                           data-k-options="datepickerOptions" data-ng-model="startDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StartDate')">
                     <span class="help-block" ng-if="startDateErrMessage">{{startDateErrMessage}}</span>
                     <span ng-if="startDateInfoMessage" class="help-block small">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -90,7 +90,7 @@
                 <div class="form-group" ng-show="adviceTypeData.id == '1'">
                     <label class="control-label small" for="toDate">Til dato</label>
                     <input id="toDate" type="text" name="toDate" placeholder="Vælg dato" class="form-control input-sm" data-kendo-date-picker
-                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')" data-element-type="adviceEndDate">
+                           data-k-options="datepickerOptions" data-ng-model="stopDate" ng-change='checkDates(startDate,stopDate)' data-ng-disabled="!isEditable('StopDate')">
                     <span class="help-block" ng-if="stopDateErrMessage">{{stopDateErrMessage}}</span>
                     <span ng-if="startDate && !stopDate" class="help-block small">
                         <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -103,7 +103,7 @@
             <div class="col-md-12">
                 <div class="form-group has-feedback" data-show-errors>
                     <label class="control-label" for="name">Emne <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" name="subject" id="subject" data-element-type="adviceSubject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="!isEditable('Subject')">
+                    <input type="text" class="form-control" name="subject" id="adviceSubject" placeholder="Emne" required data-ng-model="subject" data-ng-disabled="!isEditable('Subject')">
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@
     <div class="modal-footer">
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-        <button type="submit" class="btn btn-primary" ng-click="save()" data-element-type="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
-        <button type="button" class="pull-left btn btn-primary" data-confirm-click="Er du sikker på at du vil deaktivere advis?" data-confirmed-click="deactivate()" data-element-type="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" id="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
+        <button type="button" class="pull-left btn btn-primary" data-confirm-click="Er du sikker på at du vil deaktivere advis?" data-confirmed-click="deactivate()" id="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>

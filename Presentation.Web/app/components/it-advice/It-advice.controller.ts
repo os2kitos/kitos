@@ -121,7 +121,7 @@
                             name: "advis",
                             text: "Opret advis",
                             template:
-                                "<button data-element-type=\"NewAdviceButton\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
+                                "<button id=\"NewAdviceButton\" data-ng-disabled=\"!hasWriteAccess\" class=\"btn btn-success btn-sm\" data-ng-click=\"newAdvice('POST')\"><i class=\"glyphicon glyphicon-plus small\" ></i>Ny</button>"
                         }
                     ],
                     sortable: {
