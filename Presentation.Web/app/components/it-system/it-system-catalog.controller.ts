@@ -587,19 +587,19 @@
                             // handles null cases
                             if (!dataItem ||
                                 !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
                                 return "";
                             }
-                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
                         },
                         excelTemplate: dataItem => {
                             // handles null cases
                             if (!dataItem ||
                                 !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format("DD-MM-YYYY") === "01-01-0001") {
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
                                 return "";
                             }
-                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
                         },
                         attributes: { "class": "text-center" },
                         filterable: {

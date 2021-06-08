@@ -86,8 +86,12 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Notifications\IUserNotificationService.cs" />
+    <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
+    <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />
+    <Compile Include="Repositories\Notification\UserNotificationRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />

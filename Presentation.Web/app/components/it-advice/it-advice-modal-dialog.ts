@@ -10,7 +10,7 @@
                 "$scope", "Roles", "$window", "type", "action", "object", "currentUser", "entityMapper",
                 "adviceData",
                 ($scope,
-                    roles,
+                    roles: Models.IRoleEntity[],
                     $window,
                     type,
                     action,
@@ -28,14 +28,14 @@
                     $scope.startDateInfoMessage = null;
 
                     //Format {email1},{email2}. Space between , and {email2} is ok but not required
-                    const emailMatchRegex = "([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
+                    const emailMatchRegex = "([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)";
                     $scope.multipleEmailValidationRegex = `^(${emailMatchRegex}(((,)( )*)${emailMatchRegex})*)$`;
 
                     var payloadDateFormat = "YYYY-MM-DD";
-                    var allowedDateFormats = ["DD-MM-YYYY", payloadDateFormat];
+                    var allowedDateFormats = [Constants.DateFormat.DanishDateFormat, payloadDateFormat];
 
                     var select2Roles = entityMapper.mapRoleToSelect2ViewModel(roles);
-                    if (select2Roles) {
+                    if (select2Roles.length > 0) {
                         $scope.receiverRoles = select2Roles;
                     } else {
                         $scope.showRoleFields = false;
@@ -73,14 +73,24 @@
                                 if (recpientType === "ROLE" && recieverType === "RECIEVER") {
                                     var nameOfRoleReceiver = adviceData.Reciepients[i].Name;
                                     var selectedReceiver = _.find(select2Roles, x => x.text === nameOfRoleReceiver);
-                                    if (selectedReceiver !== undefined) {
+                                    if (selectedReceiver) {
                                         $scope.preSelectedReceivers.push(selectedReceiver);
+                                    } else {
+                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
+                                        $scope.preSelectedReceivers.push({
+                                            text: nameOfRoleReceiver
+                                        });
                                     }
                                 } else if (recpientType === "ROLE" && recieverType === "CC") {
                                     var nameOfRoleCC = adviceData.Reciepients[i].Name;
                                     var selectedCC = _.find(select2Roles, x => x.text === nameOfRoleCC);
-                                    if (selectedCC !== undefined) {
+                                    if (selectedCC) {
                                         $scope.preSelectedCCs.push(selectedCC);
+                                    } else {
+                                        //NOTE: Once solving: https://os2web.atlassian.net/browse/KITOSUDV-1882, we can use the id to fetch the old assignments from the global list
+                                        $scope.preSelectedCCs.push({
+                                            text: nameOfRoleCC
+                                        });
                                     }
                                 } else if (recpientType === "USER" && recieverType === "RECIEVER") {
                                     receivers.push(adviceData.Reciepients[i].Name);
@@ -139,11 +149,11 @@
                     }
 
                     function isCurrentAdviceImmediate() {
-                        return $scope.adviceTypeData.id === "0";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "0";
                     }
 
                     function isCurrentAdviceRecurring() {
-                        return $scope.adviceTypeData.id === "1";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "1";
                     }
 
                     $scope.send = () => {
@@ -164,8 +174,12 @@
                         }
                     };
 
+                    function isEditableInGeneral() {
+                        return $scope.hasWriteAccess && $scope.isActive;
+                    }
+
                     function isEditable(context: string) {
-                        var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
+                        var editableInGeneral = isEditableInGeneral();
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" ||
                                 context === "Subject" ||
@@ -202,12 +216,12 @@
                         var start = moment($scope.startDate, allowedDateFormats, true);
                         if (performStartDateValidation) {
                             if (!start.isValid()) {
-                                $scope.startDateErrMessage = "Fra Dato er ugyldig!";
+                                $scope.startDateErrMessage = "'Fra dato' er ugyldig!";
                                 return false;
                             }
 
                             if (moment().isAfter(start, 'day') && action === "POST") {
-                                $scope.startDateErrMessage = "Fra Dato må ikke være før idag!";
+                                $scope.startDateErrMessage = "'Fra dato' må ikke være før idag!";
                                 return false;
                             }
                         }
@@ -217,17 +231,17 @@
                             var stop = moment($scope.stopDate, allowedDateFormats, true);
 
                             if (!stop.isValid()) {
-                                $scope.stopDateErrMessage = "Til Dato er ugyldig!";
+                                $scope.stopDateErrMessage = "'Til dato' er ugyldig!";
                                 return false;
                             }
 
                             if (moment().isAfter(stop, 'day')) {
-                                $scope.stopDateErrMessage = "Til Dato må ikke være før idag!";
+                                $scope.stopDateErrMessage = "'Til dato' må ikke være før idag!";
                                 return false;
                             }
 
                             if (start.isAfter(stop)) {
-                                $scope.stopDateErrMessage = "Til Dato skal være samme eller senere end Fra dato!";
+                                $scope.stopDateErrMessage = "'Til dato' skal være samme eller senere end 'Fra dato'!";
                                 return false;
                             }
 
@@ -262,7 +276,7 @@
 
                         if (showIntervalWarning) {
                             $scope.startDateInfoMessage =
-                                "OBS: Du har valgt en startdato større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den sidste dag i den aktuelle måned.";
+                                "OBS: Du har valgt en 'Fra dato' større end 28 og et gentagelsesinterval der kan ramme måneder hvor dagen ikke findes. Hvis dagen ikke findes i måneden, vil advis blive afsendt den sidste dag i den aktuelle måned.";
                         }
 
                         $scope.startDateErrMessage = "";
@@ -283,34 +297,36 @@
                         parseFormats: ["yyyy-MM-dd"]
                     };
 
-                    $scope.hasInputErrors = () => {
-                        if ($scope.adviceTypeData == null) {
-                            return true;
+                    $scope.formHasErrors = () => {
+                        if ($scope.adviceTypeData != null &&
+                            isEditableInGeneral() &&
+                            validateReceiversAndCC() &&
+                            $scope.subject) {
+
+                            if (isCurrentAdviceImmediate()) {
+                                return false;
+                            }
+
+                            if (isCurrentAdviceRecurring()) {
+                                if ($scope.adviceRepetitionData && $scope.checkDates($scope.startDate, $scope.stopDate)) {
+                                    return false;
+                                }
+                            }
                         }
 
-                        if (isCurrentAdviceImmediate()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                $scope.subject &&
-                                $scope.isEditable()) {
-                                return false;
-                            }
-                            else {
-                                return true;
-                            }
-                        }
-                        if (isCurrentAdviceRecurring()) {
-                            if (($scope.externalTo || $scope.selectedReceivers.length > 0) &&
-                                $scope.subject &&
-                                $scope.adviceRepetitionData &&
-                                $scope.checkDates($scope.startDate, $scope.stopDate) &&
-                                $scope.isEditable('Deactivate')) {
-                                return false;
-                            }
-                            else {
-                                return true;
-                            }
-                        }
                         return true;
+                    }
+
+                    function validateReceiversAndCC() {
+                        if ($scope.createForm.externalEmail.$invalid || $scope.createForm.ccEmail.$invalid) { //Make sure email inputs are valid. (No input is valid).
+                            return false;
+                        }
+                        if ($scope.externalTo || $scope.selectedReceivers.length > 0) {
+                            return true;
+                        }
+                        else { // No need to check if CC has been assigned as there is no requirement for them and the email part has been validated. 
+                            return false;
+                        }
                     }
 
                     function httpCall(payload, action, url) {
@@ -422,7 +438,8 @@
                     (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) => {
                         if (type === "itSystemUsage") {
                             return localOptionServiceFactory
-                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles).getAll();
+                                .create(Kitos.Services.LocalOptions.LocalOptionType.ItSystemRoles)
+                                .getAll();
                         }
                         if (type === "itContract") {
                             return localOptionServiceFactory
@@ -436,11 +453,10 @@
                         }
                         if (type === "dataProcessingRegistration") {
                             return localOptionServiceFactory.create(Kitos.Services.LocalOptions
-                                .LocalOptionType.DataProcessingRegistrationRoles).getAll();
+                                .LocalOptionType.DataProcessingRegistrationRoles)
+                                .getAll();
                         }
-                        if (type === "itInterface") {
-                            return [];
-                        }
+                        return [];
                     }
                 ],
                 type: [() => $scope.type],

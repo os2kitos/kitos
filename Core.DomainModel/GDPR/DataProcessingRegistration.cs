@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Notification;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -16,7 +17,8 @@ namespace Core.DomainModel.GDPR
         IOwnedByOrganization,
         IDataProcessingModule,
         IEntityWithExternalReferences,
-        IEntityWithAdvices
+        IEntityWithAdvices,
+        IEntityWithUserNotification
     {
         public DataProcessingRegistration()
         {
@@ -28,6 +30,7 @@ namespace Core.DomainModel.GDPR
             OversightOptions = new List<DataProcessingOversightOption>();
             AssociatedContracts = new List<ItContract.ItContract>();
             OversightDates = new List<DataProcessingRegistrationOversightDate>();
+            UserNotifications = new List<UserNotification>();
         }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
@@ -288,6 +291,8 @@ namespace Core.DomainModel.GDPR
                 );
 
         }
+
+        public virtual ICollection<UserNotification> UserNotifications { get; set; }
 
         public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
 

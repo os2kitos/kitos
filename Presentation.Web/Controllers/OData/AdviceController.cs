@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IAdviceRootResolution _adviceRootResolution;
         private readonly IOperationClock _operationClock;
 
-        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,
@@ -216,7 +216,7 @@ namespace Presentation.Web.Controllers.OData
                 if (response is UpdatedODataResult<Advice>)
                 {
                     var updatedAdvice = Repository.GetByKey(key); //Re-load
-                    _adviceService.RescheduleRecurringJob(updatedAdvice);
+                    _adviceService.UpdateSchedule(updatedAdvice);
                 }
 
                 return response;
@@ -250,15 +250,15 @@ namespace Presentation.Web.Controllers.OData
             {
                 return NotFound();
             }
-            if (!entity.CanBeDeleted)
-            {
-                return BadRequest("Cannot delete advice which is active or has been sent");
-            }
             if (!AllowDelete(entity))
             {
                 return Forbidden();
             }
 
+            if (!entity.CanBeDeleted)
+            {
+                return BadRequest("Cannot delete advice which is active or has been sent");
+            }
             try
             {
                 _adviceService.Delete(entity);

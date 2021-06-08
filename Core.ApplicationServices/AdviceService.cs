@@ -12,6 +12,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -19,6 +20,11 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Ninject.Extensions.Logging;
+using Infrastructure.Services.Types;
+using Core.DomainModel.Shared;
+using Core.DomainServices.Notifications;
+using Core.DomainModel.Notification;
+using Core.DomainServices.Advice;
 
 namespace Core.ApplicationServices
 {
@@ -78,6 +84,10 @@ namespace Core.ApplicationServices
 
         [Inject] public IOperationClock OperationClock { get; set; }
 
+        [Inject] public IUserNotificationService UserNotificationService { get; set; }
+
+        [Inject] public IAdviceRootResolution AdviceRootResolution { get; set; }
+
         #endregion
 
         public void CreateAdvice(Advice advice)
@@ -117,11 +127,12 @@ namespace Core.ApplicationServices
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
-                        DispatchEmails(advice);
+                        if (DispatchEmails(advice))
+                        {
+                            AdviceRepository.Update(advice);
 
-                        AdviceRepository.Update(advice);
-
-                        AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
+                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
+                        }
                     }
 
                     if (advice.AdviceType == AdviceType.Immediate)
@@ -158,7 +169,7 @@ namespace Core.ApplicationServices
             return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= OperationClock.Now.Date && !IsAdviceExpired(advice);
         }
 
-        private void DispatchEmails(Advice advice)
+        private bool DispatchEmails(Advice advice)
         {
             var message = new MailMessage
             {
@@ -200,10 +211,30 @@ namespace Core.ApplicationServices
             if (message.To.Any() || message.CC.Any())
             {
                 MailClient.Send(message);
+                advice.SentDate = OperationClock.Now;
+                return true;
             }
-            //TODO: JMO - consider if this should be a custom error because if someone expected an email to be sent but no receivers (roles removed) then what?
-
-            advice.SentDate = OperationClock.Now;
+            else
+            {
+                var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
+                if(organizationIdOfRelatedEntityId.IsNone)
+                {
+                    Logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
+                }
+                else
+                {
+                    if (advice.HasInvalidState())
+                    {
+                        Logger?.Error($"Advis is missing critical function information. Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}, Advice ownerId: {advice.ObjectOwnerId}");
+                    }
+                    else
+                    {
+                        var nameForNotification = advice.Name ?? "Ikke navngivet";
+                        UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                    }
+                }
+                return false;
+            }
         }
 
         private static void AddRecipientByName(AdviceUserRelation r, MailAddressCollection mailAddressCollection)
@@ -218,7 +249,7 @@ namespace Core.ApplicationServices
         {
             switch (advice.Type)
             {
-                case ObjectType.itContract:
+                case RelatedEntityType.itContract:
 
                     var itContractRoles = ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
@@ -228,7 +259,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.itProject:
+                case RelatedEntityType.itProject:
                     var projectRoles = ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in projectRoles)
@@ -237,7 +268,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.itSystemUsage:
+                case RelatedEntityType.itSystemUsage:
 
                     var systemRoles = ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                                                                               && I.Role.Name == r.Name);
@@ -247,7 +278,7 @@ namespace Core.ApplicationServices
                     }
 
                     break;
-                case ObjectType.dataProcessingRegistration:
+                case RelatedEntityType.dataProcessingRegistration:
 
                     var dpaRoles = DataProcessingRegistrationRights.AsQueryable().Where(I =>
                         I.ObjectId == advice.RelationId
@@ -276,15 +307,35 @@ namespace Core.ApplicationServices
         private void DeleteJobFromHangfire(Advice advice)
         {
             //Remove pending shcedules if any
-            var jobsScheduled =
-                HangfireApi
-                    .GetScheduledJobs(0, int.MaxValue)
-                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob));
+            var allScheduledJobs = HangfireApi
+                .GetScheduledJobs(0, int.MaxValue)
+                .ToList();
 
-            foreach (var j in jobsScheduled)
+            //Remove all pending calls to CreateOrUpdateJob
+            var allScheduledCreateOrUpdate =
+                allScheduledJobs
+                    .Where(x => x.Value.Job.Method.Name == nameof(CreateOrUpdateJob))
+                    .ToList();
+
+            foreach (var j in allScheduledCreateOrUpdate)
             {
-                var t = j.Value.Job.Args[1].ToString(); // Pick "Advice: nn"
-                if (t.Equals(advice.JobId))
+                var adviceIdAsString = j.Value.Job.Args[0].ToString();
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
+                {
+                    HangfireApi.DeleteScheduledJob(j.Key);
+                    break;
+                }
+            }
+
+            //Remove all pending calls to CreateOrUpdateJob
+            var allScheduledDeactivations =
+                allScheduledJobs
+                    .Where(x => x.Value.Job.Method.Name == nameof(DeactivateById));
+
+            foreach (var j in allScheduledDeactivations)
+            {
+                var adviceIdAsString = j.Value.Job.Args[0].ToString();
+                if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
                 {
                     HangfireApi.DeleteScheduledJob(j.Key);
                     break;
@@ -318,6 +369,19 @@ namespace Core.ApplicationServices
             AdviceRepository.Save();
         }
 
+        /// <summary>
+        /// Public only to allow HangFire to access it
+        /// </summary>
+        /// <param name="adviceId"></param>
+        public void DeactivateById(int adviceId)
+        {
+            var advice = AdviceRepository.AsQueryable().ById(adviceId);
+            if (advice != null)
+            {
+                Deactivate(advice);
+            }
+        }
+
         private void ScheduleAdvice(Advice advice)
         {
             if (advice.AdviceType == AdviceType.Immediate)
@@ -331,12 +395,13 @@ namespace Core.ApplicationServices
                 if (alarmDate == null)
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
-                HangfireApi.Schedule(
-                    () => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+                //Only postpone the trigger creation if the alarm date has not been passed yet
+                var runAt = OperationClock.Now.Date >= alarmDate.Value.Date ? default(DateTimeOffset?) : new DateTimeOffset(alarmDate.Value.Date);
+                HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id), runAt);
             }
         }
 
-        public void RescheduleRecurringJob(Advice advice)
+        public void UpdateSchedule(Advice advice)
         {
             var alarmDate = advice.AlarmDate;
 
@@ -344,27 +409,89 @@ namespace Core.ApplicationServices
                 throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
             DeleteJobFromHangfire(advice); // Remove existing hangfire job
-            HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id, advice.JobId, advice.Scheduling.GetValueOrDefault(), alarmDate.Value), new DateTimeOffset(alarmDate.Value));
+            ScheduleAdvice(advice);
         }
 
-        public void CreateOrUpdateJob(int entityId, string name, Scheduling schedule, DateTime alarmDate)
+        /// <summary>
+        /// Public only to allow HangFire to access it
+        /// </summary>
+        /// <param name="adviceId"></param>
+        public void CreateOrUpdateJob(int adviceId)
         {
-            var advice = AdviceRepository.GetByKey(entityId);
-            if (advice == null)
+            var advice = AdviceRepository.GetByKey(adviceId);
+            if (advice == null || advice.Scheduling == null || advice.AlarmDate == null)
             {
-                throw new ArgumentException(nameof(entityId) + " does not point to a valid id");
+                throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
             }
 
-            foreach (var adviceTrigger in AdviceTriggerFactory.CreateFrom(alarmDate, schedule))
+            var adviceAlarmDate = advice.AlarmDate.Value;
+            var adviceScheduling = advice.Scheduling.Value;
+
+            var adviceTriggers = AdviceTriggerFactory.CreateFrom(adviceAlarmDate, adviceScheduling);
+
+            foreach (var adviceTrigger in adviceTriggers)
             {
-                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(name, partitionId), () => name);
-                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(entityId), adviceTrigger.Cron);
+                var prefix = advice.JobId;
+                var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
+                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
+
+            if (advice.StopDate.HasValue)
+            {
+                //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
+                HangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
+            }
+
+            //If time has passed the trigger time, Hangfire will not fire until the next trigger data so we must force it.
+            if (adviceAlarmDate.Date.Equals(OperationClock.Now.Date))
+            {
+                switch (adviceScheduling)
+                {
+                    case Scheduling.Day:
+                    case Scheduling.Week:
+                    case Scheduling.Month:
+                    case Scheduling.Year:
+                    case Scheduling.Quarter:
+                    case Scheduling.Semiannual:
+                        var mustScheduleAdviceToday = 
+                            advice.AdviceSent.Where(x=>x.AdviceSentDate.Date == adviceAlarmDate.Date).Any() == false && 
+                            WillTriggerInvokeToday() == false;
+                        if (mustScheduleAdviceToday)
+                        {
+                            //Send the first advice now
+                            HangfireApi.Schedule(() => SendAdvice(adviceId));
+                        }
+                        break;
+                    //Intentional fallthrough - no corrections here
+                    case Scheduling.Hour:
+                    case Scheduling.Immediate:
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private bool WillTriggerInvokeToday()
+        {
+            var utcNow = OperationClock.Now.ToUniversalTime();
+            return 
+                utcNow.Hour < CronPatternDefaults.TriggerHourUTC || 
+                (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
         }
 
         private static string CreatePartitionJobId(string prefix, int partitionIndex)
         {
             return $"{prefix}_part_{partitionIndex}";
+        }
+
+        public Maybe<Advice> GetAdviceById(int id)
+        {
+            return AdviceRepository.GetByKey(id);
+        }
+
+        private Maybe<int> GetRelatedEntityOrganizationId(Advice advice)
+        {
+            return AdviceRootResolution.Resolve(advice).Select(x => x.OrganizationId);
         }
     }
 }

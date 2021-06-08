@@ -12,6 +12,15 @@
             }
         }
 
+        static renderInternalReferenceFromModal(detailsType: string, detailsState: string, stateId: number, value: string) {
+            if (!!value && !!stateId) {
+                return `<a ng-click="$dismiss()" data-element-type="${detailsType}" data-ui-sref="${detailsState}({id: ${stateId}})">${value}</a>`;
+            }
+            else {
+                return RenderFieldsHelper.noValueFallback;
+            }
+        }
+
         static renderUrlWithTitle(title: string | null | undefined, url: string) {
             if (title === null || _.isUndefined(title) || title.trim() === "") {
                 title = url;
@@ -57,7 +66,7 @@
 
         static renderDate(date: Date | undefined | null) {
             if (!!date) {
-                return moment(date).format("DD-MM-YYYY");
+                return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return RenderFieldsHelper.noValueFallback;
         }

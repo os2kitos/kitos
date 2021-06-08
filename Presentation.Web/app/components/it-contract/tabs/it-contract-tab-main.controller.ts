@@ -133,7 +133,7 @@
                     }
                 }
                 $scope.patchDate = (field, value) => {
-                    var date = moment(moment(value, "DD-MM-YYYY", true).format());
+                    var date = moment(moment(value, Kitos.Constants.DateFormat.DanishDateFormat, true).format());
                     if(value === "") {
                         var payload = {};
                         payload[field] = null;
@@ -265,8 +265,8 @@
                 }
                 function isActive() {
                     var today = moment();
-                    let fromDate = moment($scope.contract.concluded, "DD-MM-YYYY").startOf('day');
-                    let endDate = moment($scope.contract.expirationDate, "DD-MM-YYYY").endOf('day');
+                    let fromDate = moment($scope.contract.concluded, Kitos.Constants.DateFormat.DanishDateFormat).startOf('day');
+                    let endDate = moment($scope.contract.expirationDate, Kitos.Constants.DateFormat.DanishDateFormat).endOf('day');
                     if ($scope.contract.active || today.isBetween(fromDate, endDate, null, '[]') ||
                         (today.isSameOrAfter(fromDate) && !endDate.isValid()) ||
                         (today.isSameOrBefore(endDate) && !fromDate.isValid()) ||
@@ -280,11 +280,10 @@
                 $scope.checkContractValidity = (field, value) => {
                     var expirationDate = $scope.contract.expirationDate;
                     var concluded = $scope.contract.concluded;
-                    var formatString = "DD-MM-YYYY";
                     var formatDateString = "YYYY-MM-DD";
-                    var fromDate = moment(concluded, [formatString, formatDateString]).startOf('day');
-                    var endDate = moment(expirationDate, [formatString, formatDateString]).endOf('day');
-                    var date = moment(value, ["DD-MM-YYYY", "YYYY-MM-DDTHH:mm:ssZ"], true);
+                    var fromDate = moment(concluded, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day');
+                    var endDate = moment(expirationDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
+                    var date = moment(value, [Kitos.Constants.DateFormat.DanishDateFormat, "YYYY-MM-DDTHH:mm:ssZ"], true);
                     var payload = {};
                     if (value === "") {
                         payload[field] = null;

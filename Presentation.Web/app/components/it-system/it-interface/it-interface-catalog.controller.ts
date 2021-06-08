@@ -426,7 +426,7 @@
                                 return "";
                             }
 
-                            return this.moment(dataItem.LastChanged).format("DD-MM-YYYY");
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
                         },
                         attributes: { "class": "text-center" },
                         filterable: {

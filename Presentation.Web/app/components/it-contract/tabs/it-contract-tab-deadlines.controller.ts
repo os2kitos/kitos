@@ -153,8 +153,8 @@
             $scope.saveMilestone = function (paymentMilestone) {
                 paymentMilestone.itContractId = $scope.contract.id;
 
-                var approvedDate = moment(paymentMilestone.approved, "DD-MM-YYYY");
-                var expectedDate = moment(paymentMilestone.expected, "DD-MM-YYYY");
+                var approvedDate = moment(paymentMilestone.approved, Kitos.Constants.DateFormat.DanishDateFormat);
+                var expectedDate = moment(paymentMilestone.expected, Kitos.Constants.DateFormat.DanishDateFormat);
                 var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
                 var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
                 if (approvedDateValid) {
@@ -197,8 +197,8 @@
             $scope.saveTrial = function (handoverTrial) {
                 handoverTrial.itContractId = $scope.contract.id;
                 handoverTrial.handoverTrialTypeId = $scope.handoverTrialType.id;
-                var approvedDate = moment(handoverTrial.approved, "DD-MM-YYYY");
-                var expectedDate = moment(handoverTrial.expected, "DD-MM-YYYY");
+                var approvedDate = moment(handoverTrial.approved, Kitos.Constants.DateFormat.DanishDateFormat);
+                var expectedDate = moment(handoverTrial.expected, Kitos.Constants.DateFormat.DanishDateFormat);
                 var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
                 var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
 
@@ -241,7 +241,7 @@
             };
 
             $scope.patchDate = (field, value) => {
-                var date = moment(value, "DD-MM-YYYY");
+                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 if (value === "") {
                     var payload = {};
                     payload[field] = null;
@@ -259,7 +259,7 @@
                 }
             }
             $scope.patchDateProcurement = (field, value, id, url) => {
-                var date = moment(value, "DD-MM-YYYY");
+                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
 
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");

@@ -581,7 +581,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.CurrentPhaseObj.StartDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.CurrentPhaseObj.StartDate).format(Constants.DateFormat.DanishDateFormat);
                         },
                         excelTemplate: dataItem => {
                             if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.StartDate) {
@@ -605,7 +605,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.CurrentPhaseObj.EndDate).format("DD-MM-YYYY");
+                            return self.moment(dataItem.CurrentPhaseObj.EndDate).format(Constants.DateFormat.DanishDateFormat);
                         },
                         excelTemplate: dataItem => {
                             if (!dataItem.CurrentPhaseObj || !dataItem.CurrentPhaseObj.EndDate) {

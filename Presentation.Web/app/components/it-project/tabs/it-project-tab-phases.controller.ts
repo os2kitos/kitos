@@ -62,7 +62,7 @@
         }
 
         updatePhaseDate(phase: IPhase, num: number): void {
-            var dateObject = moment(phase.startDate, "DD-MM-YYYY");
+            var dateObject = moment(phase.startDate, Constants.DateFormat.DanishDateFormat);
             var startDate;
             if (phase.startDate === "") {
                 startDate = null;

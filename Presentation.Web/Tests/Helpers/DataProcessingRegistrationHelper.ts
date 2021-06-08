@@ -204,7 +204,8 @@ class DataProcessingRegistrationHelper {
 
     public static removeOversightDateAndRemark() {
         console.log(`Removing oversight date`);
-        return this.editOversightPo.getRemoveOversightDateButton().click();
+        return this.editOversightPo.getRemoveOversightDateButton().click()
+            .then(() => browser.switchTo().alert().accept());
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {

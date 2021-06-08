@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using ExpectedObjects;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -156,7 +157,7 @@ namespace Tests.Integration.Presentation.Web.Contract
                 Scheduling = Scheduling.Quarter,
                 Subject = "Can_Delete_Contract_Advices",
                 RelationId = contract.Id,
-                Type = ObjectType.itProject
+                Type = RelatedEntityType.itProject
             };
             using var createResponse = await AdviceHelper.PostAdviceAsync(advice, organizationId);
             Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);

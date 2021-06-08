@@ -119,10 +119,10 @@
     readonly adviceSelectRoleCss = "s2id_role-ccs";
     readonly adviceSelectType = "s2id_adviceType";
     readonly adviceSelectRepetition = "s2id_adviceRepetition";
-    readonly adviceEmailInput = "adviceEmailToInput";
-    readonly adviceEmailCCInput = "adviceEmailCCToInput";
-    readonly adviceStartDateField = "adviceStartDate";
-    readonly adviceEndDateField = "adviceEndDate";
+    readonly adviceEmailInput = "toExternal";
+    readonly adviceEmailCCInput = "cc";
+    readonly adviceStartDateField = "fromDate";
+    readonly adviceEndDateField = "toDate";
     readonly adviceSubjectInput = "adviceSubject";
     readonly adviceSaveButton = "adviceSaveButton";
     readonly adviceNewButton = "NewAdviceButton";

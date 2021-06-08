@@ -87,6 +87,9 @@ using Core.DomainServices.SystemUsage;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
+using Core.ApplicationServices.Notification;
+using Core.DomainServices.Repositories.Notification;
+using Core.DomainServices.Notifications;
 
 namespace Presentation.Web.Ninject
 {
@@ -167,6 +170,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationRoleService>().To<OrganizationRoleService>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRightsService>().To<OrganizationRightsService>().InCommandScope(Mode);
             kernel.Bind<IAdviceService>().To<AdviceService>().InCommandScope(Mode);
+            kernel.Bind<AdviceService>().ToSelf().InCommandScope(Mode);
             kernel.Bind<IOrganizationService>().To<OrganizationService>().InCommandScope(Mode);
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
@@ -201,6 +205,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOversightDateAssignmentService>().To<DataProcessingRegistrationOversightDateAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IHangfireApi>().To<HangfireApi>().InCommandScope(Mode);
             kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -266,6 +272,11 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
+
+            RegisterDomainEvent<ContractDeleted, ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
 
             //Itsystem overview updates
             RegisterDomainEvent<EntityCreatedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
@@ -370,6 +381,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IKendoOrganizationalConfigurationRepository>().To<KendoOrganizationalConfigurationRepository>().InCommandScope(Mode);
 
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
+            kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

@@ -77,9 +77,8 @@
                 let dateList = [];
                 let dateNotList = [];
                 _.each($scope.archivePeriods, x => {
-                    var formatString = "DD-MM-YYYY";
                     var formatDateString = "YYYY-MM-DD";
-                    if (moment().isBetween(moment(x.StartDate, [formatString, formatDateString]).startOf('day'), moment(x.EndDate, [formatString, formatDateString]).endOf('day'), null, '[]')) {
+                    if (moment().isBetween(moment(x.StartDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day'), moment(x.EndDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day'), null, '[]')) {
                         dateList.push(x);
                     } else {
                         dateNotList.push(x);
@@ -125,10 +124,9 @@
 
             $scope.save = () => {
                 $scope.$broadcast("show-errors-check-validity");
-                var formatString = "DD-MM-YYYY";
 
-                var startDate = moment($scope.archivePeriod.startDate, formatString);
-                var endDate = moment($scope.archivePeriod.endDate, formatString);
+                var startDate = moment($scope.archivePeriod.startDate, Kitos.Constants.DateFormat.DanishDateFormat);
+                var endDate = moment($scope.archivePeriod.endDate, Kitos.Constants.DateFormat.DanishDateFormat);
                 var startDateValid = !startDate.isValid() || isNaN(startDate.valueOf()) || startDate.year() < 1000 || startDate.year() > 2099;
                 var endDateValid = !endDate.isValid() || isNaN(endDate.valueOf()) || endDate.year() < 1000 || endDate.year() > 2099;
                 var dateCheck = startDate.startOf('day') >= endDate.endOf('day');
@@ -184,13 +182,12 @@
             }
 
             $scope.patchDatePeriode = (field, value, id) => {
-                var formatString = "DD-MM-YYYY";
                 var formatDateString = "YYYY-MM-DD";
 
-                var date = moment(value, formatString);
+                var date = moment(value, Kitos.Constants.DateFormat.DanishDateFormat);
                 var dateObject = $scope.archivePeriods.filter(x => x.Id === id);
-                var dateObjectStart = moment(dateObject[0].StartDate, [formatString, formatDateString]).startOf('day');
-                var dateObjectEnd = moment(dateObject[0].EndDate, [formatString, formatDateString]).endOf('day');
+                var dateObjectStart = moment(dateObject[0].StartDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).startOf('day');
+                var dateObjectEnd = moment(dateObject[0].EndDate, [Kitos.Constants.DateFormat.DanishDateFormat, formatDateString]).endOf('day');
                 if (!date.isValid() || isNaN(date.valueOf()) || date.year() < 1000 || date.year() > 2099) {
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
                 }
