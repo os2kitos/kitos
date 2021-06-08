@@ -208,6 +208,10 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = true;
             }
+            else if (entity is OrganizationRight right)
+            {
+                result = AllowAdministerOrganizationRight(right);
+            }
             else if (EntityEqualsActiveUser(entity))
             {
                 result = true;
@@ -399,6 +403,13 @@ namespace Core.ApplicationServices.Authorization
             var result = false;
 
             if (right.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (IsGlobalAdmin())
+                {
+                    result = true;
+                }
+            }
+            else if (right.Role == OrganizationRole.RightsHolderAccess)
             {
                 if (IsGlobalAdmin())
                 {
