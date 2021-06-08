@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -97,12 +96,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         /// <returns></returns>
         public bool AllowCreation(int organizationId, Type target)
         {
-            if (MatchType<KendoOrganizationalConfiguration>(target))
-            {
-                // Global admin are not allowed to create KendoOrganizationalConfigurations
-                return IsLocalAdmin(organizationId);
-            }
-
             if (IsGlobalAdmin())
             {
                 return true;
