@@ -6,8 +6,11 @@
         mainGridOptions;
         mainGrid; // We don't set the grid. It is being set by the options that we define. But we need access to this in order to manually force a refresh of the data.
 
+        showItPrefix: boolean;
+        titleSuffix: string;
+
+
         static $inject: Array<string> = [
-            "$scope",
             "notify",
             "$uibModalInstance",
             "userNotificationService",
@@ -16,7 +19,6 @@
         ];
 
         constructor(
-            private readonly $scope,
             private readonly notify,
             private readonly $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
             private readonly userNotificationService: Services.UserNotification.IUserNotificationService,
@@ -123,20 +125,20 @@
         getTitleSuffixFromContext(context: Models.UserNotification.RelatedEntityType) {
         switch (context) {
             case Models.UserNotification.RelatedEntityType.itContract:
-                this.$scope.showItPrefix = this.user.currentConfig.showItContractPrefix;
-                this.$scope.titleSuffix = "Kontrakter";
+                this.showItPrefix = this.user.currentConfig.showItContractPrefix;
+                this.titleSuffix = "Kontrakter";
                 break;
             case Models.UserNotification.RelatedEntityType.itSystemUsage:
-                this.$scope.showItPrefix = this.user.currentConfig.showItSystemPrefix;
-                this.$scope.titleSuffix = "Systemer";
+                this.showItPrefix = this.user.currentConfig.showItSystemPrefix;
+                this.titleSuffix = "Systemer";
                 break;
             case Models.UserNotification.RelatedEntityType.itProject:
-                this.$scope.showItPrefix = this.user.currentConfig.showItProjectPrefix;
-                this.$scope.titleSuffix = "Projekter";
+                this.showItPrefix = this.user.currentConfig.showItProjectPrefix;
+                this.titleSuffix = "Projekter";
                 break;
             case Models.UserNotification.RelatedEntityType.dataProcessingRegistration:
-                this.$scope.showItPrefix = false; //There is no IT prefix for DataProcessingRegistration
-                this.$scope.titleSuffix = "Databehandling";
+                this.showItPrefix = false; //There is no IT prefix for DataProcessingRegistration
+                this.titleSuffix = "Databehandling";
                 break;
             default:
                 //Nothing to do on default
