@@ -139,11 +139,11 @@
                     }
 
                     function isCurrentAdviceImmediate() {
-                        return $scope.adviceTypeData.id === "0";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "0";
                     }
 
                     function isCurrentAdviceRecurring() {
-                        return $scope.adviceTypeData.id === "1";
+                        return $scope.adviceTypeData && $scope.adviceTypeData.id === "1";
                     }
 
                     $scope.send = () => {
@@ -164,8 +164,12 @@
                         }
                     };
 
+                    function isEditableInGeneral() {
+                        return $scope.hasWriteAccess && $scope.isActive;
+                    }
+
                     function isEditable(context: string) {
-                        var editableInGeneral = $scope.hasWriteAccess && $scope.isActive;
+                        var editableInGeneral = isEditableInGeneral();
                         if (editableInGeneral && action === "PATCH" && isCurrentAdviceRecurring()) {
                             if (context === "Name" ||
                                 context === "Subject" ||
@@ -283,33 +287,23 @@
                         parseFormats: ["yyyy-MM-dd"]
                     };
 
-                    $scope.hasInputErrors = () => {
-                        if ($scope.adviceTypeData == null) {
-                            return true;
-                        }
+                    $scope.formHasErrors = () => {
+                        if ($scope.adviceTypeData != null &&
+                            isEditableInGeneral() &&
+                            validateReceiversAndCC() &&
+                            $scope.subject) {
 
-                        if (isCurrentAdviceImmediate()) {
-                            if (validateReceiversAndCC() &&
-                                $scope.subject &&
-                                $scope.isEditable()) {
+                            if (isCurrentAdviceImmediate()) {
                                 return false;
                             }
-                            else {
-                                return true;
+
+                            if (isCurrentAdviceRecurring()) {
+                                if ($scope.adviceRepetitionData && $scope.checkDates($scope.startDate, $scope.stopDate)) {
+                                    return false;
+                                }
                             }
                         }
-                        if (isCurrentAdviceRecurring()) {
-                            if (validateReceiversAndCC() &&
-                                $scope.subject &&
-                                $scope.adviceRepetitionData &&
-                                $scope.checkDates($scope.startDate, $scope.stopDate) &&
-                                $scope.isEditable('Deactivate')) {
-                                return false;
-                            }
-                            else {
-                                return true;
-                            }
-                        }
+                        
                         return true;
                     }
 

@@ -118,7 +118,7 @@
     <div class="modal-footer">
         <!--Send Advis-->
         <button type="button" class="btn btn-warning" ng-click="$dismiss()">Annuller</button>
-        <button type="submit" class="btn btn-primary" ng-click="save()" id="adviceSaveButton" data-ng-disabled="hasInputErrors()">Gem</button>
+        <button type="submit" class="btn btn-primary" ng-click="save()" id="adviceSaveButton" data-ng-disabled="formHasErrors()">Gem</button>
         <button type="button" class="pull-left btn btn-primary" data-confirm-click="Er du sikker på at du vil deaktivere advis?" data-confirmed-click="deactivate()" id="adviceDeactivateButton" data-ng-disabled="!isEditable('Deactivate')" ng-if="showDeactivate">Deaktiver</button>
     </div>
 </form>
