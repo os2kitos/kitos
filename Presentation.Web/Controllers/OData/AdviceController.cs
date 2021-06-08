@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.OData
         private readonly IAdviceRootResolution _adviceRootResolution;
         private readonly IOperationClock _operationClock;
 
-        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\.]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
+        private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
         public AdviceController(
             IAdviceService adviceService,

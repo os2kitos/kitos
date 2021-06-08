@@ -49,7 +49,8 @@ describe("Is able to create advice and delete advice",
         }
 
         function getRandomEmail() {
-            return `ItSystemAdviceTest@${new Date().getTime()}.com`;
+            //Using the special chars we need to allow
+            return `It_System.Advice-Test123456789@${new Date().getTime()}.com`;
         }
 
         function getRandomText(text: string) {
