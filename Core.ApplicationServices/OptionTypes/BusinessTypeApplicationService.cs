@@ -6,7 +6,7 @@ using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
 
-namespace Core.ApplicationServices.LocalOption
+namespace Core.ApplicationServices.OptionTypes
 {
     public class BusinessTypeApplicationService : IBusinessTypeApplicationService
     {
@@ -35,7 +35,7 @@ namespace Core.ApplicationServices.LocalOption
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            if(_businessTypeOptionService.GetOptionByUuid(orgId, businessTypeUuid).IsNone)
+            if (_businessTypeOptionService.GetOptionByUuid(orgId, businessTypeUuid).IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
             }

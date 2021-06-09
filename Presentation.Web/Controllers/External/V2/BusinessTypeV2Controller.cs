@@ -4,7 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.LocalOption;
+using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -15,11 +15,11 @@ namespace Presentation.Web.Controllers.External.V2
 {
     [PublicApi]
     [RoutePrefix("api/v2/business-types")]
-    public class BusinessTypeController: ExternalBaseController
+    public class BusinessTypeV2Controller: ExternalBaseController
     {
         private readonly IBusinessTypeApplicationService _businessTypeApplicationService;
 
-        public BusinessTypeController(IBusinessTypeApplicationService businessTypeApplicationService)
+        public BusinessTypeV2Controller(IBusinessTypeApplicationService businessTypeApplicationService)
         {
             _businessTypeApplicationService = businessTypeApplicationService;
         }
@@ -28,10 +28,9 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Returns IT-System business types
         /// </summary>
-        /// <param name="organizationUuid">organization identifier</param>
         /// <returns>A list of available IT-System business type specifics formatted as uuid and name pairs</returns>
         [HttpGet]
-        [Route("organisation/{organizationUuid}")]
+        [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -46,17 +45,16 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Returns requested IT-System business type
         /// </summary>
-        /// <param name="organizationUuid">organization identifier</param>
         /// <param name="businessTypeUuid">business type identifier</param>
         /// <returns>A uuid and name pair with boolean to mark if the business type is available in the organization</returns>
         [HttpGet]
-        [Route("organisation/{organizationUuid}/{businessTypeUuid}")]
+        [Route("{businessTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetBusinessType(Guid organizationUuid, Guid businessTypeUuid)
+        public HttpResponseMessage GetBusinessType(Guid businessTypeUuid, Guid organizationUuid)
         {
             return _businessTypeApplicationService
                 .GetBusinessType(organizationUuid, businessTypeUuid)

@@ -3,7 +3,7 @@ using Core.DomainModel.Result;
 using System;
 using System.Collections.Generic;
 
-namespace Core.ApplicationServices.LocalOption
+namespace Core.ApplicationServices.OptionTypes
 {
     public interface IBusinessTypeApplicationService
     {

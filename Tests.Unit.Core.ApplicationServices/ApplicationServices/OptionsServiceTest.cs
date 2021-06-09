@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -68,17 +69,76 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(frequencyTypes.Select(x => x.Id).OrderBy(x => x).SequenceEqual(new[] { enabledOption1.global.Id, enabledOption2.global.Id }.OrderBy(x => x)));
         }
 
+        [Fact]
+        public void GetOptionByUuid_Returns_Option_With_Available_Property_True()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var optionUuid = new Guid();
+            var enabledOption = MakeOptionPair(organizationId, true, true, true, optionUuid);
+            SetupRepositories(enabledOption);
+
+            //Act
+            var option = _sut.GetOptionByUuid(organizationId, optionUuid);
+
+            //Assert
+            Assert.True(option.HasValue);
+            Assert.True(option.Value.available);
+            Assert.Equal(enabledOption.global, option.Value.option);
+        }
+
+        [Fact]
+        public void GetOptionByUuid_Returns_Option_With_Available_Property_False()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var optionUuid = new Guid();
+            var disabledOption = MakeOptionPair(organizationId, false, true, false, optionUuid);
+            SetupRepositories(disabledOption);
+            SetupGetByKey(disabledOption.global);
+
+            //Act
+            var option = _sut.GetOptionByUuid(organizationId, optionUuid);
+
+            //Assert
+            Assert.True(option.HasValue);
+            Assert.False(option.Value.available);
+            Assert.Equal(disabledOption.global, option.Value.option);
+        }
+
+        [Fact]
+        public void GetOptionByUuid_Returns_Maybe_With_No_Value_If_Not_Exist()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var optionUuid = new Guid();
+
+            _globalOptionsRepository.Setup(x => x.AsQueryable()).Returns(new List<RelationFrequencyType>().AsQueryable());
+
+            //Act
+            var option = _sut.GetOptionByUuid(organizationId, optionUuid);
+
+            //Assert
+            Assert.False(option.HasValue);
+        }
+
         private void SetupRepositories(params (LocalRelationFrequencyType local, RelationFrequencyType global)[] options)
         {
             _localOptionsRepository.Setup(x => x.AsQueryable()).Returns(options.Select(x => x.local).AsQueryable());
             _globalOptionsRepository.Setup(x => x.AsQueryable()).Returns(options.Select(x => x.global).AsQueryable());
         }
 
+        private void SetupGetByKey(RelationFrequencyType global)
+        {
+            _globalOptionsRepository.Setup(x => x.GetByKey(global.Id)).Returns(global);
+        }
+
         private (LocalRelationFrequencyType local, RelationFrequencyType global) MakeOptionPair(
             int orgId,
             bool locallyEnabled = false,
             bool globallyEnabled = false,
-            bool globallyObligatory = false)
+            bool globallyObligatory = false,
+            Guid uuid = new Guid())
         {
             var localRelationFrequencyType = new LocalRelationFrequencyType
             {
@@ -90,7 +150,8 @@ namespace Tests.Unit.Core.ApplicationServices
             {
                 Id = A<int>(),
                 IsEnabled = globallyEnabled,
-                IsObligatory = globallyObligatory
+                IsObligatory = globallyObligatory,
+                Uuid = uuid
             };
 
             var option = new Mock<OptionEntity<RelationFrequencyType>>();
