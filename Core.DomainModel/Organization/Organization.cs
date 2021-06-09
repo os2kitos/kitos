@@ -37,6 +37,7 @@ namespace Core.DomainModel.Organization
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
+            Uuid = new Guid();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
