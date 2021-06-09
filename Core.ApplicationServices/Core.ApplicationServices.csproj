@@ -118,6 +118,8 @@
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="LocalOption\BusinessTypeApplicationService.cs" />
+    <Compile Include="LocalOption\IBusinessTypeApplicationService.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />
     <Compile Include="Model\EventHandler\SystemUsageDeletedUserNotificationsHandler.cs" />
     <Compile Include="Model\EventHandler\ProjectDeletedUserNotificationsHandler.cs" />

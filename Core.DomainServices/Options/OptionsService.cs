@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainServices.Extensions;
@@ -91,6 +92,23 @@ namespace Core.DomainServices.Options
                             .FromNullable()
                             .Select(option => (option, false))
                     );
+        }
+
+        public Maybe<(TOption option, bool available)> GetOptionByUuid(int organizationId, Guid optionUuid)
+        {
+            var option = _optionRepository
+                .AsQueryable()
+                .Where(x => x.Uuid == optionUuid)
+                .FirstOrDefault();
+
+            if(option == null)
+            {
+                return Maybe<(TOption option, bool available)>.None;
+            }
+            else
+            {
+                return GetOption(organizationId, option.Id);
+            }
         }
     }
 }

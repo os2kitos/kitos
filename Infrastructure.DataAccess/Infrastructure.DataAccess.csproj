@@ -729,6 +729,10 @@
     <Compile Include="Migrations\202106051508000_Added_UserNotifications.designer.cs">
       <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202106090926019_Added_Uuid_To_OptionTypes.cs" />
+    <Compile Include="Migrations\202106090926019_Added_Uuid_To_OptionTypes.designer.cs">
+      <DependentUpon>202106090926019_Added_Uuid_To_OptionTypes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1188,6 +1192,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106051508000_Added_UserNotifications.resx">
       <DependentUpon>202106051508000_Added_UserNotifications.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106090926019_Added_Uuid_To_OptionTypes.resx">
+      <DependentUpon>202106090926019_Added_Uuid_To_OptionTypes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

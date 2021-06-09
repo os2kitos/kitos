@@ -347,6 +347,7 @@
     <Compile Include="Controllers\API\UserNotificationController.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
+    <Compile Include="Models\External\V2\AvailableNamePairResponseDTO.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
@@ -359,7 +360,7 @@
     <Compile Include="Models\External\V2\ItInterfaceRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
     <Compile Include="Models\External\V2\DeactivationReasonRequestDTO.cs" />
-    <Compile Include="Controllers\External\V2\GeneralController.cs" />
+    <Compile Include="Controllers\External\V2\BusinessTypeController.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />

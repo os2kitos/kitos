@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 
@@ -28,6 +29,14 @@ namespace Core.DomainServices.Repositories.Organization
             return _repository
                 .AsQueryable()
                 .Where(organization => organization.Cvr == cvrNumber)
+                .FirstOrDefault();
+        }
+
+        public Maybe<DomainModel.Organization.Organization> GetByUuid(Guid uuid)
+        {
+            return _repository
+                .AsQueryable()
+                .Where(organization => organization.Uuid == uuid)
                 .FirstOrDefault();
         }
     }

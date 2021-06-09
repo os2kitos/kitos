@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
@@ -42,7 +43,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(int? page = 0, int? pageSize = 100)
+        public HttpResponseMessage GetItInterface(int? page = 0, int? pageSize = 100)
         {
             return Ok(new List<ItInterfaceResponseDTO>());
         }
@@ -59,7 +60,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterface(Guid uuid)
+        public HttpResponseMessage GetItInterface(Guid uuid)
         {
             return Ok(new ItInterfaceResponseDTO());
         }
@@ -76,7 +77,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
+        public HttpResponseMessage PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
         {
             return Ok(new ItInterfaceResponseDTO());
         }

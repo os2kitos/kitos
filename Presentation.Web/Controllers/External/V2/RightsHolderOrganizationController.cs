@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
@@ -20,7 +21,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetAccessibleOrganizations()
+        public HttpResponseMessage GetAccessibleOrganizations()
         {
             return Ok(new List<OrganizationResponseDTO>());
         }

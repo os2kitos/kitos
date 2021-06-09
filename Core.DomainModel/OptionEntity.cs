@@ -55,5 +55,6 @@ namespace Core.DomainModel
         public string Description { get; set; }
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
+        public Guid Uuid { get; set; } = Guid.NewGuid();
     }
 }
