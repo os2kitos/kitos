@@ -1224,6 +1224,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Advice_Scheduling_To_AdviceType.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Migrations\SQLScripts\Migrate_Uuid_On_OptionTypes.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
