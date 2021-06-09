@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.Read;
@@ -20,7 +19,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization
+    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization, IHasUuid
     {
         public const int MaxNameLength = 100;
 
@@ -55,7 +54,7 @@ namespace Core.DomainModel.Organization
         public string Cvr { get; set; }
         public string ForeignCvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
-        public Guid? Uuid { get; set; } //TODO: null is not a valid property here!--> change it
+        public Guid Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }

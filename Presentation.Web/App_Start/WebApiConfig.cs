@@ -179,6 +179,8 @@ namespace Presentation.Web
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder);
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
             organizations.EntityType.Property(p => p.Uuid).IsOptional();
+            builder.StructuralTypes.First(t => t.ClrType == typeof(Organization)).RemoveProperty(typeof(Organization).GetProperty(nameof(Organization.Uuid)));
+
 
             organizations.HasManyBinding(o => o.ItSystems, entitySetItSystems);
             organizations.HasManyBinding(o => o.BelongingSystems, entitySetItSystems);

@@ -52,9 +52,7 @@ namespace Presentation.Web.Controllers.External.V2
 
         private static OrganizationResponseDTO ToDTO(Organization arg)
         {
-            //TODO: Enforce UUID as non nullable and assign one before changing it
-            //TODO: Add IHasUUID to organization
-            return new OrganizationResponseDTO(arg.Uuid.GetValueOrDefault(), arg.Name, arg.Cvr ?? arg.ForeignCvr);
+            return new OrganizationResponseDTO(arg.Uuid, arg.Name, arg.Cvr ?? arg.ForeignCvr);
         }
     }
 }
