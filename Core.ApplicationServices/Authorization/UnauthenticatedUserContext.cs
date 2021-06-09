@@ -27,6 +27,11 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
+        public bool HasRoleInAnyOrganization(OrganizationRole role)
+        {
+            return false;
+        }
+
         public bool HasRoleIn(int organizationId)
         {
             return false;

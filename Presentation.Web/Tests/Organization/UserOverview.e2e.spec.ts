@@ -3,7 +3,7 @@ import TestFixtureWrapper = require("../Utility/TestFixtureWrapper");
 import Login = require("../Helpers/LoginHelper");
 import WaitTimers = require("../Utility/waitTimers");
 
-describe("Only Global and Local Admins can view API column in user overview", () => {
+describe("Special column access test", () => {
     var testFixture = new TestFixtureWrapper();
     var pageObject = new HomePage();
     var loginHelper = new Login();
@@ -18,35 +18,44 @@ describe("Only Global and Local Admins can view API column in user overview", ()
         testFixture.cleanupState();
     });
 
-    it("Global Admin can see API access attribute in overview", () =>
+    it("Global Admin can see special attributes in overview", () =>
     {
         loginHelper.loginAsGlobalAdmin();
-        checkApiColumn(true);
+        checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi, "api");
+        checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess, "RightsHolderAccess");
     });
 
-    it("Local Admin can see API access attribute in overview", () => {
+    it("Local Admin can see API access but not RightsHolderAccess attribute in overview", () => {
         loginHelper.loginAsLocalAdmin();
-        checkApiColumn(true);
+        checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi, "api");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess, "RightsHolderAccess");
     });
 
-    it("Regular user cannot see API access attribute in overview", () =>
+    it("Regular user cannot see special attributes attribute in overview", () =>
     {
         loginHelper.loginAsRegularUser();
-        checkApiColumn(false);
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi,"api");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess,"RightsHolderAccess");
     });
 
-    function checkApiColumn(isColumnVisible : boolean)
+    function checkColumnVisibility(isColumnVisible : boolean, getColumn: () => protractor.ElementFinder, logName : string)
     {
-        pageObject.getPage();
-        browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
+        console.log(`Testing that ${logName} column presence is ${isColumnVisible}`);
 
-        if (isColumnVisible)
-        {
-            expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
+        pageObject.getPage();
+
+        browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userEmail), waitUpTo.twentySeconds);
+
+        const expectation = expect(getColumn().getAttribute("style"));
+
+        if (isColumnVisible) {
+            //NOTE: Cannot use IsVisible method since it returns false if out of the visible area (scroll bars)
+            expectation.not.toContain("display: none");
         }
         else
         {
-            expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeFalsy();
+            //NOTE: Cannot use IsVisible method since it returns false if out of the visible area (scroll bars)
+            expectation.toContain("display: none");
         }
     }
 

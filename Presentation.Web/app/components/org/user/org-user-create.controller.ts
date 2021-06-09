@@ -13,6 +13,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         hasApi: boolean;
+        isRightsHolder: boolean;
     }
 
     class CreateOrganizationUserController {
@@ -59,6 +60,24 @@
             this.$uibModalInstance.close();
         }
 
+        private createUserRights(promises: ng.IHttpPromise<any>[], currentOrganizationId: number, userId : number) {
+            promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.User));
+            if (this.vm.isLocalAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.LocalAdmin));
+            if (this.vm.isOrgAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.OrganizationModuleAdmin));
+            if (this.vm.isProjectAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ProjectModuleAdmin));
+            if (this.vm.isSystemAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.SystemModuleAdmin));
+            if (this.vm.isContractAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ContractModuleAdmin));
+            if (this.vm.isReportAdmin)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ReportModuleAdmin));
+            if (this.vm.isRightsHolder)
+                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.RightsHolderAccess));
+        }
+
         public create(sendMail: boolean) {
             this.busy = true;
             var userPayload: Models.ICreateUserPayload = {
@@ -80,19 +99,10 @@
                     var userResult = response.data;
 
                     var promises: ng.IHttpPromise<any>[] = [];
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.User));
-                    if (this.vm.isLocalAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.LocalAdmin));
-                    if (this.vm.isOrgAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.OrganizationModuleAdmin));
-                    if (this.vm.isProjectAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ProjectModuleAdmin));
-                    if (this.vm.isSystemAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.SystemModuleAdmin));
-                    if (this.vm.isContractAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
-                    if (this.vm.isReportAdmin)
-                        promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
+                    const currentOrganizationId = this.user.currentOrganizationId;
+                    const userId = userResult.Id;
+
+                    this.createUserRights(promises, currentOrganizationId, userId);
 
                     // when all requests are done
                     this.$q.all(promises).then(
@@ -123,19 +133,10 @@
                 var userResult = this._.first(response.data.value);
 
                 var promises: ng.IHttpPromise<any>[] = [];
-                promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.User));
-                if (this.vm.isLocalAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.LocalAdmin));
-                if (this.vm.isOrgAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.OrganizationModuleAdmin));
-                if (this.vm.isProjectAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ProjectModuleAdmin));
-                if (this.vm.isSystemAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.SystemModuleAdmin));
-                if (this.vm.isContractAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ContractModuleAdmin));
-                if (this.vm.isReportAdmin)
-                    promises.push(this.addRole(this.user.currentOrganizationId, userResult.Id, Models.OrganizationRole.ReportModuleAdmin));
+                const currentOrganizationId = this.user.currentOrganizationId;
+                const userId = userResult.Id;
+
+                this.createUserRights(promises, currentOrganizationId, userId);
 
                 // when all requests are done
                 this.$q.all(promises).then(

@@ -71,12 +71,17 @@
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReportAdmin">Rapport admin</label>
                 </div>
             </div>
-            <label for="Andet" class="col-xs-3 control-label">
-                Andet
-            </label>
-            <div class="col-xs-8">
-                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin">
-                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+            <div ng-if="ctrl.isUserGlobalAdmin">
+                <label for="Andet" class="col-xs-3 control-label">
+                    Andet
+                </label>
+                <div class="col-xs-8">
+                    <div class="checkbox">
+                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+                    </div>
+                    <div class="checkbox">
+                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isRightsHolder">Rettighedshaveradgang</label>
+                    </div>
                 </div>
             </div>
         </div>

@@ -3,7 +3,8 @@
     public enum CrossOrganizationDataReadAccessLevel
     {
         None = 0,
-        Public = 1,
-        All = 2
+        RightsHolder = 1,
+        Public = 2,
+        All = 3
     }
 }

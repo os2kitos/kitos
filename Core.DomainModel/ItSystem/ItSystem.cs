@@ -11,7 +11,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus, IHasRightsHolder
     {
         public const int MaxNameLength = 100;
 
@@ -86,7 +86,7 @@ namespace Core.DomainModel.ItSystem
         /// The type of the business.
         /// </value>
         public virtual BusinessType BusinessType { get; set; }
-        
+
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
@@ -148,6 +148,15 @@ namespace Core.DomainModel.ItSystem
         public Maybe<ItSystemUsage.ItSystemUsage> GetUsageForOrganization(int organizationId)
         {
             return Usages.FirstOrDefault(x => x.OrganizationId == organizationId);
+        }
+
+        public Maybe<int> GetRightsHolderOrganizationId()
+        {
+            if (BelongsToId.HasValue)
+                return BelongsToId.Value;
+            if (BelongsTo != null)
+                return BelongsTo.Id;
+            return Maybe<int>.None;
         }
     }
 }

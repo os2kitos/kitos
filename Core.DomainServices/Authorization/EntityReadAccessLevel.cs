@@ -4,6 +4,7 @@
     {
         None,
         OrganizationOnly,
+        OrganizationAndRightsHolderAccess,
         OrganizationAndPublicFromOtherOrganizations,
         All
     }
