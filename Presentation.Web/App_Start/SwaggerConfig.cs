@@ -61,11 +61,12 @@ namespace Presentation.Web
                     c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     c.GroupActionsBy(apiDesc =>
                         {
+                            var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
                             if (apiDesc.RelativePath.IsExternalApiPath())
-                                return "API V2 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                                return "API V2 - " + (controllerName.EndsWith("V2",StringComparison.OrdinalIgnoreCase) ? controllerName.Substring(0,controllerName.Length-2) : controllerName);
                             if (apiDesc.RelativePath.Contains("api"))
-                                return "API - V1 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
-                            return "API - V1 (ODATA) - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                                return "API - V1 - " + controllerName;
+                            return "API - V1 (ODATA) - " + controllerName;
                         }
                     );
                     c.IncludeXmlComments(commentsFile);
