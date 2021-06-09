@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;
@@ -26,6 +27,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new ModuleModificationPolicy(_userContext.Object, false);
         }
 
+        public interface IRightsHolderElement : IEntity, IHasRightsHolder { }
         public interface IContractElement : IEntity, IContractModule { }
         public interface IOrganizationElement : IEntity, IOrganizationModule { }
         public interface IProjectElement : IEntity, IProjectModule { }
@@ -83,7 +85,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
-        public void Allow_With_Entity_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
+        public void Allow_Modify_With_Entity_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
             var orgId = A<int>();
@@ -94,6 +96,34 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Act
             var allow = _sut.AllowModification(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, allow);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(false, true, false)]
+        [InlineData(false, false, false)]
+        [InlineData(true, false, false)]
+        public void Allow_Modify_With_RightsHolder_Type_Returns(bool hasRightsholderSet, bool isRightsholder, bool expectedResult)
+        {
+            //Arrange
+            var orgId = A<int>();
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { orgId });
+
+            var entity = new Mock<IRightsHolderElement>();
+            var rightsHolderOrg = A<int>();
+            entity
+                .Setup(x => x.GetRightsHolderOrganizationId())
+                .Returns(hasRightsholderSet ? Maybe<int>.Some(rightsHolderOrg) : Maybe<int>.None);
+            _userContext
+                .Setup(x => x.HasRole(rightsHolderOrg, OrganizationRole.RightsHolderAccess))
+                .Returns(isRightsholder);
+
+
+            //Act
+            var allow = _sut.AllowModification(entity.Object);
 
             //Assert
             Assert.Equal(expectedResult, allow);
@@ -151,7 +181,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(Organization), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(User), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
 
-        public void Allow_With_Type_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
+        public void Allow_Creation_With_Type_Returns(Type entityType, bool isLocalAdmin, bool isGlobalAdmin, OrganizationRole? otherRole, bool expectedResult)
         {
             //Arrange
             var organizationId = A<int>();
@@ -164,6 +194,24 @@ namespace Tests.Unit.Presentation.Web.Authorization
             Assert.Equal(expectedResult, allow);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Allow_Creation_With_Rightsholder_Type_Returns(bool isRightsholder)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            if (isRightsholder)
+            {
+                ExpectUserHasRole(organizationId, OrganizationRole.RightsHolderAccess);
+            }
+
+            //Act
+            var allow = _sut.AllowCreation(organizationId, typeof(IRightsHolderElement));
+
+            //Assert
+            Assert.Equal(isRightsholder, allow);
+        }
 
         private void ExpectUserHasRole(int organizationId, OrganizationRole organizationRole)
         {

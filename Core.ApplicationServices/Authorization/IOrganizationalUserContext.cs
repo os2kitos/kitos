@@ -11,6 +11,7 @@ namespace Core.ApplicationServices.Authorization
         bool HasRoleInOrganizationOfType(OrganizationCategory category);
         bool IsGlobalAdmin();
         bool HasRole(int organizationId, OrganizationRole role);
+        bool HasRoleInAnyOrganization(OrganizationRole role);
         bool HasRoleIn(int organizationId);
         bool HasRoleInSameOrganizationAs(IEntity entity);
     }

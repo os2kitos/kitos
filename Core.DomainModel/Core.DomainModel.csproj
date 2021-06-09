@@ -85,6 +85,7 @@
     <Compile Include="IHasAttachedOptions.cs" />
     <Compile Include="IHasId.cs" />
     <Compile Include="IHasName.cs" />
+    <Compile Include="IHasRightsHolder.cs" />
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="IReadModel.cs" />

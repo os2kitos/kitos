@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
@@ -46,9 +45,13 @@ namespace Core.ApplicationServices.Authorization
                 return CrossOrganizationDataReadAccessLevel.All;
             }
 
-            return IsUserInMunicipality() ?
-                CrossOrganizationDataReadAccessLevel.Public :
-                CrossOrganizationDataReadAccessLevel.None;
+            //If rightsholder access is selected for the user it overrides the default calculation
+            if (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
+                return CrossOrganizationDataReadAccessLevel.RightsHolder;
+
+            return IsUserInMunicipality()
+                ? CrossOrganizationDataReadAccessLevel.Public
+                : CrossOrganizationDataReadAccessLevel.None;
         }
 
         public OrganizationDataReadAccessLevel GetOrganizationReadAccessLevel(int organizationId)
@@ -64,9 +67,16 @@ namespace Core.ApplicationServices.Authorization
                     return OrganizationDataReadAccessLevel.Public;
                 case CrossOrganizationDataReadAccessLevel.All:
                     return OrganizationDataReadAccessLevel.All;
+                case CrossOrganizationDataReadAccessLevel.RightsHolder:
+                    return OrganizationDataReadAccessLevel.RightsHolder;
                 default:
                     return OrganizationDataReadAccessLevel.None;
             }
+        }
+
+        private bool HasRightsHolderAccessIn(int organizationId)
+        {
+            return _activeUserContext.HasRole(organizationId, OrganizationRole.RightsHolderAccess);
         }
 
         public EntityReadAccessLevel GetReadAccessLevel<T>()
@@ -94,6 +104,8 @@ namespace Core.ApplicationServices.Authorization
             {
                 case EntityReadAccessLevel.None:
                     return false;
+                case EntityReadAccessLevel.OrganizationAndRightsHolderAccess:
+                    return HasRoleInSameOrganizationAs(entity) || IsRightsHolderFor(entity);
                 case EntityReadAccessLevel.OrganizationOnly:
                     return HasRoleInSameOrganizationAs(entity);
                 case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
@@ -103,6 +115,19 @@ namespace Core.ApplicationServices.Authorization
                 default:
                     throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level");
             }
+        }
+
+        private bool IsRightsHolderFor(IEntity entity)
+        {
+            if (entity is IHasRightsHolder withRightsHolder)
+            {
+                return withRightsHolder
+                    .GetRightsHolderOrganizationId()
+                    .Select(HasRightsHolderAccessIn)
+                    .GetValueOrFallback(false);
+            }
+
+            return false;
         }
 
         public bool AllowCreate<T>(int organizationId)
@@ -129,9 +154,18 @@ namespace Core.ApplicationServices.Authorization
 
             if (IsOrganizationSpecificData(entityType))
             {
-                return GetCrossOrganizationReadAccess() >= CrossOrganizationDataReadAccessLevel.Public
-                    ? EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations
-                    : EntityReadAccessLevel.OrganizationOnly;
+                var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccess();
+
+                switch (crossOrganizationDataReadAccessLevel)
+                {
+                    case CrossOrganizationDataReadAccessLevel.RightsHolder:
+                        return EntityReadAccessLevel.OrganizationAndRightsHolderAccess;
+                    case CrossOrganizationDataReadAccessLevel.All:
+                    case CrossOrganizationDataReadAccessLevel.Public:
+                        return EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations;
+                    default:
+                        return EntityReadAccessLevel.OrganizationOnly;
+                }
             }
 
             return EntityReadAccessLevel.None;
@@ -168,20 +202,21 @@ namespace Core.ApplicationServices.Authorization
 
         public bool AllowModify(IEntity entity)
         {
-            if (entity is KendoOrganizationalConfiguration)
-            {
-                // Global admin are not allowed to modify KendoOrganizationalConfigurations
-                var kendoConfig = entity as KendoOrganizationalConfiguration;
-                return IsLocalAdmin(kendoConfig.OrganizationId);
-            }
-
             var result = false;
 
             if (IsGlobalAdmin())
             {
                 result = true;
             }
+            else if (entity is OrganizationRight right)
+            {
+                result = AllowAdministerOrganizationRight(right);
+            }
             else if (EntityEqualsActiveUser(entity))
+            {
+                result = true;
+            }
+            else if (IsRightsHolderFor(entity))
             {
                 result = true;
             }
@@ -209,7 +244,12 @@ namespace Core.ApplicationServices.Authorization
             {
                 switch (entity)
                 {
+                    case ItInterface itInterface:
+                        //Even rightsholders are not allowed to delete interfaces
+                        result = IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId);
+                        break;
                     case ItSystem system:
+                        //Even rightsholders are not allowed to delete systems
                         result = IsGlobalAdmin() || IsLocalAdmin(system.OrganizationId);
                         break;
                     case OrganizationRight right:
@@ -363,6 +403,13 @@ namespace Core.ApplicationServices.Authorization
             var result = false;
 
             if (right.Role == OrganizationRole.GlobalAdmin)
+            {
+                if (IsGlobalAdmin())
+                {
+                    result = true;
+                }
+            }
+            else if (right.Role == OrganizationRole.RightsHolderAccess)
             {
                 if (IsGlobalAdmin())
                 {

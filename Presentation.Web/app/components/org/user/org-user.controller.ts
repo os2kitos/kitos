@@ -10,6 +10,7 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
+        isRightsHolder: boolean;
     }
 
 
@@ -62,6 +63,10 @@
 
             //Defer loading grid unitil navigtion completed
             setTimeout(() => this.activate(), 1);
+        }
+
+        private hasRole(user : IGridModel, role: Models.OrganizationRole): boolean {
+            return this._.find(user.OrganizationRights, (right) => right.Role === role) !== undefined;
         }
 
         private saveGridOptions = () => {
@@ -178,12 +183,13 @@
                                 // remove the user role
                                 this._.remove(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.User);
 
-                                usr.isLocalAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.LocalAdmin) !== undefined;
-                                usr.isOrgAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.OrganizationModuleAdmin) !== undefined;
-                                usr.isProjectAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ProjectModuleAdmin) !== undefined;
-                                usr.isSystemAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.SystemModuleAdmin) !== undefined;
-                                usr.isContractAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ContractModuleAdmin) !== undefined;
-                                usr.isReportAdmin = this._.find(usr.OrganizationRights, (right) => right.Role === Models.OrganizationRole.ReportModuleAdmin) !== undefined;
+                                usr.isLocalAdmin = this.hasRole(usr, Models.OrganizationRole.LocalAdmin);
+                                usr.isOrgAdmin = this.hasRole(usr, Models.OrganizationRole.OrganizationModuleAdmin);
+                                usr.isProjectAdmin = this.hasRole(usr, Models.OrganizationRole.ProjectModuleAdmin);
+                                usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
+                                usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
+                                usr.isReportAdmin = this.hasRole(usr, Models.OrganizationRole.ReportModuleAdmin);
+                                usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
                             });
                             return response;
                         }
@@ -394,6 +400,20 @@
                         hidden: false,
                         filterable: false,
                         sortable: false
+                    },
+                    {
+
+                        field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
+                        persistId: "rightsHolder", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
+                        headerAttributes: {
+                            "data-element-type": "rightsHolderHeader"
+                        },
+                        template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
+                        hidden: !this.user.isGlobalAdmin,
+                        filterable: false,
+                        sortable: false,
+                        menu: this.user.isGlobalAdmin,
                     },
                     {
                         template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
