@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.LocalOption;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Swashbuckle.Swagger.Annotations;
@@ -34,10 +35,11 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public HttpResponseMessage GetBusinessTypes(Guid organizationUuid)
+        public HttpResponseMessage GetBusinessTypes(Guid organizationUuid, int pageSize, int pageNumber)
         {
             return _businessTypeApplicationService
                 .GetBusinessTypes(organizationUuid)
+                .Select(x => x.Pagination(pageSize, pageNumber))
                 .Match(value => Ok(ToDTOs(value)), FromOperationError);
         }
 
