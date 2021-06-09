@@ -405,9 +405,9 @@
 
                         field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
                         persistId: "rightsHolder", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center", "data-element-type": "userObject" },
+                        attributes: { "class": "text-center", "data-element-type": "rightsHolderObject" },
                         headerAttributes: {
-                            "data-element-type": "userHeader"
+                            "data-element-type": "rightsHolderHeader"
                         },
                         template: (dataItem) => setBooleanValue(dataItem.isRightsHolder),
                         hidden: !this.user.isGlobalAdmin,
