@@ -14,6 +14,14 @@ class CreateUserHelper {
             });
     }
 
+    public checkRightsHolderAccessRoleStatusOnUser(email: string, hasAccess: boolean) {
+        return this.openEditUser(email)
+            .then(() => {
+                var expectedValue = hasAccess ? "true" : null;
+                return expect(this.pageObject.hasRightsHolderAccessCheckBox.getAttribute("checked")).toEqual(expectedValue);
+            });
+    }
+
     public updateApiOnUser(email: string, apiAccess: boolean) {
         return this.openEditUser(email)
             .then(() => {
@@ -31,10 +39,27 @@ class CreateUserHelper {
             });
     }
 
+    public updateRightsHolderAccessOnUser(email: string, hasAccess: boolean) {
+        return this.openEditUser(email)
+            .then(() => {
+                return this.pageObject.hasRightsHolderAccessCheckBox.isSelected()
+                    .then(selected => {
+                        if (selected !== hasAccess) {
+                            return this.pageObject.hasRightsHolderAccessCheckBox.click()
+                                .then(() => {
+                                    return this.pageCreateObject.editUserButton.click();
+                                });
+                        } else {
+                            return this.pageCreateObject.cancelEditUserButton.click();
+                        }
+                    });
+            });
+    }
+
     private getUserRow(email: string) {
         const emailColumnElementType = "userEmailObject";
 
-        var rows = this.pageObject.mainGridAllTableRows.filter((row, index) => {
+        const rows = this.pageObject.mainGridAllTableRows.filter((row, index) => {
             console.log("Searching for email column");
             var column = row.element(this.cssHelper.byDataElementType(emailColumnElementType));
             return column.isPresent()

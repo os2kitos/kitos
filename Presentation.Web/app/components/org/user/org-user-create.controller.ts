@@ -13,7 +13,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         hasApi: boolean;
-        hasRightsHolderAccess: boolean;
+        isRightsHolder: boolean;
     }
 
     class CreateOrganizationUserController {
@@ -74,7 +74,7 @@
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ContractModuleAdmin));
             if (this.vm.isReportAdmin)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ReportModuleAdmin));
-            if (this.vm.hasRightsHolderAccess)
+            if (this.vm.isRightsHolder)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.RightsHolderAccess));
         }
 

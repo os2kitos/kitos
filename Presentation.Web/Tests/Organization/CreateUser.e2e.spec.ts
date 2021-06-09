@@ -4,7 +4,7 @@ import Login = require("../Helpers/LoginHelper");
 import WaitTimers = require("../Utility/waitTimers");
 import createUserHelper = require("../Helpers/CreateUserHelper");
 
-describe("Only Global Admins can create user with API access",
+describe("Only Global Admins can create user with special permissions",
     () => {
         var testFixture = new TestFixtureWrapper();
         var userHelper = new createUserHelper();
@@ -17,44 +17,54 @@ describe("Only Global Admins can create user with API access",
             testFixture.cleanupState();
         });
 
-        it("Global Admin can enable api access on new user", () => {
+        it("Global Admin can enable special permissions on new user", () => {
             loginHelper.loginAsGlobalAdmin();
             pageObject.getPage();
             browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
             pageObject.createUserButton.click();
             expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
+            expect(pageObject.hasRightsHolderAccessCheckBox.isDisplayed()).toBeTrue();
         });
 
-        it("Local Admin cannot enable api access on new user", () => {
+        it("Local Admin cannot enable special permissions on new user", () => {
             loginHelper.loginAsLocalAdmin();
             pageObject.getPage();
             browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
             pageObject.createUserButton.click();
-            expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeFalse();
+            expect(pageObject.hasAPiCheckBox.isPresent()).toBeFalse();
+            expect(pageObject.hasRightsHolderAccessCheckBox.isPresent()).toBeFalse();
         });
+
+        function executeSpecialPermissionUseCase(mutate: () => webdriver.promise.Promise<void>, validate: () => webdriver.promise.Promise<boolean>) {
+            return loginHelper.loginAsGlobalAdmin()
+                .then(() => pageObject.getPage())
+                .then(() => browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds))
+                .then(() => mutate())
+                .then(() => browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userEmail), waitUpTo.twentySeconds))
+                .then(() => validate());
+        }
 
         function canSetApiAccessTo(value: boolean) {
             const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
-
-            return loginHelper.loginAsGlobalAdmin()
-                .then(() => {
-                    return pageObject.getPage();
-                })
-                .then(() => {
-                    return browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds);
-                })
-                .then(() => {
-                    console.log("Updating API status to " + value);
-                    return userHelper.updateApiOnUser(credentials.username, value);
-                }).then(() => {
-                    return browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userApi), waitUpTo.twentySeconds);
-                })
-                .then(() => {
-                    return expect(pageObject.kendoToolbarWrapper.columnHeaders().userApi.isDisplayed()).toBeTruthy();
-                })
-                .then(() => {
+            executeSpecialPermissionUseCase(() => {
+                console.log("Updating API status to " + value);
+                return userHelper.updateApiOnUser(credentials.username, value);
+            },
+                () => {
                     console.log("Checking that status is updated");
                     return userHelper.checkApiRoleStatusOnUser(credentials.username, value);
+                });
+        }
+
+        function canSetRightsHolderAccessTo(value: boolean) {
+            const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
+            executeSpecialPermissionUseCase(() => {
+                console.log("Updating Rightsholderaccess status to " + value);
+                return userHelper.updateRightsHolderAccessOnUser(credentials.username, value);
+            },
+                () => {
+                    console.log("Checking that Rightsholderaccess status is updated");
+                    return userHelper.checkRightsHolderAccessRoleStatusOnUser(credentials.username, value);
                 });
         }
 
@@ -64,6 +74,14 @@ describe("Only Global Admins can create user with API access",
 
         it("Global admin is able to set api access to FALSE on existing user", () => {
             canSetApiAccessTo(false);
+        });
+
+        it("Global admin is able to set RightsHolder access to TRUE on existing user", () => {
+            canSetRightsHolderAccessTo(true);
+        });
+
+        it("Global admin is able to set RightsHolder access to FALSE on existing user", () => {
+            canSetRightsHolderAccessTo(false);
         });
     });
 
