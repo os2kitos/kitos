@@ -1,5 +1,6 @@
 ﻿namespace Infrastructure.DataAccess.Migrations
 {
+    using Infrastructure.DataAccess.Tools;
     using System;
     using System.Data.Entity.Migrations;
     
@@ -42,6 +43,8 @@
             AddColumn("dbo.BusinessTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.RegisterTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.SensitivePersonalDataTypes", "Uuid", c => c.Guid(nullable: false));
+
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Uuid_On_OptionTypes.sql"));
         }
         
         public override void Down()
