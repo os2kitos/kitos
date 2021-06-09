@@ -54,7 +54,7 @@ namespace Core.DomainModel.Organization
         public string Cvr { get; set; }
         public string ForeignCvr { get; set; }
         public AccessModifier AccessModifier { get; set; }
-        public Guid? Uuid { get; set; }
+        public Guid? Uuid { get; set; } //TODO: null is not a valid property here!--> change it
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
 
         public virtual ICollection<LocalOptionEntity<Entity>> OrganizationOptions { get; set; }
