@@ -3,7 +3,9 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.RightsHolders;
+using Core.ApplicationServices.Shared;
 using Core.DomainModel.Organization;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Swashbuckle.Swagger.Annotations;
@@ -11,12 +13,12 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2
 {
     [PublicApi]
-    [RoutePrefix("api/v2")]
-    public class OrganizationController : ExternalBaseController
+    [RoutePrefix("api/v2/organizations")]
+    public class OrganizationV2Controller : ExternalBaseController
     {
         private readonly IRightsHoldersService _rightsHoldersService;
 
-        public OrganizationController(IRightsHoldersService rightsHoldersService)
+        public OrganizationV2Controller(IRightsHoldersService rightsHoldersService)
         {
             _rightsHoldersService = rightsHoldersService;
         }
@@ -26,20 +28,24 @@ namespace Presentation.Web.Controllers.External.V2
         /// </summary>
         /// <returns>A list of organizations formatted as uuid, cvr and name pairs</returns>
         [HttpGet]
-        [Route("rightsholder/organizations")]
+        [Route("with-rightsholder-access")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetAccessibleOrganizations()
+        public IHttpActionResult GetAccessibleOrganizations([FromUri] StandardPaginationQuery pagination)
         {
-            //TODO: Pagination standard - add it here
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             return _rightsHoldersService
                 .ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
+                .Select(organizations => organizations.OrderBy(organization => organization.Id))
+                .Select(organizations => organizations.Page(pagination))
                 .Select(ToDTOs)
                 .Match(Ok, FromOperationError);
         }
 
-        private IEnumerable<OrganizationResponseDTO> ToDTOs(IQueryable<Organization> organizations)
+        private static IEnumerable<OrganizationResponseDTO> ToDTOs(IQueryable<Organization> organizations)
         {
             return organizations.ToList().Select(ToDTO).ToList();
         }

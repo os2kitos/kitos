@@ -6,6 +6,7 @@ using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.External.V2
 {
+    [Authorize]
     public class ExternalBaseController: ApiController
     {
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)

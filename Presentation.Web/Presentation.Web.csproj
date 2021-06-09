@@ -345,12 +345,14 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
+    <Compile Include="Models\External\V2\StandardPaginationQuery.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
-    <Compile Include="Controllers\External\V2\OrganizationController.cs" />
+    <Compile Include="Controllers\External\V2\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />

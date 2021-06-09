@@ -59,7 +59,15 @@ namespace Presentation.Web
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
                     c.DocumentFilter<RemoveInternalApiOperationsFilter>();
                     c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
-
+                    c.GroupActionsBy(apiDesc =>
+                        {
+                            if (apiDesc.RelativePath.IsExternalApiPath())
+                                return "API V2 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            if (apiDesc.RelativePath.Contains("api"))
+                                return "API - V1 - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                            return "API - V1 (ODATA) - " + apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
+                        }
+                    );
                     c.IncludeXmlComments(commentsFile);
 
                     c.DescribeAllEnumsAsStrings();
