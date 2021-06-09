@@ -44,6 +44,11 @@ namespace Core.ApplicationServices.Authorization
             return _isGlobalAdmin;
         }
 
+        public IEnumerable<int> GetOrganizationIdsWhereHasRole(OrganizationRole role)
+        {
+            return _roles.Keys.Where(id => HasRole(id, role)).Distinct().ToList();
+        }
+
         public bool HasRole(int organizationId, OrganizationRole role)
         {
             return _roles.TryGetValue(organizationId, out var rolesInOrganization) &&
