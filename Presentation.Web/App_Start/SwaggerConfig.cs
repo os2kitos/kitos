@@ -31,6 +31,15 @@ namespace Presentation.Web
 
                     c.MultipleApiVersions((description, version) => version == ApiVersions.V1.ToString() || version == ApiVersions.V2.ToString(), builder =>
                       {
+                          //NOTE: Add new versions to the top so that users are always presented with the latest version by default (first one added)
+                          builder.Version("2", "OS2Kitos API - V2")
+                              .Description(
+                                  "<b><i>OBS: Dokumentation for V1 findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
+                                  "Arbejdet med V2 er påbegyndt og " +
+                                  "resultatet heraf opdateres løbende på denne side. I første omgang vil V2 omfatte supplerende data fra it-system- og " +
+                                  "snitfladekataloget. V2 kommer til at omfatte tilsvarende funktionalitet som V1.<br/><br/>" +
+                                  "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
+                              );
                           builder.Version("1", "OS2Kitos API - V1")
                               .Description(
                                   "<b><i>OBS: Dokumentation for V2 findes ved at skifte version på dokumentet til 2 øverst på siden</i></b><br/><br/>" +
@@ -45,16 +54,6 @@ namespace Presentation.Web
                               "Der er udelukkende adgang til læseoperationer i V1. Ved behov for adgang til funktionalitet, der ændrer i data, kontakt da venligst KITOS sekretariatet.<br/><br/>" +
                               "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
                               );
-
-                          builder.Version("2", "OS2Kitos API - V2")
-                              .Description(
-                                  "<b><i>OBS: Dokumentation for V1 findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
-                                  "Arbejdet med V2 er påbegyndt og " +
-                                  "resultatet heraf opdateres løbende på denne side. I første omgang vil V2 omfatte supplerende data fra it-system- og " +
-                                  "snitfladekataloget. V2 kommer til at omfatte tilsvarende funktionalitet som V1.<br/><br/>" +
-                                "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
-                                  );
-
                       });
 
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
