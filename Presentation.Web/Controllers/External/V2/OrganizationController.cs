@@ -8,20 +8,26 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2
 {
     [PublicApi]
-    [RoutePrefix("api/v2/rightsholder")]
-    public class RightsHolderOrganizationController: ExternalBaseController
+    [RoutePrefix("api/v2")]
+    public class OrganizationController: ExternalBaseController
     {
+        public OrganizationController()
+        {
+
+        }
+
         /// <summary>
-        /// Returns organizations accessible to the rightsholder user
+        /// Returns organizations in which the current user has "RightsHolderAccess" permission
         /// </summary>
-        /// <returns>A list of organizations formatted as uuid and name pairs</returns>
+        /// <returns>A list of organizations formatted as uuid, cvr and name pairs</returns>
         [HttpGet]
-        [Route("organizations")]
+        [Route("rightsholder/organizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetAccessibleOrganizations()
         {
+            //TODO: Create domain service to do the query and map the response here!
             return Ok(new List<OrganizationResponseDTO>());
         }
     }

@@ -350,7 +350,7 @@
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
-    <Compile Include="Controllers\External\V2\RightsHolderOrganizationController.cs" />
+    <Compile Include="Controllers\External\V2\OrganizationController.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\ItSystemStakeholderResponseDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
