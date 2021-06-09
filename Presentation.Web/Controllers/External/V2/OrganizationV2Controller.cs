@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.RightsHolders;
-using Core.ApplicationServices.Shared;
 using Core.DomainModel.Organization;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -52,7 +51,7 @@ namespace Presentation.Web.Controllers.External.V2
 
         private static OrganizationResponseDTO ToDTO(Organization arg)
         {
-            return new OrganizationResponseDTO(arg.Uuid, arg.Name, arg.Cvr ?? arg.ForeignCvr);
+            return new(arg.Uuid, arg.Name, arg.Cvr ?? arg.ForeignCvr);
         }
     }
 }
