@@ -30,9 +30,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <param name="mutate"></param>
         public static void MutateEntitySet<TModel>(Action<IGenericRepository<TModel>> mutate) where TModel : class
         {
-            using var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase());
+            using var kitosContext = TestEnvironment.GetDatabase();
+            using var repository = new GenericRepository<TModel>(kitosContext);
 
             mutate(repository);
+
+            repository.Save();
         }
 
         /// <summary>

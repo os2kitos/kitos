@@ -166,6 +166,42 @@ namespace Tests.Unit.Presentation.Web.Services
             _roleService.Verify(x => x.MakeUser(_user, newOrg), Times.Exactly(expectRolesAssigned ? 1 : 0));
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CreateNewOrganization_Assigns_Uuid_If_Not_Defined(bool useEmptyGuid)
+        {
+            //Arrange
+            var originalUuid = useEmptyGuid ? Guid.Empty : Guid.NewGuid();
+            var newOrg = new Organization
+            {
+                Name = A<string>(),
+                TypeId = (int)OrganizationTypeKeys.Kommune,
+                Uuid = originalUuid
+            };
+            _userRepository.Setup(x => x.GetByKey(_user.Id)).Returns(_user);
+            ExpectAllowCreateReturns<Organization>(true);
+            _authorizationContext.Setup(x => x.HasPermission(It.IsAny<DefineOrganizationTypePermission>())).Returns(true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _organizationRepository.Setup(x => x.Insert(newOrg)).Returns(newOrg);
+
+            //Act
+            var result = _sut.CreateNewOrganization(newOrg);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(newOrg, result.Value);
+            if (useEmptyGuid)
+            {
+                Assert.NotEqual(originalUuid, result.Value.Uuid);
+            }
+            else
+            {
+                Assert.Equal(originalUuid,result.Value.Uuid);
+            }
+        }
+
         [Fact]
         public void RemoveUser_Returns_NotFound()
         {

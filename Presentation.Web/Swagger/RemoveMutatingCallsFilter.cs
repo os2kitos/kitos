@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 
@@ -6,14 +7,24 @@ namespace Presentation.Web.Swagger
 {
     public class RemoveMutatingCallsFilter : IDocumentFilter
     {
+        private readonly Predicate<SwaggerDocument> _applyTo;
+
+        public RemoveMutatingCallsFilter(Predicate<SwaggerDocument> applyTo)
+        {
+            _applyTo = applyTo;
+        }
+
         public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
         {
-            foreach (var swaggerDocPath in swaggerDoc.paths)
+            if (_applyTo(swaggerDoc))
             {
-                if (IsExternalEndpointDocs(swaggerDocPath.Key))
-                    continue;
+                foreach (var swaggerDocPath in swaggerDoc.paths)
+                {
+                    if (IsExternalEndpointDocs(swaggerDocPath.Key))
+                        continue;
 
-                NukeWriteOperationDocs(swaggerDocPath);
+                    NukeWriteOperationDocs(swaggerDocPath);
+                }
             }
         }
 

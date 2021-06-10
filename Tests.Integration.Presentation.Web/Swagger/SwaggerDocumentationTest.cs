@@ -13,11 +13,13 @@ namespace Tests.Integration.Presentation.Web.Swagger
             public string Host { get; set; }
         }
 
-        [Fact]
-        public async Task Can_Load_Swagger_Doc()
+        [Theory]
+        [InlineData(1)]
+        [InlineData(2)]
+        public async Task Can_Load_Swagger_Doc(int version)
         {
             //Arrange
-            var url = TestEnvironment.CreateUrl("/swagger/docs/1.0.0");
+            var url = TestEnvironment.CreateUrl($"/swagger/docs/{version}");
 
             //Act
             using (var result = await HttpApi.GetAsync(url))

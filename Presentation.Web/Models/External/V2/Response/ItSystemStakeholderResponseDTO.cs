@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Presentation.Web.Models.External.V2
+namespace Presentation.Web.Models.External.V2.Response
 {
     public class ItSystemStakeholderResponseDTO: ItSystemResponseDTO
     {
