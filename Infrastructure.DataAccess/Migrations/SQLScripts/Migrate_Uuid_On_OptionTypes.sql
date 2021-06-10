@@ -1,12 +1,13 @@
 ﻿/*
 Content:
-    We are added Uuid to option types to be used for external api.
+    We added Uuid to option types to be used for external api: https://os2web.atlassian.net/browse/KITOSUDV-1709.
     As they are not generated automatically when adding the column on existing values we use this to initialize their value.
 */
 
 BEGIN
     UPDATE [ArchiveLocations]
     SET Uuid = NEWID()
+    WHERE Uuid = ''
 
     UPDATE [AgreementElementTypes]
     SET Uuid = NEWID()

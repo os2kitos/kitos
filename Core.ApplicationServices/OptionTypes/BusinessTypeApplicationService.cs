@@ -1,6 +1,7 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
@@ -23,41 +24,44 @@ namespace Core.ApplicationServices.OptionTypes
 
         public Result<(BusinessType option, bool available), OperationError> GetBusinessType(Guid organizationUuid, Guid businessTypeUuid)
         {
-            var organization = _organizationRepository.GetByUuid(organizationUuid);
-            if (organization.IsNone)
+            var orgId = ResolveOrgIdAndAccessLevel(organizationUuid);
+            if (orgId.Failed)
             {
-                return new OperationError(OperationFailure.NotFound);
+                return orgId.Error;
             }
-            var orgId = organization.Value.Id;
-
-            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) < DomainServices.Authorization.OrganizationDataReadAccessLevel.All)
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-
-            if (_businessTypeOptionService.GetOptionByUuid(orgId, businessTypeUuid).IsNone)
+            var businessTypeResult = _businessTypeOptionService.GetOptionByUuid(orgId.Value, businessTypeUuid);
+            if (businessTypeResult.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
             }
 
-            return Result<(BusinessType option, bool available), OperationError>.Success(_businessTypeOptionService.GetOptionByUuid(orgId, businessTypeUuid).Value);
+            return businessTypeResult.Value;
         }
 
         public Result<IEnumerable<BusinessType>, OperationError> GetBusinessTypes(Guid organizationUuid)
         {
-            var organization = _organizationRepository.GetByUuid(organizationUuid);
-            if (organization.IsNone)
+            var orgId = ResolveOrgIdAndAccessLevel(organizationUuid);
+            if (orgId.Failed)
+            {
+                return orgId.Error;
+            }
+
+            return Result<IEnumerable<BusinessType>, OperationError>.Success(_businessTypeOptionService.GetAvailableOptions(orgId.Value));
+        }
+
+        private Result<int, OperationError> ResolveOrgIdAndAccessLevel(Guid organizationUuid)
+        {
+            var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(org => org.Id);
+            if (organizationId.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
             }
-            var orgId = organization.Value.Id;
-
-            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) < DomainServices.Authorization.OrganizationDataReadAccessLevel.All)
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId.Value) < OrganizationDataReadAccessLevel.All)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return Result<IEnumerable<BusinessType>, OperationError>.Success(_businessTypeOptionService.GetAvailableOptions(orgId));
+            return organizationId.Value;
         }
     }
 }

@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using Core.DomainModel.ItSystem;
+using Presentation.Web.Models.External.V2;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -7,21 +11,23 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.External
 {
-    public class BusinessTypeTest :WithAutoFixture
+    public class BusinessTypesTest :WithAutoFixture
     {
         [Fact]
         public async Task Can_Get_AvailableBusinessTypes()
         {
             //Arrange
             var organisation = await OrganizationHelper.GetOrganizationAsync(TestEnvironment.DefaultOrganizationId);
-            var pageSize = A<int>() % 10;
+            var pageSize = A<int>() % 9 + 1; //Minimum is 1;
             var pageNumber = 0; //Always takes the first page;
+            var data = DatabaseAccess.MapFromEntitySet<BusinessType, IEnumerable<Guid>>(x => x.AsQueryable().OrderBy(x => x.Name).Select(x => x.Uuid).Take(pageSize).ToList());
 
             //Act
             var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, pageSize, pageNumber);
 
             //Assert
             Assert.Equal(pageSize, businessTypes.Count());
+            Assert.Collection(businessTypes, x => data.Contains(x.Uuid));
         }
 
         [Fact]

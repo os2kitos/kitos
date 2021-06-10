@@ -2,27 +2,15 @@
 
 namespace Presentation.Web.Models.External.V2
 {
-    public class AvailableNamePairResponseDTO
+    public class AvailableNamePairResponseDTO : IdentityNamePairResponseDTO
     {
         /// <summary>
-        /// UUID
+        /// IsAvailable is set to true if the type is available in the requested context
         /// </summary>
-        public Guid Uuid { get; set; }
+        public bool IsAvailable { get; }
 
-        /// <summary>
-        /// Name
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
-        /// IsAvailable
-        /// </summary>
-        public bool IsAvailable { get; set; }
-
-        public AvailableNamePairResponseDTO(Guid uuid, string name, bool isAvailable)
+        public AvailableNamePairResponseDTO(Guid uuid, string name, bool isAvailable) : base(uuid, name)
         {
-            Uuid = uuid;
-            Name = name;
             IsAvailable = isAvailable;
         }
     }

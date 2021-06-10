@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public HttpResponseMessage GetItSystems(int? page = 0, int? pageSize = 100)
+        public IHttpActionResult GetItSystems(int? page = 0, int? pageSize = 100)
         {
             return Ok(new List<ItSystemResponseDTO>());
         }
@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetItSystem(Guid uuid)
+        public IHttpActionResult GetItSystem(Guid uuid)
         {
             return Ok(new ItSystemResponseDTO());
         }
@@ -77,7 +77,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage PutItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
         {
             return Ok(new ItSystemResponseDTO());
         }

@@ -21,7 +21,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public HttpResponseMessage GetAccessibleOrganizations()
+        public IHttpActionResult GetAccessibleOrganizations()
         {
             return Ok(new List<OrganizationResponseDTO>());
         }

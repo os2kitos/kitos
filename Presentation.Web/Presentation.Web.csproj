@@ -361,7 +361,7 @@
     <Compile Include="Models\External\V2\ItInterfaceRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
     <Compile Include="Models\External\V2\DeactivationReasonRequestDTO.cs" />
-    <Compile Include="Controllers\External\V2\BusinessTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\BusinessTypesV2Controller.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />

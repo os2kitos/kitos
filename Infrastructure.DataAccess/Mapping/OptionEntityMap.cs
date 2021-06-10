@@ -12,7 +12,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
 
             Property(x => x.Uuid)
-                .HasUniqueIndexAnnotation("Option_Uuid", 0);
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Option_Uuid", 0);
         }
     }
 }

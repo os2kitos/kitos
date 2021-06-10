@@ -15,11 +15,11 @@ namespace Presentation.Web.Controllers.External.V2
 {
     [PublicApi]
     [RoutePrefix("api/v2/business-types")]
-    public class BusinessTypeV2Controller: ExternalBaseController
+    public class BusinessTypesV2Controller: ExternalBaseController
     {
         private readonly IBusinessTypeApplicationService _businessTypeApplicationService;
 
-        public BusinessTypeV2Controller(IBusinessTypeApplicationService businessTypeApplicationService)
+        public BusinessTypesV2Controller(IBusinessTypeApplicationService businessTypeApplicationService)
         {
             _businessTypeApplicationService = businessTypeApplicationService;
         }
@@ -37,10 +37,12 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetBusinessTypes(Guid organizationUuid, int pageSize, int pageNumber)
         {
+            //TODO: MRJ
             return _businessTypeApplicationService
                 .GetBusinessTypes(organizationUuid)
                 .Select(x => x.Pagination(pageSize, pageNumber))
-                .Match(value => Ok(ToDTOs(value)), FromOperationError);
+                .Select(ToDTOs)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -59,7 +61,8 @@ namespace Presentation.Web.Controllers.External.V2
         {
             return _businessTypeApplicationService
                 .GetBusinessType(organizationUuid, businessTypeUuid)
-                .Match(value => Ok(ToAvailableDTO(value.option, value.available)), FromOperationError);
+                .Select(x => ToAvailableDTO(x.option, x.available))
+                .Match(Ok, FromOperationError);
         }
 
         private List<IdentityNamePairResponseDTO> ToDTOs(IEnumerable<BusinessType> businessTypes)

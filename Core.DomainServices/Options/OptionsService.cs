@@ -96,19 +96,16 @@ namespace Core.DomainServices.Options
 
         public Maybe<(TOption option, bool available)> GetOptionByUuid(int organizationId, Guid optionUuid)
         {
-            var option = _optionRepository
+            return _optionRepository
                 .AsQueryable()
                 .Where(x => x.Uuid == optionUuid)
-                .FirstOrDefault();
-
-            if(option == null)
-            {
-                return Maybe<(TOption option, bool available)>.None;
-            }
-            else
-            {
-                return GetOption(organizationId, option.Id);
-            }
+                .First()
+                .FromNullable()
+                .Match
+                (
+                    foundOption => GetOption(organizationId, foundOption.Id),
+                    () => Maybe<(TOption option, bool available)>.None
+                );
         }
     }
 }
