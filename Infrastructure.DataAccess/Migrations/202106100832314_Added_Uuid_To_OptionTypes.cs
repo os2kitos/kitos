@@ -43,6 +43,9 @@
             AddColumn("dbo.BusinessTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.RegisterTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.SensitivePersonalDataTypes", "Uuid", c => c.Guid(nullable: false));
+
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Uuid_On_OptionTypes.sql"));
+
             CreateIndex("dbo.AgreementElementTypes", "Uuid", unique: true, name: "Option_Uuid");
             CreateIndex("dbo.GoalTypes", "Uuid", unique: true, name: "Option_Uuid");
             CreateIndex("dbo.OrganizationUnitRoles", "Uuid", unique: true, name: "Option_Uuid");
@@ -71,8 +74,6 @@
             CreateIndex("dbo.ArchiveTypes", "Uuid", unique: true, name: "Option_Uuid");
             CreateIndex("dbo.SensitiveDataTypes", "Uuid", unique: true, name: "Option_Uuid");
             CreateIndex("dbo.BusinessTypes", "Uuid", unique: true, name: "Option_Uuid");
-
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Uuid_On_OptionTypes.sql"));
         }
         
         public override void Down()
