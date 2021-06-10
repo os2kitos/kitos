@@ -22,12 +22,10 @@ namespace Core.ApplicationServices.RightsHolders
         public Result<IQueryable<Organization>, OperationError> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
         {
             var organizationIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
-            if (!organizationIds.Any())
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
 
-            return Result<IQueryable<Organization>, OperationError>.Success(_organizationRepository.AsQueryable().ByIds(organizationIds));
+            var organizations = _organizationRepository.AsQueryable().ByIds(organizationIds);
+
+            return Result<IQueryable<Organization>, OperationError>.Success(organizations);
         }
     }
 }

@@ -98,14 +98,12 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public interface IRightsHolderOwnedObject : IEntity, IOwnedByOrganization, IHasRightsHolder { }
 
         [Theory]
-        [InlineData(false, false, false, AccessModifier.Local, false)]
-        [InlineData(true, false, false, AccessModifier.Local, false)]
-        [InlineData(true, true, false, AccessModifier.Local, true)]
-        [InlineData(true, true, false, AccessModifier.Public, true)]
-        [InlineData(true, false, true, AccessModifier.Public, true)]
-        [InlineData(false, false, true, AccessModifier.Public, true)]
-        [InlineData(false, false, true, AccessModifier.Local, true)]
-        public void AllowReads_For_Context_Dependent_With_RightsHolder_Object_Returns(bool isRightsHolderInAnyOrganization, bool isRightsholderForEntity, bool isInSameOrg, AccessModifier accessModifier, bool expectedResult)
+        [InlineData(false, false, false, false)]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, false, true, true)]
+        public void AllowReads_For_Context_Dependent_With_RightsHolder_Object_Returns(bool isRightsHolderInAnyOrganization, bool isRightsholderForEntity, bool isInSameOrg, bool expectedResult)
         {
             //Arrange
             var organizationId = A<int>();
