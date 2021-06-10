@@ -53,6 +53,9 @@ namespace Core.DomainModel.Organization
         /// </remarks>
         public string Cvr { get; set; }
         public string ForeignCvr { get; set; }
+
+        public string GetActiveCvr() => Cvr ?? ForeignCvr;
+
         public AccessModifier AccessModifier { get; set; }
         public Guid Uuid { get; set; }
         public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }

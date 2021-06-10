@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 
@@ -19,13 +18,10 @@ namespace Core.ApplicationServices.RightsHolders
             _organizationRepository = organizationRepository;
         }
 
-        public Result<IQueryable<Organization>, OperationError> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
+        public IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
         {
             var organizationIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
-
-            var organizations = _organizationRepository.AsQueryable().ByIds(organizationIds);
-
-            return Result<IQueryable<Organization>, OperationError>.Success(organizations);
+            return _organizationRepository.AsQueryable().ByIds(organizationIds);
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.Organization;
+using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
@@ -31,7 +31,6 @@ namespace Presentation.Web.Controllers.External.V2
         [HttpGet]
         [Route("with-rightsholder-access")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetAccessibleOrganizations([FromUri] StandardPaginationQuery pagination)
         {
@@ -40,10 +39,10 @@ namespace Presentation.Web.Controllers.External.V2
 
             return _rightsHoldersService
                 .ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
-                .Select(organizations => organizations.OrderBy(organization => organization.Id))
-                .Select(organizations => organizations.Page(pagination))
-                .Select(ToDTOs)
-                .Match(Ok, FromOperationError);
+                .OrderBy(x => x.Id)
+                .Page(pagination)
+                .Transform(ToDTOs)
+                .Transform(Ok);
         }
 
         private static IEnumerable<OrganizationResponseDTO> ToDTOs(IQueryable<Organization> organizations)
@@ -51,9 +50,9 @@ namespace Presentation.Web.Controllers.External.V2
             return organizations.ToList().Select(ToDTO).ToList();
         }
 
-        private static OrganizationResponseDTO ToDTO(Organization arg)
+        private static OrganizationResponseDTO ToDTO(Organization organization)
         {
-            return new(arg.Uuid, arg.Name, arg.Cvr ?? arg.ForeignCvr);
+            return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }
     }
 }
