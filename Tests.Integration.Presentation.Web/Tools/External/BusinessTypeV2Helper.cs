@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
-    public static class BusinessTypeHelper
+    public static class BusinessTypeV2Helper
     {
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetBusinessTypesAsync(Guid orgUuid, int pageSize, int pageNumber)

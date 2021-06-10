@@ -18,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.External
             var pageNumber = 0; //Always takes the first page;
 
             //Act
-            var businessTypes = await BusinessTypeHelper.GetBusinessTypesAsync(organisation.Uuid.Value, pageSize, pageNumber);
+            var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, pageSize, pageNumber);
 
             //Assert
             Assert.Equal(pageSize, businessTypes.Count());
@@ -32,11 +32,11 @@ namespace Tests.Integration.Presentation.Web.External
             var businessTypeName = A<string>();
             var createdBusinessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName, orgId);
             var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var businessTypes = await BusinessTypeHelper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
+            var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
             var businessType = businessTypes.Where(x => x.Name.Equals(businessTypeName)).First(); //Get the newly created businessType.
 
             //Act
-            var businessTypeResult = await BusinessTypeHelper.GetBusinessTypeAsync(businessType.Uuid, organisation.Uuid.Value);
+            var businessTypeResult = await BusinessTypeV2Helper.GetBusinessTypeAsync(businessType.Uuid, organisation.Uuid.Value);
 
             //Assert
             Assert.Equal(businessTypeName, businessTypeResult.Name);
@@ -52,14 +52,14 @@ namespace Tests.Integration.Presentation.Web.External
             var businessTypeName = A<string>();
             var createdBusinessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName, orgId);
             var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var businessTypes = await BusinessTypeHelper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
+            var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
             var businessType = businessTypes.Where(x => x.Name.Equals(businessTypeName)).First(); //Get the newly created businessType.
 
             //Disable businessType
             await EntityOptionHelper.SendChangeBusinessTypeIsObligatoryAsync(createdBusinessType.Id, false); 
 
             //Act
-            var businessTypeResult = await BusinessTypeHelper.GetBusinessTypeAsync(businessType.Uuid, organisation.Uuid.Value);
+            var businessTypeResult = await BusinessTypeV2Helper.GetBusinessTypeAsync(businessType.Uuid, organisation.Uuid.Value);
 
             //Assert
             Assert.Equal(businessType.Name, businessTypeResult.Name);
