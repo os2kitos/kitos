@@ -144,7 +144,7 @@
     <Compile Include="Tools\DatabaseAccess.cs" />
     <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
-    <Compile Include="Tools\External\BusinessTypeHelper.cs" />
+    <Compile Include="Tools\External\BusinessTypeV2Helper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
