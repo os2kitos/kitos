@@ -23,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.Tools
     public static class HttpApi
     {
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new ConcurrentDictionary<string, Cookie>();
-        private static readonly ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO> TokenCache = new ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO>();
+        private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new ConcurrentDictionary<string, GetTokenResponseDTO>();
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
@@ -199,16 +199,23 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
-            if (TokenCache.TryGetValue(role, out var cachedToken))
+            var userCredentials = TestEnvironment.GetCredentials(role, true);
+
+            return await GetTokenAsync(userCredentials);
+        }
+
+        private static async Task<GetTokenResponseDTO> GetTokenAsync(KitosCredentials userCredentials)
+        {
+            if (TokenCache.TryGetValue(userCredentials.Username, out var cachedToken))
                 return cachedToken;
 
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var userCredentials = TestEnvironment.GetCredentials(role, true);
+
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
             using var httpResponseMessage = await PostForKitosToken(url, loginDto);
             var tokenResponseDtoAsync = await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
-            TokenCache.TryAdd(role, tokenResponseDtoAsync);
+            TokenCache.TryAdd(userCredentials.Username, tokenResponseDtoAsync);
             return tokenResponseDtoAsync;
         }
 
@@ -280,6 +287,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await GetCookieAsync(new KitosCredentials(email, password));
 
             return (userId, new KitosCredentials(email, password), cookie);
+        }
+
+        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
+        {
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
+            var password = Guid.NewGuid().ToString("N");
+            DatabaseAccess.MutateEntitySet<User>(x =>
+            {
+                using var crypto = new CryptoService();
+                var user = x.AsQueryable().ById(userId);
+                user.Password = crypto.Encrypt(password + user.Salt);
+            });
+
+            var token = await GetTokenAsync(new KitosCredentials(email, password));
+
+            return (userId, new KitosCredentials(email, password), token.Token);
         }
 
         public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId)
