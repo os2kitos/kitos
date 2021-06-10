@@ -19,11 +19,14 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
+            .then(() => browser.waitForAngular())
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogVisible(), SystemCatalogHelper.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
+            .then(() => browser.waitForAngular())
             .then(() => browser.wait(this.ec.elementToBeClickable(element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton))), this.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log("System created"));
     }
 
@@ -38,7 +41,8 @@ class SystemCatalogHelper {
         console.log(`Deleting system: ${name}`);
         return SystemCatalogHelper.getDeleteButtonForSystem(name)
             .then((button) => button.click())
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(() => browser.waitForAngular());
     }
 
     public static getDeleteButtonForSystem(name: string) {
@@ -67,6 +71,7 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
             .then(() => SystemCatalogHelper.getActivationToggleButton(name).click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log("Local system created"));
     }
 
@@ -74,7 +79,8 @@ class SystemCatalogHelper {
         console.log(`open details for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click());
+            .then(() => SystemCatalogHelper.findCatalogColumnsFor(name).first().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static findCatalogColumnsFor(name: string) {
@@ -90,12 +96,13 @@ class SystemCatalogHelper {
         console.log("Resetting system catalog filters");
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().resetFilter.click());
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().resetFilter.click())
+            .then(() => browser.waitForAngular());
     }
 
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
-        return SystemCatalogHelper.pageObject.waitForKendoGrid();
+        return SystemCatalogHelper.pageObject.waitForKendoGrid().then(() => browser.waitForAngular());
 
     }
 }
