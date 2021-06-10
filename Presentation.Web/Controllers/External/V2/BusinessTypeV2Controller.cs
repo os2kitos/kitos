@@ -34,6 +34,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetBusinessTypes(Guid organizationUuid, int pageSize, int pageNumber)
         {
             return _businessTypeApplicationService
