@@ -47,8 +47,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var db = TestEnvironment.GetDatabase();
 
             mutate(db);
-
-            db.SaveChanges();
         }
     }
 }
