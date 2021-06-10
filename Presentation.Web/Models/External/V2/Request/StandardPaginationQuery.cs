@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.External.V2.Request
     {
         [Range(0, int.MaxValue)] public int? Page { get; set; } = 0;
 
-        [Range(1, PagingContraints.MaxPageSize)]
+        [Range(PagingContraints.MinPageSize, PagingContraints.MaxPageSize)]
         public int? PageSize { get; set; } = PagingContraints.MaxPageSize;
     }
 }
