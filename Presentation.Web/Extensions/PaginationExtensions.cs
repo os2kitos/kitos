@@ -11,7 +11,7 @@ namespace Presentation.Web.Extensions
     {
         public static IEnumerable<T> Pagination<T>(this IEnumerable<T> source, int pageSize, int pageNumber)
         {
-            return source.Skip(pageSize * pageNumber).Take(pageNumber);
+            return source.Skip(pageSize * pageNumber).Take(pageSize);
         }
 
     }

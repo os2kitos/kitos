@@ -40,5 +40,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
         }
+
+        public static async Task<HttpResponseMessage> SendChangeBusinessTypeIsObligatoryAsync(int businessTypeId, bool isObligatory, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/BusinessTypes({businessTypeId})");
+
+            var body = new
+            {
+                IsObligatory = isObligatory
+            };
+
+            using var response = await HttpApi.PatchWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            return response;
+        }
     }
 }

@@ -37,7 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetAvailableOptions_Returns_Options_If_Options_Exists()
         {
             //Arrange
-            var uuid = new Guid();
+            var uuid = Guid.NewGuid();
             var orgId = A<int>();
             var numberOfBusinessTypes = A<int>() % 10;
             var listOfBusinessTypes = new List<BusinessType>();
@@ -63,7 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetAvailableOptions_Returns_Empty_List_If_No_Options_Exists()
         {
             //Arrange
-            var uuid = new Guid();
+            var uuid = Guid.NewGuid();
             var orgId = A<int>();
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
@@ -82,7 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetAvailableOptions_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All()
         {
             //Arrange
-            var uuid = new Guid();
+            var uuid = Guid.NewGuid();
             var orgId = A<int>();
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
@@ -101,7 +101,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetAvailableOptions_Returns_NotFound_If_No_Organization_With_Uuid_Is_Found()
         {
             //Arrange
-            var uuid = new Guid();
+            var uuid = Guid.NewGuid();
             var orgId = A<int>();
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(Maybe<Organization>.None);
@@ -120,9 +120,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetBusinessType_Returns_BusinessType_With_IsAvailable_Property_Set()
         {
             //Arrange
-            var orgUuid = new Guid();
+            var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
-            var typeUuid = new Guid();
+            var typeUuid = Guid.NewGuid();
             var businessType = CreateBusinessType();
             var isAvailable = A<bool>();
 
@@ -143,9 +143,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetBusinessType_Returns_NotFound_If_No_Organization_With_Uuid_Is_Found()
         {
             //Arrange
-            var orgUuid = new Guid();
+            var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
-            var typeUuid = new Guid();
+            var typeUuid = Guid.NewGuid();
             var businessType = CreateBusinessType();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(Maybe<Organization>.None);
@@ -164,9 +164,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetBusinessType_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All()
         {
             //Arrange
-            var orgUuid = new Guid();
+            var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
-            var typeUuid = new Guid();
+            var typeUuid = Guid.NewGuid();
             var businessType = CreateBusinessType();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
@@ -185,9 +185,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
         public void GetBusinessType_Returns_NotFound_If_No_BusinessType_With_Uuid_Is_Found()
         {
             //Arrange
-            var orgUuid = new Guid();
+            var orgUuid = Guid.NewGuid();
             var orgId = A<int>();
-            var typeUuid = new Guid();
+            var typeUuid = Guid.NewGuid();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);

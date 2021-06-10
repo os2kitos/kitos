@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202106090926019_Added_Uuid_To_OptionTypes"; }
+            get { return "202106100832314_Added_Uuid_To_OptionTypes"; }
         }
         
         string IMigrationMetadata.Source

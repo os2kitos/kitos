@@ -90,6 +90,7 @@ using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
+using Core.ApplicationServices.OptionTypes;
 
 namespace Presentation.Web.Ninject
 {
@@ -207,6 +208,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IBusinessTypeApplicationService>().To<BusinessTypeApplicationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

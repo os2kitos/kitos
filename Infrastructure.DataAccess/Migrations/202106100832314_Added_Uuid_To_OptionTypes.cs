@@ -43,12 +43,68 @@
             AddColumn("dbo.BusinessTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.RegisterTypes", "Uuid", c => c.Guid(nullable: false));
             AddColumn("dbo.SensitivePersonalDataTypes", "Uuid", c => c.Guid(nullable: false));
+            CreateIndex("dbo.AgreementElementTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.GoalTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.OrganizationUnitRoles", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItProjectTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItProjectRoles", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.InterfaceTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.RelationFrequencyTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItContractTemplateTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItContractTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.HandoverTrialTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.OptionExtendTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.PaymentFreqencyTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.PaymentModelTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.PriceRegulationTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ProcurementStrategyTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.PurchaseFormTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItContractRoles", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.TerminationDeadlineTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataProcessingBasisForTransferOptions", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataProcessingDataResponsibleOptions", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataProcessingCountryOptions", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataProcessingOversightOptions", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.DataProcessingRegistrationRoles", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ItSystemRoles", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.ArchiveTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.SensitiveDataTypes", "Uuid", unique: true, name: "Option_Uuid");
+            CreateIndex("dbo.BusinessTypes", "Uuid", unique: true, name: "Option_Uuid");
 
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Uuid_On_OptionTypes.sql"));
         }
         
         public override void Down()
         {
+            DropIndex("dbo.BusinessTypes", "Option_Uuid");
+            DropIndex("dbo.SensitiveDataTypes", "Option_Uuid");
+            DropIndex("dbo.ArchiveTypes", "Option_Uuid");
+            DropIndex("dbo.ItSystemRoles", "Option_Uuid");
+            DropIndex("dbo.DataProcessingRegistrationRoles", "Option_Uuid");
+            DropIndex("dbo.DataProcessingOversightOptions", "Option_Uuid");
+            DropIndex("dbo.DataProcessingCountryOptions", "Option_Uuid");
+            DropIndex("dbo.DataProcessingDataResponsibleOptions", "Option_Uuid");
+            DropIndex("dbo.DataProcessingBasisForTransferOptions", "Option_Uuid");
+            DropIndex("dbo.TerminationDeadlineTypes", "Option_Uuid");
+            DropIndex("dbo.ItContractRoles", "Option_Uuid");
+            DropIndex("dbo.PurchaseFormTypes", "Option_Uuid");
+            DropIndex("dbo.ProcurementStrategyTypes", "Option_Uuid");
+            DropIndex("dbo.PriceRegulationTypes", "Option_Uuid");
+            DropIndex("dbo.PaymentModelTypes", "Option_Uuid");
+            DropIndex("dbo.PaymentFreqencyTypes", "Option_Uuid");
+            DropIndex("dbo.OptionExtendTypes", "Option_Uuid");
+            DropIndex("dbo.HandoverTrialTypes", "Option_Uuid");
+            DropIndex("dbo.ItContractTypes", "Option_Uuid");
+            DropIndex("dbo.ItContractTemplateTypes", "Option_Uuid");
+            DropIndex("dbo.RelationFrequencyTypes", "Option_Uuid");
+            DropIndex("dbo.InterfaceTypes", "Option_Uuid");
+            DropIndex("dbo.DataTypes", "Option_Uuid");
+            DropIndex("dbo.ItProjectRoles", "Option_Uuid");
+            DropIndex("dbo.ItProjectTypes", "Option_Uuid");
+            DropIndex("dbo.OrganizationUnitRoles", "Option_Uuid");
+            DropIndex("dbo.GoalTypes", "Option_Uuid");
+            DropIndex("dbo.AgreementElementTypes", "Option_Uuid");
             DropColumn("dbo.SensitivePersonalDataTypes", "Uuid");
             DropColumn("dbo.RegisterTypes", "Uuid");
             DropColumn("dbo.BusinessTypes", "Uuid");

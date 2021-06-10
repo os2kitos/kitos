@@ -110,6 +110,7 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="External\BusinessTypeTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
@@ -143,6 +144,7 @@
     <Compile Include="Tools\DatabaseAccess.cs" />
     <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
+    <Compile Include="Tools\External\BusinessTypeHelper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />

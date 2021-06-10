@@ -74,7 +74,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var organizationId = A<int>();
-            var optionUuid = new Guid();
+            var optionUuid = Guid.NewGuid();
             var enabledOption = MakeOptionPair(organizationId, true, true, true, optionUuid);
             SetupRepositories(enabledOption);
 
@@ -92,7 +92,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var organizationId = A<int>();
-            var optionUuid = new Guid();
+            var optionUuid = Guid.NewGuid();
             var disabledOption = MakeOptionPair(organizationId, false, true, false, optionUuid);
             SetupRepositories(disabledOption);
             SetupGetByKey(disabledOption.global);
@@ -111,7 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var organizationId = A<int>();
-            var optionUuid = new Guid();
+            var optionUuid = Guid.NewGuid();
 
             _globalOptionsRepository.Setup(x => x.AsQueryable()).Returns(new List<RelationFrequencyType>().AsQueryable());
 
