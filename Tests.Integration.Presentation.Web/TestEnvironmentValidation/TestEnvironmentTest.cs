@@ -19,7 +19,6 @@ namespace Tests.Integration.Presentation.Web.TestEnvironmentValidation
             Assert.NotNull(user);
             Assert.False(string.IsNullOrWhiteSpace(user.Username));
             Assert.False(string.IsNullOrWhiteSpace(user.Password));
-            Assert.Equal(role, user.Role);
         }
     }
 }

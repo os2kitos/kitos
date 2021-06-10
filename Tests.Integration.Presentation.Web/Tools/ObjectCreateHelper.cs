@@ -10,7 +10,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static LoginDTO MakeSimpleLoginDto(string email, string pwd)
         {
-            return new LoginDTO
+            return new()
             {
                 Email = email,
                 Password = pwd
@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static ApiUserDTO MakeSimpleApiUserDto(string email, bool apiAccess)
         {
-            return new ApiUserDTO
+            return new()
             {
                 Email = email,
                 Name = Fixture.Create<string>(),
@@ -30,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static CreateUserDTO MakeSimpleCreateUserDto(ApiUserDTO apiUser)
         {
-            return new CreateUserDTO
+            return new()
             {
                 user = apiUser,
                 organizationId = TestEnvironment.DefaultOrganizationId,

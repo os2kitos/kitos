@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Infrastructure.DataAccess;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -46,22 +48,19 @@ namespace Tests.Integration.Presentation.Web.Tools
                         OrganizationRole.User,
                         new KitosCredentials(
                             "local-regular-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.User)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.LocalAdmin,
                         new KitosCredentials(
                             "local-local-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.LocalAdmin)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
                             "local-global-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.GlobalAdmin)
+                            localDevUserPassword)
                     }
                 };
                 ApiUsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
@@ -70,15 +69,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                         OrganizationRole.User,
                         new KitosCredentials(
                             "local-api-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.User)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
                             "local-api-global-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.GlobalAdmin)
+                            localDevUserPassword)
                     }
                 };
 
@@ -130,7 +127,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var username = GetEnvironmentVariable($"TestUser{suffix}");
             var password = GetEnvironmentVariable($"TestUser{suffix}Pw");
-            return new KitosCredentials(username, password, role);
+            return new KitosCredentials(username, password);
         }
 
         public static KitosContext GetDatabase()
@@ -187,6 +184,11 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static string GetDefaultUserPassword()
         {
             return DefaultUserPassword;
+        }
+
+        public static Guid GetEntityUuid<T>(int dbId) where T : class, IHasUuid, IHasId
+        {
+            return DatabaseAccess.MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
         }
     }
 }

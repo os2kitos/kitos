@@ -133,5 +133,11 @@ namespace Core.DomainServices.Extensions
         {
             return new QueryById<T>(id).Apply(result).SingleOrDefault();
         }
+
+        public static T ByUuid<T>(this IQueryable<T> result, Guid id) where T :
+            class, IHasUuid
+        {
+            return new QueryByUuid<T>(id).Apply(result).SingleOrDefault();
+        }
     }
 }

@@ -5,9 +5,9 @@ namespace Presentation.Web.Models.External.V2.Request
 {
     public class StandardPaginationQuery
     {
-        [Range(0,int.MaxValue)]
-        public int? Page { get; set; } = 0;
-        [Range(1,PagingContraints.MaxPageSize)]
+        [Range(0, int.MaxValue)] public int? Page { get; set; } = 0;
+
+        [Range(1, PagingContraints.MaxPageSize)]
         public int? PageSize { get; set; } = PagingContraints.MaxPageSize;
     }
 }
