@@ -10,6 +10,7 @@ namespace Core.ApplicationServices.Authorization
         IEnumerable<int> OrganizationIds { get; }
         bool HasRoleInOrganizationOfType(OrganizationCategory category);
         bool IsGlobalAdmin();
+        bool HasStakeHolderAccess();
         IEnumerable<int> GetOrganizationIdsWhereHasRole(OrganizationRole role);
         bool HasRole(int organizationId, OrganizationRole role);
         bool HasRoleInAnyOrganization(OrganizationRole role);

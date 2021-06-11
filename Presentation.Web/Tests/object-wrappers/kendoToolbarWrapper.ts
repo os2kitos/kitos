@@ -35,6 +35,7 @@ type ColumnHeaders = {
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
     userRightsHolderAccess: protractor.ElementFinder,
+    userStakeHolderAccess : protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
 };
 
@@ -106,7 +107,8 @@ class kendoToolbarWrapper {
             userApi: kendo.getColumnHeader(consts.kendoUserApiHeader),
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
-            userRightsHolderAccess: kendo.getColumnHeader(consts.kendoUserRightsHolderHeader)
+            userRightsHolderAccess: kendo.getColumnHeader(consts.kendoUserRightsHolderHeader),
+            userStakeHolderAccess: kendo.getColumnHeader(consts.kendoUserStakeHolderHeader)
 
         };
         return columns;

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Microsoft.AspNet.OData;
 using Core.DomainServices;
 using Ninject;
@@ -43,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
             return Ok(entity);
         }
 
-        protected virtual IHttpActionResult Forbidden()
+        protected virtual ResponseMessageResult Forbidden()
         {
             return ResponseMessage(new HttpResponseMessage(HttpStatusCode.Forbidden));
         }

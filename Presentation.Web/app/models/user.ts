@@ -24,6 +24,8 @@
         HandoverParticipants?: ItProject.IHandover[];
         /** The contracts that the user has been marked as contract signer for */
         SignerForContracts?: ItContract.IItContract[];
+        /** Stakeholder access */
+        HasStakeHolderAccess: boolean;
     }
 
     export interface IContactPerson extends IEntity {
@@ -40,6 +42,7 @@
         PhoneNumber?: string;
         IsGlobalAdmin?: boolean;
         HasApiAccess?: boolean;
+        HasStakeHolderAccess?: boolean;
     }
 
     export interface ICreateUserPayload {

@@ -14,6 +14,7 @@
         isContractAdmin: boolean;
         isReportAdmin: boolean;
         isRightsHolder: boolean;
+        hasStakeHolderAccess: boolean;
     }
 
     class EditOrganizationUserController {
@@ -57,7 +58,8 @@
                 isSystemAdmin: hasRole(Models.OrganizationRole.SystemModuleAdmin),
                 isContractAdmin: hasRole(Models.OrganizationRole.ContractModuleAdmin),
                 isReportAdmin: hasRole(Models.OrganizationRole.ReportModuleAdmin),
-                isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess)
+                isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess),
+                hasStakeHolderAccess: user.HasStakeHolderAccess
             };
             this.originalVm = _.clone(userVm);
 
@@ -109,9 +111,8 @@
                 LastName: this.vm.lastName,
                 PhoneNumber: this.vm.phoneNumber,
                 Email: this.vm.email,
-                HasApiAccess: this.vm.hasApi
-
-
+                HasApiAccess: this.vm.hasApi,
+                HasStakeHolderAccess: this.vm.hasStakeHolderAccess
             };
             this.$http.patch(`/odata/Users(${this.userId})`, payload);
 

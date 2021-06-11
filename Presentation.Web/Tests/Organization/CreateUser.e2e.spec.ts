@@ -24,6 +24,7 @@ describe("Only Global Admins can create user with special permissions",
             pageObject.createUserButton.click();
             expect(pageObject.hasAPiCheckBox.isDisplayed()).toBeTrue();
             expect(pageObject.hasRightsHolderAccessCheckBox.isDisplayed()).toBeTrue();
+            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeTrue();
         });
 
         it("Local Admin cannot enable special permissions on new user", () => {
@@ -33,6 +34,7 @@ describe("Only Global Admins can create user with special permissions",
             pageObject.createUserButton.click();
             expect(pageObject.hasAPiCheckBox.isPresent()).toBeFalse();
             expect(pageObject.hasRightsHolderAccessCheckBox.isPresent()).toBeFalse();
+            expect(pageObject.hasStakeHolderAccessCheckBox.isPresent()).toBeFalse();
         });
 
         function executeSpecialPermissionUseCase(mutate: () => webdriver.promise.Promise<void>, validate: () => webdriver.promise.Promise<boolean>) {
@@ -68,6 +70,18 @@ describe("Only Global Admins can create user with special permissions",
                 });
         }
 
+        function canSetStakeHolderAccessTo(value: boolean) {
+            const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
+            executeSpecialPermissionUseCase(() => {
+                    console.log("Updating StakeHolderAccess status to " + value);
+                    return userHelper.updateStakeHolderAccessOnUser(credentials.username, value);
+                },
+                () => {
+                    console.log("Checking that StakeHolderAccess status is updated");
+                    return userHelper.checkStakeHolderAccessRoleStatusOnUser(credentials.username, value);
+                });
+        }
+
         it("Global admin is able to set api access to TRUE on existing user", () => {
             canSetApiAccessTo(true);
         });
@@ -82,6 +96,14 @@ describe("Only Global Admins can create user with special permissions",
 
         it("Global admin is able to set RightsHolder access to FALSE on existing user", () => {
             canSetRightsHolderAccessTo(false);
+        });
+
+        it("Global admin is able to set StakeHolder access to TRUE on existing user", () => {
+            canSetStakeHolderAccessTo(true);
+        });
+
+        it("Global admin is able to set StakeHolder access to FALSE on existing user", () => {
+            canSetStakeHolderAccessTo(false);
         });
     });
 

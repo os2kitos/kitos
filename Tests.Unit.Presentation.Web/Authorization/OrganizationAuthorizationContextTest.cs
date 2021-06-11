@@ -48,17 +48,25 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
-        [InlineData(false, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
-        [InlineData(false, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.None)]
+        [InlineData(true, false, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.None)]
 
-        //Regardless of municipality or not, a user marked as rightsholder access will only get rightsholder cross level access rights
-        [InlineData(false, true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.RightsHolder)]
-        [InlineData(false, true, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.RightsHolder)]
-        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, bool isRightsHolder, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
+        //Regardless of municipality, stakeholder or not, a user marked as rightsholder access will only get rightsholder cross level access rights
+        [InlineData(false, true, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, true, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+
+        //Stakeholder access grants public cross level read access even for non-municipality users
+        [InlineData(false, false, true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
+
+        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, bool isRightsHolder, bool isStakeHolder, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasStakeHolderAccess(isStakeHolder);
             ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, organizationCategory == OrganizationCategory.Municipality);
             ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolder);
 
@@ -70,19 +78,27 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, false, OrganizationDataReadAccessLevel.All)]
-        [InlineData(false, false, true, false, OrganizationDataReadAccessLevel.All)]
-        [InlineData(false, false, false, true, OrganizationDataReadAccessLevel.Public)]
-        [InlineData(false, false, false, false, OrganizationDataReadAccessLevel.None)]
+        [InlineData(true, false, false, false, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, true, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, false, true, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, false, false, false, OrganizationDataReadAccessLevel.None)]
 
-        [InlineData(false, true, false, false, OrganizationDataReadAccessLevel.RightsHolder)]
-        [InlineData(false, true, true, false, OrganizationDataReadAccessLevel.All)] //Rightsholders still get full access to own organization data
-        [InlineData(false, true, false, true, OrganizationDataReadAccessLevel.RightsHolder)] //Even if municipality rightsholder access is granted
-        public void GetOrganizationReadAccessLevel_Returns(bool isGlobalAdmin, bool isRightsHolder, bool isActiveInOrganization, bool isMunicipality, OrganizationDataReadAccessLevel expectedResult)
+        [InlineData(false, true, false, false, false, OrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, false, true, false, OrganizationDataReadAccessLevel.All)] //Rightsholders still get full access to own organization data
+        [InlineData(false, true, false, false, true, OrganizationDataReadAccessLevel.RightsHolder)] //Even if municipality rightsholder access is granted
+        [InlineData(false, true, true, false, false, OrganizationDataReadAccessLevel.RightsHolder)] //Even if stakeholder is set, rightsholder access is still the result
+
+
+        //Stake holders get public read access in other organizations - just like municipality users
+        [InlineData(false, false, true, false, false, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, false, true, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, true, false, OrganizationDataReadAccessLevel.All)] //Part of the organization always grants full access to that organization
+        public void GetOrganizationReadAccessLevel_Returns(bool isGlobalAdmin, bool isRightsHolder, bool hasStakeHolderAccess, bool isActiveInOrganization, bool isMunicipality, OrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             var targetOrganization = A<int>();
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasStakeHolderAccess(hasStakeHolderAccess);
             ExpectUserHasRoleIn(targetOrganization, isActiveInOrganization);
             ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, isMunicipality);
             ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolder);
@@ -725,7 +741,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             {
                 itProject.Rights = new List<ItProjectRight>()
                 {
-                    new ItProjectRight {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
+                    new() {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
 
                 };
             }
@@ -745,6 +761,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         private void ExpectUserIsGlobalAdmin(bool isGlobalAdmin)
         {
             _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(isGlobalAdmin);
+        }
+
+        private void ExpectUserHasStakeHolderAccess(bool isStakeHolder)
+        {
+            _userContextMock.Setup(x => x.HasStakeHolderAccess()).Returns(isStakeHolder);
         }
 
         private void ExpectUserHasRoleIn(int targetOrganization, bool value)
@@ -770,7 +791,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
         private static IEntity CreateUserEntity(int id)
         {
-            return (IEntity)new User() { Id = id };
+            return new User() { Id = id };
         }
     }
 }

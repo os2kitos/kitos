@@ -12,5 +12,6 @@ namespace Core.ApplicationServices.Authorization
         bool Visit(CreateEntityWithVisibilityPermission permission);
         bool Visit(ViewBrokenExternalReferencesReportPermission permission);
         bool Visit(TriggerBrokenReferencesReportPermission permission);
+        bool Visit(AdministerGlobalPermission permission);
     }
 }
