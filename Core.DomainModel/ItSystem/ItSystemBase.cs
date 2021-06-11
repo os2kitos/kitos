@@ -18,5 +18,7 @@ namespace Core.DomainModel.ItSystem
         /// The organization.
         /// </value>
         public virtual Organization.Organization Organization { get; set; }
+
+        public DateTime? Created { get; set; }
     }
 }

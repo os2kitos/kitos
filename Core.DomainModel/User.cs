@@ -15,7 +15,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IIsPartOfOrganization, IHasName
+    public class User : Entity, IIsPartOfOrganization, IHasName, IHasUuid
     {
         public string GetFullName()
         {
@@ -35,6 +35,7 @@ namespace Core.DomainModel
             HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
+            Uuid = Guid.NewGuid();
         }
 
         public string Name { get; set; }
@@ -44,6 +45,8 @@ namespace Core.DomainModel
         public string Password { get; set; }
         public string Salt { get; set; }
         public DateTime? LastAdvisDate { get; set; }
+
+        public Guid Uuid { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
         /// <summary>

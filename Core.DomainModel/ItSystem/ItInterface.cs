@@ -15,6 +15,7 @@ namespace Core.DomainModel.ItSystem
         {
             DataRows = new List<DataRow>();
             Uuid = Guid.NewGuid();
+            Created = DateTime.UtcNow;
         }
         public string Url { get; set; }
         /// <summary>

@@ -82,6 +82,7 @@ namespace Presentation.Web.Controllers.External.V2
                 Description = input.Description,
                 UrlReference = input.Url,
                 Deactivated = input.Disabled,
+                Created = input.Created,
                 CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
                 LastModified = input.LastChanged,
                 LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())

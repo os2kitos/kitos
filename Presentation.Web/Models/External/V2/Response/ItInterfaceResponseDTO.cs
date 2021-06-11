@@ -47,7 +47,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// Date of creation
         /// </summary>
-        public DateTime Created { get; set; }
+        public DateTime? Created { get; set; }
 
         /// <summary>
         /// Responsible for creation
