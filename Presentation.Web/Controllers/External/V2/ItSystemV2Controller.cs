@@ -72,9 +72,28 @@ namespace Presentation.Web.Controllers.External.V2
                 .Transform(Ok);
         }
 
-        private ItSystemInResponseDto ToDTO(ItSystem arg)
+        private static ItSystemInResponseDto ToDTO(ItSystem arg)
         {
-            throw new NotImplementedException();
+            return new()
+            {
+                Uuid = arg.Uuid,
+                Name = arg.Name,
+                RightsHolder = arg.BelongsTo?.Transform(rh => new OrganizationResponseDTO(rh.Uuid, rh.Name, rh.GetActiveCvr())), //TODO: To extension (Organization map)
+                BusinessType = arg.BusinessType?.Transform(bt => new IdentityNamePairResponseDTO(bt.Uuid, bt.Name)),//TODO: extension
+                Description = arg.Description,
+                Created = null, //TODO - does not exist
+                CreatedBy = null, //TODO - does not exist
+                Deactivated = arg.Disabled,
+                FormerName = arg.PreviousName,
+                LastModified = arg.LastChanged,
+                LastModifiedBy = arg.LastChangedByUser.Transform(user => new IdentityNamePairResponseDTO(user.Uuid, user.Name)), //TODO: extension
+                ParentSystem = arg.Parent?.Transform(parent => new IdentityNamePairResponseDTO(parent.Uuid, parent.Name)), //TODO: Use extension
+                UrlReference = arg.Reference?.URL,
+                ExposedInterfaces = arg.ItInterfaceExhibits.Select(exhibit => new IdentityNamePairResponseDTO(exhibit.ItInterface.Uuid, exhibit.ItInterface.Name)).ToList(), //TODO: Use extension
+                RecommendedArchiveDutyResponse = arg.ArchiveDuty?.Transform(duty => new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, duty.ToString("G"))), //TODO: Add enum and map it
+                UsingOrganizations = arg.Usages.Select(x => x.Organization).Select(x => new OrganizationResponseDTO(x.Uuid, x.Name, x.GetActiveCvr())).ToList(), //TODO: Use org map extension,
+                KLE = arg.TaskRefs.Select(x => new IdentityNamePairResponseDTO(x.Uuid, x.TaskKey)).ToList()
+            };
         }
 
         /// <summary>
@@ -91,6 +110,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItSystem(Guid uuid)
         {
+            //TODO
             return Ok(new ItSystemInResponseDto());
         }
     }

@@ -13,7 +13,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
-        public Guid? ParentSystemUuid { get; set; }
+        public IdentityNamePairResponseDTO ParentSystem { get; set; }
         
         /// <summary>
         /// Name of IT-System
@@ -58,15 +58,15 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// List of IT-Interfaces exposed by this IT-System
         /// </summary>
-        public IEnumerable<Guid> ExposedInterfaces { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> ExposedInterfaces { get; set; }
 
         /// <summary>
-        /// Date of creation
+        /// Date of creation (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
-        public DateTime Created { get; set; }
+        public DateTime? Created { get; set; } //TODO: Missing in domain model
 
         /// <summary>
-        /// Responsible for creation
+        /// Responsible for creation. (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
 
@@ -83,7 +83,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// Comment for recommended archive duty
         /// </summary>
-        public string RecommendedArchiveDutyComment { get; set; }
+        public string RecommendedArchiveDutyComment { get; set; } //TODO: Add enum in api model here and map back and forth with the domain model
 
         /// <summary>
         /// Name and id pair detailing the archive duty

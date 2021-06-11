@@ -137,6 +137,7 @@ namespace Core.DomainModel
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }
+        public Guid Uuid { get; set; } //TODO:
 
         public override bool HasUserWriteAccess(User user)
         {

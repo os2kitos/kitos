@@ -2,14 +2,20 @@
 {
     public class RecommendedArchiveDutyResponseDTO
     {
+        public RecommendedArchiveDutyResponseDTO(string name, string id)
+        {
+            Name = name;
+            Id = id;
+        }
+
         /// <summary>
         /// Name for archive duty
         /// </summary>
-        public string Name { get; set; }
+        public string Name { get; }
 
         /// <summary>
         /// Archive duty identifier
         /// </summary>
-        public int Id { get; set; }
+        public string Id { get; }
     }
 }
