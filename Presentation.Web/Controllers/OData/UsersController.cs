@@ -31,13 +31,14 @@ namespace Presentation.Web.Controllers.OData
         protected override Maybe<IHttpActionResult> ValidatePatch(Delta<User> delta, User entity)
         {
             var error = base.ValidatePatch(delta, entity);
-            if (error.HasValue)
-                return error;
-            if (AttemptToChangeStakeHolderAccess(delta, entity))
+            if (error.IsNone)
             {
-                if (!UserContext.IsGlobalAdmin())
+                if (AttemptToChangeStakeHolderAccess(delta, entity))
                 {
-                    error = Forbidden(); //Only global admins may edit stake holders
+                    if (!UserContext.IsGlobalAdmin())
+                    {
+                        error = Forbidden(); //Only global admins may edit stake holders
+                    }
                 }
             }
 
