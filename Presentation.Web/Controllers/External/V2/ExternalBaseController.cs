@@ -3,9 +3,11 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.Result;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.External.V2
 {
+    [PublicApi(true)]
     [Authorize]
     public class ExternalBaseController: ApiController
     {
