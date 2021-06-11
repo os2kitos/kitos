@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Interface;
+using Core.DomainModel.ItSystem;
+using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
@@ -54,7 +57,35 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterface(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination)
         {
-            return Ok(new List<ItInterfaceResponseDTO>());
+            return _itInterfaceService
+                .GetInterfaces(organizationUuid)
+                .Select(x => x.OrderBy(y => y.Id))
+                .Select(x => x.Page(pagination))
+                .Select(ToDTOs)
+                .Match(value => Ok(value), FromOperationError);
+        }
+
+        private IEnumerable<ItInterfaceResponseDTO> ToDTOs(IQueryable<ItInterface> interfaces)
+        {
+            return interfaces.Select(ToDTO).ToList();
+        }
+
+        private ItInterfaceResponseDTO ToDTO(ItInterface input)
+        {
+            return new ItInterfaceResponseDTO()
+            {
+                Uuid = input.Uuid,
+                ExposedBySystemUuid = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
+                Name = input.Name,
+                InterfaceId = input.ItInterfaceId,
+                Version = input.Version,
+                Description = input.Description,
+                UrlReference = input.Url,
+                Deactivated = input.Disabled,
+                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
+                LastModified = input.LastChanged,
+                LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())
+            };
         }
 
         /// <summary>
