@@ -4,7 +4,7 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Web.Http;
-using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 
@@ -28,7 +28,27 @@ namespace Presentation.Web.Controllers.OData
         [NonAction]
         public override IHttpActionResult Post(int organizationId, User entity) => throw new NotSupportedException();
 
-        //TODO: Check if patch is hit and even if not we must guard against it here
+        protected override Maybe<IHttpActionResult> ValidatePatch(Delta<User> delta, User entity)
+        {
+            var error = base.ValidatePatch(delta, entity);
+            if (error.HasValue)
+                return error;
+            if (AttemptToChangeStakeHolderAccess(delta, entity))
+            {
+                if (!UserContext.IsGlobalAdmin())
+                {
+                    error = Forbidden(); //Only global admins may edit stake holders
+                }
+            }
+
+            return error;
+        }
+
+        private static bool AttemptToChangeStakeHolderAccess(Delta<User> delta, User entity)
+        {
+            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.HasStakeHolderAccess),
+                out var hasStakeHolderAccess) && ((bool) hasStakeHolderAccess) != entity.HasStakeHolderAccess;
+        }
 
         [HttpPost]
         public IHttpActionResult Create(ODataActionParameters parameters)

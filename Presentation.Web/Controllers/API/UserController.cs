@@ -36,9 +36,13 @@ namespace Presentation.Web.Controllers.API
         [NonAction]
         public override HttpResponseMessage Post(int organizationId, UserDTO dto) => throw new NotSupportedException();
 
+        /// <summary>
+        /// Sends advice to user
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public HttpResponseMessage Post(UserDTO dto)
         {
-            //TODO: This one does nothing but sending advis. It does not create the user.. wtf?
             try
             {
                 // do some string magic to determine parameters, and actions
@@ -119,12 +123,12 @@ namespace Presentation.Web.Controllers.API
                 var destName = mapMember.DestinationName;
 
                 if (destName == nameof(Core.DomainModel.User.IsGlobalAdmin))
-                    if (valuePair.Value.Value<bool>()) // check if value is being set to true
+                    if ((valuePair.Value?.Value<bool>()).GetValueOrDefault()) // check if value is being set to true
                         if (!_userContext.IsGlobalAdmin())
                             return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
                 if (destName == nameof(Core.DomainModel.User.HasStakeHolderAccess))
                 {
-                    if (existingUser.HasStakeHolderAccess != valuePair.Value.Value<bool>())
+                    if (existingUser.HasStakeHolderAccess != (valuePair.Value?.Value<bool>()).GetValueOrDefault())
                     {
                         if (!_userContext.IsGlobalAdmin())
                             return Forbidden();//Only global admins may edit stakeholder access
