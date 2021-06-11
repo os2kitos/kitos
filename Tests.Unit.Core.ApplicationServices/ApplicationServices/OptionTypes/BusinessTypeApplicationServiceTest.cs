@@ -78,15 +78,18 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             Assert.Empty(businessTypes.Value);
         }
 
-        [Fact]
-        public void GetAvailableOptions_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All()
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void GetAvailableOptions_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All(OrganizationDataReadAccessLevel authContextReturn)
         {
             //Arrange
             var uuid = Guid.NewGuid();
             var orgId = A<int>();
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.Public);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(authContextReturn);
             _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(new List<BusinessType>() { CreateBusinessType() });
 
             //Act
@@ -160,8 +163,11 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             Assert.Equal(OperationFailure.NotFound, businessTypeResult.Error.FailureType);
         }
 
-        [Fact]
-        public void GetBusinessType_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All()
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void GetBusinessType_Returns_Forbidden_If_Not_OrganizationDataReadAccessLevel_Is_All(OrganizationDataReadAccessLevel authContextReturn)
         {
             //Arrange
             var orgUuid = Guid.NewGuid();
@@ -170,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var businessType = CreateBusinessType();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.Public);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(authContextReturn);
             _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns((businessType, true));
 
             //Act

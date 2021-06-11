@@ -88,6 +88,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.RightsHolders;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
@@ -225,6 +226,8 @@ namespace Presentation.Web.Ninject
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
+
+            kernel.Bind<IRightsHoldersService>().To<RightsHoldersService>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -454,7 +457,7 @@ namespace Presentation.Web.Ninject
             //Itsystemusage
             kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
-            
+
             //Generic
             kernel.Bind<PurgeDuplicatePendingReadModelUpdates>().ToSelf().InCommandScope(Mode);
 

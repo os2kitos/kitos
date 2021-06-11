@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Uuid_To_OptionTypes : IMigrationMetadata
+    public sealed partial class Organization_Add_Uuid_UX : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Uuid_To_OptionTypes));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Organization_Add_Uuid_UX));
         
         string IMigrationMetadata.Id
         {
-            get { return "202106100832314_Added_Uuid_To_OptionTypes"; }
+            get { return "202106100736579_Organization_Add_Uuid_UX"; }
         }
         
         string IMigrationMetadata.Source

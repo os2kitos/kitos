@@ -126,6 +126,8 @@
     <Compile Include="Model\EventHandler\ContractDeletedUserNotificationsHandler.cs" />
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
+    <Compile Include="RightsHolders\IRightsHoldersService.cs" />
+    <Compile Include="RightsHolders\RightsHoldersService.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />

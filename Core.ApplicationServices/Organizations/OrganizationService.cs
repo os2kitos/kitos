@@ -133,6 +133,7 @@ namespace Core.ApplicationServices.Organizations
             }
 
             //Setup defaults
+            newOrg.Uuid = newOrg.Uuid == Guid.Empty ? Guid.NewGuid() : newOrg.Uuid;
             newOrg.Config = Config.Default(user);
             newOrg.OrgUnits.Add(new OrganizationUnit
             {

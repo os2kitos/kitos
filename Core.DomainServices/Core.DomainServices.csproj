@@ -88,6 +88,7 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
+    <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />

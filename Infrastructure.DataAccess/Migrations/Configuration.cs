@@ -647,9 +647,6 @@ namespace Infrastructure.DataAccess.Migrations
 
                 var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
 
-                //TODO: MRJ
-                commonOrganization.Uuid = Guid.NewGuid(); // Set Uuid on organization.
-
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
 

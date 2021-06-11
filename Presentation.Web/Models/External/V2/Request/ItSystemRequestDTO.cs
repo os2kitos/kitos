@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.External.V2
+namespace Presentation.Web.Models.External.V2.Request
 {
     public class ItSystemRequestDTO
     {
@@ -15,9 +15,9 @@ namespace Presentation.Web.Models.External.V2
 
         /// <summary>
         /// UUID for IT-System
+        /// If no uuid is provided, KITOS will assign one automatically
         /// </summary>
-        [Required]
-        public Guid Uuid { get; set; }
+        public Guid? Uuid { get; set; }
 
         /// <summary>
         /// UUID for possible IT-System parent (if any)
@@ -27,7 +27,7 @@ namespace Presentation.Web.Models.External.V2
         /// <summary>
         /// Name of IT-System
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public string Name { get; set; }
 
         /// <summary>

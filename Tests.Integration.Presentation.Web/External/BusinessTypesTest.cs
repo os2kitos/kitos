@@ -1,5 +1,7 @@
 ﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Presentation.Web.Models.External.V2;
+using Presentation.Web.Models.External.V2.Response;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,17 +19,21 @@ namespace Tests.Integration.Presentation.Web.External
         public async Task Can_Get_AvailableBusinessTypes()
         {
             //Arrange
-            var organisation = await OrganizationHelper.GetOrganizationAsync(TestEnvironment.DefaultOrganizationId);
+            var orgUuid = DatabaseAccess.MapFromEntitySet<Organization, Guid>(x => x.AsQueryable().Where(x => x.Id == TestEnvironment.DefaultOrganizationId).Select(x => x.Uuid).SingleOrDefault());
             var pageSize = A<int>() % 9 + 1; //Minimum is 1;
             var pageNumber = 0; //Always takes the first page;
-            var data = DatabaseAccess.MapFromEntitySet<BusinessType, IEnumerable<Guid>>(x => x.AsQueryable().OrderBy(x => x.Name).Select(x => x.Uuid).Take(pageSize).ToList());
+            var dbData = DatabaseAccess.MapFromEntitySet<BusinessType, IEnumerable<Guid>>(x => x.AsQueryable().OrderBy(x => x.Name).Select(x => x.Uuid).Take(pageSize).ToList());
 
             //Act
-            var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, pageSize, pageNumber);
+            var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(orgUuid, pageSize, pageNumber);
 
             //Assert
             Assert.Equal(pageSize, businessTypes.Count());
-            Assert.Collection(businessTypes, x => data.Contains(x.Uuid));
+            //Assert.Collection(businessTypes, x => data.Contains(x.Uuid));
+            foreach (IdentityNamePairResponseDTO uuidPair in businessTypes)
+            {
+                Assert.Contains(uuidPair.Uuid, dbData);
+            }
         }
 
         [Fact]

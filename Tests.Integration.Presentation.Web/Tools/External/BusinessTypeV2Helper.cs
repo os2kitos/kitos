@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.Organization;
 using Presentation.Web.Models.External.V2;
+using Presentation.Web.Models.External.V2.Response;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -14,11 +15,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetBusinessTypesAsync(Guid orgUuid, int pageSize, int pageNumber)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v2/business-types?organizationUuid={orgUuid}&pageSize={pageSize}&pageNumber={pageNumber}");
+            var url = TestEnvironment.CreateUrl($"api/v2/business-types?organizationUuid={orgUuid}&pageSize={pageSize}&page={pageNumber}");
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+                return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
             }
         }
 
@@ -29,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
             {
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<AvailableNamePairResponseDTO>();
+                return await response.ReadResponseBodyAsAsync<AvailableNamePairResponseDTO>();
             }
         }
     }

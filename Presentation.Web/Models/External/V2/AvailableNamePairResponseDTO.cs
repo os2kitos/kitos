@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Presentation.Web.Models.External.V2.Response;
+using System;
 
 namespace Presentation.Web.Models.External.V2
 {

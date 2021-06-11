@@ -206,6 +206,7 @@
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\QueryByAccessModifierTest.cs" />
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
+    <Compile Include="DomainServices\QueryByUuidTest.cs" />
     <Compile Include="DomainServices\QueryByIdTest.cs" />
     <Compile Include="DomainServices\QueryByOrganizationIdTest.cs" />
     <Compile Include="DomainServices\QueryByNameTest.cs" />

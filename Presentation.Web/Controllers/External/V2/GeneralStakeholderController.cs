@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
+using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2

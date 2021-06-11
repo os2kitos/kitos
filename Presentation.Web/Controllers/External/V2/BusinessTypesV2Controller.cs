@@ -9,6 +9,8 @@ using Core.DomainModel.ItSystem;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
+using Presentation.Web.Models.External.V2.Request;
+using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
@@ -35,14 +37,13 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetBusinessTypes(Guid organizationUuid, int pageSize, int pageNumber)
+        public IHttpActionResult GetBusinessTypes(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination)
         {
-            //TODO: MRJ
             return _businessTypeApplicationService
                 .GetBusinessTypes(organizationUuid)
-                .Select(x => x.Pagination(pageSize, pageNumber))
+                .Select(x => x.Page(pagination))
                 .Select(ToDTOs)
-                .Match(Ok, FromOperationError);
+                .Match(value => Ok(value), FromOperationError);
         }
 
         /// <summary>
@@ -57,12 +58,12 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetBusinessType(Guid businessTypeUuid, Guid organizationUuid)
+        public IHttpActionResult GetBusinessType(Guid businessTypeUuid, Guid organizationUuid)
         {
             return _businessTypeApplicationService
                 .GetBusinessType(organizationUuid, businessTypeUuid)
                 .Select(x => ToAvailableDTO(x.option, x.available))
-                .Match(Ok, FromOperationError);
+                .Match(value => Ok(value), FromOperationError);
         }
 
         private List<IdentityNamePairResponseDTO> ToDTOs(IEnumerable<BusinessType> businessTypes)

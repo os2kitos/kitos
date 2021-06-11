@@ -42,6 +42,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             TypeMapping.AddIndexOnAccessModifier<OrganizationMap, Organization>(this);
 
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Organization_UUID", 0);
+
         }
     }
 }

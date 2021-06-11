@@ -32,13 +32,11 @@ namespace Core.DomainServices.Repositories.Organization
                 .FirstOrDefault();
         }
 
-        //TODO: MRJ
         public Maybe<DomainModel.Organization.Organization> GetByUuid(Guid uuid)
         {
             return _repository
                 .AsQueryable()
-                .Where(organization => organization.Uuid == uuid)
-                .FirstOrDefault();
+                .ByUuid(uuid);
         }
     }
 }
