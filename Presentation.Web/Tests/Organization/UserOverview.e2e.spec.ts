@@ -10,10 +10,6 @@ describe("Special column access test", () => {
     var waitUpTo = new WaitTimers();
     var ec = protractor.ExpectedConditions;
 
-    beforeEach(() => {
-
-    });
-
     afterEach(() => {
         testFixture.cleanupState();
     });
