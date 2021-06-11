@@ -7,7 +7,10 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Interface;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -24,6 +27,8 @@ namespace Core.ApplicationServices.Interface
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<ItInterface> _repository;
+        private readonly IOrganizationRepository _organizationRepository;
+        private readonly IInterfaceRepository _interfaceRepository;
 
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
@@ -31,7 +36,9 @@ namespace Core.ApplicationServices.Interface
             IItSystemRepository systemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IOrganizationRepository organizationRepository, 
+            IInterfaceRepository interfaceRepository)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
@@ -39,6 +46,8 @@ namespace Core.ApplicationServices.Interface
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
+            _organizationRepository = organizationRepository;
+            _interfaceRepository = interfaceRepository;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -180,6 +189,31 @@ namespace Core.ApplicationServices.Interface
                     .Where(x => x.ItInterfaceId == interfaceId);
 
             return !system.Any();
+        }
+
+        public Result<IQueryable<ItInterface>, OperationError> GetInterfaces(Guid orgGuid)
+        {
+            var orgId = ResolveOrgIdAndAccessLevel(orgGuid);
+            if (orgId.Failed)
+            {
+                return orgId.Error;
+            }
+            return Result<IQueryable<ItInterface>, OperationError>.Success(_interfaceRepository.GetInterfacesFromOrganization(orgId.Value));
+        }
+
+        private Result<int, OperationError> ResolveOrgIdAndAccessLevel(Guid organizationUuid)
+        {
+            var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(org => org.Id);
+            if (organizationId.IsNone)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId.Value) == OrganizationDataReadAccessLevel.RightsHolder)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return organizationId.Value;
         }
     }
 }

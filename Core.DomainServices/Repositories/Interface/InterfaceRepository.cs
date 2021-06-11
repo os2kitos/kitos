@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices.Extensions;
 
 namespace Core.DomainServices.Repositories.Interface
 {
@@ -10,6 +11,11 @@ namespace Core.DomainServices.Repositories.Interface
         public InterfaceRepository(IGenericRepository<ItInterface> interfaceRepository)
         {
             _interfaceRepository = interfaceRepository;
+        }
+
+        public IQueryable<ItInterface> GetInterfacesFromOrganization(int orgId)
+        {
+            return _interfaceRepository.AsQueryable().ByOrganizationId(orgId);
         }
 
         public IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined()

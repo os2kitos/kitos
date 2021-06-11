@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Interface;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
@@ -12,6 +13,14 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2/rightsholder")]
     public class RightsHolderItInterfaceController: ExternalBaseController
     {
+        private readonly IItInterfaceService _itInterfaceService;
+
+        public RightsHolderItInterfaceController(IItInterfaceService itInterfaceService)
+        {
+            _itInterfaceService = itInterfaceService;
+        }
+
+
         /// <summary>
         /// Creates a new IT-Interface based on given input values
         /// </summary>
@@ -33,6 +42,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Returns active IT-Interfaces
         /// </summary>
+        /// <param name="organizationUuid">Uuid of the organization you want interfaces from</param>
         /// <param name="page">Page index to be returned (zero based)</param>
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
@@ -42,7 +52,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(int? page = 0, int? pageSize = 100)
+        public IHttpActionResult GetItInterface(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination)
         {
             return Ok(new List<ItInterfaceResponseDTO>());
         }

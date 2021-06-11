@@ -6,5 +6,6 @@ namespace Core.DomainServices.Repositories.Interface
     public interface IInterfaceRepository
     {
         IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined();
+        IQueryable<ItInterface> GetInterfacesFromOrganization(int orgId);
     }
 }
