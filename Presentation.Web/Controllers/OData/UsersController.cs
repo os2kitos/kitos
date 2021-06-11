@@ -4,6 +4,7 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization.Permissions;
 using Infrastructure.Services.Types;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -35,9 +36,17 @@ namespace Presentation.Web.Controllers.OData
             {
                 if (AttemptToChangeStakeHolderAccess(delta, entity))
                 {
-                    if (!UserContext.IsGlobalAdmin())
+                    if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
                     {
-                        error = Forbidden(); //Only global admins may edit stake holders
+                        error = Forbidden();
+                    }
+                }
+
+                if (AttemptToChangeGlobalAdminFlag(delta, entity))
+                {
+                    if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
+                    {
+                        error = Forbidden();
                     }
                 }
             }
@@ -45,10 +54,16 @@ namespace Presentation.Web.Controllers.OData
             return error;
         }
 
+        private static bool AttemptToChangeGlobalAdminFlag(Delta<User> delta, User entity)
+        {
+            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.IsGlobalAdmin),
+                out var globalAdmin) && ((bool)globalAdmin) != entity.IsGlobalAdmin;
+        }
+
         private static bool AttemptToChangeStakeHolderAccess(Delta<User> delta, User entity)
         {
             return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.HasStakeHolderAccess),
-                out var hasStakeHolderAccess) && ((bool) hasStakeHolderAccess) != entity.HasStakeHolderAccess;
+                out var hasStakeHolderAccess) && ((bool)hasStakeHolderAccess) != entity.HasStakeHolderAccess;
         }
 
         [HttpPost]
@@ -87,7 +102,7 @@ namespace Presentation.Web.Controllers.OData
             if (user?.IsGlobalAdmin == true)
             {
                 // only other global admins can create global admin users
-                if (!UserContext.IsGlobalAdmin())
+                if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
                 }
@@ -96,7 +111,7 @@ namespace Presentation.Web.Controllers.OData
             if (user?.HasStakeHolderAccess == true)
             {
                 // only global admins can create stakeholder access
-                if (!UserContext.IsGlobalAdmin())
+                if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
                 {
                     ModelState.AddModelError(nameof(user.HasStakeHolderAccess), "You don't have permission to issue stakeholder access.");
                 }
@@ -106,7 +121,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
 
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
-            
+
             return Created(createdUser);
         }
         [HttpGet]

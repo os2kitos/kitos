@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainServices;
@@ -124,14 +125,14 @@ namespace Presentation.Web.Controllers.API
 
                 if (destName == nameof(Core.DomainModel.User.IsGlobalAdmin))
                     if ((valuePair.Value?.Value<bool>()).GetValueOrDefault()) // check if value is being set to true
-                        if (!_userContext.IsGlobalAdmin())
-                            return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+                        if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
+                            return Forbidden();
                 if (destName == nameof(Core.DomainModel.User.HasStakeHolderAccess))
                 {
                     if (existingUser.HasStakeHolderAccess != (valuePair.Value?.Value<bool>()).GetValueOrDefault())
                     {
-                        if (!_userContext.IsGlobalAdmin())
-                            return Forbidden();//Only global admins may edit stakeholder access
+                        if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                            return Forbidden();
                     }
                 }
             }

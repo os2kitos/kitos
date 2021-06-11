@@ -409,7 +409,7 @@ namespace Core.ApplicationServices.Authorization
 
             if (right.Role == OrganizationRole.GlobalAdmin)
             {
-                if (IsGlobalAdmin())
+                if (HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                 {
                     result = true;
                 }
@@ -466,6 +466,18 @@ namespace Core.ApplicationServices.Authorization
         public bool Visit(TriggerBrokenReferencesReportPermission permission)
         {
             return IsGlobalAdmin();
+        }
+
+        public bool Visit(AdministerGlobalPermission permission)
+        {
+            switch (permission.Permission)
+            {
+                case GlobalPermission.GlobalAdmin:
+                case GlobalPermission.StakeHolderAccess:
+                    return IsGlobalAdmin();
+                default:
+                    return false;
+            }
         }
 
         #endregion PERMISSIONS

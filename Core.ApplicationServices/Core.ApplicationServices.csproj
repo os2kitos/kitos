@@ -88,6 +88,8 @@
     <Compile Include="Authorization\IAuthorizationContextFactory.cs" />
     <Compile Include="Authorization\IOrganizationalUserContext.cs" />
     <Compile Include="Authorization\IUserContextFactory.cs" />
+    <Compile Include="Authorization\Permissions\AdministerGlobalPermission.cs" />
+    <Compile Include="Authorization\Permissions\GlobalPermission.cs" />
     <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
     <Compile Include="Authorization\Permissions\ViewBrokenExternalReferencesReportPermission.cs" />
     <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
