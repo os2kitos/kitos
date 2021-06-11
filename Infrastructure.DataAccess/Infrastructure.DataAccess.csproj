@@ -737,9 +737,13 @@
     <Compile Include="Migrations\202106100736579_Organization_Add_Uuid_UX.designer.cs">
       <DependentUpon>202106100736579_Organization_Add_Uuid_UX.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202106102021364_Added_Uuid_To_OptionTypes.cs" />
-    <Compile Include="Migrations\202106102021364_Added_Uuid_To_OptionTypes.designer.cs">
-      <DependentUpon>202106102021364_Added_Uuid_To_OptionTypes.cs</DependentUpon>
+    <Compile Include="Migrations\202106101307490_User_Add_StakeholderAccessFlag.cs" />
+    <Compile Include="Migrations\202106101307490_User_Add_StakeholderAccessFlag.designer.cs">
+      <DependentUpon>202106101307490_User_Add_StakeholderAccessFlag.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106110925321_Added_Uuid_To_OptionTypes.cs" />
+    <Compile Include="Migrations\202106110925321_Added_Uuid_To_OptionTypes.designer.cs">
+      <DependentUpon>202106110925321_Added_Uuid_To_OptionTypes.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1207,8 +1211,11 @@
     <EmbeddedResource Include="Migrations\202106100736579_Organization_Add_Uuid_UX.resx">
       <DependentUpon>202106100736579_Organization_Add_Uuid_UX.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106102021364_Added_Uuid_To_OptionTypes.resx">
-      <DependentUpon>202106102021364_Added_Uuid_To_OptionTypes.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106101307490_User_Add_StakeholderAccessFlag.resx">
+      <DependentUpon>202106101307490_User_Add_StakeholderAccessFlag.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106110925321_Added_Uuid_To_OptionTypes.resx">
+      <DependentUpon>202106110925321_Added_Uuid_To_OptionTypes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

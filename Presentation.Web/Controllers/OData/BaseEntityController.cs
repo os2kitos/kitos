@@ -130,40 +130,55 @@ namespace Presentation.Web.Controllers.OData
                 return NotFound();
             }
 
+            var validationError = ValidatePatch(delta, entity);
+
+            return validationError.Match(error => error, () =>
+            {
+                try
+                {
+                    // patch the entity
+                    delta.Patch(entity);
+                    RaiseUpdatedDomainEvent(entity);
+                    Repository.Save();
+                }
+                catch (Exception e)
+                {
+                    return InternalServerError(e);
+                }
+
+                // add the request header "Prefer: return=representation"
+                // if you want the updated entity returned,
+                // else you'll just get 204 (No Content) returned
+                return Updated(entity);
+            });
+        }
+
+        protected virtual Maybe<IHttpActionResult> ValidatePatch(Delta<T> delta, T entity)
+        {
             // check if user is allowed to write to the entity
             if (AllowModify(entity) == false)
             {
-                return Forbidden();
+                {
+                    return Forbidden();
+                }
             }
 
-            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) &&
-                accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
+            if (delta.TryGetPropertyValue(nameof(IHasAccessModifier.AccessModifier), out object accessModifier) && accessModifier.Equals(AccessModifier.Public) && AllowEntityVisibilityControl(entity) == false)
             {
-                return Forbidden();
+                {
+                    return Forbidden();
+                }
             }
 
             // check model state
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                {
+                    return BadRequest(ModelState);
+                }
             }
 
-            try
-            {
-                // patch the entity
-                delta.Patch(entity);
-                RaiseUpdatedDomainEvent(entity);
-                Repository.Save();
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-
-            // add the request header "Prefer: return=representation"
-            // if you want the updated entity returned,
-            // else you'll just get 204 (No Content) returned
-            return Updated(entity);
+            return Maybe<IHttpActionResult>.None;
         }
 
         protected virtual void RaiseUpdatedDomainEvent(T entity)

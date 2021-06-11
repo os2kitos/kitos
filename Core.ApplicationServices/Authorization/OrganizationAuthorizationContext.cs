@@ -49,7 +49,7 @@ namespace Core.ApplicationServices.Authorization
             if (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
                 return CrossOrganizationDataReadAccessLevel.RightsHolder;
 
-            return IsUserInMunicipality()
+            return (IsUserInMunicipality() || HasStakeHolderAccess())
                 ? CrossOrganizationDataReadAccessLevel.Public
                 : CrossOrganizationDataReadAccessLevel.None;
         }
@@ -331,6 +331,11 @@ namespace Core.ApplicationServices.Authorization
                    typeof(IIsPartOfOrganization).IsAssignableFrom(entityType);
         }
 
+        private bool HasStakeHolderAccess()
+        {
+            return _activeUserContext.HasStakeHolderAccess();
+        }
+
         private bool HasRoleInSameOrganizationAs(IEntity entity)
         {
             return _activeUserContext.HasRoleInSameOrganizationAs(entity);
@@ -404,7 +409,7 @@ namespace Core.ApplicationServices.Authorization
 
             if (right.Role == OrganizationRole.GlobalAdmin)
             {
-                if (IsGlobalAdmin())
+                if (HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                 {
                     result = true;
                 }
@@ -461,6 +466,18 @@ namespace Core.ApplicationServices.Authorization
         public bool Visit(TriggerBrokenReferencesReportPermission permission)
         {
             return IsGlobalAdmin();
+        }
+
+        public bool Visit(AdministerGlobalPermission permission)
+        {
+            switch (permission.Permission)
+            {
+                case GlobalPermission.GlobalAdmin:
+                case GlobalPermission.StakeHolderAccess:
+                    return IsGlobalAdmin();
+                default:
+                    return false;
+            }
         }
 
         #endregion PERMISSIONS

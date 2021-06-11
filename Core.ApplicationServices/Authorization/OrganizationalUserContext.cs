@@ -13,16 +13,19 @@ namespace Core.ApplicationServices.Authorization
     {
         private readonly IReadOnlyDictionary<int, HashSet<OrganizationRole>> _roles;
         private readonly IReadOnlyDictionary<int, OrganizationCategory> _categoriesOfMemberOrganizations;
+        private readonly bool _stakeHolderAccess;
         private readonly HashSet<OrganizationCategory> _membershipCategories;
         private readonly bool _isGlobalAdmin;
 
         public OrganizationalUserContext(
             int userId,
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roles,
-            IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations)
+            IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations,
+            bool stakeHolderAccess)
         {
             UserId = userId;
             _categoriesOfMemberOrganizations = categoriesOfMemberOrganizations;
+            _stakeHolderAccess = stakeHolderAccess;
             _membershipCategories = new HashSet<OrganizationCategory>(_categoriesOfMemberOrganizations.Values);
             _roles = roles
                 .ToDictionary(kvp => kvp.Key, kvp => new HashSet<OrganizationRole>(kvp.Value))
@@ -42,6 +45,11 @@ namespace Core.ApplicationServices.Authorization
         public bool IsGlobalAdmin()
         {
             return _isGlobalAdmin;
+        }
+
+        public bool HasStakeHolderAccess()
+        {
+            return _stakeHolderAccess;
         }
 
         public IEnumerable<int> GetOrganizationIdsWhereHasRole(OrganizationRole role)

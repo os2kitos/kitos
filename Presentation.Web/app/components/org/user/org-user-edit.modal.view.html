@@ -62,16 +62,30 @@
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReportAdmin">Rapport admin</label>
                 </div>
             </div>
-            <div ng-if="ctrl.isUserGlobalAdmin">
-                <label for="Andet" class="col-xs-3 control-label">
-                    Andet
-                </label>
+        </div>
+        <div class="form-group" ng-if="ctrl.isUserGlobalAdmin">
+            <div>
+                <label class="col-xs-3 control-label">Særlige roller i organisationen</label>
                 <div class="col-xs-8">
                     <div class="checkbox">
-                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isRightsHolder">Rettighedshaveradgang</label>
+                    </div>
+                    <span ng-if="ctrl.vm.isRightsHolder" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Bemærk: Særlig rettighed der ikke bør kombineres med andre udover API adgang.
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" ng-if="ctrl.isUserGlobalAdmin">
+            <div>
+                <label class="col-xs-3 control-label">Tværgående rettigheder</label>
+                <div class="col-xs-8">
+                    <div class="checkbox">
+                        <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
                     </div>
                     <div class="checkbox">
-                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isRightsHolder">Rettighedshaveradgang</label>
+                        <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasStakeHolderAccess">Interessentadgang</label>
                     </div>
                 </div>
             </div>

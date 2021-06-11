@@ -6,46 +6,34 @@ class CreateUserHelper {
     private cssHelper = new CSSLocator();
     private pageCreateObject = new CreatePage();
     private pageObject = new HomePageObjects();
-    public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
+
+    private assertCheckboxState(email: string, checkbox: protractor.ElementFinder, expectedState: boolean) {
         return this.openEditUser(email)
             .then(() => {
-                var expectedValue = apiStatus ? "true" : null;
-                return expect(this.pageObject.hasAPiCheckBox.getAttribute("checked")).toEqual(expectedValue);
+                var expectedValue = expectedState ? "true" : null;
+                return expect(checkbox.getAttribute("checked")).toEqual(expectedValue);
             });
+    }
+
+    public checkApiRoleStatusOnUser(email: string, apiStatus: boolean) {
+        return this.assertCheckboxState(email, this.pageObject.hasAPiCheckBox, apiStatus);
     }
 
     public checkRightsHolderAccessRoleStatusOnUser(email: string, hasAccess: boolean) {
-        return this.openEditUser(email)
-            .then(() => {
-                var expectedValue = hasAccess ? "true" : null;
-                return expect(this.pageObject.hasRightsHolderAccessCheckBox.getAttribute("checked")).toEqual(expectedValue);
-            });
+        return this.assertCheckboxState(email, this.pageObject.hasRightsHolderAccessCheckBox, hasAccess);
     }
 
-    public updateApiOnUser(email: string, apiAccess: boolean) {
-        return this.openEditUser(email)
-            .then(() => {
-                return this.pageObject.hasAPiCheckBox.isSelected()
-                    .then(selected => {
-                        if (selected !== apiAccess) {
-                            return this.pageCreateObject.boolApi.click()
-                                .then(() => {
-                                   return this.pageCreateObject.editUserButton.click();
-                                });
-                        } else {
-                            return this.pageCreateObject.cancelEditUserButton.click();
-                        }
-                    });
-            });
+    public checkStakeHolderAccessRoleStatusOnUser(email: string, hasAccess: boolean) {
+        return this.assertCheckboxState(email, this.pageObject.hasStakeHolderAccessCheckBox, hasAccess);
     }
 
-    public updateRightsHolderAccessOnUser(email: string, hasAccess: boolean) {
+    private setUserCheckboxState(email: string, checkbox: protractor.ElementFinder, toState: boolean) {
         return this.openEditUser(email)
             .then(() => {
-                return this.pageObject.hasRightsHolderAccessCheckBox.isSelected()
+                return checkbox.isSelected()
                     .then(selected => {
-                        if (selected !== hasAccess) {
-                            return this.pageObject.hasRightsHolderAccessCheckBox.click()
+                        if (selected !== toState) {
+                            return checkbox.click()
                                 .then(() => {
                                     return this.pageCreateObject.editUserButton.click();
                                 });
@@ -53,7 +41,20 @@ class CreateUserHelper {
                             return this.pageCreateObject.cancelEditUserButton.click();
                         }
                     });
-            });
+            })
+            .then(() => browser.waitForAngular());
+    }
+
+    public updateApiOnUser(email: string, apiAccess: boolean) {
+        return this.setUserCheckboxState(email, this.pageObject.hasAPiCheckBox, apiAccess);
+    }
+
+    public updateRightsHolderAccessOnUser(email: string, hasAccess: boolean) {
+        return this.setUserCheckboxState(email, this.pageObject.hasRightsHolderAccessCheckBox, hasAccess);
+    }
+
+    public updateStakeHolderAccessOnUser(email: string, hasAccess: boolean) {
+        return this.setUserCheckboxState(email, this.pageObject.hasStakeHolderAccessCheckBox, hasAccess);
     }
 
     private getUserRow(email: string) {

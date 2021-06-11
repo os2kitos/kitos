@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
-using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [PublicApi]
     [RoutePrefix("api/v2/rightsholder")]
     public class RightsHolderItSystemsController: ExternalBaseController
     {
@@ -97,8 +94,9 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public void DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
+            return Ok();
         }
     }
 }

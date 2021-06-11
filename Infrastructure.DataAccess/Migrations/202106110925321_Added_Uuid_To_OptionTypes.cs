@@ -45,7 +45,7 @@
             AddColumn("dbo.SensitivePersonalDataTypes", "Uuid", c => c.Guid(nullable: false));
 
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Migrate_Uuid_On_OptionTypes.sql"));
-            
+
             CreateIndex("dbo.AgreementElementTypes", "Uuid", unique: true, name: "UX_Option_Uuid");
             CreateIndex("dbo.GoalTypes", "Uuid", unique: true, name: "UX_Option_Uuid");
             CreateIndex("dbo.OrganizationUnitRoles", "Uuid", unique: true, name: "UX_Option_Uuid");

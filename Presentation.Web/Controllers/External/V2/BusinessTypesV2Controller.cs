@@ -15,7 +15,6 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [PublicApi]
     [RoutePrefix("api/v2/business-types")]
     public class BusinessTypesV2Controller: ExternalBaseController
     {

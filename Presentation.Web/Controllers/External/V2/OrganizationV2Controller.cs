@@ -6,14 +6,12 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [PublicApi]
     [RoutePrefix("api/v2/organizations")]
     public class OrganizationV2Controller : ExternalBaseController
     {
