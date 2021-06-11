@@ -33,7 +33,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         private void SetupSut(
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roleMap = null,
-            IReadOnlyDictionary<int, OrganizationCategory> categoryMap = null)
+            IReadOnlyDictionary<int, OrganizationCategory> categoryMap = null,
+            bool isStakeHolder = true)
         {
             _userId = A<int>();
             _municipalityOrganizationId = A<int>();
@@ -54,7 +55,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new OrganizationalUserContext(
                 _userId,
                 _rolesPerOrganizationId,
-                _categoryPerOrganizationId
+                _categoryPerOrganizationId,
+                isStakeHolder
             );
         }
 
@@ -218,6 +220,21 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public void OrganizationIds_Returns_OrganizationIds_With_Roles()
         {
             Assert.Equal(_rolesPerOrganizationId.Keys, _sut.OrganizationIds);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void HasStakeHolderAccess_Returns(bool expected)
+        {
+            //Arrange
+            SetupSut(isStakeHolder:expected);
+
+            //Act
+            var result = _sut.HasStakeHolderAccess();
+
+            //Assert
+            Assert.Equal(expected,result);
         }
 
         #region helpers
