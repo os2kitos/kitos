@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -37,6 +38,7 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage Post(UserDTO dto)
         {
+            //TODO: This one does nothing but sending advis. It does not create the user.. wtf?
             try
             {
                 // do some string magic to determine parameters, and actions
@@ -99,6 +101,10 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
+            var existingUser = Repository.AsQueryable().ById(id);
+            if (existingUser == null)
+                return NotFound();
+
             // get name of mapped property
             var map = Mapper.ConfigurationProvider.FindTypeMapFor<UserDTO, User>().PropertyMaps;
 
@@ -112,10 +118,18 @@ namespace Presentation.Web.Controllers.API
 
                 var destName = mapMember.DestinationName;
 
-                if (destName == "IsGlobalAdmin")
+                if (destName == nameof(Core.DomainModel.User.IsGlobalAdmin))
                     if (valuePair.Value.Value<bool>()) // check if value is being set to true
                         if (!_userContext.IsGlobalAdmin())
                             return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+                if (destName == nameof(Core.DomainModel.User.HasStakeHolderAccess))
+                {
+                    if (existingUser.HasStakeHolderAccess != valuePair.Value.Value<bool>())
+                    {
+                        if (!_userContext.IsGlobalAdmin())
+                            return Forbidden();//Only global admins may edit stakeholder access
+                    }
+                }
             }
 
             return base.Patch(id, organizationId, obj);

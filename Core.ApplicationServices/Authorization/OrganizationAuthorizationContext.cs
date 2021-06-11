@@ -49,7 +49,7 @@ namespace Core.ApplicationServices.Authorization
             if (_activeUserContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
                 return CrossOrganizationDataReadAccessLevel.RightsHolder;
 
-            return IsUserInMunicipality()
+            return (IsUserInMunicipality() || HasStakeHolderAccess())
                 ? CrossOrganizationDataReadAccessLevel.Public
                 : CrossOrganizationDataReadAccessLevel.None;
         }
@@ -329,6 +329,11 @@ namespace Core.ApplicationServices.Authorization
         {
             return typeof(IOwnedByOrganization).IsAssignableFrom(entityType) ||
                    typeof(IIsPartOfOrganization).IsAssignableFrom(entityType);
+        }
+
+        private bool HasStakeHolderAccess()
+        {
+            return _activeUserContext.HasStakeHolderAccess();
         }
 
         private bool HasRoleInSameOrganizationAs(IEntity entity)

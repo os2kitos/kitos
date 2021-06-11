@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using NotImplementedException = System.NotImplementedException;
 
 namespace Core.ApplicationServices.Authorization
 {
@@ -18,6 +19,11 @@ namespace Core.ApplicationServices.Authorization
         }
 
         public bool IsGlobalAdmin()
+        {
+            return false;
+        }
+
+        public bool HasStakeHolderAccess()
         {
             return false;
         }

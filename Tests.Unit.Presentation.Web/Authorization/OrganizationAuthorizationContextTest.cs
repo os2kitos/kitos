@@ -47,6 +47,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _sut = new OrganizationAuthorizationContext(_userContextMock.Object, typeResolver.Object, _moduleLevelAccessPolicy.Object, _globalAccessPolicy.Object, _creationPolicy.Object, _userRepository.Object);
         }
 
+        //TODO: Test stakeholder access
+
         [Theory]
         [InlineData(true, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
         [InlineData(false, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]

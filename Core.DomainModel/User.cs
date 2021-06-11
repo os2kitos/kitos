@@ -46,8 +46,14 @@ namespace Core.DomainModel
         public DateTime? LastAdvisDate { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
-
+        /// <summary>
+        /// User has been granted api access
+        /// </summary>
         public bool? HasApiAccess { get; set; }
+        /// <summary>
+        /// User has been marked as a user with stake holder access
+        /// </summary>
+        public bool HasStakeHolderAccess { get; set; }
 
         public bool CanAuthenticate()
         {

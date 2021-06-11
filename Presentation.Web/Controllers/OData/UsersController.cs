@@ -28,6 +28,8 @@ namespace Presentation.Web.Controllers.OData
         [NonAction]
         public override IHttpActionResult Post(int organizationId, User entity) => throw new NotSupportedException();
 
+        //TODO: Check if patch is hit and even if not we must guard against it here
+
         [HttpPost]
         public IHttpActionResult Create(ODataActionParameters parameters)
         {
@@ -67,6 +69,15 @@ namespace Presentation.Web.Controllers.OData
                 if (!UserContext.IsGlobalAdmin())
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
+                }
+            }
+
+            if (user?.HasStakeHolderAccess == true)
+            {
+                // only global admins can create stakeholder access
+                if (!UserContext.IsGlobalAdmin())
+                {
+                    ModelState.AddModelError(nameof(user.HasStakeHolderAccess), "You don't have permission to issue stakeholder access.");
                 }
             }
 
