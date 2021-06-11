@@ -11,35 +11,35 @@ describe("Special column access test", () => {
     var ec = protractor.ExpectedConditions;
 
     beforeEach(() => {
-       
+
     });
 
     afterEach(() => {
         testFixture.cleanupState();
     });
 
-    it("Global Admin can see special attributes in overview", () =>
-    {
+    it("Global Admin can see special attributes in overview", () => {
         loginHelper.loginAsGlobalAdmin();
         checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi, "api");
         checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess, "RightsHolderAccess");
+        checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userStakeHolderAccess, "StakeHolderAccess");
     });
 
     it("Local Admin can see API access but not RightsHolderAccess attribute in overview", () => {
         loginHelper.loginAsLocalAdmin();
         checkColumnVisibility(true, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi, "api");
         checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess, "RightsHolderAccess");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userStakeHolderAccess, "StakeHolderAccess");
     });
 
-    it("Regular user cannot see special attributes attribute in overview", () =>
-    {
+    it("Regular user cannot see special attributes attribute in overview", () => {
         loginHelper.loginAsRegularUser();
-        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi,"api");
-        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess,"RightsHolderAccess");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userApi, "api");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userRightsHolderAccess, "RightsHolderAccess");
+        checkColumnVisibility(false, () => pageObject.kendoToolbarWrapper.columnHeaders().userStakeHolderAccess, "StakeHolderAccess");
     });
 
-    function checkColumnVisibility(isColumnVisible : boolean, getColumn: () => protractor.ElementFinder, logName : string)
-    {
+    function checkColumnVisibility(isColumnVisible: boolean, getColumn: () => protractor.ElementFinder, logName: string) {
         console.log(`Testing that ${logName} column presence is ${isColumnVisible}`);
 
         pageObject.getPage();
@@ -52,8 +52,7 @@ describe("Special column access test", () => {
             //NOTE: Cannot use IsVisible method since it returns false if out of the visible area (scroll bars)
             expectation.not.toContain("display: none");
         }
-        else
-        {
+        else {
             //NOTE: Cannot use IsVisible method since it returns false if out of the visible area (scroll bars)
             expectation.toContain("display: none");
         }
