@@ -416,6 +416,20 @@
                         menu: this.user.isGlobalAdmin,
                     },
                     {
+
+                        field: "stakeHolder", title: "Interessentadgang", width: 160,
+                        persistId: "stakeHolder", // DON'T YOU DARE RENAME!
+                        attributes: { "class": "text-center", "data-element-type": "stakeHolderObject" },
+                        headerAttributes: {
+                            "data-element-type": "stakeHolderHeader"
+                        },
+                        template: (dataItem) => setBooleanValue(dataItem.HasStakeHolderAccess),
+                        hidden: !this.user.isGlobalAdmin,
+                        filterable: false,
+                        sortable: false,
+                        menu: this.user.isGlobalAdmin,
+                    },
+                    {
                         template: (dataItem) => dataItem.canEdit ? `<a data-ng-click="ctrl.onEdit(${dataItem.Id})" class="k-button k-button-icontext"><span class="k-icon k-edit"></span>Redigér</a><a data-ng-click="ctrl.onDelete(${dataItem.Id})" class="k-button k-button-icontext" data-user="dataItem"><span class="k-icon k-delete"></span>Slet</a>` : `<a class="k-button k-button-icontext" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-edit"></span>Redigér</a><a class="k-button k-button-icontext" data-user="dataItem" data-ng-disabled="${!dataItem.canEdit}"><span class="k-icon k-delete"></span>Slet</a>`,
                         title: " ",
                         width: 176,
