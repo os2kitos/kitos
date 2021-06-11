@@ -93,8 +93,9 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public void DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
+            return Ok();
         }
     }
 }
