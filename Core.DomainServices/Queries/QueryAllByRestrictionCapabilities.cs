@@ -20,7 +20,8 @@ namespace Core.DomainServices.Queries
 
         public QueryAllByRestrictionCapabilities(CrossOrganizationDataReadAccessLevel crossOrganizationAccess, IEnumerable<int> organizationIds)
         {
-            _crossOrganizationAccess = crossOrganizationAccess;
+            //Rightsholders only have local access from a generic perspective. Queries must be custom-built
+            _crossOrganizationAccess = crossOrganizationAccess == CrossOrganizationDataReadAccessLevel.RightsHolder ? CrossOrganizationDataReadAccessLevel.None : crossOrganizationAccess;
             _organizationIds = organizationIds;
             _hasOrganization = typeof(IOwnedByOrganization).IsAssignableFrom(typeof(T));
             _hasAccessModifier = typeof(IHasAccessModifier).IsAssignableFrom(typeof(T));

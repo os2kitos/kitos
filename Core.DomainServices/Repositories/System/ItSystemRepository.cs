@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.System
 {
@@ -22,14 +22,11 @@ namespace Core.DomainServices.Repositories.System
             _systemRepository = systemRepository;
         }
 
-        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters)
+        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters = null)
         {
-            if (parameters == null)
-                throw new ArgumentNullException(nameof(parameters));
+            var itSystems = _systemRepository.AsQueryable();
 
-            return _systemRepository
-                .AsQueryable()
-                .ByOrganizationDataQueryParameters(parameters);
+            return parameters?.Transform(p => itSystems.ByOrganizationDataQueryParameters(p)) ?? itSystems;
         }
 
         public IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters)

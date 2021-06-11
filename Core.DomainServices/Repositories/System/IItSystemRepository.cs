@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Model;
 
@@ -7,7 +6,7 @@ namespace Core.DomainServices.Repositories.System
 {
     public interface IItSystemRepository
     {
-        IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters);
+        IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters = null);
 
         IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters);
 

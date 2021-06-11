@@ -345,6 +345,7 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemV2Controller.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
@@ -354,10 +355,10 @@
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
-    <Compile Include="Models\External\V2\Response\ItSystemStakeholderResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\ItSystemInResponseDto.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
     <Compile Include="Models\External\V2\Response\ItInterfaceResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\ItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\ItSystemInformationResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\ItInterfaceRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
     <Compile Include="Models\External\V2\Request\DeactivationReasonRequestDTO.cs" />

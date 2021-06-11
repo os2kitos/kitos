@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Presentation.Web.Models.External.V2.Response
 {
-    public class ItSystemResponseDTO
+    public class ItSystemInformationResponseDTO
     {
         /// <summary>
         /// UUID for IT-System

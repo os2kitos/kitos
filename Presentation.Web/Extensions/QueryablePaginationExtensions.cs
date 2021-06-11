@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Shared;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 
 namespace Presentation.Web.Extensions

@@ -11,10 +11,13 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.System
@@ -27,6 +30,7 @@ namespace Core.ApplicationServices.System
         private readonly ITransactionManager _transactionManager;
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository,
@@ -34,7 +38,8 @@ namespace Core.ApplicationServices.System
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IReferenceService referenceService,
-            ILogger logger
+            ILogger logger,
+            IOrganizationalUserContext userContext
             )
         {
             _repository = repository;
@@ -43,8 +48,29 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
             _referenceService = referenceService;
             _logger = logger;
+            _userContext = userContext;
         }
 
+
+        public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
+        {
+            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+            
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
+
+            var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+                Maybe<QueryAllByRestrictionCapabilities<ItSystem>>.None :
+                Maybe<QueryAllByRestrictionCapabilities<ItSystem>>.Some(new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds));
+
+            var mainQuery = _itSystemRepository.GetSystems();
+
+            var refinedResult = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            return conditions.Any() ? new IntersectionQuery<ItSystem>(conditions).Apply(refinedResult) : refinedResult;
+        }
 
         public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
         {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Core.DomainModel.ItSystem
 {
@@ -8,5 +9,6 @@ namespace Core.DomainModel.ItSystem
     public class BusinessType : OptionEntity<ItSystem>, IOptionReference<ItSystem>
     {
         public virtual ICollection<ItSystem> References { get; set; } = new HashSet<ItSystem>();
+        public Guid Uuid { get; set; } //TODO: Remove once JMO is in master with his changes
     }
 }
