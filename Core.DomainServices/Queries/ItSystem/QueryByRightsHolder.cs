@@ -14,7 +14,7 @@ namespace Core.DomainServices.Queries.ItSystem
 
         public IQueryable<DomainModel.ItSystem.ItSystem> Apply(IQueryable<DomainModel.ItSystem.ItSystem> itSystems)
         {
-            return itSystems.Where(x => x.BelongsToId != null && x.BelongsTo.Uuid == _rightsHolderUuid);
+            return itSystems.Where(x => x.BelongsTo != null && x.BelongsTo.Uuid == _rightsHolderUuid);
         }
     }
 }
