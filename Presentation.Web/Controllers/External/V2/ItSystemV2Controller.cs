@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
@@ -19,10 +20,12 @@ namespace Presentation.Web.Controllers.External.V2
     public class ItSystemV2Controller : ExternalBaseController
     {
         private readonly IItSystemService _itSystemService;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public ItSystemV2Controller(IItSystemService itSystemService)
+        public ItSystemV2Controller(IItSystemService itSystemService, IAuthorizationContext authorizationContext)
         {
             _itSystemService = itSystemService;
+            _authorizationContext = authorizationContext;
         }
 
         /// <summary>
@@ -92,7 +95,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .Match(Ok, FromOperationError);
         }
 
-        private static ItSystemInResponseDto ToDTO(ItSystem arg)
+        private ItSystemInResponseDto ToDTO(ItSystem arg)
         {
             return new()
             {
@@ -109,10 +112,23 @@ namespace Presentation.Web.Controllers.External.V2
                 LastModifiedBy = arg.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO()),
                 ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
                 UrlReference = arg.Reference?.URL,
-                ExposedInterfaces = arg.ItInterfaceExhibits.Select(exhibit => exhibit.ItInterface.MapIdentityNamePairDTO()).ToList(),
+                ExposedInterfaces = arg
+                    .ItInterfaceExhibits
+                    .Select(exhibit => exhibit.ItInterface)
+                    .ToList()
+                    .Where(_authorizationContext.AllowReads)//Some interfaces descriptions may not be read-accessible (created as private in an organization which the user is not a member of).
+                    .Select(x => x.MapIdentityNamePairDTO())
+                    .ToList(),
                 RecommendedArchiveDutyResponse = new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType()),
-                UsingOrganizations = arg.Usages.Select(systemUsage => systemUsage.Organization).Select(organization => organization.MapOrganizationResponseDTO()).ToList(),
-                KLE = arg.TaskRefs.Select(taskRef => new IdentityNamePairResponseDTO(taskRef.Uuid, taskRef.TaskKey)).ToList()
+                UsingOrganizations = arg
+                    .Usages
+                    .Select(systemUsage => systemUsage.Organization)
+                    .Select(organization => organization.MapOrganizationResponseDTO())
+                    .ToList(),
+                KLE = arg
+                    .TaskRefs
+                    .Select(taskRef => new IdentityNamePairResponseDTO(taskRef.Uuid, taskRef.TaskKey))
+                    .ToList()
             };
         }
     }
