@@ -9,7 +9,6 @@ namespace Core.DomainServices.Repositories.Interface
     public interface IInterfaceRepository
     {
         IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined();
-        IQueryable<ItInterface> GetInterfacesFromOrganization(int orgId);
         IQueryable<ItInterface> GetInterfaces();
         IQueryable<ItInterface> GetInterfacesFromRightsHolderOrganizations(IEnumerable<int> rightsHolderOrgs);
         Maybe<ItInterface> GetInterface(Guid uuid);

@@ -59,6 +59,9 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var refinements = new List<IDomainQuery<ItInterface>>();
 
             if (rightsHolderUuid.HasValue)

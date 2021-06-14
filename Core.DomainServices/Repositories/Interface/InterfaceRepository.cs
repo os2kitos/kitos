@@ -26,11 +26,6 @@ namespace Core.DomainServices.Repositories.Interface
             return _interfaceRepository.AsQueryable();
         }
 
-        public IQueryable<ItInterface> GetInterfacesFromOrganization(int orgId)
-        {
-            return _interfaceRepository.AsQueryable().ByOrganizationId(orgId);
-        }
-
         public IQueryable<ItInterface> GetInterfacesFromRightsHolderOrganizations(IEnumerable<int> rightsHolderOrgs)
         {
             return _interfaceRepository.AsQueryable().ByRightsHolderIds(rightsHolderOrgs);
