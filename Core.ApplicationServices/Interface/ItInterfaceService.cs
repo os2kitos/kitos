@@ -203,18 +203,22 @@ namespace Core.ApplicationServices.Interface
 
                 return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(rightsHolderQuery) : rightsHolderQuery;
             }
+            else
+            {
+                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1735");
+            }
+            //TODO: Solve this as part of https://os2web.atlassian.net/browse/KITOSUDV-1735
+            //var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
+            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
 
-            var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
-                Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
-                Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
+            //var mainQuery = _interfaceRepository.GetInterfaces();
 
-            var mainQuery = _interfaceRepository.GetInterfaces();
+            //var refinedResult = refinement
+            //    .Select(x => x.Apply(mainQuery))
+            //    .GetValueOrFallback(mainQuery);
 
-            var refinedResult = refinement
-                .Select(x => x.Apply(mainQuery))
-                .GetValueOrFallback(mainQuery);
-
-            return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
+            //return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
         }
 
         public Result<ItInterface, OperationError> GetInterface(Guid uuid)
@@ -223,7 +227,7 @@ namespace Core.ApplicationServices.Interface
                 .GetInterface(uuid)
                 .Match
                 (
-                    system => _authorizationContext.AllowReads(system) ? Result<ItInterface, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
+                    itInterface => _authorizationContext.AllowReads(itInterface) ? Result<ItInterface, OperationError>.Success(itInterface) : new OperationError(OperationFailure.Forbidden),
                     () => new OperationError(OperationFailure.NotFound)
                 );
         }
