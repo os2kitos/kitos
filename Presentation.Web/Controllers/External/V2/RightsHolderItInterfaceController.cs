@@ -133,7 +133,7 @@ namespace Presentation.Web.Controllers.External.V2
             return new ItInterfaceResponseDTO()
             {
                 Uuid = input.Uuid,
-                ExposedBySystemUuid = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
+                ExposedBySystem = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
                 Name = input.Name,
                 InterfaceId = input.ItInterfaceId,
                 Version = input.Version,

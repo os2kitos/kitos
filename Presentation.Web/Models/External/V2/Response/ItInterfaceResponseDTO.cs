@@ -12,7 +12,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>
-        public IdentityNamePairResponseDTO ExposedBySystemUuid { get; set; }
+        public IdentityNamePairResponseDTO ExposedBySystem { get; set; }
         
         /// <summary>
         /// Name of IT-Interface
