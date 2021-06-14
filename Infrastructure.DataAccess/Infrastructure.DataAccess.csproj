@@ -741,10 +741,6 @@
     <Compile Include="Migrations\202106101307490_User_Add_StakeholderAccessFlag.designer.cs">
       <DependentUpon>202106101307490_User_Add_StakeholderAccessFlag.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202106140356218_Introduce_Uuid_User_BusinessType_ItSystem.cs" />
-    <Compile Include="Migrations\202106140356218_Introduce_Uuid_User_BusinessType_ItSystem.designer.cs">
-      <DependentUpon>202106140356218_Introduce_Uuid_User_BusinessType_ItSystem.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1213,9 +1209,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106101307490_User_Add_StakeholderAccessFlag.resx">
       <DependentUpon>202106101307490_User_Add_StakeholderAccessFlag.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106140356218_Introduce_Uuid_User_BusinessType_ItSystem.resx">
-      <DependentUpon>202106140356218_Introduce_Uuid_User_BusinessType_ItSystem.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
