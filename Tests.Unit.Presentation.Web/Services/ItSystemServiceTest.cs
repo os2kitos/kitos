@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
@@ -9,9 +11,13 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Moq;
+using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -27,6 +33,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IDatabaseTransaction> _dbTransaction;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<ILogger> _logger;
+        private readonly Mock<IOrganizationalUserContext> _userContext;
 
         public ItSystemServiceTest()
         {
@@ -36,6 +43,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _dbTransaction = new Mock<IDatabaseTransaction>();
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
+            _userContext = new Mock<IOrganizationalUserContext>();
             _sut = new ItSystemService(
                 null,
                 _systemRepository.Object,
@@ -43,12 +51,136 @@ namespace Tests.Unit.Presentation.Web.Services
                 _transactionManager.Object,
                 _referenceService.Object,
                 _logger.Object,
-                Mock.Of<IOrganizationalUserContext>()
+                _userContext.Object
                 );
         }
 
-        //TODO: GetSystem
-        //TODO: GetAvailableSystems
+        [Fact]
+        public void GetSystem_Returns_Not_Found_If_System_Does_Not_Exist()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            ExpectGetSystemReturns(uuid, Maybe<ItSystem>.None);
+
+            //Act
+            var system = _sut.GetSystem(uuid);
+
+            //Assert
+            Assert.True(system.Failed);
+            Assert.Equal(OperationFailure.NotFound, system.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystem_Returns_Forbidden_If_ReadAccessIsDeclined()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = CreateSystem();
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, false);
+
+            //Act
+            var system = _sut.GetSystem(uuid);
+
+            //Assert
+            Assert.True(system.Failed);
+            Assert.Equal(OperationFailure.Forbidden, system.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetSystem_Returns_Ok()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystem = CreateSystem();
+            ExpectGetSystemReturns(uuid, itSystem);
+            ExpectAllowReadsReturns(itSystem, true);
+
+            //Act
+            var system = _sut.GetSystem(uuid);
+
+            //Assert
+            Assert.True(system.Ok);
+            Assert.Same(itSystem, system.Value);
+        }
+
+        [Fact]
+        public void GetAvailableSystems_With_Full_Access()
+        {
+            //Arrange
+            var all = new List<ItSystem> { CreateSystem(), CreateSystem() };
+            ExpectGetSystemsReturns(all);
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var availableSystems = _sut.GetAvailableSystems().ToList();
+
+            //Assert
+            Assert.Equal(all, availableSystems);
+        }
+
+        [Fact]
+        public void GetAvailableSystems_With_Own_OrganizationOnlyAccess()
+        {
+            //Arrange
+            var ownOrganizationId1 = A<int>();
+            var ownOrganizationId2 = ownOrganizationId1 + 1;
+            var otherOrganizationId = ownOrganizationId2 + 1;
+            var includedSystem1 = CreateSystem(ownOrganizationId1);
+            var includedSystem2 = CreateSystem(ownOrganizationId2);
+            var all = new List<ItSystem> { includedSystem1, CreateSystem(otherOrganizationId), CreateSystem(otherOrganizationId), includedSystem2 };
+            ExpectGetSystemsReturns(all);
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.None);
+            ExpectGetUserOrganizationIdsReturns(ownOrganizationId1, ownOrganizationId2);
+
+            //Act
+            var availableSystems = _sut.GetAvailableSystems().ToList();
+
+            //Assert
+            Assert.Equal(new[] { includedSystem1, includedSystem2 }, availableSystems);
+        }
+
+        [Fact]
+        public void GetAvailableSystems_With_Public_Shared_Access()
+        {
+            //Arrange
+            var ownOrganizationId1 = A<int>();
+            var ownOrganizationId2 = ownOrganizationId1 + 1;
+            var otherOrganizationId = ownOrganizationId2 + 1;
+            var includedSystem1 = CreateSystem(ownOrganizationId1);
+            var includedSystem2 = CreateSystem(ownOrganizationId2);
+            var includedBySharing = CreateSystem(otherOrganizationId, AccessModifier.Public);
+            var all = new List<ItSystem> { includedSystem1, includedBySharing, CreateSystem(otherOrganizationId, AccessModifier.Local), includedSystem2 };
+            ExpectGetSystemsReturns(all);
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.Public);
+            ExpectGetUserOrganizationIdsReturns(ownOrganizationId1, ownOrganizationId2);
+
+            //Act
+            var availableSystems = _sut.GetAvailableSystems().ToList();
+
+            //Assert
+            Assert.Equal(new[] { includedSystem1, includedBySharing, includedSystem2 }, availableSystems);
+        }
+
+        [Fact]
+        public void GetAvailableSystems_Applies_Sub_queries()
+        {
+            //Arrange
+            var all = new List<ItSystem> { CreateSystem(), CreateSystem() };
+            ExpectGetSystemsReturns(all);
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.All);
+
+            var subQuery = new Mock<IDomainQuery<ItSystem>>();
+            subQuery.Setup(x => x.Apply(It.Is<IQueryable<ItSystem>>(systems => systems.ToList().SequenceEqual(all))))
+                .Returns<IQueryable<ItSystem>>((input) => input.Take(1).AsQueryable());
+
+            //Act
+            var availableSystems = _sut.GetAvailableSystems(subQuery.Object).ToList();
+
+            //Assert
+            var itSystem = Assert.Single(availableSystems);
+            Assert.Same(all.Take(1).Single(), itSystem);
+        }
 
         [Fact]
         public void GetUsingOrganizations_Returns_Forbidden_If_Read_Access_To_System_Is_Unauthorized()
@@ -318,9 +450,19 @@ namespace Tests.Unit.Presentation.Web.Services
             return new Organization { Id = A<int>(), Name = A<string>() };
         }
 
-        private ItSystem CreateSystem()
+        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local)
         {
-            return new ItSystem { Id = A<int>() };
+            ItSystem itSystem = new()
+            {
+                Id = A<int>(),
+                AccessModifier = accessModifier
+            };
+
+            if (organizationId.HasValue)
+            {
+                itSystem.OrganizationId = organizationId.Value;
+            }
+            return itSystem;
         }
 
         private TaskRef createTaskRef()
@@ -354,6 +496,10 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         private void ExpectGetSystemReturns(int id, ItSystem system)
+        {
+            _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
+        }
+        private void ExpectGetSystemReturns(Guid id, Maybe<ItSystem> system)
         {
             _systemRepository.Setup(x => x.GetSystem(id)).Returns(system);
         }
@@ -391,6 +537,21 @@ namespace Tests.Unit.Presentation.Web.Services
         private static void AddTaskRef(ItSystem system, TaskRef taskRef)
         {
             system.TaskRefs.Add(taskRef);
+        }
+
+        private IReturnsResult<IAuthorizationContext> ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            return _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+        }
+
+        private IReturnsResult<IItSystemRepository> ExpectGetSystemsReturns(List<ItSystem> itSystems)
+        {
+            return _systemRepository.Setup(x => x.GetSystems(null)).Returns(new EnumerableQuery<ItSystem>(itSystems));
+        }
+
+        private void ExpectGetUserOrganizationIdsReturns(params int[] ownOrganizationIds)
+        {
+            _userContext.Setup(x => x.OrganizationIds).Returns(ownOrganizationIds);
         }
     }
 }
