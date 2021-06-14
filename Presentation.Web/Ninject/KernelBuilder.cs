@@ -209,7 +209,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
-            kernel.Bind<IBusinessTypeApplicationService>().To<BusinessTypeApplicationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -319,6 +318,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //DomainService bindings
             kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
                 .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
 
@@ -342,6 +342,11 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
                 .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
+
+
+            // ApplicationService bindings
+            kernel.Bind<IOptionsApplicationService<ItSystem, BusinessType>>()
+               .To<OptionsApplicationService<ItSystem, BusinessType>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

@@ -98,8 +98,7 @@ namespace Core.DomainServices.Options
         {
             return _optionRepository
                 .AsQueryable()
-                .Where(x => x.Uuid == optionUuid)
-                .FirstOrDefault()
+                .ByUuid(optionUuid)
                 .FromNullable()
                 .Match
                 (

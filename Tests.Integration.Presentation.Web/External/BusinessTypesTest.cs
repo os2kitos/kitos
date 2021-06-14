@@ -1,6 +1,6 @@
 ﻿using Core.DomainModel.ItSystem;
+using Core.DomainModel.LocalOptions;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Response;
 using System;
 using System.Collections.Generic;
@@ -19,10 +19,11 @@ namespace Tests.Integration.Presentation.Web.External
         public async Task Can_Get_AvailableBusinessTypes()
         {
             //Arrange
-            var orgUuid = DatabaseAccess.MapFromEntitySet<Organization, Guid>(x => x.AsQueryable().Where(x => x.Id == TestEnvironment.DefaultOrganizationId).Select(x => x.Uuid).SingleOrDefault());
-            var pageSize = 5; //Minimum is 1;
+            var orgUuid = TestEnvironment.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+            var pageSize = Math.Max(1, A<int>() % 9); //Minimum is 1;
             var pageNumber = 0; //Always takes the first page;
-            var dbData = DatabaseAccess.MapFromEntitySet<BusinessType, IEnumerable<Guid>>(x => x.AsQueryable().OrderBy(x => x.Name).Where(x => x.IsObligatory).Select(x => x.Uuid).Take(pageSize).ToList());
+            var locallyEnabledOptions = DatabaseAccess.MapFromEntitySet<LocalBusinessType, IEnumerable<int>>(x => x.AsQueryable().Where(y => y.IsActive).Select(y => y.OptionId).ToList());
+            var dbData = DatabaseAccess.MapFromEntitySet<BusinessType, IEnumerable<Guid>>(x => x.AsQueryable().OrderBy(x => x.Name).Where(x => x.IsObligatory || (x.IsEnabled && locallyEnabledOptions.Contains(x.Id))).Select(x => x.Uuid).Take(pageSize).ToList());
 
             //Act
             var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(orgUuid, pageSize, pageNumber);

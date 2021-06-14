@@ -1,5 +1,5 @@
 ﻿using Core.ApplicationServices.Authorization;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
@@ -9,27 +9,28 @@ using System.Collections.Generic;
 
 namespace Core.ApplicationServices.OptionTypes
 {
-    public class BusinessTypeApplicationService : IBusinessTypeApplicationService
+    public class OptionsApplicationService<TReference, TOption> : IOptionsApplicationService<TReference, TOption> 
+        where TOption : OptionEntity<TReference>
     {
-        private readonly IOptionsService<ItSystem, BusinessType> _businessTypeOptionService;
+        private readonly IOptionsService<TReference, TOption> _optionsTypeService;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IAuthorizationContext _authorizationContext;
 
-        public BusinessTypeApplicationService(IOptionsService<ItSystem, BusinessType> businessTypeOptionService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository)
+        public OptionsApplicationService(IOptionsService<TReference, TOption> optionsTypeService, IAuthorizationContext authorizationContext, IOrganizationRepository organizationRepository)
         {
-            _businessTypeOptionService = businessTypeOptionService;
+            _optionsTypeService = optionsTypeService;
             _authorizationContext = authorizationContext;
             _organizationRepository = organizationRepository;
         }
 
-        public Result<(BusinessType option, bool available), OperationError> GetBusinessType(Guid organizationUuid, Guid businessTypeUuid)
+        public Result<(TOption option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid businessTypeUuid)
         {
-            var orgId = ResolveOrgIdAndAccessLevel(organizationUuid);
+            var orgId = ResolveOrgId(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
             }
-            var businessTypeResult = _businessTypeOptionService.GetOptionByUuid(orgId.Value, businessTypeUuid);
+            var businessTypeResult = _optionsTypeService.GetOptionByUuid(orgId.Value, businessTypeUuid);
             if (businessTypeResult.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
@@ -38,18 +39,18 @@ namespace Core.ApplicationServices.OptionTypes
             return businessTypeResult.Value;
         }
 
-        public Result<IEnumerable<BusinessType>, OperationError> GetBusinessTypes(Guid organizationUuid)
+        public Result<IEnumerable<TOption>, OperationError> GetOptionTypes(Guid organizationUuid)
         {
-            var orgId = ResolveOrgIdAndAccessLevel(organizationUuid);
+            var orgId = ResolveOrgId(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
             }
 
-            return Result<IEnumerable<BusinessType>, OperationError>.Success(_businessTypeOptionService.GetAvailableOptions(orgId.Value));
+            return Result<IEnumerable<TOption>, OperationError>.Success(_optionsTypeService.GetAvailableOptions(orgId.Value));
         }
 
-        private Result<int, OperationError> ResolveOrgIdAndAccessLevel(Guid organizationUuid)
+        private Result<int, OperationError> ResolveOrgId(Guid organizationUuid)
         {
             var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(org => org.Id);
             if (organizationId.IsNone)

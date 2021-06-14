@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
@@ -18,9 +17,9 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2/business-types")]
     public class BusinessTypesV2Controller: ExternalBaseController
     {
-        private readonly IBusinessTypeApplicationService _businessTypeApplicationService;
+        private readonly IOptionsApplicationService<ItSystem, BusinessType> _businessTypeApplicationService;
 
-        public BusinessTypesV2Controller(IBusinessTypeApplicationService businessTypeApplicationService)
+        public BusinessTypesV2Controller(IOptionsApplicationService<ItSystem, BusinessType> businessTypeApplicationService)
         {
             _businessTypeApplicationService = businessTypeApplicationService;
         }
@@ -36,10 +35,13 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessTypes(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination)
+        public IHttpActionResult GetBusinessTypes(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             return _businessTypeApplicationService
-                .GetBusinessTypes(organizationUuid)
+                .GetOptionTypes(organizationUuid)
                 .Select(x => x.Page(pagination))
                 .Select(ToDTOs)
                 .Match(value => Ok(value), FromOperationError);
@@ -60,7 +62,7 @@ namespace Presentation.Web.Controllers.External.V2
         public IHttpActionResult GetBusinessType(Guid businessTypeUuid, Guid organizationUuid)
         {
             return _businessTypeApplicationService
-                .GetBusinessType(organizationUuid, businessTypeUuid)
+                .GetOptionType(organizationUuid, businessTypeUuid)
                 .Select(x => ToAvailableDTO(x.option, x.available))
                 .Match(value => Ok(value), FromOperationError);
         }
