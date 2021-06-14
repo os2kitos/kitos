@@ -142,7 +142,6 @@ namespace Presentation.Web.Controllers.External.V2
                 Deactivated = input.Disabled,
                 Created = input.Created,
                 CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
-                LastModified = input.LastChanged,
                 LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())
             };
         }
