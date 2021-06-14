@@ -91,6 +91,7 @@ using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
+using Core.ApplicationServices.OptionTypes;
 
 namespace Presentation.Web.Ninject
 {
@@ -317,6 +318,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //DomainService bindings
             kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
                 .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
 
@@ -340,6 +342,11 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
                 .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
+
+
+            // ApplicationService bindings
+            kernel.Bind<IOptionsApplicationService<ItSystem, BusinessType>>()
+               .To<OptionsApplicationService<ItSystem, BusinessType>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
