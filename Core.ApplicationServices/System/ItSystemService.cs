@@ -72,7 +72,7 @@ namespace Core.ApplicationServices.System
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
                 var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                //TODO: Extend the rightsholder query and initialize the refinement to scope it to those systems where the user rightsholding organizations have been set.
+                //TODO: Extend the rightsholder query and initialize the refinement to scope it to those systems where the user rightsholding organizations have been set. - solve in https://os2web.atlassian.net/browse/KITOSUDV-1743
                 throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
             }
 

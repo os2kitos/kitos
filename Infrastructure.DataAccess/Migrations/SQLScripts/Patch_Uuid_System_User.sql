@@ -13,9 +13,4 @@ BEGIN
     UPDATE [User]
     SET Uuid = NEWID()
     WHERE Uuid = '00000000-0000-0000-0000-000000000000' OR Uuid IS NULL
-
-    -- TODO: JMO conflict here
-    UPDATE [BusinessTypes]
-    SET Uuid = NEWID()
-    WHERE Uuid = '00000000-0000-0000-0000-000000000000' OR Uuid IS NULL
 END
