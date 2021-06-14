@@ -4,7 +4,7 @@ using Core.DomainModel;
 
 namespace Core.DomainServices.Queries
 {
-    public class QueryByUuid<T> : IDomainQuery<T> where T : IHasUuid
+    public class QueryByUuid<T> : IDomainQuery<T> where T : class, IHasUuid
     {
         private readonly Guid _uuid;
 

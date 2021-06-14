@@ -5,6 +5,7 @@ using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Controllers.OData
 {
@@ -28,14 +29,20 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest();
             }
 
+            var entity = _repository.GetByKey(key);
+            var changedPropertyNames = delta.GetChangedPropertyNames().ToHashSet();
+
+            if (AttemptToChangeUuid(delta, entity, changedPropertyNames))
+            {
+                return BadRequest("Uuid cannot be changed");
+            }
+
             foreach (var t in delta.GetChangedPropertyNames())
             {
 
                 if (t.ToLower() == "priority")
                 {
                     var initDelta = delta.GetInstance();
-                    var entity = _repository.GetByKey(key);
-
 
                     if (initDelta.Priority > entity.Priority)
                     {
@@ -77,6 +84,13 @@ namespace Presentation.Web.Controllers.OData
             return base.Patch(key, delta);
         }
 
+        private static bool AttemptToChangeUuid(Delta<TType> delta, TType entity, HashSet<string> changedPropertyNames)
+        {
+            const string uuidName = nameof(OptionEntity<TDomainModelType>.Uuid);
+            return changedPropertyNames.Contains(uuidName) && delta.TryGetPropertyValue(uuidName,
+                out var uuid) && ((Guid)uuid) != entity.Uuid;
+        }
+
         [InternalApi]
         public override IHttpActionResult Post(int organizationId, TType entity)
         {
@@ -88,6 +102,7 @@ namespace Presentation.Web.Controllers.OData
             {
                 entity.Priority = 1;
             }
+            entity.Uuid = Guid.NewGuid();
 
             return base.Post(organizationId, entity);
         }

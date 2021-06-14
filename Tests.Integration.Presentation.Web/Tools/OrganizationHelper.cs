@@ -10,6 +10,17 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class OrganizationHelper
     {
+        public static async Task<OrganizationDTO> GetOrganizationAsync(int organizationId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/organization/{organizationId}");
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationDTO>();
+            }
+        }
+
         public static async Task<ContactPersonDTO> GetContactPersonAsync(int organizationId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
