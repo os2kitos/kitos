@@ -2,7 +2,7 @@
 
 namespace Presentation.Web.Models.External.V2.Response
 {
-    public class ItSystemInResponseDto: ItSystemInformationResponseDTO
+    public class ItSystemResponseDTO: ItSystemInformationResponseDTO
     {
         /// <summary>
         /// Organizations using this IT-System

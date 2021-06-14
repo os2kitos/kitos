@@ -16,7 +16,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [RoutePrefix("api/v2")]
+    [RoutePrefix("api/v2/it-systems")]
     public class ItSystemV2Controller : ExternalBaseController
     {
         private readonly IItSystemService _itSystemService;
@@ -40,8 +40,8 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-systems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemInResponseDto>))]
+        [Route("")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -51,8 +51,11 @@ namespace Presentation.Web.Controllers.External.V2
             string kleNumber = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
-            StandardPaginationQuery paginationQuery = null)
+            [FromUri]StandardPaginationQuery paginationQuery = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var refinements = new List<IDomainQuery<ItSystem>>();
 
             if (rightsHolderUuid.HasValue)
@@ -81,8 +84,8 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
-        [Route("it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemInResponseDto))]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -95,7 +98,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .Match(Ok, FromOperationError);
         }
 
-        private ItSystemInResponseDto ToDTO(ItSystem arg)
+        private ItSystemResponseDTO ToDTO(ItSystem arg)
         {
             return new()
             {

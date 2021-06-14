@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -17,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange - create user in new org and mark as stakeholder - then ensure that public data can be read from another org
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
-            var entityUuid = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var (entityUuid,_) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
             //Act
             var system = await ItSystemV2Helper.GetSingleAsync(token, entityUuid);
@@ -32,7 +33,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange - create user in new org and mark as stakeholder - then ensure that public data can be read from another org
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
-            var entityUuid = await CreateSystemAsync(organization.Id, AccessModifier.Local);
+            var (entityUuid, _) = await CreateSystemAsync(organization.Id, AccessModifier.Local);
 
             //Act
             var system = await ItSystemV2Helper.GetSingleAsync(token, entityUuid);
@@ -47,7 +48,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
-            var entityUuid = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var (entityUuid, _) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
 
             //Act
             using var systemResponse = await ItSystemV2Helper.SendGetSingleAsync(token, entityUuid);
@@ -70,34 +71,44 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task GET_Many_Without_Filters()
         {
-            //Arrange
-            //TODO
+            //Arrange - make sure there are always systems to satisfy the test regardless of order
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            await CreateSystemAsync(organization.Id, AccessModifier.Local);
+            await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
             //Act
+            var systems = await ItSystemV2Helper.GetManyAsync(token, pageSize: 2);
 
             //Assert
-            Assert.True(false);
-        }
-
-        [Fact]
-        public async Task GET_Many_With_Pagination()
-        {
-            //Arrange
-            //TODO
-            //Act
-
-            //Assert
-            Assert.True(false);
+            Assert.Equal(2, systems.Count());
         }
 
         [Fact]
         public async Task GET_Many_With_RightsHolderFilter()
         {
-            //Arrange
-            //TODO
-            //Act
+            //Arrange - make sure there are always systems to satisfy the test regardless of order
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var rightsHolder = await CreateOrganizationAsync();
 
-            //Assert
-            Assert.True(false);
+            var unExpectedAsItIsLocalInNonMemberOrg = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var expected1 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var expected2 = await CreateSystemAsync(organization.Id, AccessModifier.Local);
+
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(unExpectedAsItIsLocalInNonMemberOrg.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected1.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp3 = await ItSystemHelper.SendSetBelongsToRequestAsync(expected2.dbId, rightsHolder.Id, organization.Id);
+
+            Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp3.StatusCode);
+
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolder.Uuid)).ToList();
+
+            //Assert - only 2 are actually valid since the excluded one was hidden to the stakeholder
+            Assert.Equal(2, systems.Count());
+            Assert.Contains(systems,dto=>dto.Uuid == expected1.uuid);
+            Assert.Contains(systems,dto=>dto.Uuid == expected2.uuid);
         }
 
         [Fact]
@@ -144,24 +155,30 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.True(false);
         }
 
-        private async Task<Guid> CreateSystemAsync(int organizationId, AccessModifier accessModifier)
+        private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier)
         {
             var systemName = CreateName();
-            var publicSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName,
-                organizationId, accessModifier);
-            var entityUuid = TestEnvironment.GetEntityUuid<Core.DomainModel.ItSystem.ItSystem>(publicSystem.Id);
-            return entityUuid;
+            var createdSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, accessModifier);
+            var entityUuid = TestEnvironment.GetEntityUuid<Core.DomainModel.ItSystem.ItSystem>(createdSystem.Id);
+
+            return (entityUuid, createdSystem.Id);
         }
 
         private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
-            var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, "11224455", OrganizationTypeKeys.Virksomhed,
-                AccessModifier.Public);
+            var organization = await CreateOrganizationAsync();
+
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
                 OrganizationRole.User, organization.Id, true, true);
             return (token, organization);
+        }
+
+        private async Task<Organization> CreateOrganizationAsync()
+        {
+            var organizationName = CreateName();
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
+                organizationName, "11224455", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            return organization;
         }
 
         private string CreateName()
