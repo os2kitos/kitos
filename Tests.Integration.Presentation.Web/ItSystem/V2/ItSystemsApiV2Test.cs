@@ -12,15 +12,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
     public class ItSystemsApiV2Test : WithAutoFixture
     {
-        /*
-         *TODO:
-         * - LIST
-         
-         * SINGLE
-         * - Assert the content within
-         * - Assert interface filtering of local interfaces which the user does not have access to
-         * *
-         */
         [Fact]
         public async Task Can_GET_Public_ItSystem_As_Stakeholder_If_Placed_In_Other_Organization()
         {
@@ -63,6 +54,94 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, systemResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task GET_ItSystem_Returns_Expected_Data()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert - data is set as expected. Interfaces are filtered by access control so that only interfaces, which are accessible to the user, are pointed out
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_Without_Filters()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_Pagination()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_RightsHolderFilter()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_BusinessTypeFilter()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_KLE_Number_Filter()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_KLE_Uuid_Filter()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
+        }
+
+        [Fact]
+        public async Task GET_Many_With_NumberOfUsers_Filter()
+        {
+            //Arrange
+            //TODO
+            //Act
+
+            //Assert
+            Assert.True(false);
         }
 
         private async Task<Guid> CreateSystemAsync(int organizationId, AccessModifier accessModifier)
