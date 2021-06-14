@@ -1,6 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Interface
 {
@@ -13,9 +16,24 @@ namespace Core.DomainServices.Repositories.Interface
             _interfaceRepository = interfaceRepository;
         }
 
+        public Maybe<ItInterface> GetInterface(Guid uuid)
+        {
+            return _interfaceRepository.AsQueryable().ByUuid(uuid);
+        }
+
+        public IQueryable<ItInterface> GetInterfaces()
+        {
+            return _interfaceRepository.AsQueryable();
+        }
+
         public IQueryable<ItInterface> GetInterfacesFromOrganization(int orgId)
         {
             return _interfaceRepository.AsQueryable().ByOrganizationId(orgId);
+        }
+
+        public IQueryable<ItInterface> GetInterfacesFromRightsHolderOrganizations(IEnumerable<int> rightsHolderOrgs)
+        {
+            return _interfaceRepository.AsQueryable().ByRightsHolderIds(rightsHolderOrgs);
         }
 
         public IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined()

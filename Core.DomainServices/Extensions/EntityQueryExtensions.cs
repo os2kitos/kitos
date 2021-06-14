@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Queries;
@@ -138,6 +139,11 @@ namespace Core.DomainServices.Extensions
             class, IHasUuid
         {
             return new QueryByUuid<T>(id).Apply(result).SingleOrDefault();
+        }
+
+        public static IQueryable<ItInterface> ByRightsHolderIds(this IQueryable<ItInterface> result, IEnumerable<int> rightsHolderIds)
+        {
+            return result.Where(x => x.ExhibitedBy.ItSystem.BelongsToId != null && rightsHolderIds.Contains(x.ExhibitedBy.ItSystem.BelongsToId.Value));
         }
     }
 }

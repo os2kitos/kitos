@@ -3,9 +3,10 @@ using System.Data;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Repositories.Interface;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -25,6 +26,8 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IGenericRepository<DataRow>> _dataRowRepository;
+        private readonly Mock<IInterfaceRepository> _repository;
+        private readonly Mock<IOrganizationRepository> _organizationRepository;
 
         public ItInterfaceServiceTest()
         {
@@ -34,13 +37,17 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents = new Mock<IDomainEvents>();
             _transactionManager = new Mock<ITransactionManager>();
             _dataRowRepository = new Mock<IGenericRepository<DataRow>>();
+            _organizationRepository = new Mock<IOrganizationRepository>();
+            _repository = new Mock<IInterfaceRepository>();
             _sut = new ItInterfaceService(
                 _interfaceRepository.Object,
                 _dataRowRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
-                _domainEvents.Object);
+                _domainEvents.Object,
+                _organizationRepository.Object,
+                _repository.Object);
         }
 
         [Fact]

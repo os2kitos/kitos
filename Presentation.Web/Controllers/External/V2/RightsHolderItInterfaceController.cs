@@ -6,6 +6,9 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.ItSystem;
+using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
@@ -55,38 +58,20 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination)
+        public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
         {
+            var refinements = new List<IDomainQuery<ItInterface>>();
+
+            if (rightsHolderUuid.HasValue)
+                refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
+
             return _itInterfaceService
-                .GetInterfaces(organizationUuid)
-                .Select(x => x.OrderBy(y => y.Id))
-                .Select(x => x.Page(pagination))
-                .Select(ToDTOs)
-                .Match(value => Ok(value), FromOperationError);
-        }
-
-        private IEnumerable<ItInterfaceResponseDTO> ToDTOs(IQueryable<ItInterface> interfaces)
-        {
-            return interfaces.Select(ToDTO).ToList();
-        }
-
-        private ItInterfaceResponseDTO ToDTO(ItInterface input)
-        {
-            return new ItInterfaceResponseDTO()
-            {
-                Uuid = input.Uuid,
-                ExposedBySystemUuid = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
-                Name = input.Name,
-                InterfaceId = input.ItInterfaceId,
-                Version = input.Version,
-                Description = input.Description,
-                UrlReference = input.Url,
-                Deactivated = input.Disabled,
-                Created = input.Created,
-                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
-                LastModified = input.LastChanged,
-                LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())
-            };
+                .GetAvailableInterfaces(refinements.ToArray())
+                .OrderBy(y => y.Id)
+                .Page(pagination)
+                .ToList()
+                .Select(ToDTO)
+                .Transform(Ok);
         }
 
         /// <summary>
@@ -103,7 +88,10 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItInterface(Guid uuid)
         {
-            return Ok(new ItInterfaceResponseDTO());
+            return _itInterfaceService
+                .GetInterface(uuid)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -139,6 +127,25 @@ namespace Presentation.Web.Controllers.External.V2
         public IHttpActionResult DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
             return Ok();
+        }
+
+        private ItInterfaceResponseDTO ToDTO(ItInterface input)
+        {
+            return new ItInterfaceResponseDTO()
+            {
+                Uuid = input.Uuid,
+                ExposedBySystemUuid = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
+                Name = input.Name,
+                InterfaceId = input.ItInterfaceId,
+                Version = input.Version,
+                Description = input.Description,
+                UrlReference = input.Url,
+                Deactivated = input.Disabled,
+                Created = input.Created,
+                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
+                LastModified = input.LastChanged,
+                LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())
+            };
         }
     }
 }

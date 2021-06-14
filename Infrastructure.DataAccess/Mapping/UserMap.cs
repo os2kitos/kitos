@@ -42,6 +42,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             // Table & Column Mappings
             this.ToTable("User");
+
+            Property(t => t.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
         }
     }
 }

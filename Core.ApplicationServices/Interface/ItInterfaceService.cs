@@ -5,12 +5,13 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Interface;
-using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -27,8 +28,8 @@ namespace Core.ApplicationServices.Interface
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<ItInterface> _repository;
-        private readonly IOrganizationRepository _organizationRepository;
-        private readonly IInterfaceRepository _interfaceRepository;
+        private readonly IInterfaceRepository _interfaceRepository; 
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
@@ -37,8 +38,8 @@ namespace Core.ApplicationServices.Interface
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IOrganizationRepository organizationRepository, 
-            IInterfaceRepository interfaceRepository)
+            IInterfaceRepository interfaceRepository, 
+            IOrganizationalUserContext userContext)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
@@ -46,8 +47,8 @@ namespace Core.ApplicationServices.Interface
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _organizationRepository = organizationRepository;
             _interfaceRepository = interfaceRepository;
+            _userContext = userContext;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -191,29 +192,40 @@ namespace Core.ApplicationServices.Interface
             return !system.Any();
         }
 
-        public Result<IQueryable<ItInterface>, OperationError> GetInterfaces(Guid orgGuid)
+        public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
         {
-            var orgId = ResolveOrgIdAndAccessLevel(orgGuid);
-            if (orgId.Failed)
+            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
-                return orgId.Error;
+                var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+                var rightsHolderQuery = _interfaceRepository.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs);
+
+                return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(rightsHolderQuery) : rightsHolderQuery;
             }
-            return Result<IQueryable<ItInterface>, OperationError>.Success(_interfaceRepository.GetInterfacesFromOrganization(orgId.Value));
+
+            var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+                Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
+                Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
+
+            var mainQuery = _interfaceRepository.GetInterfaces();
+
+            var refinedResult = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
         }
 
-        private Result<int, OperationError> ResolveOrgIdAndAccessLevel(Guid organizationUuid)
+        public Result<ItInterface, OperationError> GetInterface(Guid uuid)
         {
-            var organizationId = _organizationRepository.GetByUuid(organizationUuid).Select(org => org.Id);
-            if (organizationId.IsNone)
-            {
-                return new OperationError(OperationFailure.NotFound);
-            }
-            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId.Value) == OrganizationDataReadAccessLevel.RightsHolder)
-            {
-                return new OperationError(OperationFailure.Forbidden);
-            }
-
-            return organizationId.Value;
+            return _interfaceRepository
+                .GetInterface(uuid)
+                .Match
+                (
+                    system => _authorizationContext.AllowReads(system) ? Result<ItInterface, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
         }
     }
 }
