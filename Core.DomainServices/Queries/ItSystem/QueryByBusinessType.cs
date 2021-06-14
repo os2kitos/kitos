@@ -14,7 +14,7 @@ namespace Core.DomainServices.Queries.ItSystem
 
         public IQueryable<DomainModel.ItSystem.ItSystem> Apply(IQueryable<DomainModel.ItSystem.ItSystem> itSystems)
         {
-            return itSystems.Where(x => x.BusinessTypeId != null && x.BusinessType.Uuid == _businessTypeId);
+            return itSystems.Where(x => x.BusinessType != null && x.BusinessType.Uuid == _businessTypeId);
         }
     }
 }
