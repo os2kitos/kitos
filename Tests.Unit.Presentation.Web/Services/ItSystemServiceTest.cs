@@ -42,7 +42,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
-                _logger.Object
+                _logger.Object,
+                Mock.Of<IOrganizationalUserContext>()
                 );
         }
 

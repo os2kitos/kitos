@@ -63,10 +63,10 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// Date of creation (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
-        public DateTime? Created { get; set; } //TODO: Missing in domain model
+        public DateTime? Created { get; set; }
 
         /// <summary>
-        /// Responsible for creation. (on some legacy systems , this information is not available. If so, it will be null)
+        /// Responsible for creation.
         /// </summary>
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
 
@@ -81,12 +81,7 @@ namespace Presentation.Web.Models.External.V2.Response
         public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
 
         /// <summary>
-        /// Comment for recommended archive duty
-        /// </summary>
-        public string RecommendedArchiveDutyComment { get; set; } //TODO: Add enum in api model here and map back and forth with the domain model
-
-        /// <summary>
-        /// Name and id pair detailing the archive duty
+        /// Archive duty recommendation from "Rigsarkivet"
         /// </summary>
         public RecommendedArchiveDutyResponseDTO RecommendedArchiveDutyResponse { get; set; }
     }

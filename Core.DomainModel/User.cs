@@ -15,7 +15,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IIsPartOfOrganization, IHasName
+    public class User : Entity, IIsPartOfOrganization, IHasName, IHasUuid
     {
         public string GetFullName()
         {

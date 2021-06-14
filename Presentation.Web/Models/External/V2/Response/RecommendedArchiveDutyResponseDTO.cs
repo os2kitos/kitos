@@ -1,21 +1,23 @@
-﻿namespace Presentation.Web.Models.External.V2.Response
+﻿using Presentation.Web.Models.External.V2.Types;
+
+namespace Presentation.Web.Models.External.V2.Response
 {
     public class RecommendedArchiveDutyResponseDTO
     {
-        public RecommendedArchiveDutyResponseDTO(string name, string id)
+        public RecommendedArchiveDutyResponseDTO(string comment, RecommendedArchiveDuty id)
         {
-            Name = name;
+            Comment = comment;
             Id = id;
         }
 
         /// <summary>
-        /// Name for archive duty
+        /// Comment attached to the recommendation
         /// </summary>
-        public string Name { get; }
+        public string Comment { get; }
 
         /// <summary>
-        /// Archive duty identifier
+        /// Archive duty recommendation identifier
         /// </summary>
-        public string Id { get; }
+        public RecommendedArchiveDuty Id { get; }
     }
 }

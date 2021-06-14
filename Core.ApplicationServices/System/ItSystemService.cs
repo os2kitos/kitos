@@ -52,10 +52,21 @@ namespace Core.ApplicationServices.System
         }
 
 
+        public Result<ItSystem, OperationError> GetSystem(Guid uuid)
+        {
+            return _itSystemRepository
+                .GetSystem(uuid)
+                .Match
+                (
+                    system => _authorizationContext.AllowReads(system) ? Result<ItSystem, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
         public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            
+
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
                 throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
 

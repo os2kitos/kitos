@@ -51,6 +51,11 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().ById(systemId);
         }
 
+        public Maybe<ItSystem> GetSystem(Guid systemId)
+        {
+            return _systemRepository.AsQueryable().ByUuid(systemId).FromNullable();
+        }
+
         public void DeleteSystem(ItSystem itSystem)
         {
             _systemRepository.DeleteWithReferencePreload(itSystem);

@@ -1,9 +1,9 @@
-﻿namespace Core.DomainModel
+﻿namespace Presentation.Web.Models.External.V2.Types
 {
-    public enum ArchiveDutyRecommendationTypes
+    public enum RecommendedArchiveDuty
     {
         /// <summary>
-        /// Covers the case where no registration has been entered yet or the field has been reset to "blank" by a user.
+        /// Registration has been explicitly reset to "blank" by a user.
         /// </summary>
         Undecided = 0,
         /// <summary>

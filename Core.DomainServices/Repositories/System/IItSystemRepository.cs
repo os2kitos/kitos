@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Model;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.System
 {
@@ -13,6 +15,8 @@ namespace Core.DomainServices.Repositories.System
         IQueryable<ItSystem> GetSystemsInUse(int organizationId);
 
         ItSystem GetSystem(int systemId);
+
+        Maybe<ItSystem> GetSystem(Guid systemId);
 
         void DeleteSystem(ItSystem itSystem);
         IQueryable<ItSystem> GetByRightsHolderId(int sourceId);
