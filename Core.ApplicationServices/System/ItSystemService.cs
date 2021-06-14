@@ -9,6 +9,7 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -66,13 +67,18 @@ namespace Core.ApplicationServices.System
         public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+            Maybe<IDomainQuery<ItSystem>> refinement;
 
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+                //TODO: Extend the rightsholder query and initialize the refinement to scope it to those systems where the user rightsholding organizations have been set.
                 throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
+            }
 
-            var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
-                Maybe<QueryAllByRestrictionCapabilities<ItSystem>>.None :
-                Maybe<QueryAllByRestrictionCapabilities<ItSystem>>.Some(new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds));
+            refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+                Maybe<IDomainQuery<ItSystem>>.None :
+                Maybe<IDomainQuery<ItSystem>>.Some(new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds));
 
             var mainQuery = _itSystemRepository.GetSystems();
 
@@ -204,7 +210,7 @@ namespace Core.ApplicationServices.System
             return MapToUsingOrganization(itSystem.Usages).ToList();
         }
 
-        private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
+        private static IEnumerable<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
         {
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
