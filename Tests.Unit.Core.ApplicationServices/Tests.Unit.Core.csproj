@@ -187,7 +187,7 @@
     <Compile Include="ApplicationServices\Notification\UserNotificationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\RightsHolders\RightsHoldersServiceTest.cs" />
-    <Compile Include="ApplicationServices\OptionTypes\BusinessTypeApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\OptionTypes\OptionsApplicationServiceTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
     <Compile Include="DomainServices\Contract\ContractDataProcessingRegistrationAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandlerTest.cs" />

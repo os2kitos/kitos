@@ -16,21 +16,21 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.OptionTypes
 {
-    public class BusinessTypeApplicationServiceTest : WithAutoFixture
+    public class OptionsApplicationServiceTest : WithAutoFixture
     {
-        private readonly BusinessTypeApplicationService _sut;
+        private readonly OptionsApplicationService<ItSystem, BusinessType> _sut;
 
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeOptionService;
         private readonly Mock<IOrganizationRepository> _organizationRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
 
-        public BusinessTypeApplicationServiceTest()
+        public OptionsApplicationServiceTest()
         {
             _businessTypeOptionService = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _organizationRepository = new Mock<IOrganizationRepository>();
             _authorizationContext = new Mock<IAuthorizationContext>();
 
-            _sut = new BusinessTypeApplicationService(_businessTypeOptionService.Object, _authorizationContext.Object, _organizationRepository.Object);
+            _sut = new OptionsApplicationService<ItSystem, BusinessType>(_businessTypeOptionService.Object, _authorizationContext.Object, _organizationRepository.Object);
         }
 
         [Fact]
@@ -48,15 +48,15 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-
             _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(listOfBusinessTypes);
 
             //Act
-            var businessTypes = _sut.GetBusinessTypes(uuid);
+            var businessTypes = _sut.GetOptionTypes(uuid);
 
             //Assert
             Assert.True(businessTypes.Ok);
             Assert.Equal(numberOfBusinessTypes, businessTypes.Value.Count());
+            Assert.Same(listOfBusinessTypes, businessTypes.Value);
         }
 
         [Fact]
@@ -71,7 +71,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(new List<BusinessType>() { });
 
             //Act
-            var businessTypes = _sut.GetBusinessTypes(uuid);
+            var businessTypes = _sut.GetOptionTypes(uuid);
 
             //Assert
             Assert.True(businessTypes.Ok);
@@ -90,10 +90,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(authContextReturn);
-            _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(new List<BusinessType>() { CreateBusinessType() });
 
             //Act
-            var businessTypes = _sut.GetBusinessTypes(uuid);
+            var businessTypes = _sut.GetOptionTypes(uuid);
 
             //Assert
             Assert.True(businessTypes.Failed);
@@ -108,11 +107,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var orgId = A<int>();
 
             _organizationRepository.Setup(x => x.GetByUuid(uuid)).Returns(Maybe<Organization>.None);
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-            _businessTypeOptionService.Setup(x => x.GetAvailableOptions(orgId)).Returns(new List<BusinessType>() { CreateBusinessType() });
 
             //Act
-            var businessTypes = _sut.GetBusinessTypes(uuid);
+            var businessTypes = _sut.GetOptionTypes(uuid);
 
             //Assert
             Assert.True(businessTypes.Failed);
@@ -134,7 +131,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns((businessType, isAvailable));
 
             //Act
-            var businessTypeResult = _sut.GetBusinessType(orgUuid, typeUuid);
+            var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
 
             //Assert
             Assert.True(businessTypeResult.Ok);
@@ -152,11 +149,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             var businessType = CreateBusinessType();
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(Maybe<Organization>.None);
-            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(OrganizationDataReadAccessLevel.All);
-            _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns((businessType, true));
 
             //Act
-            var businessTypeResult = _sut.GetBusinessType(orgUuid, typeUuid);
+            var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
 
             //Assert
             Assert.True(businessTypeResult.Failed);
@@ -177,10 +172,9 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
 
             _organizationRepository.Setup(x => x.GetByUuid(orgUuid)).Returns(new Organization() { Id = orgId });
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId)).Returns(authContextReturn);
-            _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns((businessType, true));
 
             //Act
-            var businessTypeResult = _sut.GetBusinessType(orgUuid, typeUuid);
+            var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
 
             //Assert
             Assert.True(businessTypeResult.Failed);
@@ -200,7 +194,7 @@ namespace Tests.Unit.Core.ApplicationServices.OptionTypes
             _businessTypeOptionService.Setup(x => x.GetOptionByUuid(orgId, typeUuid)).Returns(Maybe<(BusinessType, bool)>.None);
 
             //Act
-            var businessTypeResult = _sut.GetBusinessType(orgUuid, typeUuid);
+            var businessTypeResult = _sut.GetOptionType(orgUuid, typeUuid);
 
             //Assert
             Assert.True(businessTypeResult.Failed);
