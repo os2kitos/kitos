@@ -49,6 +49,10 @@ namespace Infrastructure.DataAccess.Mapping
                 //No cascading delete in order to avoid causing cycles or multiple cascade paths
                 .WillCascadeOnDelete(false);
 
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_System_Uuuid", 0);
+
             TypeMapping.AddIndexOnAccessModifier<ItSystemMap, ItSystem>(this);
         }
     }

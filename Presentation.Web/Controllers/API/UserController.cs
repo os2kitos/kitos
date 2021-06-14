@@ -123,10 +123,15 @@ namespace Presentation.Web.Controllers.API
 
                 var destName = mapMember.DestinationName;
 
+                if (destName == nameof(Core.DomainModel.User.Uuid))
+                    if (valuePair.Value?.Value<Guid>() != existingUser.Uuid)
+                        return BadRequest($"{nameof(Core.DomainModel.User.Uuid)}cannot be updated");
+
                 if (destName == nameof(Core.DomainModel.User.IsGlobalAdmin))
                     if ((valuePair.Value?.Value<bool>()).GetValueOrDefault()) // check if value is being set to true
                         if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                             return Forbidden();
+
                 if (destName == nameof(Core.DomainModel.User.HasStakeHolderAccess))
                 {
                     if (existingUser.HasStakeHolderAccess != (valuePair.Value?.Value<bool>()).GetValueOrDefault())

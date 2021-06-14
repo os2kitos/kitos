@@ -35,6 +35,7 @@ namespace Core.DomainModel
             HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
+            Uuid = Guid.NewGuid(); 
         }
 
         public string Name { get; set; }

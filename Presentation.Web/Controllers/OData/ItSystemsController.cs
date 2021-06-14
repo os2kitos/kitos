@@ -52,8 +52,13 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Patch(int key, Delta<ItSystem> delta)
         {
             var itSystem = Repository.GetByKey(key);
+            
             if (itSystem == null)
                 return NotFound();
+
+            if (AttemptToChangeUuid(delta))
+                return BadRequest("Cannot change Uuid");
+
             var disabledBefore = itSystem.Disabled;
             var result = base.Patch(key, delta);
             if (disabledBefore != itSystem.Disabled)
@@ -62,6 +67,11 @@ namespace Presentation.Web.Controllers.OData
             }
 
             return result;
+        }
+
+        private bool AttemptToChangeUuid(Delta<ItSystem> delta)
+        {
+            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.Uuid), out _);
         }
 
         [ODataRoute("ItSystems")]

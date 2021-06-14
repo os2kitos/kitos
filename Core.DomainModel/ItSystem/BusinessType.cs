@@ -8,6 +8,11 @@ namespace Core.DomainModel.ItSystem
     /// </summary>
     public class BusinessType : OptionEntity<ItSystem>, IOptionReference<ItSystem>, IHasUuid /*TODO: Conflict with jmo*/
     {
+        public BusinessType()
+        {
+            Uuid = Guid.NewGuid();
+        }
+
         public virtual ICollection<ItSystem> References { get; set; } = new HashSet<ItSystem>();
         public Guid Uuid { get; set; } //TODO: Remove once JMO is in master with his changes
     }

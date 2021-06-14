@@ -364,6 +364,12 @@ namespace Presentation.Web.Controllers.API
 
             }
 
+            if (obj.TryGetValue(nameof(ItSystem.Uuid), StringComparison.OrdinalIgnoreCase, out var uuidToken) &&
+                uuidToken.ToObject<Guid>() != itSystem.Uuid)
+            {
+                return BadRequest("Cannot change uuid");
+            }
+
             var httpResponseMessage = base.Patch(id, organizationId, obj);
 
             if (httpResponseMessage.IsSuccessStatusCode && namechange)

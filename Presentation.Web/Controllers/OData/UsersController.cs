@@ -49,9 +49,19 @@ namespace Presentation.Web.Controllers.OData
                         error = Forbidden();
                     }
                 }
+
+                if (AttemptToChangeUuid(delta))
+                {
+                    return BadRequest("Uuid cannot be changed");
+                }
             }
 
             return error;
+        }
+
+        private bool AttemptToChangeUuid(Delta<User> delta)
+        {
+            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.Uuid),out _);
         }
 
         private static bool AttemptToChangeGlobalAdminFlag(Delta<User> delta, User entity)
