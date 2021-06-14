@@ -185,11 +185,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
-        public static async Task<T> ReadResponseBodyAsKitosV2ApiResponseAsync<T>(this HttpResponseMessage response)
-        {
-            return await response.ReadResponseBodyAsAsync<T>().ConfigureAwait(false);
-        }
-
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
             var requestMessage = CreatePostMessage(url, loginDto);

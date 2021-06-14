@@ -13,7 +13,7 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/with-rightsholder-access?page={page}&pageSize={pageSize}"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsKitosV2ApiResponseAsync<IEnumerable<OrganizationResponseDTO>>();
+            return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
         }
     }
 }

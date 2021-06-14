@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.DomainModel.Events;
@@ -52,11 +53,13 @@ namespace Presentation.Web.Controllers.OData
         public override IHttpActionResult Patch(int key, Delta<ItSystem> delta)
         {
             var itSystem = Repository.GetByKey(key);
-            
+
             if (itSystem == null)
                 return NotFound();
 
-            if (AttemptToChangeUuid(delta))
+            var changedPropertyNames = delta.GetChangedPropertyNames().ToHashSet();
+
+            if (AttemptToChangeUuid(delta, itSystem, changedPropertyNames))
                 return BadRequest("Cannot change Uuid");
 
             var disabledBefore = itSystem.Disabled;
@@ -69,10 +72,13 @@ namespace Presentation.Web.Controllers.OData
             return result;
         }
 
-        private bool AttemptToChangeUuid(Delta<ItSystem> delta)
+        private bool AttemptToChangeUuid(Delta<ItSystem> delta, ItSystem itSystem, HashSet<string> changedPropertyNames)
         {
-            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.Uuid), out _);
+            const string uuidName = nameof(Core.DomainModel.User.Uuid);
+
+            return changedPropertyNames.Contains(uuidName) && delta.TryGetPropertyValue(uuidName, out var uuid) && ((Guid)uuid) != itSystem.Uuid;
         }
+
 
         [ODataRoute("ItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystem>>))]
