@@ -6,7 +6,6 @@ using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Extensions;
-using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
@@ -44,7 +43,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .GetOptionTypes(organizationUuid)
                 .Select(x => x.Page(pagination))
                 .Select(ToDTOs)
-                .Match(value => Ok(value), FromOperationError);
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -64,22 +63,22 @@ namespace Presentation.Web.Controllers.External.V2
             return _businessTypeApplicationService
                 .GetOptionType(organizationUuid, businessTypeUuid)
                 .Select(x => ToAvailableDTO(x.option, x.available))
-                .Match(value => Ok(value), FromOperationError);
+                .Match(Ok, FromOperationError);
         }
 
         private List<IdentityNamePairResponseDTO> ToDTOs(IEnumerable<BusinessType> businessTypes)
         {
-            return businessTypes.Select(x => ToDTO(x)).ToList();
+            return businessTypes.Select(ToDTO).ToList();
         }
 
-        private IdentityNamePairResponseDTO ToDTO(BusinessType businessType)
+        private static IdentityNamePairResponseDTO ToDTO(BusinessType businessType)
         {
-            return new IdentityNamePairResponseDTO(businessType.Uuid, businessType.Name);
+            return new(businessType.Uuid, businessType.Name);
         }
 
-        private AvailableNamePairResponseDTO ToAvailableDTO(BusinessType businessType, bool isAvailable)
+        private static AvailableNamePairResponseDTO ToAvailableDTO(BusinessType businessType, bool isAvailable)
         {
-            return new AvailableNamePairResponseDTO(businessType.Uuid, businessType.Name, isAvailable);
+            return new(businessType.Uuid, businessType.Name, isAvailable);
         }
     }
 }

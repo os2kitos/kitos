@@ -194,12 +194,41 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Fact]
         public async Task GET_Many_With_NumberOfUsers_Filter()
         {
-            //Arrange
-            //TODO - also use some other filter or else it will be impossible to control it.... like a new rightsholder or a business type filter!
-            //Act
+            //Arrange - Scope the test with additional rightsHolder filter so that we can control which response we get
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var rightsHolder = await CreateOrganizationAsync();
 
-            //Assert
-            Assert.True(false);
+            var excludedSinceTooFewUsages = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var includedLowerBound = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var includedAboveLowerBound = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(excludedSinceTooFewUsages.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(includedLowerBound.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp3 = await ItSystemHelper.SendSetBelongsToRequestAsync(includedAboveLowerBound.dbId, rightsHolder.Id, organization.Id);
+
+            await TakeSystemIntoUseIn(excludedSinceTooFewUsages.dbId, TestEnvironment.DefaultOrganizationId);
+            await TakeSystemIntoUseIn(includedLowerBound.dbId, TestEnvironment.DefaultOrganizationId, TestEnvironment.SecondOrganizationId);
+            await TakeSystemIntoUseIn(includedAboveLowerBound.dbId, TestEnvironment.DefaultOrganizationId, TestEnvironment.SecondOrganizationId, rightsHolder.Id);
+
+            Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp3.StatusCode);
+
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolder.Uuid, numberOfUsers: 2)).ToList();
+
+            //Assert - only 2 are actually valid since the excluded one was hidden to the stakeholder
+            Assert.Equal(2, systems.Count);
+            Assert.Contains(systems, dto => dto.Uuid == includedLowerBound.uuid);
+            Assert.Contains(systems, dto => dto.Uuid == includedAboveLowerBound.uuid);
+        }
+
+        private static async Task TakeSystemIntoUseIn(int systemDbId, params int[] organizationIds)
+        {
+            foreach (var organizationId in organizationIds)
+            {
+                await ItSystemHelper.TakeIntoUseAsync(systemDbId, organizationId);
+            }
         }
 
         private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier)
