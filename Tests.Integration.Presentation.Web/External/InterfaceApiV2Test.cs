@@ -15,13 +15,13 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.External
 {
-    public class RightsHolderInterfaceTest : WithAutoFixture
+    public class InterfaceApiV2Test : WithAutoFixture
     {
         private readonly CryptoService _cryptoService = new();
 
 
         [Fact]
-        public async Task Can_Get_Interfaces()
+        public async Task Can_Get_Interfaces_With_RightsholderAccess()
         {
             //Arrange
             var rightsholderOrg = new Organization()
@@ -42,7 +42,7 @@ namespace Tests.Integration.Presentation.Web.External
             roles.Add(OrganizationRole.RightsHolderAccess);
             roles.Add(OrganizationRole.User);
 
-            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, rightsHolderOrgId, roles.ToArray());
+            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, rightsHolderOrgId, false, roles.ToArray());
 
             var loginUser = new LoginDTO()
             {
@@ -63,11 +63,10 @@ namespace Tests.Integration.Presentation.Web.External
             var interfaceDTO = Assert.Single(result.Where(x => x.Name.Equals(itInterface.Name)));
             CheckDTOValues(system, itInterface, interfaceDTO);
         }
-
         
 
         [Fact]
-        public async Task Can_Get_Interface()
+        public async Task Can_Get_Interface_With_RightsholderAccess()
         {
             //Arrange
             var email = $"{A<string>()}@test.dk";
@@ -78,7 +77,7 @@ namespace Tests.Integration.Presentation.Web.External
             roles.Add(OrganizationRole.RightsHolderAccess);
             roles.Add(OrganizationRole.User);
 
-            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, TestEnvironment.DefaultOrganizationId, roles.ToArray());
+            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, TestEnvironment.DefaultOrganizationId, false, roles.ToArray());
 
             var loginUser = new LoginDTO()
             {
@@ -95,6 +94,79 @@ namespace Tests.Integration.Presentation.Web.External
 
             //Assert
             CheckDTOValues(system, itInterface, result);
+        }
+
+        [Fact]
+        public async Task Can_Get_Interface_With_StakeholderAccess()
+        {
+            //Arrange
+            var email = $"{A<string>()}@test.dk";
+            var password = A<string>();
+            var salt = A<string>();
+            var encryptedPwd = _cryptoService.Encrypt(password + salt);
+            var roles = new List<OrganizationRole>();
+            roles.Add(OrganizationRole.User);
+
+            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, TestEnvironment.DefaultOrganizationId, true, roles.ToArray());
+
+            var loginUser = new LoginDTO()
+            {
+                Email = user.Email,
+                Password = password
+            };
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+
+            //Act
+            var result = await InterfaceV2Helper.GetStakeholderInterfaceAsync(loginUser, itInterface.Uuid);
+
+            //Assert
+            CheckDTOValues(system, itInterface, result);
+        }
+
+        [Fact]
+        public async Task Can_Get_Interfaces_With_StakeholderAccess()
+        {
+            //Arrange
+            var rightsholderOrg = new Organization()
+            {
+                Name = A<string>(),
+                ObjectOwnerId = TestEnvironment.DefaultUserId,
+                LastChangedByUserId = TestEnvironment.DefaultUserId,
+                TypeId = TestEnvironment.DefaultOrganizationTypeId
+            };
+            DatabaseAccess.MutateEntitySet<Organization>(x => x.Insert(rightsholderOrg));
+            var rightsHolderOrgId = DatabaseAccess.MapFromEntitySet<Organization, int>(x => x.AsQueryable().Where(x => x.Name == rightsholderOrg.Name).Select(x => x.Id).FirstOrDefault());
+
+            var email = $"{A<string>()}@test.dk";
+            var password = A<string>();
+            var salt = A<string>();
+            var encryptedPwd = _cryptoService.Encrypt(password + salt);
+            var roles = new List<OrganizationRole>();
+            roles.Add(OrganizationRole.User);
+
+            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, rightsHolderOrgId, true, roles.ToArray());
+
+            var loginUser = new LoginDTO()
+            {
+                Email = user.Email,
+                Password = password
+            };
+            var pageSize = 100; //Get as many as we can
+            var pageNumber = 0; //Always takes the first page;
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrgId, AccessModifier.Public);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), rightsHolderOrgId, AccessModifier.Public));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+
+            //Act
+            var result = await InterfaceV2Helper.GetStakeholderInterfacesAsync(loginUser, pageSize, pageNumber);
+
+            //Assert
+            var interfaceDTO = Assert.Single(result.Where(x => x.Name.Equals(itInterface.Name)));
+            CheckDTOValues(system, itInterface, interfaceDTO);
         }
 
         private static void CheckDTOValues(ItSystemDTO system, ItInterfaceDTO itInterface, ItInterfaceResponseDTO interfaceDTO)

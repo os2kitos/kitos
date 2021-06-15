@@ -9,7 +9,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public class UserHelper : WithAutoFixture
     {
-        public static async Task<User> CreateUserWithRoles(string email, string pwd, string salt, string encryptedPwd, int orgId, params OrganizationRole[] organizationRoles)
+        public static async Task<User> CreateUserWithRoles(string email, string pwd, string salt, string encryptedPwd, int orgId, bool isStakeholder, params OrganizationRole[] organizationRoles)
         {
             var user = new User()
             {
@@ -17,7 +17,8 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Password = encryptedPwd,
                 HasApiAccess = true,
                 Name = "CreatedByIntegrationTest",
-                Salt = salt
+                Salt = salt,
+                HasStakeHolderAccess = isStakeholder
             };
             DatabaseAccess.MutateEntitySet<User>(x => x.Insert(user));
             var userId = DatabaseAccess.MapFromEntitySet<User, int>(x => x.AsQueryable().Where(x => x.Email.Equals(user.Email)).Select(x => x.Id).FirstOrDefault());
