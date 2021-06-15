@@ -24,7 +24,15 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
         }
 
-        public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null, Guid? businessTypeId = null, string kleKey = null, Guid? kleUuid = null, int? numberOfUsers = null)
+        public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(
+            string token, 
+            int? page = null, 
+            int? pageSize = null, 
+            Guid? rightsHolderId = null, 
+            Guid? businessTypeId = null, 
+            string kleKey = null, 
+            Guid? kleUuid = null, 
+            int? numberOfUsers = null)
         {
             using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -32,7 +40,15 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null, Guid? businessTypeId = null, string kleKey = null, Guid? kleUuid = null, int? numberOfUsers = null)
+        public static async Task<HttpResponseMessage> SendGetManyAsync(
+            string token, 
+            int? page = null, 
+            int? pageSize = null, 
+            Guid? rightsHolderId = null, 
+            Guid? businessTypeId = null, 
+            string kleKey = null, 
+            Guid? kleUuid = null, 
+            int? numberOfUsers = null)
         {
             var path = "api/v2/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -45,6 +61,9 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
 
             if (rightsHolderId.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("rightsHolderUuid", rightsHolderId.Value.ToString("D")));
+
+            if (businessTypeId.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("businessTypeUuid", businessTypeId.Value.ToString("D")));
 
             if (kleKey != null)
                 queryParameters.Add(new KeyValuePair<string, string>("kleNumber", kleKey));
