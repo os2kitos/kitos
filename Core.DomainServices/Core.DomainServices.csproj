@@ -90,7 +90,8 @@
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />
     <Compile Include="Queries\ItSystem\QueryByNumberOfUsages.cs" />
-    <Compile Include="Queries\ItSystem\QueryByRightsHolder.cs" />
+    <Compile Include="Queries\ItSystem\QueryByRightsHolderIds.cs" />
+    <Compile Include="Queries\ItSystem\QueryByRightsHolderUuid.cs" />
     <Compile Include="Queries\ItSystem\QueryByTaskRef.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />

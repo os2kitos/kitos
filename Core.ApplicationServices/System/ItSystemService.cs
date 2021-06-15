@@ -16,6 +16,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
@@ -67,18 +68,17 @@ namespace Core.ApplicationServices.System
         public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            Maybe<IDomainQuery<ItSystem>> refinement;
+            var refinement = Maybe<IDomainQuery<ItSystem>>.None;
 
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
                 var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                //TODO: Extend the rightsholder query and initialize the refinement to scope it to those systems where the user rightsholding organizations have been set. - solve in https://os2web.atlassian.net/browse/KITOSUDV-1743
-                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
+                refinement = new QueryByRightsHolderIds(rightsHoldingOrganizations);
             }
-
-            refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
-                Maybe<IDomainQuery<ItSystem>>.None :
-                Maybe<IDomainQuery<ItSystem>>.Some(new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds));
+            else if(accessLevel < CrossOrganizationDataReadAccessLevel.All)
+            {
+                refinement = new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
+            }
 
             var mainQuery = _itSystemRepository.GetSystems();
 

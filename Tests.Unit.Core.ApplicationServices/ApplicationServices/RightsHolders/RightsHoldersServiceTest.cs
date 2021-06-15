@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.RightsHolders;
+using Core.ApplicationServices.System;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Moq;
@@ -19,8 +20,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
-            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object);
+            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, Mock.Of<IItSystemService>());
         }
+
+        //TODO: Test the bridge methods
 
         [Fact]
         public void ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess_Returns_Only_Organizations_Where_User_Has_RightsHolderAccessRole()
