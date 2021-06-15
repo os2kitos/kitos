@@ -3,7 +3,7 @@
     public enum ArchiveDutyRecommendationTypes
     {
         /// <summary>
-        /// Covers the case where the choice is explicitly reset
+        /// Covers the case where no registration has been entered yet or the field has been reset to "blank" by a user.
         /// </summary>
         Undecided = 0,
         /// <summary>

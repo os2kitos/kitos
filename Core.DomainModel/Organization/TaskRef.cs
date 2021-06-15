@@ -7,7 +7,7 @@ namespace Core.DomainModel.Organization
     /// Represents a task (such as KLE), which can be associated
     /// with Systems, Projects or Organization Units.
     /// </summary>
-    public class TaskRef : Entity, IHierarchy<TaskRef>
+    public class TaskRef : Entity, IHierarchy<TaskRef>, IHasUuid
     {
         public static int MaxTaskKeyLength = 15;
         public static int MaxDescriptionLength = 150;

@@ -9,12 +9,16 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.System
@@ -27,6 +31,7 @@ namespace Core.ApplicationServices.System
         private readonly ITransactionManager _transactionManager;
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository,
@@ -34,7 +39,8 @@ namespace Core.ApplicationServices.System
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IReferenceService referenceService,
-            ILogger logger
+            ILogger logger,
+            IOrganizationalUserContext userContext
             )
         {
             _repository = repository;
@@ -43,8 +49,45 @@ namespace Core.ApplicationServices.System
             _transactionManager = transactionManager;
             _referenceService = referenceService;
             _logger = logger;
+            _userContext = userContext;
         }
 
+
+        public Result<ItSystem, OperationError> GetSystem(Guid uuid)
+        {
+            return _itSystemRepository
+                .GetSystem(uuid)
+                .Match
+                (
+                    system => _authorizationContext.AllowReads(system) ? Result<ItSystem, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
+        public IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions)
+        {
+            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+            Maybe<IDomainQuery<ItSystem>> refinement;
+
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+                //TODO: Extend the rightsholder query and initialize the refinement to scope it to those systems where the user rightsholding organizations have been set. - solve in https://os2web.atlassian.net/browse/KITOSUDV-1743
+                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1743");
+            }
+
+            refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+                Maybe<IDomainQuery<ItSystem>>.None :
+                Maybe<IDomainQuery<ItSystem>>.Some(new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds));
+
+            var mainQuery = _itSystemRepository.GetSystems();
+
+            var refinedResult = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            return conditions.Any() ? new IntersectionQuery<ItSystem>(conditions).Apply(refinedResult) : refinedResult;
+        }
 
         public IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null)
         {
@@ -167,7 +210,7 @@ namespace Core.ApplicationServices.System
             return MapToUsingOrganization(itSystem.Usages).ToList();
         }
 
-        private static IReadOnlyList<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
+        private static IEnumerable<UsingOrganization> MapToUsingOrganization(IEnumerable<ItSystemUsage> itSystemUsages)
         {
             return itSystemUsages.Select(
                 itSystemUsage => new UsingOrganization(
