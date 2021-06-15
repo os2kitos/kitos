@@ -20,7 +20,6 @@ namespace Core.DomainModel.Organization
             this.ItSystemUsagesOptOut = new List<ItSystemUsage.ItSystemUsage>();
             this.ItProjects = new List<ItProject.ItProject>();
             this.Usages = new List<TaskUsage>();
-            this.Uuid = Guid.NewGuid();
         }
 
         /// <summary>
