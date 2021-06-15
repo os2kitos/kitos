@@ -196,29 +196,26 @@ namespace Core.ApplicationServices.Interface
         {
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
 
+            IQueryable<ItInterface> mainResult;
+
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
                 var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                var rightsHolderQuery = _interfaceRepository.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs);
-
-                return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(rightsHolderQuery) : rightsHolderQuery;
+                mainResult = _interfaceRepository.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs);
             }
             else
             {
-                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1735");
+                var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+                    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
+                    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
+
+                var mainQuery = _interfaceRepository.GetInterfaces();
+
+                mainResult = refinement
+                    .Select(x => x.Apply(mainQuery))
+                    .GetValueOrFallback(mainQuery);
             }
-            //TODO: Solve this as part of https://os2web.atlassian.net/browse/KITOSUDV-1735
-            //var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
-            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
-            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
-
-            //var mainQuery = _interfaceRepository.GetInterfaces();
-
-            //var refinedResult = refinement
-            //    .Select(x => x.Apply(mainQuery))
-            //    .GetValueOrFallback(mainQuery);
-
-            //return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
+            return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(mainResult) : mainResult;
         }
 
         public Result<ItInterface, OperationError> GetInterface(Guid uuid)
