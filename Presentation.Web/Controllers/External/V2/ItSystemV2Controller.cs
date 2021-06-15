@@ -98,7 +98,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .Match(Ok, FromOperationError);
         }
 
-        private ItSystemResponseDTO ToDTO(ItSystem arg)
+        private static ItSystemResponseDTO ToDTO(ItSystem arg)
         {
             return new()
             {
@@ -119,7 +119,6 @@ namespace Presentation.Web.Controllers.External.V2
                     .ItInterfaceExhibits
                     .Select(exhibit => exhibit.ItInterface)
                     .ToList()
-                    .Where(_authorizationContext.AllowReads)//Some interfaces descriptions may not be read-accessible (created as private in an organization which the user is not a member of).
                     .Select(x => x.MapIdentityNamePairDTO())
                     .ToList(),
                 RecommendedArchiveDutyResponse = new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType()),

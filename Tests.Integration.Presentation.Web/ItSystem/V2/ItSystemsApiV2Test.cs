@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
 using Tests.Toolkit.Patterns;
@@ -63,11 +64,86 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GET_ItSystem_Returns_Expected_Data()
         {
             //Arrange
-            //TODO - test that properties contain what we expect AND that the interface list is filtered by access control before being returned
-            //Act
+            var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var rightsHolderOrganization = await CreateOrganizationAsync();
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
+            var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
+            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
+            var businessTypeUuid = TestEnvironment.GetEntityUuid<BusinessType>(businessType.Id);
+            var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var itSystem = db.ItSystems.AsQueryable().ByUuid(system.uuid);
+                var interfaceToExpose = db.Set<ItInterface>().AsQueryable().ById(exposedInterface.Id);
+                var taskRef = db.TaskRefs.AsQueryable().First();
 
-            //Assert - data is set as expected. Interfaces are filtered by access control so that only interfaces, which are accessible to the user, are pointed out
-            Assert.True(false);
+                itSystem.PreviousName = A<string>();
+                itSystem.Description = A<string>();
+                itSystem.Disabled = A<bool>();
+                itSystem.ArchiveDuty = A<ArchiveDutyRecommendationTypes>();
+                itSystem.ArchiveDutyComment = A<string>();
+                itSystem.ParentId = parentSystem.dbId;
+                itSystem.BelongsToId = rightsHolderOrganization.Id;
+                itSystem.BusinessTypeId = businessType.Id;
+
+                itSystem.TaskRefs.Add(taskRef);
+                db.ItInterfaceExhibits.Add(new ItInterfaceExhibit { ItInterface = interfaceToExpose, ItSystem = itSystem, ObjectOwnerId = 1, LastChangedByUserId = 1 });
+
+                var externalReference = new ExternalReference()
+                {
+                    ObjectOwnerId = 1,
+                    LastChangedByUserId = 1,
+                    ItSystem = itSystem,
+                    Title = A<string>(),
+                    URL = A<string>()
+                };
+                db.ExternalReferences.Add(externalReference);
+                itSystem.SetMasterReference(externalReference);
+
+                db.SaveChanges();
+            });
+
+            //Act
+            var systemDTO = await ItSystemV2Helper.GetSingleAsync(token, system.uuid);
+
+            //Assert - compare db entity with the response DTO
+            Assert.NotNull(systemDTO);
+            DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(x =>
+             {
+                 var dbSystem = x.AsQueryable().ByUuid(system.uuid);
+                 var parentDbSystem = x.AsQueryable().ByUuid(parentSystem.uuid);
+                 var taskRef = dbSystem.TaskRefs.Single();
+                 var dbExposedInterface = dbSystem.ItInterfaceExhibits.Single().ItInterface;
+
+                 Assert.Equal(dbSystem.Uuid, systemDTO.Uuid);
+                 Assert.Equal(dbSystem.Name, systemDTO.Name);
+                 Assert.Equal(dbSystem.Description, systemDTO.Description);
+                 Assert.Equal(dbSystem.PreviousName, systemDTO.FormerName);
+                 Assert.Equal(dbSystem.Disabled, systemDTO.Deactivated);
+                 Assert.Equal(dbSystem.Created, systemDTO.Created);
+                 Assert.Equal(dbSystem.ObjectOwner.Uuid, systemDTO.CreatedBy.Uuid);
+                 Assert.Equal(dbSystem.ObjectOwner.GetFullName(), systemDTO.CreatedBy.Name);
+                 Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
+                 Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
+                 Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
+                 Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDutyResponse.Id.ToString("G"));
+                 Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDutyResponse.Comment);
+                 Assert.Equal(parentDbSystem.Uuid, systemDTO.ParentSystem.Uuid);
+                 Assert.Equal(parentDbSystem.Name, systemDTO.ParentSystem.Name);
+                 Assert.Equal(rightsHolderOrganization.Uuid, systemDTO.RightsHolder.Uuid);
+                 Assert.Equal(rightsHolderOrganization.Name, systemDTO.RightsHolder.Name);
+                 Assert.Equal(rightsHolderOrganization.GetActiveCvr(), systemDTO.RightsHolder.Cvr);
+                 Assert.Equal(businessTypeUuid, systemDTO.BusinessType.Uuid);
+                 Assert.Equal(businessType.Name, systemDTO.BusinessType.Name);
+                 Assert.Equal(taskRef.Uuid, systemDTO.KLE.Single().Uuid);
+                 Assert.Equal(taskRef.TaskKey, systemDTO.KLE.Single().Name);
+                 Assert.Equal(dbExposedInterface.Uuid, systemDTO.ExposedInterfaces.Single().Uuid);
+                 Assert.Equal(dbExposedInterface.Name, systemDTO.ExposedInterfaces.Single().Name);
+                 Assert.Equal(dbSystem.Reference.URL, systemDTO.UrlReference);
+
+                 return true;
+             });
         }
 
         [Fact]

@@ -10,11 +10,17 @@ namespace Presentation.Web.Extensions
     {
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO<T>(this T source) where T : IHasUuid, IHasName
         {
-            return new IdentityNamePairResponseDTO(source.Uuid, source.Name);
+            return new(source.Uuid, source.Name);
         }
+
+        public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this User source)
+        {
+            return new(source.Uuid, source.GetFullName());
+        }
+
         public static OrganizationResponseDTO MapOrganizationResponseDTO(this Organization organization)
         {
-            return new OrganizationResponseDTO(organization.Uuid, organization.Name, organization.GetActiveCvr());
+            return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }
 
         public static RecommendedArchiveDuty ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
