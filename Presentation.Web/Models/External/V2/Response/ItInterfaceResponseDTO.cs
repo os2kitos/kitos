@@ -43,9 +43,9 @@ namespace Presentation.Web.Models.External.V2.Response
         /// Active status
         /// </summary>
         public bool Deactivated { get; set; }
-        
+
         /// <summary>
-        /// Date of creation
+        /// Date of creation. (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
         public DateTime? Created { get; set; }
 
@@ -53,10 +53,5 @@ namespace Presentation.Web.Models.External.V2.Response
         /// Responsible for creation
         /// </summary>
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
-
-        /// <summary>
-        /// Responsible for last modification
-        /// </summary>
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
     }
 }

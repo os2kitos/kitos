@@ -170,7 +170,6 @@
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
-    <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\V2\OrganizationV2Helper.cs" />
   </ItemGroup>
   <ItemGroup>

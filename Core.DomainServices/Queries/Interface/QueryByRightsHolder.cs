@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace Core.DomainServices.Queries.ItSystem
+namespace Core.DomainServices.Queries.Interface
 {
     public class QueryByRightsHolder : IDomainQuery<ItInterface>
     {
@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries.ItSystem
 
         public IQueryable<ItInterface> Apply(IQueryable<ItInterface> itInterface)
         {
-            return itInterface.Where(x => x.ExhibitedBy.ItSystem.BelongsTo != null && x.ExhibitedBy.ItSystem.BelongsTo.Uuid == _rightsHolderUuid);
+            return itInterface.Where(x => x.ExhibitedBy != null && x.ExhibitedBy.ItSystem != null && x.ExhibitedBy.ItSystem.BelongsTo != null && x.ExhibitedBy.ItSystem.BelongsTo.Uuid == _rightsHolderUuid);
         }
     }
 }

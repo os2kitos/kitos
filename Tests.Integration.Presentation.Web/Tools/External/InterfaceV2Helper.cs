@@ -2,7 +2,9 @@
 using Presentation.Web.Models.External.V2.Response;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,26 +12,46 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public class InterfaceV2Helper
     {
-        public static async Task<IEnumerable<ItInterfaceResponseDTO>> GetRightsholderInterfacesAsync(LoginDTO user, int pageSize, int pageNumber)
+        public static async Task<IEnumerable<ItInterfaceResponseDTO>> GetRightsholderInterfacesAsync(string token, int? pageSize = null, int? pageNumber = null, Guid? rightsHolder = null)
         {
-            var token = await HttpApi.GetTokenAsync(user);
-            var url = TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces?pageSize={pageSize}&page={pageNumber}");
-            using (var response = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
-            }
+            using var response = await SendGetRightsholderInterfacesAsync(token, pageSize, pageNumber, rightsHolder);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
         }
 
-        public static async Task<ItInterfaceResponseDTO> GetRightsholderInterfaceAsync(LoginDTO user, Guid interfaceGuid)
+        public static async Task<HttpResponseMessage> SendGetRightsholderInterfacesAsync(string token, int? pageSize = null, int? pageNumber = null, Guid? rightsHolder = null)
         {
-            var token = await HttpApi.GetTokenAsync(user);
+            var path = "api/v2/rightsholder/it-interfaces";
+            var queryParameters = new List<KeyValuePair<string, string>>();
+
+            if (pageSize.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("pageSize", pageSize.Value.ToString("D")));
+
+            if (pageNumber.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("page", pageNumber.Value.ToString("D")));
+
+            if (rightsHolder.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("rightsHolderUuid", rightsHolder.Value.ToString("D")));
+
+            if (queryParameters.Any())
+                path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
+
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+        }
+
+        public static async Task<ItInterfaceResponseDTO> GetRightsholderInterfaceAsync(string token, Guid interfaceGuid)
+        {
+            using var response = await SendGetRightsholderInterfaceAsync(token, interfaceGuid);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetRightsholderInterfaceAsync(string token, Guid interfaceGuid)
+        {
             var url = TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{interfaceGuid}");
-            using (var response = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
-            }
+            return await HttpApi.GetWithTokenAsync(url, token);
         }
     }
 }

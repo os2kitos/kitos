@@ -13,6 +13,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -30,6 +31,7 @@ namespace Core.ApplicationServices.Interface
         private readonly IGenericRepository<ItInterface> _repository;
         private readonly IInterfaceRepository _interfaceRepository; 
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IOperationClock _operationClock;
 
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
@@ -38,8 +40,9 @@ namespace Core.ApplicationServices.Interface
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IInterfaceRepository interfaceRepository, 
-            IOrganizationalUserContext userContext)
+            IInterfaceRepository interfaceRepository,
+            IOrganizationalUserContext userContext, 
+            IOperationClock operationClock)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
@@ -49,6 +52,7 @@ namespace Core.ApplicationServices.Interface
             _domainEvents = domainEvents;
             _interfaceRepository = interfaceRepository;
             _userContext = userContext;
+            _operationClock = operationClock;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -106,7 +110,8 @@ namespace Core.ApplicationServices.Interface
                 OrganizationId = organizationId,
                 ItInterfaceId = interfaceId ?? string.Empty,
                 Uuid = Guid.NewGuid(),
-                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public)
+                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public),
+                Created = _operationClock.Now
             };
 
             if (!_authorizationContext.AllowCreate<ItInterface>(organizationId, newInterface))
@@ -199,7 +204,7 @@ namespace Core.ApplicationServices.Interface
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
                 var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                var rightsHolderQuery = _interfaceRepository.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs);
+                var rightsHolderQuery = _interfaceRepository.GetInterfacesWhereRightsHolderIsOneOf(rightsHolderOrgs);
 
                 return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(rightsHolderQuery) : rightsHolderQuery;
             }

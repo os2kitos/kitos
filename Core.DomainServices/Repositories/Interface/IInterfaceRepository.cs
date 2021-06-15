@@ -10,7 +10,7 @@ namespace Core.DomainServices.Repositories.Interface
     {
         IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined();
         IQueryable<ItInterface> GetInterfaces();
-        IQueryable<ItInterface> GetInterfacesFromRightsHolderOrganizations(IEnumerable<int> rightsHolderOrgs);
+        IQueryable<ItInterface> GetInterfacesWhereRightsHolderIsOneOf(IEnumerable<int> rightsHolderOrgs);
         Maybe<ItInterface> GetInterface(Guid uuid);
     }
 }

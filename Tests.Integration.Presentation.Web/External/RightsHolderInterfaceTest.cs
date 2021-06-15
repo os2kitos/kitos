@@ -1,12 +1,12 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Infrastructure.Services.Cryptography;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
 using Presentation.Web.Models.External.V2.Response;
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -17,84 +17,230 @@ namespace Tests.Integration.Presentation.Web.External
 {
     public class RightsHolderInterfaceTest : WithAutoFixture
     {
-        private readonly CryptoService _cryptoService = new();
-
 
         [Fact]
         public async Task Can_Get_Interfaces()
         {
             //Arrange
-            var rightsholderOrg = new Organization()
-            {
-                Name = A<string>(),
-                ObjectOwnerId = TestEnvironment.DefaultUserId,
-                LastChangedByUserId = TestEnvironment.DefaultUserId,
-                TypeId = TestEnvironment.DefaultOrganizationTypeId
-            };
-            DatabaseAccess.MutateEntitySet<Organization>(x => x.Insert(rightsholderOrg));
-            var rightsHolderOrgId = DatabaseAccess.MapFromEntitySet<Organization, int>(x => x.AsQueryable().Where(x => x.Name == rightsholderOrg.Name).Select(x => x.Id).FirstOrDefault());
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var email = $"{A<string>()}@test.dk";
-            var password = A<string>();
-            var salt = A<string>();
-            var encryptedPwd = _cryptoService.Encrypt(password + salt);
-            var roles = new List<OrganizationRole>();
-            roles.Add(OrganizationRole.RightsHolderAccess);
-            roles.Add(OrganizationRole.User);
-
-            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, rightsHolderOrgId, roles.ToArray());
-
-            var loginUser = new LoginDTO()
-            {
-                Email = user.Email,
-                Password = password
-            };
-            var pageSize = 100; //Get as many as we can
+            var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrgId, AccessModifier.Public);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), rightsHolderOrgId, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id);
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(loginUser, pageSize, pageNumber);
+            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
 
             //Assert
-            var interfaceDTO = Assert.Single(result.Where(x => x.Name.Equals(itInterface.Name)));
-            CheckDTOValues(system, itInterface, interfaceDTO);
+            Assert.Equal(pageSize, result.Count());
+            var interface1DTO = result.Where(x => x.Name.Equals(itInterface1.Name)).First();
+            CheckDTOValues(system, itInterface1, interface1DTO);
         }
 
-        
+        [Fact]
+        public async Task Can_Get_Interfaces_From_Multiple_RightsHolders_If_RightsHolderAccess_In_Both()
+        {
+            //Arrange
+            var (token, org1, org2) = await CreateRightsHolderUserInMultipleNewOrganizationsAsync();
+
+            var pageSize = 2;
+            var pageNumber = 0; //Always takes the first page;
+
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id);
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
+
+            //Assert
+            Assert.Equal(pageSize, result.Count());
+        }
+
+        [Fact]
+        public async Task Can_Get_Interfaces_From_Specific_RightsHolder()
+        {
+            //Arrange
+            var (token, org1, org2) = await CreateRightsHolderUserInMultipleNewOrganizationsAsync();
+
+            var pageSize = 2;
+            var pageNumber = 0; //Always takes the first page;
+
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id);
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, org1.Uuid);
+
+            //Assert
+            var interface1DTO = Assert.Single(result);
+            CheckDTOValues(system1, itInterface1, interface1DTO);
+        }
 
         [Fact]
         public async Task Can_Get_Interface()
         {
             //Arrange
-            var email = $"{A<string>()}@test.dk";
-            var password = A<string>();
-            var salt = A<string>();
-            var encryptedPwd = _cryptoService.Encrypt(password + salt);
-            var roles = new List<OrganizationRole>();
-            roles.Add(OrganizationRole.RightsHolderAccess);
-            roles.Add(OrganizationRole.User);
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var user = await UserHelper.CreateUserWithRoles(email, password, salt, encryptedPwd, TestEnvironment.DefaultOrganizationId, roles.ToArray());
-
-            var loginUser = new LoginDTO()
-            {
-                Email = user.Email,
-                Password = password
-            };
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var result = await InterfaceV2Helper.GetRightsholderInterfaceAsync(loginUser, itInterface.Uuid);
+            var result = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
             CheckDTOValues(system, itInterface, result);
+        }
+
+        [Fact]
+        public async Task Can_Get_Interface_With_Correct_Data()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId);
+
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface.Id);
+
+                dbInterface.Description = A<string>();
+                dbInterface.ItInterfaceId = A<string>();
+                dbInterface.Name = A<string>();
+                dbInterface.Url = A<string>();
+                dbInterface.Version = A<string>().Substring(0, ItInterface.MaxVersionLength); // Version has maxLength of 20
+                dbInterface.Disabled = A<bool>();
+
+                db.SaveChanges();
+            });
+
+            //Act
+            var itInterfaceDTO = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, itInterface.Uuid);
+
+            //Assert
+            Assert.NotNull(itInterfaceDTO);
+            DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItInterface, bool>(x =>
+            {
+                var dbInterface = x.AsQueryable().ById(itInterface.Id);
+
+                Assert.Equal(dbInterface.Uuid, itInterfaceDTO.Uuid);
+                Assert.Equal(dbInterface.Name, itInterfaceDTO.Name);
+                Assert.Equal(dbInterface.Description, itInterfaceDTO.Description);
+                Assert.Equal(dbInterface.ItInterfaceId, itInterfaceDTO.InterfaceId);
+                Assert.Equal(dbInterface.Url, itInterfaceDTO.UrlReference);
+                Assert.Equal(dbInterface.Version, itInterfaceDTO.Version);
+                Assert.Equal(dbInterface.Disabled, itInterfaceDTO.Deactivated);
+
+                Assert.Equal(dbInterface.Created, itInterfaceDTO.Created);
+                Assert.Equal(dbInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy.Uuid);
+                Assert.Equal(dbInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy.Name);
+
+                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem.Uuid);
+                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem.Name);
+
+                return true;
+            });
+        }
+
+        [Fact]
+        public async Task Cannot_Get_Interface_If_Not_Exists()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var uuid = Guid.NewGuid();
+
+            //Act
+            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Get_Interface_If_System_Has_No_RightsHolder()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, null, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Get_Interface_If_System_Has_Different_RightsHolder()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, TestEnvironment.SecondOrganizationId, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        private async Task<(string token, Organization createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
+        {
+            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
+            return (token, org);
+        }
+
+        private async Task<(string token, Organization createdOrganization1, Organization createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
+        {
+            var org1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+
+            var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Id, true);
+            await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id);
+
+            return (token, org1, org2);
+        }
+
+        private string CreateName()
+        {
+            return $"{nameof(RightsHolderInterfaceTest)}{A<string>()}";
+        }
+
+        private string CreateEmail()
+        {
+            return $"{A<string>()}@test.dk";
         }
 
         private static void CheckDTOValues(ItSystemDTO system, ItInterfaceDTO itInterface, ItInterfaceResponseDTO interfaceDTO)
