@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
@@ -18,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange - create user in new org and mark as stakeholder - then ensure that public data can be read from another org
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
-            var (entityUuid,_) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var (entityUuid, _) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
             //Act
             var system = await ItSystemV2Helper.GetSingleAsync(token, entityUuid);
@@ -107,19 +108,37 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert - only 2 are actually valid since the excluded one was hidden to the stakeholder
             Assert.Equal(2, systems.Count);
-            Assert.Contains(systems,dto=>dto.Uuid == expected1.uuid);
-            Assert.Contains(systems,dto=>dto.Uuid == expected2.uuid);
+            Assert.Contains(systems, dto => dto.Uuid == expected1.uuid);
+            Assert.Contains(systems, dto => dto.Uuid == expected2.uuid);
         }
 
         [Fact]
         public async Task GET_Many_With_BusinessTypeFilter()
         {
             //Arrange
-            //TODO
+            var (token, newOrganization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var businessType1 = A<string>();
+            var businessType2 = A<string>();
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            var correctBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType1, organizationId);
+            var incorrectBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType2, organizationId);
+            var correctBusinessTypeId = TestEnvironment.GetEntityUuid<BusinessType>(correctBusinessType.Id);
+
+            var unexpectedWrongBusinessType = await CreateSystemAsync(organizationId, AccessModifier.Public);
+            var expected = await CreateSystemAsync(organizationId, AccessModifier.Public);
+
+            var setBt1 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(expected.dbId, correctBusinessType.Id, organizationId);
+            var setBt2 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(unexpectedWrongBusinessType.dbId, incorrectBusinessType.Id, organizationId);
+            Assert.Equal(HttpStatusCode.OK, setBt1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, setBt2.StatusCode);
+
             //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, businessTypeId: correctBusinessTypeId)).ToList();
 
             //Assert
-            Assert.True(false);
+            var dto = Assert.Single(systems);
+            Assert.Equal(dto.Uuid, expected.uuid);
         }
 
         [Fact]

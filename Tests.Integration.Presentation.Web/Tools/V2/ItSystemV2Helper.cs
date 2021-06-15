@@ -24,15 +24,15 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
         }
 
-        public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null)
+        public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null, Guid? businessTypeId = null)
         {
-            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId);
+            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null)
+        public static async Task<HttpResponseMessage> SendGetManyAsync(string token, int? page = null, int? pageSize = null, Guid? rightsHolderId = null, Guid? businessTypeId = null)
         {
             var path = "api/v2/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -45,6 +45,9 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
 
             if (rightsHolderId.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("rightsHolderUuid", rightsHolderId.Value.ToString("D")));
+
+            if (businessTypeId.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("businessTypeUuid", businessTypeId.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
