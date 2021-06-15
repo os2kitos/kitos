@@ -60,9 +60,9 @@ namespace Infrastructure.DataAccess.Interceptors
 
             var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
             {
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName), userId),
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName), userId),
+                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
+                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
             };
 
             var setClauses = insertCommand.SetClauses
@@ -84,9 +84,9 @@ namespace Infrastructure.DataAccess.Interceptors
 
             var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
             {
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName) && MatchNull(clause), userId), //Some EF updates end up in this e.g. changing an owned child on a parent
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName) && MatchNull(clause), userId), //Some EF updates end up in this e.g. changing an owned child on a parent
+                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
+                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
             };
 
             var setClauses = updateCommand.SetClauses

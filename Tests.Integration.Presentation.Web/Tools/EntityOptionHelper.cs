@@ -9,7 +9,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class EntityOptionHelper
     {
-        public static async Task<OptionDTO> SendCreateBusinessTypeAsync(string businessTypeName, int organizationId, Cookie optionalLogin = null)
+        public static async Task<OptionDTO> CreateBusinessTypeAsync(string businessTypeName, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/BusinessTypes?organizationId={organizationId}");
@@ -26,7 +26,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await response.ReadResponseBodyAsAsync<OptionDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendChangeBusinessTypeNameAsync(int businessTypeId, string businessTypeName, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> ChangeBusinessTypeNameAsync(int businessTypeId, string businessTypeName, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/BusinessTypes({businessTypeId})");

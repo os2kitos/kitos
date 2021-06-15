@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -34,7 +35,8 @@ namespace Presentation.Web.Controllers.OData
             var error = base.ValidatePatch(delta, entity);
             if (error.IsNone)
             {
-                if (AttemptToChangeStakeHolderAccess(delta, entity))
+                var changedPropertyNames = delta.GetChangedPropertyNames().ToHashSet();
+                if (AttemptToChangeStakeHolderAccess(delta, entity, changedPropertyNames))
                 {
                     if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
                     {
@@ -42,27 +44,44 @@ namespace Presentation.Web.Controllers.OData
                     }
                 }
 
-                if (AttemptToChangeGlobalAdminFlag(delta, entity))
+                if (AttemptToChangeGlobalAdminFlag(delta, entity, changedPropertyNames))
                 {
                     if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                     {
                         error = Forbidden();
                     }
                 }
+
+                if (AttemptToChangeUuid(delta, entity, changedPropertyNames))
+                {
+                    return BadRequest("Uuid cannot be changed");
+                }
             }
 
             return error;
         }
 
-        private static bool AttemptToChangeGlobalAdminFlag(Delta<User> delta, User entity)
+        private static bool AttemptToChangeUuid(Delta<User> delta, User entity, HashSet<string> changedPropertyNames)
         {
-            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.IsGlobalAdmin),
+            const string uuidName = nameof(Core.DomainModel.User.Uuid);
+
+            return changedPropertyNames.Contains(uuidName) && delta.TryGetPropertyValue(uuidName,
+                out var uuid) && ((Guid)uuid) != entity.Uuid;
+        }
+
+        private static bool AttemptToChangeGlobalAdminFlag(Delta<User> delta, User entity, ICollection<string> changedPropertyNames)
+        {
+            const string isGlobalAdminName = nameof(Core.DomainModel.User.IsGlobalAdmin);
+
+            return changedPropertyNames.Contains(isGlobalAdminName) && delta.TryGetPropertyValue(isGlobalAdminName,
                 out var globalAdmin) && ((bool)globalAdmin) != entity.IsGlobalAdmin;
         }
 
-        private static bool AttemptToChangeStakeHolderAccess(Delta<User> delta, User entity)
+        private static bool AttemptToChangeStakeHolderAccess(Delta<User> delta, User entity, ICollection<string> changedPropertyNames)
         {
-            return delta.TryGetPropertyValue(nameof(Core.DomainModel.User.HasStakeHolderAccess),
+            const string stakeHolderAccess = nameof(Core.DomainModel.User.HasStakeHolderAccess);
+
+            return changedPropertyNames.Contains(stakeHolderAccess) && delta.TryGetPropertyValue(nameof(stakeHolderAccess),
                 out var hasStakeHolderAccess) && ((bool)hasStakeHolderAccess) != entity.HasStakeHolderAccess;
         }
 

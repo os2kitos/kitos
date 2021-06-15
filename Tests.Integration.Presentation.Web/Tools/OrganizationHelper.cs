@@ -62,11 +62,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<Organization> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
-            using (var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                return await createdResponse.ReadResponseBodyAsAsync<Organization>();
-            }
+            using var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            return await createdResponse.ReadResponseBodyAsAsync<Organization>();
         }
 
         public static async Task<HttpResponseMessage> SendCreateOrganizationRequestAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)

@@ -68,6 +68,7 @@ namespace Core.ApplicationServices
             // hash his salt and default password
             var utcNow = DateTime.UtcNow;
             user.Salt = _cryptoService.Encrypt(utcNow + " spices");
+            user.Uuid = Guid.NewGuid();
 
             user.Password = _useDefaultUserPassword
                 ? _cryptoService.Encrypt(_defaultUserPassword + user.Salt)
@@ -80,7 +81,7 @@ namespace Core.ApplicationServices
 
             _userRepository.Insert(user);
             _userRepository.Save();
-            
+
             var savedUser = _userRepository.Get(u => u.Id == user.Id).FirstOrDefault();
 
             _domainEvents.Raise(new EntityDeletedEvent<User>(savedUser));

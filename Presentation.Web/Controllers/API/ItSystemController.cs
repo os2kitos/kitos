@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
@@ -27,15 +28,18 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
+        private readonly IOperationClock _operationClock;
 
         public ItSystemController(
             IGenericRepository<ItSystem> repository,
             IGenericRepository<TaskRef> taskRepository,
-            IItSystemService systemService)
+            IItSystemService systemService,
+            IOperationClock operationClock)
             : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
+            _operationClock = operationClock;
         }
 
 
@@ -159,7 +163,8 @@ namespace Presentation.Web.Controllers.API
                     OrganizationId = dto.OrganizationId,
                     BelongsToId = dto.OrganizationId,
                     Uuid = Guid.NewGuid(),
-                    AccessModifier = dto.AccessModifier ?? AccessModifier.Public
+                    AccessModifier = dto.AccessModifier ?? AccessModifier.Public,
+                    Created = _operationClock.Now
                 };
 
                 if (!AllowCreate<ItSystem>(dto.OrganizationId, item))
@@ -362,6 +367,12 @@ namespace Presentation.Web.Controllers.API
                 if (system.Any())
                     return Conflict("Name is already taken!");
 
+            }
+
+            if (obj.TryGetValue(nameof(ItSystem.Uuid), StringComparison.OrdinalIgnoreCase, out var uuidToken) &&
+                uuidToken.ToObject<Guid>() != itSystem.Uuid)
+            {
+                return BadRequest("Cannot change uuid");
             }
 
             var httpResponseMessage = base.Patch(id, organizationId, obj);

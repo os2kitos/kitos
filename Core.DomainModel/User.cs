@@ -35,7 +35,7 @@ namespace Core.DomainModel
             HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
-            Uuid = Guid.NewGuid();
+            Uuid = Guid.NewGuid(); 
         }
 
         public string Name { get; set; }
@@ -45,8 +45,6 @@ namespace Core.DomainModel
         public string Password { get; set; }
         public string Salt { get; set; }
         public DateTime? LastAdvisDate { get; set; }
-
-        public Guid Uuid { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
         /// <summary>
@@ -140,6 +138,7 @@ namespace Core.DomainModel
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }
+        public Guid Uuid { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {

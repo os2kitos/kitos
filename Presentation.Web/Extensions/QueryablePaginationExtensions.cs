@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Shared;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 
 namespace Presentation.Web.Extensions
@@ -10,18 +9,28 @@ namespace Presentation.Web.Extensions
     {
         public static IQueryable<T> Page<T>(this IQueryable<T> src, StandardPaginationQuery pagination)
         {
-            var paginationPageSize = pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
-            var page = pagination?.Page.GetValueOrDefault(0) ?? 0;
+            var paginationPageSize = GetPaginationPageSize(pagination);
+            var page = GetPaginationPage(pagination);
 
             return src.Skip(page * paginationPageSize).Take(paginationPageSize);
         }
 
         public static IEnumerable<T> Page<T>(this IEnumerable<T> src, StandardPaginationQuery pagination)
         {
-            var paginationPageSize = pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
-            var page = pagination?.Page.GetValueOrDefault(0) ?? 0;
+            var paginationPageSize = GetPaginationPageSize(pagination);
+            var page = GetPaginationPage(pagination);
 
             return src.Skip(page * paginationPageSize).Take(paginationPageSize);
+        }
+
+        private static int GetPaginationPage(StandardPaginationQuery pagination)
+        {
+            return pagination?.Page.GetValueOrDefault(0) ?? 0;
+        }
+
+        private static int GetPaginationPageSize(StandardPaginationQuery pagination)
+        {
+            return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
         }
     }
 }
