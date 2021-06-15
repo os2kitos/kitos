@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
 using Tests.Toolkit.Patterns;
@@ -62,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GET_ItSystem_Returns_Expected_Data()
         {
             //Arrange
-            //TODO
+            //TODO - test that properties contain what we expect AND that the interface list is filtered by access control before being returned
             //Act
 
             //Assert - data is set as expected. Interfaces are filtered by access control so that only interfaces, which are accessible to the user, are pointed out
@@ -116,7 +117,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         public async Task GET_Many_With_BusinessTypeFilter()
         {
             //Arrange
-            var (token, newOrganization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
             var businessType1 = A<string>();
             var businessType2 = A<string>();
             const int organizationId = TestEnvironment.DefaultOrganizationId;
@@ -128,8 +129,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var unexpectedWrongBusinessType = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var expected = await CreateSystemAsync(organizationId, AccessModifier.Public);
 
-            var setBt1 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(expected.dbId, correctBusinessType.Id, organizationId);
-            var setBt2 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(unexpectedWrongBusinessType.dbId, incorrectBusinessType.Id, organizationId);
+            using var setBt1 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(expected.dbId, correctBusinessType.Id, organizationId);
+            using var setBt2 = await ItSystemHelper.SendSetBusinessTypeRequestAsync(unexpectedWrongBusinessType.dbId, incorrectBusinessType.Id, organizationId);
             Assert.Equal(HttpStatusCode.OK, setBt1.StatusCode);
             Assert.Equal(HttpStatusCode.OK, setBt2.StatusCode);
 
@@ -141,33 +142,60 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(dto.Uuid, expected.uuid);
         }
 
-        [Fact]
-        public async Task GET_Many_With_KLE_Number_Filter()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GET_Many_With_KLE_Filter(bool useKeyAsFilter)
         {
             //Arrange
-            //TODO
+            var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var rand = new Random(DateTime.UtcNow.Millisecond);
+
+            var correctRef = new
+            {
+                uuid = A<Guid>(),
+                key = rand.Next().ToString("D"),
+            };
+            var incorrectRef = new
+            {
+                uuid = A<Guid>(),
+                key = rand.Next().ToString("D"),
+            };
+
+            CreateTaskRefInDatabase(correctRef.key, correctRef.uuid);
+            CreateTaskRefInDatabase(incorrectRef.key, incorrectRef.uuid);
+
+            var correctRefDbId = DatabaseAccess.MapFromEntitySet<TaskRef, int>(rep => rep.AsQueryable().ByUuid(correctRef.uuid).Id);
+            var incorrectRefDbId = DatabaseAccess.MapFromEntitySet<TaskRef, int>(rep => rep.AsQueryable().ByUuid(incorrectRef.uuid).Id);
+
+            var systemWithWrongRef = await CreateSystemAsync(organizationId, AccessModifier.Public);
+            var system1WithCorrectRef = await CreateSystemAsync(organizationId, AccessModifier.Public);
+            var system2WithCorrectRef = await CreateSystemAsync(organizationId, AccessModifier.Public);
+
+            using var addRefResponse1 = await ItSystemHelper.SendAddTaskRefRequestAsync(system1WithCorrectRef.dbId, correctRefDbId, organizationId);
+            using var addRefResponse2 = await ItSystemHelper.SendAddTaskRefRequestAsync(system2WithCorrectRef.dbId, correctRefDbId, organizationId);
+            using var addRefResponse3 = await ItSystemHelper.SendAddTaskRefRequestAsync(systemWithWrongRef.dbId, incorrectRefDbId, organizationId);
+            Assert.Equal(HttpStatusCode.OK, addRefResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, addRefResponse2.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, addRefResponse3.StatusCode);
+
             //Act
+            var kleKeyFilter = useKeyAsFilter ? correctRef.key : null;
+            var kleUuidFilter = useKeyAsFilter ? (Guid?)null : correctRef.uuid;
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, kleKey: kleKeyFilter, kleUuid: kleUuidFilter)).ToList();
 
             //Assert
-            Assert.True(false);
-        }
-
-        [Fact]
-        public async Task GET_Many_With_KLE_Uuid_Filter()
-        {
-            //Arrange
-            //TODO
-            //Act
-
-            //Assert
-            Assert.True(false);
+            Assert.Equal(2, systems.Count);
+            Assert.Contains(systems, x => x.Uuid == system1WithCorrectRef.uuid);
+            Assert.Contains(systems, x => x.Uuid == system2WithCorrectRef.uuid);
         }
 
         [Fact]
         public async Task GET_Many_With_NumberOfUsers_Filter()
         {
             //Arrange
-            //TODO
+            //TODO - also use some other filter or else it will be impossible to control it.... like a new rightsholder or a business type filter!
             //Act
 
             //Assert
@@ -208,6 +236,18 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         private string CreateEmail()
         {
             return $"{CreateName()}@kitos.dk";
+        }
+
+        private static void CreateTaskRefInDatabase(string key, Guid uuid)
+        {
+            DatabaseAccess.MutateEntitySet<TaskRef>(repo => repo.Insert(new TaskRef
+            {
+                Uuid = uuid,
+                TaskKey = key,
+                ObjectOwnerId = 1,
+                LastChangedByUserId = 1,
+                OwnedByOrganizationUnitId = 1
+            }));
         }
     }
 }
