@@ -60,7 +60,7 @@ class CreateUserHelper {
     private getUserRow(email: string) {
         const emailColumnElementType = "userEmailObject";
 
-        const rows = this.pageObject.mainGridAllTableRows.filter((row, index) => {
+        return this.pageObject.mainGridAllTableRows.filter((row, index) => {
             console.log("Searching for email column");
             var column = row.element(this.cssHelper.byDataElementType(emailColumnElementType));
             return column.isPresent()
@@ -74,15 +74,21 @@ class CreateUserHelper {
                     }
                     return false;
                 });
+        }).then(elements => {
+            if (elements.length === 0) {
+                throw `No rows found for email:${email}`;
+            }
+            return elements[0];
         });
-
-        return rows.first();
     }
 
     private openEditUser(email: string) {
-        const row = this.getUserRow(email);
-        expect(row).not.toBe(null);
-        return row.element(by.linkText("Redigér")).click();
+        return this.getUserRow(email)
+            .then(row => {
+                expect(row).not.toBe(null);
+                return row.element(by.linkText("Redigér")).click();
+            })
+            .then(() => browser.waitForAngular());
     }
 }
 export = CreateUserHelper;
