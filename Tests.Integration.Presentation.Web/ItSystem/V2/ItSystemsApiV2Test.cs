@@ -106,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolder.Uuid)).ToList();
 
             //Assert - only 2 are actually valid since the excluded one was hidden to the stakeholder
-            Assert.Equal(2, systems.Count());
+            Assert.Equal(2, systems.Count);
             Assert.Contains(systems,dto=>dto.Uuid == expected1.uuid);
             Assert.Contains(systems,dto=>dto.Uuid == expected2.uuid);
         }
