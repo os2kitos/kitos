@@ -15,12 +15,12 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [RoutePrefix("api/v2/rightsholder")]
-    public class RightsHolderItInterfaceController: ExternalBaseController
+    [RoutePrefix("api/v2")]
+    public class ItInterfaceV2Controller: ExternalBaseController
     {
         private readonly IItInterfaceService _itInterfaceService;
 
-        public RightsHolderItInterfaceController(IItInterfaceService itInterfaceService)
+        public ItInterfaceV2Controller(IItInterfaceService itInterfaceService)
         {
             _itInterfaceService = itInterfaceService;
         }
@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="itInterfaceDTO">A collection of specific IT-Interface values</param>
         /// <returns>Location header is set to uri for newly created IT-Interface</returns>
         [HttpPost]
-        [Route("it-interfaces")]
+        [Route("rightsholder/it-interfaces")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -52,7 +52,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-interfaces")]
+        [Route("rightsholder/it-interfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -102,7 +102,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>The updated IT-Interface</returns>
         [HttpPut]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -120,7 +120,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="deactivationReasonDTO">Reason for deactivation</param>
         /// <returns>No content</returns>
         [HttpDelete]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -133,6 +133,7 @@ namespace Presentation.Web.Controllers.External.V2
 
         private ItInterfaceResponseDTO ToDTO(ItInterface input)
         {
+            //TODO: JMO use new IdNamePair mapper after merge
             return new ItInterfaceResponseDTO()
             {
                 Uuid = input.Uuid,
