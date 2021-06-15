@@ -52,5 +52,9 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             var itSystem = Assert.Single(result);
             Assert.Same(matched, itSystem);
         }
+
+        [Fact]
+        public void Ctor_Throws_If_Both_Conditions_Are_Null() =>
+            Assert.Throws<ArgumentException>(() => new QueryByTaskRef());
     }
 }

@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
@@ -27,15 +28,18 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IGenericRepository<TaskRef> _taskRepository;
         private readonly IItSystemService _systemService;
+        private readonly IOperationClock _operationClock;
 
         public ItSystemController(
             IGenericRepository<ItSystem> repository,
             IGenericRepository<TaskRef> taskRepository,
-            IItSystemService systemService)
+            IItSystemService systemService,
+            IOperationClock operationClock)
             : base(repository)
         {
             _taskRepository = taskRepository;
             _systemService = systemService;
+            _operationClock = operationClock;
         }
 
 
@@ -160,7 +164,7 @@ namespace Presentation.Web.Controllers.API
                     BelongsToId = dto.OrganizationId,
                     Uuid = Guid.NewGuid(),
                     AccessModifier = dto.AccessModifier ?? AccessModifier.Public,
-                    Created = DateTime.Now
+                    Created = _operationClock.Now
                 };
 
                 if (!AllowCreate<ItSystem>(dto.OrganizationId, item))

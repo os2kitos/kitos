@@ -11,6 +11,8 @@ namespace Core.DomainServices.Queries.ItSystem
 
         public QueryByTaskRef(string key = null, Guid? uuid = null)
         {
+            if (key == null && uuid == null)
+                throw new ArgumentException("No constraints provided");
             _key = key;
             _uuid = uuid;
         }
