@@ -6,9 +6,9 @@ using Core.DomainServices.Queries.ItSystem;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.DomainServices
+namespace Tests.Unit.Presentation.Web.DomainServices.System
 {
-    public class QueryByRightsHolderItSystemTest : WithAutoFixture
+    public class QueryByRightsHolderTest : WithAutoFixture
     {
         [Fact]
         public void Apply_Returns_Items_With_Uuid_Match()
@@ -21,7 +21,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             var excludedWrongUuid = new ItSystem { BelongsTo = new Organization { Uuid = incorrectId } };
 
             var input = new[] { excludedWrongUuid, matched, excludedNoRightsHolder }.AsQueryable();
-            var sut = new QueryByRightsHolder(correctId);
+            var sut = new QueryByRightsHolderUuid(correctId);
 
             //Act
             var result = sut.Apply(input);

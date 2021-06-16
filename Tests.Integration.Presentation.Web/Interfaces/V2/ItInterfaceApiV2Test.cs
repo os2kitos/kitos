@@ -69,6 +69,32 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         }
 
         [Fact]
+        public async Task Can_Get_Interfaces_From_Specific_RightsHolder()
+        {
+            //Arrange
+            var (token, org1, org2) = await CreateRightsHolderUserInMultipleNewOrganizationsAsync();
+
+            var pageSize = 2;
+            var pageNumber = 0; //Always takes the first page;
+
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id);
+            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, org1.Uuid);
+
+            //Assert
+            var interface1DTO = Assert.Single(result);
+            CheckBaseDTOValues(system1, itInterface1, interface1DTO);
+        }
+
+        [Fact]
         public async Task Can_Get_Interface_As_RightsHolder()
         {
             //Arrange

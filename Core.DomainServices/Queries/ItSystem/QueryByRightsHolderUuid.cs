@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace Core.DomainServices.Queries.ItSystem
 {
-    public class QueryByRightsHolder : IDomainQuery<DomainModel.ItSystem.ItSystem>
+    public class QueryByRightsHolderUuid : IDomainQuery<DomainModel.ItSystem.ItSystem>
     {
         private readonly Guid _rightsHolderUuid;
 
-        public QueryByRightsHolder(Guid rightsHolderUuid)
+        public QueryByRightsHolderUuid(Guid rightsHolderUuid)
         {
             _rightsHolderUuid = rightsHolderUuid;
         }

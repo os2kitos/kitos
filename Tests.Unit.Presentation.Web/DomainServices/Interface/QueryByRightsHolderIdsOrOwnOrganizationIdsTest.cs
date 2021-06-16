@@ -5,7 +5,7 @@ using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.DomainServices
+namespace Tests.Unit.Presentation.Web.DomainServices.Interface
 {
     public class QueryByRightsHolderIdsOrOwnOrganizationIdsTest : WithAutoFixture
     {

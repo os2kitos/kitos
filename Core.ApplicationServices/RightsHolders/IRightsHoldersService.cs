@@ -9,8 +9,9 @@ namespace Core.ApplicationServices.RightsHolders
     public interface IRightsHoldersService
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
-
-        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess();
+        Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
+        Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
+        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
     }
 }

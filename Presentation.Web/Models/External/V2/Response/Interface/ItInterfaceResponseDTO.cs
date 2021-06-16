@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Presentation.Web.Models.External.V2.Response.Interface
 {
-    public class StakeHolderItInterfaceResponseDTO : BaseItInterfaceResponseDTO
+    public class ItInterfaceResponseDTO : BaseItInterfaceResponseDTO
     {
         /// <summary>
         /// Time of last modification

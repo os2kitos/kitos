@@ -54,12 +54,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(url, token);
         }
 
-        public static async Task<IEnumerable<StakeHolderItInterfaceResponseDTO>> GetStakeholderInterfacesAsync(string token, int? pageSize = null, int? pageNumber = null, Guid? exposedBySystemUuid = null)
+        public static async Task<IEnumerable<ItInterfaceResponseDTO>> GetStakeholderInterfacesAsync(string token, int? pageSize = null, int? pageNumber = null, Guid? exposedBySystemUuid = null)
         {
             using var response = await SendGetStakeholderInterfacesAsync(token, pageSize, pageNumber, exposedBySystemUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<IEnumerable<StakeHolderItInterfaceResponseDTO>>();
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItInterfaceResponseDTO>>();
         }
 
         public static async Task<HttpResponseMessage> SendGetStakeholderInterfacesAsync(string token, int? pageSize = null, int? pageNumber = null, Guid? exposedBySystemUuid = null)
@@ -82,12 +82,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
         }
 
-        public static async Task<StakeHolderItInterfaceResponseDTO> GetStakeholderInterfaceAsync(string token, Guid interfaceGuid)
+        public static async Task<ItInterfaceResponseDTO> GetStakeholderInterfaceAsync(string token, Guid interfaceGuid)
         {
             using var response = await SendGetStakeholderInterfaceAsync(token, interfaceGuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<StakeHolderItInterfaceResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<ItInterfaceResponseDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetStakeholderInterfaceAsync(string token, Guid interfaceGuid)

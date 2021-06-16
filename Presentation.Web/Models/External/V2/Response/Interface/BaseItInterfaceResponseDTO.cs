@@ -9,7 +9,7 @@ using System;
 
 namespace Presentation.Web.Models.External.V2.Response.Interface
 {
-    public class BaseItInterfaceResponseDTO
+    public abstract class BaseItInterfaceResponseDTO
     {
         /// <summary>
         /// UUID for IT-Interface

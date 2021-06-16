@@ -351,8 +351,9 @@
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\External\V2\Request\StandardPaginationQuery.cs" />
+    <Compile Include="Models\External\V2\Response\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\Interface\StakeHolderItInterfaceResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\Interface\ItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Types\ArchiveDutyChoice.cs" />
     <Compile Include="Models\External\V2\AvailableNamePairResponseDTO.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
@@ -361,13 +362,12 @@
     <Compile Include="Controllers\External\V2\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\Response\ItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\BaseItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\BaseItInterfaceResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\ItSystemInformationResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\ItInterfaceRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\ItInterfaceV2Controller.cs" />
     <Compile Include="Models\External\V2\Request\DeactivationReasonRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\BusinessTypesV2Controller.cs" />
-    <Compile Include="Controllers\External\V2\RightsHolderItSystemController.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />

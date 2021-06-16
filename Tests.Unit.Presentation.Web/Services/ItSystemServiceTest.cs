@@ -163,6 +163,30 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void GetAvailableSystems_With_RightsHolders_Access()
+        {
+            //Arrange
+            var mainOrg = A<int>();
+            var rightsHoldingOrganization1 = mainOrg + 1;
+            var rightsHoldingOrganization2 = rightsHoldingOrganization1 + 1;
+            var otherOrganizationId = rightsHoldingOrganization2 + 1;
+            var includedSystem1 = CreateSystem(mainOrg, AccessModifier.Public, rightsHoldingOrganization1);
+            var includedSystem2 = CreateSystem(mainOrg, AccessModifier.Local, rightsHoldingOrganization2);
+            var excludedWrongRightsHolder = CreateSystem(otherOrganizationId, AccessModifier.Public, otherOrganizationId);
+            var all = new List<ItSystem> { includedSystem1, excludedWrongRightsHolder, CreateSystem(otherOrganizationId), includedSystem2 };
+            ExpectGetSystemsReturns(all);
+            ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel.RightsHolder);
+            _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess))
+                .Returns(new[] { rightsHoldingOrganization1, rightsHoldingOrganization2 });
+
+            //Act
+            var availableSystems = _sut.GetAvailableSystems().ToList();
+
+            //Assert
+            Assert.Equal(new[] { includedSystem1, includedSystem2 }, availableSystems);
+        }
+
+        [Fact]
         public void GetAvailableSystems_Applies_Sub_queries()
         {
             //Arrange
@@ -450,7 +474,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new Organization { Id = A<int>(), Name = A<string>() };
         }
 
-        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local)
+        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null)
         {
             ItSystem itSystem = new()
             {
@@ -462,6 +486,9 @@ namespace Tests.Unit.Presentation.Web.Services
             {
                 itSystem.OrganizationId = organizationId.Value;
             }
+
+            itSystem.BelongsToId = belongsToId;
+
             return itSystem;
         }
 
