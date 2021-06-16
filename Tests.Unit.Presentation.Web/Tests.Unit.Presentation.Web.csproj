@@ -208,6 +208,7 @@
     <Compile Include="DomainServices\QueryByBusinessTypeTest.cs" />
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
     <Compile Include="DomainServices\QueryByNumberOfUsagesTest.cs" />
+    <Compile Include="DomainServices\QueryByRightsHolderIdsTest.cs" />
     <Compile Include="DomainServices\QueryByRightsHolderTest.cs" />
     <Compile Include="DomainServices\QueryByTaskRefTest.cs" />
     <Compile Include="DomainServices\QueryByUuidTest.cs" />
