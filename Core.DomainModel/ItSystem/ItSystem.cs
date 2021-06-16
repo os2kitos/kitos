@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,8 +27,6 @@ namespace Core.DomainModel.ItSystem
             Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
         }
-
-        public DateTime? Created { get; set; }
 
         public int? BelongsToId { get; set; }
 

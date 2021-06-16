@@ -1,13 +1,17 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Queries.ItSystem;
 using Infrastructure.Services.Types;
 
@@ -18,12 +22,53 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<Organization> _organizationRepository;
         private readonly IItSystemService _systemService;
+        private readonly IItInterfaceService _itInterfaceService;
 
-        public RightsHoldersService(IOrganizationalUserContext userContext, IGenericRepository<Organization> organizationRepository, IItSystemService systemService)
+        public RightsHoldersService(
+            IOrganizationalUserContext userContext,
+            IGenericRepository<Organization> organizationRepository,
+            IItInterfaceService itInterfaceService,
+            IItSystemService systemService)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
+            _itInterfaceService = itInterfaceService;
             _systemService = systemService;
+        }
+
+        public Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid)
+        {
+            return WithAnyRightsHoldersAccess()
+                .Match
+                (
+                    error => error,
+                    () => _itInterfaceService.GetInterface(interfaceUuid).Bind(WithRightsHolderAccessTo)
+                );
+        }
+
+        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
+        {
+            return WithAnyRightsHoldersAccess()
+                .Match
+                (
+                    error => error,
+                    () =>
+                    {
+                        var refinements = new List<IDomainQuery<ItInterface>>();
+                        if (rightsHolderUuid.HasValue)
+                        {
+                            var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
+                            if (!_userContext.HasRole(org.Id, OrganizationRole.RightsHolderAccess))
+                            {
+                                return new OperationError("User is not rightsholder in the provided organization",OperationFailure.Forbidden);
+                            }
+                            refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
+                        }
+
+
+                        return Result<IQueryable<ItInterface>, OperationError>.Success(_itInterfaceService.GetAvailableInterfaces(refinements.ToArray()));
+                    }
+                );
         }
 
         public IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
@@ -64,16 +109,16 @@ namespace Core.ApplicationServices.RightsHolders
                 : new OperationError("User does not have 'rightsholders access' in any organization", OperationFailure.Forbidden);
         }
 
-        private Result<ItSystem, OperationError> WithRightsHolderAccessTo(ItSystem system)
+        private Result<T, OperationError> WithRightsHolderAccessTo<T>(T subject) where T : IHasRightsHolder
         {
             //User may have read access in a different context (own systems but not with rightsholder set to a rightsholding organization) but in this case we insist that rightsholder access must be issued
-            var hasAssignedRightsHolderAccess = system
+            var hasAssignedRightsHolderAccess = subject
                 .GetRightsHolderOrganizationId()
                 .Select(organizationId => _userContext.HasRole(organizationId, OrganizationRole.RightsHolderAccess))
                 .GetValueOrFallback(false);
 
             if (hasAssignedRightsHolderAccess)
-                return system;
+                return subject;
 
             return new OperationError("Not rightsholder for the requested system", OperationFailure.Forbidden);
         }

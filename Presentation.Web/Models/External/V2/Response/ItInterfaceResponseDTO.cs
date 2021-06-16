@@ -12,7 +12,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>
-        public Guid ExposedBySystemUuid { get; set; }
+        public IdentityNamePairResponseDTO ExposedBySystem { get; set; }
         
         /// <summary>
         /// Name of IT-Interface
@@ -43,25 +43,15 @@ namespace Presentation.Web.Models.External.V2.Response
         /// Active status
         /// </summary>
         public bool Deactivated { get; set; }
-        
+
         /// <summary>
-        /// Date of creation
+        /// Date of creation. (on some legacy systems , this information is not available. If so, it will be null)
         /// </summary>
-        public DateTime Created { get; set; }
+        public DateTime? Created { get; set; }
 
         /// <summary>
         /// Responsible for creation
         /// </summary>
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
-
-        /// <summary>
-        /// Time of last modification
-        /// </summary>
-        public DateTime LastModified { get; set; }
-
-        /// <summary>
-        /// Responsible for last modification
-        /// </summary>
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
     }
 }

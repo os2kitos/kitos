@@ -1,14 +1,22 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Interface;
+using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -25,6 +33,9 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IGenericRepository<DataRow>> _dataRowRepository;
+        private readonly Mock<IInterfaceRepository> _repository;
+        private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<IOperationClock> _operationClock;
 
         public ItInterfaceServiceTest()
         {
@@ -34,13 +45,19 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents = new Mock<IDomainEvents>();
             _transactionManager = new Mock<ITransactionManager>();
             _dataRowRepository = new Mock<IGenericRepository<DataRow>>();
+            _userContext = new Mock<IOrganizationalUserContext>();
+            _repository = new Mock<IInterfaceRepository>();
+            _operationClock = new Mock<IOperationClock>();
             _sut = new ItInterfaceService(
                 _interfaceRepository.Object,
                 _dataRowRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
-                _domainEvents.Object);
+                _domainEvents.Object,
+                _repository.Object,
+                _userContext.Object,
+                _operationClock.Object);
         }
 
         [Fact]
@@ -269,6 +286,147 @@ namespace Tests.Unit.Core.ApplicationServices
             _interfaceRepository.Verify(x => x.Save(), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
+
+        [Fact]
+        public void GetInterface_Returns_Interface()
+        {
+            //Arrange
+            var interfaceUuid = Guid.NewGuid();
+            var itInterface = new ItInterface();
+
+            _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowReads(itInterface)).Returns(true);
+
+            //Act
+            var businessTypeResult = _sut.GetInterface(interfaceUuid);
+
+            //Assert
+            Assert.True(businessTypeResult.Ok);
+            Assert.Equal(itInterface, businessTypeResult.Value);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_Forbidden_If_Not_Read_Access()
+        {
+            //Arrange
+            var interfaceUuid = Guid.NewGuid();
+            var itInterface = new ItInterface();
+
+            _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowReads(itInterface)).Returns(false);
+
+            //Act
+            var businessTypeResult = _sut.GetInterface(interfaceUuid);
+
+            //Assert
+            Assert.True(businessTypeResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, businessTypeResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_NotFound_If_No_Interface()
+        {
+            //Arrange
+            var interfaceUuid = Guid.NewGuid();
+
+            _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(Maybe<ItInterface>.None);
+
+            //Act
+            var businessTypeResult = _sut.GetInterface(interfaceUuid);
+
+            //Assert
+            Assert.True(businessTypeResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, businessTypeResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetAvailableInterfaces_Returns_RightsholderInterfaces_If_User_Has_Rightsholderaccess()
+        {
+            //Arrange
+            var interfaceUuid = Guid.NewGuid();
+            var orgId = A<int>();
+            var rightsHolderOrgs = new List<int>() { orgId };
+            var itInterface = new ItInterface()
+            {
+                Uuid = interfaceUuid
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.RightsHolder);
+            _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(rightsHolderOrgs);
+            _repository.Setup(x => x.GetInterfacesWhereRightsHolderIsOneOf(rightsHolderOrgs)).Returns(new List<ItInterface>() { itInterface }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableInterfaces();
+
+            //Assert
+            var interfaceResult = Assert.Single(result.ToList());
+            Assert.Equal(interfaceUuid, interfaceResult.Uuid);
+        }
+
+        [Fact]
+        public void GetAvailableInterfaces_Returns_RightsholderInterfaces_From_Specific_Rightsholder_If_User_Has_Rightsholderaccess()
+        {
+            //Arrange
+            var org1 = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var org2 = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var rightsHolderOrgs = new List<int>() {
+                org1.Id,
+                org2.Id
+            };
+            var itInterface1 = new ItInterface()
+            {
+                Uuid = Guid.NewGuid(),
+                ExhibitedBy = new ItInterfaceExhibit()
+                {
+                    ItSystemId = A<int>(),
+                    ItSystem = new ItSystem()
+                    {
+                        BelongsTo = org1,
+                        BelongsToId = org1.Id
+                    }
+                }
+            };
+            var itInterface2 = new ItInterface()
+            {
+                Uuid = Guid.NewGuid(),
+                ExhibitedBy = new ItInterfaceExhibit()
+                {
+                    ItSystemId = A<int>(),
+                    ItSystem = new ItSystem()
+                    {
+                        BelongsTo = org2,
+                        BelongsToId = org2.Id
+                    }
+                }
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.RightsHolder);
+            _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(rightsHolderOrgs);
+            _repository.Setup(x => x.GetInterfacesWhereRightsHolderIsOneOf(rightsHolderOrgs)).Returns(new List<ItInterface>() { itInterface1, itInterface2 }.AsQueryable());
+
+            var domainQuery = new Mock<IDomainQuery<ItInterface>>();
+            domainQuery.Setup(x => x.Apply(It.IsAny<IQueryable<ItInterface>>())).Returns(new List<ItInterface>() { itInterface1 }.AsQueryable());
+
+            var refinements = new List<IDomainQuery<ItInterface>>();
+
+            refinements.Add(domainQuery.Object);
+
+            //Act
+            var result = _sut.GetAvailableInterfaces(refinements.ToArray());
+
+            //Assert
+            var interfaceResult = Assert.Single(result.ToList());
+            Assert.Equal(itInterface1.Uuid, interfaceResult.Uuid);
+        }
+
 
         private void ExpectGetInterfaceReturns(int interfaceId, ItInterface value)
         {

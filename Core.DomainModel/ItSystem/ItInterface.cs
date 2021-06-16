@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Qa.References;
 using Infrastructure.Services.Types;
@@ -7,12 +8,15 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItInterface : ItSystemBase, IHasRightsHolder
+    public class ItInterface : ItSystemBase, IHasRightsHolder, IHasUuid
     {
         public static int MaxNameLength = 100;
+        public static int MaxVersionLength = 20;
+
         public ItInterface()
         {
             DataRows = new List<DataRow>();
+            Uuid = Guid.NewGuid();
         }
         public string Url { get; set; }
         /// <summary>

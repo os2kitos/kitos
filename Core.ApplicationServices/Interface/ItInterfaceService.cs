@@ -5,10 +5,15 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -24,6 +29,9 @@ namespace Core.ApplicationServices.Interface
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<ItInterface> _repository;
+        private readonly IInterfaceRepository _interfaceRepository; 
+        private readonly IOrganizationalUserContext _userContext;
+        private readonly IOperationClock _operationClock;
 
         public ItInterfaceService(
             IGenericRepository<ItInterface> repository,
@@ -31,7 +39,10 @@ namespace Core.ApplicationServices.Interface
             IItSystemRepository systemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IInterfaceRepository interfaceRepository,
+            IOrganizationalUserContext userContext, 
+            IOperationClock operationClock)
         {
             _repository = repository;
             _dataRowRepository = dataRowRepository;
@@ -39,6 +50,9 @@ namespace Core.ApplicationServices.Interface
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
+            _interfaceRepository = interfaceRepository;
+            _userContext = userContext;
+            _operationClock = operationClock;
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
@@ -96,7 +110,8 @@ namespace Core.ApplicationServices.Interface
                 OrganizationId = organizationId,
                 ItInterfaceId = interfaceId ?? string.Empty,
                 Uuid = Guid.NewGuid(),
-                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public)
+                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public),
+                Created = _operationClock.Now
             };
 
             if (!_authorizationContext.AllowCreate<ItInterface>(organizationId, newInterface))
@@ -180,6 +195,46 @@ namespace Core.ApplicationServices.Interface
                     .Where(x => x.ItInterfaceId == interfaceId);
 
             return !system.Any();
+        }
+
+        public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
+        {
+            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+
+            if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
+            {
+                var rightsHolderOrgs = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+                var rightsHolderQuery = _interfaceRepository.GetInterfacesWhereRightsHolderIsOneOf(rightsHolderOrgs);
+
+                return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(rightsHolderQuery) : rightsHolderQuery;
+            }
+            else
+            {
+                throw new NotImplementedException("https://os2web.atlassian.net/browse/KITOSUDV-1735");
+            }
+            //TODO: Solve this as part of https://os2web.atlassian.net/browse/KITOSUDV-1735
+            //var refinement = accessLevel == CrossOrganizationDataReadAccessLevel.All ?
+            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.None :
+            //    Maybe<QueryAllByRestrictionCapabilities<ItInterface>>.Some(new QueryAllByRestrictionCapabilities<ItInterface>(accessLevel, _userContext.OrganizationIds));
+
+            //var mainQuery = _interfaceRepository.GetInterfaces();
+
+            //var refinedResult = refinement
+            //    .Select(x => x.Apply(mainQuery))
+            //    .GetValueOrFallback(mainQuery);
+
+            //return conditions.Any() ? new IntersectionQuery<ItInterface>(conditions).Apply(refinedResult) : refinedResult;
+        }
+
+        public Result<ItInterface, OperationError> GetInterface(Guid uuid)
+        {
+            return _interfaceRepository
+                .GetInterface(uuid)
+                .Match
+                (
+                    itInterface => _authorizationContext.AllowReads(itInterface) ? Result<ItInterface, OperationError>.Success(itInterface) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
         }
     }
 }

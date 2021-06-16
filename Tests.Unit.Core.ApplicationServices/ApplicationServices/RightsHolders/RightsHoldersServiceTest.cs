@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
@@ -20,13 +21,15 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IGenericRepository<Organization>> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
+        private readonly Mock<IItInterfaceService> _interfaceService;
 
         public RightsHoldersServiceTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
             _itSystemServiceMock = new Mock<IItSystemService>();
-            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _itSystemServiceMock.Object);
+            _interfaceService = new Mock<IItInterfaceService>();
+            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object);
         }
 
         [Fact]

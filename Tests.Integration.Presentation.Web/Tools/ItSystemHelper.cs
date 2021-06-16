@@ -247,7 +247,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<HttpResponseMessage> SendSetBelongsToRequestAsync(
             int systemId,
-            int belongsToId,
+            int? belongsToId,
             int organizationId,
             Cookie optionalLogin = null)
         {
