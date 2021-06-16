@@ -73,9 +73,11 @@ namespace Core.ApplicationServices.System
             if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
             {
                 var rightsHoldingOrganizations = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+
+                //TODO: Consider if the users own organization data should also be included and then filtered by the rightsholders service as a domain query because AllowRead will return true if rightsholderaccess, no rightsholder set but the object is created in an organization in which the user is a member
                 refinement = new QueryByRightsHolderIds(rightsHoldingOrganizations);
             }
-            else if(accessLevel < CrossOrganizationDataReadAccessLevel.All)
+            else if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
             {
                 refinement = new QueryAllByRestrictionCapabilities<ItSystem>(accessLevel, _userContext.OrganizationIds);
             }
