@@ -6,7 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Presentation.Web.Models;
+using Presentation.Web.Models.External.V2.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
 using Tests.Toolkit.Patterns;
@@ -112,35 +112,16 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(x =>
              {
                  var dbSystem = x.AsQueryable().ByUuid(system.uuid);
-                 var parentDbSystem = x.AsQueryable().ByUuid(parentSystem.uuid);
-                 var taskRef = dbSystem.TaskRefs.Single();
-                 var dbExposedInterface = dbSystem.ItInterfaceExhibits.Single().ItInterface;
 
-                 Assert.Equal(dbSystem.Uuid, systemDTO.Uuid);
-                 Assert.Equal(dbSystem.Name, systemDTO.Name);
-                 Assert.Equal(dbSystem.Description, systemDTO.Description);
-                 Assert.Equal(dbSystem.PreviousName, systemDTO.FormerName);
-                 Assert.Equal(dbSystem.Disabled, systemDTO.Deactivated);
-                 Assert.Equal(dbSystem.Created, systemDTO.Created);
-                 Assert.Equal(dbSystem.ObjectOwner.Uuid, systemDTO.CreatedBy.Uuid);
-                 Assert.Equal(dbSystem.ObjectOwner.GetFullName(), systemDTO.CreatedBy.Name);
+                 AssertBaseSystemDTO(dbSystem, systemDTO);
+
                  Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
                  Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
                  Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
-                 Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDutyResponse.Id.ToString("G"));
-                 Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDutyResponse.Comment);
-                 Assert.Equal(parentDbSystem.Uuid, systemDTO.ParentSystem.Uuid);
-                 Assert.Equal(parentDbSystem.Name, systemDTO.ParentSystem.Name);
-                 Assert.Equal(rightsHolderOrganization.Uuid, systemDTO.RightsHolder.Uuid);
-                 Assert.Equal(rightsHolderOrganization.Name, systemDTO.RightsHolder.Name);
-                 Assert.Equal(rightsHolderOrganization.GetActiveCvr(), systemDTO.RightsHolder.Cvr);
-                 Assert.Equal(businessTypeUuid, systemDTO.BusinessType.Uuid);
-                 Assert.Equal(businessType.Name, systemDTO.BusinessType.Name);
-                 Assert.Equal(taskRef.Uuid, systemDTO.KLE.Single().Uuid);
-                 Assert.Equal(taskRef.TaskKey, systemDTO.KLE.Single().Name);
-                 Assert.Equal(dbExposedInterface.Uuid, systemDTO.ExposedInterfaces.Single().Uuid);
-                 Assert.Equal(dbExposedInterface.Name, systemDTO.ExposedInterfaces.Single().Name);
-                 Assert.Equal(dbSystem.Reference.URL, systemDTO.UrlReference);
+
+                 var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(x => x.Uuid, x => (x.Name, x.Cvr));
+                 var dbOrgs = dbSystem.Usages.Select(x => x.Organization).ToDictionary(x => x.Uuid, x => (x.Name, x.GetActiveCvr()));
+                 Assert.Equal(dbOrgs, dtoOrgs);
 
                  return true;
              });
@@ -297,6 +278,36 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(2, systems.Count);
             Assert.Contains(systems, dto => dto.Uuid == includedLowerBound.uuid);
             Assert.Contains(systems, dto => dto.Uuid == includedAboveLowerBound.uuid);
+        }
+
+        private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, ItSystemResponseDTO systemDTO)
+        {
+            var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);
+            var dtoTaskKeys = systemDTO.KLE.ToDictionary(x => x.Uuid, x => x.Name);
+
+            var dbInterfaces = dbSystem.ItInterfaceExhibits.Select(x => x.ItInterface).ToDictionary(x => x.Uuid, x => x.Name);
+            var dtoInterfaces = systemDTO.ExposedInterfaces.ToDictionary(x => x.Uuid, x => x.Name);
+
+            Assert.Equal(dbSystem.Uuid, systemDTO.Uuid);
+            Assert.Equal(dbSystem.Name, systemDTO.Name);
+            Assert.Equal(dbSystem.Description, systemDTO.Description);
+            Assert.Equal(dbSystem.PreviousName, systemDTO.FormerName);
+            Assert.Equal(dbSystem.Disabled, systemDTO.Deactivated);
+            Assert.Equal(dbSystem.Created, systemDTO.Created);
+            Assert.Equal(dbSystem.ObjectOwner.Uuid, systemDTO.CreatedBy.Uuid);
+            Assert.Equal(dbSystem.ObjectOwner.GetFullName(), systemDTO.CreatedBy.Name);
+            Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDutyResponse.Id.ToString("G"));
+            Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDutyResponse.Comment);
+            Assert.Equal(dbSystem.Parent.Uuid, systemDTO.ParentSystem.Uuid);
+            Assert.Equal(dbSystem.Parent.Name, systemDTO.ParentSystem.Name);
+            Assert.Equal(dbSystem.BelongsTo.Uuid, systemDTO.RightsHolder.Uuid);
+            Assert.Equal(dbSystem.BelongsTo.Name, systemDTO.RightsHolder.Name);
+            Assert.Equal(dbSystem.BelongsTo.GetActiveCvr(), systemDTO.RightsHolder.Cvr);
+            Assert.Equal(dbSystem.BusinessType.Uuid, systemDTO.BusinessType.Uuid);
+            Assert.Equal(dbSystem.BusinessType.Name, systemDTO.BusinessType.Name);
+            Assert.Equal(dbTaskKeys, dtoTaskKeys);
+            Assert.Equal(dbInterfaces, dtoInterfaces);
+            Assert.Equal(dbSystem.Reference.URL, systemDTO.UrlReference);
         }
 
         private static async Task TakeSystemIntoUseIn(int systemDbId, params int[] organizationIds)
