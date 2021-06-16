@@ -109,7 +109,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns></returns>
         [HttpGet]
         [Route("rightsholder/it-systems")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemInformationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RightsHolderItSystemResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -136,7 +136,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
         [Route("rightsholder/it-systems/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemInformationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -152,9 +152,9 @@ namespace Presentation.Web.Controllers.External.V2
                 .Match(Ok, FromOperationError);
         }
 
-        private static ItSystemInformationResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)
+        private static RightsHolderItSystemResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)
         {
-            var dto = new ItSystemInformationResponseDTO();
+            var dto = new RightsHolderItSystemResponseDTO();
             MapBaseInformation(itSystem, dto);
             return dto;
         }
@@ -167,7 +167,9 @@ namespace Presentation.Web.Controllers.External.V2
                     .Usages
                     .Select(systemUsage => systemUsage.Organization)
                     .Select(organization => organization.MapOrganizationResponseDTO())
-                    .ToList()
+                    .ToList(),
+                LastModified = itSystem.LastChanged,
+                LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
             };
 
             MapBaseInformation(itSystem, dto);
@@ -175,7 +177,7 @@ namespace Presentation.Web.Controllers.External.V2
             return dto;
         }
 
-        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : ItSystemInformationResponseDTO
+        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
@@ -186,8 +188,6 @@ namespace Presentation.Web.Controllers.External.V2
             dto.Created = arg.Created;
             dto.Deactivated = arg.Disabled;
             dto.FormerName = arg.PreviousName;
-            dto.LastModified = arg.LastChanged;
-            dto.LastModifiedBy = arg.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO());
             dto.ParentSystem = arg.Parent?.Transform(parent => parent.MapIdentityNamePairDTO());
             dto.UrlReference = arg.Reference?.URL;
             dto.ExposedInterfaces = arg

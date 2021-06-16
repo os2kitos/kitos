@@ -351,6 +351,7 @@
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\External\V2\Request\StandardPaginationQuery.cs" />
+    <Compile Include="Models\External\V2\Response\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Types\ArchiveDutyChoice.cs" />
     <Compile Include="Models\External\V2\AvailableNamePairResponseDTO.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
@@ -361,7 +362,7 @@
     <Compile Include="Models\External\V2\Response\ItSystemResponseDTO.cs" />
     <Compile Include="Controllers\External\V2\GeneralStakeholderController.cs" />
     <Compile Include="Models\External\V2\Response\ItInterfaceResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\ItSystemInformationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\BaseItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\ItInterfaceRequestDTO.cs" />
     <Compile Include="Controllers\External\V2\RightsHolderItInterfaceController.cs" />
     <Compile Include="Models\External\V2\Request\DeactivationReasonRequestDTO.cs" />
