@@ -1,23 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.RightsHolders;
+using Core.DomainModel.ItSystem;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Interface;
+using Infrastructure.Services.Types;
+using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [RoutePrefix("api/v2/rightsholder")]
-    public class RightsHolderItInterfaceController: ExternalBaseController
+    [RoutePrefix("api/v2")]
+    public class ItInterfaceV2Controller: ExternalBaseController
     {
+        private readonly IRightsHoldersService _rightsHolderService;
+
+        public ItInterfaceV2Controller(IRightsHoldersService rightsHolderService)
+        {
+            _rightsHolderService = rightsHolderService;
+        }
+
+
         /// <summary>
         /// Creates a new IT-Interface based on given input values
         /// </summary>
         /// <param name="itInterfaceDTO">A collection of specific IT-Interface values</param>
         /// <returns>Location header is set to uri for newly created IT-Interface</returns>
         [HttpPost]
-        [Route("it-interfaces")]
+        [Route("rightsholder/it-interfaces")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -32,18 +48,32 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Returns active IT-Interfaces
         /// </summary>
+        /// <param name="organizationUuid">Uuid of the organization you want interfaces from</param>
         /// <param name="page">Page index to be returned (zero based)</param>
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-interfaces")]
+        [Route("rightsholder/it-interfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(int? page = 0, int? pageSize = 100)
+        public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
         {
-            return Ok(new List<ItInterfaceResponseDTO>());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+
+            return _rightsHolderService
+                .GetInterfacesForRightsHolder(rightsHolderUuid)
+                .Match(
+                    success => success
+                        .OrderBy(y => y.Id)
+                        .Page(pagination)
+                        .ToList()
+                        .Select(ToDTO)
+                        .Transform(Ok),
+                    FromOperationError);
         }
 
         /// <summary>
@@ -52,7 +82,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -60,7 +90,10 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItInterface(Guid uuid)
         {
-            return Ok(new ItInterfaceResponseDTO());
+            return _rightsHolderService
+                .GetInterfaceForRightsHolder(uuid)
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -69,7 +102,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>The updated IT-Interface</returns>
         [HttpPut]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -87,7 +120,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="deactivationReasonDTO">Reason for deactivation</param>
         /// <returns>No content</returns>
         [HttpDelete]
-        [Route("it-interfaces/{uuid}")]
+        [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -96,6 +129,24 @@ namespace Presentation.Web.Controllers.External.V2
         public IHttpActionResult DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
         {
             return Ok();
+        }
+
+        private ItInterfaceResponseDTO ToDTO(ItInterface input)
+        {
+            //TODO: JMO use new IdNamePair mapper after merge
+            return new ItInterfaceResponseDTO()
+            {
+                Uuid = input.Uuid,
+                ExposedBySystem = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
+                Name = input.Name,
+                InterfaceId = input.ItInterfaceId,
+                Version = input.Version,
+                Description = input.Description,
+                UrlReference = input.Url,
+                Deactivated = input.Disabled,
+                Created = input.Created,
+                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName())
+            };
         }
     }
 }

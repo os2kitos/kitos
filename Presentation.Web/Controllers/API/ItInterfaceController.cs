@@ -72,6 +72,19 @@ namespace Presentation.Web.Controllers.API
                     return Conflict("Name is already taken!");
             }
 
+            var itInterface = Repository.GetByKey(id);
+
+            if (itInterface == null)
+            {
+                return NotFound();
+            }
+
+            if (obj.TryGetValue(nameof(ItInterface.Uuid), StringComparison.OrdinalIgnoreCase, out var uuidToken) &&
+                uuidToken.ToObject<Guid>() != itInterface.Uuid)
+            {
+                return BadRequest("Cannot change uuid");
+            }
+
             return base.Patch(id, organizationId, obj);
         }
 

@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.DomainServices
 {
-    public class QueryByRightsHolderTest : WithAutoFixture
+    public class QueryByRightsHolderItSystemTest : WithAutoFixture
     {
         [Fact]
         public void Apply_Returns_Items_With_Uuid_Match()
@@ -32,3 +32,4 @@ namespace Tests.Unit.Presentation.Web.DomainServices
         }
     }
 }
+
