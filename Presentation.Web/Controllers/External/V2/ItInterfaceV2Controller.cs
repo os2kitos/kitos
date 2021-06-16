@@ -65,7 +65,7 @@ namespace Presentation.Web.Controllers.External.V2
 
 
             return _rightsHolderService
-                .GetInterfacesForRightsHolder(rightsHolderUuid)
+                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
                 .Match(
                     success => success
                         .OrderBy(y => y.Id)
@@ -91,7 +91,7 @@ namespace Presentation.Web.Controllers.External.V2
         public IHttpActionResult GetItInterface(Guid uuid)
         {
             return _rightsHolderService
-                .GetInterfaceForRightsHolder(uuid)
+                .GetInterfaceAsRightsHolder(uuid)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }

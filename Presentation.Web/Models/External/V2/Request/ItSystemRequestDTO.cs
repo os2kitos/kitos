@@ -9,7 +9,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for owning organization
         /// </summary>
-        /// <remarks>Use organization API for getting a list of possible organizations related to the logged in user</remarks>
+        /// <remarks>Use api/v2/rightsholder/organizations API for getting a list of possible organizations related to the logged in user</remarks>
         [Required]
         public Guid RightsHolderUuid { get; set; }  
 

@@ -21,7 +21,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             var excludedWrongUuid = new ItSystem { BelongsTo = new Organization { Uuid = incorrectId } };
 
             var input = new[] { excludedWrongUuid, matched, excludedNoRightsHolder }.AsQueryable();
-            var sut = new QueryByRightsHolder(correctId);
+            var sut = new QueryByRightsHolderUuid(correctId);
 
             //Act
             var result = sut.Apply(input);

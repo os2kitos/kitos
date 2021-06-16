@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Presentation.Web.Models.External.V2.Response
 {
-    public class ItSystemInformationResponseDTO
+    public abstract class BaseItSystemResponseDTO
     {
         /// <summary>
         /// UUID for IT-System
@@ -69,16 +69,6 @@ namespace Presentation.Web.Models.External.V2.Response
         /// Responsible for creation.
         /// </summary>
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
-
-        /// <summary>
-        /// Time of last modification
-        /// </summary>
-        public DateTime LastModified { get; set; }
-
-        /// <summary>
-        /// Responsible for last modification
-        /// </summary>
-        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
 
         /// <summary>
         /// Archive duty recommendation from "Rigsarkivet"
