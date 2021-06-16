@@ -9,7 +9,9 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -29,8 +31,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
             _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceService = new Mock<IItInterfaceService>();
-            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object);
+            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object,Mock.Of<ITransactionManager>(),Mock.Of<ILogger>());
         }
+
+        //TODO: Test all added methods!!!
 
         [Fact]
         public void ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess_Returns_Only_Organizations_Where_User_Has_RightsHolderAccessRole()

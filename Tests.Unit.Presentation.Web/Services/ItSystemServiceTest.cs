@@ -15,6 +15,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
 using Moq.Language.Flow;
@@ -51,7 +52,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _transactionManager.Object,
                 _referenceService.Object,
                 _logger.Object,
-                _userContext.Object
+                _userContext.Object,
+                Mock.Of<IDomainEvents>()
                 );
         }
 

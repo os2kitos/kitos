@@ -7,6 +7,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -19,6 +20,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Serilog;
 
@@ -33,6 +35,7 @@ namespace Core.ApplicationServices.System
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IDomainEvents _domainEvents;
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository,
@@ -41,7 +44,8 @@ namespace Core.ApplicationServices.System
             ITransactionManager transactionManager,
             IReferenceService referenceService,
             ILogger logger,
-            IOrganizationalUserContext userContext
+            IOrganizationalUserContext userContext,
+            IDomainEvents domainEvents
             )
         {
             _repository = repository;
@@ -51,6 +55,7 @@ namespace Core.ApplicationServices.System
             _referenceService = referenceService;
             _logger = logger;
             _userContext = userContext;
+            _domainEvents = domainEvents;
         }
 
 
@@ -195,6 +200,76 @@ namespace Core.ApplicationServices.System
                 }
             }
         }
+
+        public Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Maybe<Guid> uuid)
+        {
+            if (_authorizationContext.AllowCreate<ItSystem>(organizationId))
+            {
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+                var nameError = ValidateNewSystemName(organizationId, name);
+
+                if (nameError.HasValue)
+                    return nameError.Value;
+
+                var uuidTaken = uuid.Select(id => _itSystemRepository.GetSystem(id).HasValue).GetValueOrFallback(false);
+
+                if (uuidTaken)
+                    return new OperationError("UUID already exists on another it-system in KITOS", OperationFailure.Conflict);
+
+                var newSystem = new ItSystem
+                {
+                    OrganizationId = organizationId,
+                    AccessModifier = AccessModifier.Public,
+                    Uuid = uuid.Match(providedUuid => providedUuid, Guid.NewGuid),
+                    ObjectOwnerId = _userContext.UserId
+                };
+
+                _itSystemRepository.Add(newSystem);
+                _domainEvents.Raise(new EntityCreatedEvent<ItSystem>(newSystem));
+                transaction.Commit();
+                return newSystem;
+            }
+
+            return new OperationError(OperationFailure.Forbidden);
+        }
+
+        public bool CanChangeNameTo(int organizationId, int systemId, string newName)
+        {
+            return ValidateName(newName) &&
+                   FindSystemsByNameInOrganization(organizationId, newName).ExceptEntitiesWithIds(systemId).Any() == false;
+        }
+
+        private static bool ValidateName(string newName)
+        {
+            return string.IsNullOrWhiteSpace(newName) == false &&
+                   newName.Length <= ItSystem.MaxNameLength;
+        }
+
+        public bool CanCreateSystemWithName(int organizationId, string name)
+        {
+            return ValidateNewSystemName(organizationId, name).IsNone;
+        }
+
+        public Maybe<OperationError> ValidateNewSystemName(int organizationId, string name)
+        {
+            if (!ValidateName(name))
+                return new OperationError("Name was not valid", OperationFailure.BadInput);
+
+            if (FindSystemsByNameInOrganization(organizationId, name).Any())
+                return new OperationError("Name already exists within the target organization", OperationFailure.Conflict);
+
+            return Maybe<OperationError>.None;
+        }
+
+        private IQueryable<ItSystem> FindSystemsByNameInOrganization(int organizationId, string name)
+        {
+            return _repository
+                .AsQueryable()
+                .ByOrganizationId(organizationId)
+                .ByNameExact(name);
+        }
+
 
         public Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId)
         {

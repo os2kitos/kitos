@@ -55,11 +55,11 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// KLE numbers categorizing this IT-System
         /// </summary>
-        public IEnumerable<string>? KLENumbers { get; set; }
+        public IEnumerable<string> KLENumbers { get; set; }
 
         /// <summary>
         /// UUID's for KLE numbers categorizing this IT-System
         /// </summary>
-        public IEnumerable<Guid>? KLEUuids { get; set; }
+        public IEnumerable<Guid> KLEUuids { get; set; }
     }
 }

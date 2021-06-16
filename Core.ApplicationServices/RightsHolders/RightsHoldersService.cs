@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -13,7 +15,9 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Queries.ItSystem;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
+using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
@@ -22,18 +26,24 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOrganizationalUserContext _userContext;
         private readonly IGenericRepository<Organization> _organizationRepository;
         private readonly IItSystemService _systemService;
+        private readonly ITransactionManager _transactionManager;
+        private readonly ILogger _logger;
         private readonly IItInterfaceService _itInterfaceService;
 
         public RightsHoldersService(
             IOrganizationalUserContext userContext,
             IGenericRepository<Organization> organizationRepository,
             IItInterfaceService itInterfaceService,
-            IItSystemService systemService)
+            IItSystemService systemService,
+            ITransactionManager transactionManager,
+            ILogger logger)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
             _itInterfaceService = itInterfaceService;
             _systemService = systemService;
+            _transactionManager = transactionManager;
+            _logger = logger;
         }
 
         public Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid)
@@ -44,6 +54,36 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () => _itInterfaceService.GetInterface(interfaceUuid).Bind(WithRightsHolderAccessTo)
                 );
+        }
+
+        public Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var organization = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid);
+
+                if (organization == null)
+                    return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
+
+                if (!_userContext.HasRole(organization.Id, OrganizationRole.RightsHolderAccess))
+                    return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
+
+                var result = _systemService
+                    .CreateNewSystem(organization.Id, creationParameters.Name, creationParameters.RightsHolderProvidedUuid);
+                //TODO: Bind to setter methods on the service for updating the different properties!
+                //TODO: Must be rights holder for parent as well - do they have to have the same rightsholder?
+                
+                if (result.Ok)
+                    transaction.Commit();
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "Failed creating rightsholder system for rightsholder with id {rightsHolderUuid}", rightsHolderUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
         }
 
         public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
@@ -60,7 +100,7 @@ namespace Core.ApplicationServices.RightsHolders
                             var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
                             if (!_userContext.HasRole(org.Id, OrganizationRole.RightsHolderAccess))
                             {
-                                return new OperationError("User is not rightsholder in the provided organization",OperationFailure.Forbidden);
+                                return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
                             }
                             refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
                         }

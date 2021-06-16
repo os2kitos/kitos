@@ -79,6 +79,12 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().Where(x => systemTaskRefIds.Contains(x.Id));
         }
 
+        public void Add(ItSystem newSystem)
+        {
+            _systemRepository.Insert(newSystem);
+            _systemRepository.Save();
+        }
+
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)
         {
             var idsOfSystemsInUse = _systemUsageRepository

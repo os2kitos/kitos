@@ -167,7 +167,8 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public IHttpActionResult PostItSystem([FromBody] ItSystemRequestDTO itSystemRequestDTO)
         {
-            return Created(Request.RequestUri + "/" + itSystemRequestDTO.Uuid, new RightsHolderItSystemResponseDTO());
+            //TODO: Implement
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{itSystemRequestDTO.Uuid}", new RightsHolderItSystemResponseDTO());
         }
 
         /// <summary>
