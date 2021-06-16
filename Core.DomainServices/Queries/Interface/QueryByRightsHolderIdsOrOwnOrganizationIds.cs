@@ -21,21 +21,20 @@ namespace Core.DomainServices.Queries.Interface
 
         public IQueryable<ItInterface> Apply(IQueryable<ItInterface> itInterface)
         {
-            return itInterface.Where(
-                x => x.ExhibitedBy != null &&
-                x.ExhibitedBy.ItSystem != null &&
-                (ByRightsHolder(x) || ByOwnOrganization(x))
-                );
+            return itInterface.Where(x => ByOwnOrganization(x) || ByRightsHolder(x));
         }
 
         private bool ByRightsHolder(ItInterface itInterface)
         {
-            return (itInterface.ExhibitedBy.ItSystem.BelongsToId != null && _rightsHolderIds.Contains(itInterface.ExhibitedBy.ItSystem.BelongsToId.Value));
+            return itInterface.ExhibitedBy != null &&
+                itInterface.ExhibitedBy.ItSystem != null && 
+                itInterface.ExhibitedBy.ItSystem.BelongsToId != null && 
+                _rightsHolderIds.Contains(itInterface.ExhibitedBy.ItSystem.BelongsToId.Value);
         }
 
         private bool ByOwnOrganization(ItInterface itInterface)
         {
-            return _ownOrganizationIds.Contains(itInterface.ExhibitedBy.ItSystemId);
+            return _ownOrganizationIds.Contains(itInterface.OrganizationId);
         }
     }
 }

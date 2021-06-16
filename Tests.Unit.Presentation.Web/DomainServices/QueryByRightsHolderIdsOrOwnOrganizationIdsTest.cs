@@ -15,6 +15,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             //Arrange
             var correctId1 = A<int>();
             var correctId2 = A<int>();
+            var correctId3 = A<int>();
             var incorrectId = A<int>();
 
             var matched1 = new ItInterface
@@ -37,6 +38,11 @@ namespace Tests.Unit.Presentation.Web.DomainServices
                         BelongsToId = correctId2
                     }
                 }
+            };
+
+            var matched3 = new ItInterface
+            {
+                OrganizationId = correctId3
             };
 
             var excludedNoExhibit = new ItInterface { ExhibitedBy = null };
@@ -63,19 +69,20 @@ namespace Tests.Unit.Presentation.Web.DomainServices
                 }
             };
 
-            var input = new[] { excludedWrongUuid, matched1, excludedNoRightsHolder, excludedNoExhibit, matched2 }.AsQueryable();
-            var sut = new QueryByRightsHolderIdsOrOwnOrganizationIds(new List<int>() { correctId1, correctId2 });
+            var input = new[] { excludedWrongUuid, matched1, excludedNoRightsHolder, excludedNoExhibit, matched2, matched3 }.AsQueryable();
+            var sut = new QueryByRightsHolderIdsOrOwnOrganizationIds(new List<int>() { correctId1, correctId2 }, new List<int>() { correctId3 });
 
             //Act
             var result = sut.Apply(input);
 
             //Assert
-            Assert.Equal(2, result.Count());
+            Assert.Equal(3, result.Count());
             var interface1 = result.Where(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId1).First();
             Assert.Same(matched1, interface1);
             var interface2 = result.Where(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId2).First();
             Assert.Same(matched2, interface2);
-            
+            var interface3 = result.Where(x => x.OrganizationId == correctId3).First();
+            Assert.Same(matched3, interface3);
         }
     }
 }
