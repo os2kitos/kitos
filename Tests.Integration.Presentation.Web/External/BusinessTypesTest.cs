@@ -1,8 +1,5 @@
-﻿using Core.DomainModel.ItSystem;
-using Core.DomainModel.LocalOptions;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
@@ -19,27 +16,14 @@ namespace Tests.Integration.Presentation.Web.External
         {
             //Arrange
             var orgUuid = TestEnvironment.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-            var pageSize = Math.Max(1, A<int>() % 9); //Minimum is 1;
+            var pageSize = Math.Max(1, A<int>() % 2); //Minimum is 1;
             var pageNumber = 0; //Always takes the first page;
-            var locallyEnabledOptions = DatabaseAccess.MapFromEntitySet<LocalBusinessType, IEnumerable<int>>(x => x.AsQueryable().Where(y => y.IsActive).Select(y => y.OptionId).ToList());
-            var expectedResponse = DatabaseAccess
-                .MapFromEntitySet<BusinessType, ISet<Guid>>(genericRepository => genericRepository
-                    .AsQueryable()
-                    .OrderBy(businessType => businessType.Name)
-                    .Where(businessType => businessType.IsObligatory || (businessType.IsEnabled && locallyEnabledOptions.Contains(businessType.Id)))
-                    .Select(businessType => businessType.Uuid)
-                    .Take(pageSize)
-                    .ToHashSet());
 
             //Act
             var businessTypes = (await BusinessTypeV2Helper.GetBusinessTypesAsync(orgUuid, pageSize, pageNumber)).ToList();
 
             //Assert
-            Assert.Equal(expectedResponse.Count, businessTypes.Count());
-            foreach (var uuidPair in businessTypes)
-            {
-                Assert.Contains(uuidPair.Uuid, expectedResponse);
-            }
+            Assert.Equal(pageSize, businessTypes.Count);
         }
 
         [Fact]
