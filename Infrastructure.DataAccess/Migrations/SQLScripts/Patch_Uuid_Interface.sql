@@ -7,7 +7,7 @@ Content:
 */
 
 BEGIN
-    UPDATE [User]
+    UPDATE [ItInterface]
         SET Uuid = NEWID()
     where Uuid is null OR Uuid = '00000000-0000-0000-0000-000000000000';
 END

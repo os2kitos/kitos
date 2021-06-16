@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
-using AutoFixture;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -14,12 +12,6 @@ namespace Tests.Unit.Presentation.Web.DomainServices
 
     public class QueryByUuidTest : WithAutoFixture
     {
-        protected override void OnFixtureCreated(Fixture fixture)
-        {
-            fixture.Register(() => new ItSystem { Id = fixture.Create<int>() });
-            base.OnFixtureCreated(fixture);
-        }
-
         [Fact]
         public void Apply_Returns_Items_With_Id_Match()
         {

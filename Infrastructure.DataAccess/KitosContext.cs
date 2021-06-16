@@ -173,6 +173,7 @@ namespace Infrastructure.DataAccess
         public DbSet<KendoOrganizationalConfiguration> KendoOrganizationalConfigurations { get; set; }
         public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
+        public DbSet<ItInterface> ItInterfaces { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

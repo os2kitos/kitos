@@ -10,9 +10,10 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.ItSystem;
+using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -34,6 +35,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<DataRow>> _dataRowRepository;
         private readonly Mock<IInterfaceRepository> _repository;
         private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<IOperationClock> _operationClock;
 
         public ItInterfaceServiceTest()
         {
@@ -45,6 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _dataRowRepository = new Mock<IGenericRepository<DataRow>>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _repository = new Mock<IInterfaceRepository>();
+            _operationClock = new Mock<IOperationClock>();
             _sut = new ItInterfaceService(
                 _interfaceRepository.Object,
                 _dataRowRepository.Object,
@@ -53,7 +56,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _transactionManager.Object,
                 _domainEvents.Object,
                 _repository.Object,
-                _userContext.Object);
+                _userContext.Object,
+                _operationClock.Object);
         }
 
         [Fact]
@@ -340,16 +344,29 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             //Arrange
             var interfaceUuid = Guid.NewGuid();
-            var orgId = A<int>();
-            var rightsHolderOrgs = new List<int>() { orgId };
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var rightsHolderOrgs = new List<int>() { org.Id };
             var itInterface = new ItInterface()
             {
-                Uuid = interfaceUuid
+                Uuid = interfaceUuid,
+                ExhibitedBy = new ItInterfaceExhibit()
+                {
+                    ItSystemId = A<int>(),
+                    ItSystem = new ItSystem()
+                    {
+                        BelongsTo = org,
+                        BelongsToId = org.Id
+                    }
+                }
             };
 
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.RightsHolder);
             _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(rightsHolderOrgs);
-            _repository.Setup(x => x.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs)).Returns(new List<ItInterface>() { itInterface }.AsQueryable());
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>() { itInterface }.AsQueryable());
 
             //Act
             var result = _sut.GetAvailableInterfaces();
@@ -406,11 +423,14 @@ namespace Tests.Unit.Core.ApplicationServices
 
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.RightsHolder);
             _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(rightsHolderOrgs);
-            _repository.Setup(x => x.GetInterfacesFromRightsHolderOrganizations(rightsHolderOrgs)).Returns(new List<ItInterface>() { itInterface1, itInterface2 }.AsQueryable());
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>() { itInterface1, itInterface2 }.AsQueryable());
+
+            var domainQuery = new Mock<IDomainQuery<ItInterface>>();
+            domainQuery.Setup(x => x.Apply(It.IsAny<IQueryable<ItInterface>>())).Returns(new List<ItInterface>() { itInterface1 }.AsQueryable());
 
             var refinements = new List<IDomainQuery<ItInterface>>();
 
-            refinements.Add(new QueryByRightsHolder(org1.Uuid));
+            refinements.Add(domainQuery.Object);
 
             //Act
             var result = _sut.GetAvailableInterfaces(refinements.ToArray());

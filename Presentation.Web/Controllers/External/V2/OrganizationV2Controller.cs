@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.External.V2
         [Route("with-rightsholder-access")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetAccessibleOrganizations([FromUri] StandardPaginationQuery pagination)
+        public IHttpActionResult GetAccessibleOrganizations([FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

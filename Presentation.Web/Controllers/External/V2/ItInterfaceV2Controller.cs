@@ -4,9 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.ItSystem;
+using Core.DomainServices.Queries.Interface;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
@@ -18,10 +19,12 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2")]
     public class ItInterfaceV2Controller: ExternalBaseController
     {
+        private readonly IRightsHoldersService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
 
-        public ItInterfaceV2Controller(IItInterfaceService itInterfaceService)
+        public ItInterfaceV2Controller(IRightsHoldersService rightsHolderService, IItInterfaceService itInterfaceService)
         {
+            _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
         }
 
@@ -62,18 +65,17 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refinements = new List<IDomainQuery<ItInterface>>();
 
-            if (rightsHolderUuid.HasValue)
-                refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
-
-            return _itInterfaceService
-                .GetAvailableInterfaces(refinements.ToArray())
-                .OrderBy(y => y.Id)
-                .Page(pagination)
-                .ToList()
-                .Select(ToDTO)
-                .Transform(Ok);
+            return _rightsHolderService
+                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .Match(
+                    success => success
+                        .OrderBy(y => y.Id)
+                        .Page(pagination)
+                        .ToList()
+                        .Select(ToDTO)
+                        .Transform(Ok),
+                    FromOperationError);
         }
 
         /// <summary>
@@ -90,8 +92,8 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult GetItInterface(Guid uuid)
         {
-            return _itInterfaceService
-                .GetInterface(uuid)
+            return _rightsHolderService
+                .GetInterfaceAsRightsHolder(uuid)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
@@ -197,8 +199,7 @@ namespace Presentation.Web.Controllers.External.V2
                 UrlReference = input.Url,
                 Deactivated = input.Disabled,
                 Created = input.Created,
-                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName()),
-                LastModifiedBy = new IdentityNamePairResponseDTO(input.LastChangedByUser.Uuid, input.LastChangedByUser.GetFullName())
+                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName())
             };
         }
     }

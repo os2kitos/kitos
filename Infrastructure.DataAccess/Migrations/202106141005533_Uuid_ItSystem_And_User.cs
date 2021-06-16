@@ -1,26 +1,26 @@
 ﻿namespace Infrastructure.DataAccess.Migrations
 {
-    using Infrastructure.DataAccess.Tools;
+    using System;
     using System.Data.Entity.Migrations;
+    using Infrastructure.DataAccess.Tools;
 
-    public partial class Added_Uuid_To_User_And_Created_To_Interface : DbMigration
+    public partial class Uuid_ItSystem_And_User : DbMigration
     {
         public override void Up()
         {
             AddColumn("dbo.ItSystem", "Created", c => c.DateTime(precision: 7, storeType: "datetime2"));
             AddColumn("dbo.User", "Uuid", c => c.Guid(nullable: false));
-            AddColumn("dbo.ItInterface", "Created", c => c.DateTime(precision: 7, storeType: "datetime2"));
 
-            SqlResource(SqlMigrationScriptRepository.GetResourceName("AddUuidToUsers.sql"));
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Patch_Uuid_System_User.sql"));
 
+            CreateIndex("dbo.ItSystem", "Uuid", unique: true, name: "UX_System_Uuuid");
             CreateIndex("dbo.User", "Uuid", unique: true, name: "UX_User_Uuid");
-
         }
         
         public override void Down()
         {
             DropIndex("dbo.User", "UX_User_Uuid");
-            DropColumn("dbo.ItInterface", "Created");
+            DropIndex("dbo.ItSystem", "UX_System_Uuuid");
             DropColumn("dbo.User", "Uuid");
             DropColumn("dbo.ItSystem", "Created");
         }

@@ -42,7 +42,7 @@ namespace Tests.Integration.Presentation.Web.External
             //Arrange
             var orgId = TestEnvironment.DefaultOrganizationId;
             var businessTypeName = A<string>();
-            var createdBusinessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName, orgId);
+            var createdBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessTypeName, orgId);
             var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
             var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
             var businessType = businessTypes.Where(x => x.Name.Equals(businessTypeName)).First(); //Get the newly created businessType.
@@ -62,7 +62,7 @@ namespace Tests.Integration.Presentation.Web.External
             //Arrange
             var orgId = TestEnvironment.DefaultOrganizationId;
             var businessTypeName = A<string>();
-            var createdBusinessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName, orgId);
+            var createdBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessTypeName, orgId);
             var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
             var businessTypes = await BusinessTypeV2Helper.GetBusinessTypesAsync(organisation.Uuid.Value, 100, 0); //100 should be more than enough to get all.
             var businessType = businessTypes.Where(x => x.Name.Equals(businessTypeName)).First(); //Get the newly created businessType.

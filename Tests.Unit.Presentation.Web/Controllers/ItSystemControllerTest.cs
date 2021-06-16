@@ -11,6 +11,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Time;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
@@ -35,7 +36,8 @@ namespace Tests.Unit.Presentation.Web.Controllers
             _sut = new ItSystemController(
                 _systemRepository.Object,
                 Mock.Of<IGenericRepository<TaskRef>>(),
-                _systemService.Object
+                _systemService.Object,
+                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now)
                 );
 
             SetupControllerFrorTest(_sut);

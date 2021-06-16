@@ -185,11 +185,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return apiReturnFormat.Response;
         }
 
-        public static async Task<T> ReadResponseBodyAsKitosV2ApiResponseAsync<T>(this HttpResponseMessage response)
-        {
-            return await response.ReadResponseBodyAsAsync<T>().ConfigureAwait(false);
-        }
-
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
             var requestMessage = CreatePostMessage(url, loginDto);
@@ -289,9 +284,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             return (userId, new KitosCredentials(email, password), cookie);
         }
 
-        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
+        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false)
         {
-            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess, stakeHolderAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
             DatabaseAccess.MutateEntitySet<User>(x =>
             {

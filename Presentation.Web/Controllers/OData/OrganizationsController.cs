@@ -7,7 +7,6 @@ using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Core.DomainModel;
 using System.Linq;
-using System.Net.Http;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
@@ -18,18 +17,15 @@ namespace Presentation.Web.Controllers.OData
     public class OrganizationsController : BaseEntityController<Organization>
     {
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly IGenericRepository<User> _userRepository;
 
         public OrganizationsController(
             IGenericRepository<Organization> repository,
             IOrganizationService organizationService,
-            IOrganizationRoleService organizationRoleService,
             IGenericRepository<User> userRepository)
             : base(repository)
         {
             _organizationService = organizationService;
-            _organizationRoleService = organizationRoleService;
             _userRepository = userRepository;
         }
 

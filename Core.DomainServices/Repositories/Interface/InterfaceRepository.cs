@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
@@ -24,11 +23,6 @@ namespace Core.DomainServices.Repositories.Interface
         public IQueryable<ItInterface> GetInterfaces()
         {
             return _interfaceRepository.AsQueryable();
-        }
-
-        public IQueryable<ItInterface> GetInterfacesFromRightsHolderOrganizations(IEnumerable<int> rightsHolderOrgs)
-        {
-            return _interfaceRepository.AsQueryable().ByRightsHolderIds(rightsHolderOrgs);
         }
 
         public IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined()

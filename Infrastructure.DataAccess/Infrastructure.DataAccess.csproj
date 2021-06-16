@@ -745,9 +745,13 @@
     <Compile Include="Migrations\202106110925321_Added_Uuid_To_OptionTypes.designer.cs">
       <DependentUpon>202106110925321_Added_Uuid_To_OptionTypes.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202106131430319_Added_Uuid_To_User_And_Created_To_Interface.cs" />
-    <Compile Include="Migrations\202106131430319_Added_Uuid_To_User_And_Created_To_Interface.designer.cs">
-      <DependentUpon>202106131430319_Added_Uuid_To_User_And_Created_To_Interface.cs</DependentUpon>
+    <Compile Include="Migrations\202106141005533_Uuid_ItSystem_And_User.cs" />
+    <Compile Include="Migrations\202106141005533_Uuid_ItSystem_And_User.designer.cs">
+      <DependentUpon>202106141005533_Uuid_ItSystem_And_User.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202106151916246_Uuid_ItInterface.cs" />
+    <Compile Include="Migrations\202106151916246_Uuid_ItInterface.designer.cs">
+      <DependentUpon>202106151916246_Uuid_ItInterface.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1221,8 +1225,11 @@
     <EmbeddedResource Include="Migrations\202106110925321_Added_Uuid_To_OptionTypes.resx">
       <DependentUpon>202106110925321_Added_Uuid_To_OptionTypes.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202106131430319_Added_Uuid_To_User_And_Created_To_Interface.resx">
-      <DependentUpon>202106131430319_Added_Uuid_To_User_And_Created_To_Interface.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202106141005533_Uuid_ItSystem_And_User.resx">
+      <DependentUpon>202106141005533_Uuid_ItSystem_And_User.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202106151916246_Uuid_ItInterface.resx">
+      <DependentUpon>202106151916246_Uuid_ItInterface.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
@@ -1256,10 +1263,13 @@
     <EmbeddedResource Include="Migrations\SQLScripts\AddUuidToOrganizations.sql" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_System_User.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Uuid_On_OptionTypes.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\SQLScripts\AddUuidToUsers.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_Interface.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

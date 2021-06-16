@@ -20,10 +20,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         public const int SecondOrganizationId = 2;
         public const int DefaultUserId = 1;
         public const int DefaultTaskRefId = 1;
-        public const int DefaultOrganizationTypeId = 1; // Municipality
         public const string EmptyListApiJson = "{\"msg\":\"\",\"response\":[]}";
         private static readonly string ConnectionString;
-
 
         static TestEnvironment()
         {

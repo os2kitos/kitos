@@ -3,7 +3,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
 using Tests.Toolkit.Patterns;
