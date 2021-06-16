@@ -24,12 +24,12 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
         }
 
-        public static async Task<ItSystemResponseDTO> GetSingleRightsHolderSystemAsync(string token, Guid uuid)
+        public static async Task<RightsHolderItSystemResponseDTO> GetSingleRightsHolderSystemAsync(string token, Guid uuid)
         {
             using var response = await SendGetSingleRightsHolderSystemAsync(token, uuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetSingleRightsHolderSystemAsync(string token, Guid uuid)
@@ -38,13 +38,13 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
         }
 
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(
-            string token, 
-            int? page = null, 
-            int? pageSize = null, 
-            Guid? rightsHolderId = null, 
-            Guid? businessTypeId = null, 
-            string kleKey = null, 
-            Guid? kleUuid = null, 
+            string token,
+            int? page = null,
+            int? pageSize = null,
+            Guid? rightsHolderId = null,
+            Guid? businessTypeId = null,
+            string kleKey = null,
+            Guid? kleUuid = null,
             int? numberOfUsers = null)
         {
             using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers);
@@ -54,13 +54,13 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
         }
 
         public static async Task<HttpResponseMessage> SendGetManyAsync(
-            string token, 
-            int? page = null, 
-            int? pageSize = null, 
-            Guid? rightsHolderId = null, 
-            Guid? businessTypeId = null, 
-            string kleKey = null, 
-            Guid? kleUuid = null, 
+            string token,
+            int? page = null,
+            int? pageSize = null,
+            Guid? rightsHolderId = null,
+            Guid? businessTypeId = null,
+            string kleKey = null,
+            Guid? kleUuid = null,
             int? numberOfUsers = null)
         {
             var path = "api/v2/it-systems";
@@ -86,6 +86,37 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
 
             if (numberOfUsers.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("numberOfUsers", numberOfUsers.Value.ToString("D")));
+
+            if (queryParameters.Any())
+                path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
+
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(path), token);
+        }
+
+        public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyRightsHolderSystemsAsync(
+            string token,
+            int? page = null,
+            int? pageSize = null)
+        {
+            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetManyRightsHolderSystemsAsync(
+            string token,
+            int? page = null,
+            int? pageSize = null)
+        {
+            var path = "api/v2/rightsholder/it-systems";
+            var queryParameters = new List<KeyValuePair<string, string>>();
+
+            if (page.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("page", page.Value.ToString("D")));
+
+            if (pageSize.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("pageSize", pageSize.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

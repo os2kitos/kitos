@@ -35,7 +35,8 @@ namespace Core.ApplicationServices.RightsHolders
         public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess()
         {
             return WithAnyRightsHoldersAccess()
-                .Match(
+                .Match
+                (
                     error => error,
                     () =>
                     {
@@ -49,7 +50,8 @@ namespace Core.ApplicationServices.RightsHolders
         public Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid)
         {
             return WithAnyRightsHoldersAccess()
-                .Match(
+                .Match
+                (
                     error => error,
                     () => _systemService.GetSystem(systemUuid).Bind(WithRightsHolderAccessTo)
                 );
