@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Queries;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -70,7 +71,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(true);
             var expectedResponse = Mock.Of<IQueryable<ItSystem>>();
-            _itSystemServiceMock.Setup(x => x.GetAvailableSystems()).Returns(expectedResponse);
+            _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
+            _itSystemServiceMock.Setup(x => x.GetAvailableSystems(It.IsAny<IDomainQuery<ItSystem>>())).Returns(expectedResponse);
 
             //Act
             var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess();
@@ -81,7 +83,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void GetSystem_Returns_Forbidden_If_User_Does_Not_Have_RightsHoldersAccess()
+        public void GetSystemAsRightsHolder_Returns_Forbidden_If_User_Does_Not_Have_RightsHoldersAccess()
         {
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(false);
@@ -95,13 +97,37 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Can_GetSystem_If_User_Has_RightsHoldersAccess()
+        public void GetSystemAsRightsHolder_Returns_Forbidden_If_User_Does_Not_Have_RightsHoldersAccess_To_The_Retrieved_System()
         {
             //Arrange
             var systemUuid = A<Guid>();
             ExpectUserHasRightsHolderAccessReturns(true);
-            var itSystem = new ItSystem();
+            var itSystem = new ItSystem()
+            {
+                BelongsToId = A<int>()
+            };
+            _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(itSystem);
+            ExpectHasSpecificAccessReturns(itSystem, false);
 
+            //Act
+            var result = _sut.GetSystemAsRightsHolder(systemUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_GetSystemAsRightsHolderIf_User_Has_RightsHoldersAccess()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            ExpectUserHasRightsHolderAccessReturns(true);
+            var itSystem = new ItSystem()
+            {
+                BelongsToId = A<int>()
+            };
+            ExpectHasSpecificAccessReturns(itSystem, true);
             _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(itSystem);
 
             //Act
@@ -109,7 +135,13 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(itSystem,result.Value);
+            Assert.Same(itSystem, result.Value);
+        }
+
+        private void ExpectHasSpecificAccessReturns(ItSystem itSystem, bool value)
+        {
+            _userContextMock.Setup(x => x.HasRole(itSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
+                .Returns(value);
         }
 
         private void ExpectUserHasRightsHolderAccessReturns(bool value)
