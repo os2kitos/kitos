@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.External.V2
         }
 
         /// <summary>
-        /// Returns public and active IT-Systems
+        /// Returns all IT-Systems available to the current user
         /// </summary>
         /// <param name="rightsHolderUuid">Rightsholder UUID filter</param>
         /// <param name="businessTypeUuid">Business type UUID filter</param>
@@ -102,8 +102,9 @@ namespace Presentation.Web.Controllers.External.V2
         }
 
         /// <summary>
-        /// Returns active IT-Systems
+        /// Returns IT-Systems for which the current user has rights holders access
         /// </summary>
+        /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
         /// <param name="page">Page index to be returned (zero based)</param>
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
@@ -113,13 +114,13 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystemsByRightsHoldersAccess([FromUri] StandardPaginationQuery paginationQuery = null)
+        public IHttpActionResult GetItSystemsByRightsHoldersAccess(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _rightsHoldersService
-                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess()
+                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
                 .Select(itSystems => itSystems
                     .OrderBy(system => system.Id)
                     .Page(paginationQuery)
