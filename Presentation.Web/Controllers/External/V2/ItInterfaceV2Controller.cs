@@ -12,6 +12,7 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Interface;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
@@ -44,7 +45,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
         {
-            return Created(Request.RequestUri + "/" + itInterfaceDTO.Uuid, new ItInterfaceResponseDTO());
+            return Created(Request.RequestUri + "/" + itInterfaceDTO.Uuid, new BaseItInterfaceResponseDTO());
         }
 
         /// <summary>
@@ -56,24 +57,24 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns></returns>
         [HttpGet]
         [Route("rightsholder/it-interfaces")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<BaseItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetItInterface([FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
 
             return _rightsHolderService
-                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess()
                 .Match(
                     success => success
                         .OrderBy(y => y.Id)
                         .Page(pagination)
                         .ToList()
-                        .Select(ToDTO)
+                        .Select(ToRightsHolderItInterfaceResponseDTO)
                         .Transform(Ok),
                     FromOperationError);
         }
@@ -85,7 +86,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(BaseItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -94,7 +95,7 @@ namespace Presentation.Web.Controllers.External.V2
         {
             return _rightsHolderService
                 .GetInterfaceAsRightsHolder(uuid)
-                .Select(ToDTO)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -105,14 +106,14 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns>The updated IT-Interface</returns>
         [HttpPut]
         [Route("rightsholder/it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(BaseItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
         {
-            return Ok(new ItInterfaceResponseDTO());
+            return Ok(new BaseItInterfaceResponseDTO());
         }
 
         /// <summary>
@@ -142,7 +143,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<BaseItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -161,7 +162,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .OrderBy(y => y.Id)
                 .Page(pagination)
                 .ToList()
-                .Select(ToDTO)
+                .Select(ToStakeHolderItInterfaceResponseDTO)
                 .Transform(Ok);
         }
 
@@ -172,7 +173,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
         [Route("it-interfaces/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(BaseItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -181,26 +182,40 @@ namespace Presentation.Web.Controllers.External.V2
         {
             return _itInterfaceService
                 .GetInterface(uuid)
-                .Select(ToDTO)
+                .Select(ToStakeHolderItInterfaceResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
-        private ItInterfaceResponseDTO ToDTO(ItInterface input)
+        private static RightsHolderItInterfaceResponseDTO ToRightsHolderItInterfaceResponseDTO(ItInterface itInterface)
         {
-            //TODO: JMO use new IdNamePair mapper after merge
-            return new ItInterfaceResponseDTO()
+            var dto = new RightsHolderItInterfaceResponseDTO();
+            MapBaseInformation(itInterface, dto);
+            return dto;
+        }
+
+        private static StakeHolderItInterfaceResponseDTO ToStakeHolderItInterfaceResponseDTO(ItInterface itInterface)
+        {
+            var dto = new StakeHolderItInterfaceResponseDTO
             {
-                Uuid = input.Uuid,
-                ExposedBySystem = new IdentityNamePairResponseDTO(input.ExhibitedBy.ItSystem.Uuid, input.ExhibitedBy.ItSystem.Name),
-                Name = input.Name,
-                InterfaceId = input.ItInterfaceId,
-                Version = input.Version,
-                Description = input.Description,
-                UrlReference = input.Url,
-                Deactivated = input.Disabled,
-                Created = input.Created,
-                CreatedBy = new IdentityNamePairResponseDTO(input.ObjectOwner.Uuid, input.ObjectOwner.GetFullName())
+                LastModified = itInterface.LastChanged,
+                LastModifiedBy = itInterface.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
             };
+            MapBaseInformation(itInterface, dto);
+            return dto;
+        }
+
+        private static void MapBaseInformation<T>(ItInterface input, T outputDTO) where T: BaseItInterfaceResponseDTO
+        {
+            outputDTO.Uuid = input.Uuid;
+            outputDTO.ExposedBySystem = input.ExhibitedBy?.ItSystem?.Transform(exposingSystem => exposingSystem.MapIdentityNamePairDTO());
+            outputDTO.Name = input.Name;
+            outputDTO.InterfaceId = input.ItInterfaceId;
+            outputDTO.Version = input.Version;
+            outputDTO.Description = input.Description;
+            outputDTO.UrlReference = input.Url;
+            outputDTO.Deactivated = input.Disabled;
+            outputDTO.Created = input.Created;
+            outputDTO.CreatedBy = input.ObjectOwner.MapIdentityNamePairDTO();
         }
     }
 }

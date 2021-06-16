@@ -41,7 +41,7 @@ namespace Core.ApplicationServices.RightsHolders
 
 
 
-        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
+        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess()
         {
             return WithAnyRightsHoldersAccess()
                 .Match

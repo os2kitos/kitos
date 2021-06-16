@@ -1,8 +1,15 @@
-﻿using System;
+﻿using Presentation;
+using Presentation.Web;
+using Presentation.Web.Models;
+using Presentation.Web.Models.External;
+using Presentation.Web.Models.External.V2;
+using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Interface;
+using System;
 
-namespace Presentation.Web.Models.External.V2.Response
+namespace Presentation.Web.Models.External.V2.Response.Interface
 {
-    public class ItInterfaceResponseDTO
+    public class BaseItInterfaceResponseDTO
     {
         /// <summary>
         /// UUID for IT-Interface
@@ -13,7 +20,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>
         public IdentityNamePairResponseDTO ExposedBySystem { get; set; }
-        
+
         /// <summary>
         /// Name of IT-Interface
         /// </summary>

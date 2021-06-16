@@ -3,7 +3,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
-using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Interface;
 using System;
 using System.Linq;
 using System.Net;
@@ -40,7 +40,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             //Assert
             Assert.Equal(pageSize, result.Count());
             var interface1DTO = result.Where(x => x.Name.Equals(itInterface1.Name)).First();
-            CheckDTOValues(system, itInterface1, interface1DTO);
+            CheckBaseDTOValues(system, itInterface1, interface1DTO);
         }
 
         [Fact]
@@ -69,32 +69,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         }
 
         [Fact]
-        public async Task Can_Get_Interfaces_As_RightsHolder_From_Specific_RightsHolder()
-        {
-            //Arrange
-            var (token, org1, org2) = await CreateRightsHolderUserInMultipleNewOrganizationsAsync();
-
-            var pageSize = 2;
-            var pageNumber = 0; //Always takes the first page;
-
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id);
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system2.Id, itInterface2.Id);
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system1.Id, org1.Id, TestEnvironment.DefaultOrganizationId);
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system2.Id, org2.Id, TestEnvironment.DefaultOrganizationId);
-
-            //Act
-            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, org1.Uuid);
-
-            //Assert
-            var interface1DTO = Assert.Single(result);
-            CheckDTOValues(system1, itInterface1, interface1DTO);
-        }
-
-        [Fact]
         public async Task Can_Get_Interface_As_RightsHolder()
         {
             //Arrange
@@ -109,7 +83,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var result = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
-            CheckDTOValues(system, itInterface, result);
+            CheckBaseDTOValues(system, itInterface, result);
         }
 
         [Fact]
@@ -145,25 +119,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             DatabaseAccess.MapFromEntitySet<ItInterface, bool>(x =>
             {
                 var dbInterface = x.AsQueryable().ById(itInterface.Id);
-
-                Assert.Equal(dbInterface.Uuid, itInterfaceDTO.Uuid);
-                Assert.Equal(dbInterface.Name, itInterfaceDTO.Name);
-                Assert.Equal(dbInterface.Description, itInterfaceDTO.Description);
-                Assert.Equal(dbInterface.ItInterfaceId, itInterfaceDTO.InterfaceId);
-                Assert.Equal(dbInterface.Url, itInterfaceDTO.UrlReference);
-                Assert.Equal(dbInterface.Version, itInterfaceDTO.Version);
-                Assert.Equal(dbInterface.Disabled, itInterfaceDTO.Deactivated);
-
-                Assert.Equal(dbInterface.Created, itInterfaceDTO.Created);
-                Assert.Equal(dbInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy.Uuid);
-                Assert.Equal(dbInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy.Name);
-
-                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem.Uuid);
-                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem.Name);
+                BaseItInterfaceResponseDTODBCheck(dbInterface, itInterfaceDTO);
 
                 return true;
             });
         }
+
+        
 
         [Fact]
         public async Task Cannot_Get_Interface_As_RightsHolder_If_Not_Exists()
@@ -229,7 +191,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var itInterfaceDTO = await InterfaceV2Helper.GetStakeholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
-            CheckDTOValues(system, itInterface, itInterfaceDTO);
+            CheckBaseDTOValues(system, itInterface, itInterfaceDTO);
         }
 
         [Fact]
@@ -246,7 +208,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var itInterfaceDTO = await InterfaceV2Helper.GetStakeholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
-            CheckDTOValues(system, itInterface, itInterfaceDTO);
+            CheckBaseDTOValues(system, itInterface, itInterfaceDTO);
         }
 
         [Fact]
@@ -298,21 +260,13 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             DatabaseAccess.MapFromEntitySet<ItInterface, bool>(x =>
             {
                 var dbInterface = x.AsQueryable().ById(itInterface.Id);
+                BaseItInterfaceResponseDTODBCheck(dbInterface, itInterfaceDTO);
 
-                Assert.Equal(dbInterface.Uuid, itInterfaceDTO.Uuid);
-                Assert.Equal(dbInterface.Name, itInterfaceDTO.Name);
-                Assert.Equal(dbInterface.Description, itInterfaceDTO.Description);
-                Assert.Equal(dbInterface.ItInterfaceId, itInterfaceDTO.InterfaceId);
-                Assert.Equal(dbInterface.Url, itInterfaceDTO.UrlReference);
-                Assert.Equal(dbInterface.Version, itInterfaceDTO.Version);
-                Assert.Equal(dbInterface.Disabled, itInterfaceDTO.Deactivated);
+                Assert.Equal(dbInterface.LastChanged, itInterfaceDTO.LastModified);
+                Assert.Equal(dbInterface.LastChanged, itInterfaceDTO.LastModified);
 
-                Assert.Equal(dbInterface.Created, itInterfaceDTO.Created);
-                Assert.Equal(dbInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy.Uuid);
-                Assert.Equal(dbInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy.Name);
-
-                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem.Uuid);
-                Assert.Equal(dbInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem.Name);
+                Assert.Equal(dbInterface.LastChangedByUser.Uuid, itInterfaceDTO.LastModifiedBy.Uuid);
+                Assert.Equal(dbInterface.LastChangedByUser.GetFullName(), itInterfaceDTO.LastModifiedBy.Name);
 
                 return true;
             });
@@ -398,7 +352,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             return $"{A<string>()}@test.dk";
         }
 
-        private static void CheckDTOValues(ItSystemDTO system, ItInterfaceDTO itInterface, ItInterfaceResponseDTO interfaceDTO)
+        private static void CheckBaseDTOValues(ItSystemDTO system, ItInterfaceDTO itInterface, BaseItInterfaceResponseDTO interfaceDTO)
         {
             Assert.Equal(itInterface.Name, interfaceDTO.Name);
             Assert.Equal(system.Name, interfaceDTO.ExposedBySystem.Name);
@@ -408,6 +362,24 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(itInterface.ItInterfaceId, interfaceDTO.InterfaceId);
             Assert.Equal(itInterface.Url, interfaceDTO.UrlReference);
             Assert.Equal(itInterface.Version, interfaceDTO.Version);
+        }
+
+        private static void BaseItInterfaceResponseDTODBCheck(ItInterface itInterface, BaseItInterfaceResponseDTO itInterfaceDTO)
+        {
+            Assert.Equal(itInterface.Uuid, itInterfaceDTO.Uuid);
+            Assert.Equal(itInterface.Name, itInterfaceDTO.Name);
+            Assert.Equal(itInterface.Description, itInterfaceDTO.Description);
+            Assert.Equal(itInterface.ItInterfaceId, itInterfaceDTO.InterfaceId);
+            Assert.Equal(itInterface.Url, itInterfaceDTO.UrlReference);
+            Assert.Equal(itInterface.Version, itInterfaceDTO.Version);
+            Assert.Equal(itInterface.Disabled, itInterfaceDTO.Deactivated);
+
+            Assert.Equal(itInterface.Created, itInterfaceDTO.Created);
+            Assert.Equal(itInterface.ObjectOwner.Uuid, itInterfaceDTO.CreatedBy.Uuid);
+            Assert.Equal(itInterface.ObjectOwner.GetFullName(), itInterfaceDTO.CreatedBy.Name);
+
+            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Uuid, itInterfaceDTO.ExposedBySystem.Uuid);
+            Assert.Equal(itInterface.ExhibitedBy.ItSystem.Name, itInterfaceDTO.ExposedBySystem.Name);
         }
     }
 }

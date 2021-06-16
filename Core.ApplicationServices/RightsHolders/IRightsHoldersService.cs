@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
@@ -11,7 +10,7 @@ namespace Core.ApplicationServices.RightsHolders
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
 
-        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
+        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess();
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
     }
 }
