@@ -6,9 +6,9 @@ using Core.DomainServices.Queries.Interface;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.DomainServices
+namespace Tests.Unit.Presentation.Web.DomainServices.Interface
 {
-    public class QueryByRightsHolderItInterfaceTest : WithAutoFixture
+    public class QueryByRightsHolderTest : WithAutoFixture
     {
         [Fact]
         public void Apply_Returns_Items_With_RightsHolder_Uuid_Match()

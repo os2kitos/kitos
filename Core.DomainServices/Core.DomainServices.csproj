@@ -94,7 +94,8 @@
     <Compile Include="Queries\ItSystem\QueryByRightsHolderUuid.cs" />
     <Compile Include="Queries\ItSystem\QueryByTaskRef.cs" />
     <Compile Include="Queries\Interface\QueryByRightsHolder.cs" />
-    <Compile Include="Queries\Interface\QueryByRightsHolderIds.cs" />
+    <Compile Include="Queries\Interface\QueryByRightsHolderIdsOrOwnOrganizationIds.cs" />
+    <Compile Include="Queries\Interface\QueryByExposingSystem.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />

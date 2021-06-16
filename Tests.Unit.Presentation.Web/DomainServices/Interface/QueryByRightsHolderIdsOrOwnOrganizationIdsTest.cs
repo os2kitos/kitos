@@ -1,27 +1,21 @@
+﻿using Core.DomainModel.ItSystem;
+using Core.DomainServices.Queries.Interface;
 using System.Collections.Generic;
 using System.Linq;
-using AutoFixture;
-using Core.DomainModel.ItSystem;
-using Core.DomainServices.Queries.Interface;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.DomainServices
+namespace Tests.Unit.Presentation.Web.DomainServices.Interface
 {
-    public class QueryByRightsHolderIdsTest : WithAutoFixture
+    public class QueryByRightsHolderIdsOrOwnOrganizationIdsTest : WithAutoFixture
     {
-        protected override void OnFixtureCreated(Fixture fixture)
-        {
-            fixture.Register(() => new ItSystem { Id = fixture.Create<int>() });
-            base.OnFixtureCreated(fixture);
-        }
-
         [Fact]
         public void Apply_Returns_Items_With_Id_Matches()
         {
             //Arrange
             var correctId1 = A<int>();
             var correctId2 = A<int>();
+            var correctId3 = A<int>();
             var incorrectId = A<int>();
 
             var matched1 = new ItInterface
@@ -44,6 +38,11 @@ namespace Tests.Unit.Presentation.Web.DomainServices
                         BelongsToId = correctId2
                     }
                 }
+            };
+
+            var matched3 = new ItInterface
+            {
+                OrganizationId = correctId3
             };
 
             var excludedNoExhibit = new ItInterface { ExhibitedBy = null };
@@ -70,19 +69,20 @@ namespace Tests.Unit.Presentation.Web.DomainServices
                 }
             };
 
-            var input = new[] { excludedWrongUuid, matched1, excludedNoRightsHolder, excludedNoExhibit, matched2 }.AsQueryable();
-            var sut = new QueryByRightsHolderIds(new List<int>() { correctId1, correctId2 });
+            var input = new[] { excludedWrongUuid, matched1, excludedNoRightsHolder, excludedNoExhibit, matched2, matched3 }.AsQueryable();
+            var sut = new QueryByRightsHolderIdsOrOwnOrganizationIds(new List<int>() { correctId1, correctId2 }, new List<int>() { correctId3 });
 
             //Act
             var result = sut.Apply(input);
 
             //Assert
-
-            Assert.Equal(2, result.Count());
-            var interface1 = result.First(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId1);
+            Assert.Equal(3, result.Count());
+            var interface1 = result.Where(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId1).First();
             Assert.Same(matched1, interface1);
-            var interface2 = result.First(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId2);
+            var interface2 = result.Where(x => x.ExhibitedBy.ItSystem.BelongsToId == correctId2).First();
             Assert.Same(matched2, interface2);
+            var interface3 = result.Where(x => x.OrganizationId == correctId3).First();
+            Assert.Same(matched3, interface3);
         }
     }
 }

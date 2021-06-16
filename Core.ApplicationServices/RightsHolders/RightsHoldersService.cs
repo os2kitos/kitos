@@ -54,7 +54,13 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () =>
                     {
-                        var refinements = new List<IDomainQuery<ItInterface>>();
+                        var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+
+                        var refinements = new List<IDomainQuery<ItInterface>>()
+                        {
+                            new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
+                        };
+
                         if (rightsHolderUuid.HasValue)
                         {
                             var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
