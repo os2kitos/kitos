@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -6,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Moq.Language;
 using Presentation.Web.Models.External.V2.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.V2;
@@ -61,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_ItSystem_Returns_Expected_Data()
+        public async Task GET_ItSystem_As_StakeHolder_Returns_Expected_Data()
         {
             //Arrange
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -70,7 +72,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
-            var businessTypeUuid = TestEnvironment.GetEntityUuid<BusinessType>(businessType.Id);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {
@@ -90,7 +91,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                 itSystem.TaskRefs.Add(taskRef);
                 db.ItInterfaceExhibits.Add(new ItInterfaceExhibit { ItInterface = interfaceToExpose, ItSystem = itSystem, ObjectOwnerId = 1, LastChangedByUserId = 1 });
 
-                var externalReference = new ExternalReference()
+                var externalReference = new ExternalReference
                 {
                     ObjectOwnerId = 1,
                     LastChangedByUserId = 1,
@@ -103,15 +104,17 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
                 db.SaveChanges();
             });
+            await ItSystemHelper.TakeIntoUseAsync(system.dbId, organizationId);
+            await ItSystemHelper.TakeIntoUseAsync(system.dbId, rightsHolderOrganization.Id);
 
             //Act
             var systemDTO = await ItSystemV2Helper.GetSingleAsync(token, system.uuid);
 
             //Assert - compare db entity with the response DTO
             Assert.NotNull(systemDTO);
-            DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(x =>
+            DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(repository =>
              {
-                 var dbSystem = x.AsQueryable().ByUuid(system.uuid);
+                 var dbSystem = repository.AsQueryable().ByUuid(system.uuid);
 
                  AssertBaseSystemDTO(dbSystem, systemDTO);
 
@@ -119,8 +122,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
                  Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
                  Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
 
-                 var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(x => x.Uuid, x => (x.Name, x.Cvr));
-                 var dbOrgs = dbSystem.Usages.Select(x => x.Organization).ToDictionary(x => x.Uuid, x => (x.Name, x.GetActiveCvr()));
+                 var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(dto => dto.Uuid, dto => (dto.Name, dto.Cvr));
+                 var dbOrgs = dbSystem.Usages.Select(itSystemUsage => itSystemUsage.Organization).ToDictionary(organization => organization.Uuid, organization => (organization.Name, organization.GetActiveCvr()));
                  Assert.Equal(dbOrgs, dtoOrgs);
 
                  return true;
@@ -128,7 +131,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_Many_Without_Filters()
+        public async Task GET_Many_As_StakeHolder_Without_Filters()
         {
             //Arrange - make sure there are always systems to satisfy the test regardless of order
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -143,7 +146,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_Many_With_RightsHolderFilter()
+        public async Task GET_Many_As_StakeHolder_With_RightsHolderFilter()
         {
             //Arrange - make sure there are always systems to satisfy the test regardless of order
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -171,7 +174,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_Many_With_BusinessTypeFilter()
+        public async Task GET_Many_As_StakeHolder_With_BusinessTypeFilter()
         {
             //Arrange
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -202,7 +205,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public async Task GET_Many_With_KLE_Filter(bool useKeyAsFilter)
+        public async Task GET_Many_As_StakeHolder_With_KLE_Filter(bool useKeyAsFilter)
         {
             //Arrange
             var (token, _) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -249,7 +252,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
-        public async Task GET_Many_With_NumberOfUsers_Filter()
+        public async Task GET_Many_As_StakeHolder_With_NumberOfUsers_Filter()
         {
             //Arrange - Scope the test with additional rightsHolder filter so that we can control which response we get
             var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
@@ -279,6 +282,64 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Contains(systems, dto => dto.Uuid == includedLowerBound.uuid);
             Assert.Contains(systems, dto => dto.Uuid == includedAboveLowerBound.uuid);
         }
+
+        [Theory]
+        [InlineData(AccessModifier.Local)]
+        [InlineData(AccessModifier.Public)]
+        public async Task Can_GET_RightsHolderSystem_In_Other_Organization_If_SystemRightsHolder_Matches_A_RightsHolder_Access_For_User(AccessModifier accessModifier)
+        {
+            //Arrange
+            var (token, createdOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, accessModifier);
+            using var sendSetBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, createdOrganization.Id, TestEnvironment.DefaultOrganizationId);
+            Assert.Equal(HttpStatusCode.OK, sendSetBelongsToResponse.StatusCode);
+
+            //Act
+            var systemDTO = await ItSystemV2Helper.GetSingleRightsHolderSystemAsync(token, system.uuid);
+
+            //Assert
+            Assert.Equal(system.uuid, systemDTO.Uuid);
+        }
+
+        [Theory]
+        [InlineData(AccessModifier.Local)]
+        [InlineData(AccessModifier.Public)]
+        public async Task Cannot_GET_System_In_Other_Organization_If_No_RightsHolderAccess_To_That_Organization(AccessModifier accessModifier)
+        {
+            //Arrange - system has different rightsholder
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, accessModifier);
+            using var sendSetBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, TestEnvironment.SecondOrganizationId, TestEnvironment.DefaultOrganizationId);
+            Assert.Equal(HttpStatusCode.OK, sendSetBelongsToResponse.StatusCode);
+
+            //Act
+            using var response = await ItSystemV2Helper.SendGetSingleRightsHolderSystemAsync(token, system.uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden,response.StatusCode);
+        }
+
+        [Theory, Description("Ensures that when requesting systems with rightsholder access, only those are returned. No default rules overrule this")]
+        [InlineData(AccessModifier.Local)]
+        [InlineData(AccessModifier.Public)]
+        public async Task Cannot_GET_System_In_OWN_Organization_If_No_RightsHolderAccess(AccessModifier accessModifier)
+        {
+            //Arrange - system has different rightsholder
+            var (token, ownOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system = await CreateSystemAsync(ownOrganization.Id, accessModifier);
+
+            //Set rightsholder to a different organization
+            using var sendSetBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, TestEnvironment.SecondOrganizationId, ownOrganization.Id);
+
+            //Act
+            using var response = await ItSystemV2Helper.SendGetSingleRightsHolderSystemAsync(token, system.uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        //TODO: Mapped mdata
+        //TODO: GET many
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, ItSystemResponseDTO systemDTO)
         {
@@ -333,6 +394,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
                 OrganizationRole.User, organization.Id, true, true);
+            return (token, organization);
+        }
+
+        private async Task<(string token, Organization createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAsync()
+        {
+            var organization = await CreateOrganizationAsync();
+
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
+                OrganizationRole.RightsHolderAccess, organization.Id, true);
             return (token, organization);
         }
 

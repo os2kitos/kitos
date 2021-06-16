@@ -24,6 +24,19 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
         }
 
+        public static async Task<ItSystemResponseDTO> GetSingleRightsHolderSystemAsync(string token, Guid uuid)
+        {
+            using var response = await SendGetSingleRightsHolderSystemAsync(token, uuid);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetSingleRightsHolderSystemAsync(string token, Guid uuid)
+        {
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid:D}"), token);
+        }
+
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyAsync(
             string token, 
             int? page = null, 

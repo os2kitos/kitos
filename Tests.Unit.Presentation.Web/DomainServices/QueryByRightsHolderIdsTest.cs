@@ -30,7 +30,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             var includedSystems = Many<ItSystem>().ToList();
             includedSystems.ForEach(x => x.BelongsToId = correctRightsHolderId);
 
-            var sut = new QueryByRightsHolderIds(new[] { correctRightsHolderId });
+            var sut = new QueryByRightsHolderIdOrOwnOrganizationIds(new[] { correctRightsHolderId });
             var input = excludedSystemsNoRightsHolder.Concat(excludedSystemsWrongRightsHolder).Concat(includedSystems).AsQueryable();
 
             //Act

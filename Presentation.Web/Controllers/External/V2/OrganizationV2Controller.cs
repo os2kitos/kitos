@@ -12,7 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    [RoutePrefix("api/v2/organizations")]
+    [RoutePrefix("api/v2")]
     public class OrganizationV2Controller : ExternalBaseController
     {
         private readonly IRightsHoldersService _rightsHoldersService;
@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// </summary>
         /// <returns>A list of organizations formatted as uuid, cvr and name pairs</returns>
         [HttpGet]
-        [Route("with-rightsholder-access")]
+        [Route("rightsholder/organizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetAccessibleOrganizations([FromUri] StandardPaginationQuery pagination = null)

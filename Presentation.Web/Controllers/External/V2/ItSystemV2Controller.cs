@@ -119,7 +119,7 @@ namespace Presentation.Web.Controllers.External.V2
                 return BadRequest(ModelState);
 
             return _rightsHoldersService
-                .GetAvailableSystems()
+                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess()
                 .Select(itSystems => itSystems
                     .OrderBy(system => system.Id)
                     .Page(paginationQuery)
@@ -147,9 +147,62 @@ namespace Presentation.Web.Controllers.External.V2
                 return BadRequest(nameof(uuid) + " must be a non-empty guid");
 
             return _rightsHoldersService
-                .GetSystem(uuid)
+                .GetSystemAsRightsHolder(uuid)
                 .Select(ToSystemInformationResponseDTO)
                 .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Creates a new IT-System based on given input values
+        /// </summary>
+        /// <param name="itSystemRequestDTO">A collection of specific IT-System values</param>
+        /// <returns>Location header is set to uri for newly created IT-System</returns>
+        [HttpPost]
+        [Route("rightsholder/it-systems")]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(RightsHolderItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        public IHttpActionResult PostItSystem([FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        {
+            return Created(Request.RequestUri + "/" + itSystemRequestDTO.Uuid, new RightsHolderItSystemResponseDTO());
+        }
+
+        /// <summary>
+        /// Sets IT-System values
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <returns>The updated IT-System</returns>
+        [HttpPut]
+        [Route("rightsholder/it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        {
+            return Ok(new RightsHolderItSystemResponseDTO());
+        }
+
+        /// <summary>
+        /// Deactivates an IT-System
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <param name="deactivationReasonDTO">Reason for deactivation</param>
+        /// <returns>No content</returns>
+        [HttpDelete]
+        [Route("rightsholder/it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        {
+            return Ok();
         }
 
         private static RightsHolderItSystemResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)

@@ -57,7 +57,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessReturns(false);
 
             //Act
-            var result = _sut.GetAvailableSystems();
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess();
 
             //Assert
             Assert.True(result.Failed);
@@ -73,7 +73,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock.Setup(x => x.GetAvailableSystems()).Returns(expectedResponse);
 
             //Act
-            var result = _sut.GetAvailableSystems();
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess();
 
             //Assert
             Assert.True(result.Ok);
@@ -87,7 +87,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessReturns(false);
 
             //Act
-            var result = _sut.GetSystem(A<Guid>());
+            var result = _sut.GetSystemAsRightsHolder(A<Guid>());
 
             //Assert
             Assert.True(result.Failed);
@@ -105,7 +105,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(itSystem);
 
             //Act
-            var result = _sut.GetSystem(systemUuid);
+            var result = _sut.GetSystemAsRightsHolder(systemUuid);
 
             //Assert
             Assert.True(result.Ok);

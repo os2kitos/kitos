@@ -26,11 +26,11 @@ namespace Core.DomainModel.Result
         public TFailure Error => _state.ErrorValue;
 
         public static Result<TSuccess, TFailure> Success(TSuccess value) =>
-            new Result<TSuccess, TFailure>(new WithSuccessfulWithResult<TSuccess, TFailure>(value));
+            new(new WithSuccessfulWithResult<TSuccess, TFailure>(value));
 
 
         public static Result<TSuccess, TFailure> Failure(TFailure value) =>
-            new Result<TSuccess, TFailure>(new WithFailure<TSuccess, TFailure>(value));
+            new(new WithFailure<TSuccess, TFailure>(value));
 
         /// <summary>
         /// Transform the success result to a new result where the <typeparam name="TSuccess" /> is transformed into <typeparam name="T" /> using <paramref name="onSuccess"/>
