@@ -65,7 +65,6 @@ namespace Core.ApplicationServices.RightsHolders
                             refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
                         }
 
-
                         return Result<IQueryable<ItInterface>, OperationError>.Success(_itInterfaceService.GetAvailableInterfaces(refinements.ToArray()));
                     }
                 );
@@ -90,7 +89,6 @@ namespace Core.ApplicationServices.RightsHolders
                         {
                             new QueryByRightsHolderIdOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
                         };
-
 
                         if (rightsHolderUuid.HasValue)
                         {
