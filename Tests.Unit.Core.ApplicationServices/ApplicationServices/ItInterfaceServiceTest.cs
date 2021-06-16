@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -377,6 +378,59 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void GetAvailableInterfaces_Returns_Interfaces_Where_User_Has_Rightsholderaccess_Or_Other_Role_In_Owning_Org()
+        {
+            //Arrange
+            var rightsHolderItInterfaceUuid = Guid.NewGuid();
+            var organizationItInterfaceUuid = Guid.NewGuid();
+            var rightsHolderOrg = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var rightsHolderOrgs = new List<int>() { rightsHolderOrg.Id };
+            var userRoleOrg = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var userRoleOrgs = new List<int>() { userRoleOrg.Id };
+            var rightsHolderItInterface = new ItInterface()
+            {
+                Uuid = rightsHolderItInterfaceUuid,
+                ExhibitedBy = new ItInterfaceExhibit()
+                {
+                    ItSystemId = A<int>(),
+                    ItSystem = new ItSystem()
+                    {
+                        BelongsTo = rightsHolderOrg,
+                        BelongsToId = rightsHolderOrg.Id
+                    }
+                }
+            };
+            var organizationItInterface = new ItInterface()
+            {
+                Uuid = organizationItInterfaceUuid,
+                OrganizationId = userRoleOrg.Id,
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.RightsHolder);
+            _userContext.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(rightsHolderOrgs);
+            _userContext.Setup(x => x.OrganizationIds).Returns(userRoleOrgs);
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>() { rightsHolderItInterface, organizationItInterface }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableInterfaces();
+
+            //Assert
+            Assert.Equal(2, result.Count());
+            var rightsHolderItInterfaceResult = Assert.Single(result.Where(x => x.Uuid == rightsHolderItInterfaceUuid));
+            Assert.Equal(rightsHolderItInterfaceUuid, rightsHolderItInterfaceResult.Uuid);
+            var organizationItInterfaceResult = Assert.Single(result.Where(x => x.Uuid == organizationItInterfaceUuid));
+            Assert.Equal(organizationItInterfaceUuid, organizationItInterfaceResult.Uuid);
+        }
+
+        [Fact]
         public void GetAvailableInterfaces_Returns_RightsholderInterfaces_From_Specific_Rightsholder_If_User_Has_Rightsholderaccess()
         {
             //Arrange
@@ -438,6 +492,41 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             var interfaceResult = Assert.Single(result.ToList());
             Assert.Equal(itInterface1.Uuid, interfaceResult.Uuid);
+        }
+
+        [Theory]
+        [InlineData(CrossOrganizationDataReadAccessLevel.All, 2)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.Public, 1)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.None, 0)]
+        public void GetAvailableInterfaces_Returns_Public_Interfaces_If_User_Has_Access_Level_Public(CrossOrganizationDataReadAccessLevel accessLevel, int expectedNumberOfInterfaces)
+        {
+            //Arrange
+            var interfaceUuid = Guid.NewGuid();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+            var rightsHolderOrgs = new List<int>() { org.Id };
+            var publicItInterface = new ItInterface()
+            {
+                Uuid = interfaceUuid,
+                AccessModifier = AccessModifier.Public
+            };
+            var localItInterface = new ItInterface()
+            {
+                Uuid = interfaceUuid,
+                AccessModifier = AccessModifier.Local
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>() { publicItInterface, localItInterface }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableInterfaces();
+
+            //Assert
+            Assert.Equal(expectedNumberOfInterfaces, result.Count());
         }
 
 
