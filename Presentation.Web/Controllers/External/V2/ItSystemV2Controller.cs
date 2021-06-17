@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
@@ -21,11 +22,13 @@ namespace Presentation.Web.Controllers.External.V2
     {
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHoldersService _rightsHoldersService;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHoldersService rightsHoldersService)
+        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHoldersService rightsHoldersService, IAuthorizationContext authorizationContext)
         {
             _itSystemService = itSystemService;
             _rightsHoldersService = rightsHoldersService;
+            _authorizationContext = authorizationContext;
         }
 
         /// <summary>
@@ -207,14 +210,14 @@ namespace Presentation.Web.Controllers.External.V2
             return Ok();
         }
 
-        private static RightsHolderItSystemResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)
+        private RightsHolderItSystemResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)
         {
             var dto = new RightsHolderItSystemResponseDTO();
             MapBaseInformation(itSystem, dto);
             return dto;
         }
 
-        private static ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
+        private ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
         {
             var dto = new ItSystemResponseDTO
             {
@@ -232,7 +235,7 @@ namespace Presentation.Web.Controllers.External.V2
             return dto;
         }
 
-        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
+        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
@@ -249,6 +252,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .ItInterfaceExhibits
                 .Select(exhibit => exhibit.ItInterface)
                 .ToList()
+                .Where(_authorizationContext.AllowReads)// Only accessible interfaces may be referenced here
                 .Select(x => x.MapIdentityNamePairDTO())
                 .ToList();
             dto.RecommendedArchiveDutyResponse =

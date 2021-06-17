@@ -9,6 +9,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -31,7 +32,15 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
             _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceService = new Mock<IItInterfaceService>();
-            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object,Mock.Of<ITransactionManager>(),Mock.Of<ILogger>());
+            _sut = new RightsHoldersService(
+                _userContextMock.Object,
+                _organizationRepositoryMock.Object,
+                _interfaceService.Object,
+                _itSystemServiceMock.Object,
+                Mock.Of<ITaskRefRepository>(),
+                Mock.Of<ITransactionManager>(),
+                Mock.Of<ILogger>()
+                );
         }
 
         //TODO: Test all added methods!!!

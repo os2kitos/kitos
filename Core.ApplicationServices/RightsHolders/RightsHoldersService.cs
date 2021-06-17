@@ -142,21 +142,15 @@ namespace Core.ApplicationServices.RightsHolders
             var parentSystemId = default(int?);
             if (parentSystemUuid.HasValue)
             {
-                var mainSystem = _systemService.GetSystem(systemId);
-                if (mainSystem.Failed)
-                {
-                    return mainSystem.Error;
-                }
+                //Make sure that user has rightsholders access to the parent system
+                var parentSystemResult =
+                    _systemService
+                        .GetSystem(parentSystemUuid.Value)
+                        .Bind(WithRightsHolderAccessTo);
 
-                var parentSystemResult = _systemService.GetSystem(parentSystemUuid.Value);
                 if (parentSystemResult.Failed)
                     return parentSystemResult.Error;
 
-                var hasSameRightsHolder = parentSystemResult.Value.GetRightsHolderOrganizationId().Equals(mainSystem.Value.GetRightsHolderOrganizationId());
-                if (!hasSameRightsHolder)
-                {
-                    return new OperationError("Parent system must have same rights holder as child system", OperationFailure.BadInput);
-                }
 
                 parentSystemId = parentSystemResult.Value.Id;
             }

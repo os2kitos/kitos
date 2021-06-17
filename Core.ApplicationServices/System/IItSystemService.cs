@@ -25,7 +25,7 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, ICollection<int> taskRefIds);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
-        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid rightsHolderUuid);
+        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid);
         Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null);
     }
 }

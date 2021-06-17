@@ -12,8 +12,11 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -51,11 +54,16 @@ namespace Tests.Unit.Presentation.Web.Services
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
+                Mock.Of<ITaskRefRepository>(),
+                Mock.Of<IOptionsService<ItSystem, BusinessType>>(),
+                Mock.Of<IOrganizationRepository>(),
                 _logger.Object,
                 _userContext.Object,
                 Mock.Of<IDomainEvents>()
                 );
         }
+
+        //TODO: Test all of the new juicy stuff
 
         [Fact]
         public void GetSystem_Returns_Not_Found_If_System_Does_Not_Exist()

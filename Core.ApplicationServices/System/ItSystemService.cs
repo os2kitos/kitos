@@ -11,6 +11,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -19,6 +20,7 @@ using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
@@ -37,6 +39,7 @@ namespace Core.ApplicationServices.System
         private readonly IReferenceService _referenceService;
         private readonly ITaskRefRepository _taskRefRepository;
         private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
+        private readonly IOrganizationRepository _organizationRepository;
         private readonly ILogger _logger;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
@@ -48,7 +51,8 @@ namespace Core.ApplicationServices.System
             ITransactionManager transactionManager,
             IReferenceService referenceService,
             ITaskRefRepository taskRefRepository,
-            IOptionsService<ItSystem,BusinessType> businessTypeService,
+            IOptionsService<ItSystem, BusinessType> businessTypeService,
+            IOrganizationRepository organizationRepository,
             ILogger logger,
             IOrganizationalUserContext userContext,
             IDomainEvents domainEvents
@@ -61,6 +65,7 @@ namespace Core.ApplicationServices.System
             _referenceService = referenceService;
             _taskRefRepository = taskRefRepository;
             _businessTypeService = businessTypeService;
+            _organizationRepository = organizationRepository;
             _logger = logger;
             _userContext = userContext;
             _domainEvents = domainEvents;
@@ -282,7 +287,27 @@ namespace Core.ApplicationServices.System
 
         public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
         {
-            throw new NotImplementedException("Yet");
+
+            return Mutate(systemId, system => system.Reference?.URL != urlReference, updateWithResult: system =>
+            {
+                if (string.IsNullOrWhiteSpace(urlReference))
+                    return new OperationError("Url must be defined", OperationFailure.BadInput);
+
+                var existingReference = system.Reference;
+                if (existingReference != null)
+                {
+                    existingReference.URL = urlReference;
+                    return system;
+                }
+
+                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url);
+                if (addReferenceResult.Failed)
+                {
+                    return addReferenceResult.Error;
+                }
+
+                return system.SetMasterReference(addReferenceResult.Value).Match(_ => Result<ItSystem, OperationError>.Success(system), error => error);
+            });
         }
 
         public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, ICollection<int> taskRefIds)
@@ -315,14 +340,14 @@ namespace Core.ApplicationServices.System
                 var itSystem = _itSystemRepository.GetSystem(systemId);
                 if (itSystem == null)
                     return new OperationError(OperationFailure.NotFound);
-                var optionByUuid = _businessTypeService.GetOptionByUuid(itSystem.OrganizationId,businessTypeUuid.Value);
-                
+                var optionByUuid = _businessTypeService.GetOptionByUuid(itSystem.OrganizationId, businessTypeUuid.Value);
+
                 if (optionByUuid.IsNone)
                     return new OperationError("Business type uuid does not point to a business type in KITOS", OperationFailure.BadInput);
 
                 var option = optionByUuid.Value;
 
-                if(!option.available)
+                if (!option.available)
                     return new OperationError("Business exists but is not available in the System's organization", OperationFailure.BadInput);
 
                 return Mutate(systemId, system => system.BusinessTypeId != option.option.Id, system => system.UpdateBusinessType(option.option));
@@ -331,14 +356,54 @@ namespace Core.ApplicationServices.System
             return Mutate(systemId, system => system.BusinessTypeId != null, system => system.ResetBusinessType());
         }
 
-        public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid rightsHolderUuid)
+        public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid)
         {
-            throw new NotImplementedException();
+            return Mutate(systemId, system => system.BelongsTo?.Uuid != rightsHolderUuid, updateWithResult: system =>
+            {
+                if (rightsHolderUuid.HasValue)
+                {
+                    var rightsHolder = _organizationRepository.GetByUuid(rightsHolderUuid.Value);
+
+                    if (rightsHolder.IsNone)
+                        return new OperationError("Rightsholder id is invalid", OperationFailure.BadInput);
+
+                    if (!_authorizationContext.AllowReads(rightsHolder.Value))
+                        return new OperationError("Rightsholder organization is not accessible", OperationFailure.Forbidden);
+
+                    system.UpdateRightsHolder(rightsHolder.Value);
+                }
+                else
+                {
+                    system.ResetRightsHolder();
+                }
+
+                return system;
+            });
         }
 
         public Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null)
         {
-            return Mutate(systemId,system=>system.ParentId != parentSystemId)
+            return Mutate(systemId, system => system.ParentId != parentSystemId, updateWithResult: system =>
+            {
+                if (parentSystemId.HasValue)
+                {
+                    var parent = _itSystemRepository.GetSystem(parentSystemId.Value);
+
+                    if (parent == null)
+                        return new OperationError("Parent system id is invalid", OperationFailure.BadInput);
+
+                    if (!_authorizationContext.AllowReads(parent))
+                        return new OperationError("Access to parent system is denied", OperationFailure.Forbidden);
+
+                    system.SetUpdateParentSystem(parent);
+                }
+                else
+                {
+                    system.ResetParentSystem();
+                }
+
+                return system;
+            });
         }
 
         public Maybe<OperationError> ValidateNewSystemName(int organizationId, string name)

@@ -195,5 +195,34 @@ namespace Core.DomainModel.ItSystem
             BusinessType = businessType;
             BusinessTypeId = businessType.Id;
         }
+
+        public void ResetParentSystem()
+        {
+            Parent = null;
+            ParentId = null;
+        }
+
+        public void SetUpdateParentSystem(ItSystem parent)
+        {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+            Parent = parent;
+            ParentId = parent.Id;
+        }
+
+        public void ResetRightsHolder()
+        {
+            BelongsTo = null;
+            BelongsToId = null;
+        }
+
+        public void UpdateRightsHolder(Organization.Organization organization)
+        {
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+            
+            BelongsTo = organization;
+            BelongsToId = organization.Id;
+        }
     }
 }
