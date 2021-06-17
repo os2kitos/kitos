@@ -7,6 +7,9 @@ using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.RightsHolders
 {
+    /// <summary>
+    /// Application service which implements the use cases specific to rights holders KITOS access
+    /// </summary>
     public interface IRightsHoldersService
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();

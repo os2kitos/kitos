@@ -58,6 +58,9 @@ namespace Core.DomainServices.Repositories.System
 
         public void DeleteSystem(ItSystem itSystem)
         {
+            if (itSystem == null)
+                throw new ArgumentNullException(nameof(itSystem));
+
             _systemRepository.DeleteWithReferencePreload(itSystem);
             _systemRepository.Save();
         }
@@ -81,7 +84,19 @@ namespace Core.DomainServices.Repositories.System
 
         public void Add(ItSystem newSystem)
         {
+            if (newSystem == null)
+                throw new ArgumentNullException(nameof(newSystem));
+
             _systemRepository.Insert(newSystem);
+            _systemRepository.Save();
+        }
+
+        public void Update(ItSystem itSystem)
+        {
+            if (itSystem == null)
+                throw new ArgumentNullException(nameof(itSystem));
+
+            _systemRepository.Update(itSystem);
             _systemRepository.Save();
         }
 

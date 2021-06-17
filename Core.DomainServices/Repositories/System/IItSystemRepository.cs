@@ -22,5 +22,6 @@ namespace Core.DomainServices.Repositories.System
         IQueryable<ItSystem> GetByRightsHolderId(int sourceId);
         IQueryable<ItSystem> GetByTaskRefId(int taskRefId);
         void Add(ItSystem newSystem);
+        void Update(ItSystem itSystem);
     }
 }

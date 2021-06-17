@@ -160,5 +160,24 @@ namespace Core.DomainModel.ItSystem
                 return BelongsTo.Id;
             return Maybe<int>.None;
         }
+
+        public void AddTaskRef(TaskRef taskRef)
+        {
+            var existing = GetTaskRef(taskRef.Id);
+            if (existing.IsNone)
+                TaskRefs.Add(taskRef);
+        }
+
+        public void RemoveTaskRef(TaskRef taskRef)
+        {
+            var toRemove = GetTaskRef(taskRef.Id);
+            if (toRemove.HasValue)
+                TaskRefs.Remove(toRemove.Value);
+        }
+
+        public Maybe<TaskRef> GetTaskRef(int taskRefId)
+        {
+            return TaskRefs.SingleOrDefault(tr => tr.Id == taskRefId);
+        }
     }
 }

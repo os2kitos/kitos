@@ -16,9 +16,11 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.System;
+using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -33,6 +35,8 @@ namespace Core.ApplicationServices.System
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IReferenceService _referenceService;
+        private readonly ITaskRefRepository _taskRefRepository;
+        private readonly IOptionsService<ItSystem, BusinessType> _businessTypeService;
         private readonly ILogger _logger;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
@@ -43,6 +47,8 @@ namespace Core.ApplicationServices.System
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
             IReferenceService referenceService,
+            ITaskRefRepository taskRefRepository,
+            IOptionsService<ItSystem,BusinessType> businessTypeService,
             ILogger logger,
             IOrganizationalUserContext userContext,
             IDomainEvents domainEvents
@@ -53,6 +59,8 @@ namespace Core.ApplicationServices.System
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
             _referenceService = referenceService;
+            _taskRefRepository = taskRefRepository;
+            _businessTypeService = businessTypeService;
             _logger = logger;
             _userContext = userContext;
             _domainEvents = domainEvents;
@@ -63,6 +71,18 @@ namespace Core.ApplicationServices.System
         {
             return _itSystemRepository
                 .GetSystem(uuid)
+                .Match
+                (
+                    system => _authorizationContext.AllowReads(system) ? Result<ItSystem, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
+        public Result<ItSystem, OperationError> GetSystem(int id)
+        {
+            return _itSystemRepository
+                .GetSystem(id)
+                .FromNullable()
                 .Match
                 (
                     system => _authorizationContext.AllowReads(system) ? Result<ItSystem, OperationError>.Success(system) : new OperationError(OperationFailure.Forbidden),
@@ -176,32 +196,31 @@ namespace Core.ApplicationServices.System
                 return SystemDeleteResult.HasInterfaceExhibits;
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
-            {
-                try
-                {
-                    var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
-                    if (deleteReferenceResult.Ok == false)
-                    {
-                        _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult.Error}");
-                        transaction.Rollback();
-                        return SystemDeleteResult.UnknownError;
-                    }
-                    _itSystemRepository.DeleteSystem(system);
-                    transaction.Commit();
-                    return SystemDeleteResult.Ok;
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
-                }
-                catch (Exception e)
+            try
+            {
+                var deleteReferenceResult = _referenceService.DeleteBySystemId(system.Id);
+                if (deleteReferenceResult.Ok == false)
                 {
-                    _logger.Error(e, $"Failed to delete it system with id: {system.Id}");
+                    _logger.Error($"Failed to delete external references of it system with id: {system.Id}. Service returned a {deleteReferenceResult.Error}");
                     transaction.Rollback();
                     return SystemDeleteResult.UnknownError;
                 }
+                _itSystemRepository.DeleteSystem(system);
+                transaction.Commit();
+                return SystemDeleteResult.Ok;
+
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Failed to delete it system with id: {system.Id}");
+                transaction.Rollback();
+                return SystemDeleteResult.UnknownError;
             }
         }
 
-        public Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Maybe<Guid> uuid)
+        public Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Guid? uuid = null)
         {
             if (_authorizationContext.AllowCreate<ItSystem>(organizationId))
             {
@@ -212,7 +231,7 @@ namespace Core.ApplicationServices.System
                 if (nameError.HasValue)
                     return nameError.Value;
 
-                var uuidTaken = uuid.Select(id => _itSystemRepository.GetSystem(id).HasValue).GetValueOrFallback(false);
+                var uuidTaken = uuid?.Transform(id => _itSystemRepository.GetSystem(id).HasValue) == true;
 
                 if (uuidTaken)
                     return new OperationError("UUID already exists on another it-system in KITOS", OperationFailure.Conflict);
@@ -221,7 +240,7 @@ namespace Core.ApplicationServices.System
                 {
                     OrganizationId = organizationId,
                     AccessModifier = AccessModifier.Public,
-                    Uuid = uuid.Match(providedUuid => providedUuid, Guid.NewGuid),
+                    Uuid = uuid ?? Guid.NewGuid(),
                     ObjectOwnerId = _userContext.UserId
                 };
 
@@ -232,6 +251,16 @@ namespace Core.ApplicationServices.System
             }
 
             return new OperationError(OperationFailure.Forbidden);
+        }
+
+        public Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newValue)
+        {
+            return Mutate(systemId, system => system.PreviousName != newValue, system => system.PreviousName = newValue);
+        }
+
+        public Result<ItSystem, OperationError> UpdateDescription(int systemId, string newValue)
+        {
+            return Mutate(systemId, system => system.Description != newValue, system => system.Description = newValue);
         }
 
         public bool CanChangeNameTo(int organizationId, int systemId, string newName)
@@ -249,6 +278,47 @@ namespace Core.ApplicationServices.System
         public bool CanCreateSystemWithName(int organizationId, string name)
         {
             return ValidateNewSystemName(organizationId, name).IsNone;
+        }
+
+        public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
+        {
+            throw new NotImplementedException("Yet");
+        }
+
+        public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, ICollection<int> taskRefIds)
+        {
+            return Mutate(systemId, system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(taskRefIds.OrderBy(id => id)), updateWithResult: system =>
+            {
+                var inBoundIds = new HashSet<int>(taskRefIds);
+                var taskRefIdsToAdd = inBoundIds.Where(id => system.GetTaskRef(id).IsNone).ToList();
+                var taskRefsToRemove = system.TaskRefs.Where(taskRef => !inBoundIds.Contains(taskRef.Id)).ToList();
+                var taskRefsToAdd = new List<TaskRef>();
+                foreach (var taskRefId in taskRefIdsToAdd)
+                {
+                    var taskRef = _taskRefRepository.GetTaskRef(taskRefId);
+                    if (taskRef.IsNone)
+                        return new OperationError("Invalid task id:" + taskRefId, OperationFailure.BadInput);
+                    taskRefsToAdd.Add(taskRef.Value);
+                }
+                taskRefsToRemove.ForEach(system.RemoveTaskRef);
+                taskRefsToAdd.ForEach(system.AddTaskRef);
+                return system;
+            });
+        }
+
+        public Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid rightsHolderUuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null)
+        {
+            throw new NotImplementedException();
         }
 
         public Maybe<OperationError> ValidateNewSystemName(int organizationId, string name)
@@ -296,6 +366,40 @@ namespace Core.ApplicationServices.System
                         itSystemUsage.Organization.Name)))
                 .ToList()
                 .AsReadOnly();
+        }
+        private Result<ItSystem, OperationError> Mutate(int systemId, Predicate<ItSystem> performUpdateTo, Action<ItSystem> updateWith = null, Func<ItSystem, Result<ItSystem, OperationError>> updateWithResult = null)
+        {
+            if (updateWith == null && updateWithResult == null)
+                throw new ArgumentException("No mutations provided");
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+            var itSystem = _itSystemRepository.GetSystem(systemId);
+            if (itSystem == null)
+                return new OperationError(OperationFailure.NotFound);
+
+            if (!_authorizationContext.AllowModify(itSystem))
+                return new OperationError(OperationFailure.Forbidden);
+
+            if (performUpdateTo(itSystem))
+            {
+                updateWith?.Invoke(itSystem);
+                var result = updateWithResult?.Invoke(itSystem) ?? Result<ItSystem, OperationError>.Success(itSystem);
+                if (result.Ok)
+                {
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
+                    _itSystemRepository.Update(itSystem);
+                }
+                else
+                {
+                    //Terminate the flow
+                    return result;
+                }
+            }
+
+            transaction.Commit();
+
+            return itSystem;
         }
     }
 }
