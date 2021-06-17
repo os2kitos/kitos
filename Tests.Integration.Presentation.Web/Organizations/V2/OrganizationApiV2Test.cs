@@ -4,7 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.V2;
+using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

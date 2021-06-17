@@ -132,8 +132,8 @@ namespace Tests.Integration.Presentation.Web.KLE
                 var toBeRemoved = FlattenTreeDepthFirst(root).ToList();
 
                 // Remove task refs with ItSystem FKs
-                var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Count() > 0).ToList();
-                taskRefsWithItSystem.ForEach(taskRefWithItSystem => repository.DeleteWithReferencePreload(taskRefWithItSystem));
+                var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Any()).ToList();
+                taskRefsWithItSystem.ForEach(repository.DeleteWithReferencePreload);
 
                 // Remove task refs without FKs
                 repository.RemoveRange(toBeRemoved);
@@ -614,7 +614,7 @@ namespace Tests.Integration.Presentation.Web.KLE
 
         private static TaskUsage CreateTaskUsage(TaskRef taskRef1, int? objectOwnerId, int organizationUnitId)
         {
-            return new TaskUsage
+            return new()
             {
                 TaskRefId = taskRef1.Id,
                 LastChangedByUserId = objectOwnerId,
@@ -625,12 +625,10 @@ namespace Tests.Integration.Presentation.Web.KLE
 
         private static void ResetKleHistory()
         {
-            using (var kleRepo = new GenericRepository<KLEUpdateHistoryItem>(TestEnvironment.GetDatabase()))
-            {
-                var all = kleRepo.AsQueryable().ToList();
-                kleRepo.RemoveRange(all);
-                kleRepo.Save();
-            }
+            using var kleRepo = new GenericRepository<KLEUpdateHistoryItem>(TestEnvironment.GetDatabase());
+            var all = kleRepo.AsQueryable().ToList();
+            kleRepo.RemoveRange(all);
+            kleRepo.Save();
         }
 
         private static IReadOnlyList<string> GetProjectTaskRefKeys(int projectId)

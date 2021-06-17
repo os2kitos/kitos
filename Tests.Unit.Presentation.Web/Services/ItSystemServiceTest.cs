@@ -17,6 +17,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -59,7 +60,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<IOrganizationRepository>(),
                 _logger.Object,
                 _userContext.Object,
-                Mock.Of<IDomainEvents>()
+                Mock.Of<IDomainEvents>(),
+                Mock.Of<IOperationClock>()
                 );
         }
 

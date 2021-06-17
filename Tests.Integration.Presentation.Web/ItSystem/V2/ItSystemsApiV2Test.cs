@@ -7,10 +7,11 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Moq.Language;
+using Infrastructure.Services.Types;
+using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Tests.Integration.Presentation.Web.Tools;
-using Tests.Integration.Presentation.Web.Tools.V2;
+using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -425,7 +426,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Arrange - create three systems in different organizations but with the right rightsholder
             var (userId, token, rightsHolderOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync();
             var rightsHolder2Org = await CreateOrganizationAsync();
-            
+
             const int mainOrganizationId = TestEnvironment.DefaultOrganizationId;
             var systemRightsHolder1 = await CreateSystemAsync(mainOrganizationId, AccessModifier.Local);
             var systemRightsHolder2 = await CreateSystemAsync(mainOrganizationId, AccessModifier.Local);
@@ -444,6 +445,40 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var systemResponseDto = Assert.Single(response);
             Assert.Equal(systemRightsHolder2.uuid, systemResponseDto.Uuid);
         }
+
+        [Theory]
+        [InlineData(true, true, true, true, true)]
+        public async Task Can_POST_ItSystem_As_RightsHolder(bool withProvidedUuid, bool withBusinessType, bool withKleNumbers, bool withKleUuid, bool withParent)
+        {
+            //Arrange
+            var (token, createdOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var parentCandidate = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), createdOrganization.Id, AccessModifier.Local);
+
+            var businessType = DatabaseAccess.MapFromEntitySet<BusinessType, Guid>(repository => repository.AsQueryable().First(x => x.IsEnabled && x.IsObligatory).Uuid);
+            var kle = DatabaseAccess.MapFromEntitySet<TaskRef, (string key, Guid uuid)>(x => x.AsQueryable().First().Transform(taskRef => (taskRef.TaskKey, taskRef.Uuid)));
+            var dto = new RightsHolderCreateItSystemRequestDTO
+            {
+                RightsHolderUuid = createdOrganization.Uuid,
+                Uuid = withProvidedUuid ? Guid.NewGuid() : null,
+                Name = A<string>(),
+                Description = A<string>(),
+                FormerName = A<string>(),
+                UrlReference = $"https://{A<int>()}.dk",
+                BusinessTypeUuid = withBusinessType ? businessType : null,
+                KLENumbers = withKleNumbers ? new[] { kle.key } : new string[0],
+                KLEUuids = withKleUuid ? new[] { kle.uuid } : new Guid[0],
+                ParentUuid = withParent ? parentCandidate.Uuid : null
+            };
+
+            //Act
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, dto);
+
+            //Assert
+            //TODO: Assert properties of response
+        }
+        //TODO: Error cases
+        //TODO: Parent system cases
+        //TODO: Minimum cases - maybe covered if we parameterize the test above
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {

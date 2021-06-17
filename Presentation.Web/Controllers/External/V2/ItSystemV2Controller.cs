@@ -278,7 +278,7 @@ namespace Presentation.Web.Controllers.External.V2
         }
         private CreatedNegotiatedContentResult<RightsHolderItSystemResponseDTO> MapSystemCreatedResponse(RightsHolderItSystemResponseDTO dto)
         {
-            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", new RightsHolderItSystemResponseDTO());
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

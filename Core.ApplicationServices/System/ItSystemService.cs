@@ -23,6 +23,7 @@ using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -43,6 +44,7 @@ namespace Core.ApplicationServices.System
         private readonly ILogger _logger;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
+        private readonly IOperationClock _operationClock;
 
         public ItSystemService(
             IGenericRepository<ItSystem> repository,
@@ -55,7 +57,8 @@ namespace Core.ApplicationServices.System
             IOrganizationRepository organizationRepository,
             ILogger logger,
             IOrganizationalUserContext userContext,
-            IDomainEvents domainEvents
+            IDomainEvents domainEvents,
+            IOperationClock operationClock
             )
         {
             _repository = repository;
@@ -69,6 +72,7 @@ namespace Core.ApplicationServices.System
             _logger = logger;
             _userContext = userContext;
             _domainEvents = domainEvents;
+            _operationClock = operationClock;
         }
 
 
@@ -243,10 +247,12 @@ namespace Core.ApplicationServices.System
 
                 var newSystem = new ItSystem
                 {
+                    Name = name,
                     OrganizationId = organizationId,
                     AccessModifier = AccessModifier.Public,
                     Uuid = uuid ?? Guid.NewGuid(),
-                    ObjectOwnerId = _userContext.UserId
+                    ObjectOwnerId = _userContext.UserId,
+                    Created = _operationClock.Now
                 };
 
                 _itSystemRepository.Add(newSystem);
