@@ -4,21 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.External.V2.Request
 {
-    public class ItSystemRequestDTO
+    public class RightsHolderWritableITSystemPropertiesDTO
     {
-        /// <summary>
-        /// UUID for owning organization
-        /// </summary>
-        /// <remarks>Use api/v2/rightsholder/organizations API for getting a list of possible organizations related to the logged in user</remarks>
-        [Required]
-        public Guid RightsHolderUuid { get; set; }  
-
-        /// <summary>
-        /// UUID for IT-System
-        /// If no uuid is provided, KITOS will assign one automatically
-        /// </summary>
-        public Guid? Uuid { get; set; }
-
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
@@ -38,13 +25,13 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// Description
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
 
         /// <summary>
         /// Url reference for further information
         /// </summary>
-        [Required]
+        [Required(AllowEmptyStrings = false)]
         public string UrlReference { get; set; }
 
         /// <summary>
