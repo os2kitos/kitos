@@ -5,6 +5,7 @@ using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
@@ -178,6 +179,21 @@ namespace Core.DomainModel.ItSystem
         public Maybe<TaskRef> GetTaskRef(int taskRefId)
         {
             return TaskRefs.SingleOrDefault(tr => tr.Id == taskRefId);
+        }
+
+        public void ResetBusinessType()
+        {
+            BusinessType = null;
+            BusinessTypeId = null;
+        }
+
+        public void UpdateBusinessType(BusinessType businessType)
+        {
+            if (businessType == null)
+                throw new ArgumentNullException(nameof(businessType));
+
+            BusinessType = businessType;
+            BusinessTypeId = businessType.Id;
         }
     }
 }

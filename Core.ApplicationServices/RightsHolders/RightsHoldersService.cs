@@ -87,7 +87,13 @@ namespace Core.ApplicationServices.RightsHolders
                     .Bind(system => UpdateTaskRefs(system.Id, creationParameters.TaskRefKeys, creationParameters.TaskRefUuids));
 
                 if (result.Ok)
+                {
                     transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error("RightsHolder {uuid} failed to create It-System {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.Name, result.Error.ToString());
+                }
 
                 return result;
             }

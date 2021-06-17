@@ -287,7 +287,9 @@ namespace Core.ApplicationServices.System
 
         public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, ICollection<int> taskRefIds)
         {
-            return Mutate(systemId, system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(taskRefIds.OrderBy(id => id)), updateWithResult: system =>
+            Predicate<ItSystem> updateIfTaskRefCollectionDiffers = system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(taskRefIds.OrderBy(id => id)) == false;
+
+            return Mutate(systemId, updateIfTaskRefCollectionDiffers, updateWithResult: system =>
             {
                 var inBoundIds = new HashSet<int>(taskRefIds);
                 var taskRefIdsToAdd = inBoundIds.Where(id => system.GetTaskRef(id).IsNone).ToList();
@@ -308,7 +310,25 @@ namespace Core.ApplicationServices.System
 
         public Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid)
         {
-            throw new NotImplementedException();
+            if (businessTypeUuid.HasValue)
+            {
+                var itSystem = _itSystemRepository.GetSystem(systemId);
+                if (itSystem == null)
+                    return new OperationError(OperationFailure.NotFound);
+                var optionByUuid = _businessTypeService.GetOptionByUuid(itSystem.OrganizationId,businessTypeUuid.Value);
+                
+                if (optionByUuid.IsNone)
+                    return new OperationError("Business type uuid does not point to a business type in KITOS", OperationFailure.BadInput);
+
+                var option = optionByUuid.Value;
+
+                if(!option.available)
+                    return new OperationError("Business exists but is not available in the System's organization", OperationFailure.BadInput);
+
+                return Mutate(systemId, system => system.BusinessTypeId != option.option.Id, system => system.UpdateBusinessType(option.option));
+            }
+
+            return Mutate(systemId, system => system.BusinessTypeId != null, system => system.ResetBusinessType());
         }
 
         public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid rightsHolderUuid)
@@ -318,7 +338,7 @@ namespace Core.ApplicationServices.System
 
         public Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null)
         {
-            throw new NotImplementedException();
+            return Mutate(systemId,system=>system.ParentId != parentSystemId)
         }
 
         public Maybe<OperationError> ValidateNewSystemName(int organizationId, string name)
