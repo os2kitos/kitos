@@ -141,10 +141,5 @@ namespace Core.DomainServices.Extensions
         {
             return new QueryByUuid<T>(id).Apply(result).SingleOrDefault();
         }
-
-        public static IQueryable<ItInterface> ByRightsHolderIds(this IQueryable<ItInterface> result, IEnumerable<int> rightsHolderIds)
-        {
-            return new QueryByRightsHolderIds(rightsHolderIds).Apply(result);
-        }
     }
 }

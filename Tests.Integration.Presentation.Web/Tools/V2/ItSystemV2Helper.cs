@@ -96,9 +96,10 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
         public static async Task<IEnumerable<ItSystemResponseDTO>> GetManyRightsHolderSystemsAsync(
             string token,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null,
+            Guid? rightsHolderUuid = null)
         {
-            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize);
+            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize, rightsHolderUuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -107,7 +108,8 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
         public static async Task<HttpResponseMessage> SendGetManyRightsHolderSystemsAsync(
             string token,
             int? page = null,
-            int? pageSize = null)
+            int? pageSize = null,
+            Guid? rightsHolderUuid = null)
         {
             var path = "api/v2/rightsholder/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -117,6 +119,9 @@ namespace Tests.Integration.Presentation.Web.Tools.V2
 
             if (pageSize.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("pageSize", pageSize.Value.ToString("D")));
+
+            if (rightsHolderUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("rightsHolderUuid", rightsHolderUuid.Value.ToString("D")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

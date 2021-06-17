@@ -419,6 +419,32 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(new[] { system3.uuid }, page2.Select(x => x.Uuid));
         }
 
+        [Fact]
+        public async Task Can_GET_Many_RightsHolderSystems_And_Filter_By_Specific_RightsHolder()
+        {
+            //Arrange - create three systems in different organizations but with the right rightsholder
+            var (userId, token, rightsHolderOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync();
+            var rightsHolder2Org = await CreateOrganizationAsync();
+            
+            const int mainOrganizationId = TestEnvironment.DefaultOrganizationId;
+            var systemRightsHolder1 = await CreateSystemAsync(mainOrganizationId, AccessModifier.Local);
+            var systemRightsHolder2 = await CreateSystemAsync(mainOrganizationId, AccessModifier.Local);
+
+            using var belongsToResponse1 = await ItSystemHelper.SendSetBelongsToRequestAsync(systemRightsHolder1.dbId, rightsHolderOrganization.Id, mainOrganizationId);
+            using var belongsToResponse2 = await ItSystemHelper.SendSetBelongsToRequestAsync(systemRightsHolder2.dbId, rightsHolder2Org.Id, mainOrganizationId);
+            Assert.Equal(HttpStatusCode.OK, belongsToResponse1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, belongsToResponse2.StatusCode);
+            using var assignRightsHolderInOrg2Response = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, rightsHolder2Org.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRightsHolderInOrg2Response.StatusCode);
+
+            //Act
+            var response = await ItSystemV2Helper.GetManyRightsHolderSystemsAsync(token, rightsHolderUuid: rightsHolder2Org.Uuid);
+
+            //Assert
+            var systemResponseDto = Assert.Single(response);
+            Assert.Equal(systemRightsHolder2.uuid, systemResponseDto.Uuid);
+        }
+
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
             var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);
@@ -482,6 +508,15 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
                 OrganizationRole.RightsHolderAccess, organization.Id, true);
             return (token, organization);
+        }
+
+        private async Task<(int userId, string token, Organization createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync()
+        {
+            var organization = await CreateOrganizationAsync();
+
+            var (id, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(),
+                OrganizationRole.RightsHolderAccess, organization.Id, true);
+            return (id, token, organization);
         }
 
         private async Task<Organization> CreateOrganizationAsync()

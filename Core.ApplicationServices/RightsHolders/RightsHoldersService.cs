@@ -94,7 +94,13 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () =>
                     {
-                        var refinements = new List<IDomainQuery<ItInterface>>();
+                        var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
+
+                        var refinements = new List<IDomainQuery<ItInterface>>()
+                        {
+                            new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
+                        };
+
                         if (rightsHolderUuid.HasValue)
                         {
                             var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
@@ -104,7 +110,6 @@ namespace Core.ApplicationServices.RightsHolders
                             }
                             refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
                         }
-
 
                         return Result<IQueryable<ItInterface>, OperationError>.Success(_itInterfaceService.GetAvailableInterfaces(refinements.ToArray()));
                     }
@@ -117,7 +122,7 @@ namespace Core.ApplicationServices.RightsHolders
             return _organizationRepository.AsQueryable().ByIds(organizationIds);
         }
 
-        public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess()
+        public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
         {
             return WithAnyRightsHoldersAccess()
                 .Match
@@ -126,8 +131,24 @@ namespace Core.ApplicationServices.RightsHolders
                     () =>
                     {
                         var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                        var query = new QueryByRightsHolderIdOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess);
-                        return Result<IQueryable<ItSystem>, OperationError>.Success(_systemService.GetAvailableSystems(query));
+                        var refinements = new List<IDomainQuery<ItSystem>>
+                        {
+                            new QueryByRightsHolderIdOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
+                        };
+
+                        if (rightsHolderUuid.HasValue)
+                        {
+                            var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
+                            if (!_userContext.HasRole(org.Id, OrganizationRole.RightsHolderAccess))
+                            {
+                                return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
+                            }
+                            refinements.Add(new QueryByRightsHolderUuid(rightsHolderUuid.Value));
+                        }
+
+                        var systems = _systemService.GetAvailableSystems(refinements.ToArray());
+
+                        return Result<IQueryable<ItSystem>, OperationError>.Success(systems);
                     }
                 );
         }

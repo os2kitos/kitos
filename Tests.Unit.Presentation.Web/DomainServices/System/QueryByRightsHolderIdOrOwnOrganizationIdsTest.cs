@@ -5,7 +5,7 @@ using Core.DomainServices.Queries.ItSystem;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Presentation.Web.DomainServices
+namespace Tests.Unit.Presentation.Web.DomainServices.System
 {
     public class QueryByRightsHolderIdOrOwnOrganizationIdsTest : WithAutoFixture
     {
