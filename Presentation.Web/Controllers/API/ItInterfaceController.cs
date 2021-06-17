@@ -49,10 +49,10 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var result = _itInterfaceService.Create(dto.OrganizationId, dto.Name, dto.ItInterfaceId, dto.AccessModifier);
+                var result = _itInterfaceService.CreateNewItInterface(dto.OrganizationId, dto.Name, dto.ItInterfaceId, null, dto.AccessModifier);
                 return result.Ok ?
                     Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
-                    FromOperationFailure(result.Error);
+                    FromOperationError(result.Error);
             }
             catch (Exception e)
             {

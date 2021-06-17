@@ -29,13 +29,11 @@ namespace Core.ApplicationServices.Interface
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IGenericRepository<ItInterface> _repository;
         private readonly IInterfaceRepository _interfaceRepository; 
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
 
         public ItInterfaceService(
-            IGenericRepository<ItInterface> repository,
             IGenericRepository<DataRow> dataRowRepository,
             IItSystemRepository systemRepository,
             IAuthorizationContext authorizationContext,
@@ -45,7 +43,6 @@ namespace Core.ApplicationServices.Interface
             IOrganizationalUserContext userContext, 
             IOperationClock operationClock)
         {
-            _repository = repository;
             _dataRowRepository = dataRowRepository;
             _systemRepository = systemRepository;
             _authorizationContext = authorizationContext;
@@ -59,13 +56,14 @@ namespace Core.ApplicationServices.Interface
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
             {
-                var itInterface = _repository.GetByKey(id);
+                var getItInterfaceResult = _interfaceRepository.GetInterface(id);
 
-                if (itInterface == null)
+                if (getItInterfaceResult.IsNone)
                 {
                     return OperationFailure.NotFound;
                 }
 
+                var itInterface = getItInterfaceResult.Value;
                 if (!_authorizationContext.AllowDelete(itInterface))
                 {
                     return OperationFailure.Forbidden;
@@ -85,118 +83,12 @@ namespace Core.ApplicationServices.Interface
 
                 // delete it interface
                 _domainEvents.Raise(new EntityDeletedEvent<ItInterface>(itInterface));
-                _repository.DeleteWithReferencePreload(itInterface);
-                _repository.Save();
+                _interfaceRepository.Delete(itInterface);
 
                 transaction.Commit();
                 return itInterface;
             }
-        }
-
-        public Result<ItInterface, OperationFailure> Create(int organizationId, string name, string interfaceId, AccessModifier? accessModifier = default)
-        {
-            if (name == null)
-            {
-                throw new ArgumentNullException(nameof(name));
-            }
-
-            if (!IsItInterfaceIdAndNameUnique(interfaceId, name,
-                organizationId))
-            {
-                return OperationFailure.Conflict;
-            }
-            var newInterface = new ItInterface
-            {
-                Name = name,
-                OrganizationId = organizationId,
-                ItInterfaceId = interfaceId ?? string.Empty,
-                Uuid = Guid.NewGuid(),
-                AccessModifier = accessModifier.GetValueOrDefault(AccessModifier.Public),
-                Created = _operationClock.Now
-            };
-
-            if (!_authorizationContext.AllowCreate<ItInterface>(organizationId, newInterface))
-            {
-                return OperationFailure.Forbidden;
-            }
-
-            var createdInterface = _repository.Insert(newInterface);
-            _repository.Save();
-
-            return createdInterface;
-        }
-
-        public Result<ItInterface, OperationFailure> ChangeExposingSystem(int interfaceId, int? newSystemId)
-        {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
-            {
-                var itInterface = _repository.GetByKey(interfaceId);
-
-                if (itInterface == null)
-                {
-                    return OperationFailure.NotFound;
-                }
-
-                if (!_authorizationContext.AllowModify(itInterface))
-                {
-                    return OperationFailure.Forbidden;
-                }
-
-                Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
-                Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
-                var newSystem = Maybe<ItSystem>.None;
-
-                if (newSystemId.HasValue)
-                {
-                    newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
-                    if (newSystem.IsNone)
-                    {
-                        return OperationFailure.BadInput;
-                    }
-
-                    if (!_authorizationContext.AllowReads(newSystem.Value))
-                    {
-                        return OperationFailure.Forbidden;
-                    }
-                }
-
-                var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
-
-                var changed = !oldExhibit.Equals(newExhibit);
-
-                if (changed)
-                {
-                    _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
-                    if (oldSystem.HasValue)
-                    {
-                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem.Value));
-                    }
-                    if (newSystem.HasValue)
-                    {
-                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem.Value));
-                    }
-
-                    _repository.Save();
-                    transaction.Commit();
-                }
-
-                return itInterface;
-            }
-        }
-
-        private bool IsItInterfaceIdAndNameUnique(string itInterfaceId, string name, int orgId)
-        {
-            var interfaceId = itInterfaceId ?? string.Empty;
-
-            var system =
-                _repository
-                    .AsQueryable()
-                    .ByOrganizationId(orgId)
-                    .ByNameExact(name)
-                    .Where(x => x.ItInterfaceId == interfaceId);
-
-            return !system.Any();
-        }
+        }        
 
         public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
         {
@@ -231,6 +123,199 @@ namespace Core.ApplicationServices.Interface
                     itInterface => _authorizationContext.AllowReads(itInterface) ? Result<ItInterface, OperationError>.Success(itInterface) : new OperationError(OperationFailure.Forbidden),
                     () => new OperationError(OperationFailure.NotFound)
                 );
+        }
+
+        public Result<ItInterface, OperationError> CreateNewItInterface(int organizationId, string name, string interfaceId, Guid? rightsHolderProvidedUuid = null, AccessModifier? accessModifier = null)
+        {
+            if (_authorizationContext.AllowCreate<ItInterface>(organizationId))
+            {
+                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+                var nameError = IsItInterfaceIdAndNameUnique(name, interfaceId, organizationId);
+
+                if (nameError.HasValue)
+                    return nameError.Value;
+
+                var uuidTaken = rightsHolderProvidedUuid?.Transform(uuid => _interfaceRepository.GetInterface(uuid).HasValue) == true;
+
+                if (uuidTaken)
+                    return new OperationError("UUID already exists on another it-interface in KITOS", OperationFailure.Conflict);
+
+                var newItInterface = new ItInterface
+                {
+                    OrganizationId = organizationId,
+                    AccessModifier = accessModifier ?? AccessModifier.Public,
+                    Uuid = rightsHolderProvidedUuid ?? Guid.NewGuid(),
+                    ItInterfaceId = interfaceId,
+                    ObjectOwnerId = _userContext.UserId,
+                    Name = name,
+                    Created = _operationClock.Now
+                };
+
+                _interfaceRepository.Add(newItInterface);
+                _domainEvents.Raise(new EntityCreatedEvent<ItInterface>(newItInterface));
+                transaction.Commit();
+                return newItInterface;
+            }
+            return new OperationError(OperationFailure.Forbidden);
+        }
+
+        public Result<ItInterface, OperationError> UpdateInterfaceId(int id, string interfaceId)
+        {
+            var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+
+            if (getItInterfaceResult.IsNone)
+            {
+                return new OperationError($"ItInterface with id: {id} could not be found.", OperationFailure.NotFound);
+            }
+            var itInterface = getItInterfaceResult.Value;
+
+            var nameError = IsItInterfaceIdAndNameUnique(itInterface.Name, interfaceId, itInterface.OrganizationId);
+            if (nameError.HasValue)
+                return nameError.Value;
+
+            return Mutate(id, itInterface => itInterface.ItInterfaceId != interfaceId, itInterface => itInterface.ItInterfaceId = interfaceId);
+        }
+
+        public Result<ItInterface, OperationError> UpdateVersion(int id, string newValue)
+        {
+            return Mutate(id, itInterface => itInterface.Version != newValue, itInterface => itInterface.Version = newValue);
+        }
+
+        public Result<ItInterface, OperationError> UpdateDescription(int id, string newValue)
+        {
+            return Mutate(id, itInterface => itInterface.Description != newValue, itInterface => itInterface.Description = newValue);
+        }
+
+        public Result<ItInterface, OperationError> UpdateUrlReference(int id, string newValue)
+        {
+            return Mutate(id, itInterface => itInterface.Url != newValue, itInterface => itInterface.Url = newValue);
+        }
+
+        public Result<ItInterface, OperationError> UpdateExposingSystem(int id, int? newSystemId)
+        {
+            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            {
+                var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+
+                if (getItInterfaceResult.IsNone)
+                {
+                    return new OperationError($"ItInterface with id: {id} could not be found.", OperationFailure.NotFound);
+                }
+
+                var itInterface = getItInterfaceResult.Value;
+                if (!_authorizationContext.AllowModify(itInterface))
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+
+                Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
+                Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
+                var newSystem = Maybe<ItSystem>.None;
+
+                if (newSystemId.HasValue)
+                {
+                    newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
+                    if (newSystem.IsNone)
+                    {
+                        return new OperationError($"Cannot set ItSystem with id: {newSystemId.Value} as exposing system for ItInterface with id: {id} since the system does not exist", OperationFailure.BadInput);
+                    }
+
+                    if (!_authorizationContext.AllowReads(newSystem.Value))
+                    {
+                        return new OperationError(OperationFailure.Forbidden);
+                    }
+                }
+
+                var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
+
+                var changed = !oldExhibit.Equals(newExhibit);
+
+                if (changed)
+                {
+                    _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
+                    if (oldSystem.HasValue)
+                    {
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem.Value));
+                    }
+                    if (newSystem.HasValue)
+                    {
+                        _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem.Value));
+                    }
+
+                    _interfaceRepository.Update(itInterface);
+                    transaction.Commit();
+                }
+
+                return itInterface;
+            }
+        }
+
+        private bool ValidateName(string name)
+        {
+            return string.IsNullOrWhiteSpace(name) == false &&
+                   name.Length <= ItInterface.MaxNameLength;
+        }
+
+        private bool ValidateItInterfaceId(string itInterfaceId)
+        {
+            return itInterfaceId != null;
+        }
+
+        private Maybe<OperationError> IsItInterfaceIdAndNameUnique(string name, string itInterfaceId, int orgId)
+        {
+            if (!ValidateName(name))
+                return new OperationError("Name was not valid", OperationFailure.BadInput);
+
+            if(!ValidateItInterfaceId(itInterfaceId))
+                return new OperationError("ItInterfaceId was not valid", OperationFailure.BadInput);
+
+            if (!_interfaceRepository
+                    .GetInterfaces()
+                    .ByOrganizationId(orgId)
+                    .ByNameExact(name)
+                    .Where(x => x.ItInterfaceId == itInterfaceId)
+                    .Any())
+                return new OperationError("Name and ItInterfaceId combination already exists in the organization", OperationFailure.Conflict);
+
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Result<ItInterface, OperationError> Mutate(int interfaceId, Predicate<ItInterface> performUpdateTo, Action<ItInterface> updateWith = null, Func<ItInterface, Result<ItInterface, OperationError>> updateWithResult = null)
+        {
+            if (updateWith == null && updateWithResult == null)
+                throw new ArgumentException("No mutations provided");
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+            var getItInterfaceResult = _interfaceRepository.GetInterface(interfaceId);
+            if (getItInterfaceResult.IsNone)
+                return new OperationError(OperationFailure.NotFound);
+
+            var itInterface = getItInterfaceResult.Value;
+            if (!_authorizationContext.AllowModify(itInterface))
+                return new OperationError(OperationFailure.Forbidden);
+
+            if (performUpdateTo(itInterface))
+            {
+                updateWith?.Invoke(itInterface);
+                var result = updateWithResult?.Invoke(itInterface) ?? Result<ItInterface, OperationError>.Success(itInterface);
+                if (result.Ok)
+                {
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItInterface>(itInterface));
+                    _interfaceRepository.Update(itInterface);
+                }
+                else
+                {
+                    //Terminate the flow
+                    return result;
+                }
+            }
+
+            transaction.Commit();
+
+            return itInterface;
         }
     }
 }

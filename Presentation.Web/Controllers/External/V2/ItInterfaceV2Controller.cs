@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
@@ -45,7 +46,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
         {
-            return Created(Request.RequestUri + "/" + itInterfaceDTO.Uuid, new RightsHolderItInterfaceResponseDTO());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var creationParameters = new RightsHolderItInterfaceCreationParameters(
+                itInterfaceDTO.Uuid, 
+                itInterfaceDTO.Name, 
+                itInterfaceDTO.InterfaceId, 
+                itInterfaceDTO.Version, 
+                itInterfaceDTO.Description, 
+                itInterfaceDTO.UrlReference);
+
+            return _rightsHolderService
+                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, itInterfaceDTO.ExposedBySystemUuid, creationParameters)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

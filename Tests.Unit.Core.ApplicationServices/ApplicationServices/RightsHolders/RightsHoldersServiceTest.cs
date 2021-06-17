@@ -9,7 +9,9 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DataAccess;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -22,6 +24,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IGenericRepository<Organization>> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IItInterfaceService> _interfaceService;
+        private readonly Mock<ITransactionManager> _transactionManager;
+        private readonly Mock<ILogger> _logger;
 
         public RightsHoldersServiceTest()
         {
@@ -29,7 +33,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _organizationRepositoryMock = new Mock<IGenericRepository<Organization>>();
             _itSystemServiceMock = new Mock<IItSystemService>();
             _interfaceService = new Mock<IItInterfaceService>();
-            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object);
+            _transactionManager = new Mock<ITransactionManager>();
+            _logger = new Mock<ILogger>();
+            _sut = new RightsHoldersService(_userContextMock.Object, _organizationRepositoryMock.Object, _interfaceService.Object, _itSystemServiceMock.Object, _transactionManager.Object, _logger.Object);
         }
 
         [Fact]

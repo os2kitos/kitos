@@ -9,6 +9,10 @@ namespace Core.DomainServices.Repositories.Interface
     {
         IQueryable<ItInterface> GetInterfacesWithExternalReferenceDefined();
         IQueryable<ItInterface> GetInterfaces();
+        Maybe<ItInterface> GetInterface(int id);
         Maybe<ItInterface> GetInterface(Guid uuid);
+        void Add(ItInterface newItInterface); 
+        void Update(ItInterface itInterface);
+        void Delete(ItInterface itInterface);
     }
 }

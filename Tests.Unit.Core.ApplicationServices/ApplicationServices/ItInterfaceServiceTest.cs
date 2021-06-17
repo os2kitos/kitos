@@ -28,7 +28,6 @@ namespace Tests.Unit.Core.ApplicationServices
     public class ItInterfaceServiceTest : WithAutoFixture
     {
         private readonly ItInterfaceService _sut;
-        private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
@@ -40,7 +39,6 @@ namespace Tests.Unit.Core.ApplicationServices
 
         public ItInterfaceServiceTest()
         {
-            _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
             _domainEvents = new Mock<IDomainEvents>();
@@ -50,7 +48,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository = new Mock<IInterfaceRepository>();
             _operationClock = new Mock<IOperationClock>();
             _sut = new ItInterfaceService(
-                _interfaceRepository.Object,
                 _dataRowRepository.Object,
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -69,10 +66,10 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetInterfaceReturns(interfaceId, default(ItInterface));
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, A<int>());
+            var result = _sut.UpdateExposingSystem(interfaceId, A<int>());
 
             //Assert
-            Assert.Equal(OperationFailure.NotFound, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -85,10 +82,10 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(itInterface, false);
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, A<int>());
+            var result = _sut.UpdateExposingSystem(interfaceId, A<int>());
 
             //Assert
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -104,10 +101,10 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetSystemReturns(newSystemId, default(ItSystem));
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, newSystemId);
+            var result = _sut.UpdateExposingSystem(interfaceId, newSystemId);
 
             //Assert
-            Assert.Equal(OperationFailure.BadInput, result.Error);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         [Fact]
@@ -125,10 +122,10 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowReadReturns(itSystem, false);
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, newSystemId);
+            var result = _sut.UpdateExposingSystem(interfaceId, newSystemId);
 
             //Assert
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -144,12 +141,12 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, null);
+            var result = _sut.UpdateExposingSystem(interfaceId, null);
 
             //Assert that no changes were saved
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Never);
-            _interfaceRepository.Verify(x => x.Save(), Times.Never);
+            _repository.Verify(x => x.Update(itInterface), Times.Never);
         }
 
         [Fact]
@@ -167,12 +164,12 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, existingSystem.Id);
+            var result = _sut.UpdateExposingSystem(interfaceId, existingSystem.Id);
 
             //Assert that no changes were saved
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Never);
-            _interfaceRepository.Verify(x => x.Save(), Times.Never);
+            _repository.Verify(x => x.Update(itInterface), Times.Never);
         }
 
         [Fact]
@@ -191,13 +188,13 @@ namespace Tests.Unit.Core.ApplicationServices
             _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
 
             //Act
-            var result = _sut.ChangeExposingSystem(interfaceId, newSystem.Id);
+            var result = _sut.UpdateExposingSystem(interfaceId, newSystem.Id);
 
             //Assert that no changes were saved
             Assert.True(result.Ok);
             Assert.Same(newSystem, result.Value.ExhibitedBy.ItSystem);
             transaction.Verify(x => x.Commit(), Times.Once);
-            _interfaceRepository.Verify(x => x.Save(), Times.Once);
+            _repository.Verify(x => x.Update(itInterface), Times.Once);
         }
 
         [Fact]
@@ -283,8 +280,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow1.Id), Times.Once);
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow2.Id), Times.Once);
             _dataRowRepository.Verify(x => x.Save(), Times.Once);
-            _interfaceRepository.Verify(x => x.DeleteWithReferencePreload(interfaceToDelete), Times.Once);
-            _interfaceRepository.Verify(x => x.Save(), Times.Once);
+            _repository.Verify(x => x.Delete(interfaceToDelete), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
@@ -532,7 +528,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void ExpectGetInterfaceReturns(int interfaceId, ItInterface value)
         {
-            _interfaceRepository.Setup(x => x.GetByKey(interfaceId)).Returns(value);
+            _repository.Setup(x => x.GetInterface(interfaceId)).Returns(value);
         }
 
         private void ExpectAllowModifyReturns(ItInterface itInterface, bool value)

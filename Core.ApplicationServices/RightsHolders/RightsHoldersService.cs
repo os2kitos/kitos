@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
@@ -13,7 +15,9 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Queries.ItSystem;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
+using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
@@ -23,17 +27,23 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IGenericRepository<Organization> _organizationRepository;
         private readonly IItSystemService _systemService;
         private readonly IItInterfaceService _itInterfaceService;
+        private readonly ITransactionManager _transactionManager; 
+        private readonly ILogger _logger;
 
         public RightsHoldersService(
             IOrganizationalUserContext userContext,
             IGenericRepository<Organization> organizationRepository,
             IItInterfaceService itInterfaceService,
-            IItSystemService systemService)
+            IItSystemService systemService,
+            ITransactionManager transactionManager, 
+            ILogger logger)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
             _itInterfaceService = itInterfaceService;
             _systemService = systemService;
+            _transactionManager = transactionManager;
+            _logger = logger;
         }
 
         public Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid)
@@ -142,6 +152,54 @@ namespace Core.ApplicationServices.RightsHolders
                 return subject;
 
             return new OperationError("Not rightsholder for the requested system", OperationFailure.Forbidden);
+        }
+
+        public Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, Guid exposingSystemUuid, RightsHolderItInterfaceCreationParameters creationParameters)
+        {
+            if (creationParameters == null)
+                throw new ArgumentNullException(nameof(creationParameters));
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var organization = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid);
+
+                if (organization == null)
+                    return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
+
+                var exposingSystem = _systemService.GetSystem(exposingSystemUuid);
+
+                if (exposingSystem.Failed)
+                {
+                    return exposingSystem.Error;
+                }
+
+                if (!_userContext.HasRole(organization.Id, OrganizationRole.RightsHolderAccess))
+                    return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
+
+                var result = _itInterfaceService
+                    .CreateNewItInterface(organization.Id, creationParameters.Name, creationParameters.InterfaceId, creationParameters.RightsHolderProvidedUuid)
+                    .Bind(itInterface => _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id))
+                    .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, creationParameters.Version))
+                    .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, creationParameters.Description))
+                    .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, creationParameters.UrlReference));
+
+                if (result.Ok) 
+                {
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error($"RightsHolder {rightsHolderUuid} failed to create It-System {creationParameters.Name} due to error: {result.Error}");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Failed creating rightsholder system for rightsholder with id {rightsHolderUuid}");
+                return new OperationError(OperationFailure.UnknownError);
+            }
         }
     }
 }

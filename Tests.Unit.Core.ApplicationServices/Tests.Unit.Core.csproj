@@ -200,6 +200,7 @@
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationOptionRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
+    <Compile Include="DomainServices\Repositories\ItInterfaceRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\Kendo\KendoOrganizationalConfigurationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />
