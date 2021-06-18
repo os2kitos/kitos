@@ -33,7 +33,6 @@ namespace Core.ApplicationServices.System
 {
     public class ItSystemService : IItSystemService
     {
-        private readonly IGenericRepository<ItSystem> _repository;
         private readonly IItSystemRepository _itSystemRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
@@ -47,7 +46,6 @@ namespace Core.ApplicationServices.System
         private readonly IOperationClock _operationClock;
 
         public ItSystemService(
-            IGenericRepository<ItSystem> repository,
             IItSystemRepository itSystemRepository,
             IAuthorizationContext authorizationContext,
             ITransactionManager transactionManager,
@@ -61,7 +59,6 @@ namespace Core.ApplicationServices.System
             IOperationClock operationClock
             )
         {
-            _repository = repository;
             _itSystemRepository = itSystemRepository;
             _authorizationContext = authorizationContext;
             _transactionManager = transactionManager;
@@ -144,7 +141,11 @@ namespace Core.ApplicationServices.System
         public IEnumerable<ItSystem> GetHierarchy(int systemId)
         {
             var result = new List<ItSystem>();
-            var system = _repository.GetByKey(systemId);
+            var system = _itSystemRepository.GetSystem(systemId);
+            
+            if (system == null)
+                throw new ArgumentException("Invalid system id");
+
             result.Add(system);
             result.AddRange(GetHierarchyChildren(system));
             result.AddRange(GetHierarchyParents(system));
@@ -417,8 +418,7 @@ namespace Core.ApplicationServices.System
 
         private IQueryable<ItSystem> FindSystemsByNameInOrganization(int organizationId, string name)
         {
-            return _repository
-                .AsQueryable()
+            return _itSystemRepository.GetSystems()
                 .ByOrganizationId(organizationId)
                 .ByNameExact(name);
         }

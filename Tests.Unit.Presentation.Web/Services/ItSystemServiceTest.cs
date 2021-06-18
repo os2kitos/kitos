@@ -12,6 +12,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Model;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
@@ -50,7 +51,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _logger = new Mock<ILogger>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _sut = new ItSystemService(
-                null,
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
@@ -64,8 +64,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<IOperationClock>()
                 );
         }
-
-        //TODO: Test all of the new juicy stuff
 
         [Fact]
         public void GetSystem_Returns_Not_Found_If_System_Does_Not_Exist()
@@ -481,9 +479,116 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService.Verify(x => x.DeleteBySystemId(system.Id), Times.Once);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CreateNewSystem_Returns_Ok(bool withUuid)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var uuid = withUuid ? A<Guid>() : (Guid?)null;
+            var name = A<string>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectAllowCreateReturns(organizationId, true);
+            ExpectGetSystemsReturns(null, Enumerable.Empty<ItSystem>());
+            if (withUuid)
+                ExpectGetSystemByUuidReturns(uuid, Maybe<ItSystem>.None);
+
+            //Act
+
+            var result = _sut.CreateNewSystem(organizationId, name, uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(name, result.Value.Name);
+            if (withUuid)
+                Assert.Equal(uuid, result.Value.Uuid);
+            else
+                Assert.NotEqual(Guid.Empty, result.Value.Uuid);
+            Assert.Equal(organizationId, result.Value.OrganizationId);
+
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            _systemRepository.Verify(x => x.Add(It.Is<ItSystem>(s => s.Uuid == result.Value.Uuid)), Times.Once);
+        }
+
+        [Fact]
+        public void CreateNewSystem_Returns_Error_If_Name_Overlaps()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var name = A<string>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectAllowCreateReturns(organizationId, true);
+            ExpectGetSystemsReturns(null,
+                new[]
+                {
+                    new ItSystem() {Name = A<string>(), OrganizationId = organizationId},
+                    new ItSystem() {Name = name, OrganizationId = organizationId} //Overlapping name
+                });
+
+            //Act
+
+            var result = _sut.CreateNewSystem(organizationId, name);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void CreateNewSystem_Returns_Error_If_Uuid_Overlaps()
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var name = A<string>();
+            var uuid = A<Guid>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectAllowCreateReturns(organizationId, true);
+            ExpectGetSystemsReturns(null, new List<ItSystem>());
+            ExpectGetSystemReturns(uuid,new ItSystem());
+
+            //Act
+
+            var result = _sut.CreateNewSystem(organizationId, name, uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        private void ExpectGetSystemByUuidReturns(Guid? uuid, Maybe<ItSystem> value)
+        {
+            _systemRepository.Setup(x => x.GetSystem(uuid.Value)).Returns(value);
+        }
+
+        private void ExpectAllowCreateReturns(int organizationId, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystem>(organizationId)).Returns(value);
+        }
+
+        private void ExpectGetSystemsReturns(OrganizationDataQueryParameters organizationDataQueryParameters, IEnumerable<ItSystem> itSystems)
+        {
+            _systemRepository.Setup(x => x.GetSystems(organizationDataQueryParameters))
+                .Returns(new EnumerableQuery<ItSystem>(itSystems));
+        }
+
+        /*
+         * Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Guid? uuid = null);
+        Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newValue);
+        Result<ItSystem, OperationError> UpdateDescription(int systemId, string newValue);
+        Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
+        Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
+        Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
+        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid);
+        Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null);
+         *
+         */
+
         private Organization CreateOrganization()
         {
-            return new Organization { Id = A<int>(), Name = A<string>() };
+            return new() { Id = A<int>(), Name = A<string>() };
         }
 
         private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null)
@@ -548,9 +653,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService.Setup(x => x.DeleteBySystemId(id)).Returns(result);
         }
 
-        private void ExpectTransactionToBeSet()
+        private void ExpectTransactionToBeSet(IsolationLevel isolationLevel = IsolationLevel.Serializable)
         {
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(_dbTransaction.Object);
+            _transactionManager.Setup(x => x.Begin(isolationLevel)).Returns(_dbTransaction.Object);
         }
 
         private static void AddUsage(ItSystem system, ItSystemUsage usage)
