@@ -21,10 +21,10 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2")]
     public class ItInterfaceV2Controller: ExternalBaseController
     {
-        private readonly IRightsHoldersService _rightsHolderService;
+        private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
 
-        public ItInterfaceV2Controller(IRightsHoldersService rightsHolderService, IItInterfaceService itInterfaceService)
+        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService, IItInterfaceService itInterfaceService)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;

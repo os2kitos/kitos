@@ -227,6 +227,7 @@ namespace Presentation.Web.Ninject
             RegisterSSO(kernel);
 
             kernel.Bind<IRightsHoldersService>().To<RightsHoldersService>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)

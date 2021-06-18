@@ -643,7 +643,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(OperationFailure.Conflict, createdInterfaceResult.Error.FailureType);
 
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
-            transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
         [Fact]
@@ -673,7 +672,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(OperationFailure.Conflict, createdInterfaceResult.Error.FailureType);
 
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
-            transaction.Verify(x => x.Rollback(), Times.Once);
         }
 
         [Fact]
