@@ -25,15 +25,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-systems/{uuid:D}"), token);
         }
 
-        public static async Task<ItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<RightsHolderItSystemResponseDTO> CreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
         {
             using var response = await SendCreateRightsHolderSystemAsync(token, request);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<ItSystemResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
         }
 
-        private static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderSystemAsync(string token, RightsHolderCreateItSystemRequestDTO request)
         {
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/rightsholder/it-systems"), request, token);
 

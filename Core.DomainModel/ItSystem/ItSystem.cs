@@ -224,5 +224,10 @@ namespace Core.DomainModel.ItSystem
             BelongsTo = organization;
             BelongsToId = organization.Id;
         }
+
+        public static bool IsValidName(string newName)
+        {
+            return string.IsNullOrWhiteSpace(newName) == false && newName.Length <= ItSystem.MaxNameLength;
+        }
     }
 }

@@ -80,7 +80,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .CreateNewSystem(organization.Id, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
                     .Bind(system => _systemService.UpdatePreviousName(system.Id, creationParameters.FormerName))
-                    .Bind(system => _systemService.UpdateDescription(system.Id, creationParameters.FormerName))
+                    .Bind(system => _systemService.UpdateDescription(system.Id, creationParameters.Description))
                     .Bind(system => UpdateMainUrlReference(system.Id, creationParameters.UrlReference))
                     .Bind(system => UpdateParentSystem(system.Id, creationParameters.ParentSystemUuid))
                     .Bind(system => _systemService.UpdateBusinessType(system.Id, creationParameters.BusinessTypeUuid))

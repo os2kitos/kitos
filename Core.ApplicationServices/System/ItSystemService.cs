@@ -75,7 +75,6 @@ namespace Core.ApplicationServices.System
             _operationClock = operationClock;
         }
 
-
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
         {
             return _itSystemRepository
@@ -276,14 +275,8 @@ namespace Core.ApplicationServices.System
 
         public bool CanChangeNameTo(int organizationId, int systemId, string newName)
         {
-            return ValidateName(newName) &&
+            return ItSystem.IsValidName(newName) &&
                    FindSystemsByNameInOrganization(organizationId, newName).ExceptEntitiesWithIds(systemId).Any() == false;
-        }
-
-        private static bool ValidateName(string newName)
-        {
-            return string.IsNullOrWhiteSpace(newName) == false &&
-                   newName.Length <= ItSystem.MaxNameLength;
         }
 
         public bool CanCreateSystemWithName(int organizationId, string name)
@@ -293,7 +286,6 @@ namespace Core.ApplicationServices.System
 
         public Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
         {
-
             return Mutate(systemId, system => system.Reference?.URL != urlReference, updateWithResult: system =>
             {
                 if (string.IsNullOrWhiteSpace(urlReference))
@@ -414,7 +406,7 @@ namespace Core.ApplicationServices.System
 
         public Maybe<OperationError> ValidateNewSystemName(int organizationId, string name)
         {
-            if (!ValidateName(name))
+            if (!ItSystem.IsValidName(name))
                 return new OperationError("Name was not valid", OperationFailure.BadInput);
 
             if (FindSystemsByNameInOrganization(organizationId, name).Any())
