@@ -18,14 +18,14 @@ namespace Core.ApplicationServices.System
         IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
         Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId);
-        Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newValue);
-        Result<ItSystem, OperationError> UpdateDescription(int systemId, string newValue);
+        Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newPreviousName);
+        Result<ItSystem, OperationError> UpdateDescription(int systemId, string newDescription);
         bool CanChangeNameTo(int organizationId, int systemId, string newName);
         bool CanCreateSystemWithName(int organizationId, string name);
         Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
-        Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
-        Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
-        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid);
-        Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null);
+        Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState);
+        Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState);
+        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);
+        Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null);
     }
 }

@@ -546,7 +546,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
             ExpectAllowCreateReturns(organizationId, true);
             ExpectGetSystemsReturns(null, new List<ItSystem>());
-            ExpectGetSystemReturns(uuid,new ItSystem());
+            ExpectGetSystemReturns(uuid, new ItSystem());
 
             //Act
 
@@ -556,6 +556,225 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdatePreviousName_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+
+            //Act
+            var result = _sut.UpdatePreviousName(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(newValue, result.Select(x => x.PreviousName).Value);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdatePreviousName_Returns_Error_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            var itSystem = new ItSystem();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdatePreviousName(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdatePreviousName_Returns_Error_If_System_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdatePreviousName(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+
+            //Act
+            var result = _sut.UpdateDescription(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(newValue, result.Select(x => x.Description).Value);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_Error_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            var itSystem = new ItSystem();
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateDescription(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_Error_If_System_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newValue = A<string>();
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateDescription(systemId, newValue);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        //TODO:
+        [Fact]
+        public void UpdateParentSystem_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var parentSystemId = A<int>();
+            var itSystem = new ItSystem();
+            var parentSystem = new ItSystem { Id = parentSystemId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemReturns(parentSystemId, parentSystem);
+            ExpectAllowReadsReturns(parentSystem, true);
+
+            //Act
+            var result = _sut.UpdateParentSystem(systemId, parentSystemId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(parentSystem.Id, result.Select(x => x.ParentId.GetValueOrDefault()).Value);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateParentSystem_Returns_Error_If_ParentSystem_Cannot_Be_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var parentSystemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemReturns(parentSystemId, null);
+
+            //Act
+            var result = _sut.UpdateParentSystem(systemId, parentSystemId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateParentSystem_Returns_Error_If_Access_To_ParentSystem_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var parentSystemId = A<int>();
+            var itSystem = new ItSystem();
+            var parentSystem = new ItSystem { Id = parentSystemId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemReturns(parentSystemId, parentSystem);
+            ExpectAllowReadsReturns(parentSystem, false);
+
+            //Act
+            var result = _sut.UpdateParentSystem(systemId, parentSystemId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateParentSystem_Returns_Error_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var parentSystemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateParentSystem(systemId, parentSystemId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void UpdateParentSystem_Returns_Error_If_System_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var parentSystemId = A<int>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateParentSystem(systemId, parentSystemId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+
+        }
+
+        private void ExpectAllowModifyReturns(ItSystem itSystem, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowModify(itSystem)).Returns(value);
         }
 
         private void ExpectGetSystemByUuidReturns(Guid? uuid, Maybe<ItSystem> value)
@@ -575,14 +794,10 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         /*
-         * Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Guid? uuid = null);
-        Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newValue);
-        Result<ItSystem, OperationError> UpdateDescription(int systemId, string newValue);
         Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid);
-        Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null);
          *
          */
 

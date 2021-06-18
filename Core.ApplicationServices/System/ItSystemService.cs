@@ -264,14 +264,14 @@ namespace Core.ApplicationServices.System
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        public Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newValue)
+        public Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newPreviousName)
         {
-            return Mutate(systemId, system => system.PreviousName != newValue, system => system.PreviousName = newValue);
+            return Mutate(systemId, system => system.PreviousName != newPreviousName, system => system.PreviousName = newPreviousName);
         }
 
-        public Result<ItSystem, OperationError> UpdateDescription(int systemId, string newValue)
+        public Result<ItSystem, OperationError> UpdateDescription(int systemId, string newDescription)
         {
-            return Mutate(systemId, system => system.Description != newValue, system => system.Description = newValue);
+            return Mutate(systemId, system => system.Description != newDescription, system => system.Description = newDescription);
         }
 
         public bool CanChangeNameTo(int organizationId, int systemId, string newName)
@@ -309,13 +309,13 @@ namespace Core.ApplicationServices.System
             });
         }
 
-        public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds)
+        public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> newTaskRefState)
         {
-            Predicate<ItSystem> updateIfTaskRefCollectionDiffers = system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(taskRefIds.OrderBy(id => id)) == false;
+            Predicate<ItSystem> updateIfTaskRefCollectionDiffers = system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(newTaskRefState.OrderBy(id => id)) == false;
 
             return Mutate(systemId, updateIfTaskRefCollectionDiffers, updateWithResult: system =>
             {
-                var inBoundIds = new HashSet<int>(taskRefIds);
+                var inBoundIds = new HashSet<int>(newTaskRefState);
                 var taskRefIdsToAdd = inBoundIds.Where(id => system.GetTaskRef(id).IsNone).ToList();
                 var taskRefsToRemove = system.TaskRefs.Where(taskRef => !inBoundIds.Contains(taskRef.Id)).ToList();
                 var taskRefsToAdd = new List<TaskRef>();
@@ -332,14 +332,14 @@ namespace Core.ApplicationServices.System
             });
         }
 
-        public Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid)
+        public Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState)
         {
-            if (businessTypeUuid.HasValue)
+            if (newBusinessTypeState.HasValue)
             {
                 var itSystem = _itSystemRepository.GetSystem(systemId);
                 if (itSystem == null)
                     return new OperationError(OperationFailure.NotFound);
-                var optionByUuid = _businessTypeService.GetOptionByUuid(itSystem.OrganizationId, businessTypeUuid.Value);
+                var optionByUuid = _businessTypeService.GetOptionByUuid(itSystem.OrganizationId, newBusinessTypeState.Value);
 
                 if (optionByUuid.IsNone)
                     return new OperationError("Business type uuid does not point to a business type in KITOS", OperationFailure.BadInput);
@@ -355,13 +355,13 @@ namespace Core.ApplicationServices.System
             return Mutate(systemId, system => system.BusinessTypeId != null, system => system.ResetBusinessType());
         }
 
-        public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid)
+        public Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState)
         {
-            return Mutate(systemId, system => system.BelongsTo?.Uuid != rightsHolderUuid, updateWithResult: system =>
+            return Mutate(systemId, system => system.BelongsTo?.Uuid != newRightsHolderState, updateWithResult: system =>
             {
-                if (rightsHolderUuid.HasValue)
+                if (newRightsHolderState.HasValue)
                 {
-                    var rightsHolder = _organizationRepository.GetByUuid(rightsHolderUuid.Value);
+                    var rightsHolder = _organizationRepository.GetByUuid(newRightsHolderState.Value);
 
                     if (rightsHolder.IsNone)
                         return new OperationError("Rightsholder id is invalid", OperationFailure.BadInput);
@@ -380,13 +380,13 @@ namespace Core.ApplicationServices.System
             });
         }
 
-        public Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? parentSystemId = null)
+        public Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null)
         {
-            return Mutate(systemId, system => system.ParentId != parentSystemId, updateWithResult: system =>
+            return Mutate(systemId, system => system.ParentId != newParentSystemState, updateWithResult: system =>
             {
-                if (parentSystemId.HasValue)
+                if (newParentSystemState.HasValue)
                 {
-                    var parent = _itSystemRepository.GetSystem(parentSystemId.Value);
+                    var parent = _itSystemRepository.GetSystem(newParentSystemState.Value);
 
                     if (parent == null)
                         return new OperationError("Parent system id is invalid", OperationFailure.BadInput);
