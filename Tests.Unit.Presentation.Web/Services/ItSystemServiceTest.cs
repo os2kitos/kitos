@@ -42,6 +42,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
+        private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeServiceMock;
 
         public ItSystemServiceTest()
         {
@@ -53,13 +54,14 @@ namespace Tests.Unit.Presentation.Web.Services
             _logger = new Mock<ILogger>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
+            _businessTypeServiceMock = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
                 Mock.Of<ITaskRefRepository>(),
-                Mock.Of<IOptionsService<ItSystem, BusinessType>>(),
+                _businessTypeServiceMock.Object,
                 _organizationRepositoryMock.Object,
                 _logger.Object,
                 _userContext.Object,
@@ -530,13 +532,10 @@ namespace Tests.Unit.Presentation.Web.Services
                 });
 
             //Act
-
             var result = _sut.CreateNewSystem(organizationId, name);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Conflict);
         }
 
         [Fact]
@@ -556,9 +555,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.CreateNewSystem(organizationId, name, uuid);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Conflict);
         }
 
         [Fact]
@@ -596,9 +593,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdatePreviousName(systemId, newValue);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -613,9 +608,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdatePreviousName(systemId, newValue);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
         [Fact]
@@ -653,9 +646,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateDescription(systemId, newValue);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -670,9 +661,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateDescription(systemId, newValue);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
         [Fact]
@@ -715,9 +704,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateParentSystem(systemId, parentSystemId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.BadInput);
         }
 
         [Fact]
@@ -738,9 +725,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateParentSystem(systemId, parentSystemId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -758,9 +743,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateParentSystem(systemId, parentSystemId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -776,9 +759,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateParentSystem(systemId, parentSystemId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.NotFound);
 
         }
 
@@ -822,9 +803,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.BadInput);
         }
 
         [Fact]
@@ -845,9 +824,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -865,9 +842,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -883,9 +858,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
         [Fact]
@@ -904,7 +877,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(urlReference,result.Select(x=>x.Reference.URL).Value);
+            Assert.Equal(urlReference, result.Select(x => x.Reference.URL).Value);
         }
 
         [Fact]
@@ -914,7 +887,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var urlReference = A<string>();
             var createdReference = new ExternalReference { URL = A<string>() };
-            var itSystem = new ItSystem { Id = systemId};
+            var itSystem = new ItSystem { Id = systemId };
             ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
@@ -925,7 +898,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(createdReference, result.Select(x=>x.Reference).Value);
+            Assert.Same(createdReference, result.Select(x => x.Reference).Value);
             _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
@@ -947,10 +920,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError,result.Error);
-            _systemRepository.Verify(x => x.Update(itSystem), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, operationError.FailureType);
         }
 
         [Fact]
@@ -968,10 +938,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-            _systemRepository.Verify(x => x.Update(itSystem), Times.Never);
-            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -987,10 +954,121 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
 
             //Assert
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
+        [Fact]
+        public void UpdateBusinessType_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var businessTypeId = A<Guid>();
+            var organizationId = A<int>();
+            var itSystem = new ItSystem { OrganizationId = organizationId };
+            var businessType = new BusinessType { Id = A<int>() };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (businessType, true));
+
+            //Act
+            var result = _sut.UpdateBusinessType(systemId, businessTypeId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(businessType.Id, result.Select(x => x.BusinessTypeId.GetValueOrDefault()).Value);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateBusinessType_Fails_If_Option_Is_Not_Available_In_Organization()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var businessTypeId = A<Guid>();
+            var organizationId = A<int>();
+            var itSystem = new ItSystem { OrganizationId = organizationId };
+            var businessType = new BusinessType { Id = A<int>() };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (businessType, false));
+
+            //Act
+            var result = _sut.UpdateBusinessType(systemId, businessTypeId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.BadInput);
+        }
+
+        [Fact]
+        public void UpdateBusinessType_Fails_If_Option_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var businessTypeId = A<Guid>();
+            var organizationId = A<int>();
+            var itSystem = new ItSystem { OrganizationId = organizationId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, Maybe<(BusinessType, bool)>.None);
+
+            //Act
+            var result = _sut.UpdateBusinessType(systemId, businessTypeId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.BadInput);
+        }
+
+        [Fact]
+        public void UpdateBusinessType_Fails_If_WriteAccess_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var businessTypeId = A<Guid>();
+            var organizationId = A<int>();
+            var itSystem = new ItSystem { OrganizationId = organizationId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+            ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (new BusinessType(), true));
+
+            //Act
+            var result = _sut.UpdateBusinessType(systemId, businessTypeId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void UpdateBusinessType_Fails_If_System_Is_Not_found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var businessTypeId = A<Guid>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateBusinessType(systemId, businessTypeId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
+        private void AssertUpdateFailure(Result<ItSystem, OperationError> result, OperationFailure expectedErrorType)
+        {
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            Assert.Equal(expectedErrorType, result.Error.FailureType);
             _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Never);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        private void ExpectGetBusinessTypeOptionReturns(int organizationId, Guid businessTypeId, Maybe<(BusinessType, bool)> result)
+        {
+            _businessTypeServiceMock.Setup(x => x.GetOptionByUuid(organizationId, businessTypeId)).Returns(result);
         }
 
         private void ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
@@ -1021,7 +1099,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
         /*
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
-        Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
          *
          */
 
