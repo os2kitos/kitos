@@ -406,38 +406,10 @@ namespace Tests.Integration.Presentation.Web.KLE
                     .Where(MatchRootTask())
                     .First();
 
-                //Change the name of a branch of task refs. Change every second UUID
+                //Change the name of a branch of task refs. Change one uuid to empty (UX on that column now)
                 var toBeRenamed = FlattenTreeDepthFirst(root).ToList();
                 toBeRenamed.ForEach(Rename);
-                toBeRenamed.Where((_, index) => index % 2 == 2).ToList().ForEach(ClearUUID);
-                repository.Save();
-            });
-
-
-            //Act
-            await PutKle();
-
-            //Assert - make sure the task refs have the expected names
-            VerifyTaskRefIntegrity(expectedTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Patches_UUID_On_TaskRefs()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-            var expectedTaskRefs = BuildTaskRefIntegritySet().ToList();
-
-            MutateEntitySet<TaskRef>(repository =>
-            {
-                var root = repository
-                    .AsQueryable()
-                    .Where(MatchRootTask())
-                    .First();
-
-                //Change the name of a branch of task refs
-                var toBeRenamed = FlattenTreeDepthFirst(root).ToList();
-                toBeRenamed.ForEach(ClearUUID);
+                toBeRenamed.Where((_, index) => index == 0).ToList().ForEach(ClearUUID);
                 repository.Save();
             });
 
