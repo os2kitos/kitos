@@ -607,7 +607,14 @@ namespace Tests.Integration.Presentation.Web.KLE
         {
             if (TestKeys.TryPop(out var nextKey))
             {
-                return new TaskRef { TaskKey = nextKey.ToString(), ObjectOwnerId = objectOwnerId, LastChangedByUserId = objectOwnerId, OwnedByOrganizationUnitId = organizationUnitId };
+                return new TaskRef
+                {
+                    TaskKey = nextKey.ToString(), 
+                    ObjectOwnerId = objectOwnerId, 
+                    LastChangedByUserId = objectOwnerId, 
+                    OwnedByOrganizationUnitId = organizationUnitId,
+                    Uuid = Guid.NewGuid()
+                };
             }
             throw new InvalidOperationException("Unable to get more keys");
         }
