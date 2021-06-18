@@ -43,6 +43,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeServiceMock;
+        private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
 
         public ItSystemServiceTest()
         {
@@ -55,12 +56,13 @@ namespace Tests.Unit.Presentation.Web.Services
             _userContext = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _businessTypeServiceMock = new Mock<IOptionsService<ItSystem, BusinessType>>();
+            _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 _referenceService.Object,
-                Mock.Of<ITaskRefRepository>(),
+                _taskRefRepositoryMock.Object,
                 _businessTypeServiceMock.Object,
                 _organizationRepositoryMock.Object,
                 _logger.Object,
@@ -467,7 +469,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var system = CreateSystem();
-            var taskRef = createTaskRef();
+            var taskRef = CreateTaskRef();
             AddTaskRef(system, taskRef);
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
@@ -1058,6 +1060,86 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
+        [Fact]
+        public void UpdateTaskRefs_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var itSystem = new ItSystem() { TaskRefs = new List<TaskRef>() { new() { Id = A<int>() } } };
+            var taskRefId1 = A<int>();
+            var taskRefId2 = A<int>();
+            var taskRefIds = new[] { taskRefId1, taskRefId2 };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetTaskRefReturnsSome(taskRefId1);
+            ExpectGetTaskRefReturnsSome(taskRefId2);
+
+            //Act
+            var result = _sut.UpdateTaskRefs(systemId, taskRefIds);
+
+            //Assert - make sure that the current task refs are now only the ones provided.. existing ones were removed
+            Assert.True(result.Ok);
+            Assert.Equal(taskRefIds.OrderBy(id => id), result.Select(system => system.TaskRefs.Select(taskRef => taskRef.Id).OrderBy(id => id)).Value);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateTaskRefs_Fails_If_TaskRefId_Is_Invalid()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var itSystem = new ItSystem() { TaskRefs = new List<TaskRef> { new() { Id = A<int>() } } };
+            var taskRefId1 = A<int>();
+            var taskRefId2 = A<int>();
+            var taskRefIds = new[] { taskRefId1, taskRefId2 };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetTaskRefReturnsSome(taskRefId1);
+            ExpectGetTaskRefReturnsNone(taskRefId2);
+
+            //Act
+            var result = _sut.UpdateTaskRefs(systemId, taskRefIds);
+
+            //Assert - make sure that the current task refs are now only the ones provided.. existing ones were removed
+            AssertUpdateFailure(result, OperationFailure.BadInput);
+        }
+
+        [Fact]
+        public void UpdateTaskRefs_Fails_If_Modification_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateTaskRefs(systemId, Many<int>());
+
+            //Assert - make sure that the current task refs are now only the ones provided.. existing ones were removed
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void UpdateTaskRefs_Fails_If_System_Cannot_Be_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateTaskRefs(systemId, Many<int>());
+
+            //Assert - make sure that the current task refs are now only the ones provided.. existing ones were removed
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
         private void AssertUpdateFailure(Result<ItSystem, OperationError> result, OperationFailure expectedErrorType)
         {
             Assert.True(result.Failed);
@@ -1097,11 +1179,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 .Returns(new EnumerableQuery<ItSystem>(itSystems));
         }
 
-        /*
-        Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
-         *
-         */
-
         private Organization CreateOrganization()
         {
             return new() { Id = A<int>(), Name = A<string>() };
@@ -1125,7 +1202,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return itSystem;
         }
 
-        private TaskRef createTaskRef()
+        private TaskRef CreateTaskRef()
         {
             return new() { Id = A<int>() };
         }
@@ -1212,6 +1289,16 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetUserOrganizationIdsReturns(params int[] ownOrganizationIds)
         {
             _userContext.Setup(x => x.OrganizationIds).Returns(ownOrganizationIds);
+        }
+
+        private void ExpectGetTaskRefReturnsSome(int taskRefId1)
+        {
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefId1)).Returns(new TaskRef() { Id = taskRefId1 });
+        }
+
+        private void ExpectGetTaskRefReturnsNone(int taskRefId1)
+        {
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefId1)).Returns(Maybe<TaskRef>.None);
         }
     }
 }

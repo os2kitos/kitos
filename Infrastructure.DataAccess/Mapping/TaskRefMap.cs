@@ -38,6 +38,8 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasMaxLength(TaskRef.MaxTaskKeyLength)
                 .HasUniqueIndexAnnotation("UX_TaskKey", 0);
 
+            //TODO: Add uuid  index
+
             Property(x => x.Description)
                 .HasMaxLength(TaskRef.MaxDescriptionLength);
 
