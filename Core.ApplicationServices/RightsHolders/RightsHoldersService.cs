@@ -10,11 +10,11 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
-using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Queries.ItSystem;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
@@ -25,7 +25,7 @@ namespace Core.ApplicationServices.RightsHolders
     public class RightsHoldersService : IRightsHoldersService
     {
         private readonly IOrganizationalUserContext _userContext;
-        private readonly IGenericRepository<Organization> _organizationRepository;
+        private readonly IOrganizationRepository _organizationRepository;
         private readonly IItSystemService _systemService;
         private readonly ITaskRefRepository _taskRefRepository;
         private readonly ITransactionManager _transactionManager;
@@ -34,7 +34,7 @@ namespace Core.ApplicationServices.RightsHolders
 
         public RightsHoldersService(
             IOrganizationalUserContext userContext,
-            IGenericRepository<Organization> organizationRepository,
+            IOrganizationRepository organizationRepository,
             IItInterfaceService itInterfaceService,
             IItSystemService systemService,
             ITaskRefRepository taskRefRepository,
@@ -68,16 +68,16 @@ namespace Core.ApplicationServices.RightsHolders
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
-                var organization = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid);
+                var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid).Select(x => x.Id);
 
-                if (organization == null)
+                if (organizationId.IsNone)
                     return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
 
-                if (!_userContext.HasRole(organization.Id, OrganizationRole.RightsHolderAccess))
+                if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
 
                 var result = _systemService
-                    .CreateNewSystem(organization.Id, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
+                    .CreateNewSystem(organizationId.Value, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
                     .Bind(system => _systemService.UpdatePreviousName(system.Id, creationParameters.FormerName))
                     .Bind(system => _systemService.UpdateDescription(system.Id, creationParameters.Description))
@@ -176,8 +176,11 @@ namespace Core.ApplicationServices.RightsHolders
 
                         if (rightsHolderUuid.HasValue)
                         {
-                            var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
-                            if (!_userContext.HasRole(org.Id, OrganizationRole.RightsHolderAccess))
+                            var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid.Value).Select(x => x.Id);
+                            if (organizationId.IsNone)
+                                return new OperationError("Invalid organization id", OperationFailure.BadInput);
+
+                            if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                             {
                                 return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
                             }
@@ -192,7 +195,7 @@ namespace Core.ApplicationServices.RightsHolders
         public IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
         {
             var organizationIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
-            return _organizationRepository.AsQueryable().ByIds(organizationIds);
+            return _organizationRepository.GetAll().ByIds(organizationIds);
         }
 
         public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
@@ -211,8 +214,12 @@ namespace Core.ApplicationServices.RightsHolders
 
                         if (rightsHolderUuid.HasValue)
                         {
-                            var org = _organizationRepository.AsQueryable().ByUuid(rightsHolderUuid.Value);
-                            if (!_userContext.HasRole(org.Id, OrganizationRole.RightsHolderAccess))
+                            var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid.Value).Select(x => x.Id);
+                            
+                            if (organizationId.IsNone)
+                                return new OperationError("Invalid organization id", OperationFailure.BadInput);
+
+                            if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                             {
                                 return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
                             }

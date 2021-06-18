@@ -308,7 +308,7 @@ namespace Core.ApplicationServices.System
             });
         }
 
-        public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, ICollection<int> taskRefIds)
+        public Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds)
         {
             Predicate<ItSystem> updateIfTaskRefCollectionDiffers = system => system.TaskRefs.Select(x => x.Id).OrderBy(id => id).SequenceEqual(taskRefIds.OrderBy(id => id)) == false;
 
@@ -472,6 +472,7 @@ namespace Core.ApplicationServices.System
                 {
                     _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
                     _itSystemRepository.Update(itSystem);
+                    transaction.Commit();
                 }
                 else
                 {
@@ -479,8 +480,6 @@ namespace Core.ApplicationServices.System
                     return result;
                 }
             }
-
-            transaction.Commit();
 
             return itSystem;
         }

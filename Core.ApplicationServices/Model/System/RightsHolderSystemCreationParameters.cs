@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Model.System
 {
