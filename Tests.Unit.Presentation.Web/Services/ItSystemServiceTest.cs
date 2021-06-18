@@ -40,6 +40,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
 
         public ItSystemServiceTest()
         {
@@ -50,6 +51,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
             _userContext = new Mock<IOrganizationalUserContext>();
+            _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -57,7 +59,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _referenceService.Object,
                 Mock.Of<ITaskRefRepository>(),
                 Mock.Of<IOptionsService<ItSystem, BusinessType>>(),
-                Mock.Of<IOrganizationRepository>(),
+                _organizationRepositoryMock.Object,
                 _logger.Object,
                 _userContext.Object,
                 Mock.Of<IDomainEvents>(),
@@ -595,6 +597,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -611,6 +614,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -650,6 +654,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -666,9 +671,9 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
-        //TODO:
         [Fact]
         public void UpdateParentSystem_Returns_Ok()
         {
@@ -711,6 +716,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -733,6 +739,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -752,6 +759,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
 
         [Fact]
@@ -769,7 +777,118 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
 
+        }
+
+        [Fact]
+        public void UpdateRightsHolder_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var rightsHolderId = A<Guid>();
+            var itSystem = new ItSystem();
+            var rightsHolder = new Organization(){Id=A<int>()};
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
+            ExpectAllowReadsReturns(rightsHolder,true);
+
+            //Act
+            var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(rightsHolder.Id, result.Select(x => x.BelongsToId.GetValueOrDefault()).Value);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateRightsHolder_Returns_Error_If_RightsHolder_Cannot_Be_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var rightsHolderId = A<Guid>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetOrganizationReturns(rightsHolderId, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateRightsHolder_Returns_Error_If_Access_To_RightsHolder_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var rightsHolderId = A<Guid>();
+            var itSystem = new ItSystem();
+            var rightsHolder = new Organization();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
+            ExpectAllowReadsReturns(rightsHolder,false);
+
+            //Act
+            var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateRightsHolder_Returns_Error_If_Write_Access_Is_Denied()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var rightsHolderId = A<Guid>();
+            var itSystem = new ItSystem();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateRightsHolder_Returns_Error_If_System_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var rightsHolderId = A<Guid>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+        private IReturnsResult<IOrganizationRepository> ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
+        {
+            return _organizationRepositoryMock.Setup(x => x.GetByUuid(id)).Returns(response);
         }
 
         private void ExpectAllowModifyReturns(ItSystem itSystem, bool value)
@@ -797,7 +916,6 @@ namespace Tests.Unit.Presentation.Web.Services
         Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
-        Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? rightsHolderUuid);
          *
          */
 
@@ -826,27 +944,27 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private TaskRef createTaskRef()
         {
-            return new TaskRef { Id = A<int>() };
+            return new() { Id = A<int>() };
         }
 
         private ItSystemUsage CreateSystemUsage(Organization organization)
         {
-            return new ItSystemUsage { Id = A<int>(), Organization = organization };
+            return new() { Id = A<int>(), Organization = organization };
         }
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
         {
-            return new ItInterfaceExhibit() { Id = A<int>() };
+            return new() { Id = A<int>() };
         }
 
         private ExternalReference CreateExternalReference()
         {
-            return new ExternalReference() { Id = A<int>() };
+            return new() { Id = A<int>() };
         }
 
-        private void ExpectAllowReadsReturns(ItSystem system, bool value)
+        private void ExpectAllowReadsReturns<T>(T entity, bool value) where T:IEntity
         {
-            _authorizationContext.Setup(x => x.AllowReads(system)).Returns(value);
+            _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
         }
 
         private void ExpectAllowDeleteReturns(ItSystem system, bool value)
@@ -898,14 +1016,14 @@ namespace Tests.Unit.Presentation.Web.Services
             system.TaskRefs.Add(taskRef);
         }
 
-        private IReturnsResult<IAuthorizationContext> ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
+        private void ExpectGetCrossLevelOrganizationAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
         {
-            return _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
         }
 
-        private IReturnsResult<IItSystemRepository> ExpectGetSystemsReturns(List<ItSystem> itSystems)
+        private void ExpectGetSystemsReturns(List<ItSystem> itSystems)
         {
-            return _systemRepository.Setup(x => x.GetSystems(null)).Returns(new EnumerableQuery<ItSystem>(itSystems));
+            _systemRepository.Setup(x => x.GetSystems(null)).Returns(new EnumerableQuery<ItSystem>(itSystems));
         }
 
         private void ExpectGetUserOrganizationIdsReturns(params int[] ownOrganizationIds)
