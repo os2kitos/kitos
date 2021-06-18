@@ -10,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
@@ -788,12 +789,12 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var rightsHolderId = A<Guid>();
             var itSystem = new ItSystem();
-            var rightsHolder = new Organization(){Id=A<int>()};
+            var rightsHolder = new Organization() { Id = A<int>() };
             ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
-            ExpectAllowReadsReturns(rightsHolder,true);
+            ExpectAllowReadsReturns(rightsHolder, true);
 
             //Act
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
@@ -838,7 +839,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
-            ExpectAllowReadsReturns(rightsHolder,false);
+            ExpectAllowReadsReturns(rightsHolder, false);
 
             //Act
             var result = _sut.UpdateRightsHolder(systemId, rightsHolderId);
@@ -886,9 +887,115 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
         }
-        private IReturnsResult<IOrganizationRepository> ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
+
+        [Fact]
+        public void UpdateMainUrlReference_With_Existing_Updates_Existing_Reference_And_Returns_Ok()
         {
-            return _organizationRepositoryMock.Setup(x => x.GetByUuid(id)).Returns(response);
+            //Arrange
+            var systemId = A<int>();
+            var urlReference = A<string>();
+            var itSystem = new ItSystem { Reference = new ExternalReference { URL = A<string>() } };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+
+            //Act
+            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(urlReference,result.Select(x=>x.Reference.URL).Value);
+        }
+
+        [Fact]
+        public void UpdateMainUrlReference_WithOut_Existing_Reference_Creates_New_And_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var urlReference = A<string>();
+            var createdReference = new ExternalReference { URL = A<string>() };
+            var itSystem = new ItSystem { Id = systemId};
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url)).Returns(createdReference);
+
+            //Act
+            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdReference, result.Select(x=>x.Reference).Value);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateMainUrlReference_Fails_If_CreateReference_Fails()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var urlReference = A<string>();
+            var itSystem = new ItSystem { Id = systemId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            var operationError = A<OperationError>();
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url)).Returns(operationError);
+
+            //Act
+            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError,result.Error);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateMainUrlReference_Fails_If_Write_Access_Is_Rejected()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var urlReference = A<string>();
+            var itSystem = new ItSystem { Id = systemId };
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _systemRepository.Verify(x => x.Update(itSystem), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateMainUrlReference_Fails_If_System_Is_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var urlReference = A<string>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, null);
+
+            //Act
+            var result = _sut.UpdateMainUrlReference(systemId, urlReference);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        private void ExpectGetOrganizationReturns(Guid id, Maybe<Organization> response)
+        {
+            _organizationRepositoryMock.Setup(x => x.GetByUuid(id)).Returns(response);
         }
 
         private void ExpectAllowModifyReturns(ItSystem itSystem, bool value)
@@ -913,7 +1020,6 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         /*
-        Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference);
         Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<int> taskRefIds);
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? businessTypeUuid);
          *
@@ -962,7 +1068,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new() { Id = A<int>() };
         }
 
-        private void ExpectAllowReadsReturns<T>(T entity, bool value) where T:IEntity
+        private void ExpectAllowReadsReturns<T>(T entity, bool value) where T : IEntity
         {
             _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
         }
