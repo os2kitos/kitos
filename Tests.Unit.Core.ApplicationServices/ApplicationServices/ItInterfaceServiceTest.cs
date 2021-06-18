@@ -59,7 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_NotFound()
+        public void UpdateExposingSystem_Returns_NotFound()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -73,7 +73,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_Forbidden_If_Modification_Access_To_Interface_Is_Denied()
+        public void UpdateExposingSystem_Returns_Forbidden_If_Modification_Access_To_Interface_Is_Denied()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -89,7 +89,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_BadInput_If_System_Id_Is_Invalid()
+        public void UpdateExposingSystem_Returns_BadInput_If_System_Id_Is_Invalid()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -108,7 +108,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_Forbidden_If_Read_Access_To_System_Is_Denied()
+        public void UpdateExposingSystem_Returns_Forbidden_If_Read_Access_To_System_Is_Denied()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -129,7 +129,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_Ok_When_Existing_And_New_Is_None()
+        public void UpdateExposingSystem_Returns_Ok_When_Existing_And_New_Is_None()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -150,7 +150,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_Ok_When_Existing_And_New_Are_Equal()
+        public void UpdateExposingSystem_Returns_Ok_When_Existing_And_New_Are_Equal()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -173,7 +173,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void ChangeExposingSystem_Returns_Ok_With_Changes()
+        public void UpdateExposingSystem_Returns_Ok_With_Changes()
         {
             //Arrange
             var interfaceId = A<int>();
@@ -525,6 +525,408 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(expectedNumberOfInterfaces, result.Count());
         }
 
+        [Fact]
+        public void CreateNewItInterface_Returns_Created_Interface_With_User_Specified_Uuid()
+        {
+            //Arrange
+            var name = A<string>();
+            var itInterfaceId = A<string>();
+            var uuid = Guid.NewGuid();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            var transaction = SetupTransaction();
+            ExpectAllowCreate(org.Id, true);
+            _repository.Setup(x => x.GetInterface(uuid)).Returns(Maybe<ItInterface>.None);
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
+            _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, uuid);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Ok);
+            Assert.Equal(uuid, createdInterfaceResult.Value.Uuid);
+            Assert.Equal(name, createdInterfaceResult.Value.Name);
+            Assert.Equal(itInterfaceId, createdInterfaceResult.Value.ItInterfaceId);
+            Assert.Equal(AccessModifier.Public, createdInterfaceResult.Value.AccessModifier); // Defaults to Public access modifier
+
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void CreateNewItInterface_Returns_Created_Interface_With_New_Uuid()
+        {
+            //Arrange
+            var name = A<string>();
+            var itInterfaceId = A<string>();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            var transaction = SetupTransaction();
+            ExpectAllowCreate(org.Id, true);
+            _repository.Setup(x => x.GetInterface(It.IsAny<Guid>())).Returns(Maybe<ItInterface>.None);
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
+            _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Ok);
+            Assert.IsType<Guid>(createdInterfaceResult.Value.Uuid);
+            Assert.Equal(name, createdInterfaceResult.Value.Name);
+            Assert.Equal(itInterfaceId, createdInterfaceResult.Value.ItInterfaceId);
+            Assert.Equal(AccessModifier.Public, createdInterfaceResult.Value.AccessModifier); // Defaults to Public access modifier
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Theory]
+        [InlineData(null, "Valid ItInterfaceId")]
+        [InlineData("", "Valid ItInterfaceId")]
+        [InlineData("Valid Name", null)]
+        public void CreateNewItInterface_Returns_BadInput_If_Name_Or_ItInterfaceId_Is_Not_Valid(string name, string itInterfaceId)
+        {
+            //Arrange
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            var transaction = SetupTransaction();
+            ExpectAllowCreate(org.Id, true);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createdInterfaceResult.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        [Fact]
+        public void CreateNewItInterface_Returns_Conflict_When_Name_And_ItInterfaceId_Combination_Already_Exists_In_Organization()
+        {
+            //Arrange
+            var name = A<string>();
+            var itInterfaceId = A<string>();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            var transaction = SetupTransaction();
+            ExpectAllowCreate(org.Id, true);
+            _repository.Setup(x => x.GetInterface(It.IsAny<Guid>())).Returns(Maybe<ItInterface>.None);
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>() { new ItInterface() { OrganizationId = org.Id, Name = name, ItInterfaceId = itInterfaceId } }.AsQueryable()); //Returns interface to conflict with
+            _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Failed);
+            Assert.Equal(OperationFailure.Conflict, createdInterfaceResult.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Rollback(), Times.Once);
+        }
+
+        [Fact]
+        public void CreateNewItInterface_Returns_Conflict_When_Interface_With_Uuid_Already_Exists()
+        {
+            //Arrange
+            var name = A<string>();
+            var itInterfaceId = A<string>();
+            var uuid = Guid.NewGuid();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            var transaction = SetupTransaction();
+            ExpectAllowCreate(org.Id, true);
+            _repository.Setup(x => x.GetInterface(uuid)).Returns(new ItInterface() { Uuid = uuid }); //Returns interface with uuid already applied so conflict exists
+            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
+            _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, uuid);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Failed);
+            Assert.Equal(OperationFailure.Conflict, createdInterfaceResult.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Rollback(), Times.Once);
+        }
+
+        [Fact]
+        public void CreateNewItInterface_Returns_Forbidden_When_Not_Allowed_To_Create()
+        {
+            //Arrange
+            var name = A<string>();
+            var itInterfaceId = A<string>();
+            var uuid = Guid.NewGuid();
+            var org = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = Guid.NewGuid()
+            };
+
+            ExpectAllowCreate(org.Id, false);
+
+            //Act
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, uuid);
+
+            //Assert
+            Assert.True(createdInterfaceResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, createdInterfaceResult.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateVersion_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newVersion = A<string>();
+
+                //Act
+                var updatedInterface = _sut.UpdateVersion(itInterface.Id, newVersion);
+
+                //Assert
+                Assert.Equal(newVersion, updatedInterface.Value.Version);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateVersion_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateVersion(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateVersion_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateVersion(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newDescription = A<string>();
+
+                //Act
+                var updatedInterface = _sut.UpdateDescription(itInterface.Id, newDescription);
+
+                //Assert
+                Assert.Equal(newDescription, updatedInterface.Value.Description);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateDescription(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateDescription_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateDescription(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateUrlReference_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newUrl = A<string>();
+
+                //Act
+                var updatedInterface = _sut.UpdateUrlReference(itInterface.Id, newUrl);
+
+                //Assert
+                Assert.Equal(newUrl, updatedInterface.Value.Url);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateUrlReference_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateUrlReference(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateUrlReference_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateUrlReference(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateInterfaceId_Returns_Updated_Interface()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
+            {
+                //Arrange
+                var newItInterfaceId = A<string>();
+
+                _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); // Return nothing so no conflicts are found.
+
+                //Act
+                var updatedInterface = _sut.UpdateItInterfaceId(itInterface.Id, newItInterfaceId);
+
+                //Assert
+                Assert.Equal(newItInterfaceId, updatedInterface.Value.ItInterfaceId);
+
+                return updatedInterface; // Return to complete generic assertions
+            });
+        }
+
+        [Fact]
+        public void UpdateInterfaceId_Returns_Forbidden()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateItInterfaceId(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateInterfaceId_Returns_NotFound()
+        {
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateItInterfaceId(itInterface.Id, A<string>()));
+        }
+
+        [Fact]
+        public void UpdateInterfaceId_Returns_Conflict()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var newItInterfaceId = A<string>();
+
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true); 
+            _repository.Setup(x => x.GetInterfaces()).Returns(
+                new List<ItInterface>() { 
+                    new ItInterface() { OrganizationId = itInterface.OrganizationId, Name = itInterface.Name, ItInterfaceId = newItInterfaceId } 
+                }.AsQueryable()); //Returns interface with same org, name and new ItInterfaceId
+
+            //Act
+            var updated = _sut.UpdateItInterfaceId(itInterface.Id, newItInterfaceId);
+
+            //Assert
+            Assert.True(updated.Failed);
+            Assert.Equal(OperationFailure.Conflict, updated.Error.FailureType);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        private void Test_Command_Which_Mutates_ItInterface_With_Success(
+            Func<ItInterface, Result<ItInterface, OperationError>> command)
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var updated = command(itInterface);
+
+            //Assert
+            Assert.True(updated.Ok);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Once);
+        }
+
+        private void Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(
+            Func<ItInterface, Result<ItInterface, OperationError>> command)
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(false);
+
+            //Act
+            var updated = command(itInterface);
+
+            //Assert
+            Assert.True(updated.Failed);
+            Assert.Equal(OperationFailure.Forbidden, updated.Error.FailureType);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        private void Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(
+            Func<ItInterface, Result<ItInterface, OperationError>> command)
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(Maybe<ItInterface>.None);
+
+            //Act
+            var updated = command(itInterface);
+
+            //Assert
+            Assert.True(updated.Failed);
+            Assert.Equal(OperationFailure.NotFound, updated.Error.FailureType);
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        private ItInterface CreateInterfaceWithAllBasicPropertiesSet()
+        {
+            return new ItInterface()
+            {
+                Id = A<int>(),
+                Version = A<string>(),
+                AccessModifier = A<AccessModifier>(),
+                Description = A<string>(),
+                ItInterfaceId = A<string>(),
+                Name = A<string>(),
+                Note = A<string>(),
+                Url = A<string>(),
+                Uuid = Guid.NewGuid(),
+                OrganizationId = A<int>()
+            };
+        }
+
+        private void ExpectAllowCreate(int orgId, bool returnValue)
+        {
+            _authorizationContext.Setup(x => x.AllowCreate<ItInterface>(orgId)).Returns(returnValue);
+        }
+
+        private Mock<IDatabaseTransaction> SetupTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            return transaction;
+        }
 
         private void ExpectGetInterfaceReturns(int interfaceId, ItInterface value)
         {

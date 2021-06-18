@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.Interface
         IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions);
         Result<ItInterface, OperationError> GetInterface(Guid uuid);
         Result<ItInterface, OperationError> CreateNewItInterface(int organizationId, string name, string itInterfaceId, Guid? rightsHolderProvidedUuid = null, AccessModifier? accessModifier = null);
-        Result<ItInterface, OperationError> UpdateInterfaceId(int id, string itInterfaceId);
+        Result<ItInterface, OperationError> UpdateItInterfaceId(int id, string itInterfaceId);
         Result<ItInterface, OperationError> UpdateVersion(int id, string newValue);
         Result<ItInterface, OperationError> UpdateDescription(int id, string newValue);
         Result<ItInterface, OperationError> UpdateUrlReference(int id, string newValue);

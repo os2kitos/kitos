@@ -160,21 +160,18 @@ namespace Core.ApplicationServices.Interface
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        public Result<ItInterface, OperationError> UpdateInterfaceId(int id, string interfaceId)
+        public Result<ItInterface, OperationError> UpdateItInterfaceId(int id, string itInterfaceId)
         {
-            var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+            return Mutate(id, 
+                itInterface => itInterface.ItInterfaceId != itInterfaceId, 
+                updateWithResult: itInterface => {
+                    var nameError = IsItInterfaceIdAndNameUnique(itInterface.Name, itInterfaceId, itInterface.OrganizationId);
+                    if (nameError.HasValue)
+                        return nameError.Value;
 
-            if (getItInterfaceResult.IsNone)
-            {
-                return new OperationError($"ItInterface with id: {id} could not be found.", OperationFailure.NotFound);
-            }
-            var itInterface = getItInterfaceResult.Value;
-
-            var nameError = IsItInterfaceIdAndNameUnique(itInterface.Name, interfaceId, itInterface.OrganizationId);
-            if (nameError.HasValue)
-                return nameError.Value;
-
-            return Mutate(id, itInterface => itInterface.ItInterfaceId != interfaceId, itInterface => itInterface.ItInterfaceId = interfaceId);
+                    itInterface.ItInterfaceId = itInterfaceId;
+                    return itInterface;
+                });
         }
 
         public Result<ItInterface, OperationError> UpdateVersion(int id, string newValue)
@@ -199,15 +196,13 @@ namespace Core.ApplicationServices.Interface
                 var getItInterfaceResult = _interfaceRepository.GetInterface(id);
 
                 if (getItInterfaceResult.IsNone)
-                {
                     return new OperationError($"ItInterface with id: {id} could not be found.", OperationFailure.NotFound);
-                }
+                
 
                 var itInterface = getItInterfaceResult.Value;
                 if (!_authorizationContext.AllowModify(itInterface))
-                {
                     return new OperationError(OperationFailure.Forbidden);
-                }
+                
 
                 Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
                 Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
@@ -217,14 +212,12 @@ namespace Core.ApplicationServices.Interface
                 {
                     newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
                     if (newSystem.IsNone)
-                    {
                         return new OperationError($"Cannot set ItSystem with id: {newSystemId.Value} as exposing system for ItInterface with id: {id} since the system does not exist", OperationFailure.BadInput);
-                    }
+                    
 
                     if (!_authorizationContext.AllowReads(newSystem.Value))
-                    {
                         return new OperationError(OperationFailure.Forbidden);
-                    }
+                    
                 }
 
                 var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
@@ -270,7 +263,7 @@ namespace Core.ApplicationServices.Interface
             if(!ValidateItInterfaceId(itInterfaceId))
                 return new OperationError("ItInterfaceId was not valid", OperationFailure.BadInput);
 
-            if (!_interfaceRepository
+            if (_interfaceRepository
                     .GetInterfaces()
                     .ByOrganizationId(orgId)
                     .ByNameExact(name)
@@ -305,6 +298,7 @@ namespace Core.ApplicationServices.Interface
                 {
                     _domainEvents.Raise(new EntityUpdatedEvent<ItInterface>(itInterface));
                     _interfaceRepository.Update(itInterface);
+                    transaction.Commit();
                 }
                 else
                 {
@@ -312,9 +306,6 @@ namespace Core.ApplicationServices.Interface
                     return result;
                 }
             }
-
-            transaction.Commit();
-
             return itInterface;
         }
     }
