@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.ItSystem;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.External.V2.Request
@@ -38,6 +39,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// Version signifier for IT-Interface
         /// </summary>
+        [MaxLength(ItInterface.MaxVersionLength)]
         public string Version { get; set; }
         
         /// <summary>

@@ -1,4 +1,5 @@
 ﻿using Presentation.Web.Models;
+using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Interface;
 using System;
 using System.Collections.Generic;
@@ -94,6 +95,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var url = TestEnvironment.CreateUrl($"api/v2/it-interfaces/{interfaceGuid}");
             return await HttpApi.GetWithTokenAsync(url, token);
+        }
+
+        public static async Task<RightsHolderItInterfaceResponseDTO> CreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        {
+            using var response = await SendCreateRightsHolderItInterfaceAsync(token, request);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/rightsholder/it-interfaces"), request, token);
+
         }
     }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Infrastructure.DataAccess;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -47,6 +49,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var db = TestEnvironment.GetDatabase();
 
             mutate(db);
+        }
+
+        /// <summary>
+        /// Map an entity db id to the corresponding uuid used outside of kitos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbId"></param>
+        /// <returns></returns>
+        public static Guid GetEntityUuid<T>(int dbId) where T : class, IHasUuid, IHasId
+        {
+            return DatabaseAccess.MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
         }
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.RightsHolders;
@@ -60,7 +61,7 @@ namespace Presentation.Web.Controllers.External.V2
             return _rightsHolderService
                 .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, itInterfaceDTO.ExposedBySystemUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
-                .Match(Ok, FromOperationError);
+                .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -231,6 +232,11 @@ namespace Presentation.Web.Controllers.External.V2
             outputDTO.Deactivated = input.Disabled;
             outputDTO.Created = input.Created;
             outputDTO.CreatedBy = input.ObjectOwner.MapIdentityNamePairDTO();
+        }
+
+        private CreatedNegotiatedContentResult<RightsHolderItInterfaceResponseDTO> MapItInterfaceCreatedResponse(RightsHolderItInterfaceResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

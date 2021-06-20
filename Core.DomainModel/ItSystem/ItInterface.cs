@@ -10,13 +10,14 @@ namespace Core.DomainModel.ItSystem
 {
     public class ItInterface : ItSystemBase, IHasRightsHolder, IHasUuid
     {
-        public static int MaxNameLength = 100;
-        public static int MaxVersionLength = 20;
+        public const int MaxNameLength = 100;
+        public const int MaxVersionLength = 20;
 
         public ItInterface()
         {
             DataRows = new List<DataRow>();
             Uuid = Guid.NewGuid();
+            AssociatedSystemRelations = new List<SystemRelation>();
         }
         public string Url { get; set; }
         /// <summary>
