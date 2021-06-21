@@ -448,13 +448,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(false, true, true, true, true, true)]
-        [InlineData(true, false, true, true, true, true)]
-        [InlineData(true, true, false, true, true, true)]
         [InlineData(true, true, true, false, true, true)]
-        [InlineData(true, true, true, true, false, true)]
-        [InlineData(true, true, true, true, true, false)]
+        [InlineData(false, true, false, true, true, true)]
+        [InlineData(true, false, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, true, false, true, false, true)]
+        [InlineData(true, true, true, false, true, false)]
         [InlineData(false, false, false, false, false, false)]
 
         public async Task Can_POST_ItSystem_As_RightsHolder(bool withProvidedUuid, bool withBusinessType, bool withKleNumbers, bool withKleUuid, bool withParent, bool withFormerName)
