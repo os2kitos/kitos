@@ -21,5 +21,7 @@ namespace Core.DomainServices.Repositories.System
         void DeleteSystem(ItSystem itSystem);
         IQueryable<ItSystem> GetByRightsHolderId(int sourceId);
         IQueryable<ItSystem> GetByTaskRefId(int taskRefId);
+        void Add(ItSystem newSystem);
+        void Update(ItSystem itSystem);
     }
 }

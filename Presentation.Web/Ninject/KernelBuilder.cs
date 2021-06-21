@@ -92,6 +92,7 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
+using Core.DomainServices.Repositories.TaskRefs;
 
 namespace Presentation.Web.Ninject
 {
@@ -393,6 +394,7 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
+            kernel.Bind<ITaskRefRepository>().To<TaskRefRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

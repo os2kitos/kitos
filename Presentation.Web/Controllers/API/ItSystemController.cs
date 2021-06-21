@@ -152,7 +152,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                if (!IsAvailable(dto.Name, dto.OrganizationId))
+                if (!CanCreateSystemWithName(dto.Name, dto.OrganizationId))
                 {
                     return Conflict("Name is already taken!");
                 }
@@ -363,8 +363,8 @@ namespace Presentation.Web.Controllers.API
             {
                 string name = nameToken.Value<string>();
                 namechange = name != itSystem.Name;
-                var system = Repository.Get(x => x.Name == name && x.OrganizationId == organizationId && x.Id != id);
-                if (system.Any())
+                var allowed = _systemService.CanChangeNameTo(organizationId, id, name);
+                if (!allowed)
                     return Conflict("Name is already taken!");
 
             }
@@ -396,7 +396,7 @@ namespace Presentation.Web.Controllers.API
                 {
                     return Forbidden();
                 }
-                return IsAvailable(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
+                return CanCreateSystemWithName(checkname, orgId) ? Ok() : Conflict("Name is already taken!");
             }
             catch (Exception e)
             {
@@ -419,15 +419,9 @@ namespace Presentation.Web.Controllers.API
             return FromOperationFailure(itSystemUsages.Error);
         }
 
-        private bool IsAvailable(string name, int orgId)
+        private bool CanCreateSystemWithName(string name, int orgId)
         {
-            var system =
-                Repository
-                    .AsQueryable()
-                    .ByOrganizationId(orgId)
-                    .ByNameExact(name);
-
-            return !system.Any();
+            return _systemService.CanCreateSystemWithName(orgId, name);
         }
 
         private static IEnumerable<UsingOrganizationDTO> Map(IEnumerable<UsingOrganization> usingOrganizations)

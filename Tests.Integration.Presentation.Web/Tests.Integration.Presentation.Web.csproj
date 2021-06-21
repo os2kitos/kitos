@@ -171,8 +171,8 @@
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
-    <Compile Include="Tools\V2\ItSystemV2Helper.cs" />
-    <Compile Include="Tools\V2\OrganizationV2Helper.cs" />
+    <Compile Include="Tools\External\ItSystemV2Helper.cs" />
+    <Compile Include="Tools\External\OrganizationV2Helper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

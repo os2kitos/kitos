@@ -79,7 +79,7 @@ namespace Tests.Unit.Core.ApplicationServices
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        private void ModifyRelation_GivenAnyUserWithItSystemWriteAccess_AllowsModifications(bool allowModifications)
+        public void ModifyRelation_GivenAnyUserWithItSystemWriteAccess_AllowsModifications(bool allowModifications)
         {
             // Arrange
             var fromSystemUsage = new ItSystemUsage { Id = FromSystemUsageId };
@@ -99,7 +99,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        private void ModifyRelation_GivenSourceSystemUsingTarget_WhenTargetIsReplaced_RelationIsUpdated()
+        public void ModifyRelation_GivenSourceSystemUsingTarget_WhenTargetIsReplaced_RelationIsUpdated()
         {
             // Arrange
             const int replacementSystemUsageId = 3;
@@ -119,7 +119,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        private void ModifyRelation_GivenSystemUsageAndInterfaceChange_ValidatesInterfaceIsExposedByTargetSystemAndUpdates()
+        public void ModifyRelation_GivenSystemUsageAndInterfaceChange_ValidatesInterfaceIsExposedByTargetSystemAndUpdates()
         {
             // Arrange
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
@@ -135,7 +135,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        private void ModifyRelation_GivenSystemUsageAndContractChange_ValidatesContractAndUpdates()
+        public void ModifyRelation_GivenSystemUsageAndContractChange_ValidatesContractAndUpdates()
         {
             // Arrange
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
@@ -151,7 +151,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        private void ModifyRelation_GivenSystemUsageAndFrequencyChange_ValidatesFrequencyAndUpdates()
+        public void ModifyRelation_GivenSystemUsageAndFrequencyChange_ValidatesFrequencyAndUpdates()
         {
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
             SetupSystemUsageRepository(systemUsages);
@@ -167,7 +167,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        private void ModifyRelation_GivenSystemUsageAndChangedDescriptionAndReference_TheseFieldsAreValidatedAndUpdated()
+        public void ModifyRelation_GivenSystemUsageAndChangedDescriptionAndReference_TheseFieldsAreValidatedAndUpdated()
         {
             // Arrange
             const string changedDescription = "ChangedDescription";
