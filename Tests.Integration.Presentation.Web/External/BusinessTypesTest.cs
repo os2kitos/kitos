@@ -15,7 +15,7 @@ namespace Tests.Integration.Presentation.Web.External
         public async Task Can_Get_AvailableBusinessTypes()
         {
             //Arrange
-            var orgUuid = TestEnvironment.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+            var orgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
             var pageSize = Math.Max(1, A<int>() % 2); //Minimum is 1;
             var pageNumber = 0; //Always takes the first page;
 

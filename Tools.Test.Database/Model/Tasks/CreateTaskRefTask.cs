@@ -1,5 +1,4 @@
 ﻿using System;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.DataAccess;
 using Tools.Test.Database.Model.Extensions;
@@ -22,7 +21,7 @@ namespace Tools.Test.Database.Model.Tasks
 
             var taskRef = new TaskRef()
             {
-                Uuid = new Guid(),
+                Uuid = Guid.NewGuid(),
                 Type = "TestKLEType",
                 TaskKey = "TestKLEKey",
                 Description = "Test task ref",

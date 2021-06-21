@@ -5,6 +5,7 @@ using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
@@ -159,6 +160,74 @@ namespace Core.DomainModel.ItSystem
             if (BelongsTo != null)
                 return BelongsTo.Id;
             return Maybe<int>.None;
+        }
+
+        public void AddTaskRef(TaskRef taskRef)
+        {
+            var existing = GetTaskRef(taskRef.Id);
+            if (existing.IsNone)
+                TaskRefs.Add(taskRef);
+        }
+
+        public void RemoveTaskRef(TaskRef taskRef)
+        {
+            var toRemove = GetTaskRef(taskRef.Id);
+            if (toRemove.HasValue)
+                TaskRefs.Remove(toRemove.Value);
+        }
+
+        public Maybe<TaskRef> GetTaskRef(int taskRefId)
+        {
+            return TaskRefs.SingleOrDefault(tr => tr.Id == taskRefId);
+        }
+
+        public void ResetBusinessType()
+        {
+            BusinessType = null;
+            BusinessTypeId = null;
+        }
+
+        public void UpdateBusinessType(BusinessType businessType)
+        {
+            if (businessType == null)
+                throw new ArgumentNullException(nameof(businessType));
+
+            BusinessType = businessType;
+            BusinessTypeId = businessType.Id;
+        }
+
+        public void ResetParentSystem()
+        {
+            Parent = null;
+            ParentId = null;
+        }
+
+        public void SetUpdateParentSystem(ItSystem parent)
+        {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+            Parent = parent;
+            ParentId = parent.Id;
+        }
+
+        public void ResetRightsHolder()
+        {
+            BelongsTo = null;
+            BelongsToId = null;
+        }
+
+        public void UpdateRightsHolder(Organization.Organization organization)
+        {
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+            
+            BelongsTo = organization;
+            BelongsToId = organization.Id;
+        }
+
+        public static bool IsValidName(string newName)
+        {
+            return string.IsNullOrWhiteSpace(newName) == false && newName.Length <= ItSystem.MaxNameLength;
         }
     }
 }

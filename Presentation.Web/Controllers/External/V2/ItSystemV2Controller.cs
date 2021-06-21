@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
+using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
@@ -21,11 +24,13 @@ namespace Presentation.Web.Controllers.External.V2
     {
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHoldersService _rightsHoldersService;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHoldersService rightsHoldersService)
+        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHoldersService rightsHoldersService, IAuthorizationContext authorizationContext)
         {
             _itSystemService = itSystemService;
             _rightsHoldersService = rightsHoldersService;
+            _authorizationContext = authorizationContext;
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace Presentation.Web.Controllers.External.V2
                     .OrderBy(system => system.Id)
                     .Page(paginationQuery)
                     .ToList()
-                    .Select(ToSystemInformationResponseDTO)
+                    .Select(ToRightsHolderResponseDTO)
                     .ToList())
                 .Match(Ok, FromOperationError);
         }
@@ -149,14 +154,14 @@ namespace Presentation.Web.Controllers.External.V2
 
             return _rightsHoldersService
                 .GetSystemAsRightsHolder(uuid)
-                .Select(ToSystemInformationResponseDTO)
+                .Select(ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
         }
 
         /// <summary>
         /// Creates a new IT-System based on given input values
         /// </summary>
-        /// <param name="itSystemRequestDTO">A collection of specific IT-System values</param>
+        /// <param name="request">A collection of specific IT-System values</param>
         /// <returns>Location header is set to uri for newly created IT-System</returns>
         [HttpPost]
         [Route("rightsholder/it-systems")]
@@ -166,9 +171,22 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItSystem([FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        public IHttpActionResult PostItSystem([FromBody] RightsHolderCreateItSystemRequestDTO request)
         {
-            return Created(Request.RequestUri + "/" + itSystemRequestDTO.Uuid, new RightsHolderItSystemResponseDTO());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = new RightsHolderSystemCreationParameters(
+                request.Name,
+                request.Uuid,
+                request.ParentUuid,
+                request.FormerName, request.Description, request.UrlReference, request.BusinessTypeUuid,
+                request.KLENumbers ?? new string[0], request.KLEUuids ?? new Guid[0]);
+
+            return _rightsHoldersService
+                .CreateNewSystem(request.RightsHolderUuid, parameters)
+                .Select(ToRightsHolderResponseDTO)
+                .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -183,7 +201,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] ItSystemRequestDTO itSystemRequestDTO)
+        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO rightsHolderCreateItSystemRequestDto)
         {
             return Ok(new RightsHolderItSystemResponseDTO());
         }
@@ -206,14 +224,14 @@ namespace Presentation.Web.Controllers.External.V2
             return Ok();
         }
 
-        private static RightsHolderItSystemResponseDTO ToSystemInformationResponseDTO(ItSystem itSystem)
+        private RightsHolderItSystemResponseDTO ToRightsHolderResponseDTO(ItSystem itSystem)
         {
             var dto = new RightsHolderItSystemResponseDTO();
             MapBaseInformation(itSystem, dto);
             return dto;
         }
 
-        private static ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
+        private ItSystemResponseDTO ToSystemResponseDTO(ItSystem itSystem)
         {
             var dto = new ItSystemResponseDTO
             {
@@ -231,7 +249,7 @@ namespace Presentation.Web.Controllers.External.V2
             return dto;
         }
 
-        private static void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
+        private void MapBaseInformation<T>(ItSystem arg, T dto) where T : BaseItSystemResponseDTO
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
@@ -248,6 +266,7 @@ namespace Presentation.Web.Controllers.External.V2
                 .ItInterfaceExhibits
                 .Select(exhibit => exhibit.ItInterface)
                 .ToList()
+                .Where(_authorizationContext.AllowReads)// Only accessible interfaces may be referenced here
                 .Select(x => x.MapIdentityNamePairDTO())
                 .ToList();
             dto.RecommendedArchiveDutyResponse =
@@ -256,6 +275,10 @@ namespace Presentation.Web.Controllers.External.V2
                 .TaskRefs
                 .Select(taskRef => new IdentityNamePairResponseDTO(taskRef.Uuid, taskRef.TaskKey))
                 .ToList();
+        }
+        private CreatedNegotiatedContentResult<RightsHolderItSystemResponseDTO> MapSystemCreatedResponse(RightsHolderItSystemResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

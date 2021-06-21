@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AutoFixture;
 
 namespace Tests.Toolkit.Patterns
@@ -16,6 +17,15 @@ namespace Tests.Toolkit.Patterns
         protected virtual void OnFixtureCreated(Fixture fixture)
         {
             //Override to configure fixture-specific defaults
+        }
+
+        /// <summary>
+        /// Invoke from test to re-configure AutoFixture within the scope of the test
+        /// </summary>
+        /// <param name="with"></param>
+        protected void Configure(Action<Fixture> with)
+        {
+            with(_fixture);
         }
 
         protected T A<T>()

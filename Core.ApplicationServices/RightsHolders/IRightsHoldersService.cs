@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Linq;
+using Core.ApplicationServices.Model.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.RightsHolders
 {
+    /// <summary>
+    /// Application service which implements the use cases specific to rights holders KITOS access
+    /// </summary>
     public interface IRightsHoldersService
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
@@ -13,5 +17,6 @@ namespace Core.ApplicationServices.RightsHolders
         Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
         Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
+        Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
     }
 }

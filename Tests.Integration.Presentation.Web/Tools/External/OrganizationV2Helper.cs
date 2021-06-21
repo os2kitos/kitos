@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.External.V2.Response;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.Tools.V2
+namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class OrganizationV2Helper
     {

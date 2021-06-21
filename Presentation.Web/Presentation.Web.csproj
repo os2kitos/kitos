@@ -350,6 +350,7 @@
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
+    <Compile Include="Models\External\V2\Request\RightsHolderWritableITSystemPropertiesDTO.cs" />
     <Compile Include="Models\External\V2\Request\StandardPaginationQuery.cs" />
     <Compile Include="Models\External\V2\Response\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
@@ -435,7 +436,7 @@
     <Compile Include="Models\Csv\CsvColumnIdentity.cs" />
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\External\V2\Response\IdentityNamePairResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Request\ItSystemRequestDTO.cs" />
+    <Compile Include="Models\External\V2\Request\RightsHolderCreateItSystemRequestDTO.cs" />
     <Compile Include="Models\External\V2\Response\OrganizationResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />

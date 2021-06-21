@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
 using Infrastructure.DataAccess;
 using Tests.Integration.Presentation.Web.Tools.Model;
 
@@ -185,11 +183,5 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             return DefaultUserPassword;
         }
-
-        public static Guid GetEntityUuid<T>(int dbId) where T : class, IHasUuid, IHasId
-        {
-            return DatabaseAccess.MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
-        }
-
     }
 }
