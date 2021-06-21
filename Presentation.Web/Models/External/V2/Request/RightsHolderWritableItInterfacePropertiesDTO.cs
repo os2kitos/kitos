@@ -16,11 +16,13 @@ namespace Presentation.Web.Models.External.V2.Request
         /// Name of IT-Interface
         /// </summary>
         [Required(AllowEmptyStrings = false)]
+        [MaxLength(ItInterface.MaxNameLength)]
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Identifier for IT-Interface
         /// </summary>
+        [MaxLength(ItInterface.MaxNameLength)]
         public string InterfaceId { get; set; }
         
         /// <summary>
