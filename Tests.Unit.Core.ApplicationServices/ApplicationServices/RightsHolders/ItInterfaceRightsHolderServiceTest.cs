@@ -408,7 +408,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 
         private void ExpectUpdateItInterfaceIdReturns(int interfaceId, RightsHolderItInterfaceCreationParameters inputParameters, Result<ItInterface, OperationError> result)
         {
-            _interfaceServiceMock.Setup(x => x.UpdateItInterfaceId(interfaceId, inputParameters.InterfaceId)).Returns(result);
+            _interfaceServiceMock.Setup(x => x.UpdateNameAndInterfaceId(interfaceId, inputParameters.Name, inputParameters.InterfaceId)).Returns(result);
         }
 
         private void ExpectUpdateUrlReferenceReturns(int interfaceId, RightsHolderItInterfaceCreationParameters inputParameters, Result<ItInterface, OperationError> result)

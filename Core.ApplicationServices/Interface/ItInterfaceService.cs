@@ -160,12 +160,12 @@ namespace Core.ApplicationServices.Interface
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        public Result<ItInterface, OperationError> UpdateItInterfaceId(int id, string itInterfaceId)
+        public Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string itInterfaceId)
         {
             return Mutate(id, 
                 itInterface => itInterface.ItInterfaceId != itInterfaceId, 
                 updateWithResult: itInterface => {
-                    var nameError = IsItInterfaceIdAndNameUnique(itInterface.Name, itInterfaceId, itInterface.OrganizationId);
+                    var nameError = IsItInterfaceIdAndNameUnique(name, itInterfaceId, itInterface.OrganizationId);
                     if (nameError.HasValue)
                         return nameError.Value;
 

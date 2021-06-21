@@ -353,7 +353,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
 
-            var input = new ItInterfaceRequestDTO()
+            var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 RightsHolderUuid = org.Uuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
@@ -395,7 +395,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
 
-            var input = new ItInterfaceRequestDTO()
+            var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 RightsHolderUuid = withoutRightsHolder ? Guid.Empty : org.Uuid,
                 ExposedBySystemUuid = withoutExposingSystem ? Guid.Empty : exposingSystem.Uuid,
@@ -419,7 +419,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
 
-            var input = new ItInterfaceRequestDTO()
+            var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 RightsHolderUuid = defaultOrgUuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
@@ -442,7 +442,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
-            var input = new ItInterfaceRequestDTO()
+            var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 RightsHolderUuid = org.Uuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
@@ -465,7 +465,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
 
-            var input = new ItInterfaceRequestDTO()
+            var input = new RightsHolderWritableItInterfacePropertiesDTO()
             {
                 RightsHolderUuid = org.Uuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,

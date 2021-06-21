@@ -138,5 +138,48 @@ namespace Core.ApplicationServices.RightsHolders
                     }
                 );
         }
+
+        public Result<ItInterface, OperationError> UpdateItInterface(Guid interfaceUuid, RightsHolderItInterfaceUpdateParameters updateParameters)
+        {
+            if (updateParameters == null)
+                throw new ArgumentNullException(nameof(updateParameters));
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var exposingSystem = _systemService.GetSystem(updateParameters.ExposingSystemUuid);
+
+                if (exposingSystem.Failed)
+                {
+                    if (exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
+                        return new OperationError("Invalid exposing system id provided", OperationFailure.BadInput);
+                    return exposingSystem.Error;
+                }
+
+                var result = _itInterfaceService
+                    .GetInterface(interfaceUuid)
+                    .Bind(itInterface => _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, updateParameters.Name, updateParameters.InterfaceId))
+                    .Bind(ItInterface => _itInterfaceService.UpdateExposingSystem(ItInterface.Id, exposingSystem.Value.Id))
+                    .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, updateParameters.Version))
+                    .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, updateParameters.Description))
+                    .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, updateParameters.UrlReference));
+
+                if (result.Ok)
+                {
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error($"Failed to update It-Interface with uuid: {interfaceUuid} due to error: {result.Error}");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Failed updating rightsholder It-Interface with uuid {interfaceUuid}");
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
     }
 }

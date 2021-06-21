@@ -790,17 +790,18 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void UpdateInterfaceId_Returns_Updated_Interface()
+        public void UpdateNameAndInterfaceId_Returns_Updated_Interface()
         {
             Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
             {
                 //Arrange
                 var newItInterfaceId = A<string>();
+                var newName = A<string>();
 
                 _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); // Return nothing so no conflicts are found.
 
                 //Act
-                var updatedInterface = _sut.UpdateItInterfaceId(itInterface.Id, newItInterfaceId);
+                var updatedInterface = _sut.UpdateNameAndInterfaceId(itInterface.Id, newName, newItInterfaceId);
 
                 //Assert
                 Assert.Equal(newItInterfaceId, updatedInterface.Value.ItInterfaceId);
@@ -810,15 +811,15 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void UpdateInterfaceId_Returns_Forbidden()
+        public void UpdateNameAndInterfaceId_Returns_Forbidden()
         {
-            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateItInterfaceId(itInterface.Id, A<string>()));
+            Test_Command_Which_Mutates_ItInterface_With_Failure_Forbidden(itInterface => _sut.UpdateNameAndInterfaceId(itInterface.Id, A<string>(), A<string>()));
         }
 
         [Fact]
-        public void UpdateInterfaceId_Returns_NotFound()
+        public void UpdateNameAndInterfaceId_Returns_NotFound()
         {
-            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateItInterfaceId(itInterface.Id, A<string>()));
+            Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateNameAndInterfaceId(itInterface.Id, A<string>(), A<string>()));
         }
 
         [Fact]
@@ -827,17 +828,18 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
             var newItInterfaceId = A<string>();
+            var newName = A<string>();
 
             var transaction = SetupTransaction();
             _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
             _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true); 
             _repository.Setup(x => x.GetInterfaces()).Returns(
                 new List<ItInterface>() { 
-                    new ItInterface() { OrganizationId = itInterface.OrganizationId, Name = itInterface.Name, ItInterfaceId = newItInterfaceId } 
+                    new ItInterface() { OrganizationId = itInterface.OrganizationId, Name = newName, ItInterfaceId = newItInterfaceId } 
                 }.AsQueryable()); //Returns interface with same org, name and new ItInterfaceId
 
             //Act
-            var updated = _sut.UpdateItInterfaceId(itInterface.Id, newItInterfaceId);
+            var updated = _sut.UpdateNameAndInterfaceId(itInterface.Id, newName, newItInterfaceId);
 
             //Assert
             Assert.True(updated.Failed);

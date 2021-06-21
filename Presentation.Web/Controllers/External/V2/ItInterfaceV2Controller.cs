@@ -45,13 +45,14 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
+        public IHttpActionResult PostItInterface([FromBody] RightsHolderCreateItInterfaceRequestDTO itInterfaceDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var creationParameters = new RightsHolderItInterfaceCreationParameters(
-                itInterfaceDTO.Uuid, 
+                itInterfaceDTO.Uuid,
+                itInterfaceDTO.ExposedBySystemUuid,
                 itInterfaceDTO.Name, 
                 itInterfaceDTO.InterfaceId, 
                 itInterfaceDTO.Version, 
@@ -127,9 +128,23 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
+        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO itInterfaceDTO)
         {
-            return Ok(new RightsHolderItInterfaceResponseDTO());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updateParameters = new RightsHolderItInterfaceUpdateParameters(
+                itInterfaceDTO.ExposedBySystemUuid,
+                itInterfaceDTO.Name,
+                itInterfaceDTO.InterfaceId,
+                itInterfaceDTO.Version,
+                itInterfaceDTO.Description,
+                itInterfaceDTO.UrlReference);
+
+            return _rightsHolderService
+                .UpdateItInterface(uuid, updateParameters)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
 
         /// <summary>

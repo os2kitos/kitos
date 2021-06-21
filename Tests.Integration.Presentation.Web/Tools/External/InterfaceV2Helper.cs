@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(url, token);
         }
 
-        public static async Task<RightsHolderItInterfaceResponseDTO> CreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        public static async Task<RightsHolderItInterfaceResponseDTO> CreateRightsHolderItInterfaceAsync(string token, RightsHolderWritableItInterfacePropertiesDTO request)
         {
             using var response = await SendCreateRightsHolderItInterfaceAsync(token, request);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -105,7 +105,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendCreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderItInterfaceAsync(string token, RightsHolderWritableItInterfacePropertiesDTO request)
         {
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/rightsholder/it-interfaces"), request, token);
 
