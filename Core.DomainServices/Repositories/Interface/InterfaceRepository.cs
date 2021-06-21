@@ -58,7 +58,7 @@ namespace Core.DomainServices.Repositories.Interface
             if (itInterface == null)
                 throw new ArgumentNullException(nameof(itInterface));
 
-            _interfaceRepository.DeleteByKeyWithReferencePreload(itInterface);
+            _interfaceRepository.DeleteWithReferencePreload(itInterface);
             _interfaceRepository.Save();
         }
     }

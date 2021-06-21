@@ -138,7 +138,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         public void Can_GetInterface_By_Uuid_Returns_Single_ItInterface()
         {
             //Arrange
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
             var itInterface1 = new ItInterface()
             {
                 Uuid = uuid
@@ -158,7 +158,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         public void GetInterface_By_Uuid_Returns_None_If_No_ItInterface_Found()
         {
             //Arrange
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
             var itInterface1 = CreateInterface();
             var itInterface2 = CreateInterface();
             _repository.Setup(x => x.AsQueryable()).Returns(new List<ItInterface>() { itInterface1, itInterface2 }.AsQueryable());
@@ -211,7 +211,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             return new ItInterface()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
         }
 

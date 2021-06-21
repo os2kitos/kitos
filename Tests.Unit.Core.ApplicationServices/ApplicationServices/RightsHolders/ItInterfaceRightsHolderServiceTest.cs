@@ -144,12 +144,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Ok()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var orgId = A<int>();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
             
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(exposingSystem.Uuid, exposingSystem);
@@ -173,8 +173,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_BadInput_If_GetRightsHolderOrganizationFails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
-            var exposingSystemUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
+            var exposingSystemUuid = A<Guid>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
 
@@ -193,11 +193,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_BadInput_If_No_GetExposingSystemFails_With_NotFound()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(exposingSystem.Uuid, new OperationError(OperationFailure.NotFound));
@@ -215,11 +215,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Forbidden_If_No_GetExposingSystemFails_With_Forbidden()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(exposingSystem.Uuid, new OperationError(OperationFailure.Forbidden));
@@ -237,11 +237,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Forbidden_If_No_RightsHolderAccess_In_Target_Organization()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgId });
             ExpectGetSystemReturns(exposingSystem.Uuid, exposingSystem);
@@ -260,11 +260,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Error_If_Create_Fails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
@@ -286,12 +286,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Error_If_UpdateExposingSystem_Fails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
@@ -314,12 +314,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Error_If_UpdateVersion_Fails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
@@ -343,12 +343,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Error_If_UpdateDescription_Fails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 
@@ -373,12 +373,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void CreateNewItInterface_Returns_Error_If_UpdateUrlReference_Fails()
         {
             //Arrange
-            var rightsHolderUuid = Guid.NewGuid();
+            var rightsHolderUuid = A<Guid>();
             var orgId = A<int>();
             var inputParameters = A<RightsHolderItInterfaceCreationParameters>();
             var transactionMock = ExpectTransactionBegins();
             var itInterface = new ItInterface { Id = A<int>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = Guid.NewGuid() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
 
             var operationError = A<OperationError>();
 

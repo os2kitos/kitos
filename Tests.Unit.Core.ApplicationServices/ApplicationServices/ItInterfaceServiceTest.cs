@@ -288,7 +288,7 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetInterface_Returns_Interface()
         {
             //Arrange
-            var interfaceUuid = Guid.NewGuid();
+            var interfaceUuid = A<Guid>();
             var itInterface = new ItInterface();
 
             _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(itInterface);
@@ -306,7 +306,7 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetInterface_Returns_Forbidden_If_Not_Read_Access()
         {
             //Arrange
-            var interfaceUuid = Guid.NewGuid();
+            var interfaceUuid = A<Guid>();
             var itInterface = new ItInterface();
 
             _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(itInterface);
@@ -324,7 +324,7 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetInterface_Returns_NotFound_If_No_Interface()
         {
             //Arrange
-            var interfaceUuid = Guid.NewGuid();
+            var interfaceUuid = A<Guid>();
 
             _repository.Setup(x => x.GetInterface(interfaceUuid)).Returns(Maybe<ItInterface>.None);
 
@@ -340,11 +340,11 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetAvailableInterfaces_Returns_RightsholderInterfaces_If_User_Has_Rightsholderaccess()
         {
             //Arrange
-            var interfaceUuid = Guid.NewGuid();
+            var interfaceUuid = A<Guid>();
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var rightsHolderOrgs = new List<int>() { org.Id };
             var itInterface = new ItInterface()
@@ -377,18 +377,18 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetAvailableInterfaces_Returns_Interfaces_Where_User_Has_Rightsholderaccess_Or_Other_Role_In_Owning_Org()
         {
             //Arrange
-            var rightsHolderItInterfaceUuid = Guid.NewGuid();
-            var organizationItInterfaceUuid = Guid.NewGuid();
+            var rightsHolderItInterfaceUuid = A<Guid>();
+            var organizationItInterfaceUuid = A<Guid>();
             var rightsHolderOrg = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var rightsHolderOrgs = new List<int>() { rightsHolderOrg.Id };
             var userRoleOrg = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var userRoleOrgs = new List<int>() { userRoleOrg.Id };
             var rightsHolderItInterface = new ItInterface()
@@ -433,12 +433,12 @@ namespace Tests.Unit.Core.ApplicationServices
             var org1 = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var org2 = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var rightsHolderOrgs = new List<int>() {
                 org1.Id,
@@ -446,7 +446,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             var itInterface1 = new ItInterface()
             {
-                Uuid = Guid.NewGuid(),
+                Uuid = A<Guid>(),
                 ExhibitedBy = new ItInterfaceExhibit()
                 {
                     ItSystemId = A<int>(),
@@ -459,7 +459,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             var itInterface2 = new ItInterface()
             {
-                Uuid = Guid.NewGuid(),
+                Uuid = A<Guid>(),
                 ExhibitedBy = new ItInterfaceExhibit()
                 {
                     ItSystemId = A<int>(),
@@ -497,11 +497,11 @@ namespace Tests.Unit.Core.ApplicationServices
         public void GetAvailableInterfaces_Returns_Public_Interfaces_If_User_Has_Access_Level_Public(CrossOrganizationDataReadAccessLevel accessLevel, int expectedNumberOfInterfaces)
         {
             //Arrange
-            var interfaceUuid = Guid.NewGuid();
+            var interfaceUuid = A<Guid>();
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
             var rightsHolderOrgs = new List<int>() { org.Id };
             var publicItInterface = new ItInterface()
@@ -531,11 +531,11 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var name = A<string>();
             var itInterfaceId = A<string>();
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             var transaction = SetupTransaction();
@@ -568,7 +568,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             var transaction = SetupTransaction();
@@ -601,7 +601,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             var transaction = SetupTransaction();
@@ -626,7 +626,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             var transaction = SetupTransaction();
@@ -651,11 +651,11 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var name = A<string>();
             var itInterfaceId = A<string>();
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             var transaction = SetupTransaction();
@@ -680,11 +680,11 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var name = A<string>();
             var itInterfaceId = A<string>();
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
             var org = new Organization()
             {
                 Id = A<int>(),
-                Uuid = Guid.NewGuid()
+                Uuid = A<Guid>()
             };
 
             ExpectAllowCreate(org.Id, false);
@@ -909,7 +909,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 Name = A<string>(),
                 Note = A<string>(),
                 Url = A<string>(),
-                Uuid = Guid.NewGuid(),
+                Uuid = A<Guid>(),
                 OrganizationId = A<int>()
             };
         }

@@ -159,7 +159,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
 
             //Act
             var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, uuid);
@@ -362,7 +362,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                 Description = A<string>(),
                 UrlReference = A<string>(),
                 Version = A<string>().Substring(0, 20),
-                Uuid = withProvidedUuid ? Guid.NewGuid() : null
+                Uuid = withProvidedUuid ? A<Guid>() : null
             };
 
             //Act
