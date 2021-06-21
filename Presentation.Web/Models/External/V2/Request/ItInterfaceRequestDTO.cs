@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.ItSystem;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.External.V2.Request
@@ -28,16 +29,19 @@ namespace Presentation.Web.Models.External.V2.Request
         /// Name of IT-Interface
         /// </summary>
         [Required(AllowEmptyStrings = false)]
+        [MaxLength(ItInterface.MaxNameLength)]
         public string Name { get; set; }
-        
+
         /// <summary>
         /// Identifier for IT-Interface
         /// </summary>
+        [MaxLength(ItInterface.MaxNameLength)]
         public string InterfaceId { get; set; }
         
         /// <summary>
         /// Version signifier for IT-Interface
         /// </summary>
+        [MaxLength(ItInterface.MaxVersionLength)]
         public string Version { get; set; }
         
         /// <summary>

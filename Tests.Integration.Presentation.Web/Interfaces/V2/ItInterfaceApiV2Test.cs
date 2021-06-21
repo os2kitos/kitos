@@ -3,6 +3,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
+using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Interface;
 using System;
 using System.Linq;
@@ -151,14 +152,14 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             });
         }
 
-        
+
 
         [Fact]
         public async Task Cannot_Get_Interface_As_RightsHolder_If_Not_Exists()
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var uuid = Guid.NewGuid();
+            var uuid = A<Guid>();
 
             //Act
             var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, uuid);
@@ -341,6 +342,144 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             //Assert
             Assert.Single(result);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_Post_ItInterface_As_Rightsholder(bool withProvidedUuid)
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+
+            var input = new ItInterfaceRequestDTO()
+            {
+                RightsHolderUuid = org.Uuid,
+                ExposedBySystemUuid = exposingSystem.Uuid,
+                Name = A<string>(),
+                InterfaceId = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>(),
+                Version = A<string>().Substring(0, 20),
+                Uuid = withProvidedUuid ? A<Guid>() : null
+            };
+
+            //Act
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, input);
+
+            //Assert
+            if (withProvidedUuid)
+                Assert.Equal(input.Uuid, createdInterface.Uuid);
+            else
+                Assert.NotEqual(Guid.Empty, createdInterface.Uuid);
+
+            Assert.Equal(input.ExposedBySystemUuid, createdInterface.ExposedBySystem.Uuid);
+            Assert.Equal(input.Name, createdInterface.Name);
+            Assert.Equal(input.InterfaceId, createdInterface.InterfaceId);
+            Assert.Equal(input.Description, createdInterface.Description);
+            Assert.Equal(input.UrlReference, createdInterface.UrlReference);
+            Assert.Equal(input.Version, createdInterface.Version);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true, true)]
+        [InlineData(true, true, true, true, false)]
+        [InlineData(true, true, true, false, true)]
+        [InlineData(true, true, false, true, true)]
+        [InlineData(true, false, true, true, true)]
+        [InlineData(false, true, true, true, true)]
+        public async Task Cannot_Post_ItInterface_As_Rightsholder_Without_All_Required_Fields(bool withoutRightsHolder, bool withoutExposingSystem, bool withoutName, bool wihtoutDescription, bool withoutUrlReference)
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+
+            var input = new ItInterfaceRequestDTO()
+            {
+                RightsHolderUuid = withoutRightsHolder ? Guid.Empty : org.Uuid,
+                ExposedBySystemUuid = withoutExposingSystem ? Guid.Empty : exposingSystem.Uuid,
+                Name = withoutName ? null : A<string>(),
+                Description = wihtoutDescription ? null : A<string>(),
+                UrlReference = withoutUrlReference ? null : A<string>()
+            };
+
+            //Act
+            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, createdInterface.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Post_ItInterface_As_Rightsholder_To_Organization_Where_User_Is_Not_RightsHolder()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync(); 
+            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+
+            var input = new ItInterfaceRequestDTO()
+            {
+                RightsHolderUuid = defaultOrgUuid,
+                ExposedBySystemUuid = exposingSystem.Uuid,
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+
+            //Act
+            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, createdInterface.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Post_ItInterface_As_Rightsholder_With_ExposingSystem_Where_User_Does_Not_Have_Read_Access()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            var input = new ItInterfaceRequestDTO()
+            {
+                RightsHolderUuid = org.Uuid,
+                ExposedBySystemUuid = exposingSystem.Uuid,
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+
+            //Act
+            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, createdInterface.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Post_ItInterface_As_Rightsholder_With_Version_Being_Longer_Than_MaxLength()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+
+            var input = new ItInterfaceRequestDTO()
+            {
+                RightsHolderUuid = org.Uuid,
+                ExposedBySystemUuid = exposingSystem.Uuid,
+                Name = A<string>(),
+                Description = A<string>(),
+                UrlReference = A<string>(),
+                Version = "Too long version parameter " + A<string>()
+            };
+
+            //Act
+            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, createdInterface.StatusCode);
         }
 
         private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrg()
