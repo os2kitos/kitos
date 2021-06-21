@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
@@ -115,21 +116,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert - compare db entity with the response DTO
             Assert.NotNull(systemDTO);
             DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(repository =>
-             {
-                 var dbSystem = repository.AsQueryable().ByUuid(system.uuid);
+            {
+                var dbSystem = repository.AsQueryable().ByUuid(system.uuid);
 
-                 AssertBaseSystemDTO(dbSystem, systemDTO);
+                AssertBaseSystemDTO(dbSystem, systemDTO);
 
-                 Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
-                 Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
-                 Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
+                Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
+                Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
+                Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
 
-                 var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(dto => dto.Uuid, dto => (dto.Name, dto.Cvr));
-                 var dbOrgs = dbSystem.Usages.Select(itSystemUsage => itSystemUsage.Organization).ToDictionary(organization => organization.Uuid, organization => (organization.Name, organization.GetActiveCvr()));
-                 Assert.Equal(dbOrgs, dtoOrgs);
+                var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(dto => dto.Uuid, dto => (dto.Name, dto.Cvr));
+                var dbOrgs = dbSystem.Usages.Select(itSystemUsage => itSystemUsage.Organization).ToDictionary(organization => organization.Uuid, organization => (organization.Name, organization.GetActiveCvr()));
+                Assert.Equal(dbOrgs, dtoOrgs);
 
-                 return true;
-             });
+                return true;
+            });
         }
 
         [Fact]
@@ -448,13 +449,12 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true)]
-        [InlineData(false, true, true, true, true, true)]
-        [InlineData(true, false, true, true, true, true)]
-        [InlineData(true, true, false, true, true, true)]
         [InlineData(true, true, true, false, true, true)]
-        [InlineData(true, true, true, true, false, true)]
-        [InlineData(true, true, true, true, true, false)]
+        [InlineData(false, true, false, true, true, true)]
+        [InlineData(true, false, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, true, false, true, false, true)]
+        [InlineData(true, true, true, false, true, false)]
         [InlineData(false, false, false, false, false, false)]
 
         public async Task Can_POST_ItSystem_As_RightsHolder(bool withProvidedUuid, bool withBusinessType, bool withKleNumbers, bool withKleUuid, bool withParent, bool withFormerName)
@@ -516,9 +516,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(true,true, true, true)]
-        [InlineData(true,true, true, false)]
-        [InlineData(true,true, false, true)]
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
         [InlineData(true, false, true, true)]
         [InlineData(false, true, true, true)]
         public async Task Cannot_POST_ItSystem_AsRightsHolder_WithoutAllRequiredFields(bool withoutRightsHolder, bool withoutName, bool withoutDescription, bool withoutReference)
@@ -568,7 +568,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var (parentUuid, dbId) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId,AccessModifier.Local);
+            var (parentUuid, dbId) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
 
             var input = new RightsHolderCreateItSystemRequestDTO
             {
@@ -584,6 +584,36 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdSystem.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(1, 1)]
+        [InlineData(0, 2)]
+        [InlineData(2, 0)]
+        public async Task Cannot_POST_ItSystem_With_Duplicate_KLE(int instancesInKleNumbers, int instancesInUuids)
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var kle = DatabaseAccess.MapFromEntitySet<TaskRef, (string key, Guid uuid)>(x => x.AsQueryable().First().Transform(taskRef => (taskRef.TaskKey, taskRef.Uuid)));
+
+            var kleNumbers = Enumerable.Repeat(kle.key, instancesInKleNumbers);
+            var kleUuids = Enumerable.Repeat(kle.uuid, instancesInUuids);
+
+            var input = new RightsHolderCreateItSystemRequestDTO
+            {
+                RightsHolderUuid = org.Uuid,
+                Name = $"Name_{A<string>()}",
+                Description = $"Description_{A<string>()}",
+                UrlReference = $"https://{A<int>()}.dk",
+                KLENumbers = kleNumbers, //Same kle by both key and uuid
+                KLEUuids = kleUuids
+            };
+
+            //Act 
+            var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, createdSystem.StatusCode);
         }
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
