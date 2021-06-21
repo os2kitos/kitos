@@ -587,8 +587,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Theory]
-        [InlineData(1,1)]
-        [InlineData(0,2)]
+        [InlineData(1, 1)]
+        [InlineData(0, 2)]
         [InlineData(2, 0)]
         public async Task Cannot_POST_ItSystem_With_Duplicate_KLE(int instancesInKleNumbers, int instancesInUuids)
         {
@@ -615,6 +615,55 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdSystem.StatusCode);
         }
+
+        [Fact]
+        public async Task Cannot_PUT_As_RightsHolder_To_Unknown_System()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var uuid = A<Guid>();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, uuid, A<RightsHolderWritableITSystemPropertiesDTO>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_As_RightsHolder_To_System_With_Wrong_RightsHolder()
+        {
+            //Arrange
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var (uuid, _) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, uuid, A<RightsHolderWritableITSystemPropertiesDTO>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_As_RightsHolder_To_System_Which_Has_Been_Deactivated()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var (uuid, _) = await CreateSystemAsync(rightsHolder.Id, AccessModifier.Local);
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(systems => systems.AsQueryable().ByUuid(uuid).Disabled = true);
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, uuid, A<RightsHolderWritableITSystemPropertiesDTO>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        /*
+         * TODO:
+         * - Can_PUT_Full_Change
+         * - individual property errors -> can more or less copy scenarios from CREATE
+         */
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
