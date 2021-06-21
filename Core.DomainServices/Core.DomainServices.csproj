@@ -101,6 +101,8 @@
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />
     <Compile Include="Repositories\Notification\UserNotificationRepository.cs" />
+    <Compile Include="Repositories\TaskRefs\ITaskRefRepository.cs" />
+    <Compile Include="Repositories\TaskRefs\TaskRefRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="IUserService.cs" />

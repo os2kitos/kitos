@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.System;
 using Core.DomainModel.Events;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -19,9 +20,12 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemsController : BaseEntityController<ItSystem>
     {
-        public ItSystemsController(IGenericRepository<ItSystem> repository)
+        private readonly IItSystemService _systemService;
+
+        public ItSystemsController(IGenericRepository<ItSystem> repository, IItSystemService systemService)
             : base(repository)
         {
+            _systemService = systemService;
         }
 
         /// <summary>
@@ -62,6 +66,17 @@ namespace Presentation.Web.Controllers.OData
             if (AttemptToChangeUuid(delta, itSystem, changedPropertyNames))
                 return BadRequest("Cannot change Uuid");
 
+            if (changedPropertyNames.Contains(nameof(ItSystem.Name)))
+            {
+                if (delta.TryGetPropertyValue(nameof(ItSystem.Name), out var name))
+                {
+                    if (!_systemService.CanChangeNameTo(itSystem.OrganizationId, itSystem.Id, (string)name))
+                    {
+                        return Conflict();
+                    }
+                }
+            }
+
             var disabledBefore = itSystem.Disabled;
             var result = base.Patch(key, delta);
             if (disabledBefore != itSystem.Disabled)
@@ -72,7 +87,7 @@ namespace Presentation.Web.Controllers.OData
             return result;
         }
 
-        private bool AttemptToChangeUuid(Delta<ItSystem> delta, ItSystem itSystem, HashSet<string> changedPropertyNames)
+        private static bool AttemptToChangeUuid(Delta<ItSystem> delta, ItSystem itSystem, HashSet<string> changedPropertyNames)
         {
             const string uuidName = nameof(Core.DomainModel.User.Uuid);
 

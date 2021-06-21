@@ -84,7 +84,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
 
             //Assert
             VerifySaved(Times.Once());
-            _repository.Verify(x => x.DeleteByKeyWithReferencePreload(itInterface), Times.Once);
+            _repository.Verify(x => x.DeleteWithReferencePreload(itInterface), Times.Once);
         }
 
         [Fact]

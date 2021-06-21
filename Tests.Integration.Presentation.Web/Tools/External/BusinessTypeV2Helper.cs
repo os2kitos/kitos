@@ -16,22 +16,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/business-types?organizationUuid={orgUuid}&pageSize={pageSize}&page={pageNumber}");
-            using (var response = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
-            }
+            
+            using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
 
         public static async Task<AvailableNamePairResponseDTO> GetBusinessTypeAsync(Guid businessTypeUuid, Guid organizationUuid)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/business-types/{businessTypeUuid}?organizationUuid={organizationUuid}");
-            using (var response = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsAsync<AvailableNamePairResponseDTO>();
-            }
+            
+            using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<AvailableNamePairResponseDTO>();
         }
     }
 }
