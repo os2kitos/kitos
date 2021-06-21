@@ -116,21 +116,21 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert - compare db entity with the response DTO
             Assert.NotNull(systemDTO);
             DatabaseAccess.MapFromEntitySet<Core.DomainModel.ItSystem.ItSystem, bool>(repository =>
-             {
-                 var dbSystem = repository.AsQueryable().ByUuid(system.uuid);
+            {
+                var dbSystem = repository.AsQueryable().ByUuid(system.uuid);
 
-                 AssertBaseSystemDTO(dbSystem, systemDTO);
+                AssertBaseSystemDTO(dbSystem, systemDTO);
 
-                 Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
-                 Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
-                 Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
+                Assert.Equal(dbSystem.LastChanged, systemDTO.LastModified);
+                Assert.Equal(dbSystem.LastChangedByUser.Uuid, systemDTO.LastModifiedBy.Uuid);
+                Assert.Equal(dbSystem.LastChangedByUser.GetFullName(), systemDTO.LastModifiedBy.Name);
 
-                 var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(dto => dto.Uuid, dto => (dto.Name, dto.Cvr));
-                 var dbOrgs = dbSystem.Usages.Select(itSystemUsage => itSystemUsage.Organization).ToDictionary(organization => organization.Uuid, organization => (organization.Name, organization.GetActiveCvr()));
-                 Assert.Equal(dbOrgs, dtoOrgs);
+                var dtoOrgs = systemDTO.UsingOrganizations.ToDictionary(dto => dto.Uuid, dto => (dto.Name, dto.Cvr));
+                var dbOrgs = dbSystem.Usages.Select(itSystemUsage => itSystemUsage.Organization).ToDictionary(organization => organization.Uuid, organization => (organization.Name, organization.GetActiveCvr()));
+                Assert.Equal(dbOrgs, dtoOrgs);
 
-                 return true;
-             });
+                return true;
+            });
         }
 
         [Fact]
