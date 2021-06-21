@@ -186,6 +186,7 @@
     <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\Notification\UserNotificationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
+    <Compile Include="ApplicationServices\RightsHolders\ItInterfaceRightsHolderServiceTest.cs" />
     <Compile Include="ApplicationServices\RightsHolders\RightsHoldersServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionTypes\OptionsApplicationServiceTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />
@@ -200,6 +201,7 @@
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationOptionRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
+    <Compile Include="DomainServices\Repositories\ItInterfaceRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\Kendo\KendoOrganizationalConfigurationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\OrganizationRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />

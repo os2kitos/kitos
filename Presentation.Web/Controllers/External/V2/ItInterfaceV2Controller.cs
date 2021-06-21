@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Interface;
 using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
@@ -20,10 +22,10 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2")]
     public class ItInterfaceV2Controller: ExternalBaseController
     {
-        private readonly IRightsHoldersService _rightsHolderService;
+        private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
 
-        public ItInterfaceV2Controller(IRightsHoldersService rightsHolderService, IItInterfaceService itInterfaceService)
+        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService, IItInterfaceService itInterfaceService)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
@@ -45,7 +47,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Conflict)]
         public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
         {
-            return Created(Request.RequestUri + "/" + itInterfaceDTO.Uuid, new RightsHolderItInterfaceResponseDTO());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var creationParameters = new RightsHolderItInterfaceCreationParameters(
+                itInterfaceDTO.Uuid, 
+                itInterfaceDTO.Name, 
+                itInterfaceDTO.InterfaceId, 
+                itInterfaceDTO.Version, 
+                itInterfaceDTO.Description, 
+                itInterfaceDTO.UrlReference);
+
+            return _rightsHolderService
+                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, itInterfaceDTO.ExposedBySystemUuid, creationParameters)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -216,6 +232,11 @@ namespace Presentation.Web.Controllers.External.V2
             outputDTO.Deactivated = input.Disabled;
             outputDTO.Created = input.Created;
             outputDTO.CreatedBy = input.ObjectOwner.MapIdentityNamePairDTO();
+        }
+
+        private CreatedNegotiatedContentResult<RightsHolderItInterfaceResponseDTO> MapItInterfaceCreatedResponse(RightsHolderItInterfaceResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }
