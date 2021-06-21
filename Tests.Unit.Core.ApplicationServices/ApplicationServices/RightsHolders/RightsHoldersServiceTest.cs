@@ -602,6 +602,86 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
+        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Key()
+        {
+            //Arrange
+            var overlapKey = A<string>();
+            var uniqueKey = A<string>();
+            Configure(fixture => fixture.Inject<IEnumerable<Guid>>(new Guid[0]));
+            Configure(fixture => fixture.Inject<IEnumerable<string>>(new[] { overlapKey, uniqueKey, overlapKey }));
+            var rightsHolderUuid = A<Guid>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var orgDbId = A<int>();
+            var itSystem = new ItSystem { Id = A<int>() };
+            var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
+
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uniqueKey)).Returns(new TaskRef() { Id = A<int>() });
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(overlapKey)).Returns(new TaskRef() { Id = A<int>() });
+
+            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
+            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
+            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
+            ExpectSystemServiceGetSystemReturns(inputParameters, parentSystem);
+            ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
+            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
+            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, itSystem);
+            ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, itSystem);
+
+            //Act
+            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            Assert.Contains("Overlapping KLE. Please specify the same KLE only once. KLE resolved by key ", result.Error.Message.Value);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void CreateNewSystem_Returns_Error_If_KLE_Duplicates_By_Uuid()
+        {
+            //Arrange
+            var overlapKey = A<Guid>();
+            var uniqueKey = A<Guid>();
+            Configure(fixture => fixture.Inject<IEnumerable<Guid>>(new Guid[]{overlapKey,uniqueKey,overlapKey}));
+            Configure(fixture => fixture.Inject<IEnumerable<string>>(new string[0]));
+            var rightsHolderUuid = A<Guid>();
+            var inputParameters = A<RightsHolderSystemCreationParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var orgDbId = A<int>();
+            var itSystem = new ItSystem { Id = A<int>() };
+            var parentSystem = new ItSystem() { Id = A<int>(), OrganizationId = A<int>(), BelongsToId = A<int>() };
+
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(uniqueKey)).Returns(new TaskRef() { Id = A<int>() });
+            _taskRefRepositoryMock.Setup(x => x.GetTaskRef(overlapKey)).Returns(new TaskRef() { Id = A<int>() });
+
+            ExpectGetOrganizationReturns(rightsHolderUuid, new Organization { Id = orgDbId });
+            ExpectUserHasRightsHolderAccessInOrganizationReturns(orgDbId, true);
+            ExpectSystemServiceCreateItSystemReturns(orgDbId, inputParameters, itSystem);
+            ExpectSystemServiceGetSystemReturns(inputParameters, parentSystem);
+            ExpectUserHasRightsHolderAccessInOrganizationReturns(parentSystem.BelongsToId.Value, true);
+            ExpectUpdateRightsHolderReturns(itSystem.Id, rightsHolderUuid, itSystem);
+            ExpectUpdatePreviousNameReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateDescriptionReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateMainUrlReferenceReturns(itSystem.Id, inputParameters, itSystem);
+            ExpectUpdateParentSystemReturns(itSystem.Id, parentSystem, itSystem);
+            ExpectUpdateBusinessTypeReturns(itSystem.Id, inputParameters, itSystem);
+
+            //Act
+            var result = _sut.CreateNewSystem(rightsHolderUuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            Assert.Contains("Overlapping KLE. Please specify the same KLE only once. KLE resolved by uuid", result.Error.Message.Value);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
         public void CreateNewSystem_Returns_Error_If_ProvidedTaskKeyIsInvalid()
         {
             //Arrange
@@ -735,8 +815,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transactionMock.Object);
             return transactionMock;
         }
-
-        //TODO: Triangulation
 
         private void ExpectHasSpecificAccessReturns(ItSystem itSystem, bool value)
         {

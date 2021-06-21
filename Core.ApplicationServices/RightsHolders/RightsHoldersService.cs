@@ -114,7 +114,8 @@ namespace Core.ApplicationServices.RightsHolders
                 if (taskRef.IsNone)
                     return new OperationError($"Invalid KLE Number:{taskRefKey}", OperationFailure.BadInput);
 
-                taskRefIds.Add(taskRef.Value.Id);
+                if (!taskRefIds.Add(taskRef.Value.Id))
+                    return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by key {taskRefKey}", OperationFailure.BadInput);
             }
             foreach (var uuid in taskRefUuids)
             {
@@ -123,7 +124,10 @@ namespace Core.ApplicationServices.RightsHolders
                 if (taskRef.IsNone)
                     return new OperationError($"Invalid KLE UUID:{uuid}", OperationFailure.BadInput);
 
-                taskRefIds.Add(taskRef.Value.Id);
+                var taskRefValue = taskRef.Value;
+
+                if (!taskRefIds.Add(taskRefValue.Id))
+                    return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by uuid {uuid} which matches overlap on KLE {taskRefValue.TaskKey}", OperationFailure.BadInput);
             }
 
             return _systemService.UpdateTaskRefs(systemId, taskRefIds.ToList());
