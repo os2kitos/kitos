@@ -197,7 +197,9 @@ namespace Core.ApplicationServices.RightsHolders
                         .Bind(WithRightsHolderAccessTo);
 
                 if (parentSystemResult.Failed)
-                    return parentSystemResult.Error;
+                    return parentSystemResult.Error.FailureType == OperationFailure.NotFound
+                        ? new OperationError("Parent system cannot be found", OperationFailure.BadInput)
+                        : parentSystemResult.Error;
 
 
                 parentSystemId = parentSystemResult.Value.Id;
