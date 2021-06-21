@@ -18,5 +18,6 @@ namespace Core.ApplicationServices.RightsHolders
         Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
         Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
+        Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters);
     }
 }

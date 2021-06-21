@@ -3,10 +3,9 @@ using System.Collections.Generic;
 
 namespace Core.ApplicationServices.Model.System
 {
-    public class RightsHolderSystemCreationParameters : IRightsHolderWritableSystemProperties
+    public class RightsHolderSystemUpdateParameters : IRightsHolderWritableSystemProperties
     {
         public string Name { get; }
-        public Guid? RightsHolderProvidedUuid { get; }
         public Guid? ParentSystemUuid { get; }
         public string FormerName { get; }
         public string Description { get; }
@@ -15,9 +14,8 @@ namespace Core.ApplicationServices.Model.System
         public IEnumerable<string> TaskRefKeys { get; }
         public IEnumerable<Guid> TaskRefUuids { get; }
 
-        public RightsHolderSystemCreationParameters(
+        public RightsHolderSystemUpdateParameters(
             string name,
-            Guid? rightsHolderProvidedUuid,
             Guid? parentSystemUuid,
             string formerName,
             string description,
@@ -27,7 +25,6 @@ namespace Core.ApplicationServices.Model.System
             IEnumerable<Guid> taskRefUuids)
         {
             Name = name;
-            RightsHolderProvidedUuid = rightsHolderProvidedUuid;
             ParentSystemUuid = parentSystemUuid;
             FormerName = formerName;
             Description = description;
