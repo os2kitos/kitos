@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using Core.ApplicationServices.Authorization;
+﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
@@ -24,8 +20,11 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
-using Moq.Language.Flow;
 using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -1140,6 +1139,83 @@ namespace Tests.Unit.Presentation.Web.Services
             AssertUpdateFailure(result, OperationFailure.NotFound);
         }
 
+        [Fact]
+        public void UpdateName_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newName = A<string>();
+            var organization1Id = A<int>();
+            var organization2Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            var otherSystem = CreateSystem(organization2Id, name: newName); //Different org, same name as the new name
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemsReturns(new List<ItSystem> { itSystem, otherSystem });
+
+            //Act
+            var result = _sut.UpdateName(systemId, newName);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(newName, result.Select(x => x.Name).Value);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void UpdateName_Returns_Conflict_If_Name_Equals_ExistingSystem_In_Same_Org()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var newName = A<string>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            var otherSystem = CreateSystem(organization1Id, name: newName);
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemsReturns(new List<ItSystem> { itSystem, otherSystem });
+
+            //Act
+            var result = _sut.UpdateName(systemId, newName);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.Conflict);
+        }
+
+        [Fact]
+        public void UpdateName_Returns_Conflict_If_Name_Is_Too_Short()
+        {
+            UpdateName_Fails_With_BadInput(string.Empty);
+        }
+
+        [Fact]
+        public void UpdateName_Returns_Conflict_If_Name_Is_Too_Long()
+        {
+            var newName = Enumerable.Repeat("a", ItSystem.MaxNameLength + 1).Transform(x => string.Join(string.Empty, x));
+            UpdateName_Fails_With_BadInput(newName);
+        }
+
+        private void UpdateName_Fails_With_BadInput(string newName)
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+            ExpectGetSystemsReturns(new List<ItSystem>());
+
+            //Act
+            var result = _sut.UpdateName(systemId, newName);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.BadInput);
+        }
+
         private void AssertUpdateFailure(Result<ItSystem, OperationError> result, OperationFailure expectedErrorType)
         {
             Assert.True(result.Failed);
@@ -1184,12 +1260,13 @@ namespace Tests.Unit.Presentation.Web.Services
             return new() { Id = A<int>(), Name = A<string>() };
         }
 
-        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null)
+        private ItSystem CreateSystem(int? organizationId = null, AccessModifier accessModifier = AccessModifier.Local, int? belongsToId = null, string name = null)
         {
             ItSystem itSystem = new()
             {
                 Id = A<int>(),
-                AccessModifier = accessModifier
+                AccessModifier = accessModifier,
+                Name = name ?? A<string>()
             };
 
             if (organizationId.HasValue)
