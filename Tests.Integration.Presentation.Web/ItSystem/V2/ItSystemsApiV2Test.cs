@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Data.Entity.Migrations.Model;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -642,22 +643,31 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_PUT_As_RightsHolder()
+        [Theory]
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public async Task Can_PUT_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent)
         {
             //Arrange
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            var newParentSystem = await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public);
             var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, true, true, false, true, true, rightsHolder);
-            var newBusinessType = GetBusinessType(1);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
-            var newKle = CreateNewTaskRefAndGetKey();
-            var update = A<RightsHolderWritableITSystemPropertiesDTO>().Transform(dto =>
+            var update = await A<RightsHolderWritableITSystemPropertiesDTO>().Transform(async dto =>
             {
-                dto.BusinessTypeUuid = newBusinessType;
+                dto.Name = updateName ? dto.Name : createdSystem.Name;
+                dto.FormerName = updateFormerName ? dto.FormerName : createdSystem.FormerName;
+                dto.Description = updateDescription ? dto.Description : createdSystem.Description;
+                dto.BusinessTypeUuid = updateBusinessType ? GetBusinessType(1) : createdSystem.BusinessType.Uuid;
+                dto.UrlReference = updateUrl ? dto.UrlReference : createdSystem.UrlReference;
                 dto.KLEUuids = null;
-                dto.KLENumbers = new[] { newKle };
-                dto.ParentUuid = newParentSystem.uuid;
+                dto.KLENumbers = updateKle ? new[] { CreateNewTaskRefAndGetKey() } : createdSystem.KLE.Select(x => x.Name).ToList();
+                dto.ParentUuid = updateParent ? (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid : createdSystem.ParentSystem.Uuid;
                 return dto;
             });
 
@@ -675,7 +685,91 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(update.BusinessTypeUuid.GetValueOrDefault(), updatedSystem.BusinessType.Uuid);
             Assert.Equal(update.ParentUuid.GetValueOrDefault(), updatedSystem.ParentSystem.Uuid);
             Assert.Equal(update.UrlReference, updatedSystem.UrlReference);
-            Assert.Equal(update.KLENumbers, updatedSystem.KLE.Select(x=>x.Name));
+            Assert.Equal(update.KLENumbers, updatedSystem.KLE.Select(x => x.Name));
+        }
+
+        [Theory]
+        [InlineData(false, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(true, false, true)]
+        public async Task Cannot_PUT_As_RightsHolder_If_Required_Properties_Are_Missing(bool nullName, bool nullUrl, bool nullDescription)
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
+            var update = A<RightsHolderWritableITSystemPropertiesDTO>().Transform(dto =>
+            {
+                dto.Name = nullName ? null : dto.Name;
+                dto.UrlReference = nullUrl ? null : dto.UrlReference;
+                dto.Description = nullDescription ? null : dto.Description;
+                dto.ParentUuid = null;
+                dto.BusinessTypeUuid = null;
+                dto.KLEUuids = null;
+                dto.KLENumbers = null;
+                return dto;
+            });
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, createdSystem.Uuid, update);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_As_RightsHolder_If_No_RightsHolderAccess_To_ParentSystem()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var (parentUuid, _) = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
+            var update = A<RightsHolderWritableITSystemPropertiesDTO>().Transform(dto =>
+            {
+                dto.ParentUuid = parentUuid;
+                dto.BusinessTypeUuid = null;
+                dto.KLEUuids = null;
+                dto.KLENumbers = null;
+                return dto;
+            });
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, createdSystem.Uuid, update);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_As_RightsHolder_If_Name_Is_Overlapping()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem1 = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
+            var createSystemRequest2 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem2 = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest2);
+
+            var update = A<RightsHolderWritableITSystemPropertiesDTO>().Transform(dto =>
+            {
+                dto.Name = createdSystem2.Name; //Conflict with second system
+                dto.ParentUuid = null;
+                dto.BusinessTypeUuid = null;
+                dto.KLEUuids = null;
+                dto.KLENumbers = null;
+                return dto;
+            });
+
+            //Act
+            using var result = await ItSystemV2Helper.SendUpdateRightsHolderSystemAsync(token, createdSystem1.Uuid, update);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
         }
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
