@@ -163,12 +163,13 @@ namespace Core.ApplicationServices.Interface
         public Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string itInterfaceId)
         {
             return Mutate(id, 
-                itInterface => itInterface.ItInterfaceId != itInterfaceId, 
+                itInterface => itInterface.ItInterfaceId != itInterfaceId || itInterface.Name != name, 
                 updateWithResult: itInterface => {
                     var nameError = CheckForUniqueNaming(name, itInterfaceId, itInterface.OrganizationId);
                     if (nameError.HasValue)
                         return nameError.Value;
 
+                    itInterface.Name = name;
                     itInterface.ItInterfaceId = itInterfaceId;
                     return itInterface;
                 });

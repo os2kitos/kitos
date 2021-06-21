@@ -772,14 +772,17 @@ namespace Tests.Unit.Core.ApplicationServices
             Test_Command_Which_Mutates_ItInterface_With_Failure_NotFound(itInterface => _sut.UpdateUrlReference(itInterface.Id, A<string>()));
         }
 
-        [Fact]
-        public void UpdateNameAndInterfaceId_Returns_Updated_Interface()
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void UpdateNameAndInterfaceId_Returns_Updated_Interface(bool withNewName, bool withNewItInterfaceId)
         {
             Test_Command_Which_Mutates_ItInterface_With_Success(itInterface =>
             {
                 //Arrange
-                var newItInterfaceId = A<string>();
-                var newName = A<string>();
+                var newItInterfaceId = withNewItInterfaceId ? A<string>() : itInterface.ItInterfaceId;
+                var newName = withNewName ? A<string>() : itInterface.Name;
 
                 _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); // Return nothing so no conflicts are found.
 
@@ -788,6 +791,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
                 //Assert
                 Assert.Equal(newItInterfaceId, updatedInterface.Value.ItInterfaceId);
+                Assert.Equal(newName, updatedInterface.Value.Name);
 
                 return updatedInterface; // Return to complete generic assertions
             });

@@ -12,6 +12,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.Types;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models;
@@ -44,6 +45,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Task<HttpResponseMessage> PostWithTokenAsync(Uri url, object body, string token)
         {
             var requestMessage = CreatePostMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+        public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
+        {
+            var requestMessage = CreatePutMessage(url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
@@ -155,6 +162,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+            };
+            return requestMessage;
+        }
+
+        private static HttpRequestMessage CreatePutMessage(Uri url, object body)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = body?.Transform(content => new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json"))
             };
             return requestMessage;
         }

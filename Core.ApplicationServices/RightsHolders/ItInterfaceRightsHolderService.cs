@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.RightsHolders
             _logger = logger;
         }
 
-        public Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, Guid exposingSystemUuid, RightsHolderItInterfaceCreationParameters creationParameters)
+        public Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, RightsHolderItInterfaceCreationParameters creationParameters)
         {
             if (creationParameters == null)
                 throw new ArgumentNullException(nameof(creationParameters));
@@ -57,7 +57,7 @@ namespace Core.ApplicationServices.RightsHolders
                 if (organizationId.IsNone)
                     return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
 
-                var exposingSystem = _systemService.GetSystem(exposingSystemUuid);
+                var exposingSystem = _systemService.GetSystem(creationParameters.ExposingSystemUuid);
 
                 if (exposingSystem.Failed)
                 {

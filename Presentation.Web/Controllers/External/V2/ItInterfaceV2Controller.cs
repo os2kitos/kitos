@@ -60,7 +60,7 @@ namespace Presentation.Web.Controllers.External.V2
                 itInterfaceDTO.UrlReference);
 
             return _rightsHolderService
-                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, itInterfaceDTO.ExposedBySystemUuid, creationParameters)
+                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
                 .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
