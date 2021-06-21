@@ -155,7 +155,7 @@ namespace Tests.Unit.Core.ApplicationServices
             //Arrange
             var interfaceId = A<int>();
             var existingSystem = new ItSystem() { Id = A<int>() };
-            var itInterface = new ItInterface() { ExhibitedBy = new ItInterfaceExhibit() { ItSystem = existingSystem } };
+            var itInterface = new ItInterface() { ExhibitedBy = new ItInterfaceExhibit() { ItSystem = existingSystem, ItSystemId = existingSystem.Id } };
             ExpectGetInterfaceReturns(interfaceId, itInterface);
             ExpectAllowModifyReturns(itInterface, true);
             ExpectGetSystemReturns(existingSystem.Id, existingSystem);
@@ -525,13 +525,18 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(expectedNumberOfInterfaces, result.Count());
         }
 
-        [Fact]
-        public void CreateNewItInterface_Returns_Created_Interface_With_User_Specified_Uuid()
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void CreateNewItInterface_Returns_Created_Interface(bool withSpecifiedUuid, bool withAccessModifier)
         {
             //Arrange
             var name = A<string>();
             var itInterfaceId = A<string>();
             var uuid = A<Guid>();
+            var accessModifier = A<AccessModifier>();
             var org = new Organization()
             {
                 Id = A<int>(),
@@ -545,47 +550,25 @@ namespace Tests.Unit.Core.ApplicationServices
             _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
 
             //Act
-            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, uuid);
+            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, withSpecifiedUuid ? uuid : null, withAccessModifier ? accessModifier : null);
 
             //Assert
             Assert.True(createdInterfaceResult.Ok);
-            Assert.Equal(uuid, createdInterfaceResult.Value.Uuid);
+
+            if (withSpecifiedUuid)
+                Assert.Equal(uuid, createdInterfaceResult.Value.Uuid);
+            else
+                Assert.NotEqual(Guid.Empty, createdInterfaceResult.Value.Uuid);
+
+            if (withAccessModifier)
+                Assert.Equal(accessModifier, createdInterfaceResult.Value.AccessModifier);
+            else
+                Assert.Equal(AccessModifier.Public, createdInterfaceResult.Value.AccessModifier); // Defaults to Public access modifier
+
             Assert.Equal(name, createdInterfaceResult.Value.Name);
             Assert.Equal(itInterfaceId, createdInterfaceResult.Value.ItInterfaceId);
-            Assert.Equal(AccessModifier.Public, createdInterfaceResult.Value.AccessModifier); // Defaults to Public access modifier
+            
 
-
-            _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Once);
-            transaction.Verify(x => x.Commit(), Times.Once);
-        }
-
-        [Fact]
-        public void CreateNewItInterface_Returns_Created_Interface_With_New_Uuid()
-        {
-            //Arrange
-            var name = A<string>();
-            var itInterfaceId = A<string>();
-            var org = new Organization()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-
-            var transaction = SetupTransaction();
-            ExpectAllowCreate(org.Id, true);
-            _repository.Setup(x => x.GetInterface(It.IsAny<Guid>())).Returns(Maybe<ItInterface>.None);
-            _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
-            _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
-
-            //Act
-            var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId);
-
-            //Assert
-            Assert.True(createdInterfaceResult.Ok);
-            Assert.IsType<Guid>(createdInterfaceResult.Value.Uuid);
-            Assert.Equal(name, createdInterfaceResult.Value.Name);
-            Assert.Equal(itInterfaceId, createdInterfaceResult.Value.ItInterfaceId);
-            Assert.Equal(AccessModifier.Public, createdInterfaceResult.Value.AccessModifier); // Defaults to Public access modifier
 
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);

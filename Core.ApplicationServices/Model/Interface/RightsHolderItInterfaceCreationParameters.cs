@@ -11,9 +11,9 @@ namespace Core.ApplicationServices.Model.Interface
         public string Description { get; }
         public string UrlReference { get; }
 
-        public RightsHolderItInterfaceCreationParameters(Guid? uuid, string name, string interfaceId, string version, string description, string urlReference)
+        public RightsHolderItInterfaceCreationParameters(Guid? rightsHolderProvidedUuid, string name, string interfaceId, string version, string description, string urlReference)
         {
-            RightsHolderProvidedUuid = uuid;
+            RightsHolderProvidedUuid = rightsHolderProvidedUuid;
             Name = name;
             InterfaceId = interfaceId;
             Version = version;

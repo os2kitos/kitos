@@ -40,9 +40,6 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         [Fact]
         public void Cannot_Add_If_Null()
         {
-            //Arrange
-            //Act
-            //Assert
             Assert.Throws<ArgumentNullException>(() => _sut.Add(null));
             VerifySaved(Times.Never());
             _repository.Verify(x => x.Insert(It.IsAny<ItInterface>()), Times.Never);
@@ -65,9 +62,6 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         [Fact]
         public void Cannot_Update_If_Null()
         {
-            //Arrange
-            //Act
-            //Assert
             Assert.Throws<ArgumentNullException>(() => _sut.Update(null));
             VerifySaved(Times.Never());
             _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
@@ -90,9 +84,6 @@ namespace Tests.Unit.Core.DomainServices.Repositories
         [Fact]
         public void Cannot_Delete_If_Null()
         {
-            //Arrange
-            //Act
-            //Assert
             Assert.Throws<ArgumentNullException>(() => _sut.Update(null));
             VerifySaved(Times.Never());
             _repository.Verify(x => x.DeleteByKeyWithReferencePreload(It.IsAny<ItInterface>()), Times.Never);

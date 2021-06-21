@@ -131,7 +131,7 @@ namespace Core.ApplicationServices.Interface
             {
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
-                var nameError = IsItInterfaceIdAndNameUnique(name, interfaceId, organizationId);
+                var nameError = CheckForUniqueNaming(name, interfaceId, organizationId);
 
                 if (nameError.HasValue)
                     return nameError.Value;
@@ -165,7 +165,7 @@ namespace Core.ApplicationServices.Interface
             return Mutate(id, 
                 itInterface => itInterface.ItInterfaceId != itInterfaceId, 
                 updateWithResult: itInterface => {
-                    var nameError = IsItInterfaceIdAndNameUnique(itInterface.Name, itInterfaceId, itInterface.OrganizationId);
+                    var nameError = CheckForUniqueNaming(itInterface.Name, itInterfaceId, itInterface.OrganizationId);
                     if (nameError.HasValue)
                         return nameError.Value;
 
@@ -191,41 +191,25 @@ namespace Core.ApplicationServices.Interface
 
         public Result<ItInterface, OperationError> UpdateExposingSystem(int id, int? newSystemId)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
-            {
-                var getItInterfaceResult = _interfaceRepository.GetInterface(id);
+            return Mutate(id,
+                itInterface => itInterface.ExhibitedBy?.ItSystemId != newSystemId, 
+                updateWithResult: itInterface => {
 
-                if (getItInterfaceResult.IsNone)
-                    return new OperationError($"ItInterface with id: {id} could not be found.", OperationFailure.NotFound);
-                
+                    Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
+                    var newSystem = Maybe<ItSystem>.None;
 
-                var itInterface = getItInterfaceResult.Value;
-                if (!_authorizationContext.AllowModify(itInterface))
-                    return new OperationError(OperationFailure.Forbidden);
-                
+                    if (newSystemId.HasValue)
+                    {
+                        newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
+                        if (newSystem.IsNone)
+                            return new OperationError($"Cannot set ItSystem with id: {newSystemId.Value} as exposing system for ItInterface with id: {id} since the system does not exist", OperationFailure.BadInput);
 
-                Maybe<ItInterfaceExhibit> oldExhibit = itInterface.ExhibitedBy;
-                Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
-                var newSystem = Maybe<ItSystem>.None;
+                        if (!_authorizationContext.AllowReads(newSystem.Value))
+                            return new OperationError(OperationFailure.Forbidden);
+                    }
 
-                if (newSystemId.HasValue)
-                {
-                    newSystem = _systemRepository.GetSystem(newSystemId.Value).FromNullable();
-                    if (newSystem.IsNone)
-                        return new OperationError($"Cannot set ItSystem with id: {newSystemId.Value} as exposing system for ItInterface with id: {id} since the system does not exist", OperationFailure.BadInput);
-                    
+                    var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
 
-                    if (!_authorizationContext.AllowReads(newSystem.Value))
-                        return new OperationError(OperationFailure.Forbidden);
-                    
-                }
-
-                var newExhibit = itInterface.ChangeExhibitingSystem(newSystem);
-
-                var changed = !oldExhibit.Equals(newExhibit);
-
-                if (changed)
-                {
                     _domainEvents.Raise(new ExposingSystemChanged(itInterface, oldSystem, newExhibit.Select(x => x.ItSystem)));
                     if (oldSystem.HasValue)
                     {
@@ -236,12 +220,8 @@ namespace Core.ApplicationServices.Interface
                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem.Value));
                     }
 
-                    _interfaceRepository.Update(itInterface);
-                    transaction.Commit();
-                }
-
-                return itInterface;
-            }
+                    return itInterface;
+                });
         }
 
         private bool ValidateName(string name)
@@ -255,7 +235,7 @@ namespace Core.ApplicationServices.Interface
             return itInterfaceId != null;
         }
 
-        private Maybe<OperationError> IsItInterfaceIdAndNameUnique(string name, string itInterfaceId, int orgId)
+        private Maybe<OperationError> CheckForUniqueNaming(string name, string itInterfaceId, int orgId)
         {
             if (!ValidateName(name))
                 return new OperationError("Name was not valid", OperationFailure.BadInput);
