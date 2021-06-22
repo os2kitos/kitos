@@ -120,9 +120,15 @@
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
+    <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
+    <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
+    <Compile Include="Notification\GlobalAdminNotificationService.cs" />
+    <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\OptionsApplicationService.cs" />
     <Compile Include="OptionTypes\IOptionsApplicationService.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />

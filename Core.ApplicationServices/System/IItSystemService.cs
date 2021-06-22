@@ -18,6 +18,7 @@ namespace Core.ApplicationServices.System
         IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null);
         IEnumerable<ItSystem> GetHierarchy(int systemId);
         Result<IReadOnlyList<UsingOrganization>, OperationFailure> GetUsingOrganizations(int systemId);
+        Result<ItSystem, OperationError> UpdateName(int systemId, string newName);
         Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newPreviousName);
         Result<ItSystem, OperationError> UpdateDescription(int systemId, string newDescription);
         bool CanChangeNameTo(int organizationId, int systemId, string newName);
@@ -27,5 +28,6 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState);
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);
         Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null);
+        Result<ItSystem, OperationError> Deactivate(int systemId);
     }
 }

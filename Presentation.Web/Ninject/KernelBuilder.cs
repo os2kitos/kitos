@@ -210,6 +210,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);

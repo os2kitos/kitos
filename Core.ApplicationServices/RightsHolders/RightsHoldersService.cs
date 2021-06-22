@@ -3,16 +3,21 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
@@ -23,7 +28,10 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOrganizationRepository _organizationRepository;
         private readonly IItSystemService _systemService;
         private readonly ITaskRefRepository _taskRefRepository;
+        private readonly IGlobalAdminNotificationService _globalAdminNotificationService;
         private readonly ITransactionManager _transactionManager;
+        private readonly IUserRepository _userRepository;
+        private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
 
         public RightsHoldersService(
@@ -31,15 +39,21 @@ namespace Core.ApplicationServices.RightsHolders
             IOrganizationRepository organizationRepository,
             IItSystemService systemService,
             ITaskRefRepository taskRefRepository,
+            IGlobalAdminNotificationService globalAdminNotificationService,
             ITransactionManager transactionManager,
+            IUserRepository userRepository,
+            IOperationClock operationClock,
             ILogger logger)
-            : base (userContext, organizationRepository)
+            : base(userContext, organizationRepository)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
             _systemService = systemService;
             _taskRefRepository = taskRefRepository;
+            _globalAdminNotificationService = globalAdminNotificationService;
             _transactionManager = transactionManager;
+            _userRepository = userRepository;
+            _operationClock = operationClock;
             _logger = logger;
         }
 
@@ -57,17 +71,12 @@ namespace Core.ApplicationServices.RightsHolders
                     return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
 
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
-                    return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
+                    return new OperationError("User does not have rights holder access in the provided organization", OperationFailure.Forbidden);
 
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => _systemService.UpdatePreviousName(system.Id, creationParameters.FormerName))
-                    .Bind(system => _systemService.UpdateDescription(system.Id, creationParameters.Description))
-                    .Bind(system => UpdateMainUrlReference(system.Id, creationParameters.UrlReference))
-                    .Bind(system => UpdateParentSystem(system.Id, creationParameters.ParentSystemUuid))
-                    .Bind(system => _systemService.UpdateBusinessType(system.Id, creationParameters.BusinessTypeUuid))
-                    .Bind(system => UpdateTaskRefs(system.Id, creationParameters.TaskRefKeys, creationParameters.TaskRefUuids));
+                    .Bind(system => ApplyUpdates(system, creationParameters, true));
 
                 if (result.Ok)
                 {
@@ -85,6 +94,104 @@ namespace Core.ApplicationServices.RightsHolders
                 _logger.Error(e, "Failed creating rightsholder system for rightsholder with id {rightsHolderUuid}", rightsHolderUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
+        }
+
+        public Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = _systemService
+                    .GetSystem(systemUuid)
+                    .Bind(WithRightsHolderAccessTo)
+                    .Bind(WithActiveSystemOnly)
+                    .Bind(system => ApplyUpdates(system, updateParameters, false));
+
+                if (result.Ok)
+                {
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
+
+        public Result<ItSystem, OperationError> Deactivate(Guid systemUuid, string reason)
+        {
+            if (string.IsNullOrEmpty(reason))
+                return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = _systemService
+                    .GetSystem(systemUuid)
+                    .Bind(WithRightsHolderAccessTo)
+                    .Bind(WithActiveSystemOnly)
+                    .Bind(system => _systemService.Deactivate(system.Id));
+
+                if (result.Ok)
+                {
+                    _logger.Information("User {userId} deactivated system with id {systemuuid} due to reason:{reason}", _userContext.UserId, systemUuid, reason);
+                    transaction.Commit();
+
+                    var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
+                    var deactivatedItSystem = result.Value;
+                    const string subject = "IT-System blev deaktiveret af rettighedshaver";
+                    var content =
+                        $"<p>IT-Systemet <b>'{deactivatedItSystem.Name}'</b> blev deaktiveret af rettighedshaver.</p>" +
+                        "<p>Detaljer:</p>" +
+                        "<ul>" +
+                        $"<li>Navn: {deactivatedItSystem.Name}</li>" +
+                        $"<li>UUID: {deactivatedItSystem.Uuid}</li>" +
+                        $"<li>Årsag til deaktivering: {reason}</li>" +
+                        $"<li>Rettighedshaver: {deactivatedItSystem.BelongsTo?.Name}</li>" +
+                        $"<li>Ansvarlig for deaktivering (email): {currentUserEmail}</li>" +
+                        "</ul>";
+
+                    _globalAdminNotificationService.Submit(new GlobalAdminNotification(_operationClock.Now, _userContext.UserId, subject, new GlobalAdminNotificationMessage(content, true)));
+                }
+                else
+                {
+                    _logger.Error("User {id} failed to deactivate It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "User {id} Failed deactivating system with uuid {uuid}", _userContext.UserId, systemUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
+
+        private static Result<ItSystem, OperationError> WithActiveSystemOnly(ItSystem system)
+        {
+            return system.Disabled
+                ? new OperationError("IT-System has been deactivated and cannot be updated. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
+                : system;
+        }
+
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, IRightsHolderWritableSystemProperties updates, bool skipNameUpdate)
+        {
+            var updateNameResult = (skipNameUpdate ? Result<ItSystem, OperationError>.Success(system) : _systemService.UpdateName(system.Id, updates.Name));
+
+            return updateNameResult
+                .Bind(itSystem => _systemService.UpdatePreviousName(itSystem.Id, updates.FormerName))
+                .Bind(itSystem => _systemService.UpdateDescription(itSystem.Id, updates.Description))
+                .Bind(itSystem => UpdateMainUrlReference(itSystem.Id, updates.UrlReference))
+                .Bind(itSystem => UpdateParentSystem(itSystem.Id, updates.ParentSystemUuid))
+                .Bind(itSystem => _systemService.UpdateBusinessType(itSystem.Id, updates.BusinessTypeUuid))
+                .Bind(itSystem => UpdateTaskRefs(itSystem.Id, updates.TaskRefKeys, updates.TaskRefUuids));
         }
 
         private Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<string> taskRefKeys, IEnumerable<Guid> taskRefUuids)
@@ -136,7 +243,9 @@ namespace Core.ApplicationServices.RightsHolders
                         .Bind(WithRightsHolderAccessTo);
 
                 if (parentSystemResult.Failed)
-                    return parentSystemResult.Error;
+                    return parentSystemResult.Error.FailureType == OperationFailure.NotFound
+                        ? new OperationError("Parent system cannot be found", OperationFailure.BadInput)
+                        : parentSystemResult.Error;
 
 
                 parentSystemId = parentSystemResult.Value.Id;
@@ -163,7 +272,7 @@ namespace Core.ApplicationServices.RightsHolders
                         if (rightsHolderUuid.HasValue)
                         {
                             var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid.Value).Select(x => x.Id);
-                            
+
                             if (organizationId.IsNone)
                                 return new OperationError("Invalid organization id", OperationFailure.BadInput);
 

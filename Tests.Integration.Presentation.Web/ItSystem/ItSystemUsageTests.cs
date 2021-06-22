@@ -1,9 +1,6 @@
-﻿using System.ComponentModel;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
