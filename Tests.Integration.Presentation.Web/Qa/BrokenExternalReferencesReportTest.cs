@@ -200,25 +200,13 @@ namespace Tests.Integration.Presentation.Web.Qa
             DatabaseAccess.MutateDatabase(context =>
             {
                 //Reset urls in db and add a few valid (one for each) since we only care about the report being generated, not the content and invlaid urls slow down the test process because the job adds retries.
-                var itSystems = context.ItSystems.AsQueryable().Where(x => x.Reference != null).ToList();
-                itSystems.ForEach(x => x.Reference.URL = null);
-                itSystems.FirstOrDefault()?.Transform(x => x.Reference.URL = "https://kitos.dk");
+                var itSystemReferences = context.ExternalReferences.AsQueryable().Where(x => x.ItSystem_Id != null).ToList();
+                itSystemReferences.ForEach(x => x.URL = null);
+                itSystemReferences.FirstOrDefault()?.Transform(x => x.URL = "https://kitos.dk");
 
-                var itSystemUsages = context.ItSystemUsages.AsQueryable().Where(x => x.Reference != null).ToList();
-                itSystemUsages.ForEach(x => x.Reference.URL = null);
-                itSystemUsages.FirstOrDefault()?.Transform(x => x.Reference.URL = "https://kitos.dk");
-
-                var dprs = context.DataProcessingRegistrations.AsQueryable().Where(x => x.Reference != null).ToList();
-                dprs.ForEach(x => x.Reference.URL = null);
-                dprs.FirstOrDefault()?.Transform(x => x.Reference.URL = "https://kitos.dk");
-
-                var contracts = context.ItContracts.AsQueryable().Where(x => x.Reference != null).ToList();
-                contracts.ForEach(x => x.Reference.URL = null);
-                contracts.FirstOrDefault()?.Transform(x => x.Reference.URL = "https://kitos.dk");
-
-                var projects = context.ItProjects.AsQueryable().Where(x => x.Reference != null).ToList();
-                projects.ForEach(x => x.Reference.URL = null);
-                projects.FirstOrDefault()?.Transform(x => x.Reference.URL = "https://kitos.dk");
+                var itinterfaces = context.ItInterfaces.AsQueryable().Where(x => x.Url != null && x.Url != "").ToList();
+                itinterfaces.ForEach(x => x.Url = null);
+                itinterfaces.FirstOrDefault()?.Transform(x => x.Url = "https://kitos.dk");
 
                 context.SaveChanges();
             });
