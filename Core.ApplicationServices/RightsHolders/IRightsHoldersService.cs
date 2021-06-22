@@ -17,5 +17,6 @@ namespace Core.ApplicationServices.RightsHolders
         Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
         Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
         Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters);
+        Result<ItSystem, OperationError> Deactivate(Guid systemUuid, string reason);
     }
 }

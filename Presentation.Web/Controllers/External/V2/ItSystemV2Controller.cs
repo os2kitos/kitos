@@ -195,6 +195,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Sets IT-System values
         /// If a property value is not provided, KITOS will fallback to the default value of the type and that will be written to the it-system so remember to define all data from the contract.
+        /// NOTE: Only active systems can be modified.
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>The updated IT-System</returns>
@@ -224,7 +225,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// Deactivates an IT-System
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
-        /// <param name="deactivationReasonDTO">Reason for deactivation</param>
+        /// <param name="request">Reason for deactivation</param>
         /// <returns>No content</returns>
         [HttpDelete]
         [Route("rightsholder/it-systems/{uuid}")]
@@ -233,9 +234,15 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _rightsHoldersService
+                .Deactivate(uuid, request.DeactivationReason)
+                .Select(ToRightsHolderResponseDTO)
+                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
 
         private RightsHolderItSystemResponseDTO ToRightsHolderResponseDTO(ItSystem itSystem)

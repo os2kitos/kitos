@@ -8,6 +8,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -430,6 +431,15 @@ namespace Core.ApplicationServices.System
                 }
 
                 return system;
+            });
+        }
+
+        public Result<ItSystem, OperationError> Deactivate(int systemId)
+        {
+            return Mutate(systemId, system => system.Disabled == false, system =>
+            {
+                system.Deactivate();
+                _domainEvents.Raise(new EnabledStatusChanged<ItSystem>(system, false, true));
             });
         }
 

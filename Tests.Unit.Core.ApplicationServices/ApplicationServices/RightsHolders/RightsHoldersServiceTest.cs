@@ -6,14 +6,17 @@ using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -31,6 +34,8 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
+        private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
 
         public RightsHoldersServiceTest()
         {
@@ -39,12 +44,17 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _itSystemServiceMock = new Mock<IItSystemService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
+            _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
+            _userRepositoryMock = new Mock<IUserRepository>();
             _sut = new RightsHoldersService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
                 _taskRefRepositoryMock.Object,
+                _globalAdminNotificationServiceMock.Object,
                 _transactionManagerMock.Object,
+                _userRepositoryMock.Object,
+                Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
                 Mock.Of<ILogger>());
         }
 
