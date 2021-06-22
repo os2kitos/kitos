@@ -1,13 +1,17 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Interface;
+using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Organization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 using System;
@@ -24,15 +28,21 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IItSystemService _systemService;
         private readonly IItInterfaceService _itInterfaceService;
         private readonly ITransactionManager _transactionManager;
-        private readonly ILogger _logger;
+        private readonly ILogger _logger; 
+        private readonly IGlobalAdminNotificationService _globalAdminNotificationService;
+        private readonly IUserRepository _userRepository;
+        private readonly IOperationClock _operationClock;
 
         public ItInterfaceRightsHolderService(
             IOrganizationalUserContext userContext,
-            IOrganizationRepository organizationRepository, 
+            IOrganizationRepository organizationRepository,
             IItSystemService systemService,
             IItInterfaceService itInterfaceService,
             ITransactionManager transactionManager,
-            ILogger logger) : base(userContext, organizationRepository)
+            ILogger logger, 
+            IGlobalAdminNotificationService globalAdminNotificationService, 
+            IUserRepository userRepository, 
+            IOperationClock operationClock) : base(userContext, organizationRepository)
         {
             _userContext = userContext;
             _organizationRepository = organizationRepository;
@@ -40,6 +50,9 @@ namespace Core.ApplicationServices.RightsHolders
             _transactionManager = transactionManager;
             _systemService = systemService;
             _logger = logger;
+            _globalAdminNotificationService = globalAdminNotificationService;
+            _userRepository = userRepository;
+            _operationClock = operationClock;
         }
 
         public Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, RightsHolderItInterfaceCreationParameters creationParameters)
@@ -110,6 +123,22 @@ namespace Core.ApplicationServices.RightsHolders
                 {
                     _logger.Information($"User {_userContext.UserId} deactivated It-Interface with uuid: {interfaceUuid} due to reason: {reason}");
                     transaction.Commit();
+
+                    var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
+                    var deactivatedItInterface = result.Value;
+                    const string subject = "Snitflade blev deaktiveret af rettighedshaver";
+                    var content =
+                        $"<p>IT-Systemet <b>'{deactivatedItInterface.Name}'</b> blev deaktiveret af rettighedshaver.</p>" +
+                        "<p>Detaljer:</p>" +
+                        "<ul>" +
+                        $"<li>Navn: {deactivatedItInterface.Name}</li>" +
+                        $"<li>UUID: {deactivatedItInterface.Uuid}</li>" +
+                        $"<li>Årsag til deaktivering: {reason}</li>" +
+                        $"<li>Rettighedshaver: {deactivatedItInterface.ExhibitedBy?.ItSystem?.BelongsTo?.Name}</li>" +
+                        $"<li>Ansvarlig for deaktivering (email): {currentUserEmail}</li>" +
+                        "</ul>";
+
+                    _globalAdminNotificationService.Submit(new GlobalAdminNotification(_operationClock.Now, _userContext.UserId, subject, new GlobalAdminNotificationMessage(content, true)));
                 }
                 else
                 {
