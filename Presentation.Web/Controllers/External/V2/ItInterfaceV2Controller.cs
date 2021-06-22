@@ -44,13 +44,24 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItInterface([FromBody] ItInterfaceRequestDTO itInterfaceDTO)
+        public IHttpActionResult PostItInterface([FromBody] RightsHolderCreateItInterfaceRequestDTO itInterfaceDTO)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+            }
+
+            if (itInterfaceDTO.RightsHolderUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.RightsHolderUuid)} cannot be empty. An interface needs to be bound to a specific rights holder.");
+            }
+
             var creationParameters = new RightsHolderItInterfaceCreationParameters(
-                itInterfaceDTO.Uuid, 
+                itInterfaceDTO.Uuid,
+                itInterfaceDTO.ExposedBySystemUuid,
                 itInterfaceDTO.Name, 
                 itInterfaceDTO.InterfaceId, 
                 itInterfaceDTO.Version, 
@@ -58,7 +69,7 @@ namespace Presentation.Web.Controllers.External.V2
                 itInterfaceDTO.UrlReference);
 
             return _rightsHolderService
-                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, itInterfaceDTO.ExposedBySystemUuid, creationParameters)
+                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
                 .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
@@ -126,9 +137,28 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] ItInterfaceRequestDTO itInterfaceRequestDTO)
+        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO itInterfaceDTO)
         {
-            return Ok(new RightsHolderItInterfaceResponseDTO());
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if(itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+            }
+
+            var updateParameters = new RightsHolderItInterfaceUpdateParameters(
+                itInterfaceDTO.ExposedBySystemUuid,
+                itInterfaceDTO.Name,
+                itInterfaceDTO.InterfaceId,
+                itInterfaceDTO.Version,
+                itInterfaceDTO.Description,
+                itInterfaceDTO.UrlReference);
+
+            return _rightsHolderService
+                .UpdateItInterface(uuid, updateParameters)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

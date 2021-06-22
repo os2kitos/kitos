@@ -2,9 +2,8 @@
 
 namespace Core.ApplicationServices.Model.Interface
 {
-    public class RightsHolderItInterfaceCreationParameters : IRightsHolderWriteableItInterfaceParameters
+    public class RightsHolderItInterfaceUpdateParameters : IRightsHolderWriteableItInterfaceParameters
     {
-        public Guid? RightsHolderProvidedUuid { get; }
         public Guid ExposingSystemUuid { get; }
         public string Name { get; }
         public string InterfaceId { get; }
@@ -12,9 +11,8 @@ namespace Core.ApplicationServices.Model.Interface
         public string Description { get; }
         public string UrlReference { get; }
 
-        public RightsHolderItInterfaceCreationParameters(Guid? rightsHolderProvidedUuid, Guid exposingSystemUuid, string name, string interfaceId, string version, string description, string urlReference)
+        public RightsHolderItInterfaceUpdateParameters(Guid exposingSystemUuid, string name, string interfaceId, string version, string description, string urlReference)
         {
-            RightsHolderProvidedUuid = rightsHolderProvidedUuid;
             ExposingSystemUuid = exposingSystemUuid;
             Name = name;
             InterfaceId = interfaceId;

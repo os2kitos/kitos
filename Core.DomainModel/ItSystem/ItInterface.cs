@@ -8,7 +8,7 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItInterface : ItSystemBase, IHasRightsHolder, IHasUuid
+    public class ItInterface : ItSystemBase, IHasRightsHolder, IHasUuid, IEntityWithEnabledStatus
     {
         public const int MaxNameLength = 100;
         public const int MaxVersionLength = 20;
