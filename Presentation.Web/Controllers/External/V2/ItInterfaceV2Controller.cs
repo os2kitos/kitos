@@ -13,7 +13,6 @@ using Core.DomainServices.Queries.Interface;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Interface;
 using Swashbuckle.Swagger.Annotations;
 
@@ -67,7 +66,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Returns active IT-Interfaces
         /// </summary>
-        /// <param name="organizationUuid">Uuid of the organization you want interfaces from</param>
+        /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
         /// <param name="page">Page index to be returned (zero based)</param>
         /// <param name="pageSize">Page size</param>
         /// <returns></returns>
