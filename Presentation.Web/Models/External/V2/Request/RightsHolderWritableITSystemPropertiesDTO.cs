@@ -16,7 +16,6 @@ namespace Presentation.Web.Models.External.V2.Request
         /// </summary>
         [Required(AllowEmptyStrings = false)]
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]
-        [MinLength(1)]
         public string Name { get; set; }
 
         /// <summary>
