@@ -201,11 +201,11 @@ namespace Tests.Integration.Presentation.Web.Qa
             {
                 //Reset urls in db and add a few valid (one for each) since we only care about the report being generated, not the content and invlaid urls slow down the test process because the job adds retries.
                 var itSystemReferences = context.ExternalReferences.AsQueryable().Where(x => x.ItSystem_Id != null).ToList();
-                itSystemReferences.ForEach(x => x.URL = null);
+                itSystemReferences.ForEach(x => x.URL = "");
                 itSystemReferences.FirstOrDefault()?.Transform(x => x.URL = "https://kitos.dk");
 
                 var itinterfaces = context.ItInterfaces.AsQueryable().Where(x => x.Url != null && x.Url != "").ToList();
-                itinterfaces.ForEach(x => x.Url = null);
+                itinterfaces.ForEach(x => x.Url = "");
                 itinterfaces.FirstOrDefault()?.Transform(x => x.Url = "https://kitos.dk");
 
                 context.SaveChanges();
