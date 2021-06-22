@@ -114,7 +114,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<RightsHolderItInterfaceResponseDTO> UpdateRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, RightsHolderWritableItInterfacePropertiesDTO request)
         {
             using var response = await SendUpdateRightsHolderItInterfaceAsync(token, itInterfaceUuid, request);
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
         }
@@ -122,7 +122,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendUpdateRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, RightsHolderWritableItInterfacePropertiesDTO request)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
+        }
 
+        public static async Task<HttpResponseMessage> SendDeleteRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, DeactivationReasonRequestDTO request)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
         }
     }
 }

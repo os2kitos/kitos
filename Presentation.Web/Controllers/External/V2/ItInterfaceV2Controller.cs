@@ -49,6 +49,16 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+            }
+
+            if (itInterfaceDTO.RightsHolderUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.RightsHolderUuid)} cannot be empty. An interface needs to be bound to a specific rights holder.");
+            }
+
             var creationParameters = new RightsHolderItInterfaceCreationParameters(
                 itInterfaceDTO.Uuid,
                 itInterfaceDTO.ExposedBySystemUuid,
@@ -132,6 +142,11 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if(itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+            }
+
             var updateParameters = new RightsHolderItInterfaceUpdateParameters(
                 itInterfaceDTO.ExposedBySystemUuid,
                 itInterfaceDTO.Name,
@@ -143,7 +158,7 @@ namespace Presentation.Web.Controllers.External.V2
             return _rightsHolderService
                 .UpdateItInterface(uuid, updateParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
-                .Match(MapItInterfaceCreatedResponse, FromOperationError);
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

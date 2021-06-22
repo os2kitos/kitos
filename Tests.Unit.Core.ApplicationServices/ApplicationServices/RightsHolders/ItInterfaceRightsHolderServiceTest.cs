@@ -1,13 +1,18 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Interface;
+using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
+using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -29,6 +34,9 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IItInterfaceService> _interfaceServiceMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<ILogger> _logger;
+        private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
+        private readonly Mock<IUserRepository> _userRepositoryMock;
+        private readonly Mock<IOperationClock> _operationClockMock;
 
         public ItInterfaceRightsHolderServiceTest()
         {
@@ -38,7 +46,20 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _interfaceServiceMock = new Mock<IItInterfaceService>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _logger = new Mock<ILogger>();
-            _sut = new ItInterfaceRightsHolderService(_userContextMock.Object, _organizationRepositoryMock.Object, _itSystemServiceMock.Object, _interfaceServiceMock.Object, _transactionManagerMock.Object, _logger.Object);
+            _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
+            _userRepositoryMock = new Mock<IUserRepository>();
+            _operationClockMock = new Mock<IOperationClock>();
+
+            _sut = new ItInterfaceRightsHolderService(
+                _userContextMock.Object, 
+                _organizationRepositoryMock.Object, 
+                _itSystemServiceMock.Object, 
+                _interfaceServiceMock.Object, 
+                _transactionManagerMock.Object, 
+                _logger.Object,
+                _globalAdminNotificationServiceMock.Object,
+                _userRepositoryMock.Object,
+                _operationClockMock.Object);
         }
 
         [Fact]
@@ -403,9 +424,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
@@ -486,16 +508,61 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
+        public void UpdateItInterface_Returns_Forbidden_If_Not_RightsHolder_Access()
+        {
+            //Arrange
+            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            ExpectHasSpecificAccessReturns(itInterface, false);
+            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+
+            //Act
+            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateItInterface_Returns_BadState_If_ItInterface_Is_Disabled()
+        {
+            //Arrange
+            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem }, Disabled = true };
+
+            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+
+            //Act
+            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
         public void UpdateItInterface_Returns_Error_If_UpdateNameAndInterfaceId_Fails()
         {
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, operationError);
@@ -515,11 +582,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -540,11 +608,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -566,11 +635,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -593,11 +663,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -613,6 +684,126 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
             transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Deactivates_System_And_Notifies_Global_Admins()
+        {
+            //Arrange
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+            var userId = A<int>();
+
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectDeactivateReturns(itInterface.Id, itInterface);
+            _userContextMock.Setup(x => x.UserId).Returns(userId);
+            _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User { Email = A<string>() });
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Uuid, reason);
+
+            //Assert
+            Assert.True(result.Ok);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Deactivation_Fails()
+        {
+            //Arrange
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            var operationError = A<OperationError>();
+
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectDeactivateReturns(itInterface.Id, operationError);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Uuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Missing_Access()
+        {
+            //Arrange
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins(); 
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasSpecificAccessReturns(itInterface, false);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Uuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Alreadly_Deactivated()
+        {
+            //Arrange
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem }, Disabled = true };
+
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+            ExpectHasSpecificAccessReturns(itInterface, true);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Uuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Get_System_Fails()
+        {
+            //Arrange
+            var interfaceUuid = A<Guid>();
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var operationError = A<OperationError>();
+
+            ExpectGetItInterfaceReturns(interfaceUuid, operationError);
+
+            //Act
+            var result = _sut.Deactivate(interfaceUuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        private void ExpectDeactivateReturns(int itInterfaceId, Result<ItInterface, OperationError> result)
+        {
+            _interfaceServiceMock.Setup(x => x.Deactivate(itInterfaceId)).Returns(result);
         }
 
         private void ExpectGetItInterfaceReturns(Guid itInterfaceUuid, Result<ItInterface, OperationError> result)

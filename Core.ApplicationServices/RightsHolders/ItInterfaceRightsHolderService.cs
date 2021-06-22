@@ -72,7 +72,7 @@ namespace Core.ApplicationServices.RightsHolders
 
                 if (exposingSystem.Failed)
                 {
-                    if(exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
+                    if (exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
                         return new OperationError("Invalid exposing system id provided", OperationFailure.BadInput);
                     return exposingSystem.Error;
                 }
@@ -82,10 +82,7 @@ namespace Core.ApplicationServices.RightsHolders
 
                 var result = _itInterfaceService
                     .CreateNewItInterface(organizationId.Value, creationParameters.Name, creationParameters.InterfaceId, creationParameters.RightsHolderProvidedUuid)
-                    .Bind(itInterface => _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id))
-                    .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, creationParameters.Version))
-                    .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, creationParameters.Description))
-                    .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, creationParameters.UrlReference));
+                    .Bind(ItInterface => ApplyUpdates(ItInterface, creationParameters, exposingSystem.Value.Id));
 
                 if (result.Ok)
                 {
@@ -93,14 +90,14 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error($"RightsHolder {rightsHolderUuid} failed to create It-Interface {creationParameters.Name} due to error: {result.Error}");
+                    _logger.Error("RightsHolder {uuid} failed to create It-Interface {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.Name, result.Error.ToString());
                 }
 
                 return result;
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"Failed creating rightsholder It-Interface for rightsholder with id {rightsHolderUuid}");
+                _logger.Error(e, "Failed creating rightsholder It-Interface for rightsholder with id {uuid}", rightsHolderUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
         }
@@ -116,19 +113,19 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _itInterfaceService
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
-                    .Bind(WithActiveInterfaceOnly)
+                    .Bind(WithActiveEntityOnly)
                     .Bind(itInterface => _itInterfaceService.Deactivate(itInterface.Id));
 
                 if (result.Ok)
                 {
-                    _logger.Information($"User {_userContext.UserId} deactivated It-Interface with uuid: {interfaceUuid} due to reason: {reason}");
+                    _logger.Information("User {userId} deactivated It-Interface with uuid: {uuid} due to reason: {reason}", _userContext.UserId, interfaceUuid, reason);
                     transaction.Commit();
 
                     var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;
                     var deactivatedItInterface = result.Value;
                     const string subject = "Snitflade blev deaktiveret af rettighedshaver";
                     var content =
-                        $"<p>IT-Systemet <b>'{deactivatedItInterface.Name}'</b> blev deaktiveret af rettighedshaver.</p>" +
+                        $"<p>Snitfladen <b>'{deactivatedItInterface.Name}'</b> blev deaktiveret af rettighedshaver.</p>" +
                         "<p>Detaljer:</p>" +
                         "<ul>" +
                         $"<li>Navn: {deactivatedItInterface.Name}</li>" +
@@ -142,14 +139,14 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error($"User {_userContext.UserId} failed to deactivate It-Interface with uuid: {interfaceUuid} due to error: {result.Error}");
+                    _logger.Error("User {userId} failed to deactivate It-Interface with uuid: {uuid} due to error: {errorMessage}", _userContext.UserId, interfaceUuid, result.Error.ToString());
                 }
 
                 return result;
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"User {_userContext.UserId} Failed deactivating It-Interface with uuid: {interfaceUuid}");
+                _logger.Error(e, "User {userId} Failed deactivating It-Interface with uuid: {uuid}", _userContext.UserId, interfaceUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
         }
@@ -217,11 +214,10 @@ namespace Core.ApplicationServices.RightsHolders
 
                 var result = _itInterfaceService
                     .GetInterface(interfaceUuid)
+                    .Bind(WithRightsHolderAccessTo)
+                    .Bind(WithActiveEntityOnly)
                     .Bind(itInterface => _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, updateParameters.Name, updateParameters.InterfaceId))
-                    .Bind(ItInterface => _itInterfaceService.UpdateExposingSystem(ItInterface.Id, exposingSystem.Value.Id))
-                    .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, updateParameters.Version))
-                    .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, updateParameters.Description))
-                    .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, updateParameters.UrlReference));
+                    .Bind(ItInterface => ApplyUpdates(ItInterface, updateParameters, exposingSystem.Value.Id));
 
                 if (result.Ok)
                 {
@@ -229,23 +225,24 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error($"Failed to update It-Interface with uuid: {interfaceUuid} due to error: {result.Error}");
+                    _logger.Error("Failed to update It-Interface with uuid: {uuid} due to error: {errorMessage}", interfaceUuid, result.Error.ToString());
                 }
 
                 return result;
             }
             catch (Exception e)
             {
-                _logger.Error(e, $"Failed updating rightsholder It-Interface with uuid {interfaceUuid}");
+                _logger.Error(e, "Failed updating rightsholder It-Interface with uuid {uuid}", interfaceUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
         }
 
-        private Result<ItInterface, OperationError> WithActiveInterfaceOnly(ItInterface itInterface)
+        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface itInterface, IRightsHolderWriteableItInterfaceParameters updates, int exposingSystemId)
         {
-            return itInterface.Disabled
-                ? new OperationError("IT-Interface has been deactivated and no more changes are allowed. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
-                : itInterface;
+            return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystemId)
+                .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, updates.Version))
+                .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, updates.Description))
+                .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, updates.UrlReference));
         }
 
     }

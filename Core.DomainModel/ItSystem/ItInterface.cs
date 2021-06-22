@@ -100,9 +100,9 @@ namespace Core.DomainModel.ItSystem
             return id ?? Maybe<int>.None;
         }
 
-        public void Deactive()
+        public void Deactivate()
         {
-            Disabled = false;
+            Disabled = true;
         }
     }
 }

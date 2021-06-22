@@ -104,7 +104,7 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _systemService
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
-                    .Bind(WithActiveSystemOnly)
+                    .Bind(WithActiveEntityOnly)
                     .Bind(system => ApplyUpdates(system, updateParameters, false));
 
                 if (result.Ok)
@@ -136,7 +136,7 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _systemService
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
-                    .Bind(WithActiveSystemOnly)
+                    .Bind(WithActiveEntityOnly)
                     .Bind(system => _systemService.Deactivate(system.Id));
 
                 if (result.Ok)
@@ -172,13 +172,6 @@ namespace Core.ApplicationServices.RightsHolders
                 _logger.Error(e, "User {id} Failed deactivating system with uuid {uuid}", _userContext.UserId, systemUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
-        }
-
-        private static Result<ItSystem, OperationError> WithActiveSystemOnly(ItSystem system)
-        {
-            return system.Disabled
-                ? new OperationError("IT-System has been deactivated and cannot be updated. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
-                : system;
         }
 
         private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, IRightsHolderWritableSystemProperties updates, bool skipNameUpdate)

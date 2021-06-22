@@ -232,7 +232,7 @@ namespace Core.ApplicationServices.Interface
                 itInterface => itInterface.Disabled == false, 
                 itInterface =>
             {
-                itInterface.Deactive();
+                itInterface.Deactivate();
                 _domainEvents.Raise(new EnabledStatusChanged<ItInterface>(itInterface, false, true));
             });
         }
