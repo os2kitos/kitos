@@ -97,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(url, token);
         }
 
-        public static async Task<RightsHolderItInterfaceResponseDTO> CreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        public static async Task<RightsHolderItInterfaceResponseDTO> CreateRightsHolderItInterfaceAsync(string token, RightsHolderCreateItInterfaceRequestDTO request)
         {
             using var response = await SendCreateRightsHolderItInterfaceAsync(token, request);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
@@ -105,10 +105,28 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendCreateRightsHolderItInterfaceAsync(string token, ItInterfaceRequestDTO request)
+        public static async Task<HttpResponseMessage> SendCreateRightsHolderItInterfaceAsync(string token, RightsHolderCreateItInterfaceRequestDTO request)
         {
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/rightsholder/it-interfaces"), request, token);
 
+        }
+
+        public static async Task<RightsHolderItInterfaceResponseDTO> UpdateRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, RightsHolderWritableItInterfacePropertiesDTO request)
+        {
+            using var response = await SendUpdateRightsHolderItInterfaceAsync(token, itInterfaceUuid, request);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendUpdateRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, RightsHolderWritableItInterfacePropertiesDTO request)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, DeactivationReasonRequestDTO request)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
         }
     }
 }

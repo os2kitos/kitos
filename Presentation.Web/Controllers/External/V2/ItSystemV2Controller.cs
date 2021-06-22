@@ -179,6 +179,11 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            if (request.RightsHolderUuid == Guid.Empty)
+            {
+                return BadRequest($"{nameof(request.RightsHolderUuid)} cannot be empty. A system needs to be bound to a specific rights holder.");
+            }
+
             var parameters = new RightsHolderSystemCreationParameters(
                 request.Name,
                 request.Uuid,

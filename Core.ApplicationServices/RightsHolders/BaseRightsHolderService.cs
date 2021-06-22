@@ -47,5 +47,12 @@ namespace Core.ApplicationServices.RightsHolders
             var organizationIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
             return _organizationRepository.GetAll().ByIds(organizationIds);
         }
+
+        protected Result<T, OperationError> WithActiveEntityOnly<T>(T entity) where T : class, IEntityWithEnabledStatus
+        {
+            return entity.Disabled
+                ? new OperationError("The entity has been deactivated and cannot be updated. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
+                : entity;
+        }
     }
 }

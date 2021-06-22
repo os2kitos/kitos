@@ -4,21 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.External.V2.Request
 {
-    public class ItInterfaceRequestDTO
+    public class RightsHolderWritableItInterfacePropertiesDTO
     {
-        /// <summary>
-        /// UUID for owning organization
-        /// </summary>
-        /// <remarks>Use api/v2/rightsholder/organizations API for getting a list of possible organizations related to the logged in user</remarks>
-        [Required]
-        public Guid RightsHolderUuid { get; set; }
-
-        /// <summary>
-        /// UUID for IT-Interface
-        /// If no UUID is provided, KITOS will assign one.
-        /// </summary>
-        public Guid? Uuid { get; set; }
-
         /// <summary>
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>

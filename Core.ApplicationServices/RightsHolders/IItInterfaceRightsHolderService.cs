@@ -10,6 +10,8 @@ namespace Core.ApplicationServices.RightsHolders
     {
         Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
-        Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, Guid exposingSystemUuid, RightsHolderItInterfaceCreationParameters creationParameters);
+        Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, RightsHolderItInterfaceCreationParameters creationParameters);
+        Result<ItInterface, OperationError> UpdateItInterface(Guid interfaceUuid, RightsHolderItInterfaceUpdateParameters updateParameters);
+        Result<ItInterface, OperationError> Deactivate(Guid interfaceUuid, string reason);
     }
 }
