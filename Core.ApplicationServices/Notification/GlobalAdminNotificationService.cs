@@ -37,7 +37,8 @@ namespace Core.ApplicationServices.Notification
             _hangfireApi.Schedule(() => SendEmail(notification.Message.IsHtml, notification.Subject, notification.Message.Content, notification.ResponsibleUserId, notification.OccurredAt));
         }
 
-        private void SendEmail(bool messageIsHtml, string subject, string messageContent, int responsibleUserId, DateTime notificationOccurredAt)
+        //NOTE: Public allow Hangfire to invoke it
+        public void SendEmail(bool messageIsHtml, string subject, string messageContent, int responsibleUserId, DateTime notificationOccurredAt)
         {
             var globalAdminEmails = GetGlobalAdminEmails();
 
@@ -66,6 +67,7 @@ namespace Core.ApplicationServices.Notification
                 .GetGlobalAdmins()
                 .Select(user => user.Email)
                 .Distinct()
+                .AsEnumerable()
                 .Select(address => new MailAddress(address))
                 .ToList();
         }
