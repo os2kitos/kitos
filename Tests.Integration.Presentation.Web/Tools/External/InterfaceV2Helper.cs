@@ -114,7 +114,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<RightsHolderItInterfaceResponseDTO> UpdateRightsHolderItInterfaceAsync(string token, Guid itInterfaceUuid, RightsHolderWritableItInterfacePropertiesDTO request)
         {
             using var response = await SendUpdateRightsHolderItInterfaceAsync(token, itInterfaceUuid, request);
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
         }

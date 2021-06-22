@@ -403,9 +403,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
 
@@ -486,16 +487,61 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
+        public void UpdateItInterface_Returns_Forbidden_If_Not_RightsHolder_Access()
+        {
+            //Arrange
+            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
+
+            ExpectHasSpecificAccessReturns(itInterface, false);
+            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+
+            //Act
+            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void UpdateItInterface_Returns_BadState_If_ItInterface_Is_Disabled()
+        {
+            //Arrange
+            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
+            var transactionMock = ExpectTransactionBegins();
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem }, Disabled = true };
+
+            ExpectHasSpecificAccessReturns(itInterface, true);
+            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
+            ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
+
+            //Act
+            var result = _sut.UpdateItInterface(itInterface.Uuid, inputParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+            transactionMock.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
         public void UpdateItInterface_Returns_Error_If_UpdateNameAndInterfaceId_Fails()
         {
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, operationError);
@@ -515,11 +561,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -540,11 +587,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -566,11 +614,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
@@ -593,11 +642,12 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             //Arrange
             var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
             var transactionMock = ExpectTransactionBegins();
-            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
-            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+            var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
+            var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
 
             var operationError = A<OperationError>();
 
+            ExpectHasSpecificAccessReturns(itInterface, true);
             ExpectGetSystemReturns(inputParameters.ExposingSystemUuid, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, itInterface);
