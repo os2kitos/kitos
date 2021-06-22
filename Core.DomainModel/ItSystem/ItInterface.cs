@@ -99,5 +99,10 @@ namespace Core.DomainModel.ItSystem
             var id = ExhibitedBy?.ItSystem?.BelongsToId ?? ExhibitedBy?.ItSystem?.BelongsTo?.Id;
             return id ?? Maybe<int>.None;
         }
+
+        public void Deactivate()
+        {
+            Disabled = true;
+        }
     }
 }

@@ -5,6 +5,7 @@ using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -832,6 +833,90 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(updated.Failed);
             Assert.Equal(OperationFailure.Conflict, updated.Error.FailureType);
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityUpdatedEvent<ItInterface>>()), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Returns_Ok()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.True(result.Select(x => x.Disabled).Value);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Once);
+        }
+
+        [Fact]
+        public void Cannot_Deactivate_If_No_Access()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(false);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
+        }
+
+        [Fact]
+        public void Cannot_Deactivate_If_Not_Found()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(Maybe<ItInterface>.None);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Returns_Interface_With_No_Changes_If_Already_Deactivated()
+        {
+            //Arrange
+            var itInterface = CreateInterfaceWithAllBasicPropertiesSet();
+            itInterface.Disabled = true;
+            var transaction = SetupTransaction();
+            _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
+
+            //Act
+            var result = _sut.Deactivate(itInterface.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.True(result.Select(x => x.Disabled).Value);
+
+            _domainEvents.Verify(x => x.Raise(It.IsAny<EnabledStatusChanged<ItInterface>>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+            _repository.Verify(x => x.Update(It.IsAny<ItInterface>()), Times.Never);
         }
 
         private void Test_Command_Which_Mutates_ItInterface_With_Success(

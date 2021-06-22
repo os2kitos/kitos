@@ -638,6 +638,98 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Fact]
+        public async Task Delete_As_RightsHolder_Deactivates_System()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, createdInterface.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
+            var dto = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, createdInterface.Uuid);
+            Assert.True(dto.Deactivated);
+        }
+
+        [Fact]
+        public async Task Cannot_Delete_As_RightsHolder_Without_Reason()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var reason = new DeactivationReasonRequestDTO() { DeactivationReason = string.Empty };
+
+            //Act
+            using var result = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, createdInterface.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+            var dto = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, createdInterface.Uuid);
+            Assert.False(dto.Deactivated); //Deactivation should not have happened
+        }
+
+        [Fact]
+        public async Task Cannot_Delete_As_RightsHolder_Without_Access()
+        {
+            //Arrange
+            var (token1, org1) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org1);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token1, creationDTO);
+
+            var (token2, org2) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token2, createdInterface.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Delete_Unknown_System()
+        {
+            //Arrange
+
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var uuid = A<Guid>();
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Delete_As_RightsHolder_If_Already_Deactivated()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+            DatabaseAccess.MutateEntitySet<ItInterface>(repository => repository.AsQueryable().ByUuid(createdInterface.Uuid).Deactivate());
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, createdInterface.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
         private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, Organization rightsHolderOrganization)
         {
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Public);

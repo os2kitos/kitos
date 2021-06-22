@@ -18,5 +18,6 @@ namespace Core.ApplicationServices.Interface
         Result<ItInterface, OperationError> UpdateUrlReference(int id, string newValue);
         Result<ItInterface, OperationError> UpdateExposingSystem(int interfaceId, int? newSystemId);
         Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string interfaceId);
+        Result<ItInterface, OperationError> Deactivate(int id);
     }
 }
