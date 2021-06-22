@@ -12,6 +12,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.Types;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models;
@@ -22,13 +23,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
-        private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new ConcurrentDictionary<string, Cookie>();
-        private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new ConcurrentDictionary<string, GetTokenResponseDTO>();
+        private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
+        private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
         private static readonly HttpClient StatelessHttpClient =
-            new HttpClient(
+            new(
                 new HttpClientHandler
                 {
                     UseCookies = false
@@ -47,6 +48,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
+        public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
+        {
+            var requestMessage = CreatePutMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
 
         public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
@@ -60,12 +67,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url);
-
-            if (body != null)
-            {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-            }
+            var requestMessage = CreatePutMessage(url, body);
 
             return SendWithCookieAsync(cookie, requestMessage);
         }
@@ -155,6 +157,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             var requestMessage = new HttpRequestMessage(HttpMethod.Post, url)
             {
                 Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json")
+            };
+            return requestMessage;
+        }
+        private static HttpRequestMessage CreatePutMessage(Uri url, object body)
+        {
+            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url)
+            {
+                Content = body?.Transform(content => new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json"))
             };
             return requestMessage;
         }

@@ -57,17 +57,12 @@ namespace Core.ApplicationServices.RightsHolders
                     return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
 
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
-                    return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
+                    return new OperationError("User does not have rights holder access in the provided organization", OperationFailure.Forbidden);
 
                 var result = _systemService
                     .CreateNewSystem(organizationId.Value, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => _systemService.UpdatePreviousName(system.Id, creationParameters.FormerName))
-                    .Bind(system => _systemService.UpdateDescription(system.Id, creationParameters.Description))
-                    .Bind(system => UpdateMainUrlReference(system.Id, creationParameters.UrlReference))
-                    .Bind(system => UpdateParentSystem(system.Id, creationParameters.ParentSystemUuid))
-                    .Bind(system => _systemService.UpdateBusinessType(system.Id, creationParameters.BusinessTypeUuid))
-                    .Bind(system => UpdateTaskRefs(system.Id, creationParameters.TaskRefKeys, creationParameters.TaskRefUuids));
+                    .Bind(system => ApplyUpdates(system, creationParameters, true));
 
                 if (result.Ok)
                 {
@@ -85,6 +80,55 @@ namespace Core.ApplicationServices.RightsHolders
                 _logger.Error(e, "Failed creating rightsholder system for rightsholder with id {rightsHolderUuid}", rightsHolderUuid);
                 return new OperationError(OperationFailure.UnknownError);
             }
+        }
+
+        public Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = _systemService
+                    .GetSystem(systemUuid)
+                    .Bind(WithRightsHolderAccessTo)
+                    .Bind(WithActiveSystemOnly)
+                    .Bind(system => ApplyUpdates(system, updateParameters, false));
+
+                if (result.Ok)
+                {
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error("User {id} failed to update It-System {uuid} due to error: {errorMessage}", _userContext.UserId, systemUuid, result.Error.ToString());
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, "User {id} Failed updating system with uuid {uuid}", _userContext.UserId, systemUuid);
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
+
+        private static Result<ItSystem, OperationError> WithActiveSystemOnly(ItSystem system)
+        {
+            return system.Disabled
+                ? new OperationError("IT-System has been deactivated and cannot be updated. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
+                : system;
+        }
+
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, IRightsHolderWritableSystemProperties updates, bool skipNameUpdate)
+        {
+            var updateNameResult = (skipNameUpdate ? Result<ItSystem, OperationError>.Success(system) : _systemService.UpdateName(system.Id, updates.Name));
+
+            return updateNameResult
+                .Bind(itSystem => _systemService.UpdatePreviousName(itSystem.Id, updates.FormerName))
+                .Bind(itSystem => _systemService.UpdateDescription(itSystem.Id, updates.Description))
+                .Bind(itSystem => UpdateMainUrlReference(itSystem.Id, updates.UrlReference))
+                .Bind(itSystem => UpdateParentSystem(itSystem.Id, updates.ParentSystemUuid))
+                .Bind(itSystem => _systemService.UpdateBusinessType(itSystem.Id, updates.BusinessTypeUuid))
+                .Bind(itSystem => UpdateTaskRefs(itSystem.Id, updates.TaskRefKeys, updates.TaskRefUuids));
         }
 
         private Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<string> taskRefKeys, IEnumerable<Guid> taskRefUuids)
@@ -136,7 +180,9 @@ namespace Core.ApplicationServices.RightsHolders
                         .Bind(WithRightsHolderAccessTo);
 
                 if (parentSystemResult.Failed)
-                    return parentSystemResult.Error;
+                    return parentSystemResult.Error.FailureType == OperationFailure.NotFound
+                        ? new OperationError("Parent system cannot be found", OperationFailure.BadInput)
+                        : parentSystemResult.Error;
 
 
                 parentSystemId = parentSystemResult.Value.Id;
@@ -163,7 +209,7 @@ namespace Core.ApplicationServices.RightsHolders
                         if (rightsHolderUuid.HasValue)
                         {
                             var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid.Value).Select(x => x.Id);
-                            
+
                             if (organizationId.IsNone)
                                 return new OperationError("Invalid organization id", OperationFailure.BadInput);
 

@@ -142,7 +142,7 @@ namespace Core.ApplicationServices.System
         {
             var result = new List<ItSystem>();
             var system = _itSystemRepository.GetSystem(systemId);
-            
+
             if (system == null)
                 throw new ArgumentException("Invalid system id");
 
@@ -264,6 +264,25 @@ namespace Core.ApplicationServices.System
             return new OperationError(OperationFailure.Forbidden);
         }
 
+        public Result<ItSystem, OperationError> UpdateName(int systemId, string newName)
+        {
+            return Mutate(systemId, system => system.Name != newName, updateWithResult: system =>
+            {
+                return ValidateNameChange(system.OrganizationId, system.Id, newName)
+                    .Match
+                    (
+                        onValue: namingError => namingError,
+                        onNone: () => system
+                            .UpdateName(newName)
+                            .Match
+                            (
+                                onValue: namingError => namingError,
+                                onNone: () => Result<ItSystem, OperationError>.Success(system)
+                            )
+                    );
+            });
+        }
+
         public Result<ItSystem, OperationError> UpdatePreviousName(int systemId, string newPreviousName)
         {
             return Mutate(systemId, system => system.PreviousName != newPreviousName, system => system.PreviousName = newPreviousName);
@@ -276,8 +295,17 @@ namespace Core.ApplicationServices.System
 
         public bool CanChangeNameTo(int organizationId, int systemId, string newName)
         {
-            return ItSystem.IsValidName(newName) &&
-                   FindSystemsByNameInOrganization(organizationId, newName).ExceptEntitiesWithIds(systemId).Any() == false;
+            return ValidateNameChange(organizationId, systemId, newName).IsNone;
+        }
+
+        private Maybe<OperationError> ValidateNameChange(int organizationId, int systemId, string newName)
+        {
+            if (!ItSystem.IsValidName(newName))
+                return new OperationError("Invalid name", OperationFailure.BadInput);
+
+            if (FindSystemsByNameInOrganization(organizationId, newName).ExceptEntitiesWithIds(systemId).Any())
+                return new OperationError("Existing system found in the organization with the same name", OperationFailure.Conflict);
+            return Maybe<OperationError>.None;
         }
 
         public bool CanCreateSystemWithName(int organizationId, string name)
