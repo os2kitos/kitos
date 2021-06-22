@@ -160,9 +160,15 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO deactivationReasonDTO)
+        public IHttpActionResult DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
-            return Ok();
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _rightsHolderService
+                .Deactivate(uuid, request.DeactivationReason)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);
         }
 
         /// <summary>

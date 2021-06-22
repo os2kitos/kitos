@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Organization;
@@ -223,6 +224,17 @@ namespace Core.ApplicationServices.Interface
 
                     return itInterface;
                 });
+        }
+
+        public Result<ItInterface, OperationError> Deactivate(int id)
+        {
+            return Mutate(id, 
+                itInterface => itInterface.Disabled == false, 
+                itInterface =>
+            {
+                itInterface.Deactive();
+                _domainEvents.Raise(new EnabledStatusChanged<ItInterface>(itInterface, false, true));
+            });
         }
 
         private bool ValidateName(string name)

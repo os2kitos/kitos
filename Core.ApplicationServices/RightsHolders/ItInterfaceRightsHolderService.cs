@@ -5,8 +5,6 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
-using Core.DomainServices;
-using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Core.DomainServices.Repositories.Organization;
@@ -94,6 +92,38 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
+        public Result<ItInterface, OperationError> Deactivate(Guid interfaceUuid, string reason)
+        {
+            if (string.IsNullOrEmpty(reason))
+                return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
+
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            try
+            {
+                var result = _itInterfaceService
+                    .GetInterface(interfaceUuid)
+                    .Bind(WithRightsHolderAccessTo)
+                    .Bind(WithActiveInterfaceOnly)
+                    .Bind(itInterface => _itInterfaceService.Deactivate(itInterface.Id));
+
+                if (result.Ok)
+                {
+                    _logger.Information($"User {_userContext.UserId} deactivated It-Interface with uuid: {interfaceUuid} due to reason: {reason}");
+                    transaction.Commit();
+                }
+                else
+                {
+                    _logger.Error($"User {_userContext.UserId} failed to deactivate It-Interface with uuid: {interfaceUuid} due to error: {result.Error}");
+                }
+
+                return result;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"User {_userContext.UserId} Failed deactivating It-Interface with uuid: {interfaceUuid}");
+                return new OperationError(OperationFailure.UnknownError);
+            }
+        }
 
         public Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid)
         {
@@ -181,5 +211,13 @@ namespace Core.ApplicationServices.RightsHolders
                 return new OperationError(OperationFailure.UnknownError);
             }
         }
+
+        private Result<ItInterface, OperationError> WithActiveInterfaceOnly(ItInterface itInterface)
+        {
+            return itInterface.Disabled
+                ? new OperationError("IT-Interface has been deactivated and no more changes are allowed. Please reach out to info@kitos.dk if this is an error.", OperationFailure.BadState)
+                : itInterface;
+        }
+
     }
 }
