@@ -220,14 +220,27 @@ namespace Core.DomainModel.ItSystem
         {
             if (organization == null)
                 throw new ArgumentNullException(nameof(organization));
-            
+
             BelongsTo = organization;
             BelongsToId = organization.Id;
         }
 
         public static bool IsValidName(string newName)
         {
-            return string.IsNullOrWhiteSpace(newName) == false && newName.Length <= ItSystem.MaxNameLength;
+            return string.IsNullOrWhiteSpace(newName) == false && newName.Length <= MaxNameLength;
+        }
+
+        public Maybe<OperationError> UpdateName(string newName)
+        {
+            if (!IsValidName(newName))
+                return new OperationError("Invalid name", OperationFailure.BadInput);
+            Name = newName;
+            return Maybe<OperationError>.None;
+        }
+
+        public void Deactivate()
+        {
+            Disabled = true;
         }
     }
 }
