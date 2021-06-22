@@ -1079,7 +1079,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Deactivation_Fails()
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Deactivation_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
@@ -1103,7 +1103,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Missing_Access()
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Missing_Access()
         {
             //Arrange
             var systemUuid = A<Guid>();
@@ -1125,7 +1125,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         }
 
         [Fact]
-        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Get_System_Fails()
+        public void Deactivate_Does_Not_Notify_Global_Admin_If_Get_System_Fails()
         {
             //Arrange
             var systemUuid = A<Guid>();
