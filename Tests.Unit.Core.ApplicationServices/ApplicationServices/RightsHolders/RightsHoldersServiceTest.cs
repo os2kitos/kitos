@@ -5,10 +5,12 @@ using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -1051,6 +1053,103 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             transaction.Verify(x => x.Commit(), Times.Never);
         }
 
+        [Fact]
+        public void Deactivate_Deactivates_System_And_Notifies_Global_Admins()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>()};
+            var userId = A<int>();
+
+            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
+            ExpectHasSpecificAccessReturns(itSystem, true);
+            ExpectDeactivateReturns(itSystem.Id, itSystem);
+            _userContextMock.Setup(x => x.UserId).Returns(userId);
+            _userRepositoryMock.Setup(x => x.GetById(userId)).Returns(new User {Email = A<string>()});
+
+            //Act
+            var result = _sut.Deactivate(systemUuid, reason);
+
+            //Assert
+            Assert.True(result.Ok);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Deactivation_Fails()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>() };
+            var operationError = A<OperationError>();
+
+            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
+            ExpectHasSpecificAccessReturns(itSystem, true);
+            ExpectDeactivateReturns(itSystem.Id, operationError);
+
+            //Act
+            var result = _sut.Deactivate(systemUuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError,result.Error);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Missing_Access()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var itSystem = new ItSystem() { Id = A<int>(), BelongsToId = A<int>() };
+
+            ExpectSystemServiceGetSystemReturns(systemUuid, itSystem);
+            ExpectHasSpecificAccessReturns(itSystem, false);
+
+            //Act
+            var result = _sut.Deactivate(systemUuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Deactivate_Noes_Not_Notify_Global_Admin_If_Get_System_Fails()
+        {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var reason = A<string>();
+            var transaction = ExpectTransactionBegins();
+            var operationError = A<OperationError>();
+
+            ExpectSystemServiceGetSystemReturns(systemUuid, operationError);
+
+            //Act
+            var result = _sut.Deactivate(systemUuid, reason);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+            _globalAdminNotificationServiceMock.Verify(x => x.Submit(It.IsAny<GlobalAdminNotification>()), Times.Never);
+            transaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        private void ExpectDeactivateReturns(int systemId, Result<ItSystem, OperationError> result)
+        {
+            _itSystemServiceMock.Setup(x => x.Deactivate(systemId)).Returns(result);
+        }
+
         private void ExpectUpdateNameReturns(int id, string name, Result<ItSystem, OperationError> result)
         {
             _itSystemServiceMock.Setup(x => x.UpdateName(id, name)).Returns(result);
@@ -1124,12 +1223,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private void ExpectHasSpecificAccessReturns(ItSystem itSystem, bool value)
         {
             _userContextMock.Setup(x => x.HasRole(itSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
-                .Returns(value);
-        }
-
-        private void ExpectHasSpecificAccessReturns(ItInterface itInterface, bool value)
-        {
-            _userContextMock.Setup(x => x.HasRole(itInterface.ExhibitedBy.ItSystem.BelongsToId.Value, OrganizationRole.RightsHolderAccess))
                 .Returns(value);
         }
 

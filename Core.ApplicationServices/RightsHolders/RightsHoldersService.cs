@@ -127,6 +127,9 @@ namespace Core.ApplicationServices.RightsHolders
 
         public Result<ItSystem, OperationError> Deactivate(Guid systemUuid, string reason)
         {
+            if (string.IsNullOrEmpty(reason))
+                return new OperationError("No deactivation reason provided", OperationFailure.BadInput);
+
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
