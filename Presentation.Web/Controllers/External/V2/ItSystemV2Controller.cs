@@ -26,13 +26,13 @@ namespace Presentation.Web.Controllers.External.V2
     public class ItSystemV2Controller : ExternalBaseController
     {
         private readonly IItSystemService _itSystemService;
-        private readonly IRightsHoldersService _rightsHoldersService;
+        private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IAuthorizationContext _authorizationContext;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHoldersService rightsHoldersService, IAuthorizationContext authorizationContext)
+        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext)
         {
             _itSystemService = itSystemService;
-            _rightsHoldersService = rightsHoldersService;
+            _rightsHolderSystemService = rightsHolderSystemService;
             _authorizationContext = authorizationContext;
         }
 
@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
                 .Select(itSystems => itSystems
                     .OrderBy(system => system.Id)
@@ -155,7 +155,7 @@ namespace Presentation.Web.Controllers.External.V2
             if (uuid == Guid.Empty)
                 return BadRequest(nameof(uuid) + " must be a non-empty guid");
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .GetSystemAsRightsHolder(uuid)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
@@ -179,11 +179,6 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (request.RightsHolderUuid == Guid.Empty)
-            {
-                return BadRequest($"{nameof(request.RightsHolderUuid)} cannot be empty. A system needs to be bound to a specific rights holder.");
-            }
-
             var parameters = new RightsHolderSystemCreationParameters(
                 request.Name,
                 request.Uuid,
@@ -191,7 +186,7 @@ namespace Presentation.Web.Controllers.External.V2
                 request.FormerName, request.Description, request.UrlReference, request.BusinessTypeUuid,
                 request.KLENumbers ?? new string[0], request.KLEUuids ?? new Guid[0]);
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .CreateNewSystem(request.RightsHolderUuid, parameters)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
@@ -221,7 +216,7 @@ namespace Presentation.Web.Controllers.External.V2
                 request.Description, request.UrlReference, request.BusinessTypeUuid,
                 request.KLENumbers ?? new string[0], request.KLEUuids ?? new Guid[0]);
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .Update(uuid, parameters)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(Ok, FromOperationError);
@@ -245,7 +240,7 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .Deactivate(uuid, request.DeactivationReason)
                 .Select(ToRightsHolderResponseDTO)
                 .Match(_ => StatusCode(HttpStatusCode.NoContent), FromOperationError);

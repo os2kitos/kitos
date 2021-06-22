@@ -10,9 +10,9 @@ namespace Core.ApplicationServices.RightsHolders
     /// <summary>
     /// Application service which implements the use cases specific to rights holders KITOS access
     /// </summary>
-    public interface IRightsHoldersService //TODO: Rename to IRightsHoldersystemService
+    public interface IRightsHolderSystemService
     {
-        IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess(); //TODO: Move to a rightsholderOrganizatoinServicer
+        IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
         Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
         Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
         Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);

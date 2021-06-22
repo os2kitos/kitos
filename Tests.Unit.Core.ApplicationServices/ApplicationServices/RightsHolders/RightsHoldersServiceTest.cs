@@ -30,7 +30,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 {
     public class RightsHoldersServiceTest : WithAutoFixture
     {
-        private readonly RightsHoldersService _sut;
+        private readonly RightsHolderSystemService _sut;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
@@ -48,7 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _sut = new RightsHoldersService(
+            _sut = new RightsHolderSystemService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,
