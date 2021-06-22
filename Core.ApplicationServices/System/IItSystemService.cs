@@ -28,5 +28,6 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> UpdateBusinessType(int systemId, Guid? newBusinessTypeState);
         Result<ItSystem, OperationError> UpdateRightsHolder(int systemId, Guid? newRightsHolderState);
         Result<ItSystem, OperationError> UpdateParentSystem(int systemId, int? newParentSystemState = null);
+        Result<ItSystem, OperationError> Deactivate(int systemId);
     }
 }

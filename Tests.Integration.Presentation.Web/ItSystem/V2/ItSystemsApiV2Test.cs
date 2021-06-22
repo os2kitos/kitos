@@ -772,6 +772,94 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.Conflict, result.StatusCode);
         }
 
+        [Fact]
+        public async Task DELETE_As_RightsHolder_Deactivates_System()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, createdSystem.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
+            var dto = await ItSystemV2Helper.GetSingleRightsHolderSystemAsync(token, createdSystem.Uuid);
+            Assert.True(dto.Deactivated);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_As_RightsHolder_Without_Reason()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
+
+            var reason = new DeactivationReasonRequestDTO() {DeactivationReason = string.Empty};
+
+            //Act
+            using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, createdSystem.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+            var dto = await ItSystemV2Helper.GetSingleRightsHolderSystemAsync(token, createdSystem.Uuid);
+            Assert.False(dto.Deactivated); //Deactivation should not have happened
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_As_RightsHolder_Without_Access()
+        {
+            //Arrange
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, system.uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_Unknown_System()
+        {
+            //Arrange
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var uuid = A<Guid>();
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_As_RightsHolder_If_Already_Deactivated()
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository=>repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
+
+            var reason = A<DeactivationReasonRequestDTO>();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, createdSystem.Uuid, reason);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
             var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);

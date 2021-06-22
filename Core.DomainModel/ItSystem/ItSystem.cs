@@ -237,5 +237,10 @@ namespace Core.DomainModel.ItSystem
             Name = newName;
             return Maybe<OperationError>.None;
         }
+
+        public void Deactivate()
+        {
+            Disabled = true;
+        }
     }
 }

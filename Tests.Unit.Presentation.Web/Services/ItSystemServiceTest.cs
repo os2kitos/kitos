@@ -1198,6 +1198,60 @@ namespace Tests.Unit.Presentation.Web.Services
             UpdateName_Fails_With_BadInput(newName);
         }
 
+        [Fact]
+        public void Deactivate_Returns_Ok()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, true);
+
+            //Act
+            var result = _sut.Deactivate(systemId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.True(result.Select(x=>x.Disabled).Value);
+            _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
+        public void Cannot_Deactivate_If_No_Access()
+        {
+            //Arrange
+            var systemId = A<int>();
+            var organization1Id = A<int>();
+            var itSystem = CreateSystem(organization1Id);
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId, itSystem);
+            ExpectAllowModifyReturns(itSystem, false);
+
+            //Act
+            var result = _sut.Deactivate(systemId);
+
+            //Assert
+            AssertUpdateFailure(result,OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void Cannot_Deactivate_If_Not_Found()
+        {
+            //Arrange
+            var systemId = A<int>();
+            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectGetSystemReturns(systemId,null);
+
+            //Act
+            var result = _sut.Deactivate(systemId);
+
+            //Assert
+            AssertUpdateFailure(result, OperationFailure.NotFound);
+        }
+
         private void UpdateName_Fails_With_BadInput(string newName)
         {
             //Arrange
