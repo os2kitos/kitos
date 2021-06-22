@@ -194,8 +194,9 @@ namespace Presentation.Web.Controllers.External.V2
 
         /// <summary>
         /// Sets IT-System values
-        /// If a property value is not provided, KITOS will fallback to the default value of the type and that will be written to the it-system so remember to define all data from the contract.
-        /// NOTE: Only active systems can be modified.
+        /// If a property value is not provided, KITOS will fallback to the default value of the type and that will be written to the it-system so remember to define all data specified in the request DTO want them to have a value after the request.
+        /// Required properties dictate the minimum value set accepted by KITOS.
+		/// NOTE: Only active systems can be modified.
         /// </summary>
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>The updated IT-System</returns>
