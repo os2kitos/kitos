@@ -75,7 +75,7 @@ namespace Presentation.Web.Controllers.External.V2
         }
 
         /// <summary>
-        /// Returns active IT-Interfaces
+        /// Returns all IT-Interfaces for which the user has rights holders access
         /// </summary>
         /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
         /// <param name="page">Page index to be returned (zero based)</param>
@@ -186,7 +186,7 @@ namespace Presentation.Web.Controllers.External.V2
         }
 
         /// <summary>
-        /// Returns active IT-Interfaces
+        /// Returns active IT-Interfaces available to the user
         /// </summary>
         /// <param name="exposedBySystemUuid">IT-System UUID filter</param>
         /// <param name="page">Page index to be returned (zero based)</param>
