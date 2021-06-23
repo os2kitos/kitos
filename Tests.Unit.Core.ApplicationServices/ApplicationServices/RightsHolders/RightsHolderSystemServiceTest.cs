@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
@@ -28,9 +27,9 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 {
-    public class RightsHoldersServiceTest : WithAutoFixture
+    public class RightsHolderSystemServiceTest : WithAutoFixture
     {
-        private readonly RightsHoldersService _sut;
+        private readonly RightsHolderSystemService _sut;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IItSystemService> _itSystemServiceMock;
@@ -39,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
 
-        public RightsHoldersServiceTest()
+        public RightsHolderSystemServiceTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
@@ -48,7 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
             _globalAdminNotificationServiceMock = new Mock<IGlobalAdminNotificationService>();
             _userRepositoryMock = new Mock<IUserRepository>();
-            _sut = new RightsHoldersService(
+            _sut = new RightsHolderSystemService(
                 _userContextMock.Object,
                 _organizationRepositoryMock.Object,
                 _itSystemServiceMock.Object,

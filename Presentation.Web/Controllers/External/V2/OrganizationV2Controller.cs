@@ -15,11 +15,11 @@ namespace Presentation.Web.Controllers.External.V2
     [RoutePrefix("api/v2")]
     public class OrganizationV2Controller : ExternalBaseController
     {
-        private readonly IRightsHoldersService _rightsHoldersService;
+        private readonly IRightsHolderSystemService _rightsHolderSystemService;
 
-        public OrganizationV2Controller(IRightsHoldersService rightsHoldersService)
+        public OrganizationV2Controller(IRightsHolderSystemService rightsHolderSystemService)
         {
-            _rightsHoldersService = rightsHoldersService;
+            _rightsHolderSystemService = rightsHolderSystemService;
         }
 
         /// <summary>
@@ -35,7 +35,7 @@ namespace Presentation.Web.Controllers.External.V2
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _rightsHoldersService
+            return _rightsHolderSystemService
                 .ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
                 .OrderBy(x => x.Id)
                 .Page(pagination)

@@ -228,7 +228,7 @@ namespace Presentation.Web.Ninject
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
 
-            kernel.Bind<IRightsHoldersService>().To<RightsHoldersService>().InCommandScope(Mode);
+            kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
         }
 

@@ -17,12 +17,11 @@ using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
 {
-    public class RightsHoldersService : BaseRightsHolderService, IRightsHoldersService
+    public class RightsHolderSystemService : BaseRightsHolderService, IRightsHolderSystemService
     {
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOrganizationRepository _organizationRepository;
@@ -34,7 +33,7 @@ namespace Core.ApplicationServices.RightsHolders
         private readonly IOperationClock _operationClock;
         private readonly ILogger _logger;
 
-        public RightsHoldersService(
+        public RightsHolderSystemService(
             IOrganizationalUserContext userContext,
             IOrganizationRepository organizationRepository,
             IItSystemService systemService,

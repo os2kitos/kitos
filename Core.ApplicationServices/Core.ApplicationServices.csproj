@@ -139,10 +139,10 @@
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
-    <Compile Include="RightsHolders\IRightsHoldersService.cs" />
+    <Compile Include="RightsHolders\IRightsHolderSystemService.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceCreationParameters.cs" />
     <Compile Include="RightsHolders\ItInterfaceRightsHolderService.cs" />
-    <Compile Include="RightsHolders\RightsHoldersService.cs" />
+    <Compile Include="RightsHolders\RightsHolderSystemService.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
