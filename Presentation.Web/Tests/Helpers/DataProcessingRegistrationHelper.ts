@@ -28,8 +28,8 @@ class DataProcessingRegistrationHelper {
     public static createDataProcessingRegistration(name: string) {
         console.log(`Creating registration with name ${name}`);
         return this.pageObject.getPage()
-            .then(() => this.waitForKendo())
             .then(() => browser.waitForAngular())
+            .then(() => this.waitForKendo())
             .then(() => this.openNewDpaDialog())
             .then(() => this.enterDpaName(name))
             .then(() => {
@@ -86,7 +86,6 @@ class DataProcessingRegistrationHelper {
         console.log("Removing role: ${role} with user: ${user}");
         return this.pageObject.getRoleDeleteButton(roleName, userName)
             .then(element => element.click())
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(() => browser.waitForAngular());
     }
@@ -97,7 +96,6 @@ class DataProcessingRegistrationHelper {
         return this.pageObject.getRoleRow(oldRoleName, oldUserName).then(row => {
             return this.pageObject.getRoleEditButton(oldRoleName, oldUserName)
                 .then(element => element.click())
-                .then(() => browser.waitForAngular())
                 .then(() => Select2Helper.selectNoSearchByParent(role, "s2id_edit-role", row))
                 .then(() => Select2Helper.searchForByParent(user, "s2id_edit-user", row))
                 .then(() => Select2Helper.waitForDataAndSelect())
@@ -124,7 +122,6 @@ class DataProcessingRegistrationHelper {
         console.log("Removing data processor with name: " + name);
         return this.editMainPo.getRemoveDataProcessorButton(name)
             .click()
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(()=>browser.waitForAngular());
     }
@@ -149,7 +146,6 @@ class DataProcessingRegistrationHelper {
         console.log("Removing sub data processor with name: " + name);
         return this.editMainPo.getRemoveSubDataProcessorButton(name)
             .click()
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(()=>browser.waitForAngular());
     }
@@ -165,7 +161,6 @@ class DataProcessingRegistrationHelper {
         console.log("Removing system with name: " + name);
         return this.pageObject.getRemoveSystemButton(name)
             .click()
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(()=>browser.waitForAngular());
     }
@@ -261,7 +256,6 @@ class DataProcessingRegistrationHelper {
         console.log(`Removing unsafe third country with name: ${thirdCountryName}`);
         return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
             .click()
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(()=>browser.waitForAngular());
     }
@@ -280,7 +274,6 @@ class DataProcessingRegistrationHelper {
         console.log("Removing oversight option with name: " + name);
         return this.editOversightPo.getRemoveOversightOptionButton(name)
             .click()
-            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(()=>browser.waitForAngular());
     }
