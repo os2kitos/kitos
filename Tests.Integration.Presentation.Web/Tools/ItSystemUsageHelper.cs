@@ -127,7 +127,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<BusinessRoleDTO>> GetAvailableRolesAsync(int orgId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory&$orderby=Priority desc&organizationId={orgId}"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalItSystemRoles?$filter=IsLocallyAvailable eq true or IsObligatory eq true&$orderby=Priority desc&organizationId={orgId}"), cookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<BusinessRoleDTO>();
