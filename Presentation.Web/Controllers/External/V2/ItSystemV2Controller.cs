@@ -59,6 +59,7 @@ namespace Presentation.Web.Controllers.External.V2
             string kleNumber = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
+            bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -77,6 +78,9 @@ namespace Presentation.Web.Controllers.External.V2
 
             if (numberOfUsers.HasValue)
                 refinements.Add(new QueryByNumberOfUsages(numberOfUsers.Value));
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
 
             return _itSystemService.GetAvailableSystems(refinements.ToArray())
                 .OrderBy(x => x.Id)
@@ -122,13 +126,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystemsByRightsHoldersAccess(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery paginationQuery = null)
+        public IHttpActionResult GetItSystemsByRightsHoldersAccess(
+            Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var refinements = new List<IDomainQuery<ItSystem>>();
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
+
             return _rightsHolderSystemService
-                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Select(itSystems => itSystems
                     .OrderBy(system => system.Id)
                     .Page(paginationQuery)

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.RightsHolders
 {
@@ -13,7 +15,7 @@ namespace Core.ApplicationServices.RightsHolders
     public interface IRightsHolderSystemService
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
-        Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null);
+        Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(List<IDomainQuery<ItSystem>> refinements, Guid? rightsHolderUuid = null);
         Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
         Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
         Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters);

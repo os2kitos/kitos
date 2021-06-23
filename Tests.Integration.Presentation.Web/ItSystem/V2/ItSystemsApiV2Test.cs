@@ -177,6 +177,63 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
         }
 
         [Fact]
+        public async Task GET_Many_Active_And_Inactive_As_StakeHolder()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (rightsHolderToken, rightsHolderOrg) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+
+            var inactive = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var active = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(inactive.dbId, rightsHolderOrg.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(active.dbId, rightsHolderOrg.Id, TestEnvironment.DefaultOrganizationId);
+
+            Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+
+            using var disabledResp = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(rightsHolderToken, inactive.uuid, A<DeactivationReasonRequestDTO>());
+
+            Assert.Equal(HttpStatusCode.NoContent, disabledResp.StatusCode);
+
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolderOrg.Uuid, includeDeactivated: true)).ToList(); // Limit to only take systems in rightsholder org
+
+            //Assert - Both the inactive and active should be in the result
+            Assert.Equal(2, systems.Count);
+            Assert.Contains(systems, dto => dto.Uuid == inactive.uuid);
+            Assert.Contains(systems, dto => dto.Uuid == active.uuid);
+        }
+
+        [Fact]
+        public async Task GET_Many_Active_As_StakeHolder()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var (rightsHolderToken, rightsHolderOrg) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+
+            var inactive = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var active = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(inactive.dbId, rightsHolderOrg.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(active.dbId, rightsHolderOrg.Id, TestEnvironment.DefaultOrganizationId);
+
+            Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+
+            using var disabledResp = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(rightsHolderToken, inactive.uuid, A<DeactivationReasonRequestDTO>());
+
+            Assert.Equal(HttpStatusCode.NoContent, disabledResp.StatusCode);
+
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolderOrg.Uuid)).ToList(); // Limit to only take systems in rightsholder org
+
+            //Assert - Both the inactive and active should be in the result
+            var systemResult = Assert.Single(systems);
+            Assert.Equal(systemResult.Uuid, active.uuid);
+        }
+
+        [Fact]
         public async Task GET_Many_As_StakeHolder_With_BusinessTypeFilter()
         {
             //Arrange
@@ -420,6 +477,63 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.Equal(new[] { system1.uuid, system2.uuid }, page1.Select(x => x.Uuid));
             Assert.Equal(new[] { system3.uuid }, page2.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_GET_Many_Active_RightsHolderSystems()
+        {
+            //Arrange - create three systems in different organizations but with the right rightsholder
+            var (token, rightsHolderOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system1 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            const int pageSize = 2;
+
+            var systems = new[] { system1, system2 };
+            foreach (var system in systems)
+            {
+                using var setBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, rightsHolderOrganization.Id, TestEnvironment.DefaultOrganizationId);
+                Assert.Equal(HttpStatusCode.OK, setBelongsToResponse.StatusCode);
+            }
+
+            using var deactivateResult = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, system2.uuid, A<DeactivationReasonRequestDTO>());
+
+            Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
+
+            //Act
+            var result = await ItSystemV2Helper.GetManyRightsHolderSystemsAsync(token, page: 0, pageSize: pageSize);
+
+            //Assert
+            var systemResult = Assert.Single(result);
+            Assert.Equal(system1.uuid, systemResult.Uuid);
+        }
+
+        [Fact]
+        public async Task Can_GET_Many_Active_And_Inactive_RightsHolderSystems()
+        {
+            //Arrange - create three systems in different organizations but with the right rightsholder
+            var (token, rightsHolderOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system1 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            const int pageSize = 2;
+
+            var systems = new[] { system1, system2 };
+            foreach (var system in systems)
+            {
+                using var setBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, rightsHolderOrganization.Id, TestEnvironment.DefaultOrganizationId);
+                Assert.Equal(HttpStatusCode.OK, setBelongsToResponse.StatusCode);
+            }
+
+            using var deactivateResult = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, system2.uuid, A<DeactivationReasonRequestDTO>());
+
+            Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
+
+            //Act
+            var result = await ItSystemV2Helper.GetManyRightsHolderSystemsAsync(token, page: 0, pageSize: pageSize, includeDeactivated: true);
+
+            //Assert
+            Assert.Equal(2, result.Count());
+            Assert.Contains(result, dto => dto.Uuid == system1.uuid);
+            Assert.Contains(result, dto => dto.Uuid == system2.uuid);
         }
 
         [Fact]

@@ -18,6 +18,7 @@ using Infrastructure.Services.Types;
 using Moq;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Tests.Toolkit.Patterns;
@@ -67,9 +68,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(false);
+            var refinements = new List<IDomainQuery<ItInterface>>();
 
             //Act
-            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess();
+            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements);
 
             //Assert
             Assert.True(result.Failed);
@@ -84,13 +86,40 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var expectedResponse = Mock.Of<IQueryable<ItInterface>>();
             _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
             _interfaceServiceMock.Setup(x => x.GetAvailableInterfaces(It.IsAny<IDomainQuery<ItInterface>>())).Returns(expectedResponse);
+            var refinements = new List<IDomainQuery<ItInterface>>();
 
             //Act
-            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess();
+            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements);
 
             //Assert
             Assert.True(result.Ok);
             Assert.Same(expectedResponse, result.Value);
+        }
+
+        [Fact]
+        public void Can_GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess_Applies_Refinements()
+        {
+            //Arrange
+            ExpectUserHasRightsHolderAccessReturns(true);
+            var expectedItInterface = new ItInterface();
+            var expectedResponse = new List<ItInterface>() { expectedItInterface };
+            _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
+            _interfaceServiceMock.Setup(x => x.GetAvailableInterfaces(It.IsAny<IDomainQuery<ItInterface>[]>())).Returns(expectedResponse.AsQueryable());
+
+            var domainQuery = new Mock<IDomainQuery<ItInterface>>();
+            domainQuery.Setup(x => x.Apply(It.IsAny<IQueryable<ItInterface>>())).Returns(new List<ItInterface>() { expectedItInterface }.AsQueryable());
+
+            var refinements = new List<IDomainQuery<ItInterface>>();
+
+            refinements.Add(domainQuery.Object);
+
+            //Act
+            var result = _sut.GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+
+            //Assert
+            Assert.True(result.Ok);
+            var resultItInterface = Assert.Single(result.Value);
+            Assert.Same(expectedItInterface, resultItInterface);
         }
 
         [Fact]

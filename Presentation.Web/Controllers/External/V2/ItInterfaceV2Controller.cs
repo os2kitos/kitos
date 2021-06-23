@@ -87,14 +87,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetItInterface(
+            Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var refinements = new List<IDomainQuery<ItInterface>>();
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
 
             return _rightsHolderService
-                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Match(
                     success => success
                         .OrderBy(y => y.Id)
@@ -198,7 +205,10 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterfaceAsStakeholder(Guid? exposedBySystemUuid = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetItInterfaceAsStakeholder(
+            Guid? exposedBySystemUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -207,6 +217,9 @@ namespace Presentation.Web.Controllers.External.V2
 
             if (exposedBySystemUuid.HasValue)
                 refinements.Add(new QueryByExposingSystem(exposedBySystemUuid.Value));
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())

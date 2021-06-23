@@ -161,7 +161,7 @@ namespace Core.ApplicationServices.RightsHolders
                 );
         }
 
-        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
+        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(List<IDomainQuery<ItInterface>> refinements, Guid? rightsHolderUuid = null)
         {
             return WithAnyRightsHoldersAccess()
                 .Match
@@ -170,11 +170,7 @@ namespace Core.ApplicationServices.RightsHolders
                     () =>
                     {
                         var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-
-                        var refinements = new List<IDomainQuery<ItInterface>>()
-                        {
-                            new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
-                        };
+                        refinements.Add(new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess));
 
                         if (rightsHolderUuid.HasValue)
                         {
