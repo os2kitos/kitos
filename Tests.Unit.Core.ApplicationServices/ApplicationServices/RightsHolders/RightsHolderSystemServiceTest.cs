@@ -4,7 +4,6 @@ using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Notification;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
@@ -28,7 +27,7 @@ using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.RightsHolders
 {
-    public class RightsHoldersServiceTest : WithAutoFixture
+    public class RightsHolderSystemServiceTest : WithAutoFixture
     {
         private readonly RightsHolderSystemService _sut;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
@@ -39,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private readonly Mock<IGlobalAdminNotificationService> _globalAdminNotificationServiceMock;
         private readonly Mock<IUserRepository> _userRepositoryMock;
 
-        public RightsHoldersServiceTest()
+        public RightsHolderSystemServiceTest()
         {
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();

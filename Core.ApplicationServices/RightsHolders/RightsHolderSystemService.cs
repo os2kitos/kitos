@@ -17,7 +17,6 @@ using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.RightsHolders
