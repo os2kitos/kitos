@@ -11,7 +11,6 @@ using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
-using Core.DomainServices.Repositories.KLE;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 

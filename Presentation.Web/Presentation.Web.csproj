@@ -504,6 +504,7 @@
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
+    <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />

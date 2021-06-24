@@ -14,10 +14,12 @@ using Core.DomainServices.Queries;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Ninject;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Extensions;
 
 namespace Presentation.Web.Controllers.API
 {
+    [DenyRightsHoldersAccess]
     public abstract class GenericApiController<TModel, TDto> : BaseApiController
         where TModel : class, IEntity
     {

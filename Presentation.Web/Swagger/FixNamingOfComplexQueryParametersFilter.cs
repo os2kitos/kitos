@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
@@ -15,9 +16,10 @@ namespace Presentation.Web.Swagger
 
         public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
         {
-            if (operation.parameters != null && MatchGET(apiDescription))
+            var parameters = operation.parameters?.ToList() ?? new List<Parameter>();
+            if (parameters.Any() && MatchGET(apiDescription))
             {
-                foreach (var parameter in operation.parameters.Where(IsNestedInComplexType).ToList())
+                foreach (var parameter in parameters.Where(IsNestedInComplexType).ToList())
                 {
                     parameter.name = GetParameterNameWithoutPrefix(parameter);
                 }

@@ -13,6 +13,7 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [RoutePrefix("api/v1/broken-external-references-report")]
+    [DenyRightsHoldersAccess]
     public class BrokenExternalReferencesReportController : BaseApiController
     {
         private readonly IBrokenExternalReferencesReportService _brokenExternalReferencesReportService;

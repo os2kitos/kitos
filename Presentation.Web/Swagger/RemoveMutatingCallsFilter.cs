@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger;
 
@@ -18,7 +19,7 @@ namespace Presentation.Web.Swagger
         {
             if (_applyTo(swaggerDoc))
             {
-                foreach (var swaggerDocPath in swaggerDoc.paths)
+                foreach (var swaggerDocPath in swaggerDoc.paths.ToList())
                 {
                     if (IsExternalEndpointDocs(swaggerDocPath.Key))
                         continue;
