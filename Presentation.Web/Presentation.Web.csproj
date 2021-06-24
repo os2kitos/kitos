@@ -348,6 +348,7 @@
     <Compile Include="Controllers\External\V2\ItSystemV2Controller.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
+    <Compile Include="Infrastructure\Attributes\DenyRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderCreateItInterfaceRequestDTO.cs" />

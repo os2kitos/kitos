@@ -13,6 +13,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
@@ -47,6 +48,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-systems")]
         [Route("it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -95,6 +97,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-systems/{uuid}")]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
