@@ -44,8 +44,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="kleNumber">KLE number filter ("NN.NN.NN" format)</param>
         /// <param name="kleUuid">KLE UUID number filter</param>
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
@@ -117,8 +116,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// Returns IT-Systems for which the current user has rights holders access
         /// </summary>
         /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
         [Route("rightsholder/it-systems")]
@@ -186,7 +184,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItSystem([FromBody] RightsHolderCreateItSystemRequestDTO request)
+        public IHttpActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderCreateItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -219,7 +217,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
+        public IHttpActionResult PutItSystemAsRightsHolder(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -247,7 +245,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateSystemAsRightsHolder(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
