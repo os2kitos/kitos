@@ -13,6 +13,7 @@ namespace Presentation.Web.Infrastructure.Middleware
         {
         }
 
+        private const int MinPageSize = PagingContraints.MinPageSize;
         private const int MaxPageSize = PagingContraints.MaxPageSize;
         private const string TopQuery = "$top";
         private const string TakeQuery = "take";
@@ -43,13 +44,13 @@ namespace Presentation.Web.Infrastructure.Middleware
         private static void RejectRequest(IOwinContext context, string queryParameter)
         {
             context.Response.StatusCode = 400;
-            context.Response.Write($"The value of the '{queryParameter}' parameter must be a number between 1 and {MaxPageSize}");
+            context.Response.Write($"The value of the '{queryParameter}' parameter must be a number between {MinPageSize} and {MaxPageSize}");
         }
 
         private static bool MatchValidPageSize(IReadableStringCollection query, string key)
         {
             return ParseIntegerFrom(query, key)
-                .Select(take => take is > 0 and < MaxPageSize)
+                .Select(take => take is >= MinPageSize and <= MaxPageSize)
                 .GetValueOrFallback(false);
         }
 
