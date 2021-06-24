@@ -39,71 +39,59 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
 
             //Assert
-            Assert.Equal(2, result.Count());
+            Assert.Equal(pageSize, result.Count());
             var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
             CheckBaseDTOValues(system, itInterface1, interface1DTO);
+            var interface2DTO = result.First(x => x.Name.Equals(itInterface2.Name));
+            CheckBaseDTOValues(system, itInterface2, interface2DTO);
         }
 
-        [Fact]
-        public async Task Can_Get_Interfaces_As_RightsHolder_Returns_Active_Interfaces()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_Get_Interfaces_As_RightsHolder_Depends_On_IncludeDeactivated(bool shouldIncludeDeactivated)
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
 
-            var pageSize = 3;
+            var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
             var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface3.Id).DisposeAsync();
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
 
-            using var deactivateResult = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, itInterface3.Uuid, A<DeactivationReasonRequestDTO>());
-
-            Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
-
-            //Act
-            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber);
-
-            //Assert
-            Assert.Equal(2, result.Count());
-            var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
-            CheckBaseDTOValues(system, itInterface1, interface1DTO);
-        }
-
-        [Fact]
-        public async Task Can_Get_Interfaces_As_RightsHolder_Returns_Active_And_Inactive_Interfaces()
-        {
-            //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-
-            var pageSize = 3;
-            var pageNumber = 0; //Always takes the first page;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface3 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface3.Id).DisposeAsync();
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
-
-            using var deactivateResult = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(token, itInterface3.Uuid, A<DeactivationReasonRequestDTO>());
-
-            Assert.Equal(HttpStatusCode.NoContent, deactivateResult.StatusCode);
+            // Disable second interface
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface2.Id);
+                dbInterface.Disabled = true;
+                db.SaveChanges();
+            });
 
             //Act
-            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, includeDeactivated: true);
+            var result = await InterfaceV2Helper.GetRightsholderInterfacesAsync(token, pageSize, pageNumber, includeDeactivated: shouldIncludeDeactivated);
 
             //Assert
-            Assert.Equal(3, result.Count());
-            var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
-            CheckBaseDTOValues(system, itInterface1, interface1DTO);
+            if (shouldIncludeDeactivated)
+            {
+                Assert.Equal(pageSize, result.Count());
+                var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
+                CheckBaseDTOValues(system, itInterface1, interface1DTO);
+                Assert.False(interface1DTO.Deactivated);
+                var interface2DTO = result.First(x => x.Name.Equals(itInterface2.Name));
+                CheckBaseDTOValues(system, itInterface2, interface2DTO);
+                Assert.True(interface2DTO.Deactivated);
+            }
+            else
+            {
+                var interfaceDTO = Assert.Single(result);
+                Assert.False(interfaceDTO.Deactivated);
+                CheckBaseDTOValues(system, itInterface1, interfaceDTO);
+            }
         }
 
         [Fact]
@@ -391,8 +379,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageSize = 2;
             var pageNumber = 0; //Always takes the first page;
 
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
             var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system1.Id, itInterface1.Id).DisposeAsync();
@@ -405,8 +393,10 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Single(result);
         }
 
-        [Fact]
-        public async Task Can_Get_Active_And_Inactive_Interfaces_As_Stakeholder()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_Get_Interfaces_As_Stakeholder_Depends_On_IncludeDeactivated(bool shouldIncludeDeactivated)
         {
             var (token, org) = await CreateStakeHolderUserInNewOrg();
 
@@ -414,52 +404,39 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageNumber = 0; //Always takes the first page;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
 
-            // use rightsholder to deactivate interface
-            var (_, _, rightsHolderToken) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
-            var deactivationResult = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(rightsHolderToken, itInterface2.Uuid, A<DeactivationReasonRequestDTO>());
-
-            Assert.Equal(HttpStatusCode.NoContent, deactivationResult.StatusCode);
-
-            //Act
-            var result = await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, pageSize, pageNumber, system.Uuid, includeDeactivated: true); // Limit by exposing system
-
-            //Assert
-            Assert.Equal(2, result.Count());
-            Assert.Contains(result, dto => dto.Uuid == itInterface1.Uuid);
-            Assert.Contains(result, dto => dto.Uuid == itInterface2.Uuid);
-        }
-
-        [Fact]
-        public async Task Can_Get_Active_Interfaces_As_Stakeholder()
-        {
-            var (token, org) = await CreateStakeHolderUserInNewOrg();
-
-            var pageSize = 2;
-            var pageNumber = 0; //Always takes the first page;
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), org.Id, AccessModifier.Public));
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
-            await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
-
-            // use rightsholder to deactivate interface
-            var (_, _, rightsHolderToken) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
-            var deactivationResult = await InterfaceV2Helper.SendDeleteRightsHolderItInterfaceAsync(rightsHolderToken, itInterface2.Uuid, A<DeactivationReasonRequestDTO>());
-
-            Assert.Equal(HttpStatusCode.NoContent, deactivationResult.StatusCode);
+            // Disable second interface
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var dbInterface = db.ItInterfaces.AsQueryable().ById(itInterface2.Id);
+                dbInterface.Disabled = true;
+                db.SaveChanges();
+            });
 
             //Act
-            var result = await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, pageSize, pageNumber, system.Uuid); // Limit by exposing system
+            var result = await InterfaceV2Helper.GetStakeholderInterfacesAsync(token, pageSize, pageNumber, system.Uuid, includeDeactivated: shouldIncludeDeactivated); // Limit by exposing system
 
             //Assert
-            var itInterfaceResult = Assert.Single(result);
-            Assert.Equal(itInterface1.Uuid, itInterfaceResult.Uuid);
+            if (shouldIncludeDeactivated)
+            {
+                Assert.Equal(pageSize, result.Count());
+                var interface1DTO = result.First(x => x.Name.Equals(itInterface1.Name));
+                CheckBaseDTOValues(system, itInterface1, interface1DTO);
+                Assert.False(interface1DTO.Deactivated);
+                var interface2DTO = result.First(x => x.Name.Equals(itInterface2.Name));
+                CheckBaseDTOValues(system, itInterface2, interface2DTO);
+                Assert.True(interface2DTO.Deactivated);
+            }
+            else
+            {
+                var interfaceDTO = Assert.Single(result);
+                Assert.False(interfaceDTO.Deactivated);
+                CheckBaseDTOValues(system, itInterface1, interfaceDTO);
+            }
         }
 
         [Theory]

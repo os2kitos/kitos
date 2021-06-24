@@ -172,7 +172,7 @@ namespace Core.ApplicationServices.RightsHolders
                     error => error,
                     () =>
                     {
-                        var subQueries = new List<IDomainQuery<ItInterface>>();
+                        var subQueries = new List<IDomainQuery<ItInterface>>(refinements);
                         var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
                         subQueries.Add(new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess));
 
