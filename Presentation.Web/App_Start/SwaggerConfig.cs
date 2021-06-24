@@ -59,6 +59,7 @@ namespace Presentation.Web
                     c.DocumentFilter(() => new FilterByApiVersionFilter(doc => int.Parse(doc.info.version), path => path.IsExternalApiPath() ? ApiVersions.V2 : ApiVersions.V1));
                     c.DocumentFilter<RemoveInternalApiOperationsFilter>();
                     c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
+                    c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
                     c.GroupActionsBy(apiDesc =>
                         {
                             var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
