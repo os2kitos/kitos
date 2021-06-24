@@ -19,6 +19,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.SystemUsage
 {
+    [CollectionDefinition(nameof(ItSystemUsageOverviewReadModelsTest), DisableParallelization = true)]
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
         [Fact]

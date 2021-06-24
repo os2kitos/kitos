@@ -15,6 +15,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
+    [CollectionDefinition(nameof(SystemRelationsTest), DisableParallelization = true)]
     public class SystemRelationsTest : WithAutoFixture
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");

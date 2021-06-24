@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -17,6 +16,7 @@ using Xunit.Abstractions;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
+    [CollectionDefinition(nameof(DataProcessingRegistrationReadModelsTest), DisableParallelization = true)]
     public class DataProcessingRegistrationReadModelsTest : WithAutoFixture
     {
         private readonly ITestOutputHelper _testOutputHelper;
