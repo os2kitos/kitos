@@ -58,17 +58,17 @@ describe("Only Global Admins can create user with special permissions",
                 });
         }
 
-        function canSetRightsHolderAccessTo(value: boolean) {
-            const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
-            executeSpecialPermissionUseCase(() => {
-                console.log("Updating Rightsholderaccess status to " + value);
-                return userHelper.updateRightsHolderAccessOnUser(credentials.username, value);
-            },
-                () => {
-                    console.log("Checking that Rightsholderaccess status is updated");
-                    return userHelper.checkRightsHolderAccessRoleStatusOnUser(credentials.username, value);
-                });
-        }
+        //function canSetRightsHolderAccessTo(value: boolean) {
+        //    const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
+        //    executeSpecialPermissionUseCase(() => {
+        //        console.log("Updating Rightsholderaccess status to " + value);
+        //        return userHelper.updateRightsHolderAccessOnUser(credentials.username, value);
+        //    },
+        //        () => {
+        //            console.log("Checking that Rightsholderaccess status is updated");
+        //            return userHelper.checkRightsHolderAccessRoleStatusOnUser(credentials.username, value);
+        //        });
+        //}
 
         function canSetStakeHolderAccessTo(value: boolean) {
             const credentials = loginHelper.getLocalAdminCredentials(); //Modify local admin instance
@@ -90,13 +90,14 @@ describe("Only Global Admins can create user with special permissions",
             canSetApiAccessTo(false);
         });
 
-        it("Global admin is able to set RightsHolder access to TRUE on existing user", () => {
-            canSetRightsHolderAccessTo(true);
-        });
+        //NOTE: Disabled from this test - we must create a new user since rightsholder access removes access to most of the v1 apis
+        //it("Global admin is able to set RightsHolder access to TRUE on existing user", () => {
+        //    canSetRightsHolderAccessTo(true);
+        //});
 
-        it("Global admin is able to set RightsHolder access to FALSE on existing user", () => {
-            canSetRightsHolderAccessTo(false);
-        });
+        //it("Global admin is able to set RightsHolder access to FALSE on existing user", () => {
+        //    canSetRightsHolderAccessTo(false);
+        //});
 
         it("Global admin is able to set StakeHolder access to TRUE on existing user", () => {
             canSetStakeHolderAccessTo(true);
