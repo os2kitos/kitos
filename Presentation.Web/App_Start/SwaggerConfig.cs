@@ -76,8 +76,8 @@ namespace Presentation.Web
 
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
-                    //Do not enable caching in this provider - it does not handle it well
-                    c.CustomProvider(defaultProvider => new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration));
+                    //Do not enable the build in caching in the odata provider. It caches error responses which we dont want so we wrap it in a custom caching provider which bails out on errors
+                    c.CustomProvider(defaultProvider => new CustomCachingSwaggerProvider(new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration)));
                 })
                 .EnableSwaggerUi(c =>
                 {
