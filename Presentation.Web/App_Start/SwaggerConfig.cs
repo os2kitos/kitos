@@ -76,9 +76,8 @@ namespace Presentation.Web
 
                     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
 
-                    c.CustomProvider(defaultProvider =>
-                        new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration).Configure(
-                            odataConfig => { odataConfig.EnableSwaggerRequestCaching(); }));
+                    //Do not enable caching in this provider - it does not handle it well
+                    c.CustomProvider(defaultProvider => new ODataSwaggerProvider(defaultProvider, c, GlobalConfiguration.Configuration));
                 })
                 .EnableSwaggerUi(c =>
                 {
