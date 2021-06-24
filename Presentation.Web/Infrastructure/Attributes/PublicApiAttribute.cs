@@ -26,7 +26,7 @@ namespace Presentation.Web.Infrastructure.Attributes
                     actionContext.Response = new HttpResponseMessage
                     {
                         StatusCode = HttpStatusCode.Forbidden,
-                        Content = new StringContent("Dette endpoint er kun for API brugere. Kontakt venligst KITOS Sekretariatet for oprettelse af API adgang.")
+                        Content = new StringContent("This endpoint is restricted to be used by API users. Please reach out to info@kitos.dk to create an API user.")
                     };
 
                 }

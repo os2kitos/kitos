@@ -247,19 +247,20 @@ namespace Core.ApplicationServices.RightsHolders
 
         }
 
-        public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(Guid? rightsHolderUuid = null)
+        public Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(IEnumerable<IDomainQuery<ItSystem>> refinements, Guid? rightsHolderUuid = null)
         {
+            if (refinements == null)
+                throw new ArgumentNullException(nameof(refinements));
+
             return WithAnyRightsHoldersAccess()
                 .Match
                 (
                     error => error,
                     () =>
                     {
+                        var subQueries = new List<IDomainQuery<ItSystem>>(refinements);
                         var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                        var refinements = new List<IDomainQuery<ItSystem>>
-                        {
-                            new QueryByRightsHolderIdOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess)
-                        };
+                        subQueries.Add(new QueryByRightsHolderIdOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess));
 
                         if (rightsHolderUuid.HasValue)
                         {
@@ -272,10 +273,10 @@ namespace Core.ApplicationServices.RightsHolders
                             {
                                 return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
                             }
-                            refinements.Add(new QueryByRightsHolderUuid(rightsHolderUuid.Value));
+                            subQueries.Add(new QueryByRightsHolderUuid(rightsHolderUuid.Value));
                         }
 
-                        var systems = _systemService.GetAvailableSystems(refinements.ToArray());
+                        var systems = _systemService.GetAvailableSystems(subQueries.ToArray());
 
                         return Result<IQueryable<ItSystem>, OperationError>.Success(systems);
                     }

@@ -13,6 +13,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
@@ -44,10 +45,10 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="kleNumber">KLE number filter ("NN.NN.NN" format)</param>
         /// <param name="kleUuid">KLE UUID number filter</param>
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-systems")]
         [Route("it-systems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -59,6 +60,7 @@ namespace Presentation.Web.Controllers.External.V2
             string kleNumber = null,
             Guid? kleUuid = null,
             int? numberOfUsers = null,
+            bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -78,6 +80,9 @@ namespace Presentation.Web.Controllers.External.V2
             if (numberOfUsers.HasValue)
                 refinements.Add(new QueryByNumberOfUsages(numberOfUsers.Value));
 
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
+
             return _itSystemService.GetAvailableSystems(refinements.ToArray())
                 .OrderBy(x => x.Id)
                 .Page(paginationQuery)
@@ -92,6 +97,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-System UUID</param>
         /// <returns>Specific data related to the IT-System</returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-systems/{uuid}")]
         [Route("it-systems/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -113,8 +119,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// Returns IT-Systems for which the current user has rights holders access
         /// </summary>
         /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
         [Route("rightsholder/it-systems")]
@@ -122,13 +127,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystemsByRightsHoldersAccess(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery paginationQuery = null)
+        public IHttpActionResult GetItSystemsByRightsHoldersAccess(
+            Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var refinements = new List<IDomainQuery<ItSystem>>();
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
+
             return _rightsHolderSystemService
-                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Select(itSystems => itSystems
                     .OrderBy(system => system.Id)
                     .Page(paginationQuery)
@@ -174,7 +187,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItSystem([FromBody] RightsHolderCreateItSystemRequestDTO request)
+        public IHttpActionResult PostItSystemAsRightsHolder([FromBody] RightsHolderCreateItSystemRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -207,7 +220,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystem(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
+        public IHttpActionResult PutItSystemAsRightsHolder(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -235,7 +248,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItSystem(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateSystemAsRightsHolder(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

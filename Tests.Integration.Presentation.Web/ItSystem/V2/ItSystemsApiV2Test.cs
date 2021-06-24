@@ -176,6 +176,51 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Contains(systems, dto => dto.Uuid == expected2.uuid);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GET_Many_As_StakeHolder_Depends_On_IncludeDeactivated(bool shouldIncludeDeactivated)
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var rightsHolder = await CreateOrganizationAsync();
+
+            var inactive = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var active = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+
+            using var resp1 = await ItSystemHelper.SendSetBelongsToRequestAsync(inactive.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+            using var resp2 = await ItSystemHelper.SendSetBelongsToRequestAsync(active.dbId, rightsHolder.Id, TestEnvironment.DefaultOrganizationId);
+
+            Assert.Equal(HttpStatusCode.OK, resp1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, resp2.StatusCode);
+
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var dbSystem = db.ItSystems.AsQueryable().ById(inactive.dbId);
+                dbSystem.Disabled = true;
+                db.SaveChanges();
+            });
+
+            //Act
+            var systems = (await ItSystemV2Helper.GetManyAsync(token, rightsHolderId: rightsHolder.Uuid, includeDeactivated: shouldIncludeDeactivated)).ToList(); // Limit to only take systems in rightsholder org
+
+            //Assert
+            if (shouldIncludeDeactivated)
+            {
+                Assert.Equal(2, systems.Count);
+                var activeSystemDTO = systems.First(x => x.Uuid.Equals(active.uuid));
+                Assert.False(activeSystemDTO.Deactivated);
+                var inactiveSystemDTO = systems.First(x => x.Uuid.Equals(inactive.uuid));
+                Assert.True(inactiveSystemDTO.Deactivated);
+            }
+            else
+            {
+                var systemResult = Assert.Single(systems);
+                Assert.Equal(systemResult.Uuid, active.uuid);
+                Assert.False(systemResult.Deactivated);
+            }
+        }
+
         [Fact]
         public async Task GET_Many_As_StakeHolder_With_BusinessTypeFilter()
         {
@@ -420,6 +465,51 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.Equal(new[] { system1.uuid, system2.uuid }, page1.Select(x => x.Uuid));
             Assert.Equal(new[] { system3.uuid }, page2.Select(x => x.Uuid));
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_GET_Many_RightsHolderSystems_Depends_On_IncludeDeactivated(bool shouldIncludeDeactivated)
+        {
+            //Arrange
+            var (token, rightsHolderOrganization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var inactive = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            var active = await CreateSystemAsync(TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
+            const int pageSize = 2;
+
+            var systems = new[] { inactive, active };
+            foreach (var system in systems)
+            {
+                using var setBelongsToResponse = await ItSystemHelper.SendSetBelongsToRequestAsync(system.dbId, rightsHolderOrganization.Id, TestEnvironment.DefaultOrganizationId);
+                Assert.Equal(HttpStatusCode.OK, setBelongsToResponse.StatusCode);
+            }
+
+            DatabaseAccess.MutateDatabase(db =>
+            {
+                var dbSystem = db.ItSystems.AsQueryable().ById(inactive.dbId);
+                dbSystem.Disabled = true;
+                db.SaveChanges();
+            });
+
+            //Act
+            var result = await ItSystemV2Helper.GetManyRightsHolderSystemsAsync(token, page: 0, pageSize: pageSize, includeDeactivated: shouldIncludeDeactivated);
+
+            //Assert
+            if (shouldIncludeDeactivated)
+            {
+                Assert.Equal(2, result.Count());
+                var activeSystemDTO = result.First(x => x.Uuid.Equals(active.uuid));
+                Assert.False(activeSystemDTO.Deactivated);
+                var inactiveSystemDTO = result.First(x => x.Uuid.Equals(inactive.uuid));
+                Assert.True(inactiveSystemDTO.Deactivated);
+            }
+            else
+            {
+                var systemResult = Assert.Single(result);
+                Assert.Equal(systemResult.Uuid, active.uuid);
+                Assert.False(systemResult.Deactivated);
+            }
         }
 
         [Fact]

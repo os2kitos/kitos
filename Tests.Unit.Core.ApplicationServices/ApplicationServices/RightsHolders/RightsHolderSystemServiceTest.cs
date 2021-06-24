@@ -86,9 +86,10 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         {
             //Arrange
             ExpectUserHasRightsHolderAccessReturns(false);
+            var refinements = new List<IDomainQuery<ItSystem>>();
 
             //Act
-            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess();
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements);
 
             //Assert
             Assert.True(result.Failed);
@@ -102,14 +103,41 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             ExpectUserHasRightsHolderAccessReturns(true);
             var expectedResponse = Mock.Of<IQueryable<ItSystem>>();
             _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
-            _itSystemServiceMock.Setup(x => x.GetAvailableSystems(It.IsAny<IDomainQuery<ItSystem>>())).Returns(expectedResponse);
+            _itSystemServiceMock.Setup(x => x.GetAvailableSystems(It.IsAny<IDomainQuery<ItSystem>[]>())).Returns(expectedResponse);
+            var refinements = new List<IDomainQuery<ItSystem>>();
 
             //Act
-            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess();
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements);
 
             //Assert
             Assert.True(result.Ok);
             Assert.Same(expectedResponse, result.Value);
+        }
+
+        [Fact]
+        public void Can_GetAvailableSystems_Applies_Refinements()
+        {
+            //Arrange
+            ExpectUserHasRightsHolderAccessReturns(true);
+            var expectedSystem = new ItSystem();
+            var expectedResponse = new List<ItSystem>() { expectedSystem };
+            _userContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(Many<int>());
+            _itSystemServiceMock.Setup(x => x.GetAvailableSystems(It.IsAny<IDomainQuery<ItSystem>[]>())).Returns(expectedResponse.AsQueryable());
+
+            var domainQuery = new Mock<IDomainQuery<ItSystem>>();
+            domainQuery.Setup(x => x.Apply(It.IsAny<IQueryable<ItSystem>>())).Returns(new List<ItSystem>() { expectedSystem }.AsQueryable());
+
+            var refinements = new List<IDomainQuery<ItSystem>>();
+
+            refinements.Add(domainQuery.Object);
+
+            //Act
+            var result = _sut.GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements);
+
+            //Assert
+            Assert.True(result.Ok);
+            var resultSystem = Assert.Single(result.Value);
+            Assert.Same(expectedSystem, resultSystem);
         }
 
         [Fact]

@@ -77,9 +77,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? businessTypeId = null,
             string kleKey = null,
             Guid? kleUuid = null,
-            int? numberOfUsers = null)
+            int? numberOfUsers = null, 
+            bool? includeDeactivated = null)
         {
-            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers);
+            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -93,7 +94,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? businessTypeId = null,
             string kleKey = null,
             Guid? kleUuid = null,
-            int? numberOfUsers = null)
+            int? numberOfUsers = null, 
+            bool? includeDeactivated = null)
         {
             var path = "api/v2/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -119,6 +121,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (numberOfUsers.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("numberOfUsers", numberOfUsers.Value.ToString("D")));
 
+            if (includeDeactivated.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("includeDeactivated", includeDeactivated.Value.ToString()));
+
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
 
@@ -129,9 +134,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             string token,
             int? page = null,
             int? pageSize = null,
-            Guid? rightsHolderUuid = null)
+            Guid? rightsHolderUuid = null,
+            bool? includeDeactivated = null)
         {
-            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize, rightsHolderUuid);
+            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize, rightsHolderUuid, includeDeactivated);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -141,7 +147,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             string token,
             int? page = null,
             int? pageSize = null,
-            Guid? rightsHolderUuid = null)
+            Guid? rightsHolderUuid = null,
+            bool? includeDeactivated = null)
         {
             var path = "api/v2/rightsholder/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -154,6 +161,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (rightsHolderUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("rightsHolderUuid", rightsHolderUuid.Value.ToString("D")));
+
+            if (includeDeactivated.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("includeDeactivated", includeDeactivated.Value.ToString()));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

@@ -12,6 +12,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Interface;
 using Swashbuckle.Swagger.Annotations;
@@ -34,42 +35,42 @@ namespace Presentation.Web.Controllers.External.V2
         /// <summary>
         /// Creates a new IT-Interface based on given input values
         /// </summary>
-        /// <param name="itInterfaceDTO">A collection of specific IT-Interface values</param>
+        /// <param name="request">A collection of specific IT-Interface values</param>
         /// <returns>Location header is set to uri for newly created IT-Interface</returns>
         [HttpPost]
         [Route("rightsholder/it-interfaces")]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.Created)]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(RightsHolderItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
-        public IHttpActionResult PostItInterface([FromBody] RightsHolderCreateItInterfaceRequestDTO itInterfaceDTO)
+        public IHttpActionResult PostItInterfaceAsRightsHolder([FromBody] RightsHolderCreateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            if (request.ExposedBySystemUuid == Guid.Empty)
             {
-                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+                return BadRequest($"{nameof(request.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
             }
 
-            if (itInterfaceDTO.RightsHolderUuid == Guid.Empty)
+            if (request.RightsHolderUuid == Guid.Empty)
             {
-                return BadRequest($"{nameof(itInterfaceDTO.RightsHolderUuid)} cannot be empty. An interface needs to be bound to a specific rights holder.");
+                return BadRequest($"{nameof(request.RightsHolderUuid)} cannot be empty. An interface needs to be bound to a specific rights holder.");
             }
 
             var creationParameters = new RightsHolderItInterfaceCreationParameters(
-                itInterfaceDTO.Uuid,
-                itInterfaceDTO.ExposedBySystemUuid,
-                itInterfaceDTO.Name, 
-                itInterfaceDTO.InterfaceId, 
-                itInterfaceDTO.Version, 
-                itInterfaceDTO.Description, 
-                itInterfaceDTO.UrlReference);
+                request.Uuid,
+                request.ExposedBySystemUuid,
+                request.Name, 
+                request.InterfaceId, 
+                request.Version, 
+                request.Description, 
+                request.UrlReference);
 
             return _rightsHolderService
-                .CreateNewItInterface(itInterfaceDTO.RightsHolderUuid, creationParameters)
+                .CreateNewItInterface(request.RightsHolderUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
                 .Match(MapItInterfaceCreatedResponse, FromOperationError);
         }
@@ -78,8 +79,7 @@ namespace Presentation.Web.Controllers.External.V2
         /// Returns all IT-Interfaces for which the user has rights holders access
         /// </summary>
         /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
         [Route("rightsholder/it-interfaces")]
@@ -87,14 +87,21 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterface(Guid? rightsHolderUuid = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetItInterfacesAsRightsHolder(
+            Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            var refinements = new List<IDomainQuery<ItInterface>>();
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
 
             return _rightsHolderService
-                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(rightsHolderUuid)
+                .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Match(
                     success => success
                         .OrderBy(y => y.Id)
@@ -117,7 +124,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterface(Guid uuid)
+        public IHttpActionResult GetItInterfaceAsRightsHolder(Guid uuid)
         {
             return _rightsHolderService
                 .GetInterfaceAsRightsHolder(uuid)
@@ -137,23 +144,23 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterface(Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO itInterfaceDTO)
+        public IHttpActionResult PutItInterfaceAsRightsHolder(Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if(itInterfaceDTO.ExposedBySystemUuid == Guid.Empty)
+            if(request.ExposedBySystemUuid == Guid.Empty)
             {
-                return BadRequest($"{nameof(itInterfaceDTO.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
+                return BadRequest($"{nameof(request.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
             }
 
             var updateParameters = new RightsHolderItInterfaceUpdateParameters(
-                itInterfaceDTO.ExposedBySystemUuid,
-                itInterfaceDTO.Name,
-                itInterfaceDTO.InterfaceId,
-                itInterfaceDTO.Version,
-                itInterfaceDTO.Description,
-                itInterfaceDTO.UrlReference);
+                request.ExposedBySystemUuid,
+                request.Name,
+                request.InterfaceId,
+                request.Version,
+                request.Description,
+                request.UrlReference);
 
             return _rightsHolderService
                 .UpdateItInterface(uuid, updateParameters)
@@ -174,7 +181,7 @@ namespace Presentation.Web.Controllers.External.V2
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItInterface(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateItInterfaceAsRightsHolder(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -186,19 +193,22 @@ namespace Presentation.Web.Controllers.External.V2
         }
 
         /// <summary>
-        /// Returns active IT-Interfaces available to the user
+        /// Returns IT-Interfaces available to the user
         /// </summary>
         /// <param name="exposedBySystemUuid">IT-System UUID filter</param>
-        /// <param name="page">Page index to be returned (zero based)</param>
-        /// <param name="pageSize">Page size</param>
+        /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-interfaces")]
         [Route("it-interfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItInterfaceAsStakeholder(Guid? exposedBySystemUuid = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetItInterfaces(
+            Guid? exposedBySystemUuid = null,
+            bool includeDeactivated = false, 
+            [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -207,6 +217,9 @@ namespace Presentation.Web.Controllers.External.V2
 
             if (exposedBySystemUuid.HasValue)
                 refinements.Add(new QueryByExposingSystem(exposedBySystemUuid.Value));
+
+            if (includeDeactivated == false)
+                refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
@@ -223,13 +236,14 @@ namespace Presentation.Web.Controllers.External.V2
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
+        [DenyRightsHoldersAccess("api/v2/rightsholder/it-interfaces/{uuid}")]
         [Route("it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaceAsStakeholder(Guid uuid)
+        public IHttpActionResult GetItInterface(Guid uuid)
         {
             return _itInterfaceService
                 .GetInterface(uuid)
