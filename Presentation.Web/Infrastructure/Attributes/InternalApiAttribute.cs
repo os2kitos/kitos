@@ -17,7 +17,7 @@ namespace Presentation.Web.Infrastructure.Attributes
                 actionContext.Response = new HttpResponseMessage()
                 {
                     StatusCode = HttpStatusCode.Forbidden,
-                    Content = new StringContent("Det er ikke tilladt at benytte dette endpoint")
+                    Content = new StringContent("Internal endpoint. Please use the public API.")
                 };
 
             }

@@ -76,7 +76,7 @@ namespace Tests.Integration.Presentation.Web.Security
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
                 var message = await httpResponse.Content.ReadAsStringAsync();
-                Assert.Equal("Det er ikke tilladt at skrive data via APIet", message);
+                Assert.Equal("Write operations are not allowed on this API", message);
             }
         }
 
