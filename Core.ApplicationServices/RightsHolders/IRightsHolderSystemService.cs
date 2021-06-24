@@ -15,7 +15,7 @@ namespace Core.ApplicationServices.RightsHolders
     public interface IRightsHolderSystemService
     {
         IQueryable<Organization> ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess();
-        Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(List<IDomainQuery<ItSystem>> refinements, Guid? rightsHolderUuid = null);
+        Result<IQueryable<ItSystem>, OperationError> GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(IEnumerable<IDomainQuery<ItSystem>> refinements, Guid? rightsHolderUuid = null);
         Result<ItSystem, OperationError> GetSystemAsRightsHolder(Guid systemUuid);
         Result<ItSystem, OperationError> CreateNewSystem(Guid rightsHolderUuid, RightsHolderSystemCreationParameters creationParameters);
         Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters);

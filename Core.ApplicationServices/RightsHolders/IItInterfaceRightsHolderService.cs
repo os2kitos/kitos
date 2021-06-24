@@ -10,7 +10,7 @@ namespace Core.ApplicationServices.RightsHolders
 {
     public interface IItInterfaceRightsHolderService
     {
-        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(List<IDomainQuery<ItInterface>> refinements, Guid? rightsHolderUuid = null);
+        Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(IEnumerable<IDomainQuery<ItInterface>> refinements, Guid? rightsHolderUuid = null);
         Result<ItInterface, OperationError> GetInterfaceAsRightsHolder(Guid interfaceUuid);
         Result<ItInterface, OperationError> CreateNewItInterface(Guid rightsHolderUuid, RightsHolderItInterfaceCreationParameters creationParameters);
         Result<ItInterface, OperationError> UpdateItInterface(Guid interfaceUuid, RightsHolderItInterfaceUpdateParameters updateParameters);

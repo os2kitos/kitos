@@ -161,16 +161,20 @@ namespace Core.ApplicationServices.RightsHolders
                 );
         }
 
-        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(List<IDomainQuery<ItInterface>> refinements, Guid? rightsHolderUuid = null)
+        public Result<IQueryable<ItInterface>, OperationError> GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(IEnumerable<IDomainQuery<ItInterface>> refinements, Guid? rightsHolderUuid = null)
         {
+            if (refinements == null)
+                throw new ArgumentNullException(nameof(refinements));
+
             return WithAnyRightsHoldersAccess()
                 .Match
                 (
                     error => error,
                     () =>
                     {
+                        var subQueries = new List<IDomainQuery<ItInterface>>();
                         var organizationIdsWhereUserHasRightsHoldersAccess = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess);
-                        refinements.Add(new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess));
+                        subQueries.Add(new QueryByRightsHolderIdsOrOwnOrganizationIds(organizationIdsWhereUserHasRightsHoldersAccess));
 
                         if (rightsHolderUuid.HasValue)
                         {
@@ -183,10 +187,10 @@ namespace Core.ApplicationServices.RightsHolders
                             {
                                 return new OperationError("User is not rightsholder in the provided organization", OperationFailure.Forbidden);
                             }
-                            refinements.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
+                            subQueries.Add(new QueryByRightsHolder(rightsHolderUuid.Value));
                         }
 
-                        return Result<IQueryable<ItInterface>, OperationError>.Success(_itInterfaceService.GetAvailableInterfaces(refinements.ToArray()));
+                        return Result<IQueryable<ItInterface>, OperationError>.Success(_itInterfaceService.GetAvailableInterfaces(subQueries.ToArray()));
                     }
                 );
         }
