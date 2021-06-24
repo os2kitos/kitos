@@ -13,6 +13,7 @@ using Presentation.Web.Models;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
+    [DenyRightsHoldersAccess]
     public class GlobalAdminController : BaseApiController
     {
         private readonly IOrganizationalUserContext _organizationalUserContext;

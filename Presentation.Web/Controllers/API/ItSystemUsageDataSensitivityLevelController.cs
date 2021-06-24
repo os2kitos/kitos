@@ -1,9 +1,7 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Core.DomainModel.Result;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.ItSystemUsage;
 
@@ -11,6 +9,7 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [RoutePrefix("api/v1/itsystemusage")]
+    [DenyRightsHoldersAccess]
     public class ItSystemUsageDataSensitivityLevelController : BaseApiController
     {
 

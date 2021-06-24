@@ -1,16 +1,12 @@
 ﻿using Core.ApplicationServices.Notification;
-using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
-using Core.DomainServices.Notifications;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.Swagger.Annotations;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Web;
 using System.Web.Http;
 
 namespace Presentation.Web.Controllers.API

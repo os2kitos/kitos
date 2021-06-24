@@ -25,6 +25,7 @@ namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
     [RoutePrefix("api/v1/data-processing-registration")]
+    [DenyRightsHoldersAccess]
     public class DataProcessingRegistrationController : BaseApiController
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
