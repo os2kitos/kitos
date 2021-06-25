@@ -510,7 +510,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessTypeName1, organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessTypeName1, organizationId);
 
             await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
 
@@ -519,7 +519,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await EntityOptionHelper.ChangeBusinessTypeNameAsync(businessType.Id, businessTypeName2);
+            await EntityOptionHelper.ChangeOptionTypeNameAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType.Id, businessTypeName2);
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
