@@ -3,9 +3,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.System
 {
@@ -22,14 +22,11 @@ namespace Core.DomainServices.Repositories.System
             _systemRepository = systemRepository;
         }
 
-        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters)
+        public IQueryable<ItSystem> GetSystems(OrganizationDataQueryParameters parameters = null)
         {
-            if (parameters == null)
-                throw new ArgumentNullException(nameof(parameters));
+            var itSystems = _systemRepository.AsQueryable();
 
-            return _systemRepository
-                .AsQueryable()
-                .ByOrganizationDataQueryParameters(parameters);
+            return parameters?.Transform(p => itSystems.ByOrganizationDataQueryParameters(p)) ?? itSystems;
         }
 
         public IQueryable<ItSystem> GetUnusedSystems(OrganizationDataQueryParameters parameters)
@@ -54,8 +51,16 @@ namespace Core.DomainServices.Repositories.System
             return _systemRepository.AsQueryable().ById(systemId);
         }
 
+        public Maybe<ItSystem> GetSystem(Guid systemId)
+        {
+            return _systemRepository.AsQueryable().ByUuid(systemId).FromNullable();
+        }
+
         public void DeleteSystem(ItSystem itSystem)
         {
+            if (itSystem == null)
+                throw new ArgumentNullException(nameof(itSystem));
+
             _systemRepository.DeleteWithReferencePreload(itSystem);
             _systemRepository.Save();
         }
@@ -75,6 +80,24 @@ namespace Core.DomainServices.Repositories.System
                 .ToList();
             
             return _systemRepository.AsQueryable().Where(x => systemTaskRefIds.Contains(x.Id));
+        }
+
+        public void Add(ItSystem newSystem)
+        {
+            if (newSystem == null)
+                throw new ArgumentNullException(nameof(newSystem));
+
+            _systemRepository.Insert(newSystem);
+            _systemRepository.Save();
+        }
+
+        public void Update(ItSystem itSystem)
+        {
+            if (itSystem == null)
+                throw new ArgumentNullException(nameof(itSystem));
+
+            _systemRepository.Update(itSystem);
+            _systemRepository.Save();
         }
 
         private ReadOnlyCollection<int> GetIdsOfSystemsInUse(int organizationId)

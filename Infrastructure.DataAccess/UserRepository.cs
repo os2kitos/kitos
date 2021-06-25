@@ -17,6 +17,11 @@ namespace Infrastructure.DataAccess
             _context = context;
         }
 
+        public IQueryable<User> GetGlobalAdmins()
+        {
+            return _context.Users.AsQueryable().Where(x => x.IsGlobalAdmin);
+        }
+
         public User GetByEmail(string email)
         {
             return _context.Users.SingleOrDefault(u => u.Email == email);

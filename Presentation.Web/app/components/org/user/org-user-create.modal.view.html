@@ -71,12 +71,39 @@
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReportAdmin">Rapport admin</label>
                 </div>
             </div>
-            <label for="Andet" class="col-xs-3 control-label">
-                Andet
-            </label>
-            <div class="col-xs-8">
-                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin">
-                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+        </div>
+        <div class="form-group" data-ng-hide="userExists || !ctrl.isUserGlobalAdmin">
+            <div ng-if="ctrl.isUserGlobalAdmin">
+                <label class="col-xs-3 control-label">Særlige roller i organisationen</label>
+                <div class="col-xs-8">
+                    <div class="checkbox">
+                        <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isRightsHolder">Rettighedshaveradgang</label>
+                    </div>
+                    <span ng-if="ctrl.vm.isRightsHolder" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Bemærk: Særlig rettighed der ikke bør kombineres med andre udover API adgang.
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="form-group" data-ng-hide="userExists || !ctrl.isUserGlobalAdmin">
+            <div ng-if="ctrl.isUserGlobalAdmin">
+                <label class="col-xs-3 control-label">Tværgående rettigheder</label>
+                <div class="col-xs-8">
+                    <div class="checkbox">
+                        <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasApi">API Adgang</label>
+                    </div>
+                    <span class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Aktiverer mulighed for udstedelse af KITOS Tokens.
+                    </span>
+                    <div class="checkbox">
+                        <label><input ng-disabled="emailExists" type="checkbox" value="" data-ng-model="ctrl.vm.hasStakeHolderAccess">Interessentadgang</label>
+                    </div>
+                    <span ng-if="emailExists" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        Brugeren findes allerede. Gennemfør tilknytningen og rediger brugeren efterfølgende for at indstille tværgående rettigheder.
+                    </span>
                 </div>
             </div>
         </div>

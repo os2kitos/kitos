@@ -10,7 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
-using ExpectedObjects.Strategies;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models.Qa;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -43,6 +43,7 @@ namespace Tests.Integration.Presentation.Web.Qa
         public async Task After_Job_Completes_Status_Returns_AvailableReport()
         {
             //Arrange
+            PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
 
             //Act
@@ -62,11 +63,10 @@ namespace Tests.Integration.Presentation.Web.Qa
             PurgeBrokenExternalReferencesReportTable();
 
             //Act
-            using (var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync())
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-            }
+            using var response = await BrokenExternalReferencesReportHelper.SendGetCurrentCsvAsync();
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         public class LinkReportCsvFormat
@@ -83,6 +83,7 @@ namespace Tests.Integration.Presentation.Web.Qa
         public async Task Get_CurrentCsv_Returns_Unicode_Encoded_Csv()
         {
             //Arrange - a broken link in both a system and an interface
+            PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var systemReferenceName = A<string>();
@@ -109,6 +110,7 @@ namespace Tests.Integration.Presentation.Web.Qa
         public async Task Can_Delete_Objects_Which_Are_Referred_By_Report()
         {
             //Arrange - a broken link in both a system and an interface
+            PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
@@ -191,6 +193,23 @@ namespace Tests.Integration.Presentation.Web.Qa
             } while (dto.Available == false && waitedFor < TimeSpan.FromMinutes(1));
 
             return dto;
+        }
+
+        private static void PrepareForReportGeneration()
+        {
+            DatabaseAccess.MutateDatabase(context =>
+            {
+                //Reset urls in db and add a few valid (one for each) since we only care about the report being generated, not the content and invlaid urls slow down the test process because the job adds retries.
+                var itSystemReferences = context.ExternalReferences.AsQueryable().Where(x => x.ItSystem_Id != null).ToList();
+                itSystemReferences.ForEach(x => x.URL = "");
+                itSystemReferences.FirstOrDefault()?.Transform(x => x.URL = "https://kitos.dk");
+
+                var itinterfaces = context.ItInterfaces.AsQueryable().Where(x => x.Url != null && x.Url != "").ToList();
+                itinterfaces.ForEach(x => x.Url = "");
+                itinterfaces.FirstOrDefault()?.Transform(x => x.Url = "https://kitos.dk");
+
+                context.SaveChanges();
+            });
         }
     }
 }

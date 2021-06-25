@@ -21,6 +21,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.KLE
 {
+    //Make sure this test is not affected by others since it is slow and will cause conflicts
     public class KleUpdateIntegrationTests : WithAutoFixture
     {
         private static readonly ConcurrentStack<int> TestKeys =
@@ -130,8 +131,8 @@ namespace Tests.Integration.Presentation.Web.KLE
                 var toBeRemoved = FlattenTreeDepthFirst(root).ToList();
 
                 // Remove task refs with ItSystem FKs
-                var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Count() > 0).ToList();
-                taskRefsWithItSystem.ForEach(taskRefWithItSystem => repository.DeleteWithReferencePreload(taskRefWithItSystem));
+                var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Any()).ToList();
+                taskRefsWithItSystem.ForEach(repository.DeleteWithReferencePreload);
 
                 // Remove task refs without FKs
                 repository.RemoveRange(toBeRemoved);
@@ -404,38 +405,10 @@ namespace Tests.Integration.Presentation.Web.KLE
                     .Where(MatchRootTask())
                     .First();
 
-                //Change the name of a branch of task refs. Change every second UUID
+                //Change the name of a branch of task refs. Change one uuid to empty (UX on that column now)
                 var toBeRenamed = FlattenTreeDepthFirst(root).ToList();
                 toBeRenamed.ForEach(Rename);
-                toBeRenamed.Where((_, index) => index % 2 == 2).ToList().ForEach(ClearUUID);
-                repository.Save();
-            });
-
-
-            //Act
-            await PutKle();
-
-            //Assert - make sure the task refs have the expected names
-            VerifyTaskRefIntegrity(expectedTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Patches_UUID_On_TaskRefs()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-            var expectedTaskRefs = BuildTaskRefIntegritySet().ToList();
-
-            MutateEntitySet<TaskRef>(repository =>
-            {
-                var root = repository
-                    .AsQueryable()
-                    .Where(MatchRootTask())
-                    .First();
-
-                //Change the name of a branch of task refs
-                var toBeRenamed = FlattenTreeDepthFirst(root).ToList();
-                toBeRenamed.ForEach(ClearUUID);
+                toBeRenamed.Where((_, index) => index == 0).ToList().ForEach(ClearUUID);
                 repository.Save();
             });
 
@@ -605,14 +578,21 @@ namespace Tests.Integration.Presentation.Web.KLE
         {
             if (TestKeys.TryPop(out var nextKey))
             {
-                return new TaskRef { TaskKey = nextKey.ToString(), ObjectOwnerId = objectOwnerId, LastChangedByUserId = objectOwnerId, OwnedByOrganizationUnitId = organizationUnitId };
+                return new TaskRef
+                {
+                    TaskKey = nextKey.ToString(), 
+                    ObjectOwnerId = objectOwnerId, 
+                    LastChangedByUserId = objectOwnerId, 
+                    OwnedByOrganizationUnitId = organizationUnitId,
+                    Uuid = Guid.NewGuid()
+                };
             }
             throw new InvalidOperationException("Unable to get more keys");
         }
 
         private static TaskUsage CreateTaskUsage(TaskRef taskRef1, int? objectOwnerId, int organizationUnitId)
         {
-            return new TaskUsage
+            return new()
             {
                 TaskRefId = taskRef1.Id,
                 LastChangedByUserId = objectOwnerId,
@@ -623,12 +603,10 @@ namespace Tests.Integration.Presentation.Web.KLE
 
         private static void ResetKleHistory()
         {
-            using (var kleRepo = new GenericRepository<KLEUpdateHistoryItem>(TestEnvironment.GetDatabase()))
-            {
-                var all = kleRepo.AsQueryable().ToList();
-                kleRepo.RemoveRange(all);
-                kleRepo.Save();
-            }
+            using var kleRepo = new GenericRepository<KLEUpdateHistoryItem>(TestEnvironment.GetDatabase());
+            var all = kleRepo.AsQueryable().ToList();
+            kleRepo.RemoveRange(all);
+            kleRepo.Save();
         }
 
         private static IReadOnlyList<string> GetProjectTaskRefKeys(int projectId)

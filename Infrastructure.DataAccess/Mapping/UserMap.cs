@@ -39,9 +39,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired();
             this.Property(t => t.IsGlobalAdmin)
                 .IsRequired();
+            this.Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
 
             // Table & Column Mappings
             this.ToTable("User");
+
+            Property(t => t.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_User_Uuid", 0);
         }
     }
 }

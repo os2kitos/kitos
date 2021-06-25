@@ -88,8 +88,11 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Repositories.Kendo;
 using Core.ApplicationServices.Notification;
+using Core.ApplicationServices.RightsHolders;
 using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
+using Core.ApplicationServices.OptionTypes;
+using Core.DomainServices.Repositories.TaskRefs;
 
 namespace Presentation.Web.Ninject
 {
@@ -207,6 +210,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOperationClock>().To<OperationClock>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
+            kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -223,6 +227,9 @@ namespace Presentation.Web.Ninject
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
+
+            kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
+            kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -314,6 +321,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
+            //DomainService bindings
             kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
                 .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
 
@@ -337,6 +345,11 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
                 .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
+
+
+            // ApplicationService bindings
+            kernel.Bind<IOptionsApplicationService<ItSystem, BusinessType>>()
+               .To<OptionsApplicationService<ItSystem, BusinessType>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
@@ -382,6 +395,7 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
+            kernel.Bind<ITaskRefRepository>().To<TaskRefRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)
@@ -452,7 +466,7 @@ namespace Presentation.Web.Ninject
             //Itsystemusage
             kernel.Bind<RebuildItSystemUsageOverviewReadModelsBatchJob>().ToSelf().InCommandScope(Mode);
             kernel.Bind<ScheduleItSystemUsageOverviewReadModelUpdates>().ToSelf().InCommandScope(Mode);
-            
+
             //Generic
             kernel.Bind<PurgeDuplicatePendingReadModelUpdates>().ToSelf().InCommandScope(Mode);
 

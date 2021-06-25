@@ -26,16 +26,14 @@ namespace Tests.Integration.Presentation.Web.Tools
                 AccessModifier = accessModifier
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem"), cookie, itSystem))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
+            using var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itsystem"), cookie, itSystem);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
 
-                Assert.Equal(orgId, response.OrganizationId);
-                Assert.Equal(orgId, response.BelongsToId);
-                Assert.Equal(itSystemName, response.Name);
-                return response;
-            }
+            Assert.Equal(orgId, response.OrganizationId);
+            Assert.Equal(orgId, response.BelongsToId);
+            Assert.Equal(itSystemName, response.Name);
+            return response;
         }
 
         public static async Task<ItSystemUsageDTO> TakeIntoUseAsync(int itSystemId, int orgId)
@@ -48,15 +46,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                 organizationId = orgId,
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itSystemUsage"), cookie, itSystem))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
+            using var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl("api/itSystemUsage"), cookie, itSystem);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
 
-                Assert.Equal(orgId, response.OrganizationId);
-                Assert.Equal(itSystemId, response.ItSystemId);
-                return response;
-            }
+            Assert.Equal(orgId, response.OrganizationId);
+            Assert.Equal(itSystemId, response.ItSystemId);
+            return response;
         }
 
         public static async Task<HttpResponseMessage> SendRemoveUsageAsync(int systemUsageId, int organizationId)
@@ -70,25 +66,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/ItSystemUsage/{itSystemUsageId}");
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
-            }
-        }
-
-        public static async Task<HttpResponseMessage> SendSetUsageDataWorkerRequestAsync(int systemUsageId, int organizationId, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"/api/UsageDataworker?organizationId={organizationId}");
-
-            var body = new
-            {
-                ItSystemUsageId = systemUsageId,
-                DataWorkerId = organizationId
-            };
-
-            return await HttpApi.PostWithCookieAsync(url, cookie, body);
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
         }
 
         public static async Task<AccessType> CreateAccessTypeAsync(int organizationId, int id, string name, Cookie optionalLogin = null)
@@ -101,11 +81,9 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Name = name
             };
 
-            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, body))
-            {
-                Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-                return await response.ReadResponseBodyAsAsync<AccessType>();
-            }
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<AccessType>();
         }
 
         public static async Task EnableAccessTypeAsync(int systemUsageId, int accessTypeId, Cookie optionalLogin = null)
@@ -113,10 +91,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})/AccessTypes/{accessTypeId}");
 
-            using (var response = await HttpApi.PostWithCookieAsync(url, cookie, new { }))
-            {
-                Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-            }
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, new { });
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
 
         public static async Task<AccessType[]> GetEnabledAccessTypesAsync(int systemUsageId, Cookie optionalLogin = null)
@@ -124,11 +100,9 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"odata/ItSystemUsages({systemUsageId})?$select=Id&$expand=AccessTypes");
 
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
-            }
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
         }
 
         public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
@@ -202,24 +176,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItSystemDTO> GetSystemAsync(int systemId, Cookie optionalLogin = null)
         {
-            using (var response = await SendGetSystemRequestAsync(systemId, optionalLogin))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
-            }
-        }
-
-        public static async Task<HttpResponseMessage> SendChangeSystemUsageArchiveDutyRequestAsync(int usageId, ArchiveDutyTypes duty)
-        {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl($"api/itsystemusage/{usageId}?{KitosApiConstants.UnusedOrganizationIdParameter}");
-            var body = new
-            {
-                archiveDuty = (int)duty
-            };
-
-            return await HttpApi.PatchWithCookieAsync(url, cookie, body);
+            using var response = await SendGetSystemRequestAsync(systemId, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendChangeArchiveDutyRecommendationRequestAsync(int systemId, ArchiveDutyRecommendationTypes recommendation)
@@ -264,7 +223,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<IEnumerable<OptionDTO>> GetBusinessTypeOptionsAsync(int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalBusinessTypes?organizationId={organizationId}"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/LocalBusinessTypes?$filter=IsLocallyAvailable eq true or IsObligatory eq true&$orderby=Priority desc&organizationId={organizationId}"), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<OptionDTO>();
         }
@@ -288,7 +247,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<HttpResponseMessage> SendSetBelongsToRequestAsync(
             int systemId,
-            int belongsToId,
+            int? belongsToId,
             int organizationId,
             Cookie optionalLogin = null)
         {
@@ -308,11 +267,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var url = TestEnvironment.CreateUrl($"api/itSystem/{systemId}?tasks=true&onlySelected=false&taskGroup=undefined&skip=0&take=50&orderBy=taskKey");
 
-            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
-            {
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<TaskRefSelectedDTO>>();
-            }
+            using var response = await HttpApi.GetWithCookieAsync(url, cookie);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<IEnumerable<TaskRefSelectedDTO>>();
         }
 
         public static async Task<HttpResponseMessage> SendAddTaskRefRequestAsync(int systemId, int taskRefId, int organizationId, Cookie optionalLogin = null)
@@ -324,15 +281,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
             };
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
-        }
-
-        public static async Task<HttpResponseMessage> SendDeletTaskRefRequestAsync(int systemId, int taskRefId, int organizationId, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-
-            var url = TestEnvironment.CreateUrl($"api/itSystem/{systemId}?taskId={taskRefId}&organizationId={organizationId}");
-
-            return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
     }
 }

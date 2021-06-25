@@ -8,7 +8,11 @@ using System.Net.Http.Headers;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
+using Infrastructure.Services.Cryptography;
+using Infrastructure.Services.Types;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models;
@@ -19,13 +23,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
-        private static readonly ConcurrentDictionary<OrganizationRole, Cookie> CookiesCache = new ConcurrentDictionary<OrganizationRole, Cookie>();
-        private static readonly ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO> TokenCache = new ConcurrentDictionary<OrganizationRole, GetTokenResponseDTO>();
+        private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
+        private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
         private static readonly HttpClient StatelessHttpClient =
-            new HttpClient(
+            new(
                 new HttpClientHandler
                 {
                     UseCookies = false
@@ -44,6 +48,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
+        public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
+        {
+            var requestMessage = CreatePutMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> DeleteWithTokenAsync(Uri url, string token, object body = null)
+        {
+            var requestMessage = CreateMessageWithContent(HttpMethod.Delete, url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
 
         public static Task<HttpResponseMessage> PostWithCookieAsync(Uri url, Cookie cookie, object body)
         {
@@ -57,12 +74,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static Task<HttpResponseMessage> PutWithCookieAsync(Uri url, Cookie cookie, object body = null)
         {
-            var requestMessage = new HttpRequestMessage(HttpMethod.Put, url);
-
-            if (body != null)
-            {
-                requestMessage.Content = new StringContent(JsonConvert.SerializeObject(body), Encoding.UTF8, "application/json");
-            }
+            var requestMessage = CreatePutMessage(url, body);
 
             return SendWithCookieAsync(cookie, requestMessage);
         }
@@ -155,6 +167,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
             return requestMessage;
         }
+        private static HttpRequestMessage CreatePutMessage(Uri url, object body)
+        {
+            return CreateMessageWithContent(HttpMethod.Put, url, body);
+        }
+
+        private static HttpRequestMessage CreateMessageWithContent(HttpMethod method, Uri url, object body)
+        {
+            var requestMessage = new HttpRequestMessage(method, url)
+            {
+                Content = body?.Transform(content =>
+                    new StringContent(JsonConvert.SerializeObject(content), Encoding.UTF8, "application/json"))
+            };
+            return requestMessage;
+        }
 
         public static Task<HttpResponseMessage> GetAsync(Uri url)
         {
@@ -191,16 +217,23 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
         {
-            if (TokenCache.TryGetValue(role, out var cachedToken))
+            var userCredentials = TestEnvironment.GetCredentials(role, true);
+
+            return await GetTokenAsync(userCredentials);
+        }
+
+        private static async Task<GetTokenResponseDTO> GetTokenAsync(KitosCredentials userCredentials)
+        {
+            if (TokenCache.TryGetValue(userCredentials.Username, out var cachedToken))
                 return cachedToken;
 
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var userCredentials = TestEnvironment.GetCredentials(role, true);
+
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
             using var httpResponseMessage = await PostForKitosToken(url, loginDto);
             var tokenResponseDtoAsync = await GetTokenResponseDtoAsync(loginDto, httpResponseMessage);
-            TokenCache.TryAdd(role, tokenResponseDtoAsync);
+            TokenCache.TryAdd(userCredentials.Username, tokenResponseDtoAsync);
             return tokenResponseDtoAsync;
         }
 
@@ -226,14 +259,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             return tokenResponse;
         }
 
-        
-
-        public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
+        public static async Task<Cookie> GetCookieAsync(KitosCredentials userCredentials)
         {
-            if (CookiesCache.TryGetValue(role, out var cachedCookie))
+            if (CookiesCache.TryGetValue(userCredentials.Username, out var cachedCookie))
                 return cachedCookie;
 
-            var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
@@ -250,11 +280,50 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Domain = url.Host
             };
-            CookiesCache.TryAdd(role, cookie);
+            CookiesCache.TryAdd(userCredentials.Username, cookie);
             return cookie;
         }
 
-        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = 1)
+
+        public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
+        {
+            var userCredentials = TestEnvironment.GetCredentials(role);
+            return await GetCookieAsync(userCredentials);
+        }
+
+        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
+        {
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
+            var password = Guid.NewGuid().ToString("N");
+            DatabaseAccess.MutateEntitySet<User>(x =>
+            {
+                using var crypto = new CryptoService();
+                var user = x.AsQueryable().ById(userId);
+                user.Password = crypto.Encrypt(password + user.Salt);
+            });
+
+            var cookie = await GetCookieAsync(new KitosCredentials(email, password));
+
+            return (userId, new KitosCredentials(email, password), cookie);
+        }
+
+        public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false)
+        {
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess, stakeHolderAccess), role, organizationId);
+            var password = Guid.NewGuid().ToString("N");
+            DatabaseAccess.MutateEntitySet<User>(x =>
+            {
+                using var crypto = new CryptoService();
+                var user = x.AsQueryable().ById(userId);
+                user.Password = crypto.Encrypt(password + user.Salt);
+            });
+
+            var token = await GetTokenAsync(new KitosCredentials(email, password));
+
+            return (userId, new KitosCredentials(email, password), token.Token);
+        }
+
+        public static async Task<int> CreateOdataUserAsync(ApiUserDTO userDto, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -270,18 +339,26 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(userDto.Email, response.Email);
             }
 
+            using (var addedRole = await SendAssignRoleToUserAsync(userId, role, organizationId))
+            {
+                Assert.Equal(HttpStatusCode.Created, addedRole.StatusCode);
+            }
+
+            return userId;
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignRoleToUserAsync(int userId, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId)
+        {
+            var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
+
             var roleDto = new OrgRightDTO
             {
                 UserId = userId,
                 Role = role.ToString("G")
             };
 
-            using (var addedRole = await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto))
-            {
-                Assert.Equal(HttpStatusCode.Created, addedRole.StatusCode);
-            }
+            return await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto);
 
-            return userId;
         }
 
         public static async Task<HttpResponseMessage> PatchOdataUserAsync(ApiUserDTO userDto, int userId)

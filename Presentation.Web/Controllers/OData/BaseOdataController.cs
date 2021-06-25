@@ -4,10 +4,12 @@ using System.Web.Http;
 using Core.DomainModel.Result;
 using Microsoft.AspNet.OData;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [DenyRightsHoldersAccess]
     public class BaseOdataController : ODataController
     {
         protected IHttpActionResult FromOperationFailure(OperationFailure failure)

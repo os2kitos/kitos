@@ -69,8 +69,8 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage Post(ItInterfaceExhibitDTO dto)
         {
             return _interfaceService
-                .ChangeExposingSystem(dto.ItInterfaceId, dto.ItSystemId)
-                .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationFailure);
+                .UpdateExposingSystem(dto.ItInterfaceId, dto.ItSystemId)
+                .Match(_ => NewObjectCreated(_.ExhibitedBy), FromOperationError);
         }
 
         [NonAction]
@@ -87,8 +87,8 @@ namespace Presentation.Web.Controllers.API
                 .Match
                 (
                     onValue: val => _interfaceService
-                        .ChangeExposingSystem(val.Id, null)
-                        .Match(_ => Ok(), FromOperationFailure),
+                        .UpdateExposingSystem(val.Id, null)
+                        .Match(_ => Ok(), FromOperationError),
                     onNone: NotFound
                 );
         }
@@ -117,8 +117,8 @@ namespace Presentation.Web.Controllers.API
                 .Match
                 (
                     onValue: val => _interfaceService
-                        .ChangeExposingSystem(val.Id, systemId)
-                        .Match(_ => Ok(), FromOperationFailure),
+                        .UpdateExposingSystem(val.Id, systemId)
+                        .Match(_ => Ok(), FromOperationError),
                     onNone: NotFound
                 );
         }

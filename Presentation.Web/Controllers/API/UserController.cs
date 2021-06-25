@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -18,23 +19,25 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
-            IOrganizationService organizationService,
-            IOrganizationalUserContext userContext)
+            IOrganizationService organizationService)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
-            _userContext = userContext;
         }
 
         [NonAction]
         public override HttpResponseMessage Post(int organizationId, UserDTO dto) => throw new NotSupportedException();
 
+        /// <summary>
+        /// Sends advice to user
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns></returns>
         public HttpResponseMessage Post(UserDTO dto)
         {
             try
@@ -99,6 +102,10 @@ namespace Presentation.Web.Controllers.API
 
         public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
         {
+            var existingUser = Repository.AsQueryable().ById(id);
+            if (existingUser == null)
+                return NotFound();
+
             // get name of mapped property
             var map = Mapper.ConfigurationProvider.FindTypeMapFor<UserDTO, User>().PropertyMaps;
 
@@ -112,10 +119,23 @@ namespace Presentation.Web.Controllers.API
 
                 var destName = mapMember.DestinationName;
 
-                if (destName == "IsGlobalAdmin")
-                    if (valuePair.Value.Value<bool>()) // check if value is being set to true
-                        if (!_userContext.IsGlobalAdmin())
-                            return Forbidden(); // don't allow users to elevate to global admin unless done by a global admin
+                if (destName == nameof(Core.DomainModel.User.Uuid))
+                    if (valuePair.Value?.Value<Guid>() != existingUser.Uuid)
+                        return BadRequest($"{nameof(Core.DomainModel.User.Uuid)}cannot be updated");
+
+                if (destName == nameof(Core.DomainModel.User.IsGlobalAdmin))
+                    if ((valuePair.Value?.Value<bool>()).GetValueOrDefault()) // check if value is being set to true
+                        if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
+                            return Forbidden();
+
+                if (destName == nameof(Core.DomainModel.User.HasStakeHolderAccess))
+                {
+                    if (existingUser.HasStakeHolderAccess != (valuePair.Value?.Value<bool>()).GetValueOrDefault())
+                    {
+                        if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                            return Forbidden();
+                    }
+                }
             }
 
             return base.Patch(id, organizationId, obj);

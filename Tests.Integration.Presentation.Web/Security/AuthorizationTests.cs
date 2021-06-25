@@ -41,10 +41,8 @@ namespace Tests.Integration.Presentation.Web.Security
         public async Task User_Without_Api_Access_Can_Not_Get_Token()
         {
             //Arrange
-            var role = _globalAdmin.Role;
-            var userCredentials = TestEnvironment.GetCredentials(role);
             var url = TestEnvironment.CreateUrl("api/authorize/GetToken");
-            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
+            var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(_globalAdmin.Username, _globalAdmin.Password);
 
             //Act
             var tokenResponse = await HttpApi.PostAsync(url, loginDto);

@@ -25,10 +25,7 @@
         <div class="form-group">
             <label for="selectedUserId">Tildel roller til: &nbsp;</label>
             <select id="selectedUserId" ng-model="ctrl.selectedUser" class="form-control" ng-change="ctrl.setSelectedUser()" ng-options="user as user.Name + ' ' + user.LastName for user in ctrl.vmUsersInOrganization">
-                <!--<option selected disabled>Vælg bruger</option>
-                <option ng-repeat="user in ctrl.vmUsersInOrganization | orderBy: user.LastName" ng-value="user">
-                    {{user.Name}} {{user.LastName}}
-                </option>-->
+                {{user.Name}} {{user.LastName}}
             </select>
         </div>
     </div>
@@ -155,6 +152,9 @@
                     </div>
                     <div ng-show="admin.Role === 'GlobalAdmin'">
                         Global admin
+                    </div>
+                    <div ng-show="admin.Role === 'RightsHolderAccess'">
+                        Rettighedshaveradgang
                     </div>
                 </td>
                 <td ng-show="adminModel">{{ctrl.selectedUser.Name}} {{ctrl.selectedUser.LastName}}</td>

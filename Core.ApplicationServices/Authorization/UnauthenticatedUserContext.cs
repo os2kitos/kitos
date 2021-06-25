@@ -22,7 +22,22 @@ namespace Core.ApplicationServices.Authorization
             return false;
         }
 
+        public bool HasStakeHolderAccess()
+        {
+            return false;
+        }
+
+        public IEnumerable<int> GetOrganizationIdsWhereHasRole(OrganizationRole role)
+        {
+            return new int[0];
+        }
+
         public bool HasRole(int organizationId, OrganizationRole role)
+        {
+            return false;
+        }
+
+        public bool HasRoleInAnyOrganization(OrganizationRole role)
         {
             return false;
         }

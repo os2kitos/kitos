@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -14,16 +13,19 @@ namespace Core.ApplicationServices.Authorization
     {
         private readonly IReadOnlyDictionary<int, HashSet<OrganizationRole>> _roles;
         private readonly IReadOnlyDictionary<int, OrganizationCategory> _categoriesOfMemberOrganizations;
+        private readonly bool _stakeHolderAccess;
         private readonly HashSet<OrganizationCategory> _membershipCategories;
         private readonly bool _isGlobalAdmin;
 
         public OrganizationalUserContext(
             int userId,
             IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> roles,
-            IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations)
+            IReadOnlyDictionary<int, OrganizationCategory> categoriesOfMemberOrganizations,
+            bool stakeHolderAccess)
         {
             UserId = userId;
             _categoriesOfMemberOrganizations = categoriesOfMemberOrganizations;
+            _stakeHolderAccess = stakeHolderAccess;
             _membershipCategories = new HashSet<OrganizationCategory>(_categoriesOfMemberOrganizations.Values);
             _roles = roles
                 .ToDictionary(kvp => kvp.Key, kvp => new HashSet<OrganizationRole>(kvp.Value))
@@ -45,10 +47,25 @@ namespace Core.ApplicationServices.Authorization
             return _isGlobalAdmin;
         }
 
+        public bool HasStakeHolderAccess()
+        {
+            return _stakeHolderAccess;
+        }
+
+        public IEnumerable<int> GetOrganizationIdsWhereHasRole(OrganizationRole role)
+        {
+            return _roles.Keys.Where(id => HasRole(id, role)).Distinct().ToList();
+        }
+
         public bool HasRole(int organizationId, OrganizationRole role)
         {
             return _roles.TryGetValue(organizationId, out var rolesInOrganization) &&
                    rolesInOrganization.Contains(role);
+        }
+
+        public bool HasRoleInAnyOrganization(OrganizationRole role)
+        {
+            return _roles.Keys.Any(org => HasRole(org, role));
         }
 
         public bool HasRoleIn(int organizationId)

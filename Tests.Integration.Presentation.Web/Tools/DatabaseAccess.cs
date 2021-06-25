@@ -1,5 +1,7 @@
 ﻿using System;
+using Core.DomainModel;
 using Core.DomainServices;
+using Core.DomainServices.Extensions;
 using Infrastructure.DataAccess;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -30,9 +32,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         /// <param name="mutate"></param>
         public static void MutateEntitySet<TModel>(Action<IGenericRepository<TModel>> mutate) where TModel : class
         {
-            using var repository = new GenericRepository<TModel>(TestEnvironment.GetDatabase());
+            using var kitosContext = TestEnvironment.GetDatabase();
+            using var repository = new GenericRepository<TModel>(kitosContext);
 
             mutate(repository);
+
+            repository.Save();
         }
 
         /// <summary>
@@ -44,6 +49,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var db = TestEnvironment.GetDatabase();
 
             mutate(db);
+        }
+
+        /// <summary>
+        /// Map an entity db id to the corresponding uuid used outside of kitos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dbId"></param>
+        /// <returns></returns>
+        public static Guid GetEntityUuid<T>(int dbId) where T : class, IHasUuid, IHasId
+        {
+            return DatabaseAccess.MapFromEntitySet<T, Guid>(x => x.AsQueryable().ById(dbId).Uuid);
         }
     }
 }

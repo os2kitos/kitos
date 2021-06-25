@@ -259,7 +259,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(businessType.Name, readModel.ItSystemBusinessTypeName);
             Assert.Equal(organizationId, readModel.ItSystemRightsHolderId);
             Assert.Equal(organizationName, readModel.ItSystemRightsHolderName);
-            Assert.Equal(taskRef.TaskRef.TaskKey, readModel.ItSystemKLEIdsAsCsv);
+            Assert.Equal(taskRef.TaskRef.TaskKey ?? string.Empty, readModel.ItSystemKLEIdsAsCsv);
             Assert.Equal(taskRef.TaskRef.Description, readModel.ItSystemKLENamesAsCsv);
             var readTaskRef = Assert.Single(readModel.ItSystemTaskRefs);
             Assert.Equal(taskRef.TaskRef.TaskKey, readTaskRef.KLEId);
@@ -509,7 +509,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var businessType = await EntityOptionHelper.SendCreateBusinessTypeAsync(businessTypeName1, organizationId);
+            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessTypeName1, organizationId);
 
             await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
 
@@ -518,7 +518,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await EntityOptionHelper.SendChangeBusinessTypeNameAsync(businessType.Id, businessTypeName2);
+            await EntityOptionHelper.ChangeBusinessTypeNameAsync(businessType.Id, businessTypeName2);
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -1002,12 +1002,12 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             //Act + assert - Rename the system used in incoming relation and verify that the readmodel is updated
             using var renameIncomingSystem = await ItSystemHelper.SendSetNameRequestAsync(incomingRelationSystem.Id, incomingRelationSystemName_changed, organizationId);
-            Assert.Equal(HttpStatusCode.OK,renameIncomingSystem.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, renameIncomingSystem.StatusCode);
 
             await WaitForReadModelQueueDepletion();
             var mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
             var mainSystemReadModel = Assert.Single(mainSystemReadModels);
-            Assert.Equal(incomingRelationSystemName_changed,mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
+            Assert.Equal(incomingRelationSystemName_changed, mainSystemReadModel.IncomingRelatedItSystemUsagesNamesAsCsv);
 
             //Act + assert - Rename the system used in outgoing relation and verify that the readmodel is updated
             using var renameOutgoingSystem = await ItSystemHelper.SendSetNameRequestAsync(outGoingRelationSystem.Id, outgoingRelationSystemName_changed, organizationId);

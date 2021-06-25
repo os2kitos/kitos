@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Web.Http;
-using Infrastructure.Services.DomainEvents;
+using Core.ApplicationServices.Authorization.Permissions;
+using Infrastructure.Services.Types;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 
@@ -27,6 +29,61 @@ namespace Presentation.Web.Controllers.OData
 
         [NonAction]
         public override IHttpActionResult Post(int organizationId, User entity) => throw new NotSupportedException();
+
+        protected override Maybe<IHttpActionResult> ValidatePatch(Delta<User> delta, User entity)
+        {
+            var error = base.ValidatePatch(delta, entity);
+            if (error.IsNone)
+            {
+                var changedPropertyNames = delta.GetChangedPropertyNames().ToHashSet();
+                if (AttemptToChangeStakeHolderAccess(delta, entity, changedPropertyNames))
+                {
+                    if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                    {
+                        error = Forbidden();
+                    }
+                }
+
+                if (AttemptToChangeGlobalAdminFlag(delta, entity, changedPropertyNames))
+                {
+                    if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
+                    {
+                        error = Forbidden();
+                    }
+                }
+
+                if (AttemptToChangeUuid(delta, entity, changedPropertyNames))
+                {
+                    return BadRequest("Uuid cannot be changed");
+                }
+            }
+
+            return error;
+        }
+
+        private static bool AttemptToChangeUuid(Delta<User> delta, User entity, HashSet<string> changedPropertyNames)
+        {
+            const string uuidName = nameof(Core.DomainModel.User.Uuid);
+
+            return changedPropertyNames.Contains(uuidName) && delta.TryGetPropertyValue(uuidName,
+                out var uuid) && ((Guid)uuid) != entity.Uuid;
+        }
+
+        private static bool AttemptToChangeGlobalAdminFlag(Delta<User> delta, User entity, ICollection<string> changedPropertyNames)
+        {
+            const string isGlobalAdminName = nameof(Core.DomainModel.User.IsGlobalAdmin);
+
+            return changedPropertyNames.Contains(isGlobalAdminName) && delta.TryGetPropertyValue(isGlobalAdminName,
+                out var globalAdmin) && ((bool)globalAdmin) != entity.IsGlobalAdmin;
+        }
+
+        private static bool AttemptToChangeStakeHolderAccess(Delta<User> delta, User entity, ICollection<string> changedPropertyNames)
+        {
+            const string stakeHolderAccess = nameof(Core.DomainModel.User.HasStakeHolderAccess);
+
+            return changedPropertyNames.Contains(stakeHolderAccess) && delta.TryGetPropertyValue(nameof(stakeHolderAccess),
+                out var hasStakeHolderAccess) && ((bool)hasStakeHolderAccess) != entity.HasStakeHolderAccess;
+        }
 
         [HttpPost]
         public IHttpActionResult Create(ODataActionParameters parameters)
@@ -64,9 +121,18 @@ namespace Presentation.Web.Controllers.OData
             if (user?.IsGlobalAdmin == true)
             {
                 // only other global admins can create global admin users
-                if (!UserContext.IsGlobalAdmin())
+                if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.GlobalAdmin)))
                 {
                     ModelState.AddModelError(nameof(user.IsGlobalAdmin), "You don't have permission to create a global admin user.");
+                }
+            }
+
+            if (user?.HasStakeHolderAccess == true)
+            {
+                // only global admins can create stakeholder access
+                if (!AuthorizationContext.HasPermission(new AdministerGlobalPermission(GlobalPermission.StakeHolderAccess)))
+                {
+                    ModelState.AddModelError(nameof(user.HasStakeHolderAccess), "You don't have permission to issue stakeholder access.");
                 }
             }
 
@@ -74,7 +140,7 @@ namespace Presentation.Web.Controllers.OData
                 return BadRequest(ModelState);
 
             var createdUser = _userService.AddUser(user, sendMailOnCreation, organizationId);
-            
+
             return Created(createdUser);
         }
         [HttpGet]

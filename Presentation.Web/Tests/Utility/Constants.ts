@@ -31,6 +31,8 @@
     readonly kendoUserEmailObject = "userEmailObject";
     readonly kendoUserApiHeader = "userHeader";
     readonly kendoUserApiObject = "userObject";
+    readonly kendoUserRightsHolderHeader = "rightsHolderHeader";
+    readonly kendoUserStakeHolderHeader = "stakeHolderHeader";
     readonly kendoResetFilter = "resetFilterButton";
     readonly kendoSaveFilter = "saveFilterButton";
     readonly kendoUseFilter = "useFilterButton";

@@ -15,7 +15,7 @@ namespace Core.DomainModel
     /// <summary>
     ///     Represents a user with credentials and user roles
     /// </summary>
-    public class User : Entity, IIsPartOfOrganization, IHasName
+    public class User : Entity, IIsPartOfOrganization, IHasName, IHasUuid
     {
         public string GetFullName()
         {
@@ -35,6 +35,7 @@ namespace Core.DomainModel
             HandoverParticipants = new List<Handover>();
             LockedOutDate = null;
             FailedAttempts = 0;
+            Uuid = Guid.NewGuid(); 
         }
 
         public string Name { get; set; }
@@ -46,8 +47,14 @@ namespace Core.DomainModel
         public DateTime? LastAdvisDate { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
-
+        /// <summary>
+        /// User has been granted api access
+        /// </summary>
         public bool? HasApiAccess { get; set; }
+        /// <summary>
+        /// User has been marked as a user with stake holder access
+        /// </summary>
+        public bool HasStakeHolderAccess { get; set; }
 
         public bool CanAuthenticate()
         {
@@ -131,6 +138,7 @@ namespace Core.DomainModel
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }
+        public Guid Uuid { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {

@@ -26,7 +26,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
 
             var itInterface = Mapper.Map<ItInterfaceDTO, ItInterface>(dto);
 
-            Assert.Null(itInterface.AssociatedSystemRelations);
+            Assert.NotNull(itInterface.AssociatedSystemRelations); //Set by ctor
             Assert.Null(itInterface.BrokenLinkReports);
             Assert.NotNull(itInterface.DataRows); //Set by ctor
             Assert.Null(itInterface.ExhibitedBy);

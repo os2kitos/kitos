@@ -10,27 +10,28 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static LoginDTO MakeSimpleLoginDto(string email, string pwd)
         {
-            return new LoginDTO
+            return new()
             {
                 Email = email,
                 Password = pwd
             };
         }
 
-        public static ApiUserDTO MakeSimpleApiUserDto(string email, bool apiAccess)
+        public static ApiUserDTO MakeSimpleApiUserDto(string email, bool apiAccess, bool stakeHolderAccess = false)
         {
-            return new ApiUserDTO
+            return new()
             {
                 Email = email,
                 Name = Fixture.Create<string>(),
                 LastName = Fixture.Create<string>(),
-                HasApiAccess = apiAccess
+                HasApiAccess = apiAccess,
+                HasStakeHolderAccess = stakeHolderAccess
             };
         }
 
         public static CreateUserDTO MakeSimpleCreateUserDto(ApiUserDTO apiUser)
         {
-            return new CreateUserDTO
+            return new()
             {
                 user = apiUser,
                 organizationId = TestEnvironment.DefaultOrganizationId,

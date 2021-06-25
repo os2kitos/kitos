@@ -17,6 +17,8 @@ class UsersPage implements IPageObject {
     public kendoToolbarWrapper = new KendoToolbarWrapper();
     public createUserButton = element(by.linkText("Opret Bruger"));
     public hasAPiCheckBox = element(by.model("ctrl.vm.hasApi"));
+    public hasRightsHolderAccessCheckBox = element(by.model("ctrl.vm.isRightsHolder"));
+    public hasStakeHolderAccessCheckBox = element(by.model("ctrl.vm.hasStakeHolderAccess"));
     public mainGridAllTableRows = element.all(by.id("mainGrid")).all(by.tagName("tr"));
     public getCreateUserButton() {
         return element(this.cssLocator.byDataElementType("createUserButton"));

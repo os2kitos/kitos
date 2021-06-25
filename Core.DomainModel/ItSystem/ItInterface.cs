@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Qa.References;
 using Infrastructure.Services.Types;
@@ -7,12 +8,16 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {
-    public class ItInterface : ItSystemBase
+    public class ItInterface : ItSystemBase, IHasRightsHolder, IHasUuid, IEntityWithEnabledStatus
     {
-        public static int MaxNameLength = 100;
+        public const int MaxNameLength = 100;
+        public const int MaxVersionLength = 20;
+
         public ItInterface()
         {
             DataRows = new List<DataRow>();
+            Uuid = Guid.NewGuid();
+            AssociatedSystemRelations = new List<SystemRelation>();
         }
         public string Url { get; set; }
         /// <summary>
@@ -87,6 +92,17 @@ namespace Core.DomainModel.ItSystem
             }
 
             return ExhibitedBy;
+        }
+
+        public Maybe<int> GetRightsHolderOrganizationId()
+        {
+            var id = ExhibitedBy?.ItSystem?.BelongsToId ?? ExhibitedBy?.ItSystem?.BelongsTo?.Id;
+            return id ?? Maybe<int>.None;
+        }
+
+        public void Deactivate()
+        {
+            Disabled = true;
         }
     }
 }

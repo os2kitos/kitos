@@ -50,7 +50,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         [Theory]
         [InlineData("31-10-2019", false)]
         [InlineData("01-01-2020", true)]
-        private void GetKLEStatus_Returns_ValidStatus(string lastUpdatedString, bool expectedUpToDate)
+        public void GetKLEStatus_Returns_ValidStatus(string lastUpdatedString, bool expectedUpToDate)
         {
             //Arrange
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-only-published-date.xml");
@@ -66,7 +66,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void GetKLEChangeSummary_Returns_List_Of_Changes()
+        public void GetKLEChangeSummary_Returns_List_Of_Changes()
         {
             //Arrange
             var document = XDocument.Load("./ApplicationServices/KLE/20200106-kle-sample-changes.xml");
@@ -101,7 +101,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Returns_Published_Date()
+        public void UpdateKLE_Given_Summary_Updates_Returns_Published_Date()
         {
             SetupUpdateObjects();
 
@@ -111,7 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_Renamed_TaskRefs()
+        public void UpdateKLE_Given_Summary_Updates_Renamed_TaskRefs()
         {
             var updateObjects = SetupUpdateObjects();
 
@@ -123,7 +123,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_On_Empty_Repos_Adds_All_TaskRefs()
+        public void UpdateKLE_Given_Summary_Updates_On_Empty_Repos_Adds_All_TaskRefs()
         {
             var updateObjects = SetupUpdateObjects();
 
@@ -134,7 +134,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_On_NonEmpty_Repos_Fills_Uuid_On_Existing_TaskRef()
+        public void UpdateKLE_Given_Summary_Updates_On_NonEmpty_Repos_Fills_Uuid_On_Existing_TaskRef()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();
@@ -154,7 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
         
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_ItProject()
+        public void UpdateKLE_Given_Summary_Updates_ItProject()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();
@@ -174,7 +174,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_ItSystem()
+        public void UpdateKLE_Given_Summary_Updates_ItSystem()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();
@@ -194,7 +194,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_ItSystemUsages()
+        public void UpdateKLE_Given_Summary_Updates_ItSystemUsages()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();
@@ -217,7 +217,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_ItSystemUsageOptOut()
+        public void UpdateKLE_Given_Summary_Updates_ItSystemUsageOptOut()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();
@@ -237,7 +237,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void UpdateKLE_Given_Summary_Updates_TaskUsage()
+        public void UpdateKLE_Given_Summary_Updates_TaskUsage()
         {
             //Arrange
             var updateObjects = SetupUpdateObjects();

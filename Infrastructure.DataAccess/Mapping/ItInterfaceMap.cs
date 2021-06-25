@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Mapping
         public ItInterfaceMap()
         {
             // Properties
-            this.Property(x => x.Version).HasMaxLength(20);
+            this.Property(x => x.Version).HasMaxLength(ItInterface.MaxVersionLength);
 
             // BUG there's an issue with indexing http://stackoverflow.com/questions/26055140/ef-migrations-drops-index-when-adding-compsite-index
             this.Property(x => x.OrganizationId)
@@ -19,7 +19,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_NamePerOrg", 1);
             this.Property(x => x.ItInterfaceId)
-                .HasMaxLength(100)
+                .HasMaxLength(ItInterface.MaxNameLength)
                 // this should really be optional but because
                 // MySql doesn't follow the SQL standard
                 // when it comes to unique indexs with nulls in them - we can't...
@@ -48,6 +48,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WillCascadeOnDelete(false);
 
             TypeMapping.AddIndexOnAccessModifier<ItInterfaceMap, ItInterface>(this);
+
+            Property(t => t.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_ItInterface_Uuid", 0);
         }
     }
 }

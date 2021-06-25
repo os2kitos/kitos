@@ -17,6 +17,7 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [RoutePrefix("api/v1/ItSystemUsageMigration")]
+    [DenyRightsHoldersAccess]
     public class ItSystemUsageMigrationController : BaseApiController
     {
         private readonly IItSystemUsageMigrationService _itSystemUsageMigrationService;

@@ -1,8 +1,11 @@
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
@@ -11,7 +14,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus, IHasRightsHolder
     {
         public const int MaxNameLength = 100;
 
@@ -86,7 +89,7 @@ namespace Core.DomainModel.ItSystem
         /// The type of the business.
         /// </value>
         public virtual BusinessType BusinessType { get; set; }
-        
+
         public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
@@ -148,6 +151,96 @@ namespace Core.DomainModel.ItSystem
         public Maybe<ItSystemUsage.ItSystemUsage> GetUsageForOrganization(int organizationId)
         {
             return Usages.FirstOrDefault(x => x.OrganizationId == organizationId);
+        }
+
+        public Maybe<int> GetRightsHolderOrganizationId()
+        {
+            if (BelongsToId.HasValue)
+                return BelongsToId.Value;
+            if (BelongsTo != null)
+                return BelongsTo.Id;
+            return Maybe<int>.None;
+        }
+
+        public void AddTaskRef(TaskRef taskRef)
+        {
+            var existing = GetTaskRef(taskRef.Id);
+            if (existing.IsNone)
+                TaskRefs.Add(taskRef);
+        }
+
+        public void RemoveTaskRef(TaskRef taskRef)
+        {
+            var toRemove = GetTaskRef(taskRef.Id);
+            if (toRemove.HasValue)
+                TaskRefs.Remove(toRemove.Value);
+        }
+
+        public Maybe<TaskRef> GetTaskRef(int taskRefId)
+        {
+            return TaskRefs.SingleOrDefault(tr => tr.Id == taskRefId);
+        }
+
+        public void ResetBusinessType()
+        {
+            BusinessType = null;
+            BusinessTypeId = null;
+        }
+
+        public void UpdateBusinessType(BusinessType businessType)
+        {
+            if (businessType == null)
+                throw new ArgumentNullException(nameof(businessType));
+
+            BusinessType = businessType;
+            BusinessTypeId = businessType.Id;
+        }
+
+        public void ResetParentSystem()
+        {
+            Parent = null;
+            ParentId = null;
+        }
+
+        public void SetUpdateParentSystem(ItSystem parent)
+        {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+            Parent = parent;
+            ParentId = parent.Id;
+        }
+
+        public void ResetRightsHolder()
+        {
+            BelongsTo = null;
+            BelongsToId = null;
+        }
+
+        public void UpdateRightsHolder(Organization.Organization organization)
+        {
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+
+            BelongsTo = organization;
+            BelongsToId = organization.Id;
+        }
+
+        public static bool IsValidName(string newName)
+        {
+            return string.IsNullOrWhiteSpace(newName) == false && newName.Length <= MaxNameLength;
+        }
+
+        public Maybe<OperationError> UpdateName(string newName)
+        {
+            if (!IsValidName(newName))
+                return new OperationError("Invalid name", OperationFailure.BadInput);
+            Name = newName;
+            return Maybe<OperationError>.None;
+        }
+
+        public void Deactivate()
+        {
+            Disabled = true;
         }
     }
 }

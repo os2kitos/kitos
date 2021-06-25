@@ -46,22 +46,19 @@ namespace Tests.Integration.Presentation.Web.Tools
                         OrganizationRole.User,
                         new KitosCredentials(
                             "local-regular-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.User)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.LocalAdmin,
                         new KitosCredentials(
                             "local-local-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.LocalAdmin)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
                             "local-global-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.GlobalAdmin)
+                            localDevUserPassword)
                     }
                 };
                 ApiUsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
@@ -70,15 +67,13 @@ namespace Tests.Integration.Presentation.Web.Tools
                         OrganizationRole.User,
                         new KitosCredentials(
                             "local-api-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.User)
+                            localDevUserPassword)
                     },
                     {
                         OrganizationRole.GlobalAdmin,
                         new KitosCredentials(
                             "local-api-global-admin-user@kitos.dk",
-                            localDevUserPassword,
-                            OrganizationRole.GlobalAdmin)
+                            localDevUserPassword)
                     }
                 };
 
@@ -130,7 +125,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var username = GetEnvironmentVariable($"TestUser{suffix}");
             var password = GetEnvironmentVariable($"TestUser{suffix}Pw");
-            return new KitosCredentials(username, password, role);
+            return new KitosCredentials(username, password);
         }
 
         public static KitosContext GetDatabase()

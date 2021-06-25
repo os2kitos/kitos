@@ -10,6 +10,10 @@ namespace Infrastructure.DataAccess.Mapping
             this.Property(t => t.Name)
                 .HasMaxLength(OptionEntity<TReference>.MaxNameLength)
                 .IsRequired();
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Option_Uuid", 0);
         }
     }
 }

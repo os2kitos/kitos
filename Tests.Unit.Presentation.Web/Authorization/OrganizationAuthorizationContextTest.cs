@@ -14,6 +14,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -47,14 +48,27 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
-        [InlineData(false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
-        [InlineData(false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.None)]
-        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
+        [InlineData(true, false, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.None)]
+
+        //Regardless of municipality, stakeholder or not, a user marked as rightsholder access will only get rightsholder cross level access rights
+        [InlineData(false, true, false, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, false, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, true, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.RightsHolder)]
+
+        //Stakeholder access grants public cross level read access even for non-municipality users
+        [InlineData(false, false, true, OrganizationCategory.Other, CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, OrganizationCategory.Municipality, CrossOrganizationDataReadAccessLevel.Public)]
+
+        public void GetCrossOrganizationReadAccess_Returns_Based_On_Role_And_Organization_Type(bool isGlobalAdmin, bool isRightsHolder, bool isStakeHolder, OrganizationCategory organizationCategory, CrossOrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasStakeHolderAccess(isStakeHolder);
             ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, organizationCategory == OrganizationCategory.Municipality);
+            ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolder);
 
             //Act
             var result = _sut.GetCrossOrganizationReadAccess();
@@ -64,23 +78,72 @@ namespace Tests.Unit.Presentation.Web.Authorization
         }
 
         [Theory]
-        [InlineData(true, false, false, OrganizationDataReadAccessLevel.All)]
-        [InlineData(false, true, false, OrganizationDataReadAccessLevel.All)]
-        [InlineData(false, false, true, OrganizationDataReadAccessLevel.Public)]
-        [InlineData(false, false, false, OrganizationDataReadAccessLevel.None)]
-        public void GetOrganizationReadAccessLevel_Returns(bool isGlobalAdmin, bool isActiveInOrganization, bool isMunicipality, OrganizationDataReadAccessLevel expectedResult)
+        [InlineData(true, false, false, false, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, true, false, OrganizationDataReadAccessLevel.All)]
+        [InlineData(false, false, false, false, true, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, false, false, false, OrganizationDataReadAccessLevel.None)]
+
+        [InlineData(false, true, false, false, false, OrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(false, true, false, true, false, OrganizationDataReadAccessLevel.All)] //Rightsholders still get full access to own organization data
+        [InlineData(false, true, false, false, true, OrganizationDataReadAccessLevel.RightsHolder)] //Even if municipality rightsholder access is granted
+        [InlineData(false, true, true, false, false, OrganizationDataReadAccessLevel.RightsHolder)] //Even if stakeholder is set, rightsholder access is still the result
+
+
+        //Stake holders get public read access in other organizations - just like municipality users
+        [InlineData(false, false, true, false, false, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, false, true, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(false, false, true, true, false, OrganizationDataReadAccessLevel.All)] //Part of the organization always grants full access to that organization
+        public void GetOrganizationReadAccessLevel_Returns(bool isGlobalAdmin, bool isRightsHolder, bool hasStakeHolderAccess, bool isActiveInOrganization, bool isMunicipality, OrganizationDataReadAccessLevel expectedResult)
         {
             //Arrange
             var targetOrganization = A<int>();
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
+            ExpectUserHasStakeHolderAccess(hasStakeHolderAccess);
             ExpectUserHasRoleIn(targetOrganization, isActiveInOrganization);
             ExpectUserHasRoleInOrganizationOfType(OrganizationCategory.Municipality, isMunicipality);
+            ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolder);
 
             //Act
             var hasAccess = _sut.GetOrganizationReadAccessLevel(targetOrganization);
 
             //Assert
             Assert.Equal(expectedResult, hasAccess);
+        }
+
+
+        public interface IRightsHolderOwnedObject : IEntity, IOwnedByOrganization, IHasRightsHolder { }
+
+        [Theory]
+        [InlineData(false, false, false, false)]
+        [InlineData(true, false, false, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, false, true, true)]
+        public void AllowReads_For_Context_Dependent_With_RightsHolder_Object_Returns(bool isRightsHolderInAnyOrganization, bool isRightsholderForEntity, bool isInSameOrg, bool expectedResult)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var idOfRightsHoldingOrganization = organizationId + 1;
+            var anotherRightsHolder = idOfRightsHoldingOrganization + 1;
+
+            var entityMock = new Mock<IRightsHolderOwnedObject>();
+            entityMock.Setup(x => x.OrganizationId).Returns(organizationId);
+            entityMock.Setup(x => x.GetRightsHolderOrganizationId()).Returns(isRightsholderForEntity
+                ? Maybe<int>.Some(idOfRightsHoldingOrganization)
+                : Maybe<int>.Some(anotherRightsHolder));
+
+            var entity = entityMock.Object;
+
+            ExpectUserIsGlobalAdmin(false);
+            ExpectHasRoleInSameOrganizationAsReturns(entity, isInSameOrg);
+            ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolderInAnyOrganization);
+            ExpectHasRoleReturns(idOfRightsHoldingOrganization, OrganizationRole.RightsHolderAccess, isRightsholderForEntity);
+
+            //Act
+            var result = _sut.AllowReads(entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
 
         [Theory]
@@ -198,6 +261,63 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             //Assert
             Assert.Equal(expectedResult, allowUpdates);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false)]
+        [InlineData(true, true, true, false, false, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, true, false, true, false, false)]
+        [InlineData(true, false, false, true, true, true)]
+        [InlineData(true, false, false, true, false, false)]
+        [InlineData(false, true, true, true, true, false)] //If type creation policy denies, it's denied
+        public void AllowCreate_With_Entity_For_RightsHolder(bool typeCreationPolicyResponse, bool isRightsHolderInAnyOrganization, bool isRightsholderForEntity, bool isInSameOrg, bool hasModuleLevelAccess, bool expectedResult)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var idOfRightsHoldingOrganization = organizationId + 1;
+            var anotherRightsHolder = idOfRightsHoldingOrganization + 1;
+
+            var entityMock = new Mock<IRightsHolderOwnedObject>();
+            entityMock.Setup(x => x.OrganizationId).Returns(organizationId);
+            entityMock.Setup(x => x.GetRightsHolderOrganizationId()).Returns(isRightsholderForEntity
+                ? Maybe<int>.Some(idOfRightsHoldingOrganization)
+                : Maybe<int>.Some(anotherRightsHolder));
+
+            var entity = entityMock.Object;
+
+            _creationPolicy.Setup(x => x.AllowCreation(organizationId, typeof(IRightsHolderOwnedObject))).Returns(typeCreationPolicyResponse);
+            _moduleLevelAccessPolicy.Setup(x => x.AllowModification(entity)).Returns(hasModuleLevelAccess);
+            ExpectUserIsGlobalAdmin(false);
+            ExpectHasRoleInSameOrganizationAsReturns(entity, isInSameOrg);
+            ExpectUserHasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess, isRightsHolderInAnyOrganization);
+            ExpectHasRoleReturns(idOfRightsHoldingOrganization, OrganizationRole.RightsHolderAccess, isRightsholderForEntity);
+
+            //Act
+            var result = _sut.AllowCreate<IRightsHolderOwnedObject>(organizationId, entity);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
+        }
+
+        [Theory]
+        [InlineData(typeof(IRightsHolderOwnedObject))]
+        [InlineData(typeof(ItSystemUsage))]
+        [InlineData(typeof(ItInterface))]
+        public void AllowCreate_Without_Entity_For_RightsHolder(Type type)
+        {
+            //Arrange
+            var organizationId = A<int>();
+            var expectedResult = A<bool>();
+
+            _creationPolicy.Setup(x => x.AllowCreation(organizationId, type)).Returns(expectedResult);
+
+            //Act
+            var result = _sut.AllowCreate<IRightsHolderOwnedObject>(organizationId);
+
+            //Assert
+            Assert.Equal(expectedResult, result);
         }
 
         public interface ISimpleEntityWithAccessModifier : IEntity, IHasAccessModifier, IOwnedByOrganization { }
@@ -621,7 +741,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             {
                 itProject.Rights = new List<ItProjectRight>()
                 {
-                    new ItProjectRight {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
+                    new() {UserId = _userId,Role = new ItProjectRole {HasWriteAccess = true}},
 
                 };
             }
@@ -643,6 +763,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
             _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(isGlobalAdmin);
         }
 
+        private void ExpectUserHasStakeHolderAccess(bool isStakeHolder)
+        {
+            _userContextMock.Setup(x => x.HasStakeHolderAccess()).Returns(isStakeHolder);
+        }
+
         private void ExpectUserHasRoleIn(int targetOrganization, bool value)
         {
             _userContextMock.Setup(x => x.HasRoleIn(targetOrganization)).Returns(value);
@@ -660,10 +785,13 @@ namespace Tests.Unit.Presentation.Web.Authorization
                 ExpectHasRoleReturns(organizationId, organizationRole, targetRoles.Contains(organizationRole));
             }
         }
-
+        private void ExpectUserHasRoleInAnyOrganization(OrganizationRole role, bool val)
+        {
+            _userContextMock.Setup(x => x.HasRoleInAnyOrganization(role)).Returns(val);
+        }
         private static IEntity CreateUserEntity(int id)
         {
-            return (IEntity)new User() { Id = id };
+            return new User() { Id = id };
         }
     }
 }

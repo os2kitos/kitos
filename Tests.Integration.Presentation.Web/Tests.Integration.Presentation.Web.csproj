@@ -110,15 +110,19 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="External\BusinessTypesTest.cs" />
+    <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
     <Compile Include="ItSystem\ItSystemUsageGDPRTest.cs" />
     <Compile Include="ItSystem\SystemRelationsTest.cs" />
+    <Compile Include="ItSystem\V2\ItSystemsApiV2Test.cs" />
     <Compile Include="Kendo\KendoOverviewConfigurationTest.cs" />
     <Compile Include="KLE\KLEDataBridgeTest.cs" />
     <Compile Include="KLE\KleUpdateIntegrationTests.cs" />
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
     <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
+    <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
@@ -142,7 +146,10 @@
     <Compile Include="Tools\BrokenExternalReferencesReportHelper.cs" />
     <Compile Include="Tools\DatabaseAccess.cs" />
     <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
+    <Compile Include="Tools\DisposableExtensions.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
+    <Compile Include="Tools\External\BusinessTypeV2Helper.cs" />
+    <Compile Include="Tools\External\InterfaceV2Helper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
@@ -165,6 +172,8 @@
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
+    <Compile Include="Tools\External\ItSystemV2Helper.cs" />
+    <Compile Include="Tools\External\OrganizationV2Helper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -199,6 +208,7 @@
       <Name>Tests.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

@@ -13,6 +13,8 @@
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
         isReportAdmin: boolean;
+        isRightsHolder: boolean;
+        hasStakeHolderAccess: boolean;
     }
 
     class EditOrganizationUserController {
@@ -32,25 +34,32 @@
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "user", "currentUser", "_"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $http: IHttpServiceWithCustomConfig,
-            private $q: ng.IQService,
-            private notify,
-            private user: Models.IUser,
-            private currentUser: Services.IUser,
-            private _: ILoDashWithMixins) {
+            private readonly $http: IHttpServiceWithCustomConfig,
+            private readonly $q: ng.IQService,
+            private readonly notify,
+            private readonly user: Models.IUser,
+            private readonly currentUser: Services.IUser,
+            private readonly _: ILoDashWithMixins) {
             this.userId = user.Id;
-            var userVm: IEditViewModel = {
+
+            const hasRole = (role: Models.OrganizationRole) => {
+                return _.find(user.OrganizationRights, { Role: role }) !== undefined;
+            }
+
+            const userVm: IEditViewModel = {
                 email: user.Email,
                 name: user.Name,
                 hasApi: user.HasApiAccess,
                 lastName: user.LastName,
                 phoneNumber: user.PhoneNumber,
-                isLocalAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.LocalAdmin }) !== undefined,
-                isOrgAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.OrganizationModuleAdmin }) !== undefined,
-                isProjectAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ProjectModuleAdmin }) !== undefined,
-                isSystemAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.SystemModuleAdmin }) !== undefined,
-                isContractAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ContractModuleAdmin }) !== undefined,
-                isReportAdmin: _.find(user.OrganizationRights, { Role: Models.OrganizationRole.ReportModuleAdmin }) !== undefined,
+                isLocalAdmin: hasRole(Models.OrganizationRole.LocalAdmin),
+                isOrgAdmin: hasRole(Models.OrganizationRole.OrganizationModuleAdmin),
+                isProjectAdmin: hasRole(Models.OrganizationRole.ProjectModuleAdmin),
+                isSystemAdmin: hasRole(Models.OrganizationRole.SystemModuleAdmin),
+                isContractAdmin: hasRole(Models.OrganizationRole.ContractModuleAdmin),
+                isReportAdmin: hasRole(Models.OrganizationRole.ReportModuleAdmin),
+                isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess),
+                hasStakeHolderAccess: user.HasStakeHolderAccess
             };
             this.originalVm = _.clone(userVm);
 
@@ -67,8 +76,7 @@
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
             // check if the requested property exsists in the diff
-            if (Object.keys(diffRights).indexOf(property) !== -1)
-            {
+            if (Object.keys(diffRights).indexOf(property) !== -1) {
                 if (diffRights[property]) {
                     // add role to user
                     let payload: Models.IOrganizationRight = {
@@ -96,16 +104,16 @@
             promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
             promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
+            promises.push(this.changeRight(diffRights, "isRightsHolder", Models.OrganizationRole.RightsHolderAccess));
 
             var payload: Models.IUser = {
                 Name: this.vm.name,
                 LastName: this.vm.lastName,
                 PhoneNumber: this.vm.phoneNumber,
                 Email: this.vm.email,
-                HasApiAccess: this.vm.hasApi
-
-
-        };
+                HasApiAccess: this.vm.hasApi,
+                HasStakeHolderAccess: this.vm.hasStakeHolderAccess
+            };
             this.$http.patch(`/odata/Users(${this.userId})`, payload);
 
             // when all requests are done
@@ -150,11 +158,11 @@
                             // GOTO parent state and reload
                             $state.go("^", null, { reload: true });
                         },
-                        () => {
-                            // Cancel
-                            // GOTO parent state
-                            $state.go("^");
-                        });
+                            () => {
+                                // Cancel
+                                // GOTO parent state
+                                $state.go("^");
+                            });
                     }
                 ]
             });

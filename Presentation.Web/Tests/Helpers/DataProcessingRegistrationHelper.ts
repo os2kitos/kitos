@@ -21,12 +21,14 @@ class DataProcessingRegistrationHelper {
 
     public static loadOverview() {
         return this.pageObject.getPage()
+            .then(() => browser.waitForAngular())
             .then(() => this.waitForKendo());
     }
 
     public static createDataProcessingRegistration(name: string) {
         console.log(`Creating registration with name ${name}`);
         return this.pageObject.getPage()
+            .then(() => browser.waitForAngular())
             .then(() => this.waitForKendo())
             .then(() => this.openNewDpaDialog())
             .then(() => this.enterDpaName(name))
@@ -35,6 +37,7 @@ class DataProcessingRegistrationHelper {
                 this.validateSaveDpaClickable(true);
             })
             .then(() => this.pageObject.getNewDpaSubmitButton().click())
+            .then(() => browser.waitForAngular())
             .then(() => this.pageObject.waitForKendoGrid());
     }
 
@@ -45,16 +48,19 @@ class DataProcessingRegistrationHelper {
             .then(() => localDpPo.getToggleDataProcessingCheckbox().isSelected())
             .then((selected) => {
                 if (!selected) {
-                    localDpPo.getToggleDataProcessingCheckbox().click();
+                    return localDpPo.getToggleDataProcessingCheckbox().click();
                 }
-            });
+                return "nop";
+            })
+            .then(() => browser.waitForAngular());
     }
 
     public static goToSpecificDataProcessingRegistration(name: string) {
         console.log(`Finding registration: ${name}`);
         return this.pageObject.getPage()
             .then(() => this.pageObject.waitForKendoGrid())
-            .then(() => this.findDataProcessingRegistrationColumnFor(name).first().click());
+            .then(() => this.findDataProcessingRegistrationColumnFor(name).first().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static goToItSystems() {
@@ -80,7 +86,8 @@ class DataProcessingRegistrationHelper {
         console.log("Removing role: ${role} with user: ${user}");
         return this.pageObject.getRoleDeleteButton(roleName, userName)
             .then(element => element.click())
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(() => browser.waitForAngular());
     }
 
     public static editRole(oldRoleName: string, oldUserName: string, role: string, user: string) {
@@ -92,7 +99,8 @@ class DataProcessingRegistrationHelper {
                 .then(() => Select2Helper.selectNoSearchByParent(role, "s2id_edit-role", row))
                 .then(() => Select2Helper.searchForByParent(user, "s2id_edit-user", row))
                 .then(() => Select2Helper.waitForDataAndSelect())
-                .then(() => this.pageObject.getRoleSubmitEditButton().click());
+                .then(() => this.pageObject.getRoleSubmitEditButton().click())
+                .then(() => browser.waitForAngular());
         });
     }
 
@@ -114,7 +122,8 @@ class DataProcessingRegistrationHelper {
         console.log("Removing data processor with name: " + name);
         return this.editMainPo.getRemoveDataProcessorButton(name)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
     public static assignSubDataProcessor(name: string) {
@@ -137,7 +146,8 @@ class DataProcessingRegistrationHelper {
         console.log("Removing sub data processor with name: " + name);
         return this.editMainPo.getRemoveSubDataProcessorButton(name)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
 
@@ -151,7 +161,8 @@ class DataProcessingRegistrationHelper {
         console.log("Removing system with name: " + name);
         return this.pageObject.getRemoveSystemButton(name)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
     public static openNewDpaDialog() {
@@ -205,7 +216,8 @@ class DataProcessingRegistrationHelper {
     public static removeOversightDateAndRemark() {
         console.log(`Removing oversight date`);
         return this.editOversightPo.getRemoveOversightDateButton().click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {
@@ -244,7 +256,8 @@ class DataProcessingRegistrationHelper {
         console.log(`Removing unsafe third country with name: ${thirdCountryName}`);
         return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
     public static assignDataResponsible(dataResponsibleOptionName) {
@@ -261,7 +274,8 @@ class DataProcessingRegistrationHelper {
         console.log("Removing oversight option with name: " + name);
         return this.editOversightPo.getRemoveOversightOptionButton(name)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(()=>browser.waitForAngular());
     }
 
     static selectBasisForTransfer(basisForTransfer: string) {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel;
 using Core.DomainServices.Model.Options;
 using Infrastructure.Services.Types;
@@ -33,5 +34,13 @@ namespace Core.DomainServices.Options
         /// <param name="optionId"></param>
         /// <returns></returns>
         Maybe<(TOption option, bool available)> GetOption(int organizationId, int optionId);
+
+        /// <summary>
+        /// Returns the option if it exists and a boolean indicating whether it is available
+        /// </summary>
+        /// <param name="organizationId"></param>
+        /// <param name="optionUuid"></param>
+        /// <returns></returns>
+        Maybe<(TOption option, bool available)> GetOptionByUuid(int organizationId, Guid optionUuid);
     }
 }

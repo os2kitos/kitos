@@ -34,6 +34,8 @@ type ColumnHeaders = {
     catalogUsage: protractor.ElementFinder,
     usedByNameHeader: protractor.ElementFinder,
     userApi: protractor.ElementFinder,
+    userRightsHolderAccess: protractor.ElementFinder,
+    userStakeHolderAccess : protractor.ElementFinder,
     userEmail: protractor.ElementFinder,
 };
 
@@ -102,9 +104,11 @@ class kendoToolbarWrapper {
             catalogUsage: kendo.getColumnHeaderClickable(consts.kendoCatalogUsageHeader),
             referenceName: kendo.getColumnHeaderClickable(consts.kendoReferencetNameHeader),
             referenceId: kendo.getColumnHeaderClickable(consts.kendoReferenceHeaderId),
-            userApi: kendo.getUserColumnHeaderClickable(consts.kendoUserApiHeader),
+            userApi: kendo.getColumnHeader(consts.kendoUserApiHeader),
             userEmail: kendo.getColumnHeaderClickable(consts.kendoUserEmailHeader),
             usedByNameHeader: kendo.getColumnHeaderClickable(consts.kendoUsedByHeader),
+            userRightsHolderAccess: kendo.getColumnHeader(consts.kendoUserRightsHolderHeader),
+            userStakeHolderAccess: kendo.getColumnHeader(consts.kendoUserStakeHolderHeader)
 
         };
         return columns;
@@ -148,12 +152,16 @@ class kendoToolbarWrapper {
 class kendoHelper {
 
     public getColumnHeaderClickable(headerHook: string) {
-        return element(byDataElementType(headerHook)).element(by.css("a[class=k-link]"));
+        return this.getColumnHeader(headerHook).element(by.css("a[class=k-link]"));
     }
 
-    public getUserColumnHeaderClickable(headerHook: string) {
-            return element(byDataElementType(headerHook)).element(by.css("a[class=k-header-column-menu]"));
-        }
+    public getUserColumnHeaderMenu(headerHook: string) {
+        return this.getColumnHeader(headerHook).element(by.css("a[class=k-header-column-menu]"));
+    }
+
+    public getColumnHeader(headerHook: string) {
+        return element(byDataElementType(headerHook));
+    }
 
     public getColumnItemLinks(itemHook: string) {
         return element.all(byDataElementType(itemHook)).all(by.tagName("a"));
