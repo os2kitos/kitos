@@ -39,9 +39,9 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// <summary>
         /// Returns requested IT-System usage data classification option type
         /// </summary>
-        /// <param name="dataClassificationTypeUuid">business type identifier</param>
+        /// <param name="dataClassificationTypeUuid">data classification type identifier</param>
         /// /// <param name="organizationUuid">organization context for the data classification type availability</param>
-        /// <returns>A uuid and name pair with boolean to mark if the business option type is available in the organization</returns>
+        /// <returns>A uuid and name pair with boolean to mark if the data classification type is available in the organization</returns>
         [HttpGet]
         [Route("{dataClassificationTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
