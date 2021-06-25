@@ -15,6 +15,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             public const string BusinessType = "business-types";
             public const string ItSystemUsageDataClassification = "it-system-usage-data-classifications";
+            public const string ItSystemUsageRelationFrequencies = "it-system-usage-relation-frequencies";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)

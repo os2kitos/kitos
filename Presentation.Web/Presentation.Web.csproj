@@ -348,6 +348,7 @@
     <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\SystemRelations\SystemRelationFrequencyTypeV2Controller.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\DenyRightsHoldersAccessAttribute.cs" />
