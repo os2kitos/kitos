@@ -6,7 +6,6 @@ using Microsoft.AspNet.OData.Routing;
 using System.Net;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Core.DomainModel.Organization;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -20,18 +19,15 @@ namespace Presentation.Web.Controllers.OData
     [PublicApi]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
-        private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
         public ItSystemUsagesController(
             IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository,
             IGenericRepository<AccessType> accessTypeRepository,
             IOrganizationUnitRepository organizationUnitRepository)
             : base(repository)
         {
-            _orgUnitRepository = orgUnitRepository;
             _accessTypeRepository = accessTypeRepository;
             _organizationUnitRepository = organizationUnitRepository;
         }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
@@ -20,18 +19,15 @@ namespace Presentation.Web.Controllers.API
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
-            IOrganizationService organizationService,
-            IOrganizationalUserContext userContext)
+            IOrganizationService organizationService)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
-            _userContext = userContext;
         }
 
         [NonAction]
