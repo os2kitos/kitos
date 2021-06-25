@@ -15,14 +15,15 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
     [RoutePrefix("api/v2/it-system-usage-data-classifications")]
     public class ItSystemUsageDataClassificationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ItSystemCategories>
     {
-        public ItSystemUsageDataClassificationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> businessTypeApplicationService) 
-            : base(businessTypeApplicationService)
+        public ItSystemUsageDataClassificationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> optionService) 
+            : base(optionService)
         {
         }
 
         /// <summary>
         /// Returns IT-System usage data classification option types
         /// </summary>
+        /// <param name="organizationUuid">organization context for the data classification type availability</param>
         /// <returns>A list of available IT-System usage data classification option types</returns>
         [HttpGet]
         [Route("")]
@@ -38,18 +39,19 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// <summary>
         /// Returns requested IT-System usage data classification option type
         /// </summary>
-        /// <param name="businessTypeUuid">business type identifier</param>
+        /// <param name="dataClassificationTypeUuid">business type identifier</param>
+        /// /// <param name="organizationUuid">organization context for the data classification type availability</param>
         /// <returns>A uuid and name pair with boolean to mark if the business option type is available in the organization</returns>
         [HttpGet]
-        [Route("{businessTypeUuid}")]
+        [Route("{dataClassificationTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemUsageDataClassification(Guid businessTypeUuid, Guid organizationUuid)
+        public IHttpActionResult GetItSystemUsageDataClassification(Guid dataClassificationTypeUuid, Guid organizationUuid)
         {
-            return GetSingle(businessTypeUuid, organizationUuid);
+            return GetSingle(dataClassificationTypeUuid, organizationUuid);
         }
     }
 }

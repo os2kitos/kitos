@@ -14,13 +14,15 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
     [RoutePrefix("api/v2/business-types")]
     public class ItSystemBusinessTypeV2Controller: BaseOptionTypeV2Controller<ItSystem,BusinessType>
     {
-        public ItSystemBusinessTypeV2Controller(IOptionsApplicationService<ItSystem, BusinessType> businessTypeApplicationService): base(businessTypeApplicationService)
+        public ItSystemBusinessTypeV2Controller(IOptionsApplicationService<ItSystem, BusinessType> optionService)
+            : base(optionService)
         {
         }
 
         /// <summary>
         /// Returns IT-System business types
         /// </summary>
+        /// <param name="organizationUuid">organization context for the business type availability</param>
         /// <returns>A list of available IT-System business type specifics formatted as uuid and name pairs</returns>
         [HttpGet]
         [Route("")]
@@ -37,6 +39,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         /// Returns requested IT-System business type
         /// </summary>
         /// <param name="businessTypeUuid">business type identifier</param>
+        /// <param name="organizationUuid">organization context for the business type availability</param>
         /// <returns>A uuid and name pair with boolean to mark if the business type is available in the organization</returns>
         [HttpGet]
         [Route("{businessTypeUuid}")]
