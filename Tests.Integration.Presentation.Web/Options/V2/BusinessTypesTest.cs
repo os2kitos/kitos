@@ -1,13 +1,13 @@
-﻿using Core.DomainModel.Organization;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Integration.Presentation.Web.External
+namespace Tests.Integration.Presentation.Web.Options.V2
 {
     [CollectionDefinition(nameof(BusinessTypesTest), DisableParallelization = true)]
     public class BusinessTypesTest : WithAutoFixture

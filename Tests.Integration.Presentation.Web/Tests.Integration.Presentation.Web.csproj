@@ -111,7 +111,7 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
-    <Compile Include="External\BusinessTypesTest.cs" />
+    <Compile Include="Options\V2\BusinessTypesTest.cs" />
     <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
