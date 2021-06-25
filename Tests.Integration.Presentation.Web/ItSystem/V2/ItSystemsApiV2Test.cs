@@ -19,6 +19,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
+    [CollectionDefinition(nameof(ItSystemsApiV2Test), DisableParallelization = true)]
     public class ItSystemsApiV2Test : WithAutoFixture
     {
         [Fact]

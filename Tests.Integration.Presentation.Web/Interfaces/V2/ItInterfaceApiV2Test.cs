@@ -16,6 +16,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
+    [CollectionDefinition(nameof(ItInterfaceApiV2Test), DisableParallelization = true)]
     public class ItInterfaceApiV2Test : WithAutoFixture
     {
 

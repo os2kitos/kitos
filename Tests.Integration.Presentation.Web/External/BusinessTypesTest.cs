@@ -9,6 +9,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.External
 {
+    [CollectionDefinition(nameof(BusinessTypesTest), DisableParallelization = true)]
     public class BusinessTypesTest : WithAutoFixture
     {
         [Fact]

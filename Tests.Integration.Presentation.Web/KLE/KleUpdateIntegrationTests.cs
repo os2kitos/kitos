@@ -22,6 +22,7 @@ using Xunit;
 namespace Tests.Integration.Presentation.Web.KLE
 {
     //Make sure this test is not affected by others since it is slow and will cause conflicts
+    [CollectionDefinition(nameof(KleUpdateIntegrationTests), DisableParallelization = true)]
     public class KleUpdateIntegrationTests : WithAutoFixture
     {
         private static readonly ConcurrentStack<int> TestKeys =
