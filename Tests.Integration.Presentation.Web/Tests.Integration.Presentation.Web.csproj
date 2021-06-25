@@ -111,6 +111,7 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="Options\V2\ItSystemUsageDataClassificationTypesV2Test.cs" />
     <Compile Include="Options\V2\BusinessTypesTest.cs" />
     <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
@@ -149,6 +150,7 @@
     <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\DisposableExtensions.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
+    <Compile Include="Tools\External\ItsystemUsageDataClassificationV2Helper.cs" />
     <Compile Include="Tools\External\BusinessTypeV2Helper.cs" />
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
     <Compile Include="Tools\HttpApi.cs" />

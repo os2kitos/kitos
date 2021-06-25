@@ -10,12 +10,12 @@ using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.External.V2
+namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-data-classifications")]
-    public class ItSystemUsageDataClassificationTypesV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ItSystemCategories>
+    public class ItSystemUsageDataClassificationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ItSystemCategories>
     {
-        public ItSystemUsageDataClassificationTypesV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> businessTypeApplicationService) 
+        public ItSystemUsageDataClassificationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> businessTypeApplicationService) 
             : base(businessTypeApplicationService)
         {
         }

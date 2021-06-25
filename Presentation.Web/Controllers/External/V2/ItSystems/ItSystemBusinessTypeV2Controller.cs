@@ -9,12 +9,12 @@ using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.External.V2
+namespace Presentation.Web.Controllers.External.V2.ItSystems
 {
     [RoutePrefix("api/v2/business-types")]
-    public class BusinessTypesV2Controller: BaseOptionTypeV2Controller<ItSystem,BusinessType>
+    public class ItSystemBusinessTypeV2Controller: BaseOptionTypeV2Controller<ItSystem,BusinessType>
     {
-        public BusinessTypesV2Controller(IOptionsApplicationService<ItSystem, BusinessType> businessTypeApplicationService): base(businessTypeApplicationService)
+        public ItSystemBusinessTypeV2Controller(IOptionsApplicationService<ItSystem, BusinessType> businessTypeApplicationService): base(businessTypeApplicationService)
         {
         }
 
