@@ -40,6 +40,8 @@
         auth(adminRoles): ng.IPromise<any>;
         patchUser(payload): ng.IPromise<any>;
         updateDefaultOrgUnit(newDefaultOrgUnitId: number): ng.IPromise<any>;
+        getUsersWithRightsholderAccess(): ng.IPromise<Kitos.Models.Api.IUserWithOrganizationName[]>;
+        getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
     }
 
     export class UserService implements IUserService {
@@ -477,6 +479,18 @@
 
             return this.$http.post("api/user?updateDefaultOrgUnit", payload);
         };
+
+        getUsersWithRightsholderAccess() {
+            return this.$http
+                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/rightsholders")
+                .then(result => result.data.response)
+        }
+
+        getUsersWithCrossAccess() {
+            return this.$http
+                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/cross-access")
+                .then(result => result.data.response)
+        }
     }
     app.service("userService", UserService);
 }

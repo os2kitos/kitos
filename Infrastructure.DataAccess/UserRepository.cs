@@ -44,5 +44,10 @@ namespace Infrastructure.DataAccess
                             .GetValueOrFallback(userQuery))
                     .Distinct();
         }
+
+        public IQueryable<User> GetUsers()
+        {
+            return AsQueryable();
+        }
     }
 }

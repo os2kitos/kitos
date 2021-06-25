@@ -9,4 +9,17 @@
         currentOrganizationName: string,
         currentOrganizationUnitName: string
     }
+
+    export interface IUserWithEmail extends Models.Generic.NamedEntity.NamedEntityDTO {
+        email: string,
+    }
+
+    export interface IUserWithCrossAccess extends IUserWithEmail {
+        apiAccess: boolean,
+        stakeholderAccess: boolean
+    }
+
+    export interface IUserWithOrganizationName extends IUserWithEmail {
+        orgName: string
+    }
 }

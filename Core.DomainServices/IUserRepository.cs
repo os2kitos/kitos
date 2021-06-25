@@ -10,5 +10,6 @@ namespace Core.DomainServices
         User GetByEmail(string email);
         User GetById(int id);
         IQueryable<User> SearchOrganizationUsers(int organizationId, Maybe<string> query);
+        IQueryable<User> GetUsers();
     }
 }

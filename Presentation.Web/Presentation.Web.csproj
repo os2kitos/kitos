@@ -345,6 +345,8 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
+    <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Controllers\External\V2\ItSystemV2Controller.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />

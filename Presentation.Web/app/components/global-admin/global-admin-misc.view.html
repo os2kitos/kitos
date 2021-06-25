@@ -44,4 +44,55 @@
     <div class="well" ng-if="!brokenLinksVm.available">
         <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
     </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-user"></i>
+            Brugere med rettighedshaveradgang
+        </div>
+        <table class="full-width table table-striped">
+            <thead>
+                <tr>
+                    <th width="33%">Organisation</th>
+                    <th width="33%">Navn</th>
+                    <th width="33%">Email</th>
+                </tr>
+            </thead>
+            <!-- for each right -->
+            <tbody>
+                <tr data-ng-repeat="userWithRightsholderAccess in usersWithRightsholderAccess">
+                    <td>{{ userWithRightsholderAccess.orgName }}</td>
+                    <td>{{ userWithRightsholderAccess.name }}</td>
+                    <td>{{ userWithRightsholderAccess.email }}</td>
+                </tr>
+            </tbody>
+
+        </table>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <i class="glyphicon glyphicon-user"></i>
+            Brugere med tværgående rettigheder
+        </div>
+        <table class="full-width table table-striped">
+            <thead>
+                <tr>
+                    <th width="35%">Navn</th>
+                    <th width="35%">Email</th>
+                    <th width="15%">API adgang</th>
+                    <th width="15%">Interessentadgang</th>
+                </tr>
+            </thead>
+            <!-- for each right -->
+            <tbody>
+                <tr data-ng-repeat="userWithCrossAccess in usersWithCrossAccess">
+                    <td>{{ userWithCrossAccess.name }}</td>
+                    <td>{{ userWithCrossAccess.email }}</td>
+                    <td><i ng-if="userWithCrossAccess.apiAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.apiAccess" class="text-danger fa fa-times"></i></td>
+                    <td><i ng-if="userWithCrossAccess.stakeholderAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.stakeholderAccess" class="text-danger fa fa-times"></i></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </div>

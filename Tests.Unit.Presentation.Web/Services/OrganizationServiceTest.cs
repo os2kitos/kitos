@@ -10,6 +10,8 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
@@ -28,6 +30,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<Organization>> _organizationRepository;
         private readonly Mock<IGenericRepository<OrganizationRight>> _orgRightRepository;
         private readonly Mock<IGenericRepository<User>> _userRepository;
+        private readonly Mock<IOrganizationRepository> _repositoryMock;
 
         public OrganizationServiceTest()
         {
@@ -41,6 +44,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRepository = new Mock<IGenericRepository<Organization>>();
             _orgRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _userRepository = new Mock<IGenericRepository<User>>();
+            _repositoryMock = new Mock<IOrganizationRepository>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -49,7 +53,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 userContext.Object,
                 Mock.Of<ILogger>(),
                 _roleService.Object,
-                _transactionManager.Object);
+                _transactionManager.Object,
+                _repositoryMock.Object);
         }
 
         [Fact]
@@ -260,6 +265,44 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgRightRepository.Verify(x => x.DeleteByKey(matchedRight2.Id), Times.Once);
             _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight1.Id), Times.Never);
             _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight2.Id), Times.Never);
+        }
+
+        [Fact]
+        public void GetOrganizations_Returns_Specific_Organizations()
+        {
+            //Arrange
+            var expectedOrg1 = new Organization() { Id = A<int>() };
+            var expectedOrg2 = new Organization() { Id = A<int>() };
+            var unexpectedOrg = new Organization() { Id = A<int>() };
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>(){ expectedOrg1, expectedOrg2, unexpectedOrg }.AsQueryable());
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.GetOrganizations(new List<int>() { expectedOrg1.Id, expectedOrg2.Id });
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(2, result.Value.Count());
+            Assert.Same(expectedOrg1, result.Value.First(x => x.Id == expectedOrg1.Id));
+            Assert.Same(expectedOrg2, result.Value.First(x => x.Id == expectedOrg2.Id));
+        }
+
+        [Theory]
+        [InlineData(CrossOrganizationDataReadAccessLevel.None)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        public void GetOrganizations_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            //Arrange
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { new Organization() }.AsQueryable());
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+
+            //Act
+            var result = _sut.GetOrganizations(new List<int>() {});
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         private OrganizationRight CreateRight(int organizationId, int userId)

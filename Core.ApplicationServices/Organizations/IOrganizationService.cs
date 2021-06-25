@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -21,5 +22,7 @@ namespace Core.ApplicationServices.Organizations
         bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType);
 
         Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
+
+        public Result<IQueryable<Organization>, OperationError> GetOrganizations(IEnumerable<int> orgIds);
     }
 }

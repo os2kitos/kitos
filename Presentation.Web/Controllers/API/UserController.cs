@@ -6,12 +6,19 @@ using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Rights;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.UserQueries;
+using Infrastructure.Services.Types;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.Users;
 
 namespace Presentation.Web.Controllers.API
 {
@@ -21,17 +28,20 @@ namespace Presentation.Web.Controllers.API
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IUserRightsService _userRightsService;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext, 
+            IUserRightsService userRightsService)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
             _userContext = userContext;
+            _userRightsService = userRightsService;
         }
 
         [NonAction]
@@ -176,6 +186,47 @@ namespace Presentation.Web.Controllers.API
         {
             // NOTE: Only exists to apply optional param for org id
             return base.Delete(id, organizationId);
+        }
+
+        [HttpGet]
+        [Route("api/user/rightsholders")]
+        public HttpResponseMessage GetUsersWithRightsholderAccess()
+        {
+            return _userRightsService
+                .GetUsersAndOrganizationsWhereUserHasRightsholderAccess()
+                .Match(
+                    success => success
+                        .OrderBy(x => x.Item2.Id)
+                        .Select(x => ToUserWithOrgDTO(x.Item1, x.Item2))
+                        .ToList()
+                        .Transform(Ok),
+                    FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("api/user/cross-access")]
+        public HttpResponseMessage GetUsersWithCrossAccess()
+        {
+            return _userService
+                .GetUsersWithCrossAccess()
+                .Match(
+                    success => success
+                        .OrderBy(x => x.Id)
+                        .ToList()
+                        .Select(ToUserWithCrossRights)
+                        .ToList()
+                        .Transform(Ok),
+                    FromOperationError);
+        }
+
+        private UserWithOrganizationDTO ToUserWithOrgDTO(User user, Organization org)
+        {
+            return new UserWithOrganizationDTO(user.Id, user.GetFullName(), user.Email, org.Name);
+        }
+
+        private UserWithCrossOrganizationalRightsDTO ToUserWithCrossRights(User user)
+        {
+            return new UserWithCrossOrganizationalRightsDTO(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess);
         }
     }
 }

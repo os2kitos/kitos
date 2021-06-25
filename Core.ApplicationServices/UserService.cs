@@ -11,6 +11,9 @@ using System.Security.Cryptography;
 using Core.ApplicationServices.Authorization;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DomainEvents;
+using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries.UserQueries;
 
 namespace Core.ApplicationServices
 {
@@ -21,6 +24,7 @@ namespace Core.ApplicationServices
         private readonly string _mailSuffix;
         private readonly string _defaultUserPassword;
         private readonly bool _useDefaultUserPassword;
+        private readonly IUserRepository _repository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -42,7 +46,8 @@ namespace Core.ApplicationServices
             IMailClient mailClient,
             ICryptoService cryptoService,
             IAuthorizationContext authorizationContext,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IUserRepository repository)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -56,6 +61,7 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
             _authorizationContext = authorizationContext;
             _domainEvents = domainEvents;
+            _repository = repository;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -218,6 +224,24 @@ namespace Core.ApplicationServices
         public void Dispose()
         {
             _crypt?.Dispose();
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersWithCrossAccess()
+        {
+            if(_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return Result<IQueryable<User>, OperationError>.Success(new QueryByApiOrStakeHolderAccess().Apply(_repository.GetUsers()));
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersWithRightsHolderAccess()
+        {
+            if (_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return Result<IQueryable<User>, OperationError>.Success(new QueryByRightsholderAccess().Apply(_repository.GetUsers()));
         }
     }
 }
