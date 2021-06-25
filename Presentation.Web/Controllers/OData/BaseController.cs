@@ -7,10 +7,12 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Authorization;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData
 {
     [Authorize]
+    [DenyRightsHoldersAccess]
     public abstract class BaseController<T> : ODataController where T : class
     {
         protected readonly IGenericRepository<T> Repository;

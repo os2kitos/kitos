@@ -323,35 +323,39 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
-            //DomainService bindings
-            kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
-                .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
+            //Data processing registrations
+            RegisterOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>>()
-                .To<OptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>>().InCommandScope(Mode);
+            //IT-System
+            RegisterOptionsService<ItSystem, BusinessType, LocalBusinessType>(kernel);
 
-            kernel.Bind<IOptionsService<ItSystem, BusinessType>>()
-               .To<OptionsService<ItSystem, BusinessType, LocalBusinessType>>().InCommandScope(Mode);
+            //IT-System usages
+            RegisterOptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>(kernel);
 
-            kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
-                .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
+            RegisterOptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>(kernel);
+            
+            RegisterOptionsService<ItSystemUsage, ItSystemCategories, LocalItSystemCategories>(kernel);
+        }
 
+        private void RegisterOptionsService<TParent, TOption, TLocalOption>(IKernel kernel)
+            where TOption : OptionEntity<TParent>
+            where TLocalOption : LocalOptionEntity<TOption>
+        {
+            //Domain service
+            kernel.Bind<IOptionsService<TParent, TOption>>()
+                .To<OptionsService<TParent, TOption, TLocalOption>>().InCommandScope(Mode);
 
-            // ApplicationService bindings
-            kernel.Bind<IOptionsApplicationService<ItSystem, BusinessType>>()
-               .To<OptionsApplicationService<ItSystem, BusinessType>>().InCommandScope(Mode);
+            //Application service
+            kernel.Bind<IOptionsApplicationService<TParent, TOption>>()
+                .To<OptionsApplicationService<TParent, TOption>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)

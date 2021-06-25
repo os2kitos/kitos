@@ -15,7 +15,7 @@ namespace Presentation.Web.Models.External.V2.Request
         [Range(0, int.MaxValue)] public int? Page { get; set; } = 0;
 
         /// <summary>
-        /// Size of the page referred by <see cref="Page"/>.
+        /// Size of the page referred by 'page'.
         /// Default: 100.
         /// </summary>
         [Range(PagingContraints.MinPageSize, PagingContraints.MaxPageSize)]

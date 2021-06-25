@@ -4,10 +4,12 @@ using Microsoft.AspNet.OData;
 using Core.ApplicationServices.Authorization;
 using Core.DomainServices;
 using Ninject;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.OData.ReportsControllers
 {
     [Authorize]
+    [DenyRightsHoldersAccess]
     public abstract class BaseOdataAuthorizationController<T> : ODataController where T : class
     {
         protected readonly IGenericRepository<T> Repository;

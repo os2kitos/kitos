@@ -18,6 +18,7 @@ using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Qa
 {
+    [CollectionDefinition(nameof(BrokenExternalReferencesReportTest), DisableParallelization = true)]
     public class BrokenExternalReferencesReportTest : WithAutoFixture
     {
         private const string SystemReferenceUrl = "http://google.com/notfount1337.html";

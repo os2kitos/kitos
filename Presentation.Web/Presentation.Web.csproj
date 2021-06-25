@@ -345,9 +345,11 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
-    <Compile Include="Controllers\External\V2\ItSystemV2Controller.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\DenyRightsHoldersAccessAttribute.cs" />
@@ -364,15 +366,15 @@
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
-    <Compile Include="Controllers\External\V2\OrganizationV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\Organizations\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\External\V2\Response\ItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\BaseItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\BaseItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderWritableItInterfacePropertiesDTO.cs" />
-    <Compile Include="Controllers\External\V2\ItInterfaceV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItInterfaces\ItInterfaceV2Controller.cs" />
     <Compile Include="Models\External\V2\Request\DeactivationReasonRequestDTO.cs" />
-    <Compile Include="Controllers\External\V2\BusinessTypesV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystems\ItSystemBusinessTypeV2Controller.cs" />
     <Compile Include="Controllers\API\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\BrokenExternalReferencesReportController.cs" />
@@ -506,6 +508,7 @@
     <Compile Include="Ninject\KernelBuilder.cs" />
     <Compile Include="Ninject\KernelMode.cs" />
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
+    <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />

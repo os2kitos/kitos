@@ -145,6 +145,7 @@ namespace Presentation.Web.Controllers.API
 
         // POST api/Authorize
         [AllowAnonymous]
+        [DenyRightsHoldersAccess("api/authorize/GetToken")]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
             if (loginDto == null)
@@ -165,7 +166,7 @@ namespace Presentation.Web.Controllers.API
 
                 var user = result.Value;
 
-                _applicationAuthenticationState.SetAuthenticatedUser(user,loginDto.RememberMe ? AuthenticationScope.Persistent : AuthenticationScope.Session);
+                _applicationAuthenticationState.SetAuthenticatedUser(user, loginDto.RememberMe ? AuthenticationScope.Persistent : AuthenticationScope.Session);
 
                 var response = Map<User, UserDTO>(user);
                 loginInfo = new { UserId = user.Id, LoginSuccessful = true };

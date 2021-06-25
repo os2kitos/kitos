@@ -10,7 +10,7 @@ using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.External.V2
+namespace Presentation.Web.Controllers.External.V2.Organizations
 {
     [RoutePrefix("api/v2")]
     public class OrganizationV2Controller : ExternalBaseController
