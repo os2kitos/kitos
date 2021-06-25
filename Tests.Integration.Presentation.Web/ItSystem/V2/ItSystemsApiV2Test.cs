@@ -75,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType,CreateName(), organizationId);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {
@@ -231,8 +231,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var businessType2 = A<string>();
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-            var correctBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType1, organizationId);
-            var incorrectBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType2, organizationId);
+            var correctBusinessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType1, organizationId);
+            var incorrectBusinessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType2, organizationId);
             var correctBusinessTypeId = DatabaseAccess.GetEntityUuid<BusinessType>(correctBusinessType.Id);
 
             var unexpectedWrongBusinessType = await CreateSystemAsync(organizationId, AccessModifier.Public);
@@ -395,7 +395,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, CreateName(), organizationId);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {

@@ -17,7 +17,7 @@ using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Interface;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.External.V2
+namespace Presentation.Web.Controllers.External.V2.ItInterfaces
 {
     [RoutePrefix("api/v2")]
     public class ItInterfaceV2Controller: ExternalBaseController
