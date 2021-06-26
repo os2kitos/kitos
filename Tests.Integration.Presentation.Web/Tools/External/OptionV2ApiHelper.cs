@@ -20,6 +20,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-locations";
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-locations";
             public const string ItSystemSensitivePersonalDataTypes = "it-system-sensitive-personal-data-types";
+            public const string ItSystemUsageRegisterTypes = "it-system-usage-register-types";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
