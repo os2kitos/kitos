@@ -87,6 +87,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.ItSystemCategories, OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification };
             yield return new[] { EntityOptionHelper.ResourceNames.FrequencyTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies };
             yield return new[] { EntityOptionHelper.ResourceNames.ArchiveTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.ArchiveLocations, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations };
         }
     }
 }

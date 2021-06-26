@@ -15,6 +15,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string ItSystemCategories = "ItSystemCategories";
             public const string FrequencyTypes = "FrequencyTypes";
             public const string ArchiveTypes = "ArchiveTypes";
+            public const string ArchiveLocations = "ArchiveLocations";
         }
 
         public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null)

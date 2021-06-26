@@ -346,6 +346,7 @@
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
     <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveLocationV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />

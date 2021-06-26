@@ -343,6 +343,8 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItSystemUsage, ItSystemCategories, LocalItSystemCategories>(kernel);
 
             RegisterOptionsService<ItSystemUsage, ArchiveType, LocalArchiveType>(kernel);
+
+            RegisterOptionsService<ItSystemUsage, ArchiveLocation, LocalArchiveLocation>(kernel);
         }
 
         private void RegisterOptionsService<TParent, TOption, TLocalOption>(IKernel kernel)
