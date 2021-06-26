@@ -113,6 +113,8 @@ namespace Infrastructure.DataAccess.Migrations
 
                 AddOptions<ItSystemCategories, ItSystemUsage>(context.ItSystemCategories, globalAdmin, "Offentlige data", "Interne data", "Fortrolige data", "Hemmelige data");
 
+                AddOptions<ArchiveTestLocation, ItSystemUsage>(context.ArchiveTestLocation, globalAdmin, "TestLocation1");
+
                 context.SaveChanges();
 
                 #endregion
