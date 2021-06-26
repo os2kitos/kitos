@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelation
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemUsageDataClassifications(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetSystemRelationFrequencies(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -58,7 +58,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelation
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemUsageDataClassification(Guid relationFrequencyTypeUuid, Guid organizationUuid)
+        public IHttpActionResult GetSystemRelationFrequency(Guid relationFrequencyTypeUuid, Guid organizationUuid)
         {
             return GetSingle(relationFrequencyTypeUuid, organizationUuid);
         }
