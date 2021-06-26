@@ -113,6 +113,10 @@ namespace Infrastructure.DataAccess.Migrations
 
                 AddOptions<ItSystemCategories, ItSystemUsage>(context.ItSystemCategories, globalAdmin, "Offentlige data", "Interne data", "Fortrolige data", "Hemmelige data");
 
+                AddOptions<ArchiveTestLocation, ItSystemUsage>(context.ArchiveTestLocation, globalAdmin, "TestLocation1");
+
+                AddOptions<RegisterType, ItSystemUsage>(context.RegisterTypes, globalAdmin, "TestRegisterType1");
+
                 context.SaveChanges();
 
                 #endregion
@@ -768,11 +772,13 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
         /// <param name="isActive">Is the option active</param>
         /// <param name="isSuggestion">Is the option an suggestion</param>
         /// <returns></returns>
-        private static T CreateOption<T, TReference>(string name, User objectOwner, string description = "...", bool isActive = true, bool isSuggestion = false)
+        private static T CreateOption<T, TReference>(string name, User objectOwner, string description = "...", bool isActive = true, bool isSuggestion = false, bool isObligatory = true, bool isEnabled = true)
             where T : OptionEntity<TReference>, new()
         {
             return new T()
             {
+                IsObligatory = isObligatory,
+                IsEnabled = isEnabled,
                 IsLocallyAvailable = isActive,
                 IsSuggestion = isSuggestion,
                 Name = name,
