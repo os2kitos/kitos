@@ -18,6 +18,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageRelationFrequencies = "it-system-usage-relation-frequencies";
             public const string ItSystemUsageArchiveTypes = "it-system-usage-archive-types";
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-locations";
+            public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-locations";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
