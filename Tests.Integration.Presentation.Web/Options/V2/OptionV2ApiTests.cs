@@ -22,10 +22,10 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var pageNumber = 0; //Always takes the first page;
 
             //Act
-            var businessTypes = (await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, orgUuid, pageSize, pageNumber)).ToList();
+            var optionTypes = (await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, orgUuid, pageSize, pageNumber)).ToList();
 
             //Assert
-            Assert.Equal(pageSize, businessTypes.Count);
+            Assert.Equal(pageSize, optionTypes.Count);
         }
 
         [Theory, MemberData(nameof(GetV1AndV2ResourceNames))]
