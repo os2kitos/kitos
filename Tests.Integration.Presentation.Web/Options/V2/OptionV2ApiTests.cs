@@ -89,6 +89,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.ArchiveTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.ArchiveLocations, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations };
             yield return new[] { EntityOptionHelper.ResourceNames.ArchiveTestLocations, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations };
+            yield return new[] { EntityOptionHelper.ResourceNames.SensitivePersonalDataTypes, OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes };
         }
     }
 }
