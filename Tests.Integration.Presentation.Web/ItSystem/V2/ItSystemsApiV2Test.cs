@@ -14,12 +14,13 @@ using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
-    [CollectionDefinition(nameof(ItSystemsApiV2Test), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class ItSystemsApiV2Test : WithAutoFixture
     {
         [Fact]

@@ -11,12 +11,13 @@ using System.Net;
 using System.Threading.Tasks;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
-    [CollectionDefinition(nameof(ItInterfaceApiV2Test), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class ItInterfaceApiV2Test : WithAutoFixture
     {
 

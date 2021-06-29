@@ -13,12 +13,13 @@ using CsvHelper.Configuration;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.Qa;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Qa
 {
-    [CollectionDefinition(nameof(BrokenExternalReferencesReportTest), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class BrokenExternalReferencesReportTest : WithAutoFixture
     {
         private const string SystemReferenceUrl = "http://google.com/notfount1337.html";

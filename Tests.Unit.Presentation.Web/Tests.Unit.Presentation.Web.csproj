@@ -224,8 +224,8 @@
     <Compile Include="DomainServices\QueryExceptEntitiesWithIdsTest.cs" />
     <Compile Include="DomainServices\QueryUserByNameOrEmailTest.cs" />
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
-    <Compile Include="DomainServices\Users\QueryByRightsholderAccessTest.cs" />
-    <Compile Include="DomainServices\Users\QueryByApiOrStakeHolderAccessTest.cs" />
+    <Compile Include="DomainServices\Users\QueryByRoleAssignmentTest.cs" />
+    <Compile Include="DomainServices\Users\QueryByCrossOrganizationPermissionsTest.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.DomainServices.Users
 {
-    public class QueryByApiOrStakeHolderAccessTest : WithAutoFixture
+    public class QueryByCrossOrganizationPermissionsTest : WithAutoFixture
     {
         [Fact]
         public void Apply_Returns_Users_With_StakeHolder_Or_Api_Access()
