@@ -483,13 +483,13 @@
         getUsersWithRightsholderAccess() {
             return this.$http
                 .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/rightsholders")
-                .then(result => result.data.response)
+                .then(result => result.data.response);
         }
 
         getUsersWithCrossAccess() {
             return this.$http
                 .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/cross-access")
-                .then(result => result.data.response)
+                .then(result => result.data.response);
         }
     }
     app.service("userService", UserService);
