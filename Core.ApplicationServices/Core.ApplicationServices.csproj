@@ -122,6 +122,7 @@
     <Compile Include="IAdviceService.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />
@@ -143,6 +144,8 @@
     <Compile Include="Model\Interface\RightsHolderItInterfaceCreationParameters.cs" />
     <Compile Include="RightsHolders\ItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\RightsHolderSystemService.cs" />
+    <Compile Include="Rights\IUserRightsService.cs" />
+    <Compile Include="Rights\UserRightsService.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />

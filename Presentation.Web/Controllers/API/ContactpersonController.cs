@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
@@ -79,6 +80,19 @@ namespace Presentation.Web.Controllers.API
             {
                 return LogError(e);
             }
+        }
+
+        protected override IQueryable<ContactPerson> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => x.Organization != null && organizationIds.Contains(x.Organization.Id));
         }
     }
 }
