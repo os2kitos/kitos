@@ -23,6 +23,6 @@ namespace Core.ApplicationServices.Organizations
 
         Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
 
-        public Result<IQueryable<Organization>, OperationError> GetOrganizations(IEnumerable<int> orgIds);
+        public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
     }
 }

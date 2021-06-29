@@ -1,11 +1,14 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
-using Core.DomainModel;
-using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Model.RightsHolder;
+using Core.DomainModel;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 
 namespace Core.ApplicationServices.Rights
 {
@@ -13,45 +16,47 @@ namespace Core.ApplicationServices.Rights
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
+        private readonly IAuthorizationContext _authorizationContext;
 
-        public UserRightsService(IUserService userService, IOrganizationService organizationService, IOrganizationalUserContext userContext)
+        public UserRightsService(IUserService userService, IOrganizationService organizationService, IAuthorizationContext authorizationContext)
         {
             _userService = userService;
             _organizationService = organizationService;
-            _userContext = userContext;
+            _authorizationContext = authorizationContext;
         }
 
 
-        public Result<IEnumerable<(User, Organization)>, OperationError> GetUsersAndOrganizationsWhereUserHasRightsholderAccess()
+        public Result<IEnumerable<UserRoleAssociationDTO>, OperationError> GetUsersWithRoleAssignment(OrganizationRole role)
         {
-            if (!_userContext.IsGlobalAdmin())
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
             {
-                return new OperationError("User is not global admin", OperationFailure.Forbidden);
+                return new OperationError(OperationFailure.Forbidden);
             }
 
-            var result = new List<(User, Organization)>();
+            return _userService
+                .GetUsersWithRoleAssignedInAnyOrganization(role)
+                .Bind(users => MapOrganizationalRightsHolderRelation(users, role));
+        }
 
-            var usersWithRightsholderAccess = _userService.GetUsersWithRightsHolderAccess();
-            if (usersWithRightsholderAccess.Failed)
+        private Result<IEnumerable<UserRoleAssociationDTO>, OperationError> MapOrganizationalRightsHolderRelation(IQueryable<User> users, OrganizationRole role)
+        {
+            var result = new List<UserRoleAssociationDTO>();
+
+            foreach (var user in users.ToList())
             {
-                return usersWithRightsholderAccess.Error;
-            }
+                var organizationIds = user.GetOrganizationIdsWhereRoleIsAssigned(role).ToList();
 
-            foreach (User user in usersWithRightsholderAccess.Value.ToList())
-            {
-                var organizationIds = user.GetOrganizationsWhereRightsholderAccess();
+                var rightsHolderRelations = _organizationService.GetAllOrganizations()
+                    .Select(organizations => organizations.ByIds(organizationIds))
+                    .Select(organizations =>
+                        organizations.ToList().Select(org => new UserRoleAssociationDTO(role, user, org)).ToList());
 
-                var organizations = _organizationService.GetOrganizations(organizationIds)
-                    .Select(x => x.ToList()
-                        .Select(org => (user, org)));
-
-                if (organizations.Failed)
+                if (rightsHolderRelations.Failed)
                 {
-                    return organizations.Error;
+                    return rightsHolderRelations.Error;
                 }
 
-                result.AddRange(organizations.Value);
+                result.AddRange(rightsHolderRelations.Value);
             }
 
             return result;

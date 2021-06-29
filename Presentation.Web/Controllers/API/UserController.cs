@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Rights;
 using Core.DomainModel;
@@ -34,7 +35,7 @@ namespace Presentation.Web.Controllers.API
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IOrganizationalUserContext userContext, 
+            IOrganizationalUserContext userContext,
             IUserRightsService userRightsService)
             : base(repository)
         {
@@ -189,44 +190,47 @@ namespace Presentation.Web.Controllers.API
         }
 
         [HttpGet]
-        [Route("api/user/rightsholders")]
+        [Route("api/user/with-rightsholder-access")]
         public HttpResponseMessage GetUsersWithRightsholderAccess()
         {
             return _userRightsService
-                .GetUsersAndOrganizationsWhereUserHasRightsholderAccess()
-                .Match(
-                    success => success
-                        .OrderBy(x => x.Item2.Id)
-                        .Select(x => ToUserWithOrgDTO(x.Item1, x.Item2))
-                        .ToList()
-                        .Transform(Ok),
-                    FromOperationError);
+                .GetUsersWithRoleAssignment(OrganizationRole.RightsHolderAccess)
+                .Select(relations => relations.OrderBy(relation => relation.User.Id))
+                .Select(relations => relations.ToList())
+                .Select(ToUserWithOrgDTOs)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
-        [Route("api/user/cross-access")]
+        [Route("api/user/with-cross-organization-permissions")]
         public HttpResponseMessage GetUsersWithCrossAccess()
         {
             return _userService
-                .GetUsersWithCrossAccess()
-                .Match(
-                    success => success
-                        .OrderBy(x => x.Id)
-                        .ToList()
-                        .Select(ToUserWithCrossRights)
-                        .ToList()
-                        .Transform(Ok),
-                    FromOperationError);
+                .GetUsersWithCrossOrganizationPermissions()
+                .Select(users => users.OrderBy(user => user.Id))
+                .Select(users => users.ToList())
+                .Select(ToUserWithCrossRightsDTOs)
+                .Match(Ok, FromOperationError);
         }
 
-        private UserWithOrganizationDTO ToUserWithOrgDTO(User user, Organization org)
+        private static IEnumerable<UserWithOrganizationDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)
         {
-            return new UserWithOrganizationDTO(user.Id, user.GetFullName(), user.Email, org.Name);
+            return dtos.Select(ToUserWithOrgDTO).ToList();
         }
 
-        private UserWithCrossOrganizationalRightsDTO ToUserWithCrossRights(User user)
+        private static UserWithOrganizationDTO ToUserWithOrgDTO(UserRoleAssociationDTO dto)
         {
-            return new UserWithCrossOrganizationalRightsDTO(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess);
+            return new(dto.User.Id, dto.User.GetFullName(), dto.User.Email, dto.Organization.Name);
+        }
+
+        private static IEnumerable<UserWithCrossOrganizationalRightsDTO> ToUserWithCrossRightsDTOs(IEnumerable<User> users)
+        {
+            return users.Select(ToUserWithCrossRightsDTO).ToList();
+        }
+
+        private static UserWithCrossOrganizationalRightsDTO ToUserWithCrossRightsDTO(User user)
+        {
+            return new(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess);
         }
     }
 }

@@ -8,7 +8,6 @@ namespace Tests.Unit.Presentation.Web.DomainServices.Users
 {
     public class QueryByApiOrStakeHolderAccessTest : WithAutoFixture
     {
-
         [Fact]
         public void Apply_Returns_Users_With_StakeHolder_Or_Api_Access()
         {
@@ -19,7 +18,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices.Users
             var userWithNothing = new User() { Id = A<int>() };
 
             var input = new[] { userWithStakeHolder, userWithApi, userWithNothing, userWithStakeHolderAndApi }.AsQueryable();
-            var sut = new QueryByApiOrStakeHolderAccess();
+            var sut = new QueryByCrossOrganizationPermissions();
 
             //Act
             var result = sut.Apply(input);

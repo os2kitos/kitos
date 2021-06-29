@@ -57,7 +57,7 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithCrossAccess_Returns_Users()
+        public void GetUsersWithCrossOrganizationPermissions_Returns_Users()
         {
             //Arrange
             var expectedUser1 = new User() { Id = A<int>(), HasStakeHolderAccess = true };
@@ -68,7 +68,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.GetUsersWithCrossAccess();
+            var result = _sut.GetUsersWithCrossOrganizationPermissions();
 
             //Assert
             Assert.True(result.Ok);
@@ -82,14 +82,14 @@ namespace Tests.Unit.Core.ApplicationServices
         [InlineData(CrossOrganizationDataReadAccessLevel.None)]
         [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
         [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
-        public void GetUsersWithCrossAccess_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
+        public void GetUsersWithCrossOrganizationPermissions_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
         {
             //Arrange
             _repositoryMock.Setup(x => x.GetUsers()).Returns(new List<User>().AsQueryable());
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
 
             //Act
-            var result = _sut.GetUsersWithCrossAccess();
+            var result = _sut.GetUsersWithCrossOrganizationPermissions();
 
             //Assert
             Assert.True(result.Failed);
@@ -112,7 +112,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.GetUsersWithRightsHolderAccess();
+            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization();
 
             //Assert
             Assert.True(result.Ok);
@@ -131,7 +131,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
 
             //Act
-            var result = _sut.GetUsersWithRightsHolderAccess();
+            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization();
 
             //Assert
             Assert.True(result.Failed);

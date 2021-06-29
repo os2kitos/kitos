@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 
 namespace Core.DomainServices
@@ -12,7 +13,7 @@ namespace Core.DomainServices
         PasswordResetRequest IssuePasswordReset(User user, string subject, string content);
         PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
-        Result<IQueryable<User>, OperationError> GetUsersWithCrossAccess();
-        Result<IQueryable<User>, OperationError> GetUsersWithRightsHolderAccess(); 
+        Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions();
+        Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role); 
     }
 }

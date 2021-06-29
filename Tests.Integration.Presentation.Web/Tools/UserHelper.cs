@@ -21,7 +21,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendGetUsersWithRightsholderAccessAsync(Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/rightsholders"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-rightsholder-access"), cookie);
         }
 
         public static async Task<List<UserWithCrossOrganizationalRightsDTO>> GetUsersWithCrossAccessAsync(Cookie optionalLogin = null)
@@ -35,7 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendGetUsersWithCrossAccessAsync(Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/cross-access"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
         }
     }
 }

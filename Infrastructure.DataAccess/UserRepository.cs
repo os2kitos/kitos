@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using Core.DomainServices;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.UserQueries;
 using Infrastructure.Services.Types;
 
 namespace Infrastructure.DataAccess
@@ -48,6 +50,16 @@ namespace Infrastructure.DataAccess
         public IQueryable<User> GetUsers()
         {
             return AsQueryable();
+        }
+
+        public IQueryable<User> GetUsersWithCrossOrganizationPermissions()
+        {
+            return AsQueryable().Transform(new QueryByCrossOrganizationPermissions().Apply);
+        }
+
+        public IQueryable<User> GetUsersWithRoleAssignment(OrganizationRole role)
+        {
+            return AsQueryable().Transform(new QueryByRoleAssignment(role).Apply);
         }
     }
 }

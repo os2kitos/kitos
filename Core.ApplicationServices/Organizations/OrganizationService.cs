@@ -187,13 +187,13 @@ namespace Core.ApplicationServices.Organizations
             }
         }
 
-        public Result<IQueryable<Organization>, OperationError> GetOrganizations(IEnumerable<int> orgIds)
+        public Result<IQueryable<Organization>, OperationError> GetAllOrganizations()
         {
             if(_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
-            return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll().ByIds(orgIds.ToList()));
+            return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
         }
     }
 }

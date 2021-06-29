@@ -33,7 +33,7 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
-        private static readonly RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
+        private static readonly RNGCryptoServiceProvider rngCsp = new();
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -226,22 +226,23 @@ namespace Core.ApplicationServices
             _crypt?.Dispose();
         }
 
-        public Result<IQueryable<User>, OperationError> GetUsersWithCrossAccess()
+        public Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions()
         {
-            if(_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
-            return Result<IQueryable<User>, OperationError>.Success(new QueryByApiOrStakeHolderAccess().Apply(_repository.GetUsers()));
+            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithCrossOrganizationPermissions());
         }
 
-        public Result<IQueryable<User>, OperationError> GetUsersWithRightsHolderAccess()
+        public Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role)
         {
-            if (_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
-            return Result<IQueryable<User>, OperationError>.Success(new QueryByRightsholderAccess().Apply(_repository.GetUsers()));
+
+            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(OrganizationRole.RightsHolderAccess));
         }
     }
 }

@@ -135,10 +135,10 @@ namespace Core.DomainModel
                 .Distinct();
         }
 
-        public IEnumerable<int> GetOrganizationsWhereRightsholderAccess()
+        public IEnumerable<int> GetOrganizationIdsWhereRoleIsAssigned(OrganizationRole role)
         {
             return OrganizationRights.
-                Where(x => x.Role == OrganizationRole.RightsHolderAccess)
+                Where(x => x.Role == role)
                 .Select(x => x.OrganizationId)
                 .Distinct();
         }

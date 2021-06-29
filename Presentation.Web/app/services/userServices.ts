@@ -482,13 +482,13 @@
 
         getUsersWithRightsholderAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/rightsholders")
+                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithOrganizationName[]>>("api/user/with-rightsholder-access")
                 .then(result => result.data.response);
         }
 
         getUsersWithCrossAccess() {
             return this.$http
-                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/cross-access")
+                .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
                 .then(result => result.data.response);
         }
     }

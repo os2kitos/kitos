@@ -8,6 +8,7 @@ using Core.DomainServices;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using Core.DomainServices.Authorization;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -19,51 +20,50 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private readonly Mock<IUserService> _userServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private Mock<IAuthorizationContext> _authServiceMock;
 
         public UserRightsServiceTest()
         {
             _userServiceMock = new Mock<IUserService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _userContextMock = new Mock<IOrganizationalUserContext>();
-            _sut = new UserRightsService(_userServiceMock.Object, _organizationServiceMock.Object, _userContextMock.Object);
+            _authServiceMock = new Mock<IAuthorizationContext>();
+            _sut = new UserRightsService(_userServiceMock.Object,_organizationServiceMock.Object, _authServiceMock.Object);
         }
 
         [Fact]
-        public void GetUsersAndOrganizationsWhereUserHasRightsholderAccess_Returns_Users_And_Organization_Tuples()
+        public void GetUsersWithRightsHoldersAccess_Returns_Users_And_Organization_Relations()
         {
             //Arrange
             var orgId1 = A<int>();
             var orgId2 = A<int>();
             var user1 = CreateUserWithRighsholderAccess(orgId1);
             var user2 = CreateUserWithRighsholderAccess(orgId2);
-            var users = new List<User>() { user1, user2 };
+            var users = new List<User> { user1, user2 };
 
-            var org1 = new Organization() { Id = orgId1 };
-            var org2 = new Organization() { Id = orgId2 };
+            var org1 = new Organization { Id = orgId1 };
+            var org2 = new Organization { Id = orgId2 };
 
-            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(true);
+            ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
             SetupUserService(users);
-            SetupOrganizationService(new List<int>() { orgId1 }, new List<Organization>() { org1 });
-            SetupOrganizationService(new List<int>() { orgId2 }, new List<Organization>() { org2 });
+            SetupOrganizationService(new List<Organization> { org1, org2 });
 
             //Act
-            var result = _sut.GetUsersAndOrganizationsWhereUserHasRightsholderAccess();
+            var result = _sut.GetUsersWithRoleAssignment();
 
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(2, result.Value.Count());
 
-            Assert.Same(user1, result.Value.First(x => x.Item1.Id == user1.Id).Item1);
-            Assert.Same(org1, result.Value.First(x => x.Item1.Id == user1.Id).Item2);
+            Assert.Same(user1, result.Value.First(x => x.User.Id == user1.Id).User);
+            Assert.Same(org1, result.Value.First(x => x.User.Id == user1.Id).Organization);
 
-            Assert.Same(user2, result.Value.First(x => x.Item1.Id == user2.Id).Item1);
-            Assert.Same(org2, result.Value.First(x => x.Item1.Id == user2.Id).Item2);
+            Assert.Same(user2, result.Value.First(x => x.User.Id == user2.Id).User);
+            Assert.Same(org2, result.Value.First(x => x.User.Id == user2.Id).Organization);
         }
 
         [Fact]
-        public void GetUsersAndOrganizationsWhereUserHasRightsholderAccess_Returns_Tuples_If_User_Is_Rightsholder_In_Multiple_Orgs()
+        public void GetUsersWithRightsHoldersAccess_Returns_Multiple_If_User_Is_RightsHolder_In_Multiple_Orgs()
         {
             //Arrange
             var orgId1 = A<int>();
@@ -75,33 +75,36 @@ namespace Tests.Unit.Core.ApplicationServices
             var org1 = new Organization() { Id = orgId1 };
             var org2 = new Organization() { Id = orgId2 };
 
-            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(true);
+            ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
             SetupUserService(users);
-            SetupOrganizationService(new List<int>() { orgId1, orgId2 }, new List<Organization>() { org1, org2 });
+            SetupOrganizationService(new List<Organization>() { org1, org2 });
 
             //Act
-            var result = _sut.GetUsersAndOrganizationsWhereUserHasRightsholderAccess();
+            var result = _sut.GetUsersWithRoleAssignment();
 
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(2, result.Value.Count());
 
-            Assert.Same(user, result.Value.First(x => x.Item2.Id == orgId1).Item1);
-            Assert.Same(org1, result.Value.First(x => x.Item2.Id == orgId1).Item2);
+            Assert.Same(user, result.Value.First(x => x.Organization.Id == orgId1).User);
+            Assert.Same(org1, result.Value.First(x => x.Organization.Id == orgId1).Organization);
 
-            Assert.Same(user, result.Value.First(x => x.Item2.Id == orgId2).Item1);
-            Assert.Same(org2, result.Value.First(x => x.Item2.Id == orgId2).Item2);
+            Assert.Same(user, result.Value.First(x => x.Organization.Id == orgId2).User);
+            Assert.Same(org2, result.Value.First(x => x.Organization.Id == orgId2).Organization);
         }
 
-        [Fact]
-        public void GetUsersAndOrganizationsWhereUserHasRightsholderAccess_Returns_Forbidden_If_User_Not_GlobalAdmin()
+        [Theory]
+        [InlineData(CrossOrganizationDataReadAccessLevel.None)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
+        public void GetUsersWithRightsHoldersAccess_Returns_Forbidden_If_User_Not_Full_Cross_Level_Access(CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccess)
         {
             //Arrange
-            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(false);
+            ExpectUserHasCrossLevelAccess(crossOrganizationDataReadAccess);
 
             //Act
-            var result = _sut.GetUsersAndOrganizationsWhereUserHasRightsholderAccess();
+            var result = _sut.GetUsersWithRoleAssignment();
 
             //Assert
             Assert.True(result.Failed);
@@ -109,18 +112,18 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersAndOrganizationsWhereUserHasRightsholderAccess_Returns_Error_If_GetUsersWithRightsHolderAccess_Fails()
+        public void GetUsersWithRightsHoldersAccess_Returns_Error_If_GetUsersWithRightsHolderAccess_Fails()
         {
             //Arrange
             var operationError = A<OperationError>();
 
-            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(true);
+            ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
             _userServiceMock
-                .Setup(x => x.GetUsersWithRightsHolderAccess())
+                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization())
                 .Returns(Result<IQueryable<User>, OperationError>.Failure(operationError));
 
             //Act
-            var result = _sut.GetUsersAndOrganizationsWhereUserHasRightsholderAccess();
+            var result = _sut.GetUsersWithRoleAssignment();
 
             //Assert
             Assert.True(result.Failed);
@@ -128,55 +131,58 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersAndOrganizationsWhereUserHasRightsholderAccess_Returns_Error_If_GetOrganizations_Fails()
+        public void GetUsersWithRightsHoldersAccess_Returns_Error_If_GetOrganizations_Fails()
         {
             //Arrange
             var orgId = A<int>();
             var user = CreateUserWithRighsholderAccess(orgId);
             var users = new List<User>() { user };
 
-            var orgIds = new List<int>() { orgId };
-
             var operationError = A<OperationError>();
 
-            _userContextMock.Setup(x => x.IsGlobalAdmin()).Returns(true);
+            ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
             SetupUserService(users); 
             
             _organizationServiceMock
-                .Setup(x => x.GetOrganizations(orgIds))
+                .Setup(x => x.GetAllOrganizations())
                 .Returns(Result<IQueryable<Organization>, OperationError>.Failure(operationError));
 
             //Act
-            var result = _sut.GetUsersAndOrganizationsWhereUserHasRightsholderAccess();
+            var result = _sut.GetUsersWithRoleAssignment();
 
             //Assert
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
         }
 
+        private void ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel value)
+        {
+            _authServiceMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(value);
+        }
+
         private void SetupUserService(IEnumerable<User> users)
         {
             _userServiceMock
-                .Setup(x => x.GetUsersWithRightsHolderAccess())
+                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization())
                 .Returns(Result<IQueryable<User>, OperationError>.Success(users.AsQueryable()));
         }
 
-        private void SetupOrganizationService(List<int> orgIds, List<Organization> orgs)
+        private void SetupOrganizationService(List<Organization> orgs)
         {
             _organizationServiceMock
-                            .Setup(x => x.GetOrganizations(orgIds))
+                            .Setup(x => x.GetAllOrganizations())
                             .Returns(Result<IQueryable<Organization>, OperationError>.Success(orgs.AsQueryable()));
         }
 
         private User CreateUserWithRighsholderAccess(int orgId)
         {
-            return new User()
+            return new()
             {
                 Id = A<int>(),
                 OrganizationRights = new List<OrganizationRight>()
                 {
-                    new OrganizationRight()
+                    new()
                     {
                         OrganizationId = orgId,
                         Role = OrganizationRole.RightsHolderAccess

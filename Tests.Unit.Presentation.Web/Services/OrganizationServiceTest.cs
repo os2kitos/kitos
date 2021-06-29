@@ -268,23 +268,24 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetOrganizations_Returns_Specific_Organizations()
+        public void GetAllOrganizations_Returns_All()
         {
             //Arrange
             var expectedOrg1 = new Organization() { Id = A<int>() };
             var expectedOrg2 = new Organization() { Id = A<int>() };
-            var unexpectedOrg = new Organization() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>(){ expectedOrg1, expectedOrg2, unexpectedOrg }.AsQueryable());
+            var expectedOrg3 = new Organization() { Id = A<int>() };
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>(){ expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.GetOrganizations(new List<int>() { expectedOrg1.Id, expectedOrg2.Id });
+            var result = _sut.GetAllOrganizations();
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(2, result.Value.Count());
+            Assert.Equal(3, result.Value.Count());
             Assert.Same(expectedOrg1, result.Value.First(x => x.Id == expectedOrg1.Id));
             Assert.Same(expectedOrg2, result.Value.First(x => x.Id == expectedOrg2.Id));
+            Assert.Same(expectedOrg3, result.Value.First(x => x.Id == expectedOrg3.Id));
         }
 
         [Theory]
@@ -294,11 +295,11 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetOrganizations_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
         {
             //Arrange
-            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { new Organization() }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { new() }.AsQueryable());
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
 
             //Act
-            var result = _sut.GetOrganizations(new List<int>() {});
+            var result = _sut.GetAllOrganizations();
 
             //Assert
             Assert.True(result.Failed);
