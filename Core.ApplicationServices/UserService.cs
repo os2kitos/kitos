@@ -241,7 +241,7 @@ namespace Core.ApplicationServices
                 return new OperationError(OperationFailure.Forbidden);
             }
 
-            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(OrganizationRole.RightsHolderAccess));
+            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(role));
         }
     }
 }

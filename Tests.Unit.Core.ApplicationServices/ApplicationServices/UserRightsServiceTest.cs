@@ -20,7 +20,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private readonly Mock<IUserService> _userServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private Mock<IAuthorizationContext> _authServiceMock;
+        private readonly Mock<IAuthorizationContext> _authServiceMock;
 
         public UserRightsServiceTest()
         {
@@ -31,13 +31,14 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithRightsHoldersAccess_Returns_Users_And_Organization_Relations()
+        public void GetUsersWithRoleAssignment_Returns_Users_And_Organization_Relations()
         {
             //Arrange
+            var role = A<OrganizationRole>();
             var orgId1 = A<int>();
             var orgId2 = A<int>();
-            var user1 = CreateUserWithRighsholderAccess(orgId1);
-            var user2 = CreateUserWithRighsholderAccess(orgId2);
+            var user1 = CreateUserWithRole(orgId1, role);
+            var user2 = CreateUserWithRole(orgId2, role);
             var users = new List<User> { user1, user2 };
 
             var org1 = new Organization { Id = orgId1 };
@@ -45,11 +46,11 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users);
+            SetupUserService(users,role);
             SetupOrganizationService(new List<Organization> { org1, org2 });
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignment();
+            var result = _sut.GetUsersWithRoleAssignment(role);
 
             //Assert
             Assert.True(result.Ok);
@@ -63,13 +64,14 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithRightsHoldersAccess_Returns_Multiple_If_User_Is_RightsHolder_In_Multiple_Orgs()
+        public void GetUsersWithRoleAssignment_Returns_Multiple_If_User_Is_RightsHolder_In_Multiple_Orgs()
         {
             //Arrange
+            var role = A<OrganizationRole>();
             var orgId1 = A<int>();
             var orgId2 = A<int>();
-            var user = CreateUserWithRighsholderAccess(orgId1);
-            user.OrganizationRights.Add(new OrganizationRight() { OrganizationId = orgId2, Role = OrganizationRole.RightsHolderAccess });
+            var user = CreateUserWithRole(orgId1, role);
+            user.OrganizationRights.Add(new OrganizationRight() { OrganizationId = orgId2, Role = role });
 
             var users = new List<User>() { user };
             var org1 = new Organization() { Id = orgId1 };
@@ -77,11 +79,11 @@ namespace Tests.Unit.Core.ApplicationServices
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users);
+            SetupUserService(users,role);
             SetupOrganizationService(new List<Organization>() { org1, org2 });
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignment();
+            var result = _sut.GetUsersWithRoleAssignment(role);
 
             //Assert
             Assert.True(result.Ok);
@@ -98,13 +100,13 @@ namespace Tests.Unit.Core.ApplicationServices
         [InlineData(CrossOrganizationDataReadAccessLevel.None)]
         [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
         [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
-        public void GetUsersWithRightsHoldersAccess_Returns_Forbidden_If_User_Not_Full_Cross_Level_Access(CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccess)
+        public void GetUsersWithRoleAssignment_Returns_Forbidden_If_User_Not_Full_Cross_Level_Access(CrossOrganizationDataReadAccessLevel crossOrganizationDataReadAccess)
         {
             //Arrange
             ExpectUserHasCrossLevelAccess(crossOrganizationDataReadAccess);
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignment();
+            var result = _sut.GetUsersWithRoleAssignment(A<OrganizationRole>());
 
             //Assert
             Assert.True(result.Failed);
@@ -112,18 +114,19 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithRightsHoldersAccess_Returns_Error_If_GetUsersWithRightsHolderAccess_Fails()
+        public void GetUsersWithRoleAssignment_Returns_Error_If_GetUsersWithRole_Fails()
         {
             //Arrange
+            var role = A<OrganizationRole>();
             var operationError = A<OperationError>();
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
             _userServiceMock
-                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization())
+                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization(role))
                 .Returns(Result<IQueryable<User>, OperationError>.Failure(operationError));
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignment();
+            var result = _sut.GetUsersWithRoleAssignment(role);
 
             //Assert
             Assert.True(result.Failed);
@@ -131,25 +134,26 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithRightsHoldersAccess_Returns_Error_If_GetOrganizations_Fails()
+        public void GetUsersWithRoleAssignment_Returns_Error_If_GetOrganizations_Fails()
         {
             //Arrange
+            var role = A<OrganizationRole>();
             var orgId = A<int>();
-            var user = CreateUserWithRighsholderAccess(orgId);
+            var user = CreateUserWithRole(orgId, role);
             var users = new List<User>() { user };
 
             var operationError = A<OperationError>();
 
             ExpectUserHasCrossLevelAccess(CrossOrganizationDataReadAccessLevel.All);
 
-            SetupUserService(users); 
+            SetupUserService(users,role); 
             
             _organizationServiceMock
                 .Setup(x => x.GetAllOrganizations())
                 .Returns(Result<IQueryable<Organization>, OperationError>.Failure(operationError));
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignment();
+            var result = _sut.GetUsersWithRoleAssignment(role);
 
             //Assert
             Assert.True(result.Failed);
@@ -161,10 +165,10 @@ namespace Tests.Unit.Core.ApplicationServices
             _authServiceMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(value);
         }
 
-        private void SetupUserService(IEnumerable<User> users)
+        private void SetupUserService(IEnumerable<User> users,OrganizationRole role)
         {
             _userServiceMock
-                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization())
+                .Setup(x => x.GetUsersWithRoleAssignedInAnyOrganization(role))
                 .Returns(Result<IQueryable<User>, OperationError>.Success(users.AsQueryable()));
         }
 
@@ -175,7 +179,7 @@ namespace Tests.Unit.Core.ApplicationServices
                             .Returns(Result<IQueryable<Organization>, OperationError>.Success(orgs.AsQueryable()));
         }
 
-        private User CreateUserWithRighsholderAccess(int orgId)
+        private User CreateUserWithRole(int orgId, OrganizationRole role)
         {
             return new()
             {
@@ -185,7 +189,7 @@ namespace Tests.Unit.Core.ApplicationServices
                     new()
                     {
                         OrganizationId = orgId,
-                        Role = OrganizationRole.RightsHolderAccess
+                        Role = role
                     }
                 }
             };

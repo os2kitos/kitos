@@ -132,7 +132,7 @@
     <Compile Include="Queries\QueryByIds.cs" />
     <Compile Include="Queries\QueryByOrganizationIds.cs" />
     <Compile Include="Queries\QueryByPublicAccessOrOrganizationIds.cs" />
-    <Compile Include="Queries\QueryUserByNameOrEmail.cs" />
+    <Compile Include="Queries\User\QueryUserByNameOrEmail.cs" />
     <Compile Include="Queries\RejectAllResultsQuery.cs" />
     <Compile Include="Queries\IDomainQuery.cs" />
     <Compile Include="Queries\QueryAllByRestrictionCapabilities.cs" />

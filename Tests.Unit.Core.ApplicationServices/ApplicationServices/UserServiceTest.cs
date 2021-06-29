@@ -63,8 +63,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var expectedUser1 = new User() { Id = A<int>(), HasStakeHolderAccess = true };
             var expectedUser2 = new User() { Id = A<int>(), HasApiAccess = true };
             var expectedUser3 = new User() { Id = A<int>(), HasStakeHolderAccess = true, HasApiAccess = true };
-            var unexpectedUser = new User() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetUsers()).Returns(new List<User>() { expectedUser1, expectedUser2, expectedUser3, unexpectedUser }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetUsersWithCrossOrganizationPermissions()).Returns(new List<User>() { expectedUser1, expectedUser2, expectedUser3}.AsQueryable());
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
@@ -97,22 +96,22 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetUsersWithRightsHolderAccess_Returns_Users()
+        public void GetUsersWithRoleAssignedInAnyOrganization_Returns_Users()
         {
             //Arrange
+            var role = A<OrganizationRole>();
             var expectedUser = new User()
             {
                 Id = A<int>(),
                 OrganizationRights = new List<OrganizationRight>(){
-                    new OrganizationRight(){ Role = OrganizationRole.RightsHolderAccess }
+                    new(){ Role = role }
                 }
             };
-            var unexpectedUser = new User() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetUsers()).Returns(new List<User>() { expectedUser, unexpectedUser }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetUsersWithRoleAssignment(role)).Returns(new List<User>() { expectedUser }.AsQueryable());
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization();
+            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization(role);
 
             //Assert
             Assert.True(result.Ok);
@@ -124,14 +123,14 @@ namespace Tests.Unit.Core.ApplicationServices
         [InlineData(CrossOrganizationDataReadAccessLevel.None)]
         [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
         [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
-        public void GetUsersWithRightsHolderAccess_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
+        public void GetUsersWithRoleAssignedInAnyOrganization_Returns_Forbidden_If_Not_CrossOrganizationDataReadAccessLevel_All(CrossOrganizationDataReadAccessLevel accessLevel)
         {
             //Arrange
             _repositoryMock.Setup(x => x.GetUsers()).Returns(new List<User>().AsQueryable());
             _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
 
             //Act
-            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization();
+            var result = _sut.GetUsersWithRoleAssignedInAnyOrganization(A<OrganizationRole>());
 
             //Assert
             Assert.True(result.Failed);
