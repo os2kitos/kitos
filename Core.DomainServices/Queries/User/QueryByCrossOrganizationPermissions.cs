@@ -1,9 +1,8 @@
-﻿using Core.DomainModel;
-using System.Linq;
+﻿using System.Linq;
 
-namespace Core.DomainServices.Queries.UserQueries
+namespace Core.DomainServices.Queries.User
 {
-    public class QueryByCrossOrganizationPermissions : IDomainQuery<User>
+    public class QueryByCrossOrganizationPermissions : IDomainQuery<DomainModel.User>
     {
         private readonly bool _includeStakeHolderAccess;
         private readonly bool _includeApiAccess;
@@ -14,7 +13,7 @@ namespace Core.DomainServices.Queries.UserQueries
             _includeApiAccess = includeApiAccess;
         }
 
-        public IQueryable<User> Apply(IQueryable<User> users)
+        public IQueryable<DomainModel.User> Apply(IQueryable<DomainModel.User> users)
         {
             return users.Where(x => x.HasStakeHolderAccess == _includeStakeHolderAccess || x.HasApiAccess == _includeApiAccess);
         }

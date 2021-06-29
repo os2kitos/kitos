@@ -1,10 +1,9 @@
-﻿using Core.DomainModel;
+﻿using System.Linq;
 using Core.DomainModel.Organization;
-using System.Linq;
 
-namespace Core.DomainServices.Queries.UserQueries
+namespace Core.DomainServices.Queries.User
 {
-    public class QueryByRoleAssignment : IDomainQuery<User>
+    public class QueryByRoleAssignment : IDomainQuery<DomainModel.User>
     {
         private readonly OrganizationRole _role;
 
@@ -13,7 +12,7 @@ namespace Core.DomainServices.Queries.UserQueries
             _role = role;
         }
 
-        public IQueryable<User> Apply(IQueryable<User> users)
+        public IQueryable<DomainModel.User> Apply(IQueryable<DomainModel.User> users)
         {
             return users.Where(x => x.OrganizationRights.Any(x => x.Role == _role));
         }

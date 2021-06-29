@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Queries.UserQueries;
+using Core.DomainServices.Queries.User;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

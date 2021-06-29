@@ -13,7 +13,6 @@ using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Queries.UserQueries;
 
 namespace Core.ApplicationServices
 {

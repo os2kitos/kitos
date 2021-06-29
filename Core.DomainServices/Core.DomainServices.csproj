@@ -98,8 +98,8 @@
     <Compile Include="Queries\Interface\QueryByExposingSystem.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
-    <Compile Include="Queries\UserQueries\QueryByCrossOrganizationPermissions.cs" />
-    <Compile Include="Queries\UserQueries\QueryByRoleAssignment.cs" />
+    <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
+    <Compile Include="Queries\User\QueryByRoleAssignment.cs" />
     <Compile Include="Repositories\Kendo\IKendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Kendo\KendoOrganizationalConfigurationRepository.cs" />
     <Compile Include="Repositories\Notification\IUserNotificationRepository.cs" />

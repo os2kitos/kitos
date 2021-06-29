@@ -14,7 +14,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.UserQueries;
 using Infrastructure.Services.Types;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;

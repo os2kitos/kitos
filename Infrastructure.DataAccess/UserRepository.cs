@@ -4,7 +4,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.UserQueries;
+using Core.DomainServices.Queries.User;
 using Infrastructure.Services.Types;
 
 namespace Infrastructure.DataAccess

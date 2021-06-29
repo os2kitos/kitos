@@ -1,6 +1,6 @@
 ﻿using Core.DomainModel;
-using Core.DomainServices.Queries.UserQueries;
 using System.Linq;
+using Core.DomainServices.Queries.User;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
