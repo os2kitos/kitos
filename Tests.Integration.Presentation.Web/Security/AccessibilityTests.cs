@@ -26,18 +26,17 @@ namespace Tests.Integration.Presentation.Web.Security
         [Theory]
         [InlineData("api/User", HttpStatusCode.Forbidden)]
         [InlineData("api/GlobalAdmin", HttpStatusCode.Forbidden)]
-        [InlineData("odata/ItSystems", HttpStatusCode.OK)]
+        [InlineData("odata/ItSystems?$top=100", HttpStatusCode.OK)]
         public async Task Api_Get_Requests_Using_Token(string apiUrl, HttpStatusCode httpCode)
         {
             //Arrange
             var token = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token))
-            {
-                //Assert
-                Assert.Equal(httpCode, httpResponse.StatusCode);
-            }
+            using var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl(apiUrl), token.Token);
+
+            //Assert
+            Assert.Equal(httpCode, httpResponse.StatusCode);
         }
 
         [Theory]
@@ -46,10 +45,9 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("odata/ItSystems", HttpStatusCode.Unauthorized)]
         public async Task Anonymous_Api_Calls_Returns_401(string apiUrl, HttpStatusCode httpCode)
         {
-            using (var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl)))
-            {
-                Assert.Equal(httpCode, httpResponse.StatusCode);
-            }
+            using var httpResponse = await HttpApi.GetAsync(TestEnvironment.CreateUrl(apiUrl));
+
+            Assert.Equal(httpCode, httpResponse.StatusCode);
         }
 
         [Theory]
@@ -65,19 +63,18 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/itcontract", typeof(ItContract))]
         [InlineData("odata/itprojects", typeof(ItProject))]
         [InlineData("api/itproject", typeof(ItProject))]
-        public async Task Api_Is_Read_Only(string path, Type inputType)
+        public async Task Api_V1_Is_Read_Only(string path, Type inputType)
         {
             //Arrange
             var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), Activator.CreateInstance(inputType), globalAdminToken.Token))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
-                var message = await httpResponse.Content.ReadAsStringAsync();
-                Assert.Equal("Write operations are not allowed on this API", message);
-            }
+            using var httpResponse = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl(path), Activator.CreateInstance(inputType), globalAdminToken.Token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, httpResponse.StatusCode);
+            var message = await httpResponse.Content.ReadAsStringAsync();
+            Assert.Equal("Write operations are not allowed on this API", message);
         }
 
         [Fact]
@@ -96,11 +93,10 @@ namespace Tests.Integration.Presentation.Web.Security
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
 
             //Act
-            using (var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/Reference?organizationId={organizationId}"), cookie, payload))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
-            }
+            using var httpResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/Reference?organizationId={organizationId}"), cookie, payload);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Created, httpResponse.StatusCode);
         }
 
         [Fact]

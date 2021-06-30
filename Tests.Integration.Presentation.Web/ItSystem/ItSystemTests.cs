@@ -26,29 +26,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             //Act
             using var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token);
-            var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
+            
             //Assert
             Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var response = await httpResponse.ReadResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
             Assert.NotNull(response.Name);
         }
 
         [Theory]
         [InlineData(OrganizationRole.User, 1)]
         [InlineData(OrganizationRole.GlobalAdmin, 2)]
-        public async Task Api_Users_Can_Get_All_IT_Systems_Data_From_Own_Organizations(OrganizationRole role, int minimumNumberOfItSystems)
+        public async Task Can_Get_All_IT_Systems_Data_From_Own_Organizations(OrganizationRole role, int minimumNumberOfItSystems)
         {
             //Arrange
-            var token = await HttpApi.GetTokenAsync(role);
+            var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl("odata/ItSystems"), token.Token))
-            {
-                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.NotNull(response.First().Name);
-                Assert.True(minimumNumberOfItSystems <= response.Count);
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItSystems"), cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var response = await httpResponse.ReadOdataListResponseBodyAsAsync<Core.DomainModel.ItSystem.ItSystem>();
+            Assert.NotNull(response.First().Name);
+            Assert.True(minimumNumberOfItSystems <= response.Count);
         }
 
         [Theory]
@@ -61,14 +61,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?getEntitiesAccessRights=true&organizationId={TestEnvironment.DefaultOrganizationId}"), cookie))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntitiesAccessRightsDTO>();
-                Assert.Equal(canView, response.CanView);
-                Assert.Equal(canCreate, response.CanCreate);
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?getEntitiesAccessRights=true&organizationId={TestEnvironment.DefaultOrganizationId}"), cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntitiesAccessRightsDTO>();
+            Assert.Equal(canView, response.CanView);
+            Assert.Equal(canCreate, response.CanCreate);
         }
 
         [Theory]
@@ -81,15 +80,14 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(role);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id={TestEnvironment.DefaultItSystemId}&getEntityAccessRights=true"), cookie))
-            {
-                //Assert
-                var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntityAccessRightsDTO>();
-                Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
-                Assert.Equal(canView, response.CanView);
-                Assert.Equal(canEdit, response.CanEdit);
-                Assert.Equal(canDelete, response.CanDelete);
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id={TestEnvironment.DefaultItSystemId}&getEntityAccessRights=true"), cookie);
+            
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var response = await httpResponse.ReadResponseBodyAsKitosApiResponseAsync<EntityAccessRightsDTO>();
+            Assert.Equal(canView, response.CanView);
+            Assert.Equal(canEdit, response.CanEdit);
+            Assert.Equal(canDelete, response.CanDelete);
         }
 
         [Fact]
@@ -99,11 +97,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id=-1&getEntityAccessRights=true"), cookie))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.NotFound, httpResponse.StatusCode);
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/itsystem?id=-1&getEntityAccessRights=true"), cookie);
+            
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, httpResponse.StatusCode);
         }
 
         [Theory]
@@ -118,12 +115,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-                await AssertSystemDeletedAsync(system.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            await AssertSystemDeletedAsync(system.Id);
         }
 
         [Theory]
@@ -137,12 +133,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-                await AssertSystemNotDeletedAsync(system.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+            await AssertSystemNotDeletedAsync(system.Id);
         }
 
         [Theory]
@@ -158,11 +153,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
-            {
-                //Assert
-                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.InUse, result, system.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+
+            //Assert
+            await AssertCorrectConflictResponseAsync(SystemDeleteConflict.InUse, result, system.Id);
         }
 
 
@@ -180,11 +174,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login))
-            {
-                //Assert
-                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasChildren, result, mainSystem.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login);
+
+            //Assert
+            await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasChildren, result, mainSystem.Id);
         }
 
         [Theory]
@@ -206,11 +199,10 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await InterfaceExhibitHelper.CreateExhibit(system.Id, itInterface.Id);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
-            {
-                //Assert
-                await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasInterfaceExhibits, result, system.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+
+            //Assert
+            await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasInterfaceExhibits, result, system.Id);
         }
 
         [Theory]
@@ -227,12 +219,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.SendSetTaskRefOnSystemRequestAsync(system.Id, taskRefId, organizationId, login);
 
             //Act
-            using (var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.OK, result.StatusCode);
-                await AssertSystemDeletedAsync(system.Id);
-            }
+            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, result.StatusCode);
+            await AssertSystemDeletedAsync(system.Id);
         }
 
         [Theory]

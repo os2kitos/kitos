@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Xunit;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel.Organization;
+using Infrastructure.Services.Extensions;
+using Infrastructure.Services.Types;
 using Tests.Integration.Presentation.Web.Tools;
 
 namespace Tests.Integration.Presentation.Web.Constraints
@@ -37,6 +39,19 @@ namespace Tests.Integration.Presentation.Web.Constraints
             Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
+        [Theory, MemberData(nameof(GetODATAPathInputs))]
+        public async Task OData_List_Requests_Must_Contain_Top(string path)
+        {
+            //Arrange
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{path}"), token.Token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         public static IEnumerable<object[]> GetRESTApiInputs()
         {
             var resourceNames = new[]
@@ -52,10 +67,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
 
         private static IEnumerable<object[]> CreateInputs(string[] resourceNames, bool odata)
         {
-            var apiType = odata ? "odata" : "api";
-            var paths = resourceNames
-                .Select(resource => $"{apiType}/{resource}")
-                .ToList();
+            var paths = CreatePaths(resourceNames, odata);
 
             foreach (var resource in paths)
             {
@@ -66,7 +78,31 @@ namespace Tests.Integration.Presentation.Web.Constraints
             }
         }
 
+        private static IEnumerable<string> CreatePaths(IEnumerable<string> resourceNames, bool odata)
+        {
+            var apiType = odata ? "odata" : "api";
+            var paths = resourceNames
+                .Select(resource => $"{apiType}/{resource}")
+                .ToList();
+            return paths;
+        }
+
         public static IEnumerable<object[]> GetODATAInputs()
+        {
+            var resourceNames = GetODataResourceNames();
+
+            return CreateInputs(resourceNames.ToArray(), true);
+        }
+
+        public static IEnumerable<object[]> GetODATAPathInputs()
+        {
+            return
+                GetODataResourceNames()
+                    .Transform(names => CreatePaths(names, true))
+                    .Transform(paths => paths.Select(path => new object[] { path }));
+        }
+
+        private static IEnumerable<string> GetODataResourceNames()
         {
             var resourceNames = new[]
             {
@@ -75,8 +111,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
                 "itcontracts",
                 "itprojects",
             };
-
-            return CreateInputs(resourceNames, true);
+            return resourceNames;
         }
     }
 }
