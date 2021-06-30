@@ -8,7 +8,9 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 
@@ -17,6 +19,7 @@ namespace Core.ApplicationServices.Organizations
     public class OrganizationService : IOrganizationService
     {
         private readonly IGenericRepository<Organization> _orgRepository;
+        private readonly IOrganizationRepository _repository;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -33,7 +36,8 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationalUserContext userContext,
             ILogger logger,
             IOrganizationRoleService organizationRoleService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager, 
+            IOrganizationRepository repository)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -43,6 +47,7 @@ namespace Core.ApplicationServices.Organizations
             _logger = logger;
             _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
+            _repository = repository;
         }
 
         /// <summary>
@@ -180,6 +185,15 @@ namespace Core.ApplicationServices.Organizations
                 transaction.Commit();
                 return newOrg;
             }
+        }
+
+        public Result<IQueryable<Organization>, OperationError> GetAllOrganizations()
+        {
+            if(_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
         }
     }
 }

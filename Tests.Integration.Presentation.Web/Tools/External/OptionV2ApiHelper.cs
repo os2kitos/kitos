@@ -14,11 +14,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static class ResourceName
         {
             public const string BusinessType = "business-types";
-            public const string ItSystemUsageDataClassification = "it-system-usage-data-classifications";
-            public const string ItSystemUsageRelationFrequencies = "it-system-usage-relation-frequencies";
+            public const string ItSystemUsageDataClassification = "it-system-usage-data-classification-types";
+            public const string ItSystemUsageRelationFrequencies = "it-system-usage-relation-frequency-types";
             public const string ItSystemUsageArchiveTypes = "it-system-usage-archive-types";
-            public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-locations";
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-locations";
+            public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)

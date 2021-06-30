@@ -16,13 +16,14 @@ using Infrastructure.DataAccess;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.KLE
 {
     //Make sure this test is not affected by others since it is slow and will cause conflicts
-    [CollectionDefinition(nameof(KleUpdateIntegrationTests), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class KleUpdateIntegrationTests : WithAutoFixture
     {
         private static readonly ConcurrentStack<int> TestKeys =

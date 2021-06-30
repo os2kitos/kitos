@@ -10,12 +10,13 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    [CollectionDefinition(nameof(SystemRelationsTest), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class SystemRelationsTest : WithAutoFixture
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");

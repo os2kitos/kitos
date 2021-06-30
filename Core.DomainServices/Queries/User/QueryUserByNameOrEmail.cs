@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Linq;
-using Core.DomainModel;
 
-namespace Core.DomainServices.Queries
+namespace Core.DomainServices.Queries.User
 {
     /// <summary>
     /// Query to search users. To search a user the input string is split into segments by the ' ' char. Each segment must be present in either firstname, lastname or email
     /// </summary>
-    public class QueryUserByNameOrEmail : IDomainQuery<User>
+    public class QueryUserByNameOrEmail : IDomainQuery<DomainModel.User>
     {
         private readonly string _query;
 
@@ -17,14 +16,14 @@ namespace Core.DomainServices.Queries
             _query = query?.Trim() ?? throw new ArgumentNullException(nameof(query));
         }
 
-        public IQueryable<User> Apply(IQueryable<User> source)
+        public IQueryable<DomainModel.User> Apply(IQueryable<DomainModel.User> source)
         {
             return _query
                 .Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
                 .Aggregate(source, Match);
         }
 
-        private static IQueryable<User> Match(IQueryable<User> original, string segment)
+        private static IQueryable<DomainModel.User> Match(IQueryable<DomainModel.User> original, string segment)
         {
             return original.Where(x => x.Name.Contains(segment) || x.LastName.Contains(segment) || x.Email.Contains(segment));
         }
