@@ -1,52 +1,43 @@
-﻿using Core.ApplicationServices.OptionTypes;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Http;
+using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Presentation;
-using Presentation.Web;
-using Presentation.Web.Controllers;
-using Presentation.Web.Controllers.External;
-using Presentation.Web.Controllers.External.V2;
-using Presentation.Web.Controllers.External.V2.ItSystemUsages;
-using Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelations;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Http;
 
-namespace Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelations
+namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-relation-frequencies")]
-    public class SystemRelationFrequencyTypeV2Controller : BaseOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
+    public class ItSystemUsageRelationFrequenciesController : BaseOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
     {
-        public SystemRelationFrequencyTypeV2Controller(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
+        public ItSystemUsageRelationFrequenciesController(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
             : base(optionService)
         {
         }
 
         /// <summary>
-        /// Returns SystemRelation relation frequency option types
+        /// Returns IT-System usage relation frequency option types
         /// </summary>
         /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
-        /// <returns>A list of available SystemRelation relation frequency option types</returns>
+        /// <returns>A list of available IT-System usage relation frequency option types</returns>
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetSystemRelationFrequencies(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetSystemUsageRelationFrequencies(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
 
         /// <summary>
-        /// Returns requested SystemRelation relation frequency option type
+        /// Returns requested IT-System usage relation frequency option type
         /// </summary>
         /// <param name="relationFrequencyTypeUuid">relation frequency type identifier</param>
         /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
@@ -58,7 +49,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelation
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetSystemRelationFrequency(Guid relationFrequencyTypeUuid, Guid organizationUuid)
+        public IHttpActionResult GetSystemUsageRelationFrequency(Guid relationFrequencyTypeUuid, Guid organizationUuid)
         {
             return GetSingle(relationFrequencyTypeUuid, organizationUuid);
         }

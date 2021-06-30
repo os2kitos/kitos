@@ -135,6 +135,14 @@ namespace Core.DomainModel
                 .Distinct();
         }
 
+        public IEnumerable<int> GetOrganizationIdsWhereRoleIsAssigned(OrganizationRole role)
+        {
+            return OrganizationRights.
+                Where(x => x.Role == role)
+                .Select(x => x.OrganizationId)
+                .Distinct();
+        }
+
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }

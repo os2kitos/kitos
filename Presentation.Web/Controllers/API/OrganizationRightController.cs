@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using Core.DomainServices;
 using Presentation.Web.Models;
 using System.Web.Http;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API

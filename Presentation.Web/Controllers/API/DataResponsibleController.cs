@@ -5,8 +5,8 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.DomainModel;
 using Core.DomainModel.Constants;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
@@ -30,6 +30,19 @@ namespace Presentation.Web.Controllers.API
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<DataResponsible, Organization>(x => _orgRepository.GetByKey(x.OrganizationId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
+        }
+
+        protected override IQueryable<DataResponsible> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => x.Organization != null && organizationIds.Contains(x.Organization.Id));
         }
 
         // GET DataProtectionAdvisor by OrganizationId

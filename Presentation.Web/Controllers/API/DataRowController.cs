@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Http;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
@@ -23,6 +23,12 @@ namespace Presentation.Web.Controllers.API
             : base(repository)
         {
             _interfaceRepository = interfaceRepository;
+        }
+
+        [NonAction]
+        public override HttpResponseMessage GetAll(PagingModel<DataRow> paging)
+        {
+            throw new NotSupportedException();
         }
 
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<DataRowDTO>>))]

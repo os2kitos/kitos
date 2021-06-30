@@ -14,12 +14,13 @@ using Core.DomainModel.Shared;
 using Presentation.Web.Models;
 using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.SystemUsage
 {
-    [CollectionDefinition(nameof(ItSystemUsageOverviewReadModelsTest), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
         [Fact]
