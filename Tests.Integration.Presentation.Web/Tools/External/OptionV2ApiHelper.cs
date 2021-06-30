@@ -15,6 +15,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             public const string BusinessType = "business-types";
             public const string ItSystemUsageDataClassification = "it-system-usage-data-classifications";
+            public const string ItSystemUsageRelationFrequencies = "it-system-usage-relation-frequencies";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
@@ -27,10 +28,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
 
-        public static async Task<AvailableNamePairResponseDTO> GetOptionAsync(string resource, Guid businessTypeUuid, Guid organizationUuid)
+        public static async Task<AvailableNamePairResponseDTO> GetOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{businessTypeUuid}?organizationUuid={organizationUuid}");
+            var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{optionTypeUuid}?organizationUuid={organizationUuid}");
             
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);

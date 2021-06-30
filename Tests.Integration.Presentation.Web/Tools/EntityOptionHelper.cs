@@ -13,6 +13,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             public const string BusinessType = "BusinessTypes";
             public const string ItSystemCategories = "ItSystemCategories";
+            public const string FrequencyTypes = "FrequencyTypes";
         }
 
         public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null)
