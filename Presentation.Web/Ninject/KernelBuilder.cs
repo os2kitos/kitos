@@ -93,6 +93,7 @@ using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.ApplicationServices.Rights;
 
 namespace Presentation.Web.Ninject
 {
@@ -230,6 +231,7 @@ namespace Presentation.Web.Ninject
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
+            kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
