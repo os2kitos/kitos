@@ -1,7 +1,9 @@
-﻿using Core.DomainModel;
+﻿using System.Linq;
 using Core.DomainModel.Constants;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -25,6 +27,19 @@ namespace Presentation.Web.Controllers.API
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<Assignment, ItProject>(x => _projectRepository.GetById(x.AssociatedItProjectId.GetValueOrDefault(EntityConstants.InvalidId)), base.GetCrudAuthorization());
+        }
+
+        protected override IQueryable<Assignment> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => x.AssociatedItProject != null && organizationIds.Contains(x.AssociatedItProject.OrganizationId));
         }
     }
 }

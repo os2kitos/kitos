@@ -49,13 +49,18 @@ namespace Presentation.Web.Controllers.OData
                 Maybe<QueryAllByRestrictionCapabilities<T>>.None :
                 Maybe<QueryAllByRestrictionCapabilities<T>>.Some(new QueryAllByRestrictionCapabilities<T>(crossOrganizationReadAccess, organizationIds));
 
-            var mainQuery = Repository.AsQueryable();
+            var mainQuery = GetAllQuery();
 
             var result = refinement
                 .Select(x => x.Apply(mainQuery))
                 .GetValueOrFallback(mainQuery);
 
             return Ok(result);
+        }
+
+        protected virtual IQueryable<T> GetAllQuery()
+        {
+            return Repository.AsQueryable();
         }
 
         [EnableQuery(MaxExpansionDepth = 4)]

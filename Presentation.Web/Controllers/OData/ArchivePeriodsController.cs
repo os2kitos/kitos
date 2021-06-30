@@ -24,6 +24,18 @@ namespace Presentation.Web.Controllers.OData
             _itSystemUsageService = itSystemUsageService;
         }
 
+        protected override IQueryable<ArchivePeriod> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => organizationIds.Contains(x.ItSystemUsage.OrganizationId));
+        }
+
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<ArchivePeriod, ItSystemUsage>(ap => _itSystemUsageService.GetById(ap.ItSystemUsageId), base.GetCrudAuthorization());
@@ -32,7 +44,7 @@ namespace Presentation.Web.Controllers.OData
         protected override void RaiseCreatedDomainEvent(ArchivePeriod entity)
         {
             var itSystemUsage = _itSystemUsageService.GetById(entity.ItSystemUsageId);
-            if(itSystemUsage != null)
+            if (itSystemUsage != null)
             {
                 DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
             }

@@ -7,6 +7,7 @@ using System.Net;
 using System.Net.Http;
 using Core.DomainModel;
 using Core.DomainModel.Constants;
+using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.Swagger.Annotations;
@@ -26,6 +27,18 @@ namespace Presentation.Web.Controllers.API
         {
             _repository = repository;
             _orgRepository = orgRepository;
+        }
+
+        protected override IQueryable<DataProtectionAdvisor> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => x.Organization != null && organizationIds.Contains(x.Organization.Id));
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
