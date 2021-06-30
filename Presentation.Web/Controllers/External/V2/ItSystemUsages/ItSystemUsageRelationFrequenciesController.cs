@@ -13,9 +13,9 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-relation-frequencies")]
-    public class ItSystemUsageRelationFrequencies : BaseOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
+    public class ItSystemUsageRelationFrequenciesController : BaseOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
     {
-        public ItSystemUsageRelationFrequencies(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
+        public ItSystemUsageRelationFrequenciesController(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
             : base(optionService)
         {
         }
