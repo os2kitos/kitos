@@ -82,7 +82,7 @@
         PurchaseFormTypes,
         RegisterTypes,
         ReportCategoryTypes,
-        SensistivePersonalDataTypes,
+        SensitivePersonalDataTypes,
         SensitiveDataTypes,
         TerminationDeadlineTypes,
         DataProcessingRegistrationRoles,
@@ -172,8 +172,8 @@
                     return "LocalRegisterTypes";
                 case LocalOptionType.ReportCategoryTypes:
                     return "LocalReportCategoryTypes";
-                case LocalOptionType.SensistivePersonalDataTypes:
-                    return "LocalSensistivePersonalDataTypes";
+                case LocalOptionType.SensitivePersonalDataTypes:
+                    return "LocalSensitivePersonalDataTypes";
                 case LocalOptionType.SensitiveDataTypes:
                     return "LocalSensitiveDataTypes";
                 case LocalOptionType.TerminationDeadlineTypes:
