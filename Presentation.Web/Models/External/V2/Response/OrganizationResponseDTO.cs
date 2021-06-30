@@ -2,16 +2,10 @@
 
 namespace Presentation.Web.Models.External.V2.Response
 {
-    public class OrganizationResponseDTO: IdentityNamePairResponseDTO
+    public class OrganizationResponseDTO: ShallowOrganizationResponseDTO
     {
-        /// <summary>
-        /// Organizational CVR identifier, if any
-        /// </summary>
-        public string Cvr { get; }
-
-        public OrganizationResponseDTO(Guid uuid, string name, string cvr) : base(uuid, name)
+        public OrganizationResponseDTO(Guid uuid, string name, string cvr) : base(uuid, name, cvr)
         {
-            Cvr = cvr;
         }
     }
 }

@@ -354,6 +354,7 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Models\External\V2\Response\ShallowOrganizationResponseDTO.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />

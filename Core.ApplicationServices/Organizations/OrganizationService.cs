@@ -10,8 +10,11 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.Organizations
@@ -36,7 +39,7 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationalUserContext userContext,
             ILogger logger,
             IOrganizationRoleService organizationRoleService,
-            ITransactionManager transactionManager, 
+            ITransactionManager transactionManager,
             IOrganizationRepository repository)
         {
             _orgRepository = orgRepository;
@@ -48,18 +51,6 @@ namespace Core.ApplicationServices.Organizations
             _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
             _repository = repository;
-        }
-
-        /// <summary>
-        /// lists the organizations the user is a member of
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns>a list of organizations that the user is a member of</returns>
-        public IEnumerable<Organization> GetOrganizations(User user)
-        {
-            if (user.IsGlobalAdmin) return _orgRepository.Get();
-            return _orgRepository
-                .Get(o => o.Rights.Any(r => r.OrganizationId == o.Id && r.UserId == user.Id));
         }
 
         //returns the default org unit for that user inside that organization
@@ -187,13 +178,47 @@ namespace Core.ApplicationServices.Organizations
             }
         }
 
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid)
+        {
+            return _repository.GetByUuid(organizationUuid).Match<Result<Organization, OperationError>>(organization =>
+                {
+                    if (!_authorizationContext.AllowReads(organization))
+                    {
+                        return new OperationError(OperationFailure.Forbidden);
+                    }
+
+                    return organization;
+                },
+                () => new OperationError(OperationFailure.NotFound)
+            );
+        }
+
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations()
         {
-            if(_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            if (_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
             {
                 return new OperationError(OperationFailure.Forbidden);
             }
             return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
+        }
+
+        public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions)
+        {
+            var crossOrganizationReadAccess = _authorizationContext.GetCrossOrganizationReadAccess();
+
+            var domainQueries = conditions.ToList();
+            if (crossOrganizationReadAccess < CrossOrganizationDataReadAccessLevel.All)
+            {
+                //Restrict organization access
+                domainQueries =
+                    new QueryOrganizationByIdsOrSharedAccess(_userContext.OrganizationIds, crossOrganizationReadAccess == CrossOrganizationDataReadAccessLevel.Public)
+                        .WrapAsEnumerable()
+                        .Concat(domainQueries)
+                        .ToList();
+            }
+
+            var query = new IntersectionQuery<Organization>(domainQueries);
+            return _repository.GetAll().Transform(query.Apply);
         }
     }
 }

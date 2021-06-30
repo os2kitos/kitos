@@ -17,6 +17,7 @@ using System.Web.Helpers;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Result;
+using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
@@ -61,10 +62,20 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
         public HttpResponseMessage GetOrganizations()
         {
-            var user = _userRepository.GetById(UserId);
-            var orgs = _organizationService.GetOrganizations(user);
-            var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs);
+            var orgs = GetOrganizationsWithMembershipAccess();
+
+            var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());
             return Ok(dtos);
+        }
+
+        private IQueryable<Organization> GetOrganizationsWithMembershipAccess()
+        {
+            var orgs = _organizationService.SearchAccessibleOrganizations();
+
+            //Global admin should se everything but regular users should only see organizations which they are a member of
+            if (!UserContext.IsGlobalAdmin())
+                orgs = orgs.ByIds(UserContext.OrganizationIds.ToList());
+            return orgs;
         }
 
         [Route("api/authorize/GetOrganization({orgId})")]
@@ -72,7 +83,7 @@ namespace Presentation.Web.Controllers.API
         public HttpResponseMessage GetOrganization(int orgId)
         {
             var user = _userRepository.GetById(UserId);
-            var org = _organizationService.GetOrganizations(user).SingleOrDefault(o => o.Id == orgId);
+            var org = GetOrganizationsWithMembershipAccess().SingleOrDefault(o => o.Id == orgId);
             if (org == null)
             {
                 return BadRequest("User is not associated with organization");
