@@ -20,10 +20,10 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns It-System sensitive personal data types 
+        /// Returns It-System usage sensitive personal data types 
         /// </summary>
         /// <param name="organizationUuid">organization context for the sensitive personal data types availability</param>
-        /// <returns>A list of available It-System sensitive personal data types</returns>
+        /// <returns>A list of available It-System usage sensitive personal data types</returns>
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
@@ -36,7 +36,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns requested It-System sensitive personal data type
+        /// Returns requested It-System usage sensitive personal data type
         /// </summary>
         /// <param name="sensitivePersonalDataTypeUuid">sensitive personal data type identifier</param>
         /// <param name="organizationUuid">organization context for the sensitive personal data type availability</param>
