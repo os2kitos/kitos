@@ -337,6 +337,8 @@ namespace Presentation.Web.Ninject
             //IT-System
             RegisterOptionsService<ItSystem, BusinessType, LocalBusinessType>(kernel);
 
+            RegisterOptionsService<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>(kernel);
+
             //IT-System usages
             RegisterOptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>(kernel);
 

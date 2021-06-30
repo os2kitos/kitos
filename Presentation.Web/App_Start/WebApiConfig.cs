@@ -242,7 +242,7 @@ namespace Presentation.Web
 
             BindEntitySet<RegisterType, RegisterTypesController>(builder);
 
-            var sensitivePersonalDataTypes = BindEntitySet<SensitivePersonalDataType, SensistivePersonalDataTypesController>(builder);
+            var sensitivePersonalDataTypes = BindEntitySet<SensitivePersonalDataType, SensitivePersonalDataTypesController>(builder);
             sensitivePersonalDataTypes.HasManyBinding(b => b.References, entitySetItSystems);
 
             BindEntitySet<OptionExtendType, OptionExtendTypesController>(builder);
@@ -354,7 +354,7 @@ namespace Presentation.Web
 
             var getSensitivePersonalDataByUsageId = builder.Function("GetSensitivePersonalDataByUsageId");
             getSensitivePersonalDataByUsageId.Parameter<int>("id");
-            getSensitivePersonalDataByUsageId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
+            getSensitivePersonalDataByUsageId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensitivePersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
             getSensitivePersonalDataByUsageId.Namespace = "gdpr";
 
@@ -366,8 +366,8 @@ namespace Presentation.Web
             var localSensitiveDataType = BindEntitySet<LocalSensitiveDataType, LocalSensitiveDataTypesController>(builder);
             localSensitiveDataType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localSensistivePersonalDataTypes = BindEntitySet<LocalSensitivePersonalDataType, LocalSensistivePersonalDataTypesController>(builder);
-            localSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+            var localSensitivePersonalDataTypes = BindEntitySet<LocalSensitivePersonalDataType, LocalSensitivePersonalDataTypesController>(builder);
+            localSensitivePersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localRegisterTypes = BindEntitySet<LocalRegisterType, LocalRegisterTypesController>(builder);
             localRegisterTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);

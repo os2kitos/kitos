@@ -8,10 +8,10 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.OData.LocalOptionControllers
 {
     [InternalApi]
-    [ODataRoutePrefix("LocalSensistivePersonalDataTypes")]
-    public class LocalSensistivePersonalDataTypesController : LocalOptionBaseController<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>
+    [ODataRoutePrefix("LocalSensitivePersonalDataTypes")]
+    public class LocalSensitivePersonalDataTypesController : LocalOptionBaseController<LocalSensitivePersonalDataType, ItSystem, SensitivePersonalDataType>
     {
-        public LocalSensistivePersonalDataTypesController(IGenericRepository<LocalSensitivePersonalDataType> repository, IGenericRepository<SensitivePersonalDataType> optionsRepository)
+        public LocalSensitivePersonalDataTypesController(IGenericRepository<LocalSensitivePersonalDataType> repository, IGenericRepository<SensitivePersonalDataType> optionsRepository)
             : base(repository, optionsRepository)
         {
         }

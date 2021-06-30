@@ -346,6 +346,7 @@
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
     <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveTestLocationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveLocationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveTypeV2Controller.cs" />
@@ -717,7 +718,7 @@
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalPurchaseFormTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalRegisterTypesController.cs" />
-    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalSensitiveDataTypesController.cs" />
     <Compile Include="Controllers\OData\LocalOptionControllers\LocalTerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\AgreementElementTypesController.cs" />
@@ -747,7 +748,7 @@
     <Compile Include="Controllers\OData\OptionControllers\RegisterTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoriesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\ReportCategoryTypesController.cs" />
-    <Compile Include="Controllers\OData\OptionControllers\SensistivePersonalDataTypesController.cs" />
+    <Compile Include="Controllers\OData\OptionControllers\SensitivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\OData\OrganizationsController.cs" />
