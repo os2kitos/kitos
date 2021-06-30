@@ -12,19 +12,19 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
-    [RoutePrefix("api/v2/it-system-usage-archive-location-types")]
-    public class ItSystemUsageArchiveLocationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
+    [RoutePrefix("api/v2/it-system-usage-registered-data-category-types")]
+    public class ItSystemUsageRegisteredDataCategoryTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, RegisterType>
     {
-        public ItSystemUsageArchiveLocationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
+        public ItSystemUsageRegisteredDataCategoryTypeV2Controller(IOptionsApplicationService<ItSystemUsage, RegisterType> optionService)
             : base(optionService)
         {
         }
 
         /// <summary>
-        /// Returns It-System Usage archive location options 
+        /// Returns It-System Usage registered data category types 
         /// </summary>
-        /// <param name="organizationUuid">organization context for the archive locations availability</param>
-        /// <returns>A list of available It-System Usage archive locations</returns>
+        /// <param name="organizationUuid">organization context for the type availability</param>
+        /// <returns>A list of available It-System Usage register types</returns>
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
@@ -37,21 +37,21 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns requested It-System Usage archive location
+        /// Returns requested It-System Usage registered data category type
         /// </summary>
-        /// <param name="archiveLocationUuid">archive location identifier</param>
-        /// <param name="organizationUuid">organization context for the archive location availability</param>
-        /// <returns>A uuid and name pair with boolean to mark if the archive location is available in the organization</returns>
+        /// <param name="registerTypeUuid">register type identifier</param>
+        /// <param name="organizationUuid">organization context for the register type availability</param>
+        /// <returns>A uuid and name pair with boolean to mark if the register type is available in the organization</returns>
         [HttpGet]
-        [Route("{archiveLocationUuid}")]
+        [Route("{registerTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get(Guid archiveLocationUuid, Guid organizationUuid)
+        public IHttpActionResult Get(Guid registerTypeUuid, Guid organizationUuid)
         {
-            return GetSingle(archiveLocationUuid, organizationUuid);
+            return GetSingle(registerTypeUuid, organizationUuid);
         }
     }
 }
