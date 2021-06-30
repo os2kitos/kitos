@@ -637,7 +637,7 @@ namespace Infrastructure.DataAccess.Migrations
                 #endregion
 
                 #region ORGANIZATIONS
-                Console.Out.WriteLine("Initializing organizatopms");
+                Console.Out.WriteLine("Initializing organizations");
 
                 var muniType = new OrganizationType { Name = "Kommune", Category = OrganizationCategory.Municipality };
                 var interestType = new OrganizationType { Name = "Interessefællesskab", Category = OrganizationCategory.Municipality };
@@ -666,19 +666,7 @@ namespace Infrastructure.DataAccess.Migrations
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"<h3>Om KITOS?</h3> <p>KITOS - Kommunernes IT OverbliksSystem er et IT System, som er udviklet i de 3 første kvartaler i 2014 af Roskilde, Sorø, Ringsted, Syddjurs og Ballerup kommune.
-Et væsentligt formål med projektet er at skabe et ensartet grundlag for hvordan vi som kommuner kan øge vores modenhed og evne til fremadrettet at 1) skabe overblik over 2) dokumentere og 3) analysere på vores samlede IT portefølje m.v. I forlængelse heraf er det en løsning, som skal hjælpe os med at understøtte det vidensbehov, som vi mener at monopolbruddet kræver – herunder kvalificere vores evne til at udnytte rammearkitekturen.
-KITOS er bygget op omkring flg. moduler:
-<ol>
-    <li>IT understøttelse af organisation</li>
-    <li>IT Projekter</li>
-    <li>IT Systemer</li>
-    <li>IT Kontrakter</li>
-</ol>
- Løsningen er ’overdraget’ til det digitale fællesskab OS2, som vil sørge for forvaltning af KITOS med hensyn til hosting, vedligeholdelse, videreudvikling, administration etc, så den også i praksis vil være mulig for andre kommuner at bruge.
-De første kommuner tager KITOS i brug i oktober 2014.
-Du kan læse mere om OS2KITOS på os2web.dk > Projekter > KITOS
-Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her for at læse mere</a></p>",
+                        Value = @"Forside - blok 1",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
@@ -686,25 +674,14 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 if (!context.Texts.Any(x => x.Id == 2))
                 {
-                    context.Texts.AddOrUpdate(new Text() { Value = "<h3>Driftstatus</h3> Der er p.t ingen driftsforstyrrelser", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                    context.Texts.AddOrUpdate(new Text() { Value = "Forside - blok 2", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
                 }
 
                 if (!context.Texts.Any(x => x.Id == 3))
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"<h3>Hjælp og vejledning til KITOS</h3> <ul class='list-unstyled'>
-                        <li><a href='/docs/Vejledning til slutbrugeren.pdf' target='_blank'>Vejledning til login og brugerkonto</a></li>
-                        <li><a href='/docs/Vejledning_Masseopret.pdf' target='_blank'>Vejledning til lokale administratorer</a></li>
-                        <li><a href='/docs/Vejledning til roller og rettigheder.pdf' target='_blank'>Vejledning til roller og rettigheder</a></li>
-                        <li><a href='/docs/Vejledning til tabeller på overblik.pdf' target='_blank'>Vejledning til tabeller på overblik</a></li>
-                        <li><a href='/docs/vejledningerOrganisation.pdf' target='_blank'>Vejledning til modulet Organisation</a></li>
-                        <li><a href='/docs/vejledningerITProjekter.pdf' target='_blank'>Vejledning til modulet IT Projekter</a></li>
-                        <li><a href='/docs/vejledningerITSystemer.pdf' target='_blank'>Vejledning til modulet IT Systemer</a></li>
-                        <li><a href='/docs/vejledningerITKontrakter.pdf' target='_blank'>Vejledning til modulet IT Kontrakter</a></li>
-                        <li><a href='/docs/html/index.html' target='_blank'>Kitos kode dokumentation</a></li>
-                        <li><a href='/Content/excel/Kontrakt_Indgåelse_Skabelon.xlsx' target='_blank'>Kontrakt-skabelon</a></li>
-                    </ul>",
+                        Value = @"Forside - blok 3",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
@@ -712,27 +689,14 @@ Kontakt: info@kitos.dk</p><p><a href='https://os2.eu/produkt/os2kitos'>Klik her 
 
                 if (!context.Texts.Any(x => x.Id == 4))
                 {
-                    context.Texts.AddOrUpdate(new Text() { Value = "<h3>Support</h3> <p>Hvis du oplever problemer med KITOS skal du kontakte din lokale adm.</p> <p><a href='https://kitostest.miracle.dk/docs/LokaladministratoreroversigtKitos.pdf'>Klik her for kontaktinfo på din lokale administrator</p>", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
+                    context.Texts.AddOrUpdate(new Text() { Value = "Forside - blok 4", ObjectOwnerId = globalAdmin.Id, LastChangedByUserId = globalAdmin.Id });
                 }
 
                 if (!context.Texts.Any(x => x.Id == 5))
                 {
                     context.Texts.AddOrUpdate(new Text()
                     {
-                        Value = @"<h3>Hvordan kommer I med på løsningen?</h3> <p>Gør følgende for at tilslutte jer KITOS:</p>
-                    <ol>
-                        <li>Læs tilslutningsaftalen <a href='http://os2.eu/dokument/kitos-tilslutningsaftale-publiceret'>her</a>.</li>
-                        <li>
-                            Udfyld og underskriv tilslutningsaftalen og send den til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at tilmelde jer KITOS. Skriv gerne hvornår
-                            I ønsker, at tilslutningen skal træde i kraft.
-                        </li>
-                        <li>Herefter kontakter vi jer, så vi kan få en snak om, hvad der skal ske fremover, og hvordan I bedst muligt tager KITOS i brug i jeres kommune.</li>
-                    </ol>
-                    <p>Ønsker I mere information om tilslutningsprocessen og KITOS generelt:</p>
-                    <ol>
-                        <li>Læs mere om KITOS <a href='http://os2.eu/produkt/os2kitos'>her</a>.</li>
-                        <li>Skriv til <a href='mailto:info@kitos.dk'>info@kitos.dk</a> for at få besvaret eventuelle spørgsmål. Oplys et telefonnr., hvis I ønsker at blive ringet op.</li>
-                    </ol>",
+                        Value = @"Forside - blok 5",
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
