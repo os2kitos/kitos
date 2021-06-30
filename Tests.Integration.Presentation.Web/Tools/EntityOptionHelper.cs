@@ -17,8 +17,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string ArchiveTypes = "ArchiveTypes";
             public const string ArchiveLocations = "ArchiveLocations";
             public const string ArchiveTestLocations = "ArchiveTestLocations";
-            public const string SensitivePersonalDataTypes = "SensistivePersonalDataTypes"; //TODO: Should probably rename the controller so it does not contain spelling mistake
             public const string RegisterTypes = "RegisterTypes";
+            public const string SensitivePersonalDataTypes = "SensitivePersonalDataTypes";
         }
 
         public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null)

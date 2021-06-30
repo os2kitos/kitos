@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Options.V2
 {
-    [CollectionDefinition(nameof(OptionV2ApiTests), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class OptionV2ApiTests : WithAutoFixture
     {
         [Theory, MemberData(nameof(GetV2ResourceNames))]

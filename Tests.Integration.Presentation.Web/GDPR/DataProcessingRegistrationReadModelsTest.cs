@@ -12,11 +12,12 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using System.Threading;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Xunit.Abstractions;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {
-    [CollectionDefinition(nameof(DataProcessingRegistrationReadModelsTest), DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class DataProcessingRegistrationReadModelsTest : WithAutoFixture
     {
         private readonly ITestOutputHelper _testOutputHelper;

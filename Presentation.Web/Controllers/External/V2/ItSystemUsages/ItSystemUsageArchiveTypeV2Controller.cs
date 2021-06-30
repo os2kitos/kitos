@@ -1,25 +1,16 @@
-﻿using Core.ApplicationServices.OptionTypes;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Web.Http;
+using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Presentation;
-using Presentation.Web;
-using Presentation.Web.Controllers;
-using Presentation.Web.Controllers.External;
-using Presentation.Web.Controllers.External.V2;
-using Presentation.Web.Controllers.External.V2.ItSystemUsages;
-using Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelations;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Web;
-using System.Web.Http;
 
-namespace Presentation.Web.Controllers.External.V2.ItSystemUsages.SystemRelations
+namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-types")]
     public class ItSystemUsageArchiveTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ArchiveType>

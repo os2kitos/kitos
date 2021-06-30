@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -22,18 +21,18 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interFacePrefixName = CreateInterFacePrefixName();
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
             var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                //Assert
-                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
-                Assert.NotNull(response);
-                var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
-                Assert.Equal(interfacesCreated.Length, filteredResult.Count);
-                Assert.True(interfacesCreated.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(url, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK,httpResponse.StatusCode);
+            var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
+            Assert.NotNull(response);
+            var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
+            Assert.Equal(interfacesCreated.Length, filteredResult.Count);
+            Assert.True(interfacesCreated.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
         }
 
         [Theory]
@@ -45,7 +44,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
         {
             //Arrange
             var interFacePrefixName = CreateInterFacePrefixName();
-            var token = await HttpApi.GetTokenAsync(role);
+            var cookie = await HttpApi.GetCookieAsync(role);
             var interfacesCreated = await GenerateTestInterfaces(interFacePrefixName);
             var expectedResults = interfacesCreated.Where(x =>
                 x.OrganizationId == TestEnvironment.DefaultOrganizationId && orgId == x.OrganizationId || //If queried org is same as user org and interface org it is returned even if private
@@ -56,15 +55,15 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var url = TestEnvironment.CreateUrl($"/odata/Organizations({orgId})/ItInterfaces");
 
             //Act
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(url, token.Token))
-            {
-                //Assert
-                var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
-                Assert.NotNull(response);
-                var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
-                Assert.Equal(expectedResults.Count, filteredResult.Count);
-                Assert.True(expectedResults.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
-            }
+            using var httpResponse = await HttpApi.GetWithCookieAsync(url, cookie);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
+            var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
+            Assert.NotNull(response);
+            var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
+            Assert.Equal(expectedResults.Count, filteredResult.Count);
+            Assert.True(expectedResults.Select(x => x.InterfaceId).SequenceEqual(filteredResult.Select(x => x.InterfaceId)));
         }
 
         [Theory]
@@ -93,11 +92,10 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
 
             //Act - perform the action with the actual role
-            using (var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.OrganizationId, interfaceDto.Id, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
+            using var result = await InterfaceHelper.SendCreateDataRowRequestAsync(interfaceDto.OrganizationId, interfaceDto.Id, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         [Fact]
@@ -147,27 +145,15 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act - perform the action with the actual role
-            using (var result = await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
+            using var result = await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, interfaceDto.Id, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         private string CreateInterFacePrefixName()
         {
             return $"{nameof(ItInterfacesTest)}-{A<Guid>():N}";
-        }
-
-        private static async Task<Task<List<ItInterface>>> GetInterfacesByName(string name)
-        {
-            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var arrangeUrl = TestEnvironment.CreateUrl($"/odata/ItInterfaces?$filter=contains(Name,'{name}')");
-            using (var httpResponse = await HttpApi.GetWithTokenAsync(arrangeUrl, token.Token))
-            {
-                var response = httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
-                return response;
-            }
         }
 
         private async Task<ItInterfaceDTO[]> GenerateTestInterfaces(string name)

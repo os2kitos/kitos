@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
@@ -41,6 +42,19 @@ namespace Presentation.Web.Controllers.API
             var items = Repository.Get(x => x.ItProjectId == id);
 
             return Ok(Map(items));
+        }
+
+        protected override IQueryable<Communication> GetAllQuery()
+        {
+            var query = Repository.AsQueryable();
+            if (AuthorizationContext.GetCrossOrganizationReadAccess() == CrossOrganizationDataReadAccessLevel.All)
+            {
+                return query;
+            }
+
+            var organizationIds = UserContext.OrganizationIds.ToList();
+
+            return query.Where(x => organizationIds.Contains(x.ItProject.OrganizationId));
         }
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
