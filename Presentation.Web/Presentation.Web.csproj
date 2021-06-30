@@ -350,7 +350,9 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
-    <Compile Include="Controllers\External\V2\ItSystemUsages\SystemRelations\SystemRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
+    <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\DenyRightsHoldersAccessAttribute.cs" />

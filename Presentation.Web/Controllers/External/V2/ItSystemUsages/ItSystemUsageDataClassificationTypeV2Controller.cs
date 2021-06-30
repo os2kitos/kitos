@@ -12,7 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
-    [RoutePrefix("api/v2/it-system-usage-data-classifications")]
+    [RoutePrefix("api/v2/it-system-usage-data-classification-types")]
     public class ItSystemUsageDataClassificationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ItSystemCategories>
     {
         public ItSystemUsageDataClassificationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> optionService) 

@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API
         {
             try
             {
-                var itInterfaceId = dto.ItInterfaceId ?? string.Empty; // We understand null as the empty string. TODO: Don't accept null. Require frontend to handle null => string.Empty case.
+                var itInterfaceId = dto.ItInterfaceId ?? string.Empty;
                 var result = _itInterfaceService.CreateNewItInterface(dto.OrganizationId, dto.Name, itInterfaceId, null, dto.AccessModifier);
                 return result.Ok ?
                     Created(Map(result.Value), new Uri(Request.RequestUri + "/" + result.Value.Id)) :
