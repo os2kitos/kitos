@@ -13,7 +13,9 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Moq;
+using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -203,7 +205,7 @@ namespace Tests.Unit.Presentation.Web.Services
             }
             else
             {
-                Assert.Equal(originalUuid,result.Value.Uuid);
+                Assert.Equal(originalUuid, result.Value.Uuid);
             }
         }
 
@@ -274,7 +276,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedOrg1 = new Organization() { Id = A<int>() };
             var expectedOrg2 = new Organization() { Id = A<int>() };
             var expectedOrg3 = new Organization() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>(){ expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
@@ -306,9 +308,80 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
+        [Fact]
+        public void SearchAccessibleOrganizations_DoesNotFilterByOrgMembership_If_Cross_Access_Is_All()
+        {
+            //Arrange
+            var searchAccessibleOrganizations = _sut.SearchAccessibleOrganizations();
+
+            //Act
+            //TODO
+            //Assert
+
+        }
+
+        [Fact]
+        public void GetOrganization_Returns_Success()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var expectedOrg = new Organization();
+            ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
+            ExpectAllowReadOrganizationReturns(expectedOrg, true);
+
+            //Act
+            var result = _sut.GetOrganization(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(expectedOrg, result.Value);
+        }
+
+        [Fact]
+        public void GetOrganization_Returns_Forbidden()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var expectedOrg = new Organization();
+            ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
+            ExpectAllowReadOrganizationReturns(expectedOrg, false);
+
+            //Act
+            var result = _sut.GetOrganization(uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetOrganization_Returns_NotFound()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            ExpectGetOrganizationByUuidReturns(uuid, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.GetOrganization(uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        private void ExpectAllowReadOrganizationReturns(Organization expectedOrg, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowReads(expectedOrg)).Returns(value);
+        }
+
+        private void ExpectGetOrganizationByUuidReturns(Guid uuid, Maybe<Organization> expectedOrg)
+        {
+            _repositoryMock.Setup(x => x.GetByUuid(uuid)).Returns(expectedOrg);
+        }
+
         private OrganizationRight CreateRight(int organizationId, int userId)
         {
-            return new OrganizationRight { Id = A<int>(), OrganizationId = organizationId, UserId = userId };
+            return new() { Id = A<int>(), OrganizationId = organizationId, UserId = userId };
         }
 
         private void ExpectAllowModifyReturns(IEntity organization, bool value)
