@@ -91,6 +91,20 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
+        [Fact]
+        public async Task GET_Organization_Returns_BadRequest_For_Empty_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var orgType = A<OrganizationTypeKeys>();
+
+            //Act
+            using var response = await OrganizationV2Helper.SendGetOrganizationAsync(regularUserToken.Token, Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
         private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =
             new ReadOnlyDictionary<OrganizationTypeKeys, OrganizationType>(new Dictionary<OrganizationTypeKeys, OrganizationType>()
             {
