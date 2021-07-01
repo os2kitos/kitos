@@ -7,11 +7,14 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -28,6 +31,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IDomainEvents> _domainEvents;
+        private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public ItProjectServiceTest()
         {
@@ -38,6 +42,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _referenceService = new Mock<IReferenceService>();
             _domainEvents = new Mock<IDomainEvents>();
+            _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
@@ -45,7 +50,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 _userRepository.Object,
                 _referenceService.Object,
                 _transactionManager.Object,
-                _domainEvents.Object);
+                _domainEvents.Object,
+                _userContextMock.Object);
         }
 
         [Fact]
@@ -336,6 +342,99 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             Assert.False(itProject.Handover.Participants.Contains(user));
             _itProjectRepo.Verify(x => x.Save(), Times.Once);
+        }
+
+        [Fact]
+        public void GetProject_Returns_Project()
+        {
+            //Arrange
+            var projectUuid = A<Guid>();
+            var project = new ItProject();
+
+            _specificProjectRepo.Setup(x => x.GetProject(projectUuid)).Returns(project);
+            _authorizationContext.Setup(x => x.AllowReads(project)).Returns(true);
+
+            //Act
+            var projectResult = _sut.GetProject(projectUuid);
+
+            //Assert
+            Assert.True(projectResult.Ok);
+            Assert.Same(project, projectResult.Value);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_Forbidden_If_Not_Read_Access()
+        {
+            //Arrange
+            var projectUuid = A<Guid>();
+            var project = new ItProject();
+
+            _specificProjectRepo.Setup(x => x.GetProject(projectUuid)).Returns(project);
+            _authorizationContext.Setup(x => x.AllowReads(project)).Returns(false);
+
+            //Act
+            var projectResult = _sut.GetProject(projectUuid);
+
+            //Assert
+            Assert.True(projectResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, projectResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_NotFound_If_No_Interface()
+        {
+            //Arrange
+            var projectUuid = A<Guid>();
+
+            _specificProjectRepo.Setup(x => x.GetProject(projectUuid)).Returns(Maybe<ItProject>.None);
+
+            //Act
+            var projectResult = _sut.GetProject(projectUuid);
+
+            //Assert
+            Assert.True(projectResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, projectResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetAvailableProjects_Returns_Projects()
+        {
+            //Arrange
+            var projectUuid = A<Guid>();
+            var project = new ItProject()
+            {
+                Uuid = projectUuid
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableProjects();
+
+            //Assert
+            var projectResult = Assert.Single(result.ToList());
+            Assert.Equal(projectUuid, projectResult.Uuid);
+        }
+
+        [Fact]
+        public void GetAvailableProjects_Returns_Nothing_If_AccessLevel_None()
+        {
+            //Arrange
+            var projectUuid = A<Guid>();
+            var project = new ItProject()
+            {
+                Uuid = projectUuid
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.None);
+            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableProjects();
+
+            //Assert
+            Assert.Empty(result.ToList());
         }
 
         private void ExpectGetUserReturns(int participantId, User value)

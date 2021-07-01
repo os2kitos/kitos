@@ -8,9 +8,11 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Factories;
 using Core.DomainServices.Model;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -27,6 +29,7 @@ namespace Core.ApplicationServices.Project
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -35,7 +38,8 @@ namespace Core.ApplicationServices.Project
             IUserRepository userRepository,
             IReferenceService referenceService,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IOrganizationalUserContext userContext)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -44,6 +48,7 @@ namespace Core.ApplicationServices.Project
             _referenceService = referenceService;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
+            _userContext = userContext;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
@@ -97,6 +102,25 @@ namespace Core.ApplicationServices.Project
                 transaction.Commit();
                 return project;
             }
+        }
+
+        public IQueryable<ItProject> GetAvailableProjects(params IDomainQuery<ItProject>[] conditions)
+        {
+            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
+            var refinement = Maybe<IDomainQuery<ItProject>>.None;
+
+            if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
+            {
+                refinement = new QueryAllByRestrictionCapabilities<ItProject>(accessLevel, _userContext.OrganizationIds);
+            }
+
+            var mainQuery = _itProjectRepository.GetProjects();
+
+            var refinedResult = refinement
+                .Select(x => x.Apply(mainQuery))
+                .GetValueOrFallback(mainQuery);
+
+            return conditions.Any() ? new IntersectionQuery<ItProject>(conditions).Apply(refinedResult) : refinedResult;
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
@@ -171,6 +195,17 @@ namespace Core.ApplicationServices.Project
             return itProject.Handover;
         }
 
+        public Result<ItProject, OperationError> GetProject(Guid uuid)
+        {
+            return _itProjectRepository
+                .GetProject(uuid)
+                .Match
+                (
+                    project => _authorizationContext.AllowReads(project) ? Result<ItProject, OperationError>.Success(project) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
         private Maybe<OperationFailure> CanRemoveParticipant(ItProject itProject, User user)
         {
             if (itProject == null)
@@ -194,5 +229,6 @@ namespace Core.ApplicationServices.Project
             }
             return Maybe<OperationFailure>.None;
         }
+
     }
 }

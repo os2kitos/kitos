@@ -9,7 +9,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
     {
         public ItProject()
         {
@@ -36,8 +36,10 @@ namespace Core.DomainModel.ItProject
             AccessModifier = AccessModifier.Local;
             ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
+            Uuid = Guid.NewGuid();
         }
 
+        public Guid Uuid { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this instance is transversal. (tværgående)

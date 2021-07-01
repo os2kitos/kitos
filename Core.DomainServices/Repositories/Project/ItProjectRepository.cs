@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Project
 {
@@ -20,6 +21,11 @@ namespace Core.DomainServices.Repositories.Project
             return _repository.AsQueryable().ById(id);
         }
 
+        public Maybe<ItProject> GetProject(Guid uuid)
+        {
+            return _repository.AsQueryable().ByUuid(uuid).FromNullable();
+        }
+
         public IQueryable<ItProject> GetProjects(OrganizationDataQueryParameters parameters)
         {
             if (parameters == null)
@@ -28,6 +34,11 @@ namespace Core.DomainServices.Repositories.Project
             }
 
             return _repository.AsQueryable().ByOrganizationDataQueryParameters(parameters);
+        }
+
+        public IQueryable<ItProject> GetProjects()
+        {
+            return _repository.AsQueryable();
         }
     }
 }

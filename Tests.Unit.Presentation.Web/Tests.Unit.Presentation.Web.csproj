@@ -210,6 +210,7 @@
     <Compile Include="DomainServices\QueryByEnabledEntitiesOnlyTest.cs" />
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
     <Compile Include="DomainServices\QueryByNumberOfUsagesTest.cs" />
+    <Compile Include="DomainServices\QueryByOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderIdOrOwnOrganizationIdsTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByRightsHolderTest.cs" />

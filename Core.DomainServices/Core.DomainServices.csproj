@@ -97,6 +97,7 @@
     <Compile Include="Queries\Interface\QueryByRightsHolderIdsOrOwnOrganizationIds.cs" />
     <Compile Include="Queries\Interface\QueryByExposingSystem.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
+    <Compile Include="Queries\QueryByOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />

@@ -84,6 +84,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(e => e.AssociatedItProjectId)
                 .WillCascadeOnDelete(true);
 
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Project_Uuid", 0);
+
             TypeMapping.AddIndexOnAccessModifier<ItProjectMap, ItProject>(this);
         }
     }
