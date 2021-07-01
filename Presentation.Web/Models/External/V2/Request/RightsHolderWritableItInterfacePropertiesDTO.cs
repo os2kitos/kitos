@@ -11,7 +11,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>
         [Required]
-        [RequireNonEmptyGuid]
+        [NonEmptyGuid]
         public Guid ExposedBySystemUuid { get; set; }
         
         /// <summary>

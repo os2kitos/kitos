@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -18,9 +19,26 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();
         }
 
-        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10)
+        public static async Task<IEnumerable<OrganizationResponseDTO>> GetOrganizationsAsync(string token, int page = 0, int pageSize = 10, string nameContent = null, bool onlyWhereUserHasMembership = false, string cvrContent = null)
         {
-            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations?page={page}&pageSize={pageSize}"), token);
+            var queryParameters = new List<KeyValuePair<string, string>>()
+            {
+                new("page", page.ToString("D")),
+                new("pageSize", pageSize.ToString("D")),
+            };
+
+            if (nameContent != null)
+                queryParameters.Add(new KeyValuePair<string, string>("nameContent", nameContent));
+
+            if (onlyWhereUserHasMembership)
+                queryParameters.Add(new KeyValuePair<string, string>("onlyWhereUserHasMembership", true.ToString()));
+
+            if(cvrContent != null)
+                queryParameters.Add(new KeyValuePair<string, string>("cvrContent",cvrContent));
+
+            var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
+
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations?{query}"), token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<OrganizationResponseDTO>>();

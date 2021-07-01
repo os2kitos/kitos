@@ -4,10 +4,10 @@ using System.ComponentModel.DataAnnotations;
 namespace Presentation.Web.Infrastructure.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-    public class RequireNonEmptyGuidAttribute : ValidationAttribute
+    public class NonEmptyGuidAttribute : ValidationAttribute
     {
         public const string DefaultErrorMessage = "The {0} field must not be an empty GUID";
-        public RequireNonEmptyGuidAttribute() : base(DefaultErrorMessage) { }
+        public NonEmptyGuidAttribute() : base(DefaultErrorMessage) { }
 
         public override bool IsValid(object value)
         {

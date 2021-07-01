@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessTypes([RequireNonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetBusinessTypes([NonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessType([RequireNonEmptyGuid] Guid businessTypeUuid, [RequireNonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult GetBusinessType([NonEmptyGuid] Guid businessTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(businessTypeUuid, organizationUuid);
         }

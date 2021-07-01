@@ -4,13 +4,13 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Infrastructure
 {
-    public class RequireNonEmptyGuidAttributeTest
+    public class NonEmptyGuidAttributeTest
     {
-        private readonly RequireNonEmptyGuidAttribute _sut;
+        private readonly NonEmptyGuidAttribute _sut;
 
-        public RequireNonEmptyGuidAttributeTest()
+        public NonEmptyGuidAttributeTest()
         {
-            _sut = new RequireNonEmptyGuidAttribute();
+            _sut = new NonEmptyGuidAttribute();
         }
 
         [Fact]

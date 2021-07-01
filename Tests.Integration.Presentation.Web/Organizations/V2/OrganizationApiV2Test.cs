@@ -82,7 +82,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var orgType = A<OrganizationTypeKeys>();
 
             //Act
             using var response = await OrganizationV2Helper.SendGetOrganizationAsync(regularUserToken.Token, Guid.NewGuid());
@@ -96,13 +95,71 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var orgType = A<OrganizationTypeKeys>();
 
             //Act
             using var response = await OrganizationV2Helper.SendGetOrganizationAsync(regularUserToken.Token, Guid.Empty);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GET_Organizations_Returns_Ok()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100);
+
+            //Assert
+            Assert.NotEmpty(organizations);
+        }
+
+        [Fact]
+        public async Task GET_Organizations_Returns_Ok_With_Name_Content_Filtering()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            //Act
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, nameContent: newOrg.Name);
+
+            //Assert
+            var org = Assert.Single(organizations);
+            Assert.Equal(newOrg.Uuid, org.Uuid);
+        }
+
+        [Fact]
+        public async Task GET_Organizations_Returns_Ok_OnlyMyOrganizations_Filtering()
+        {
+            //Arrange
+            var newOrg = await CreateOrganizationAsync(OrganizationTypeKeys.Kommune);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, newOrg.Id, true, false);
+
+            //Act
+            var organizationsWithFiltering = await OrganizationV2Helper.GetOrganizationsAsync(token, 0, 2, onlyWhereUserHasMembership: true);
+            var organizationsWithOutFiltering = await OrganizationV2Helper.GetOrganizationsAsync(token, 0, 2, onlyWhereUserHasMembership: false);
+
+            //Assert
+            Assert.Equal(2, organizationsWithOutFiltering.Count());
+            var org = Assert.Single(organizationsWithFiltering);
+            Assert.Equal(newOrg.Uuid, org.Uuid);
+        }
+
+        [Fact]
+        public async Task GET_Organizations_Returns_Ok_Cvr_Filtering()
+        { //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var newOrg = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+
+            //Act
+            var organizations = await OrganizationV2Helper.GetOrganizationsAsync(regularUserToken.Token, 0, 100, cvrContent: newOrg.Cvr);
+
+            //Assert
+            var org = Assert.Single(organizations);
+            Assert.Equal(newOrg.Uuid, org.Uuid);
         }
 
         private static readonly IReadOnlyDictionary<OrganizationTypeKeys, OrganizationType> InnerToExternalOrgType =

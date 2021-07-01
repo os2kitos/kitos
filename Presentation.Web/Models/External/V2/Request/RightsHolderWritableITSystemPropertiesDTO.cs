@@ -10,7 +10,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
-        [RequireNonEmptyGuid]
+        [NonEmptyGuid]
         public Guid? ParentUuid { get; set; }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for IT-System business type
         /// </summary>
-        [RequireNonEmptyGuid]
+        [NonEmptyGuid]
         public Guid? BusinessTypeUuid { get; set; }
 
         /// <summary>

@@ -78,7 +78,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfacesAsRightsHolder(
-            [RequireNonEmptyGuid] Guid? rightsHolderUuid = null,
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery pagination = null)
         {
@@ -114,7 +114,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaceAsRightsHolder([RequireNonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid)
         {
             return _rightsHolderService
                 .GetInterfaceAsRightsHolder(uuid)
@@ -134,7 +134,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterfaceAsRightsHolder([RequireNonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        public IHttpActionResult PutItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -166,7 +166,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateItInterfaceAsRightsHolder([RequireNonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -191,7 +191,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfaces(
-            [RequireNonEmptyGuid] Guid? exposedBySystemUuid = null,
+            [NonEmptyGuid] Guid? exposedBySystemUuid = null,
             bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery pagination = null)
         {
@@ -228,7 +228,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterface([RequireNonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItInterface([NonEmptyGuid] Guid uuid)
         {
             return _itInterfaceService
                 .GetInterface(uuid)

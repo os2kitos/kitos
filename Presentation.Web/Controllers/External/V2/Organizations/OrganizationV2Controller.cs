@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         /// </summary>
         /// <param name="onlyWhereUserHasMembership">If set to true, only organizations where the user has role(s) will be included.</param>
         /// <param name="nameContent">Optional query for name content</param>
-        /// <param name="cvr">Optional query on CVR number</param>
+        /// <param name="cvrContent">Optional query on CVR number</param>
         /// <returns>A list of organizations</returns>
         [HttpGet]
         [Route("organizations")]
@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [DenyRightsHoldersAccess]
-        public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvr = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvrContent = null, [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -56,11 +56,11 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
             if (onlyWhereUserHasMembership)
                 refinements.Add(new QueryByIds<Organization>(_userContext.OrganizationIds));
 
-            if (string.IsNullOrWhiteSpace(nameContent))
+            if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<Organization>(nameContent));
 
-            if (string.IsNullOrWhiteSpace(cvr))
-                refinements.Add(new QueryByCvrContent(cvr));
+            if (!string.IsNullOrWhiteSpace(cvrContent))
+                refinements.Add(new QueryByCvrContent(cvrContent));
 
             return _organizationService
                 .SearchAccessibleOrganizations(refinements.ToArray())
@@ -83,7 +83,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [DenyRightsHoldersAccess]
-        public IHttpActionResult GetOrganization([RequireNonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult GetOrganization([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

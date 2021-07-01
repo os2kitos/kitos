@@ -56,10 +56,10 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(
-            [RequireNonEmptyGuid] Guid? rightsHolderUuid = null,
-            [RequireNonEmptyGuid] Guid? businessTypeUuid = null,
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
+            [NonEmptyGuid] Guid? businessTypeUuid = null,
             string kleNumber = null,
-            [RequireNonEmptyGuid] Guid? kleUuid = null,
+            [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
@@ -105,7 +105,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystem([RequireNonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItSystem([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -129,7 +129,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(
-            [RequireNonEmptyGuid] Guid? rightsHolderUuid = null,
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
@@ -164,7 +164,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemByRightsHoldersAccess([RequireNonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItSystemByRightsHoldersAccess([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -221,7 +221,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystemAsRightsHolder([RequireNonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
+        public IHttpActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -249,7 +249,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateSystemAsRightsHolder([RequireNonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
