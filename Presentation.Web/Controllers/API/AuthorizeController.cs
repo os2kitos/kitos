@@ -127,7 +127,7 @@ namespace Presentation.Web.Controllers.API
 
                 var user = result.Value;
 
-                if (user.HasApiAccess == false)
+                if (CanIssueTokenTo(user))
                 {
                     Logger.Warn("User with Id {id} tried to use get a token for the API but was forbidden", user.Id);
                     return Forbidden();
@@ -152,6 +152,11 @@ namespace Presentation.Web.Controllers.API
                 Logger.Error(e, "Failed to create token");
                 return LogError(e);
             }
+        }
+
+        private static bool CanIssueTokenTo(User user)
+        {
+            return user.HasApiAccess.GetValueOrDefault(false) == false;
         }
 
         // POST api/Authorize
