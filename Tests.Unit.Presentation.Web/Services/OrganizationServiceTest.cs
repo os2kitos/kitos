@@ -33,16 +33,17 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<OrganizationRight>> _orgRightRepository;
         private readonly Mock<IGenericRepository<User>> _userRepository;
         private readonly Mock<IOrganizationRepository> _repositoryMock;
+        private readonly Mock<IOrganizationalUserContext> _userContext;
 
         public OrganizationServiceTest()
         {
             _user = new User() { Id = new Fixture().Create<int>() };
             _authorizationContext = new Mock<IAuthorizationContext>();
-            var userContext = new Mock<IOrganizationalUserContext>();
+            _userContext = new Mock<IOrganizationalUserContext>();
             _roleService = new Mock<IOrganizationRoleService>();
             _transactionManager = new Mock<ITransactionManager>();
-            userContext.Setup(x => x.UserId).Returns(_user.Id);
-            userContext.Setup(x => x.OrganizationIds).Returns(new Fixture().Create<IEnumerable<int>>());
+            _userContext.Setup(x => x.UserId).Returns(_user.Id);
+            _userContext.Setup(x => x.OrganizationIds).Returns(new Fixture().Create<IEnumerable<int>>());
             _organizationRepository = new Mock<IGenericRepository<Organization>>();
             _orgRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _userRepository = new Mock<IGenericRepository<User>>();
@@ -52,7 +53,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _orgRightRepository.Object,
                 _userRepository.Object,
                 _authorizationContext.Object,
-                userContext.Object,
+                _userContext.Object,
                 Mock.Of<ILogger>(),
                 _roleService.Object,
                 _transactionManager.Object,
@@ -312,12 +313,69 @@ namespace Tests.Unit.Presentation.Web.Services
         public void SearchAccessibleOrganizations_DoesNotFilterByOrgMembership_If_Cross_Access_Is_All()
         {
             //Arrange
-            var searchAccessibleOrganizations = _sut.SearchAccessibleOrganizations();
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
+            var allValues = new[] { new Organization(), new Organization() };
+            _repositoryMock.Setup(x => x.GetAll()).Returns(allValues.AsQueryable());
 
             //Act
-            //TODO
-            //Assert
+            var organizations = _sut.SearchAccessibleOrganizations().ToList();
 
+            //Assert
+            Assert.Equal(allValues, organizations);
+        }
+
+        [Fact]
+        public void SearchAccessibleOrganizations_Is_Filtered_By_Access_And_Sharing()
+        {
+            //Arrange
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.Public);
+            var org1WithMembership = A<int>();
+            var org2WithMembership = A<int>();
+            var org1WithoutMembership = A<int>();
+            var org2WithoutMembership = A<int>();
+
+            var expected1 = new Organization { Id = org1WithMembership, AccessModifier = AccessModifier.Local};
+            var expected2 = new Organization { Id = org2WithMembership , AccessModifier = AccessModifier.Public};
+            var expected3 = new Organization { Id = org1WithoutMembership ,AccessModifier = AccessModifier.Public};
+            var excluded = new Organization { Id = org2WithoutMembership , AccessModifier = AccessModifier.Local};
+
+            var allValues = new[] { expected1, expected2, excluded, expected3 };
+
+            _repositoryMock.Setup(x => x.GetAll()).Returns(allValues.AsQueryable());
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] {org1WithMembership, org2WithMembership});
+
+            //Act
+            var organizations = _sut.SearchAccessibleOrganizations().ToList();
+
+            //Assert
+            Assert.Equal(allValues.Except(excluded.WrapAsEnumerable()).ToList(), organizations.ToList());
+        }
+
+        [Theory]
+        [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.None)]
+        public void SearchAccessibleOrganizations_Is_Filtered_By_MembershipOnly(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            //Arrange
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+            var org1WithMembership = A<int>();
+            var org2WithMembership = A<int>();
+            var org1WithoutMembership = A<int>();
+
+            var expected1 = new Organization { Id = org1WithMembership, AccessModifier = AccessModifier.Local };
+            var expected2 = new Organization { Id = org2WithMembership, AccessModifier = AccessModifier.Public };
+            var excluded = new Organization { Id = org1WithoutMembership, AccessModifier = AccessModifier.Public };
+
+            var allValues = new[] { expected1, expected2, excluded };
+
+            _repositoryMock.Setup(x => x.GetAll()).Returns(allValues.AsQueryable());
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { org1WithMembership, org2WithMembership });
+
+            //Act
+            var organizations = _sut.SearchAccessibleOrganizations().ToList();
+
+            //Assert
+            Assert.Equal(allValues.Except(excluded.WrapAsEnumerable()).ToList(), organizations.ToList());
         }
 
         [Fact]
