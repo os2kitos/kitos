@@ -1,6 +1,6 @@
 ﻿using Presentation.Web.Models.External.V2.Types;
 
-namespace Presentation.Web.Models.External.V2.Response
+namespace Presentation.Web.Models.External.V2.Response.System
 {
     public class RecommendedArchiveDutyResponseDTO
     {

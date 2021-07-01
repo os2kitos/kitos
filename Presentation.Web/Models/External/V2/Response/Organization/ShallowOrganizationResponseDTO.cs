@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Presentation.Web.Models.External.V2.Response
+namespace Presentation.Web.Models.External.V2.Response.Organization
 {
     public class ShallowOrganizationResponseDTO : IdentityNamePairResponseDTO
     {

@@ -34,6 +34,9 @@ namespace Presentation.Web.Controllers.External.V2
 
         protected IHttpActionResult GetSingle(Guid optionUuid, Guid organizationUuid)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             return _optionApplicationService
                 .GetOptionType(organizationUuid, optionUuid)
                 .Select(x => ToAvailableDTO(x.option, x.available))

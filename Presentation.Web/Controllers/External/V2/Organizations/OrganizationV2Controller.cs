@@ -13,8 +13,9 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Organization;
 using Swashbuckle.Swagger.Annotations;
+using OrganizationType = Presentation.Web.Models.External.V2.Types.OrganizationType;
 
 namespace Presentation.Web.Controllers.External.V2.Organizations
 {
@@ -63,6 +64,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
 
             return _organizationService
                 .SearchAccessibleOrganizations(refinements.ToArray())
+                .OrderBy(x => x.Id)
                 .Page(pagination)
                 .ToList()
                 .Select(ToDTO)
@@ -81,13 +83,10 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [DenyRightsHoldersAccess]
-        public IHttpActionResult GetOrganization(Guid organizationUuid)
+        public IHttpActionResult GetOrganization([RequireNonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if (organizationUuid == Guid.Empty)
-                return BadRequest($"{nameof(organizationUuid)} must be a non-empty uuid");
 
             return _organizationService
                 .GetOrganization(organizationUuid)
@@ -112,18 +111,30 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                 .ResolveOrganizationsWhereAuthenticatedUserHasRightsHolderAccess()
                 .OrderBy(x => x.Id)
                 .Page(pagination)
-                .Transform(ToDTOs)
+                .Transform(ToShallowDTOs)
                 .Transform(Ok);
         }
 
-        private static IEnumerable<OrganizationResponseDTO> ToDTOs(IQueryable<Organization> organizations)
+        private static IEnumerable<ShallowOrganizationResponseDTO> ToShallowDTOs(IQueryable<Organization> organizations)
         {
-            return organizations.ToList().Select(ToDTO).ToList();
+            return organizations.ToList().Select(x => x.MapShallowOrganizationResponseDTO()).ToList();
         }
 
         private static OrganizationResponseDTO ToDTO(Organization organization)
         {
-            return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
+            return new(organization.Uuid, organization.Name, organization.GetActiveCvr(), MapOrganizationType(organization));
+        }
+
+        private static OrganizationType MapOrganizationType(Organization organization)
+        {
+            return organization.Type.Id switch
+            {
+                (int)OrganizationTypeKeys.Virksomhed => OrganizationType.Company,
+                (int)OrganizationTypeKeys.Kommune => OrganizationType.Municipality,
+                (int)OrganizationTypeKeys.AndenOffentligMyndighed => OrganizationType.OtherPublicAuthority,
+                (int)OrganizationTypeKeys.Interessefællesskab => OrganizationType.CommunityOfInterest,
+                _ => throw new ArgumentOutOfRangeException(nameof(organization.Type.Id), "Unknown organization type key")
+            };
         }
     }
 }

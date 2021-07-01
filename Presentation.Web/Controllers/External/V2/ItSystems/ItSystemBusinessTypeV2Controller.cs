@@ -4,6 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
@@ -30,7 +31,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessTypes(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetBusinessTypes([RequireNonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -48,7 +49,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessType(Guid businessTypeUuid, Guid organizationUuid)
+        public IHttpActionResult GetBusinessType([RequireNonEmptyGuid] Guid businessTypeUuid, [RequireNonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(businessTypeUuid, organizationUuid);
         }

@@ -233,6 +233,7 @@
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
+    <Compile Include="Infrastructure\RequireNonEmptyGuidAttributeTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />

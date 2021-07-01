@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Presentation.Web.Models.External.V2.Response.Organization;
 
-namespace Presentation.Web.Models.External.V2.Response
+namespace Presentation.Web.Models.External.V2.Response.System
 {
     public abstract class BaseItSystemResponseDTO
     {
@@ -53,7 +54,7 @@ namespace Presentation.Web.Models.External.V2.Response
         /// <summary>
         /// Organizational information for IT-System rightsholder
         /// </summary>
-        public OrganizationResponseDTO RightsHolder { get; set; }
+        public ShallowOrganizationResponseDTO RightsHolder { get; set; }
 
         /// <summary>
         /// List of IT-Interfaces exposed by this IT-System
