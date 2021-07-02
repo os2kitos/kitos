@@ -207,9 +207,11 @@
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\QueryByAccessModifierTest.cs" />
     <Compile Include="DomainServices\QueryByBusinessTypeTest.cs" />
+    <Compile Include="DomainServices\QueryByCvrContentTest.cs" />
     <Compile Include="DomainServices\QueryByEnabledEntitiesOnlyTest.cs" />
     <Compile Include="DomainServices\QueryByIdsTest.cs" />
     <Compile Include="DomainServices\QueryByNumberOfUsagesTest.cs" />
+    <Compile Include="DomainServices\QueryOrganizationByIdsOrSharedAccessTest.cs" />
     <Compile Include="DomainServices\QueryByOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderIdOrOwnOrganizationIdsTest.cs" />
     <Compile Include="DomainServices\System\QueryByRightsHolderTest.cs" />
@@ -232,6 +234,7 @@
     <Compile Include="Helpers\MoqTools.cs" />
     <Compile Include="Helpers\UserMock.cs" />
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
+    <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />
     <Compile Include="Services\ItProjectServiceTest.cs" />
     <Compile Include="Services\ItSystemServiceTest.cs" />

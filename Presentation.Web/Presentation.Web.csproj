@@ -355,6 +355,10 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Types\OrganizationType.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
@@ -365,7 +369,7 @@
     <Compile Include="Models\External\V2\Request\RightsHolderCreateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderWritableITSystemPropertiesDTO.cs" />
     <Compile Include="Models\External\V2\Request\StandardPaginationQuery.cs" />
-    <Compile Include="Models\External\V2\Response\RightsHolderItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\System\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\ItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Types\ArchiveDutyChoice.cs" />
@@ -375,8 +379,8 @@
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
     <Compile Include="Controllers\External\V2\Organizations\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
-    <Compile Include="Models\External\V2\Response\ItSystemResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\BaseItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\System\ItSystemResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\System\BaseItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\BaseItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderWritableItInterfacePropertiesDTO.cs" />
     <Compile Include="Controllers\External\V2\ItInterfaces\ItInterfaceV2Controller.cs" />
@@ -450,8 +454,8 @@
     <Compile Include="Models\Csv\CsvResponseBuilder.cs" />
     <Compile Include="Models\External\V2\Response\IdentityNamePairResponseDTO.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderCreateItSystemRequestDTO.cs" />
-    <Compile Include="Models\External\V2\Response\OrganizationResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Response\RecommendedArchiveDutyResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\Organization\OrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\System\RecommendedArchiveDutyResponseDTO.cs" />
     <Compile Include="Models\FeatureToggle\TemporaryFeature.cs" />
     <Compile Include="Models\GDPR\AssignRoleDTO.cs" />
     <Compile Include="Models\GDPR\CreateDataProcessingRegistrationDTO.cs" />

@@ -5,6 +5,7 @@ using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
@@ -13,6 +14,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-location-types")]
+    [DenyRightsHoldersAccess]
     public class ItSystemUsageArchiveLocationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
     {
         public ItSystemUsageArchiveLocationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
@@ -31,7 +33,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
@@ -49,7 +51,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get(Guid archiveLocationUuid, Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid archiveLocationUuid, [NonEmptyGuid] Guid organizationUuid)
         {
             return GetSingle(archiveLocationUuid, organizationUuid);
         }

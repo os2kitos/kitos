@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Models.External.V2.Request
 {
@@ -9,6 +10,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for possible IT-System parent (if any)
         /// </summary>
+        [NonEmptyGuid]
         public Guid? ParentUuid { get; set; }
 
         /// <summary>
@@ -38,6 +40,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for IT-System business type
         /// </summary>
+        [NonEmptyGuid]
         public Guid? BusinessTypeUuid { get; set; }
 
         /// <summary>

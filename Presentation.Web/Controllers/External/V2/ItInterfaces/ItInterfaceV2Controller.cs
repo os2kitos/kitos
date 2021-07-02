@@ -20,7 +20,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItInterfaces
 {
     [RoutePrefix("api/v2")]
-    public class ItInterfaceV2Controller: ExternalBaseController
+    public class ItInterfaceV2Controller : ExternalBaseController
     {
         private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
@@ -50,23 +50,13 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            if (request.ExposedBySystemUuid == Guid.Empty)
-            {
-                return BadRequest($"{nameof(request.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
-            }
-
-            if (request.RightsHolderUuid == Guid.Empty)
-            {
-                return BadRequest($"{nameof(request.RightsHolderUuid)} cannot be empty. An interface needs to be bound to a specific rights holder.");
-            }
-
             var creationParameters = new RightsHolderItInterfaceCreationParameters(
                 request.Uuid,
                 request.ExposedBySystemUuid,
-                request.Name, 
-                request.InterfaceId, 
-                request.Version, 
-                request.Description, 
+                request.Name,
+                request.InterfaceId,
+                request.Version,
+                request.Description,
                 request.UrlReference);
 
             return _rightsHolderService
@@ -88,8 +78,8 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfacesAsRightsHolder(
-            Guid? rightsHolderUuid = null,
-            bool includeDeactivated = false, 
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -124,7 +114,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterfaceAsRightsHolder(Guid uuid)
+        public IHttpActionResult GetItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid)
         {
             return _rightsHolderService
                 .GetInterfaceAsRightsHolder(uuid)
@@ -144,15 +134,10 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItInterfaceAsRightsHolder(Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        public IHttpActionResult PutItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            if(request.ExposedBySystemUuid == Guid.Empty)
-            {
-                return BadRequest($"{nameof(request.ExposedBySystemUuid)} cannot be empty. An interface needs to be exposed by an existing system.");
-            }
 
             var updateParameters = new RightsHolderItInterfaceUpdateParameters(
                 request.ExposedBySystemUuid,
@@ -181,7 +166,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateItInterfaceAsRightsHolder(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -206,8 +191,8 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfaces(
-            Guid? exposedBySystemUuid = null,
-            bool includeDeactivated = false, 
+            [NonEmptyGuid] Guid? exposedBySystemUuid = null,
+            bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -243,7 +228,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItInterface(Guid uuid)
+        public IHttpActionResult GetItInterface([NonEmptyGuid] Guid uuid)
         {
             return _itInterfaceService
                 .GetInterface(uuid)
@@ -269,7 +254,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
             return dto;
         }
 
-        private static void MapBaseInformation<T>(ItInterface input, T outputDTO) where T: BaseItInterfaceResponseDTO
+        private static void MapBaseInformation<T>(ItInterface input, T outputDTO) where T : BaseItInterfaceResponseDTO
         {
             outputDTO.Uuid = input.Uuid;
             outputDTO.ExposedBySystem = input.ExhibitedBy?.ItSystem?.Transform(exposingSystem => exposingSystem.MapIdentityNamePairDTO());

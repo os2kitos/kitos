@@ -12,6 +12,7 @@ using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.System;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Integration.Presentation.Web.Tools.XUnit;

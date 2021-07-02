@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using Presentation.Web.Models.External.V2.Response.Organization;
 
-namespace Presentation.Web.Models.External.V2.Response
+namespace Presentation.Web.Models.External.V2.Response.System
 {
     public class ItSystemResponseDTO: BaseItSystemResponseDTO
     {
         /// <summary>
         /// Organizations using this IT-System
         /// </summary>
-        public IEnumerable<OrganizationResponseDTO> UsingOrganizations { get; set; }
+        public IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; }
 
         /// <summary>
         /// Time of last modification
