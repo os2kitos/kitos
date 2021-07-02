@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Xml;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
@@ -23,21 +22,21 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization);
+            var user1AndToken = await CreateApiUser(organization);
             var user2 = await CreateUser(organization);
-            var user3 = await CreateApiUser(organization);
+            var user3AndToken = await CreateApiUser(organization);
 
             var rolesForUser3 = new[] { OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin };
-            await AssignRoles(organization, user3.user.Id, rolesForUser3);
+            await AssignRoles(organization, user3AndToken.user.Id, rolesForUser3);
 
             //Act
-            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1.token, organization.Uuid)).ToList();
+            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1AndToken.token, organization.Uuid)).ToList();
 
             //Assert
             Assert.Equal(3, result.Count);
-            ExpectResult(result, user1.user, OrganizationUserRole.User);
+            ExpectResult(result, user1AndToken.user, OrganizationUserRole.User);
             ExpectResult(result, user2, OrganizationUserRole.User);
-            ExpectResult(result, user3.user, OrganizationUserRole.User, OrganizationUserRole.LocalAdmin, OrganizationUserRole.OrganizationModuleAdmin, OrganizationUserRole.SystemModuleAdmin);
+            ExpectResult(result, user3AndToken.user, OrganizationUserRole.User, OrganizationUserRole.LocalAdmin, OrganizationUserRole.OrganizationModuleAdmin, OrganizationUserRole.SystemModuleAdmin);
         }
 
         [Fact]
@@ -45,15 +44,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization);
+            var user1AndToken = await CreateApiUser(organization);
             var user2 = await CreateUser(organization);
-            var user3 = await CreateUser(organization);
-
-            var rolesForUser3 = new[] { OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin };
-            await AssignRoles(organization, user3.Id, rolesForUser3);
 
             //Act
-            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1.token, organization.Uuid, nameOrEmailQuery: $"{user2.Name} {user2.LastName}")).ToList();
+            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1AndToken.token, organization.Uuid, nameOrEmailQuery: $"{user2.Name} {user2.LastName}")).ToList();
 
             //Assert
             var dto = Assert.Single(result);
@@ -65,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization);
+            var user1AndToken = await CreateApiUser(organization);
             var user2 = await CreateUser(organization);
             var user3 = await CreateUser(organization);
 
@@ -73,7 +68,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             await AssignRoles(organization, user3.Id, rolesForUser3);
 
             //Act
-            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1.token, organization.Uuid, nameOrEmailQuery: $"{user2.Email.Split('@')[0]}")).ToList();
+            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1AndToken.token, organization.Uuid, nameOrEmailQuery: $"{user2.Email.Split('@')[0]}")).ToList();
 
             //Assert
             var dto = Assert.Single(result);
@@ -85,15 +80,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization);
-            var user2 = await CreateUser(organization);
+            var user1AndToken = await CreateApiUser(organization);
             var user3 = await CreateUser(organization);
 
             var rolesForUser3 = new[] { OrganizationRole.LocalAdmin, OrganizationRole.OrganizationModuleAdmin, OrganizationRole.SystemModuleAdmin };
             await AssignRoles(organization, user3.Id, rolesForUser3);
 
             //Act
-            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1.token, organization.Uuid, roleQuery: OrganizationUserRole.SystemModuleAdmin)).ToList();
+            var result = (await OrganizationUserV2Helper.GetOrganizationUsersAsync(user1AndToken.token, organization.Uuid, roleQuery: OrganizationUserRole.SystemModuleAdmin)).ToList();
 
             //Assert
             var dto = Assert.Single(result);
@@ -106,10 +100,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization1 = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUsersAsync(user1.token, organization2.Uuid);
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUsersAsync(user1AndToken.token, organization2.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -120,10 +114,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization1 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUsersAsync(user1.token, A<Guid>());
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUsersAsync(user1AndToken.token, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -134,11 +128,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization);
+            var user1AndToken = await CreateApiUser(organization);
             var user2 = await CreateUser(organization);
 
             //Act
-            var result = await OrganizationUserV2Helper.GetOrganizationUserAsync(user1.token, organization.Uuid, user2.Uuid);
+            var result = await OrganizationUserV2Helper.GetOrganizationUserAsync(user1AndToken.token, organization.Uuid, user2.Uuid);
 
             //Assert
             AssertUser(user2, result, OrganizationUserRole.User);
@@ -150,11 +144,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization1 = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
             var user2 = await CreateUser(organization2);
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1.token, organization1.Uuid, user2.Uuid); //user 2 is only in org1
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1AndToken.token, organization1.Uuid, user2.Uuid); //user 2 is only in org1
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -166,11 +160,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             //Arrange
             var organization1 = await CreateOrganizationAsync();
             var organization2 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
             var user2 = await CreateUser(organization2);
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1.token, organization2.Uuid, user2.Uuid);
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1AndToken.token, organization2.Uuid, user2.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -181,11 +175,11 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization1 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
             var unknownUserId = A<Guid>();
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1.token, organization1.Uuid, unknownUserId);
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1AndToken.token, organization1.Uuid, unknownUserId);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -196,10 +190,10 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             //Arrange
             var organization1 = await CreateOrganizationAsync();
-            var user1 = await CreateApiUser(organization1);
+            var user1AndToken = await CreateApiUser(organization1);
 
             //Act
-            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1.token, A<Guid>(), user1.user.Uuid);
+            using var result = await OrganizationUserV2Helper.SendGetOrganizationUserAsync(user1AndToken.token, A<Guid>(), user1AndToken.user.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);

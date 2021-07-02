@@ -32,8 +32,8 @@ namespace Presentation.Web.Models.External.V2.Response.Organization
         /// </summary>
         public IEnumerable<OrganizationUserRole> Roles { get; }
 
-        public OrganizationUserResponseDTO(Guid uuid, string name, string firstName, string lastName, string email, bool apiAccess, string phoneNumber, IEnumerable<OrganizationUserRole> roles)
-            : base(uuid, name)
+        public OrganizationUserResponseDTO(Guid uuid, string fullName, string firstName, string lastName, string email, bool apiAccess, string phoneNumber, IEnumerable<OrganizationUserRole> roles)
+            : base(uuid, fullName)
         {
             FirstName = firstName;
             LastName = lastName;
