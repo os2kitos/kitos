@@ -130,5 +130,7 @@ namespace Presentation.Web.Models
                 return Risks.Any() ? Risks.Average(risk => risk.Consequence * risk.Probability) : default(double);
             }
         }
+
+        public Guid Uuid { get; set; }
     }
 }

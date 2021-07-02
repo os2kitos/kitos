@@ -3,11 +3,13 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Web;
@@ -40,8 +42,8 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystems(
-            Guid organizationUuid,
+        public IHttpActionResult GetItProjects(
+            [Required][NonEmptyGuid] Guid organizationUuid,
             string nameContent = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
@@ -52,7 +54,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
 
             refinements.Add(new QueryByOrganizationUuid<ItProject>(organizationUuid));
 
-            if (string.IsNullOrWhiteSpace(nameContent))
+            if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItProject>(nameContent));
 
             return _itProjectService
@@ -60,7 +62,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
                 .OrderBy(x => x.Id)
                 .Page(paginationQuery)
                 .ToList()
-                .Select(ToProjectResponseDTO)
+                .Select(x => x.MapIdentityNamePairDTO())
                 .Transform(Ok);
         }
 
@@ -76,20 +78,15 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystem(Guid uuid)
+        public IHttpActionResult GetItProject([Required][NonEmptyGuid] Guid uuid)
         {
-            if (uuid == Guid.Empty)
-                return BadRequest(nameof(uuid) + " must be a non-empty guid");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _itProjectService
                 .GetProject(uuid)
-                .Select(ToProjectResponseDTO)
+                .Select(x => x.MapIdentityNamePairDTO())
                 .Match(Ok, FromOperationError);
-        }
-
-        private IdentityNamePairResponseDTO ToProjectResponseDTO(ItProject project)
-        {
-            return new IdentityNamePairResponseDTO(project.Uuid, project.Name);
         }
     }
 }
