@@ -171,14 +171,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
                 {OrganizationTypeKeys.AndenOffentligMyndighed, OrganizationType.OtherPublicAuthority}
             });
 
-        private static readonly IReadOnlyDictionary<int, OrganizationType> KnownTypes =
-            new ReadOnlyDictionary<int, OrganizationType>(new Dictionary<int, OrganizationType>()
-            {
-                {1, OrganizationType.Municipality},
-                {2, OrganizationType.CommunityOfInterest},
-                {3, OrganizationType.Company},
-                {4, OrganizationType.OtherPublicAuthority}
-            });
         private static void AssertOrganizationType(OrganizationTypeKeys createdWith, OrganizationResponseDTO dto)
         {
             var expectedResult = InnerToExternalOrgType[createdWith];
@@ -197,9 +189,6 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         {
             return $"{nameof(OrganizationApiV2Test)}{A<string>()}";
         }
-
-        //TODO: GET Many, with/without params
-        //TODO: GET single
 
         private string CreateEmail()
         {
