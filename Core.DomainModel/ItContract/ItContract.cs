@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.GDPR;
@@ -17,7 +16,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
     {
         public ItContract()
         {
@@ -30,7 +29,10 @@ namespace Core.DomainModel.ItContract
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
+            Uuid = Guid.NewGuid();
         }
+
+        public Guid Uuid { get; set; }
 
         /// <summary>
         ///     Whether the contract is active or not

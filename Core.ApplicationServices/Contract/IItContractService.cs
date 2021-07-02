@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Result;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.Contract
 {
@@ -15,5 +17,8 @@ namespace Core.ApplicationServices.Contract
 
         Result<DataProcessingRegistration, OperationError> RemoveDataProcessingRegistration(int id, int dataProcessingRegistrationId);
         Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
+
+        IQueryable<ItContract> GetAvailableContracts(params IDomainQuery<ItContract>[] conditions);
+        Result<ItContract, OperationError> GetContract(Guid uuid);
     }
 }

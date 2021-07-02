@@ -11,6 +11,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
@@ -34,6 +35,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
+        private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public ItContractServiceTest()
         {
@@ -45,6 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
+            _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -53,7 +56,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEvents.Object,
                 _authorizationContext.Object,
                 _logger.Object,
-                _contractDataProcessingRegistrationAssignmentService.Object);
+                _contractDataProcessingRegistrationAssignmentService.Object,
+                _userContextMock.Object);
         }
 
         [Fact]
@@ -226,6 +230,79 @@ namespace Tests.Unit.Core.ApplicationServices
         public void Cannot_RemoveDataProcessingRegistration_If_Write_Access_Is_Denied()
         {
             Test_Command_Which_Fails_With_Contract_Insufficient_WriteAccess(id => _sut.RemoveDataProcessingRegistration(id, A<int>()));
+        }
+
+        [Fact]
+        public void GetProject_Returns_Project()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+            var contract = new ItContract();
+
+            _contractRepository.Setup(x => x.GetContract(contractUuid)).Returns(contract);
+            _authorizationContext.Setup(x => x.AllowReads(contract)).Returns(true);
+
+            //Act
+            var contractResult = _sut.GetContract(contractUuid);
+
+            //Assert
+            Assert.True(contractResult.Ok);
+            Assert.Same(contract, contractResult.Value);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_Forbidden_If_Not_Read_Access()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+            var contract = new ItContract();
+
+            _contractRepository.Setup(x => x.GetContract(contractUuid)).Returns(contract);
+            _authorizationContext.Setup(x => x.AllowReads(contract)).Returns(false);
+
+            //Act
+            var contractResult = _sut.GetContract(contractUuid);
+
+            //Assert
+            Assert.True(contractResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, contractResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetInterface_Returns_NotFound_If_No_Interface()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+
+            _contractRepository.Setup(x => x.GetContract(contractUuid)).Returns(Maybe<ItContract>.None);
+
+            //Act
+            var contractResult = _sut.GetContract(contractUuid);
+
+            //Assert
+            Assert.True(contractResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, contractResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetAvailableProjects_Returns_Projects()
+        {
+            //Arrange
+            var contractUuid = A<Guid>();
+            var contract = new ItContract()
+            {
+                Uuid = contractUuid
+            };
+
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
+            _contractRepository.Setup(x => x.GetContracts()).Returns(new List<ItContract>() { contract }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableContracts();
+
+            //Assert
+            var projectResult = Assert.Single(result.ToList());
+            Assert.Equal(contractUuid, projectResult.Uuid);
         }
 
         private EconomyStream CreateEconomyStream()

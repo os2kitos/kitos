@@ -1,5 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel.ItContract;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Contract
 {
@@ -10,5 +12,7 @@ namespace Core.DomainServices.Repositories.Contract
         IQueryable<ItContract> GetByOrganizationId(int organizationId);
         void DeleteContract(ItContract contract);
         void Update(ItContract contract);
+        IQueryable<ItContract> GetContracts();
+        Maybe<ItContract> GetContract(Guid uuid);
     }
 }
