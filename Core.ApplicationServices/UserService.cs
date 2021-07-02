@@ -15,6 +15,7 @@ using Infrastructure.Services.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices
@@ -250,7 +251,7 @@ namespace Core.ApplicationServices
             return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(role));
         }
 
-        public Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid)
+        public Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries)
         {
             return _organizationService
                 .GetOrganization(organizationUuid)
@@ -260,7 +261,12 @@ namespace Core.ApplicationServices
                     if (_authorizationContext.GetOrganizationReadAccessLevel(organization.Id) != OrganizationDataReadAccessLevel.All)
                         return new OperationError("No access inside organization", OperationFailure.Forbidden);
 
-                    return _repository.GetUsersInOrganization(organization.Id).Transform(Result<IQueryable<User>, OperationError>.Success);
+                    var query = new IntersectionQuery<User>(queries);
+
+                    return _repository
+                        .GetUsersInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<User>, OperationError>.Success);
                 });
         }
 

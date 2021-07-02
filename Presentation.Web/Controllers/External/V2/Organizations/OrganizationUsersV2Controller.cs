@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.User;
 using Infrastructure.Services.Types;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Organization;
@@ -50,12 +53,20 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
             OrganizationUserRole? roleQuery = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
-            //TODO: Apply queries
-            //TODO: Role search
+            var queries = new List<IDomainQuery<User>>();
 
+            if (!string.IsNullOrWhiteSpace(nameOrEmailQuery))
+                queries.Add(new QueryUserByNameOrEmail(nameOrEmailQuery));
 
+            if (roleQuery.HasValue)
+                queries.Add(new QueryByRoleAssignment(ApiRoleToDomainRoleMap[roleQuery.Value]));
 
-            throw new NotImplementedException();
+            return _userService
+                .GetUsersInOrganization(organizationUuid, queries.ToArray())
+                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList().Select(user => (organizationUuid, user)).Select(ToDTO))
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -96,7 +107,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         /// <summary>
         /// NOTE: Global admin is intentionally left out. It's a KITOS-only term and should not be exported.
         /// </summary>
-        private static readonly IReadOnlyDictionary<OrganizationRole, OrganizationUserRole> DomainRoleToApiRoleMap = new ReadOnlyDictionary<OrganizationRole, OrganizationUserRole>(new Dictionary<OrganizationRole, OrganizationUserRole>
+        private static readonly IReadOnlyDictionary<OrganizationRole, OrganizationUserRole> DomainRoleToApiRoleMap = new Dictionary<OrganizationRole, OrganizationUserRole>
                 {
                     {OrganizationRole.User, OrganizationUserRole.User},
                     {OrganizationRole.LocalAdmin, OrganizationUserRole.LocalAdmin},
@@ -106,7 +117,14 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                     {OrganizationRole.ContractModuleAdmin, OrganizationUserRole.ContractModuleAdmin},
                     {OrganizationRole.ReportModuleAdmin, OrganizationUserRole.ReportModuleAdmin},
                     {OrganizationRole.RightsHolderAccess, OrganizationUserRole.RightsHolderAccess}
-                });
+                }.AsReadOnly();
+
+        /// <summary>
+        /// NOTE: Global admin is intentionally left out. It's a KITOS-only term and should not be exported.
+        /// </summary>
+        private static readonly IReadOnlyDictionary<OrganizationUserRole, OrganizationRole> ApiRoleToDomainRoleMap =
+            DomainRoleToApiRoleMap.ToDictionary(x => x.Value, x => x.Key).AsReadOnly();
+
         private IEnumerable<OrganizationUserRole> MapRoles((Guid organizationUuid, User user) context)
         {
             return from organizationRole in context.user.GetRolesInOrganization(context.organizationUuid)
