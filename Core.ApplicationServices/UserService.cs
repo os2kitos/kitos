@@ -274,7 +274,13 @@ namespace Core.ApplicationServices
         {
             return GetUsersInOrganization(organizationUuid)
                 .Select(x => x.ByUuid(userUuid).FromNullable())
-                .Bind(user => user.Match<Result<User, OperationError>>(foundUser => foundUser, () => new OperationError(OperationFailure.NotFound)));
+                .Bind(user =>
+                    user.Match<Result<User, OperationError>>
+                    (
+                        foundUser => foundUser,
+                        () => new OperationError("User is not member of the organization", OperationFailure.NotFound)
+                    )
+                );
         }
     }
 }
