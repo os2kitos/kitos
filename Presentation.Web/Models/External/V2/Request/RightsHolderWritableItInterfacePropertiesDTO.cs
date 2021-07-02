@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel.ItSystem;
 using System;
 using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Models.External.V2.Request
 {
@@ -9,7 +10,8 @@ namespace Presentation.Web.Models.External.V2.Request
         /// <summary>
         /// UUID for IT-System exposing this IT-Interface
         /// </summary>
-        [Required] 
+        [Required]
+        [NonEmptyGuid]
         public Guid ExposedBySystemUuid { get; set; }
         
         /// <summary>

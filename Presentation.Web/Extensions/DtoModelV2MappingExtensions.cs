@@ -2,6 +2,7 @@
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
 
 namespace Presentation.Web.Extensions
@@ -18,7 +19,7 @@ namespace Presentation.Web.Extensions
             return new(source.Uuid, source.GetFullName());
         }
 
-        public static OrganizationResponseDTO MapOrganizationResponseDTO(this Organization organization)
+        public static ShallowOrganizationResponseDTO MapShallowOrganizationResponseDTO(this Organization organization)
         {
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }

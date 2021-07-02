@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Infrastructure.Services.Types
 {
@@ -17,6 +18,11 @@ namespace Infrastructure.Services.Types
         public static TOut Transform<TIn, TOut>(this TIn input, Func<TIn, TOut> transform)
         {
             return transform(input);
+        }
+
+        public static IEnumerable<T> WrapAsEnumerable<T>(this T source)
+        {
+            yield return source;
         }
     }
 }

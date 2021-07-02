@@ -69,7 +69,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         public async Task Can_Get_Default_Organization_From_Default_It_System_Usage(OrganizationRole role)
         {
             //Arrange
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var cookie = await HttpApi.GetCookieAsync(role);
             var url = TestEnvironment.CreateUrl(
                 $"odata/ItSystemUsages({TestEnvironment.DefaultItSystemId})");
 

@@ -1,11 +1,4 @@
-﻿using Presentation;
-using Presentation.Web;
-using Presentation.Web.Models;
-using Presentation.Web.Models.External;
-using Presentation.Web.Models.External.V2;
-using Presentation.Web.Models.External.V2.Response;
-using Presentation.Web.Models.External.V2.Response.Interface;
-using System;
+﻿using System;
 
 namespace Presentation.Web.Models.External.V2.Response.Interface
 {

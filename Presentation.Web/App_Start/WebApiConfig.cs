@@ -56,12 +56,13 @@ namespace Presentation.Web
 
             var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: routePrefix, configureAction: (builder => builder
             .AddService(ServiceLifetime.Singleton, sp => GetModel())
-            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true})
+            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true })
             .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp => ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Filters.Add(new RequireValidatedCSRFAttributed());
+            config.Filters.Add(new ValidateActionParametersAttribute());
             config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
         }
 

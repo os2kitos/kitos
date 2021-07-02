@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries.User
 
         public IQueryable<DomainModel.User> Apply(IQueryable<DomainModel.User> users)
         {
-            return users.Where(x => x.HasStakeHolderAccess == _includeStakeHolderAccess || x.HasApiAccess == _includeApiAccess);
+            return users.Where(x => (_includeStakeHolderAccess && x.HasStakeHolderAccess)|| (_includeApiAccess && x.HasApiAccess == true));
         }
     }
 }

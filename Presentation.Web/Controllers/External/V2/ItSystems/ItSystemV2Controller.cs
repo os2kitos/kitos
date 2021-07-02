@@ -16,6 +16,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.System;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystems
@@ -55,10 +56,10 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystems(
-            Guid? rightsHolderUuid = null,
-            Guid? businessTypeUuid = null,
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
+            [NonEmptyGuid] Guid? businessTypeUuid = null,
             string kleNumber = null,
-            Guid? kleUuid = null,
+            [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
@@ -104,10 +105,10 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystem(Guid uuid)
+        public IHttpActionResult GetItSystem([NonEmptyGuid] Guid uuid)
         {
-            if (uuid == Guid.Empty)
-                return BadRequest(nameof(uuid) + " must be a non-empty guid");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _itSystemService
                 .GetSystem(uuid)
@@ -128,8 +129,8 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(
-            Guid? rightsHolderUuid = null,
-            bool includeDeactivated = false, 
+            [NonEmptyGuid] Guid? rightsHolderUuid = null,
+            bool includeDeactivated = false,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -163,10 +164,10 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItSystemByRightsHoldersAccess(Guid uuid)
+        public IHttpActionResult GetItSystemByRightsHoldersAccess([NonEmptyGuid] Guid uuid)
         {
-            if (uuid == Guid.Empty)
-                return BadRequest(nameof(uuid) + " must be a non-empty guid");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _rightsHolderSystemService
                 .GetSystemAsRightsHolder(uuid)
@@ -220,7 +221,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItSystemAsRightsHolder(Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
+        public IHttpActionResult PutItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableITSystemPropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -248,7 +249,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeactivateSystemAsRightsHolder(Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
+        public IHttpActionResult DeactivateSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] DeactivationReasonRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -273,7 +274,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
                 UsingOrganizations = itSystem
                     .Usages
                     .Select(systemUsage => systemUsage.Organization)
-                    .Select(organization => organization.MapOrganizationResponseDTO())
+                    .Select(organization => organization.MapShallowOrganizationResponseDTO())
                     .ToList(),
                 LastModified = itSystem.LastChanged,
                 LastModifiedBy = itSystem.LastChangedByUser.Transform(user => user.MapIdentityNamePairDTO())
@@ -288,7 +289,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         {
             dto.Uuid = arg.Uuid;
             dto.Name = arg.Name;
-            dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapOrganizationResponseDTO());
+            dto.RightsHolder = arg.BelongsTo?.Transform(organization => organization.MapShallowOrganizationResponseDTO());
             dto.BusinessType = arg.BusinessType?.Transform(businessType => businessType.MapIdentityNamePairDTO());
             dto.Description = arg.Description;
             dto.CreatedBy = arg.ObjectOwner.MapIdentityNamePairDTO();

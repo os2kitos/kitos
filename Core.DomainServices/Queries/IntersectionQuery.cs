@@ -18,7 +18,7 @@ namespace Core.DomainServices.Queries
 
         public IQueryable<T> Apply(IQueryable<T> source)
         {
-            return _subQueries.Aggregate(source, (state, next) => next.Apply(state));
+            return _subQueries.Any() ? _subQueries.Aggregate(source, (state, next) => next.Apply(state)) : source;
         }
     }
 }
