@@ -9,7 +9,7 @@ using Core.DomainModel.Result;
 
 namespace Core.DomainModel.ItProject
 {
-    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHasAccessModifier, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
+    public class ItProject : HasRightsEntity<ItProject, ItProjectRight, ItProjectRole>,IHasReferences, IHierarchy<ItProject>, IProjectModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
     {
         public ItProject()
         {
@@ -23,7 +23,6 @@ namespace Core.DomainModel.ItProject
             JointMunicipalProjects = new List<ItProject>();
             CommonPublicProjects = new List<ItProject>();
             Children = new List<ItProject>();
-            Clones = new List<ItProject>();
             ItProjectStatuses = new List<ItProjectStatus>();
             Phase1 = new ItProjectPhase();
             Phase2 = new ItProjectPhase();
@@ -33,7 +32,6 @@ namespace Core.DomainModel.ItProject
             
             Priority = ItProjectPriority.None;
             PriorityPf = ItProjectPriority.None;
-            AccessModifier = AccessModifier.Local;
             ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
             Uuid = Guid.NewGuid();
@@ -109,30 +107,6 @@ namespace Core.DomainModel.ItProject
 
         public virtual ICollection<EconomyYear> EconomyYears { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the original it project identifier this it project was "cloned" from.
-        /// </summary>
-        /// <value>
-        ///     The original it project identifier.
-        /// </value>
-        public int? OriginalId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the original it project this it project was "cloned" from.
-        /// </summary>
-        /// <value>
-        ///     The original it project.
-        /// </value>
-        public virtual ItProject Original { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the it projects that were cloned from this it project.
-        /// </summary>
-        /// <value>
-        ///     The clones.
-        /// </value>
-        public virtual ICollection<ItProject> Clones { get; set; } // TODO this isn't used anymore, we should probably remove it
-
         public virtual GoalStatus GoalStatus { get; set; }
 
         #region Master
@@ -152,7 +126,6 @@ namespace Core.DomainModel.ItProject
         public string Note { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public AccessModifier AccessModifier { get; set; }
         public bool IsArchived { get; set; }
         public string Esdh { get; set; }
         public string Cmdb { get; set; }

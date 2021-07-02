@@ -88,7 +88,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _itProjectRepo.Verify(x => x.Insert(It.IsAny<ItProject>()), Times.Once);
             _itProjectRepo.Verify(x => x.Save(), Times.Exactly(1));
             var resultValue = result.Value;
-            Assert.Equal(AccessModifier.Local, resultValue.AccessModifier); //access modifier must be forced to local
             Assert.NotNull(resultValue.Handover);
             Assert.NotNull(resultValue.GoalStatus);
             Assert.True(new[] { PhaseNames.Phase1, PhaseNames.Phase2, PhaseNames.Phase3, PhaseNames.Phase4, PhaseNames.Phase5 }.SequenceEqual(new[] { resultValue.Phase1, resultValue.Phase2, resultValue.Phase3, resultValue.Phase4, resultValue.Phase5 }.Select(x => x.Name)));

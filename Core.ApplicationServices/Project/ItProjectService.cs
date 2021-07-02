@@ -106,32 +106,17 @@ namespace Core.ApplicationServices.Project
 
         public IQueryable<ItProject> GetAvailableProjects(params IDomainQuery<ItProject>[] conditions)
         {
-            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItProject>>.None;
-
-            if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItProject>(accessLevel, _userContext.OrganizationIds);
-            }
-
+            var userOrganizationsIds = _userContext.OrganizationIds;
+            var refinement = new QueryByOrganizationIds<ItProject>(userOrganizationsIds);
             var mainQuery = _itProjectRepository.GetProjects();
-
-            var refinedResult = refinement
-                .Select(x => x.Apply(mainQuery))
-                .GetValueOrFallback(mainQuery);
+            var refinedResult = refinement.Apply(mainQuery);
 
             return conditions.Any() ? new IntersectionQuery<ItProject>(conditions).Apply(refinedResult) : refinedResult;
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
         {
-            var projects = _itProjectRepository.GetProjects(
-                new OrganizationDataQueryParameters(
-                    organizationId,
-                    OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations,
-                    _authorizationContext.GetDataAccessLevel(organizationId)
-                )
-            );
+            var projects = _itProjectRepository.GetProjects(organizationId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
             {
