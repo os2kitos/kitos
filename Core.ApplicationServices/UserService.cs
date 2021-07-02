@@ -9,10 +9,13 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Security.Cryptography;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices
 {
@@ -24,6 +27,7 @@ namespace Core.ApplicationServices
         private readonly string _defaultUserPassword;
         private readonly bool _useDefaultUserPassword;
         private readonly IUserRepository _repository;
+        private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -46,7 +50,8 @@ namespace Core.ApplicationServices
             ICryptoService cryptoService,
             IAuthorizationContext authorizationContext,
             IDomainEvents domainEvents,
-            IUserRepository repository)
+            IUserRepository repository,
+            IOrganizationService organizationService)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -61,6 +66,7 @@ namespace Core.ApplicationServices
             _authorizationContext = authorizationContext;
             _domainEvents = domainEvents;
             _repository = repository;
+            _organizationService = organizationService;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -242,6 +248,27 @@ namespace Core.ApplicationServices
             }
 
             return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(role));
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid)
+                .Bind(organization =>
+                {
+                    //Requesting users inside the organization requires full access
+                    if (_authorizationContext.GetOrganizationReadAccessLevel(organization.Id) != OrganizationDataReadAccessLevel.All)
+                        return new OperationError("No access inside organization", OperationFailure.Forbidden);
+
+                    return _repository.GetUsersInOrganization(organization.Id).Transform(Result<IQueryable<User>, OperationError>.Success);
+                });
+        }
+
+        public Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid)
+        {
+            return GetUsersInOrganization(organizationUuid)
+                .Select(x => x.ByUuid(userUuid).FromNullable())
+                .Bind(user => user.Match<Result<User, OperationError>>(foundUser => foundUser, () => new OperationError(OperationFailure.NotFound)));
         }
     }
 }

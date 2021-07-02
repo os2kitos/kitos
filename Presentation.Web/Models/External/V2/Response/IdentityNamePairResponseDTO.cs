@@ -12,7 +12,7 @@ namespace Presentation.Web.Models.External.V2.Response
         public Guid Uuid { get; }
 
         /// <summary>
-        /// Name
+        /// Human readable name of the entity
         /// </summary>
         [Required]
         public string Name { get; }

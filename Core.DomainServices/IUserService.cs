@@ -14,6 +14,8 @@ namespace Core.DomainServices
         PasswordResetRequest GetPasswordReset(string hash);
         void ResetPassword(PasswordResetRequest passwordResetRequest, string newPassword);
         Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions();
-        Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role); 
+        Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
+        Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid);
+        Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
     }
 }

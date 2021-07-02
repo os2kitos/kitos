@@ -3,7 +3,6 @@ using Core.DomainServices;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Infrastructure.Services.Types;
 
@@ -60,6 +59,15 @@ namespace Infrastructure.DataAccess
         public IQueryable<User> GetUsersWithRoleAssignment(OrganizationRole role)
         {
             return AsQueryable().Transform(new QueryByRoleAssignment(role).Apply);
+        }
+
+        public IQueryable<User> GetUsersInOrganization(int organizationId)
+        {
+            return _context
+                .OrganizationRights
+                .AsQueryable()
+                .Where(x => x.OrganizationId == organizationId)
+                .Select(x => x.User);
         }
     }
 }
