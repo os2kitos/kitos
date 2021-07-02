@@ -63,11 +63,7 @@ namespace Infrastructure.DataAccess
 
         public IQueryable<User> GetUsersInOrganization(int organizationId)
         {
-            return _context
-                .OrganizationRights
-                .AsQueryable()
-                .Where(x => x.OrganizationId == organizationId)
-                .Select(x => x.User);
+            return AsQueryable().Where(user => user.OrganizationRights.Any(right => right.OrganizationId == organizationId));
         }
     }
 }

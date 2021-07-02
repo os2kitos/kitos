@@ -22,12 +22,12 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
 {
     [RoutePrefix("api/v2")]
     [DenyRightsHoldersAccess]
-    public class OrganizationUsersV2Controller : ExternalBaseController
+    public class OrganizationUserV2Controller : ExternalBaseController
     {
         private readonly IUserService _userService;
         private readonly ILogger _logger;
 
-        public OrganizationUsersV2Controller(IUserService userService, ILogger logger)
+        public OrganizationUserV2Controller(IUserService userService, ILogger logger)
         {
             _userService = userService;
             _logger = logger;
@@ -45,6 +45,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationUserResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound, Description = "Organization provided does not exist")]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizationUsers(
