@@ -23,8 +23,8 @@ describe("Data processing registration main detail tests", () => {
         return `Dpa${new Date().getTime()}_${index}`;
     }
 
-    const createRemark = () => {
-        return `Remark: ${new Date().getTime()}`;
+    const createRemark = (uniqueValue: string) => {
+        return `Remark: ${new Date().getTime()} ${uniqueValue}`;
     }
 
     var dropdownYes = "Ja";
@@ -50,8 +50,8 @@ describe("Data processing registration main detail tests", () => {
             const thirdCountryName = "Danmark";
             const basisForTransfer = "Andet";
             const dataResponsibleOptionName = "Fællesdataansvar";
-            var dataResponsibleRemark = createRemark();
-            var agreementConcludedRemark = createRemark();
+            var dataResponsibleRemark = createRemark("dataResponsible");
+            var agreementConcludedRemark = createRemark("agreementConcluded");
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
@@ -62,7 +62,7 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => dpaHelper.changeAgreementConcludedAt(today))
                 .then(() => verifyAgreementConcludedAt(today))
                 .then(() => pageObject.getAgreementConcludedRemark().sendKeys(agreementConcludedRemark))
-                .then(() => verifyAgreementConcludedRemark(dataResponsibleRemark))
+                .then(() => verifyAgreementConcludedRemark(agreementConcludedRemark))
                 //Changing data responsible
                 .then(() => dpaHelper.assignDataResponsible(dataResponsibleOptionName))
                 .then(() => verifyDataReponsible(dataResponsibleOptionName))
