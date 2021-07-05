@@ -354,7 +354,6 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
-    <Compile Include="Controllers\External\V2\Organizations\OrganizationUserV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />

@@ -5,7 +5,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 
-namespace Core.DomainServices
+namespace Core.ApplicationServices
 {
     public interface IUserService : IDisposable
     {
