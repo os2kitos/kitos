@@ -8,6 +8,7 @@ using Core.DomainServices;
 using Moq;
 using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices;
 using Core.DomainServices.Authorization;
 using Tests.Toolkit.Patterns;
 using Xunit;

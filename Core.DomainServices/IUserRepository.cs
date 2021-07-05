@@ -14,5 +14,6 @@ namespace Core.DomainServices
         IQueryable<User> GetUsers();
         IQueryable<User> GetUsersWithCrossOrganizationPermissions();
         IQueryable<User> GetUsersWithRoleAssignment(OrganizationRole role);
+        IQueryable<User> GetUsersInOrganization(int organizationId);
     }
 }
