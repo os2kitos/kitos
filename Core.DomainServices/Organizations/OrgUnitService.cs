@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainServices;
 using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Extensions;
 
-namespace Core.ApplicationServices
+namespace Core.DomainServices.Organizations
 {
     public class OrgUnitService : IOrgUnitService
     {
@@ -34,7 +34,7 @@ namespace Core.ApplicationServices
                 unit = unit.Parent;
 
                 //did we get a loop?
-                if(unit.Id == whereWeStarted.Id) throw new Exception("Loop in Organization Units");
+                if (unit.Id == whereWeStarted.Id) throw new Exception("Loop in Organization Units");
             }
 
             return unit;
@@ -103,16 +103,16 @@ namespace Core.ApplicationServices
 
 
             // Remove OrgUnit from ItSystemUsages
-            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId== id);
+            var itSystemUsageOrgUnitUsages = _itSystemUsageOrgUnitUsageRepository.Get(x => x.OrganizationUnitId == id);
             foreach (var itSystemUsage in itSystemUsageOrgUnitUsages)
             {
                 if (itSystemUsage.ResponsibleItSystemUsage != null)
                 {
                     throw new ArgumentException($"OrganizationUnit is ResponsibleOrgUnit for ItSystemUsage: {itSystemUsage.ItSystemUsageId}");
                 }
-                
+
                 _itSystemUsageOrgUnitUsageRepository.Delete(itSystemUsage);
-                
+
             }
             _itSystemUsageOrgUnitUsageRepository.Save();
 
@@ -140,6 +140,11 @@ namespace Core.ApplicationServices
 
             _orgUnitRepository.DeleteWithReferencePreload(orgUnit);
             _orgUnitRepository.Save();
+        }
+
+        public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)
+        {
+            return _orgUnitRepository.AsQueryable().ByOrganizationId(organization.Id);
         }
     }
 }

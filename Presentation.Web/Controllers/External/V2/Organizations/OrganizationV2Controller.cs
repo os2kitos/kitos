@@ -18,7 +18,6 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
 using Serilog;
@@ -190,13 +189,16 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
             string nameQuery = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
-            var queries = new List<IDomainQuery<User>>(); //TODO: Queries -> must use proper org unit repository
+            var queries = new List<IDomainQuery<OrganizationUnit>>();
+
+            if (!string.IsNullOrWhiteSpace(nameQuery))
+                queries.Add(new QueryByPartOfName<OrganizationUnit>(nameQuery));
 
             return _organizationService
-                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Select(organization => organization.OrgUnits.OrderBy(unit => unit.Id))
+                .GetOrganizationUnits(organizationUuid,queries.ToArray())
+                .Select(units=>units.OrderBy(unit=>unit.Id))
                 .Select(units => units.Page(paginationQuery))
-                .Select(units => units.Select(ToOrganizationUnitResponseDto).ToList())
+                .Select(units => units.AsEnumerable().Select(ToOrganizationUnitResponseDto).ToList())
                 .Match(Ok, FromOperationError);
         }
 

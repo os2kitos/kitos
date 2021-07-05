@@ -34,6 +34,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<User>> _userRepository;
         private readonly Mock<IOrganizationRepository> _repositoryMock;
         private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
 
         public OrganizationServiceTest()
         {
@@ -48,6 +49,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _userRepository = new Mock<IGenericRepository<User>>();
             _repositoryMock = new Mock<IOrganizationRepository>();
+            _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -57,7 +59,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _roleService.Object,
                 _transactionManager.Object,
-                _repositoryMock.Object);
+                _repositoryMock.Object,
+                _orgUnitServiceMock.Object);
         }
 
         [Fact]
