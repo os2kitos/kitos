@@ -178,10 +178,20 @@ namespace Core.ApplicationServices.Organizations
             }
         }
 
-        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid)
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel accessLevel = OrganizationDataReadAccessLevel.Public)
         {
+            if(accessLevel == OrganizationDataReadAccessLevel.None)
+            {
+                throw new ArgumentOutOfRangeException(nameof(accessLevel), "Cannot ask for organizations where user does not have access");
+            }
+
             return _repository.GetByUuid(organizationUuid).Match<Result<Organization, OperationError>>(organization =>
                 {
+                    if (_authorizationContext.GetOrganizationReadAccessLevel(organization.Id) < accessLevel)
+                    {
+                        return new OperationError(OperationFailure.Forbidden);
+                    }
+
                     if (!_authorizationContext.AllowReads(organization))
                     {
                         return new OperationError(OperationFailure.Forbidden);

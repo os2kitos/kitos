@@ -1,4 +1,5 @@
-﻿using Core.DomainModel.Organization;
+﻿using Core.DomainModel;
+using Core.DomainModel.Organization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +97,21 @@ namespace Tests.Integration.Presentation.Web.Projects.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GET_Projects_Returns_Forbidden_For_Organization_Where_User_Has_No_Roles()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
+                A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
+
+            //Act
+            var response = await ItProjectV2Helper.SendGetItProjectsAsync(regularUserToken.Token, organization.Uuid, null, 0, 100);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
     }
 }

@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Uuid_To_ItProject : IMigrationMetadata
+    public sealed partial class Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Uuid_To_ItProject));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields));
         
         string IMigrationMetadata.Id
         {
-            get { return "202107012249130_Added_Uuid_To_ItProject"; }
+            get { return "202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields"; }
         }
         
         string IMigrationMetadata.Source

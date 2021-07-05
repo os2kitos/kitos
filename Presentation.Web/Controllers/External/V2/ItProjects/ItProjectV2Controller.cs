@@ -21,6 +21,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
     /// API for the projects stored in KITOS.
     /// </summary>
     [RoutePrefix("api/v2")]
+    [DenyRightsHoldersAccess]
     public class ItProjectV2Controller : ExternalBaseController
     {
         private readonly IItProjectService _itProjectService;
@@ -31,7 +32,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
         }
 
         /// <summary>
-        /// Returns all IT-Projects available to the current user
+        /// Returns all IT-Projects in the requested organization available to the user
         /// </summary>
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
@@ -43,7 +44,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItProjects(
-            [Required][NonEmptyGuid] Guid organizationUuid,
+            [NonEmptyGuid] Guid organizationUuid,
             string nameContent = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
@@ -52,25 +53,22 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
 
             var refinements = new List<IDomainQuery<ItProject>>();
 
-            refinements.Add(new QueryByOrganizationUuid<ItProject>(organizationUuid));
-
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItProject>(nameContent));
 
             return _itProjectService
-                .GetAvailableProjects(refinements.ToArray())
-                .OrderBy(x => x.Id)
-                .Page(paginationQuery)
-                .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
-                .Transform(Ok);
+                .GetProjectsInOrganization(organizationUuid, refinements.ToArray())
+                .Select(x => x.OrderBy(project => project.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList().Select(x => x.MapIdentityNamePairDTO()))
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Returns requested IT-System
+        /// Returns requested IT-Project
         /// </summary>
-        /// <param name="uuid">Specific IT-System UUID</param>
-        /// <returns>Specific data related to the IT-System</returns>
+        /// <param name="uuid">Specific IT-Project UUID</param>
+        /// <returns>Specific data related to the IT-Project</returns>
         [HttpGet]
         [Route("it-projects/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]

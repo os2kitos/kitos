@@ -358,7 +358,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             };
 
             return await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto);
-
         }
 
         public static async Task<HttpResponseMessage> PatchOdataUserAsync(ApiUserDTO userDto, int userId)

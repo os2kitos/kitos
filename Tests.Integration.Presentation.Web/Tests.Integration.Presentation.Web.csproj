@@ -124,6 +124,7 @@
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
     <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
+    <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
@@ -153,6 +154,7 @@
     <Compile Include="Tools\External\ItProjectV2Helper.cs" />
     <Compile Include="Tools\External\OptionV2ApiHelper.cs" />
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
+    <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />

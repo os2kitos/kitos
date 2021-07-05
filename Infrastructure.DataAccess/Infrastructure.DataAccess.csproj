@@ -757,9 +757,9 @@
     <Compile Include="Migrations\202106181036069_Add_TaskRef_Uuid.designer.cs">
       <DependentUpon>202106181036069_Add_TaskRef_Uuid.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202107012249130_Added_Uuid_To_ItProject.cs" />
-    <Compile Include="Migrations\202107012249130_Added_Uuid_To_ItProject.designer.cs">
-      <DependentUpon>202107012249130_Added_Uuid_To_ItProject.cs</DependentUpon>
+    <Compile Include="Migrations\202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.cs" />
+    <Compile Include="Migrations\202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.designer.cs">
+      <DependentUpon>202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1242,8 +1242,8 @@
     <EmbeddedResource Include="Migrations\202106181036069_Add_TaskRef_Uuid.resx">
       <DependentUpon>202106181036069_Add_TaskRef_Uuid.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202107012249130_Added_Uuid_To_ItProject.resx">
-      <DependentUpon>202107012249130_Added_Uuid_To_ItProject.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.resx">
+      <DependentUpon>202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

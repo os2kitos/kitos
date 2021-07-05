@@ -2,7 +2,7 @@ using System;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
@@ -11,7 +11,6 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Factories;
-using Core.DomainServices.Model;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
@@ -29,7 +28,7 @@ namespace Core.ApplicationServices.Project
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IOrganizationalUserContext _userContext;
+        private readonly IOrganizationService _organizationService;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -39,7 +38,7 @@ namespace Core.ApplicationServices.Project
             IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IOrganizationalUserContext userContext)
+            IOrganizationService organizationService)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -48,7 +47,7 @@ namespace Core.ApplicationServices.Project
             _referenceService = referenceService;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _userContext = userContext;
+            _organizationService = organizationService;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
@@ -104,34 +103,24 @@ namespace Core.ApplicationServices.Project
             }
         }
 
-        public IQueryable<ItProject> GetAvailableProjects(params IDomainQuery<ItProject>[] conditions)
+        public Result<IQueryable<ItProject>, OperationError> GetProjectsInOrganization(Guid organizationUuid, params IDomainQuery<ItProject>[] conditions)
         {
-            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItProject>>.None;
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization =>
+                {
+                    var query = new IntersectionQuery<ItProject>(conditions);
 
-            if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItProject>(accessLevel, _userContext.OrganizationIds);
-            }
-
-            var mainQuery = _itProjectRepository.GetProjects();
-
-            var refinedResult = refinement
-                .Select(x => x.Apply(mainQuery))
-                .GetValueOrFallback(mainQuery);
-
-            return conditions.Any() ? new IntersectionQuery<ItProject>(conditions).Apply(refinedResult) : refinedResult;
+                    return _itProjectRepository
+                        .GetProjectsInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<ItProject>, OperationError>.Success);
+                });
         }
 
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
         {
-            var projects = _itProjectRepository.GetProjects(
-                new OrganizationDataQueryParameters(
-                    organizationId,
-                    OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations,
-                    _authorizationContext.GetDataAccessLevel(organizationId)
-                )
-            );
+            var projects = _itProjectRepository.GetProjectsInOrganization(organizationId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
             {

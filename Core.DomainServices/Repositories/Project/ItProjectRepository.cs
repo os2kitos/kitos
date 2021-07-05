@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Model;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Project
@@ -26,14 +25,9 @@ namespace Core.DomainServices.Repositories.Project
             return _repository.AsQueryable().ByUuid(uuid).FromNullable();
         }
 
-        public IQueryable<ItProject> GetProjects(OrganizationDataQueryParameters parameters)
+        public IQueryable<ItProject> GetProjectsInOrganization(int organizationId)
         {
-            if (parameters == null)
-            {
-                throw new ArgumentNullException(nameof(parameters));
-            }
-
-            return _repository.AsQueryable().ByOrganizationDataQueryParameters(parameters);
+            return _repository.AsQueryable().ByOrganizationId(organizationId);
         }
 
         public IQueryable<ItProject> GetProjects()
