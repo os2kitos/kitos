@@ -104,7 +104,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                 return BadRequest(ModelState);
 
             return _organizationService
-                .GetOrganization(organizationUuid)
+                .GetOrganization(organizationUuid, null)
                 .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }

@@ -22,7 +22,7 @@ namespace Core.ApplicationServices.Organizations
 
         Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
 
-        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel accessLevel = OrganizationDataReadAccessLevel.Public);
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
     }
