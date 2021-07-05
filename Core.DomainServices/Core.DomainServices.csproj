@@ -111,7 +111,6 @@
     <Compile Include="Repositories\TaskRefs\TaskRefRepository.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
-    <Compile Include="IUserService.cs" />
     <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />
     <Compile Include="SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandler.cs" />
     <Compile Include="GDPR\CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent.cs" />

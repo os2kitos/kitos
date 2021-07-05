@@ -143,6 +143,14 @@ namespace Core.DomainModel
                 .Distinct();
         }
 
+        public IEnumerable<OrganizationRole> GetRolesInOrganization(Guid organizationUuid)
+        {
+            return OrganizationRights
+                .Where(organizationRight => organizationRight.Organization.Uuid == organizationUuid)
+                .Select(organizationRight => organizationRight.Role)
+                .Distinct();
+        }
+
         #region Authentication
 
         public bool IsGlobalAdmin { get; set; }

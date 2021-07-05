@@ -14,7 +14,7 @@ namespace Core.DomainServices.Queries.User
 
         public IQueryable<DomainModel.User> Apply(IQueryable<DomainModel.User> users)
         {
-            return users.Where(x => x.OrganizationRights.Any(x => x.Role == _role));
+            return users.Where(user => user.OrganizationRights.Any(right => right.Role == _role));
         }
     }
 }
