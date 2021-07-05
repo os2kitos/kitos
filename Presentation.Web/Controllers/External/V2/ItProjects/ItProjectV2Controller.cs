@@ -53,18 +53,15 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
 
             var refinements = new List<IDomainQuery<ItProject>>();
 
-            refinements.Add(new QueryByOrganizationUuid<ItProject>(organizationUuid));
-
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItProject>(nameContent));
 
             return _itProjectService
-                .GetAvailableProjects(refinements.ToArray())
-                .OrderBy(x => x.Id)
-                .Page(paginationQuery)
-                .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
-                .Transform(Ok);
+                .GetProjectsInOrganization(organizationUuid, refinements.ToArray())
+                .Select(x => x.OrderBy(project => project.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList().Select(x => x.MapIdentityNamePairDTO()))
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

@@ -25,7 +25,7 @@ namespace Core.DomainServices.Repositories.Project
             return _repository.AsQueryable().ByUuid(uuid).FromNullable();
         }
 
-        public IQueryable<ItProject> GetProjects(int organizationId)
+        public IQueryable<ItProject> GetProjectsInOrganization(int organizationId)
         {
             return _repository.AsQueryable().ByOrganizationId(organizationId);
         }

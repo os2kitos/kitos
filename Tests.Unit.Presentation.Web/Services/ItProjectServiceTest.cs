@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
@@ -31,7 +32,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IDomainEvents> _domainEvents;
-        private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
 
         public ItProjectServiceTest()
         {
@@ -42,7 +43,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _transactionManager = new Mock<ITransactionManager>();
             _referenceService = new Mock<IReferenceService>();
             _domainEvents = new Mock<IDomainEvents>();
-            _userContextMock = new Mock<IOrganizationalUserContext>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new ItProjectService(
                 _itProjectRepo.Object,
                 _authorizationContext.Object,
@@ -51,7 +52,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
-                _userContextMock.Object);
+                _organizationServiceMock.Object);
         }
 
         [Fact]
@@ -399,7 +400,13 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetAvailableProjects_Returns_Projects()
         {
             //Arrange
+            var orgUuid = A<Guid>();
             var orgId = A<int>();
+            var org = new Organization()
+            {
+                Id = orgId,
+                Uuid = orgUuid
+            };
             var projectUuid = A<Guid>();
             var project = new ItProject()
             {
@@ -407,75 +414,34 @@ namespace Tests.Unit.Presentation.Web.Services
                 OrganizationId = orgId
             };
 
-            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId });
-            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
+            _organizationServiceMock.Setup(x => x.GetOrganization(orgUuid, OrganizationDataReadAccessLevel.All)).Returns(org);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(orgId)).Returns(new List<ItProject>() { project }.AsQueryable());
 
             //Act
-            var result = _sut.GetAvailableProjects();
+            var result = _sut.GetProjectsInOrganization(orgUuid);
 
             //Assert
-            var projectResult = Assert.Single(result.ToList());
+            Assert.True(result.Ok);
+            var projectResult = Assert.Single(result.Value.ToList());
             Assert.Equal(projectUuid, projectResult.Uuid);
         }
 
         [Fact]
-        public void GetAvailableProjects_Returns_Projects_Where_User_Has_Role_In_Organization()
+        public void GetAvailableProjects_Returns_Error_From_OrganizationService()
         {
             //Arrange
-            var orgId1 = A<int>();
-            var orgId2 = A<int>();
-            var project1 = new ItProject()
-            {
-                Uuid = A<Guid>(),
-                OrganizationId = orgId1
-            };
-            var project2 = new ItProject()
-            {
-                Uuid = A<Guid>(),
-                OrganizationId = orgId2
-            };
-            var project3 = new ItProject()
-            {
-                Uuid = A<Guid>(),
-                OrganizationId = A<int>()
-            };
+            var orgUuid = A<Guid>();
 
-            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId1, orgId2 });
-            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project1, project2, project3 }.AsQueryable());
+            var operationError = new OperationError(A<OperationFailure>());
+
+            _organizationServiceMock.Setup(x => x.GetOrganization(orgUuid, OrganizationDataReadAccessLevel.All)).Returns(operationError);
 
             //Act
-            var result = _sut.GetAvailableProjects();
+            var result = _sut.GetProjectsInOrganization(orgUuid);
 
             //Assert
-            Assert.Equal(2, result.Count());
-
-            var project1Result = result.First(x => x.Uuid == project1.Uuid);
-            Assert.Same(project1, project1Result);
-
-            var project2Result = result.First(x => x.Uuid == project2.Uuid);
-            Assert.Same(project2, project2Result);
-        }
-
-        [Fact]
-        public void GetAvailableProjects_Returns_Nothing_If_User_Has_No_Role_In_Project_Organization()
-        {
-            //Arrange
-            var orgId = A<int>();
-            var projectUuid = A<Guid>();
-            var project = new ItProject()
-            {
-                Uuid = projectUuid,
-                OrganizationId = A<int>()
-            };
-
-            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId });
-            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
-
-            //Act
-            var result = _sut.GetAvailableProjects();
-
-            //Assert
-            Assert.Empty(result.ToList());
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
         }
 
         private void ExpectGetUserReturns(int participantId, User value)

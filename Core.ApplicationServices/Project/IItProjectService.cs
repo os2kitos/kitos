@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Project
 
         Result<ItProject, OperationFailure> DeleteProject(int id);
 
-        IQueryable<ItProject> GetAvailableProjects(params IDomainQuery<ItProject>[] conditions);
+        Result<IQueryable<ItProject>, OperationError> GetProjectsInOrganization(Guid organizationUuid, params IDomainQuery<ItProject>[] conditions);
 
         IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null);
 
