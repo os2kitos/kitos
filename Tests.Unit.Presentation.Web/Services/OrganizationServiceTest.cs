@@ -433,7 +433,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowReadOrganizationReturns(expectedOrg, false);
 
             //Act
-            var result = _sut.GetOrganization(uuid, OrganizationDataReadAccessLevel.All);
+            var result = _sut.GetOrganization(uuid, null);
 
             //Assert
             Assert.True(result.Failed);
@@ -448,7 +448,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetOrganizationByUuidReturns(uuid, Maybe<Organization>.None);
 
             //Act
-            var result = _sut.GetOrganization(uuid);
+            var result = _sut.GetOrganization(uuid, OrganizationDataReadAccessLevel.All);
 
             //Assert
             Assert.True(result.Failed);
