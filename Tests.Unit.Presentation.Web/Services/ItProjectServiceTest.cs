@@ -362,7 +362,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetInterface_Returns_Forbidden_If_Not_Read_Access()
+        public void GetProject_Returns_Forbidden_If_Not_Read_Access()
         {
             //Arrange
             var projectUuid = A<Guid>();
@@ -380,7 +380,7 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetInterface_Returns_NotFound_If_No_Interface()
+        public void GetProject_Returns_NotFound_If_No_Interface()
         {
             //Arrange
             var projectUuid = A<Guid>();
@@ -399,13 +399,15 @@ namespace Tests.Unit.Presentation.Web.Services
         public void GetAvailableProjects_Returns_Projects()
         {
             //Arrange
+            var orgId = A<int>();
             var projectUuid = A<Guid>();
             var project = new ItProject()
             {
-                Uuid = projectUuid
+                Uuid = projectUuid,
+                OrganizationId = orgId
             };
 
-            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId });
             _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
 
             //Act
@@ -417,16 +419,56 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
-        public void GetAvailableProjects_Returns_Nothing_If_AccessLevel_None()
+        public void GetAvailableProjects_Returns_Projects_Where_User_Has_Role_In_Organization()
         {
             //Arrange
+            var orgId1 = A<int>();
+            var orgId2 = A<int>();
+            var project1 = new ItProject()
+            {
+                Uuid = A<Guid>(),
+                OrganizationId = orgId1
+            };
+            var project2 = new ItProject()
+            {
+                Uuid = A<Guid>(),
+                OrganizationId = orgId2
+            };
+            var project3 = new ItProject()
+            {
+                Uuid = A<Guid>(),
+                OrganizationId = A<int>()
+            };
+
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId1, orgId2 });
+            _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project1, project2, project3 }.AsQueryable());
+
+            //Act
+            var result = _sut.GetAvailableProjects();
+
+            //Assert
+            Assert.Equal(2, result.Count());
+
+            var project1Result = result.First(x => x.Uuid == project1.Uuid);
+            Assert.Same(project1, project1Result);
+
+            var project2Result = result.First(x => x.Uuid == project2.Uuid);
+            Assert.Same(project2, project2Result);
+        }
+
+        [Fact]
+        public void GetAvailableProjects_Returns_Nothing_If_User_Has_No_Role_In_Project_Organization()
+        {
+            //Arrange
+            var orgId = A<int>();
             var projectUuid = A<Guid>();
             var project = new ItProject()
             {
-                Uuid = projectUuid
+                Uuid = projectUuid,
+                OrganizationId = A<int>()
             };
 
-            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.None);
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { orgId });
             _specificProjectRepo.Setup(x => x.GetProjects()).Returns(new List<ItProject>() { project }.AsQueryable());
 
             //Act
