@@ -10,6 +10,7 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries.User;
@@ -17,6 +18,7 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
+using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
 using Serilog;
@@ -188,32 +190,38 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
             string nameQuery = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
         {
-            var queries = new List<IDomainQuery<User>>();
-            throw new NotImplementedException();
+            var queries = new List<IDomainQuery<User>>(); //TODO: Queries -> must use proper org unit repository
+
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(organization => organization.OrgUnits.OrderBy(unit => unit.Id))
+                .Select(units => units.Page(paginationQuery))
+                .Select(units => units.Select(ToOrganizationUnitResponseDto).ToList())
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Returns the a specific user within an organization
+        /// Returns the a specific organization unit inside an organization
         /// </summary>
         /// <param name="organizationUuid">UUID of the organization</param>
-        /// <param name="userUuid">UUID of the user entity in KITOS</param>
-        /// <returns>A user in the context of a specific organization</returns>
-        //[HttpGet]
-        //[Route("organizations/{organizationUuid}/users/{userUuid}")]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUserResponseDTO))]
-        //[SwaggerResponse(HttpStatusCode.BadRequest)]
-        //[SwaggerResponse(HttpStatusCode.NotFound)]
-        //[SwaggerResponse(HttpStatusCode.Forbidden)]
-        //[SwaggerResponse(HttpStatusCode.Unauthorized)]
-        //[DenyRightsHoldersAccess]
-        //public IHttpActionResult GetOrganizationUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
-        //{
-        //    return _userService
-        //        .GetUserInOrganization(organizationUuid, userUuid)
-        //        .Select(user => (organizationUuid, user))
-        //        .Select(ToUserResponseDTO)
-        //        .Match(Ok, FromOperationError);
-        //}
+        /// <param name="organizationUnitId">UUID of the organization unit in KITOS</param>
+        /// <returns>An organization unit</returns>
+        [HttpGet]
+        [Route("organizations/{organizationUuid}/organization-units/{organizationUnitId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUserResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [DenyRightsHoldersAccess]
+        public IHttpActionResult GetOrganizationUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitId)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(x => x.GetOrganizationUnit(organizationUnitId).Match<Result<OrganizationUnit, OperationError>>(unit => unit, () => new OperationError("Organization unit not found in the organization", OperationFailure.NotFound)))
+                .Select(ToOrganizationUnitResponseDto)
+                .Match(Ok, FromOperationError);
+        }
 
         /// <summary>
         /// Returns organizations in which the current user has "RightsHolderAccess" permission
@@ -235,7 +243,17 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                 .Transform(ToShallowDTOs)
                 .Transform(Ok);
         }
-
+        private static OrganizationUnitResponseDTO ToOrganizationUnitResponseDto(OrganizationUnit unit)
+        {
+            return new()
+            {
+                Uuid = unit.Uuid,
+                Name = unit.Name,
+                UnitId = unit.LocalId,
+                Ean = unit.Ean,
+                ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
+            };
+        }
         private OrganizationUserResponseDTO ToUserResponseDTO((Guid organizationUuid, User user) context)
         {
             return new()

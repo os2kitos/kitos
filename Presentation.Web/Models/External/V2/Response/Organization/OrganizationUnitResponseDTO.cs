@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.External.V2.Response.Organization
         /// <summary>
         /// Optional Link to parent unit in the organizational hierarchy
         /// </summary>
-        public IdentityNamePairResponseDTO ParentUnit { get; set; }
+        public IdentityNamePairResponseDTO ParentOrganizationUnit { get; set; }
         /// <summary>
         /// Kle relevant for the organization unit
         /// </summary>

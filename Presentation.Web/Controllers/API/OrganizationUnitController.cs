@@ -35,6 +35,12 @@ namespace Presentation.Web.Controllers.API
 
         public HttpResponseMessage Post(OrgUnitDTO dto) => base.Post(dto.OrganizationId, dto);
 
+        protected override void PrepareNewObject(OrganizationUnit item)
+        {
+            item.Uuid = Guid.NewGuid();
+            base.PrepareNewObject(item);
+        }
+
         [NonAction]
         public override HttpResponseMessage Post(int organizationId, OrgUnitDTO dto) => throw new NotSupportedException();
 

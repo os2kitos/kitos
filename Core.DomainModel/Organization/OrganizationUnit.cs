@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -9,17 +10,17 @@ namespace Core.DomainModel.Organization
     /// <summary>
     /// Represents a unit or department within an organization (OIO term: "OrgEnhed").
     /// </summary>
-    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization
+    public class OrganizationUnit : HasRightsEntity<OrganizationUnit, OrganizationUnitRight, OrganizationUnitRole>, IHierarchy<OrganizationUnit>, IOrganizationModule, IOwnedByOrganization, IHasUuid, IHasName
     {
         public const int MaxNameLength = 100;
         public OrganizationUnit()
         {
             TaskUsages = new List<TaskUsage>();
-            TaskRefs = new List<TaskRef>();
             OwnedTasks = new List<TaskRef>();
             DefaultUsers = new List<OrganizationRight>();
             Using = new List<ItSystemUsageOrgUnitUsage>();
             UsingItProjects = new List<ItProjectOrgUnitUsage>();
+            Uuid = Guid.NewGuid();
         }
 
         public string LocalId { get; set; }
@@ -53,8 +54,6 @@ namespace Core.DomainModel.Organization
         /// <summary>
         /// Local tasks that was created in this unit
         /// </summary>
-        public virtual ICollection<TaskRef> TaskRefs { get; set; }
-
         public virtual ICollection<TaskRef> OwnedTasks { get; set; }
         /// <summary>
         /// Gets or sets the delegated system usages.
@@ -108,5 +107,6 @@ namespace Core.DomainModel.Organization
 
             return base.HasUserWriteAccess(user);
         }
+        public Guid Uuid { get; set; }
     }
 }
