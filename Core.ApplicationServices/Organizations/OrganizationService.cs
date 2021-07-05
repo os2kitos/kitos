@@ -178,17 +178,20 @@ namespace Core.ApplicationServices.Organizations
             }
         }
 
-        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid)
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null)
         {
             return _repository.GetByUuid(organizationUuid).Match<Result<Organization, OperationError>>(organization =>
-                {
-                    if (!_authorizationContext.AllowReads(organization))
-                    {
-                        return new OperationError(OperationFailure.Forbidden);
-                    }
+            {
+                var hasAccess = withMinimumAccessLevel.HasValue
+                    ? _authorizationContext.GetOrganizationReadAccessLevel(organization.Id) >= withMinimumAccessLevel.Value
+                    : _authorizationContext.AllowReads(organization);
 
-                    return organization;
-                },
+                if (!hasAccess)
+                {
+                    return new OperationError(OperationFailure.Forbidden);
+                }
+                return organization;
+            },
                 () => new OperationError(OperationFailure.NotFound)
             );
         }

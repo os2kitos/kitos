@@ -254,7 +254,7 @@ namespace Core.ApplicationServices
         public Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries)
         {
             return _organizationService
-                .GetOrganization(organizationUuid)
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
                 .Bind(organization =>
                 {
                     //Requesting users inside the organization requires full access

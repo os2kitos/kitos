@@ -289,7 +289,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void ExpectGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
-            _organizationServiceMock.Setup(x => x.GetOrganization(organizationId)).Returns(organization);
+            _organizationServiceMock.Setup(x => x.GetOrganization(organizationId, OrganizationDataReadAccessLevel.All)).Returns(organization);
         }
     }
 }

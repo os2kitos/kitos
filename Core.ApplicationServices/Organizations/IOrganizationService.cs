@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.Organizations
@@ -21,7 +22,7 @@ namespace Core.ApplicationServices.Organizations
 
         Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
 
-        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid);
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
     }
