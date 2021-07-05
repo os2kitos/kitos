@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -31,7 +32,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IItContractRepository _repository;
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
-        private readonly IOrganizationalUserContext _userContext;
+        private readonly IOrganizationService _organizationService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -42,7 +43,7 @@ namespace Core.ApplicationServices.Contract
             IAuthorizationContext authorizationContext,
             ILogger logger,
             IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
-            IOrganizationalUserContext userContext)
+            IOrganizationService organizationService)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -52,12 +53,12 @@ namespace Core.ApplicationServices.Contract
             _authorizationContext = authorizationContext; 
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
-            _userContext = userContext;
+            _organizationService = organizationService;
         }
 
         public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
         {
-            var contracts = _repository.GetByOrganizationId(orgId);
+            var contracts = _repository.GetContractsInOrganization(orgId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
             {
@@ -140,23 +141,19 @@ namespace Core.ApplicationServices.Contract
             );
         }
 
-        public IQueryable<ItContract> GetAvailableContracts(params IDomainQuery<ItContract>[] conditions)
+        public Result<IQueryable<ItContract>, OperationError> GetContractsInOrganization(Guid organizationUuid, params IDomainQuery<ItContract>[] conditions)
         {
-            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-            var refinement = Maybe<IDomainQuery<ItContract>>.None;
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization =>
+                {
+                    var query = new IntersectionQuery<ItContract>(conditions);
 
-            if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                refinement = new QueryAllByRestrictionCapabilities<ItContract>(accessLevel, _userContext.OrganizationIds);
-            }
-
-            var mainQuery = _repository.GetContracts();
-
-            var refinedResult = refinement
-                .Select(x => x.Apply(mainQuery))
-                .GetValueOrFallback(mainQuery);
-
-            return conditions.Any() ? new IntersectionQuery<ItContract>(conditions).Apply(refinedResult) : refinedResult;
+                    return _repository
+                        .GetContractsInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<ItContract>, OperationError>.Success);
+                });
         }
 
         public Result<ItContract, OperationError> GetContract(Guid uuid)

@@ -84,5 +84,7 @@ namespace Presentation.Web.Models
         public ExternalReferenceDTO Reference;
 
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
+
+        public Guid Uuid { get; set; }
     }
 }

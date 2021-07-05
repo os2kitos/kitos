@@ -9,7 +9,7 @@ namespace Core.DomainServices.Repositories.Contract
     {
         IQueryable<ItContract> GetBySystemUsageAssociation(int systemUsageId);
         ItContract GetById(int contractId);
-        IQueryable<ItContract> GetByOrganizationId(int organizationId);
+        IQueryable<ItContract> GetContractsInOrganization(int organizationId);
         void DeleteContract(ItContract contract);
         void Update(ItContract contract);
         IQueryable<ItContract> GetContracts();

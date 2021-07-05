@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Contract
         Result<DataProcessingRegistration, OperationError> RemoveDataProcessingRegistration(int id, int dataProcessingRegistrationId);
         Result<IEnumerable<DataProcessingRegistration>, OperationError> GetDataProcessingRegistrationsWhichCanBeAssigned(int id, string nameQuery, int pageSize);
 
-        IQueryable<ItContract> GetAvailableContracts(params IDomainQuery<ItContract>[] conditions);
+        Result<IQueryable<ItContract>, OperationError> GetContractsInOrganization(Guid organizationUuid, params IDomainQuery<ItContract>[] conditions);
         Result<ItContract, OperationError> GetContract(Guid uuid);
     }
 }

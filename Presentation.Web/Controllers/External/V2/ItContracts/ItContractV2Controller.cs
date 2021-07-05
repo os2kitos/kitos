@@ -35,6 +35,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// Returns all IT-Contracts available to the current user
         /// </summary>
         /// <param name="organizationUuid">Organization UUID filter</param>
+        /// <param name="systemUuid">Associated system UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
         /// <returns></returns>
         [HttpGet]
@@ -44,7 +45,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(
-            [Required][NonEmptyGuid] Guid organizationUuid,
+            [NonEmptyGuid] Guid organizationUuid,
             [NonEmptyGuid] Guid? systemUuid = null,
             string nameContent = null,
             [FromUri] StandardPaginationQuery paginationQuery = null)
@@ -54,8 +55,6 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
 
             var refinements = new List<IDomainQuery<ItContract>>();
 
-            refinements.Add(new QueryByOrganizationUuid<ItContract>(organizationUuid));
-
             if (systemUuid.HasValue)
                 refinements.Add(new QueryBySystemUuid(systemUuid.Value));
 
@@ -63,12 +62,11 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
 
             return _itContractService
-                .GetAvailableContracts(refinements.ToArray())
-                .OrderBy(x => x.Id)
-                .Page(paginationQuery)
-                .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
-                .Transform(Ok);
+                .GetContractsInOrganization(organizationUuid, refinements.ToArray())
+                .Select(x => x.OrderBy(contract => contract.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList().Select(x => x.MapIdentityNamePairDTO()))
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -77,13 +75,13 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// <param name="uuid">Specific IT-Contract UUID</param>
         /// <returns>Specific data related to the IT-Contract</returns>
         [HttpGet]
-        [Route("it-projects/{uuid}")]
+        [Route("it-contracts/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetItProject([Required][NonEmptyGuid] Guid uuid)
+        public IHttpActionResult GetItProject([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
