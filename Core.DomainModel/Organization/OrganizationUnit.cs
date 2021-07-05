@@ -65,14 +65,6 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<ItSystemUsage.ItSystemUsage> DelegatedSystemUsages { get; set; }
 
         /// <summary>
-        /// Gets or sets it system usages.
-        /// </summary>
-        /// <value>
-        /// It system usages.
-        /// </value>
-        public virtual ICollection<ItSystemUsage.ItSystemUsage> ItSystemUsages { get; set; } // TODO is this used anymore isn't Using used instead?
-
-        /// <summary>
         /// Users which have set this as their default OrganizationUnit.
         /// </summary>
         /// <remarks>

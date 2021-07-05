@@ -757,6 +757,10 @@
     <Compile Include="Migrations\202106181036069_Add_TaskRef_Uuid.designer.cs">
       <DependentUpon>202106181036069_Add_TaskRef_Uuid.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202107050659173_OrganizatoinUnit-Remove-Unused-Properties.cs" />
+    <Compile Include="Migrations\202107050659173_OrganizatoinUnit-Remove-Unused-Properties.designer.cs">
+      <DependentUpon>202107050659173_OrganizatoinUnit-Remove-Unused-Properties.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1237,6 +1241,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202106181036069_Add_TaskRef_Uuid.resx">
       <DependentUpon>202106181036069_Add_TaskRef_Uuid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202107050659173_OrganizatoinUnit-Remove-Unused-Properties.resx">
+      <DependentUpon>202107050659173_OrganizatoinUnit-Remove-Unused-Properties.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
