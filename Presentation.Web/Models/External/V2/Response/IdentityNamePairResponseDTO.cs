@@ -9,13 +9,18 @@ namespace Presentation.Web.Models.External.V2.Response
         /// UUID which is unique within collection of entities of the same type
         /// </summary>
         [Required]
-        public Guid Uuid { get; }
+        public Guid Uuid { get; set; }
 
         /// <summary>
         /// Human readable name of the entity
         /// </summary>
         [Required]
-        public string Name { get; }
+        public string Name { get; set; }
+
+        protected IdentityNamePairResponseDTO()
+        {
+
+        }
 
         public IdentityNamePairResponseDTO(Guid uuid, string name)
         {

@@ -24,7 +24,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var queryParameters = new List<KeyValuePair<string, string>>
             {
-                new("organizationUuid", organizationUuid.ToString("D")),
                 new("page", page.ToString("D")),
                 new("pageSize", pageSize.ToString("D")),
             };
@@ -37,7 +36,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organization-users?{query}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/users?{query}"), token);
         }
 
 
@@ -50,14 +49,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
         public static async Task<HttpResponseMessage> SendGetOrganizationUserAsync(string token, Guid organizationUuid, Guid userUuid)
         {
-            var queryParameters = new List<KeyValuePair<string, string>>
-            {
-                new("organizationUuid", organizationUuid.ToString("D"))
-            };
-
-            var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
-
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organization-users/{userUuid:D}?{query}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/users/{userUuid:D}"), token);
         }
     }
 }

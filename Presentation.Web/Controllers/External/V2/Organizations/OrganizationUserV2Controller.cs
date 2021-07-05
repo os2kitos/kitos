@@ -20,7 +20,10 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.Organizations
 {
-    [RoutePrefix("api/v2")]
+    /// <summary>
+    /// Provides access to users inside a specific organization.
+    /// </summary>
+    [RoutePrefix("api/v2/organizations")]
     [DenyRightsHoldersAccess]
     public class OrganizationUserV2Controller : ExternalBaseController
     {
@@ -41,7 +44,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         /// <param name="roleQuery">Query by role assignment</param>
         /// <returns>A list og users in a specific organizational context</returns>
         [HttpGet]
-        [Route("organization-users")]
+        [Route("{organizationUuid}/users")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationUserResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -73,18 +76,18 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         /// <summary>
         /// Returns the a specific user within an organization
         /// </summary>
-        /// <param name="userUuid">UUID of the user entity in KITOS</param>
         /// <param name="organizationUuid">UUID of the organization</param>
+        /// <param name="userUuid">UUID of the user entity in KITOS</param>
         /// <returns>A user in the context of a specific organization</returns>
         [HttpGet]
-        [Route("organization-users/{userUuid}")]
+        [Route("{organizationUuid}/users/{userUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(OrganizationUserResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [DenyRightsHoldersAccess]
-        public IHttpActionResult GetOrganizationUser([NonEmptyGuid] Guid userUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult GetOrganizationUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
         {
             return _userService
                 .GetUserInOrganization(organizationUuid, userUuid)
@@ -95,14 +98,17 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
 
         private OrganizationUserResponseDTO ToDTO((Guid organizationUuid, User user) context)
         {
-            return new(
-                context.user.Uuid,
-                context.user.GetFullName(),
-                context.user.Name,
-                context.user.LastName,
-                context.user.Email,
-                context.user.HasApiAccess == true,
-                context.user.PhoneNumber, MapRoles(context));
+            return new()
+            {
+                Uuid = context.user.Uuid,
+                Name = context.user.GetFullName(),
+                Email = context.user.Email,
+                PhoneNumber = context.user.PhoneNumber,
+                FirstName = context.user.Name,
+                LastName = context.user.LastName,
+                ApiAccess = context.user.HasApiAccess.GetValueOrDefault(false),
+                Roles = MapRoles(context)
+            };
         }
 
         /// <summary>

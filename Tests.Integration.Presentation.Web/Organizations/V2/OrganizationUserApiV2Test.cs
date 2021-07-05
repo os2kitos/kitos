@@ -139,7 +139,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
         }
 
         [Fact]
-        public async Task Cannot_GET_Organization_If_Requested_User_Has_No_Roles_In_Target_Organization()
+        public async Task Cannot_GET_Organization_User_If_Requested_User_Has_No_Roles_In_Target_Organization()
         {
             //Arrange
             var organization1 = await CreateOrganizationAsync();
@@ -215,7 +215,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(dbUser.LastName, dtoUser.LastName);
             Assert.Equal(dbUser.PhoneNumber, dtoUser.PhoneNumber);
             Assert.Equal(dbUser.Email, dtoUser.Email);
-            Assert.Equal(dbUser.HasApiAccess.GetValueOrDefault(false), dtoUser.APIAccess);
+            Assert.Equal(dbUser.HasApiAccess.GetValueOrDefault(false), dtoUser.ApiAccess);
             Assert.Equal(expectedRoles, dtoUser.Roles.ToHashSet());
         }
 
