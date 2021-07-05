@@ -164,27 +164,6 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.Equal(filteredUsers, result.Value);
         }
 
-        [Theory]
-        [InlineData(OrganizationDataReadAccessLevel.None)]
-        [InlineData(OrganizationDataReadAccessLevel.Public)]
-        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
-        public void GetUsersInOrganization_Returns_Forbidden_If_Anything_But_Full_Access_In_Organization(OrganizationDataReadAccessLevel accessLevel)
-        {
-            //Arrange
-            var organizationUuid = A<Guid>();
-            var organization = new Organization { Id = A<int>(), Uuid = organizationUuid };
-            var queryMock = new Mock<IDomainQuery<User>>();
-            ExpectGetOrganizationReturns(organizationUuid, organization);
-            ExpectGetOrganizationAccessReturns(organization.Id, accessLevel);
-
-            //Act
-            var result = _sut.GetUsersInOrganization(organizationUuid, queryMock.Object);
-
-            //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
-        }
-
         [Fact]
         public void GetUsersInOrganization_Returns_Error_From_OrganizationService()
         {
