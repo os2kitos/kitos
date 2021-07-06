@@ -12,7 +12,6 @@ namespace Core.DomainServices.Repositories.Contract
         IQueryable<ItContract> GetContractsInOrganization(int organizationId);
         void DeleteContract(ItContract contract);
         void Update(ItContract contract);
-        IQueryable<ItContract> GetContracts();
         Maybe<ItContract> GetContract(Guid uuid);
     }
 }

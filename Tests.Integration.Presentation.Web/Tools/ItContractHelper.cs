@@ -135,14 +135,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        public static async Task SendAssignAgreementElementAsync(int contractId, int orgId, int agreementElementId)
+        public static async Task<HttpResponseMessage> SendAssignAgreementElementAsync(int contractId, int orgId, int agreementElementId)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using (var okResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/itcontract/{contractId}?organizationId={orgId}&elemId={agreementElementId}"), cookie, null))
             {
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
-                return;
+                return okResponse;
             }
         }
 

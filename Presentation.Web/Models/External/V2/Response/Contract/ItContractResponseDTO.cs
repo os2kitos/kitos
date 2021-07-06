@@ -20,17 +20,17 @@ namespace Presentation.Web.Models.External.V2.Response.Contract
         /// <summary>
         /// Contract type of IT-Contract
         /// </summary>
-        public IdentityNamePairResponseDTO? ContractType { get; set; }
+        public IdentityNamePairResponseDTO ContractType { get; set; }
 
         /// <summary>
         /// Supplier of It-Contract
         /// </summary>
-        public IdentityNamePairResponseDTO? Supplier { get; set; }
+        public IdentityNamePairResponseDTO Supplier { get; set; }
 
         /// <summary>
-        /// Boolean determining if the IT-Contract is about system operation 
+        /// Agreement element option types set on the IT-Contract
         /// </summary>
-        public bool InOperation { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> AgreementElements { get; set; }
 
         /// <summary>
         /// Date when IT-Contract is entered into agreement 
@@ -46,5 +46,10 @@ namespace Presentation.Web.Models.External.V2.Response.Contract
         /// Date when IT-Contract is terminated
         /// </summary>
         public DateTime? TerminatedAt { get; set; }
+
+        /// <summary>
+        /// Whether the IT-Contract is active or not
+        /// </summary>
+        public bool IsActive { get; set; }
     }
 }

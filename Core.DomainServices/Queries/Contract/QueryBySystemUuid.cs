@@ -15,7 +15,7 @@ namespace Core.DomainServices.Queries.Contract
 
         public IQueryable<ItContract> Apply(IQueryable<ItContract> source)
         {
-            return source.Where(x => x.AssociatedSystemUsages.Any(x => x.ItSystemUsage != null && x.ItSystemUsage.ItSystem != null && x.ItSystemUsage.ItSystem.Uuid == _systemUuid));
+            return source.Where(x => x.AssociatedSystemUsages.Any(x => x.ItSystemUsage != null && x.ItSystemUsage.ItSystem.Uuid == _systemUuid));
         }
     }
 }

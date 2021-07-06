@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         }
 
         /// <summary>
-        /// Returns all IT-Contracts available to the current user
+        /// Returns all IT-Contracts available to the current user within the provided organization context
         /// </summary>
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">Associated system UUID filter</param>
@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 .GetContractsInOrganization(organizationUuid, refinements.ToArray())
                 .Select(x => x.OrderBy(contract => contract.Id))
                 .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(ToItContractResponseDto))
+                .Select(x => x.ToList().Select(ToItContractResponseDto).ToList())
                 .Match(Ok, FromOperationError);
         }
 
@@ -101,10 +101,11 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 Name = contract.Name,
                 ContractType = contract.ContractTypeId.HasValue ? contract.ContractType.MapIdentityNamePairDTO() : null,
                 Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapIdentityNamePairDTO() : null,
-                InOperation = contract.IsInOperation(),
+                AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.MapIdentityNamePairDTO()),
                 ValidFrom = contract.Concluded,
                 ExpiresAt = contract.ExpirationDate,
-                TerminatedAt = contract.Terminated
+                TerminatedAt = contract.Terminated,
+                IsActive = contract.IsActive
             };
         }
     }

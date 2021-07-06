@@ -18,8 +18,6 @@ namespace Core.DomainModel.ItContract
     /// </summary>
     public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
     {
-        public const string InOperationAgreementElementName = "Drift";
-
 
         public ItContract()
         {
@@ -602,9 +600,5 @@ namespace Core.DomainModel.ItContract
             return DataProcessingRegistrations.FirstOrDefault(x => x.Id == dataProcessingRegistrationId).FromNullable();
         }
 
-        public bool IsInOperation()
-        {
-            return AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Name == InOperationAgreementElementName);
-        }
     }
 }

@@ -21,28 +21,32 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newContract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
-            var contractType = DatabaseAccess.MapFromEntitySet<ItContractType, ItContractType>(x => x.AsQueryable().First());
-            var supplier = DatabaseAccess.MapFromEntitySet<Organization, Organization>(x => x.AsQueryable().First());
-            var inOperationAgreementElement = DatabaseAccess.MapFromEntitySet<AgreementElementType, AgreementElementType>(x => x.AsQueryable().First(x => x.Name == ItContract.InOperationAgreementElementName));
-            var patchObject = new
-            {
-                concluded = DateTime.Now,
-                expirationDate = DateTime.Now.AddDays(1),
-                terminated = DateTime.Now.AddDays(2),
-                supplierId = supplier.Id,
-                contractTypeId = contractType.Id
-            };
-            await ItContractHelper.PatchContract(newContract.Id, TestEnvironment.DefaultOrganizationId, patchObject);
-            await ItContractHelper.SendAssignAgreementElementAsync(newContract.Id, TestEnvironment.DefaultOrganizationId, inOperationAgreementElement.Id);
-            var updatedContract = await ItContractHelper.GetItContract(newContract.Id);
+
+            var (newContract, expectedAgreementElement) = await CreateContractWithAllDataSet(TestEnvironment.DefaultOrganizationId);
 
             //Act
             var dto = await ItContractV2Helper.GetItContractAsync(regularUserToken.Token, newContract.Uuid);
 
             //Assert
-            AssertContractResponseDTO(updatedContract, dto);
-            Assert.True(dto.InOperation);
+            AssertContractResponseDTO(newContract, dto);
+            var agreementElement = Assert.Single(dto.AgreementElements);
+            Assert.Equal(expectedAgreementElement.Uuid, agreementElement.Uuid);
+            Assert.Equal(expectedAgreementElement.Name, agreementElement.Name);
+        }
+
+        [Fact]
+        public async Task GET_Contract_Returns_Forbidden()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var newOrg = await CreateOrganizationAsync();
+            var newContract = await ItContractHelper.CreateContract(A<string>(), newOrg.Id);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractAsync(regularUserToken.Token, newContract.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         [Fact]
@@ -75,60 +79,57 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         public async Task GET_Contracts_Returns_Ok()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-
-            // Used to compare specific contract related data
-            var expectedContractId = DatabaseAccess.MapFromEntitySet<ItContract, int>(x => x
-                .AsQueryable()
-                .First(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId)
-                .Id);
-            var expectedContract = await ItContractHelper.GetItContract(expectedContractId);
+            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
+            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
+            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, null, null, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, null, null, 0, 100);
 
             //Assert
-            Assert.NotEmpty(contracts);
+            Assert.Equal(2, contracts.Count());
 
-            // Checking contract data
-            var contract = contracts.First(x => x.Uuid == expectedContract.Uuid);
-            AssertContractResponseDTO(expectedContract, contract);
+            var contract1 = contracts.First(x => x.Uuid == newContract1.Uuid);
+            AssertContractResponseDTO(newContract1, contract1);
+
+            var contract2 = contracts.First(x => x.Uuid == newContract2.Uuid);
+            AssertContractResponseDTO(newContract2, contract2);
         }
 
         [Fact]
         public async Task GET_Contracts_Returns_Ok_With_Name_Content_Filtering()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newContract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
+            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
+            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, null, newContract.Name, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, null, newContract1.Name, 0, 100);
 
             //Assert
             var contract = Assert.Single(contracts);
-            Assert.Equal(newContract.Uuid, contract.Uuid);
+            AssertContractResponseDTO(newContract1, contract);
         }
 
         [Fact]
         public async Task GET_Contracts_Returns_Ok_With_System_Filtering()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, TestEnvironment.DefaultOrganizationId);
-            var newContract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
-            await ItContractHelper.AddItSystemUsage(newContract.Id, systemUsage.Id, TestEnvironment.DefaultOrganizationId);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
+            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
+            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+            await ItContractHelper.AddItSystemUsage(newContract1.Id, systemUsage.Id, organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, system.Uuid, null, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, system.Uuid, null, 0, 100);
 
             //Assert
             var contract = Assert.Single(contracts);
-            Assert.Equal(newContract.Uuid, contract.Uuid);
+            AssertContractResponseDTO(newContract1, contract);
         }
 
         [Fact]
@@ -182,10 +183,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expected.Concluded, actual.ValidFrom);
             Assert.Equal(expected.ExpirationDate, actual.ExpiresAt);
             Assert.Equal(expected.Terminated, actual.TerminatedAt);
+            Assert.Equal(expected.IsActive, actual.IsActive);
 
             if (expected.SupplierId.HasValue)
             {
                 Assert.Equal(expected.SupplierName, actual.Supplier.Name);
+                Assert.Equal(DatabaseAccess.GetEntityUuid<Organization>(expected.SupplierId.Value), actual.Supplier.Uuid);
             }
             else
             {
@@ -195,11 +198,56 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             if (expected.ContractTypeId.HasValue)
             {
                 Assert.Equal(expected.ContractTypeName, actual.ContractType.Name);
+                Assert.Equal(DatabaseAccess.GetEntityUuid<ItContractType>(expected.ContractTypeId.Value), actual.ContractType.Uuid);
             }
             else
             {
                 Assert.Null(actual.Supplier);
             }
+        }
+
+        private async Task<(ItContractDTO, AgreementElementType)> CreateContractWithAllDataSet(int orgId)
+        {
+            var newContract = await ItContractHelper.CreateContract(CreateName(), orgId);
+            var contractType = DatabaseAccess.MapFromEntitySet<ItContractType, ItContractType>(x => x.AsQueryable().First());
+            var supplier = DatabaseAccess.MapFromEntitySet<Organization, Organization>(x => x.AsQueryable().First());
+            var agreementElement = DatabaseAccess.MapFromEntitySet<AgreementElementType, AgreementElementType>(x => x.AsQueryable().First());
+            var patchObject = new
+            {
+                concluded = DateTime.Now,
+                expirationDate = DateTime.Now.AddDays(1),
+                terminated = DateTime.Now.AddDays(2),
+                supplierId = supplier.Id,
+                contractTypeId = contractType.Id
+            };
+            await ItContractHelper.SendAssignAgreementElementAsync(newContract.Id, orgId, agreementElement.Id).DisposeAsync();
+            var updatedContract = await ItContractHelper.PatchContract(newContract.Id, orgId, patchObject);
+            return (updatedContract, agreementElement);
+        }
+
+        private async Task<(string token, Organization createdOrganization)> CreateUserInNewOrganizationAsync()
+        {
+            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true);
+            return (token, org);
+        }
+
+        private async Task<Organization> CreateOrganizationAsync()
+        {
+            var organizationName = CreateName();
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
+                organizationName, string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
+            return organization;
+        }
+
+        private string CreateName()
+        {
+            return $"{nameof(ItContractsApiV2Test)}{A<string>()}";
+        }
+
+        private string CreateEmail()
+        {
+            return $"{A<string>()}@test.dk";
         }
     }
 }

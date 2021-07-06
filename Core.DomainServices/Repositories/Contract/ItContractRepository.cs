@@ -70,11 +70,6 @@ namespace Core.DomainServices.Repositories.Contract
             _contractRepository.Save();
         }
 
-        public IQueryable<ItContract> GetContracts()
-        {
-            return _contractRepository.AsQueryable();
-        }
-
         public Maybe<ItContract> GetContract(Guid uuid)
         {
             return _contractRepository.AsQueryable().ByUuid(uuid).FromNullable();

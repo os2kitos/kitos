@@ -44,7 +44,7 @@ namespace Presentation.Web.Models
         /// </summary>
         public bool HasOperationElement
         {
-            get { return AgreementElements.Any(option => option.Name == ItContract.InOperationAgreementElementName); }
+            get { return AgreementElements.Any(option => option.Name == "Drift"); }
         }
     }
 }
