@@ -21,6 +21,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemSensitivePersonalDataTypes = "it-system-usage-sensitive-personal-data-types";
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-location-types";
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
+            public const string ItContractContractTypes = "it-contract-contract-types";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
