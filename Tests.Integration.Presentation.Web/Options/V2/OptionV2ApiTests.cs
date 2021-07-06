@@ -36,13 +36,13 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var orgId = TestEnvironment.DefaultOrganizationId;
             var name = A<string>();
             await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, name, orgId);
-            var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organisationUuid = organisation.Uuid.GetValueOrDefault();
-            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organisationUuid, 100, 0); //100 should be more than enough to get all.
+            var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
+            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(name)); //Get the newly created type.
 
             //Act
-            var result = await OptionV2ApiHelper.GetOptionAsync(apiv2OptionResource, option.Uuid, organisationUuid);
+            var result = await OptionV2ApiHelper.GetOptionAsync(apiv2OptionResource, option.Uuid, organizationUuid);
 
             //Assert
             Assert.Equal(name, result.Name);
@@ -57,16 +57,16 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var orgId = TestEnvironment.DefaultOrganizationId;
             var newName = A<string>();
             var createdType = await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, newName, orgId);
-            var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organisationUuid = organisation.Uuid.GetValueOrDefault();
-            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organisationUuid, 100, 0); //100 should be more than enough to get all.
+            var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
+            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(newName)); //Get the newly created type.
 
             //Disable the option
             await EntityOptionHelper.SendChangeOptionIsObligatoryAsync(apiv1OptionResource, createdType.Id, false);
 
             //Act
-            var result = await OptionV2ApiHelper.GetOptionAsync(apiv2OptionResource, option.Uuid, organisationUuid);
+            var result = await OptionV2ApiHelper.GetOptionAsync(apiv2OptionResource, option.Uuid, organizationUuid);
 
             //Assert
             Assert.Equal(option.Name, result.Name);
@@ -82,13 +82,13 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var orgId = TestEnvironment.DefaultOrganizationId;
             var name = A<string>();
             await EntityOptionHelper.CreateRoleOptionTypeAsync(apiv1OptionResource, name, orgId, writeAccess);
-            var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organisationUuid = organisation.Uuid.GetValueOrDefault();
-            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organisationUuid, 100, 0); //100 should be more than enough to get all.
+            var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
+            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(name)); //Get the newly created type.
 
             //Act
-            var result = await OptionV2ApiHelper.GetRoleOptionAsync(apiv2OptionResource, option.Uuid, organisationUuid);
+            var result = await OptionV2ApiHelper.GetRoleOptionAsync(apiv2OptionResource, option.Uuid, organizationUuid);
 
             //Assert
             Assert.Equal(name, result.Name);
