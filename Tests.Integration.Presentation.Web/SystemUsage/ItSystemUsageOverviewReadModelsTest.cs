@@ -439,8 +439,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var organizationUnit1 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
-            var organizationUnit2 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
+            var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
+            var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
 
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId);
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId);
