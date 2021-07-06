@@ -43,7 +43,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// </summary>
         /// <param name="systemUsageRoleTypeUuid">relation frequency type identifier</param>
         /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
-        /// <returns>A uuid and name pair with boolean to mark if the relation frequency type is available in the organization</returns>
+        /// <returns>A detailed description of the type and it's availability</returns>
         [HttpGet]
         [Route("{systemUsageRoleTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RoleOptionExtendedResponseDTO))]
