@@ -761,6 +761,10 @@
     <Compile Include="Migrations\202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.designer.cs">
       <DependentUpon>202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202107060728172_Update-OrganizationUnit.cs" />
+    <Compile Include="Migrations\202107060728172_Update-OrganizationUnit.designer.cs">
+      <DependentUpon>202107060728172_Update-OrganizationUnit.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1244,6 +1248,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.resx">
       <DependentUpon>202107021212144_Added_Uuid_To_ItProject_And_Removed_AccessModifier_And_Other_Unused_Fields.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202107060728172_Update-OrganizationUnit.resx">
+      <DependentUpon>202107060728172_Update-OrganizationUnit.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
