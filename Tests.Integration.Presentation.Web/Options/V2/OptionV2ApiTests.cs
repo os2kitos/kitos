@@ -15,7 +15,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
     public class OptionV2ApiTests : WithAutoFixture
     {
         [Theory, MemberData(nameof(GetV2ResourceNames))]
-        public async Task Can_Get_AvailableOptions( string apiv2OptionResource)
+        public async Task Can_Get_AvailableOptions(string apiv2OptionResource)
         {
             //Arrange
             var orgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
@@ -50,7 +50,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             Assert.True(result.IsAvailable);
         }
 
-        [Theory,MemberData(nameof(GetV1AndV2ResourceNames))]
+        [Theory, MemberData(nameof(GetV1AndV2ResourceNames))]
         public async Task Can_Get_Specific_Option_That_Is_Not_Available(string apiv1OptionResource, string apiv2OptionResource)
         {
             //Arrange
@@ -74,15 +74,48 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             Assert.False(result.IsAvailable);
         }
 
+        [Theory, MemberData(nameof(GetRoleResources))]
+        public async Task Can_Get_WriteAccess_Status_For_Role_Options(string apiv1OptionResource, string apiv2OptionResource)
+        {
+            //Arrange
+            var writeAccess = A<bool>();
+            var orgId = TestEnvironment.DefaultOrganizationId;
+            var name = A<string>();
+            await EntityOptionHelper.CreateRoleOptionTypeAsync(apiv1OptionResource, name, orgId, writeAccess);
+            var organisation = await OrganizationHelper.GetOrganizationAsync(orgId);
+            var organisationUuid = organisation.Uuid.GetValueOrDefault();
+            var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organisationUuid, 100, 0); //100 should be more than enough to get all.
+            var option = options.First(x => x.Name.Equals(name)); //Get the newly created type.
+
+            //Act
+            var result = await OptionV2ApiHelper.GetRoleOptionAsync(apiv2OptionResource, option.Uuid, organisationUuid);
+
+            //Assert
+            Assert.Equal(name, result.Name);
+            Assert.Equal(option.Uuid, result.Uuid);
+            Assert.True(result.IsAvailable);
+            Assert.Equal(writeAccess, result.WriteAccess);
+        }
+
         public static IEnumerable<object[]> GetV2ResourceNames()
         {
             foreach (var v1AndV2ResourceName in GetV1AndV2ResourceNames())
             {
-                yield return new[] {v1AndV2ResourceName[1]};
+                yield return new[] { v1AndV2ResourceName[1] };
             }
         }
 
         public static IEnumerable<object[]> GetV1AndV2ResourceNames()
+        {
+            return GetRegularResources().Concat(GetRoleResources());
+        }
+
+        public static IEnumerable<object[]> GetRoleResources()
+        {
+            yield return new[] { EntityOptionHelper.ResourceNames.SystemRoles, OptionV2ApiHelper.ResourceName.ItSystemUsageRoles };
+        }
+
+        public static IEnumerable<object[]> GetRegularResources()
         {
             yield return new[] { EntityOptionHelper.ResourceNames.BusinessType, OptionV2ApiHelper.ResourceName.BusinessType };
             yield return new[] { EntityOptionHelper.ResourceNames.ItSystemCategories, OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification };
