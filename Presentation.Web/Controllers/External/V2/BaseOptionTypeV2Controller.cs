@@ -5,13 +5,11 @@ using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
 
 namespace Presentation.Web.Controllers.External.V2
 {
-    public abstract class BaseOptionTypeV2Controller<TParent,TOption> : ExternalBaseController where TOption : OptionEntity<TParent>
+    public abstract class BaseOptionTypeV2Controller<TParent,TOption, TCollectionEntryDTO, TExtendedDto> : ExternalBaseController where TOption : OptionEntity<TParent>
     {
         private readonly IOptionsApplicationService<TParent, TOption> _optionApplicationService;
 
@@ -39,23 +37,17 @@ namespace Presentation.Web.Controllers.External.V2
 
             return _optionApplicationService
                 .GetOptionType(organizationUuid, optionUuid)
-                .Select(x => ToAvailableDTO(x.option, x.available))
+                .Select(x => ToExtendedDTO(x.option, x.available))
                 .Match(Ok, FromOperationError);
         }
 
-        private static List<IdentityNamePairResponseDTO> ToDTOs(IEnumerable<OptionEntity<TParent>> options)
+        private List<TCollectionEntryDTO> ToDTOs(IEnumerable<TOption> options)
         {
             return options.Select(ToDTO).ToList();
         }
 
-        private static IdentityNamePairResponseDTO ToDTO(OptionEntity<TParent> option)
-        {
-            return new(option.Uuid, option.Name);
-        }
+        protected abstract TCollectionEntryDTO ToDTO(TOption option);
 
-        private static AvailableNamePairResponseDTO ToAvailableDTO(OptionEntity<TParent> option, bool isAvailable)
-        {
-            return new(option.Uuid, option.Name, isAvailable);
-        }
+        protected abstract TExtendedDto ToExtendedDTO(TOption option, bool isAvailable);
     }
 }
