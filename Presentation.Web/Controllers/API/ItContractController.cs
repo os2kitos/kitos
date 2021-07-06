@@ -22,7 +22,6 @@ namespace Presentation.Web.Controllers.API
     [PublicApi]
     [RoutePrefix("api/itcontract")]
     public class ItContractController : GenericHierarchyApiController<ItContract, ItContractDTO>
-
     {
         private readonly IGenericRepository<AgreementElementType> _agreementElementRepository;
         private readonly IGenericRepository<ItContractItSystemUsage> _itContractItSystemUsageRepository;
@@ -334,6 +333,12 @@ namespace Presentation.Web.Controllers.API
                         throw new InvalidOperationException(result.Error.ToString("G"));
                 }
             }
+        }
+
+        protected override void PrepareNewObject(ItContract newContract)
+        {
+            newContract.Uuid = Guid.NewGuid();
+            base.PrepareNewObject(newContract);
         }
     }
 }

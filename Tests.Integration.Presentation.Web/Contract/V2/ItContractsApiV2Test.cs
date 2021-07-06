@@ -1,5 +1,8 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models;
+using Presentation.Web.Models.External.V2.Response.Contract;
 using System;
 using System.Linq;
 using System.Net;
@@ -19,13 +22,27 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var newContract = await ItContractHelper.CreateContract(A<string>(), TestEnvironment.DefaultOrganizationId);
+            var contractType = DatabaseAccess.MapFromEntitySet<ItContractType, ItContractType>(x => x.AsQueryable().First());
+            var supplier = DatabaseAccess.MapFromEntitySet<Organization, Organization>(x => x.AsQueryable().First());
+            var inOperationAgreementElement = DatabaseAccess.MapFromEntitySet<AgreementElementType, AgreementElementType>(x => x.AsQueryable().First(x => x.Name == ItContract.InOperationAgreementElementName));
+            var patchObject = new
+            {
+                concluded = DateTime.Now,
+                expirationDate = DateTime.Now.AddDays(1),
+                terminated = DateTime.Now.AddDays(2),
+                supplierId = supplier.Id,
+                contractTypeId = contractType.Id
+            };
+            await ItContractHelper.PatchContract(newContract.Id, TestEnvironment.DefaultOrganizationId, patchObject);
+            await ItContractHelper.SendAssignAgreementElementAsync(newContract.Id, TestEnvironment.DefaultOrganizationId, inOperationAgreementElement.Id);
+            var updatedContract = await ItContractHelper.GetItContract(newContract.Id);
 
             //Act
             var dto = await ItContractV2Helper.GetItContractAsync(regularUserToken.Token, newContract.Uuid);
 
             //Assert
-            Assert.Equal(newContract.Uuid, dto.Uuid);
-            Assert.Equal(newContract.Name, dto.Name);
+            AssertContractResponseDTO(updatedContract, dto);
+            Assert.True(dto.InOperation);
         }
 
         [Fact]
@@ -80,8 +97,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, null, newContract.Name, 0, 100);
 
             //Assert
-            var project = Assert.Single(contracts);
-            Assert.Equal(newContract.Uuid, project.Uuid);
+            var contract = Assert.Single(contracts);
+            Assert.Equal(newContract.Uuid, contract.Uuid);
         }
 
         [Fact]
@@ -99,8 +116,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, system.Uuid, null, 0, 100);
 
             //Assert
-            var project = Assert.Single(contracts);
-            Assert.Equal(newContract.Uuid, project.Uuid);
+            var contract = Assert.Single(contracts);
+            Assert.Equal(newContract.Uuid, contract.Uuid);
         }
 
         [Fact]
@@ -143,6 +160,35 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual) 
+        {
+
+            Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.Name, actual.Name);
+
+            Assert.Equal(expected.Concluded, actual.ValidFrom);
+            Assert.Equal(expected.ExpirationDate, actual.ExpiresAt);
+            Assert.Equal(expected.Terminated, actual.TerminatedAt);
+
+            if (expected.SupplierId.HasValue)
+            {
+                Assert.Equal(expected.SupplierName, actual.Supplier.Name);
+            }
+            else
+            {
+                Assert.Null(actual.Supplier);
+            }
+
+            if (expected.ContractTypeId.HasValue)
+            {
+                Assert.Equal(expected.ContractTypeName, actual.ContractType.Name);
+            }
+            else
+            {
+                Assert.Null(actual.Supplier);
+            }
         }
     }
 }

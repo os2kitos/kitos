@@ -7,6 +7,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Contract;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// <returns></returns>
         [HttpGet]
         [Route("it-contracts")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItContractResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -65,7 +66,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 .GetContractsInOrganization(organizationUuid, refinements.ToArray())
                 .Select(x => x.OrderBy(contract => contract.Id))
                 .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(x => x.MapIdentityNamePairDTO()))
+                .Select(x => x.ToList().Select(ToItContractResponseDto))
                 .Match(Ok, FromOperationError);
         }
 
@@ -76,7 +77,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// <returns>Specific data related to the IT-Contract</returns>
         [HttpGet]
         [Route("it-contracts/{uuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -88,8 +89,23 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
 
             return _itContractService
                 .GetContract(uuid)
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(ToItContractResponseDto)
                 .Match(Ok, FromOperationError);
+        }
+
+        private static ItContractResponseDTO ToItContractResponseDto(ItContract contract)
+        {
+            return new()
+            {
+                Uuid = contract.Uuid,
+                Name = contract.Name,
+                ContractType = contract.ContractTypeId.HasValue ? contract.ContractType.MapIdentityNamePairDTO() : null,
+                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapIdentityNamePairDTO() : null,
+                InOperation = contract.IsInOperation(),
+                ValidFrom = contract.Concluded,
+                ExpiresAt = contract.ExpirationDate,
+                TerminatedAt = contract.Terminated
+            };
         }
     }
 }

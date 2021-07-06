@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.ItContract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -43,7 +44,7 @@ namespace Presentation.Web.Models
         /// </summary>
         public bool HasOperationElement
         {
-            get { return AgreementElements.Any(option => option.Name == "Drift"); }
+            get { return AgreementElements.Any(option => option.Name == ItContract.InOperationAgreementElementName); }
         }
     }
 }
