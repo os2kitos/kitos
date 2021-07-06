@@ -4,9 +4,7 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Options;
@@ -14,23 +12,24 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
-    [RoutePrefix("api/v2/it-system-usage-relation-frequency-types")]
+    [RoutePrefix("api/v2/it-system-usage-role-types")]
     [DenyRightsHoldersAccess]
-    public class ItSystemUsageRelationFrequencyTypeV2Controller : BaseRegularOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
+    public class ItSystemUsageRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<ItSystemRight, ItSystemRole>
     {
-        public ItSystemUsageRelationFrequencyTypeV2Controller(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
-            : base(optionService)
+        public ItSystemUsageRoleTypeV2Controller(IOptionsApplicationService<ItSystemRight, ItSystemRole> optionApplicationService)
+            : base(optionApplicationService)
         {
+            
         }
 
         /// <summary>
-        /// Returns IT-System usage relation frequency option types which are available for new registrations within the organization
+        /// Returns IT-System usage role types which are available for new registrations within the organization
         /// </summary>
-        /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
-        /// <returns>A list of available IT-System usage relation frequency option types</returns>
+        /// <param name="organizationUuid">organization context for the IT-System usage role availability</param>
+        /// <returns>A list of available IT-System usage role option types</returns>
         [HttpGet]
         [Route("")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RoleOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
@@ -40,21 +39,21 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns requested IT-System usage relation frequency option type
+        /// Returns requested IT-System usage role option type
         /// </summary>
-        /// <param name="relationFrequencyTypeUuid">relation frequency type identifier</param>
+        /// <param name="systemUsageRoleTypeUuid">relation frequency type identifier</param>
         /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
         /// <returns>A uuid and name pair with boolean to mark if the relation frequency type is available in the organization</returns>
         [HttpGet]
-        [Route("{relationFrequencyTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
+        [Route("{systemUsageRoleTypeUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RoleOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid relationFrequencyTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid systemUsageRoleTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
-            return GetSingle(relationFrequencyTypeUuid, organizationUuid);
+            return GetSingle(systemUsageRoleTypeUuid, organizationUuid);
         }
     }
 }

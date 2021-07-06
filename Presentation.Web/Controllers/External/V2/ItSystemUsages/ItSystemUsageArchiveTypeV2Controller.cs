@@ -6,16 +6,16 @@ using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-types")]
     [DenyRightsHoldersAccess]
-    public class ItSystemUsageArchiveTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ArchiveType>
+    public class ItSystemUsageArchiveTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveType>
     {
         public ItSystemUsageArchiveTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveType> optionService)
             : base(optionService)
@@ -23,7 +23,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns It-System Usage archive option types
+        /// Returns It-System Usage archive option types which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the archivetype availability</param>
         /// <returns>A list of available It-System Usage archive option types</returns>
@@ -46,7 +46,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// <returns>A uuid and name pair with boolean to mark if the archive type is available in the organization</returns>
         [HttpGet]
         [Route("{archiveTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

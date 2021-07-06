@@ -1,10 +1,9 @@
-﻿using Presentation.Web.Models.External.V2.Response;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Presentation.Web.Models.External.V2
+namespace Presentation.Web.Models.External.V2.Response.Options
 {
-    public class AvailableNamePairResponseDTO : IdentityNamePairResponseDTO
+    public class RegularOptionExtendedResponseDTO : IdentityNamePairResponseDTO
     {
         /// <summary>
         /// IsAvailable is set to true if the type is available in the requested context
@@ -12,7 +11,7 @@ namespace Presentation.Web.Models.External.V2
         [Required]
         public bool IsAvailable { get; }
 
-        public AvailableNamePairResponseDTO(Guid uuid, string name, bool isAvailable) : base(uuid, name)
+        public RegularOptionExtendedResponseDTO(Guid uuid, string name, bool isAvailable) : base(uuid, name)
         {
             IsAvailable = isAvailable;
         }

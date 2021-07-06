@@ -9,13 +9,14 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-location-types")]
     [DenyRightsHoldersAccess]
-    public class ItSystemUsageArchiveLocationTypeV2Controller : BaseOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
+    public class ItSystemUsageArchiveLocationTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveLocation>
     {
         public ItSystemUsageArchiveLocationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveLocation> optionService)
             : base(optionService)
@@ -23,7 +24,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns It-System Usage archive location options 
+        /// Returns It-System Usage archive location options which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the archive locations availability</param>
         /// <returns>A list of available It-System Usage archive locations</returns>
@@ -46,7 +47,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// <returns>A uuid and name pair with boolean to mark if the archive location is available in the organization</returns>
         [HttpGet]
         [Route("{archiveLocationUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

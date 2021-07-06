@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -33,14 +34,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
 
-        public static async Task<AvailableNamePairResponseDTO> GetOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
+        public static async Task<RegularOptionExtendedResponseDTO> GetOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{optionTypeUuid}?organizationUuid={organizationUuid}");
             
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return await response.ReadResponseBodyAsAsync<AvailableNamePairResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<RegularOptionExtendedResponseDTO>();
         }
     }
 }

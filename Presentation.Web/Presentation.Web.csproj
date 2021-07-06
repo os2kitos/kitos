@@ -345,9 +345,12 @@
   <ItemGroup>
     <Compile Include="Controllers\API\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\UserNotificationController.cs" />
+    <Compile Include="Controllers\External\V2\BaseRoleOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveTestLocationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageArchiveLocationTypeV2Controller.cs" />
@@ -357,6 +360,8 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Models\External\V2\Response\Options\RoleOptionExtendedResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\Options\RoleOptionResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUnitResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
@@ -376,7 +381,7 @@
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\ItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Types\ArchiveDutyChoice.cs" />
-    <Compile Include="Models\External\V2\AvailableNamePairResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\Options\RegularOptionExtendedResponseDTO.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />
     <Compile Include="Controllers\External\V2\ExternalBaseController.cs" />
