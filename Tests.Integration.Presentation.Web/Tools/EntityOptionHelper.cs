@@ -19,6 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string ArchiveTestLocations = "ArchiveTestLocations";
             public const string RegisterTypes = "RegisterTypes";
             public const string SensitivePersonalDataTypes = "SensitivePersonalDataTypes";
+            public const string SystemRoles = "ItSystemRoles";
             public const string ContractTypes = "ItContractTypes";
         }
 
@@ -37,6 +38,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<OptionDTO>();
+        }
+
+        public static async Task<RoleDTO> CreateRoleOptionTypeAsync(string resource, string optionName, int organizationId, bool writeAccess = false,Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"odata/{resource}?organizationId={organizationId}");
+
+            var body = new
+            {
+                IsObligatory = true,
+                IsEnabled = true,
+                Name = optionName,
+                HasWriteAccess = writeAccess
+            };
+
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<RoleDTO>();
         }
 
         public static async Task<HttpResponseMessage> ChangeOptionTypeNameAsync(string resource, int id, string name, Cookie optionalLogin = null)

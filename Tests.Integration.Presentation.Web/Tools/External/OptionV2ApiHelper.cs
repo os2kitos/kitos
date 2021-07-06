@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -21,6 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemSensitivePersonalDataTypes = "it-system-usage-sensitive-personal-data-types";
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-location-types";
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
+            public const string ItSystemUsageRoles = "it-system-usage-role-types";
             public const string ItContractContractTypes = "it-contract-contract-types";
         }
 
@@ -34,14 +36,24 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
         }
 
-        public static async Task<AvailableNamePairResponseDTO> GetOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
+        public static async Task<RegularOptionExtendedResponseDTO> GetOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{optionTypeUuid}?organizationUuid={organizationUuid}");
             
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return await response.ReadResponseBodyAsAsync<AvailableNamePairResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<RegularOptionExtendedResponseDTO>();
+        }
+
+        public static async Task<RoleOptionExtendedResponseDTO> GetRoleOptionAsync(string resource, Guid optionTypeUuid, Guid organizationUuid)
+        {
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v2/{resource}/{optionTypeUuid}?organizationUuid={organizationUuid}");
+
+            using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<RoleOptionExtendedResponseDTO>();
         }
     }
 }

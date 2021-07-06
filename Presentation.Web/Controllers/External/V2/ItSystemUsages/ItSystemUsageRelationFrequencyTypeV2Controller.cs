@@ -9,13 +9,14 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-relation-frequency-types")]
     [DenyRightsHoldersAccess]
-    public class ItSystemUsageRelationFrequencyTypeV2Controller : BaseOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
+    public class ItSystemUsageRelationFrequencyTypeV2Controller : BaseRegularOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
     {
         public ItSystemUsageRelationFrequencyTypeV2Controller(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)
             : base(optionService)
@@ -23,7 +24,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns IT-System usage relation frequency option types
+        /// Returns IT-System usage relation frequency option types which are available for new registrations within the organization
         /// </summary>
         /// <param name="organizationUuid">organization context for the relation frequency type availability</param>
         /// <returns>A list of available IT-System usage relation frequency option types</returns>
@@ -46,7 +47,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         /// <returns>A uuid and name pair with boolean to mark if the relation frequency type is available in the organization</returns>
         [HttpGet]
         [Route("{relationFrequencyTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
