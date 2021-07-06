@@ -14,6 +14,11 @@ namespace Presentation.Web.Extensions
             return new(source.Uuid, source.Name);
         }
 
+        public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
+        {
+            return new(source.Uuid, source.TaskKey);
+        }
+
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this User source)
         {
             return new(source.Uuid, source.GetFullName());

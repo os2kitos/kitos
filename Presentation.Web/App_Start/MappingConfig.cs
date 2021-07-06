@@ -380,7 +380,6 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
                 .ReverseMap()
-                .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
                 .ForMember(dest => dest.Contracts, opt => opt.Ignore())

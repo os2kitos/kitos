@@ -359,6 +359,7 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Models\External\V2\Response\Organization\OrganizationUnitResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Contract\ItContractResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />

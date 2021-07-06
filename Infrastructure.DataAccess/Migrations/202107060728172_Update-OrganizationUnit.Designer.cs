@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Added_Uuid_To_ItContract : IMigrationMetadata
+    public sealed partial class UpdateOrganizationUnit : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_Uuid_To_ItContract));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(UpdateOrganizationUnit));
         
         string IMigrationMetadata.Id
         {
-            get { return "202107050921122_Added_Uuid_To_ItContract"; }
+            get { return "202107060728172_Update-OrganizationUnit"; }
         }
         
         string IMigrationMetadata.Source

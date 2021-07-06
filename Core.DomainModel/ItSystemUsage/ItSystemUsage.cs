@@ -34,7 +34,6 @@ namespace Core.DomainModel.ItSystemUsage
         {
             this.Contracts = new List<ItContractItSystemUsage>();
             this.ArchivePeriods = new List<ArchivePeriod>();
-            this.OrgUnits = new List<OrganizationUnit>();
             this.TaskRefs = new List<TaskRef>();
             this.AccessTypes = new List<AccessType>();
             this.TaskRefsOptOut = new List<TaskRef>();
@@ -244,13 +243,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The contracts.
         /// </value>
         public virtual ICollection<ItContractItSystemUsage> Contracts { get; set; }
-        /// <summary>
-        /// Gets or sets the organization units associated with this instance.
-        /// </summary>
-        /// <value>
-        /// The organization units.
-        /// </value>
-        public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
         /// <summary>
         /// Gets or sets the organization units that are using this instance.
         /// </summary>

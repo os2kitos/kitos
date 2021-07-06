@@ -44,8 +44,6 @@
         MainContract: ItContract.IItContractItSystemUsage;
         /** Gets or sets it contracts associated with this instance. */
         Contracts: Array<ItContract.IItContractItSystemUsage>;
-        /** Gets or sets the organization units associated with this instance. */
-        OrgUnits: Array<IOrganizationUnit>;
         /** Gets or sets the organization units that are using this instance. */
         UsedBy: Array<IItSystemUsageOrgUnitUsage>;
         /** Gets or sets the tasks this instance supports. */

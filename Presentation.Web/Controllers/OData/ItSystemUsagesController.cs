@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
@@ -54,35 +53,6 @@ namespace Presentation.Web.Controllers.OData
             var result = Repository
                 .AsQueryable()
                 .ByOrganizationId(orgKey);
-
-            return Ok(result);
-        }
-
-        /// <summary>
-        /// Henter alle IT-Systemanvendelser for den pågældende organisationsenhed
-        /// </summary>
-        /// <param name="orgKey"></param>
-        /// <param name="unitKey"></param>
-        /// <returns></returns>
-        [EnableQuery(MaxExpansionDepth = 4)] // MaxExpansionDepth is 4 because we need to do MainContract($expand=ItContract($expand=Supplier))
-        [ODataRoute("Organizations({orgKey})/OrganizationUnits({unitKey})/ItSystemUsages")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ODataResponse<IEnumerable<ItSystemUsage>>))]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [RequireTopOnOdataThroughKitosToken]
-        public IHttpActionResult GetItSystemsByOrgUnit(int orgKey, int unitKey)
-        {
-            //Usages are local so full access is required
-            if (GetOrganizationReadAccessLevel(orgKey) != OrganizationDataReadAccessLevel.All)
-            {
-                return Forbidden();
-            }
-
-            var orgUnitTreeIds = _organizationUnitRepository.GetIdsOfSubTree(orgKey, unitKey).ToList();
-
-            var result = Repository
-                .AsQueryable()
-                .ByOrganizationId(orgKey)
-                .Where(usage => usage.ResponsibleUsage != null && orgUnitTreeIds.Contains(usage.ResponsibleUsage.OrganizationUnitId));
 
             return Ok(result);
         }

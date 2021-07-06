@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -23,6 +22,7 @@ namespace Core.ApplicationServices.Organizations
     {
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IOrganizationRepository _repository;
+        private readonly IOrgUnitService _orgUnitService;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -40,7 +40,8 @@ namespace Core.ApplicationServices.Organizations
             ILogger logger,
             IOrganizationRoleService organizationRoleService,
             ITransactionManager transactionManager,
-            IOrganizationRepository repository)
+            IOrganizationRepository repository,
+            IOrgUnitService orgUnitService)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -51,6 +52,7 @@ namespace Core.ApplicationServices.Organizations
             _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
             _repository = repository;
+            _orgUnitService = orgUnitService;
         }
 
         //returns the default org unit for that user inside that organization
@@ -181,17 +183,17 @@ namespace Core.ApplicationServices.Organizations
         public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null)
         {
             return _repository.GetByUuid(organizationUuid).Match<Result<Organization, OperationError>>(organization =>
-            {
-                var hasAccess = withMinimumAccessLevel.HasValue
-                    ? _authorizationContext.GetOrganizationReadAccessLevel(organization.Id) >= withMinimumAccessLevel.Value
-                    : _authorizationContext.AllowReads(organization);
-
-                if (!hasAccess)
                 {
-                    return new OperationError(OperationFailure.Forbidden);
-                }
-                return organization;
-            },
+                    var hasAccess = withMinimumAccessLevel.HasValue
+                        ? _authorizationContext.GetOrganizationReadAccessLevel(organization.Id) >= withMinimumAccessLevel.Value
+                        : _authorizationContext.AllowReads(organization);
+
+                    if (!hasAccess)
+                    {
+                        return new OperationError(OperationFailure.Forbidden);
+                    }
+                    return organization;
+                },
                 () => new OperationError(OperationFailure.NotFound)
             );
         }
@@ -222,6 +224,13 @@ namespace Core.ApplicationServices.Organizations
 
             var query = new IntersectionQuery<Organization>(domainQueries);
             return _repository.GetAll().Transform(query.Apply);
+        }
+
+        public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria)
+        {
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_orgUnitService.GetOrganizationUnits)
+                .Select(new IntersectionQuery<OrganizationUnit>(criteria).Apply);
         }
     }
 }

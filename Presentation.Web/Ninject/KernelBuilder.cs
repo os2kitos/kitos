@@ -94,6 +94,7 @@ using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.ApplicationServices.Rights;
+using Core.DomainServices.Organizations;
 
 namespace Presentation.Web.Ninject
 {

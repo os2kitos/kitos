@@ -38,6 +38,10 @@ namespace Infrastructure.DataAccess.Mapping
             HasMany(o => o.UsingItProjects)
                 .WithRequired(o => o.OrganizationUnit)
                 .WillCascadeOnDelete(true);
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_OrganizationUnit_UUID", 0);
         }
     }
 }
