@@ -4,6 +4,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.External.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
@@ -16,7 +17,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
 {
     [RoutePrefix("api/v2/it-contract-contract-types")]
     [DenyRightsHoldersAccess]
-    public class ItContractContractTypeV2Controller : BaseOptionTypeV2Controller<ItContract, ItContractType>
+    public class ItContractContractTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, ItContractType>
     {
         public ItContractContractTypeV2Controller(IOptionsApplicationService<ItContract, ItContractType> optionService)
             : base(optionService)
@@ -47,7 +48,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// <returns>A uuid and name pair with boolean to mark if the contract type is available in the organization</returns>
         [HttpGet]
         [Route("{contractTypeUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(AvailableNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
