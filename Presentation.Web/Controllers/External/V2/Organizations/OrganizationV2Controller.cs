@@ -195,8 +195,8 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                 queries.Add(new QueryByPartOfName<OrganizationUnit>(nameQuery));
 
             return _organizationService
-                .GetOrganizationUnits(organizationUuid,queries.ToArray())
-                .Select(units=>units.OrderBy(unit=>unit.Id))
+                .GetOrganizationUnits(organizationUuid, queries.ToArray())
+                .Select(units => units.OrderBy(unit => unit.Id))
                 .Select(units => units.Page(paginationQuery))
                 .Select(units => units.AsEnumerable().Select(ToOrganizationUnitResponseDto).ToList())
                 .Match(Ok, FromOperationError);
@@ -254,6 +254,10 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
                 UnitId = unit.LocalId,
                 Ean = unit.Ean,
                 ParentOrganizationUnit = unit.Parent?.Transform(parent => parent.MapIdentityNamePairDTO()),
+                Kle = unit
+                    .TaskUsages
+                    .Select(taskUsage => taskUsage.TaskRef.MapIdentityNamePairDTO())
+                    .ToList()
             };
         }
         private OrganizationUserResponseDTO ToUserResponseDTO((Guid organizationUuid, User user) context)

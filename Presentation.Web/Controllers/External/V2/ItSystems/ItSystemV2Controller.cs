@@ -309,7 +309,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
                 new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
             dto.KLE = arg
                 .TaskRefs
-                .Select(taskRef => new IdentityNamePairResponseDTO(taskRef.Uuid, taskRef.TaskKey))
+                .Select(taskRef => taskRef.MapIdentityNamePairDTO())
                 .ToList();
         }
         private CreatedNegotiatedContentResult<RightsHolderItSystemResponseDTO> MapSystemCreatedResponse(RightsHolderItSystemResponseDTO dto)
