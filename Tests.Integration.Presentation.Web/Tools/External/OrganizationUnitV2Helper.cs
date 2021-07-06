@@ -45,7 +45,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         }
         public static async Task<HttpResponseMessage> SendGetOrganizationUnitAsync(string token, Guid organizationUuid, Guid organizationUnitId)
         {
-            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/users/{organizationUnitId:D}"), token);
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/organizations/{organizationUuid}/organization-units/{organizationUnitId:D}"), token);
         }
     }
 }
