@@ -100,6 +100,7 @@
     <Compile Include="Queries\Organization\QueryByCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryOrganizationByIdsOrSharedAccess.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
+    <Compile Include="Queries\QueryByOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
     <Compile Include="Queries\User\QueryByCrossOrganizationPermissions.cs" />
     <Compile Include="Queries\User\QueryByRoleAssignment.cs" />

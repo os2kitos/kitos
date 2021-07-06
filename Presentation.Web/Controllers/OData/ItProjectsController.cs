@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.OData
         }
 
         /// <summary>
-        /// Henter organisationens projekter samt offentlige projekter fra andre organisationer
+        /// Henter organisationens projekter 
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
@@ -53,24 +53,15 @@ namespace Presentation.Web.Controllers.OData
         public IHttpActionResult GetItProjects(int key)
         {
             var all = Repository.AsQueryable();
-
-            if (GetCrossOrganizationReadAccessLevel() < CrossOrganizationDataReadAccessLevel.All)
+            
+            if (GetOrganizationReadAccessLevel(key) < OrganizationDataReadAccessLevel.All)
             {
-                if (GetOrganizationReadAccessLevel(key) < OrganizationDataReadAccessLevel.All)
-                {
-                    return Forbidden();
-                }
-
-                var result = all.ByOrganizationId(key);
-                return Ok(result);
+                return Forbidden();
             }
-            else
-            {
-                var result = all
-                    .ByPublicAccessOrOrganizationId(key);
 
-                return Ok(result);
-            }
+            var result = all.ByOrganizationId(key);
+            return Ok(result);
+            
         }
 
         // GET /Organizations(1)/OrganizationUnits(1)/ItProjects

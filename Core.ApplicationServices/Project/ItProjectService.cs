@@ -2,15 +2,16 @@ using System;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Factories;
-using Core.DomainServices.Model;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices.Project
         private readonly IReferenceService _referenceService;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
+        private readonly IOrganizationService _organizationService;
 
         public ItProjectService(
             IGenericRepository<ItProject> projectRepository,
@@ -35,7 +37,8 @@ namespace Core.ApplicationServices.Project
             IUserRepository userRepository,
             IReferenceService referenceService,
             ITransactionManager transactionManager,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IOrganizationService organizationService)
         {
             _projectRepository = projectRepository;
             _authorizationContext = authorizationContext;
@@ -44,6 +47,7 @@ namespace Core.ApplicationServices.Project
             _referenceService = referenceService;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
+            _organizationService = organizationService;
         }
 
         public Result<ItProject, OperationFailure> AddProject(string name, int organizationId)
@@ -99,15 +103,24 @@ namespace Core.ApplicationServices.Project
             }
         }
 
+        public Result<IQueryable<ItProject>, OperationError> GetProjectsInOrganization(Guid organizationUuid, params IDomainQuery<ItProject>[] conditions)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization =>
+                {
+                    var query = new IntersectionQuery<ItProject>(conditions);
+
+                    return _itProjectRepository
+                        .GetProjectsInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<ItProject>, OperationError>.Success);
+                });
+        }
+
         public IQueryable<ItProject> GetAvailableProjects(int organizationId, string optionalNameSearch = null)
         {
-            var projects = _itProjectRepository.GetProjects(
-                new OrganizationDataQueryParameters(
-                    organizationId,
-                    OrganizationDataQueryBreadth.IncludePublicDataFromOtherOrganizations,
-                    _authorizationContext.GetDataAccessLevel(organizationId)
-                )
-            );
+            var projects = _itProjectRepository.GetProjectsInOrganization(organizationId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
             {
@@ -171,6 +184,17 @@ namespace Core.ApplicationServices.Project
             return itProject.Handover;
         }
 
+        public Result<ItProject, OperationError> GetProject(Guid uuid)
+        {
+            return _itProjectRepository
+                .GetProject(uuid)
+                .Match
+                (
+                    project => _authorizationContext.AllowReads(project) ? Result<ItProject, OperationError>.Success(project) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
         private Maybe<OperationFailure> CanRemoveParticipant(ItProject itProject, User user)
         {
             if (itProject == null)
@@ -194,5 +218,6 @@ namespace Core.ApplicationServices.Project
             }
             return Maybe<OperationFailure>.None;
         }
+
     }
 }

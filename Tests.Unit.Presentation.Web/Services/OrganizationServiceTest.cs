@@ -381,34 +381,62 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(allValues.Except(excluded.WrapAsEnumerable()).ToList(), organizations.ToList());
         }
 
-        [Fact]
-        public void GetOrganization_Returns_Success()
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.All)]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void GetOrganization_Returns_Success(OrganizationDataReadAccessLevel accessLevel)
         {
             //Arrange
             var uuid = A<Guid>();
-            var expectedOrg = new Organization();
+            var expectedOrg = new Organization {Id = A<int>() };
             ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
             ExpectAllowReadOrganizationReturns(expectedOrg, true);
+            ExpectGetOrganizationReadAccessLevelReturns(expectedOrg.Id, accessLevel);
 
             //Act
-            var result = _sut.GetOrganization(uuid);
+            var result = _sut.GetOrganization(uuid, accessLevel);
 
             //Assert
             Assert.True(result.Ok);
             Assert.Same(expectedOrg, result.Value);
         }
 
-        [Fact]
-        public void GetOrganization_Returns_Forbidden()
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.Public, OrganizationDataReadAccessLevel.All)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder, OrganizationDataReadAccessLevel.All)]
+        [InlineData(OrganizationDataReadAccessLevel.None, OrganizationDataReadAccessLevel.All)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.None, OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.None, OrganizationDataReadAccessLevel.RightsHolder)]
+        public void GetOrganization_Returns_Forbidden_If_OrganizationDataReadAccessLevel_Is_Lower_Than_Required(OrganizationDataReadAccessLevel expectedAccessLevel, OrganizationDataReadAccessLevel requiredAccessLevel)
         {
             //Arrange
             var uuid = A<Guid>();
             var expectedOrg = new Organization();
             ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
+            ExpectGetOrganizationReadAccessLevelReturns(expectedOrg.Id, expectedAccessLevel);
+
+            //Act
+            var result = _sut.GetOrganization(uuid, requiredAccessLevel);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetOrganization_Returns_Forbidden_If_No_ReadAccess_On_Organization()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var expectedOrg = new Organization();
+            ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
+            ExpectGetOrganizationReadAccessLevelReturns(expectedOrg.Id, OrganizationDataReadAccessLevel.All);
             ExpectAllowReadOrganizationReturns(expectedOrg, false);
 
             //Act
-            var result = _sut.GetOrganization(uuid);
+            var result = _sut.GetOrganization(uuid, null);
 
             //Assert
             Assert.True(result.Failed);
@@ -423,7 +451,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetOrganizationByUuidReturns(uuid, Maybe<Organization>.None);
 
             //Act
-            var result = _sut.GetOrganization(uuid);
+            var result = _sut.GetOrganization(uuid, OrganizationDataReadAccessLevel.All);
 
             //Assert
             Assert.True(result.Failed);
@@ -521,6 +549,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetOrganizationByKeyReturns(int organizationId, Organization organization = null)
         {
             _organizationRepository.Setup(x => x.GetByKey(organizationId)).Returns(organization);
+        }
+
+        private void ExpectGetOrganizationReadAccessLevelReturns(int organizationId, OrganizationDataReadAccessLevel accessLevel)
+        {
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(accessLevel);
         }
     }
 }

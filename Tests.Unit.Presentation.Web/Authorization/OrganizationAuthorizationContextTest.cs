@@ -583,7 +583,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
            bool expectedResult)
         {
             //Arrange
-            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateItProject(AccessModifier.Public, hasAssignedWriteAccess);
+            var inputEntity = inputIsActiveUser || inputIsAUser ? CreateUserEntity(inputIsActiveUser ? _userId : _userId + 1) : CreateItProject(hasAssignedWriteAccess);
 
             ExpectUserIsGlobalAdmin(isGlobalAdmin);
             ExpectHasRoleInSameOrganizationAsReturns(inputEntity, isInSameOrganization);
@@ -731,12 +731,9 @@ namespace Tests.Unit.Presentation.Web.Authorization
             return testItSystem;
         }
 
-        private ItProject CreateItProject(AccessModifier accessModifier, bool hasAssignedWriteAccess)
+        private ItProject CreateItProject(bool hasAssignedWriteAccess)
         {
-            var itProject = new ItProject
-            {
-                AccessModifier = accessModifier
-            };
+            var itProject = new ItProject();
             if (hasAssignedWriteAccess)
             {
                 itProject.Rights = new List<ItProjectRight>()

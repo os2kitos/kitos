@@ -28,8 +28,8 @@ namespace Tests.Unit.Presentation.Web.DomainServices
             var result = sut.Apply(input);
 
             //Assert
-            var itSystem = Assert.Single(result);
-            Assert.Same(matched, itSystem);
+            var entity = Assert.Single(result);
+            Assert.Same(matched, entity);
         }
     }
 }

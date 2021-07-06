@@ -188,13 +188,12 @@ namespace Core.ApplicationServices.Organizations
                         ? _authorizationContext.GetOrganizationReadAccessLevel(organization.Id) >= withMinimumAccessLevel.Value
                         : _authorizationContext.AllowReads(organization);
 
-                    if (!hasAccess)
-                    {
-                        return new OperationError(OperationFailure.Forbidden);
-                    }
-
-                    return organization;
-                },
+					if (!hasAccess)
+					{
+						return new OperationError(OperationFailure.Forbidden);
+					}
+					return organization;
+				},
                 () => new OperationError(OperationFailure.NotFound)
             );
         }

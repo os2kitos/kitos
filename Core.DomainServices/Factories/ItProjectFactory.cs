@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 
 namespace Core.DomainServices.Factories
@@ -19,8 +18,6 @@ namespace Core.DomainServices.Factories
                 Name = name,
                 OrganizationId = organizationId,
             };
-
-            InitializeAccessModifier(itProject);
 
             InitializePhases(itProject);
 
@@ -55,12 +52,7 @@ namespace Core.DomainServices.Factories
 
         private static ItProjectPhase CreateItProjectPhase(string name)
         {
-            return new ItProjectPhase {Name = name};
-        }
-
-        private static void InitializeAccessModifier(ItProject itProject)
-        {
-            itProject.AccessModifier = AccessModifier.Local;
+            return new ItProjectPhase { Name = name };
         }
 
         private static void InitializeEconomyYears(ItProject project)

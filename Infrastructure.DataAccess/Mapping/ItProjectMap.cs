@@ -69,11 +69,6 @@ namespace Infrastructure.DataAccess.Mapping
             HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItProject);
 
-            HasOptional(t => t.Original)
-                .WithMany(t => t.Clones)
-                .HasForeignKey(d => d.OriginalId)
-                .WillCascadeOnDelete(false);
-
             HasMany(t => t.Stakeholders)
                 .WithRequired(d => d.ItProject)
                 .HasForeignKey(d => d.ItProjectId)
@@ -84,7 +79,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(e => e.AssociatedItProjectId)
                 .WillCascadeOnDelete(true);
 
-            TypeMapping.AddIndexOnAccessModifier<ItProjectMap, ItProject>(this);
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Project_Uuid", 0);
         }
     }
 }

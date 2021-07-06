@@ -538,9 +538,6 @@ namespace Presentation.Web.Controllers.API
                 }
             }
 
-            //force set access modifier to 0
-            project.AccessModifier = AccessModifier.Local;
-
             PatchQuery(project, null);
 
             return Ok();
