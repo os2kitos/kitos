@@ -78,11 +78,22 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
+            // Used to compare specific contract related data
+            var expectedContractId = DatabaseAccess.MapFromEntitySet<ItContract, int>(x => x
+                .AsQueryable()
+                .First(x => x.OrganizationId == TestEnvironment.DefaultOrganizationId)
+                .Id);
+            var expectedContract = await ItContractHelper.GetItContract(expectedContractId);
+
             //Act
             var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken.Token, defaultOrgUuid, null, null, 0, 100);
 
             //Assert
             Assert.NotEmpty(contracts);
+
+            // Checking contract data
+            var contract = contracts.First(x => x.Uuid == expectedContract.Uuid);
+            AssertContractResponseDTO(expectedContract, contract);
         }
 
         [Fact]
