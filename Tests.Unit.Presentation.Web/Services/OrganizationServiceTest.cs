@@ -11,11 +11,11 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
-using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -34,10 +34,11 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IGenericRepository<User>> _userRepository;
         private readonly Mock<IOrganizationRepository> _repositoryMock;
         private readonly Mock<IOrganizationalUserContext> _userContext;
+        private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
 
         public OrganizationServiceTest()
         {
-            _user = new User() { Id = new Fixture().Create<int>() };
+            _user = new User { Id = new Fixture().Create<int>() };
             _authorizationContext = new Mock<IAuthorizationContext>();
             _userContext = new Mock<IOrganizationalUserContext>();
             _roleService = new Mock<IOrganizationRoleService>();
@@ -48,6 +49,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgRightRepository = new Mock<IGenericRepository<OrganizationRight>>();
             _userRepository = new Mock<IGenericRepository<User>>();
             _repositoryMock = new Mock<IOrganizationRepository>();
+            _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -57,7 +59,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _roleService.Object,
                 _transactionManager.Object,
-                _repositoryMock.Object);
+                _repositoryMock.Object,
+                _orgUnitServiceMock.Object);
         }
 
         [Fact]
@@ -334,15 +337,15 @@ namespace Tests.Unit.Presentation.Web.Services
             var org1WithoutMembership = A<int>();
             var org2WithoutMembership = A<int>();
 
-            var expected1 = new Organization { Id = org1WithMembership, AccessModifier = AccessModifier.Local};
-            var expected2 = new Organization { Id = org2WithMembership , AccessModifier = AccessModifier.Public};
-            var expected3 = new Organization { Id = org1WithoutMembership ,AccessModifier = AccessModifier.Public};
-            var excluded = new Organization { Id = org2WithoutMembership , AccessModifier = AccessModifier.Local};
+            var expected1 = new Organization { Id = org1WithMembership, AccessModifier = AccessModifier.Local };
+            var expected2 = new Organization { Id = org2WithMembership, AccessModifier = AccessModifier.Public };
+            var expected3 = new Organization { Id = org1WithoutMembership, AccessModifier = AccessModifier.Public };
+            var excluded = new Organization { Id = org2WithoutMembership, AccessModifier = AccessModifier.Local };
 
             var allValues = new[] { expected1, expected2, excluded, expected3 };
 
             _repositoryMock.Setup(x => x.GetAll()).Returns(allValues.AsQueryable());
-            _userContext.Setup(x => x.OrganizationIds).Returns(new[] {org1WithMembership, org2WithMembership});
+            _userContext.Setup(x => x.OrganizationIds).Returns(new[] { org1WithMembership, org2WithMembership });
 
             //Act
             var organizations = _sut.SearchAccessibleOrganizations().ToList();
@@ -453,6 +456,69 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetOrganizationUnits_Returns_All_Units_Filtered()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Id = A<int>()};
+            var allOrgUnits = new []{new OrganizationUnit(), new OrganizationUnit(), new OrganizationUnit()}.AsQueryable();
+            var filteredUnits = allOrgUnits.Skip(1);
+            var orgUnitQueryMock = new Mock<IDomainQuery<OrganizationUnit>>();
+            
+            orgUnitQueryMock.Setup(x => x.Apply(allOrgUnits)).Returns(filteredUnits);
+            ExpectGetOrganizationByUuidReturns(organizationId, organization);
+            ExpectGetOrganizationAccessLevel(organization.Id, OrganizationDataReadAccessLevel.All);
+            _orgUnitServiceMock.Setup(x=>x.GetOrganizationUnits(organization)).Returns(allOrgUnits);
+
+            //Act
+            var result = _sut.GetOrganizationUnits(organizationId, orgUnitQueryMock.Object);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(filteredUnits.ToList(),result.Value.ToList());
+        }
+
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void Cannot_Get_Organization_Units_Unless_Full_Access_To_Organization(OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Id = A<int>() };
+            ExpectGetOrganizationByUuidReturns(organizationId, organization);
+            ExpectGetOrganizationAccessLevel(organization.Id, organizationDataReadAccessLevel);
+
+            //Act
+            var result = _sut.GetOrganizationUnits(organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Get_Organization_Units_If_Organization_Is_Not_Found()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Id = A<int>() };
+            ExpectGetOrganizationByUuidReturns(organizationId, Maybe<Organization>.None);
+
+            //Act
+            var result = _sut.GetOrganizationUnits(organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+        private void ExpectGetOrganizationAccessLevel(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
+        {
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(organizationDataReadAccessLevel);
         }
 
         private void ExpectAllowReadOrganizationReturns(Organization expectedOrg, bool value)

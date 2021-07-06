@@ -257,10 +257,6 @@ namespace Core.ApplicationServices
                 .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
                 .Bind(organization =>
                 {
-                    //Requesting users inside the organization requires full access
-                    if (_authorizationContext.GetOrganizationReadAccessLevel(organization.Id) != OrganizationDataReadAccessLevel.All)
-                        return new OperationError("No access inside organization", OperationFailure.Forbidden);
-
                     var query = new IntersectionQuery<User>(queries);
 
                     return _repository

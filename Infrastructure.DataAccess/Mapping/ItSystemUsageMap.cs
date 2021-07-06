@@ -20,9 +20,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 
-            this.HasMany(t => t.OrgUnits)
-                .WithMany(t => t.ItSystemUsages);
-
             this.HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);
 

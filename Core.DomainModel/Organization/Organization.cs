@@ -6,7 +6,9 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Reports;
+using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
+using Infrastructure.Services.Types;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -127,5 +129,10 @@ namespace Core.DomainModel.Organization
         }
 
         public IEnumerable<int> GetOrganizationIds() => new[] { Id };
+
+        public Maybe<OrganizationUnit> GetOrganizationUnit(Guid organizationUnitId)
+        {
+            return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
+        }
     }
 }
