@@ -348,6 +348,8 @@
     <Compile Include="Controllers\External\V2\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItContracts\ItContractContractTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItContracts\ItContractV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
@@ -367,8 +369,12 @@
     <Compile Include="Models\External\V2\Response\Options\RoleOptionExtendedResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Options\RoleOptionResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUnitResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\Contract\ItContractResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal - Copy.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\External\V2\Types\OrganizationType.cs" />
     <Compile Include="Models\External\V2\Types\OrganizationUserRole.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />

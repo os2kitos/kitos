@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Models.External.V2.Response.Organization;
+using Presentation.Web.Models.External.V2.SharedProperties;
 
 namespace Presentation.Web.Models.External.V2.Response.System
 {
-    public abstract class BaseItSystemResponseDTO
+    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal
     {
         /// <summary>
         /// UUID for IT-System

@@ -47,6 +47,7 @@ namespace Presentation.Web.Models
         public int? ResponsibleOrganizationUnitId { get; set; }
         public int? SupplierId { get; set; }
         public string SupplierName { get; set; }
+        public Guid? SupplierUuid { get; set; }
         public int? ProcurementStrategyId { get; set; }
         public string ProcurementStrategyName { get; set; }
         public int? ProcurementPlanHalf { get; set; }
@@ -55,6 +56,7 @@ namespace Presentation.Web.Models
         public string ContractTemplateName { get; set; }
         public int? ContractTypeId { get; set; }
         public string ContractTypeName { get; set; }
+        public Guid? ContractTypeUuid { get; set; }
         public int? PurchaseFormId { get; set; }
         public string PurchaseFormName { get; set; }
         public int? ParentId { get; set; }
@@ -84,5 +86,7 @@ namespace Presentation.Web.Models
         public ExternalReferenceDTO Reference;
 
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
+
+        public Guid Uuid { get; set; }
     }
 }

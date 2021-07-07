@@ -461,7 +461,7 @@ namespace Core.ApplicationServices.SystemUsage
 
                             var availableFrequencyTypes = _frequencyService.GetAvailableOptions(fromSystemUsage.OrganizationId).ToList();
                             var exposedInterfaces = toSystemUsage.GetExposedInterfaces();
-                            var contracts = _contractRepository.GetByOrganizationId(fromSystemUsage.OrganizationId).OrderBy(c => c.Name).ToList();
+                            var contracts = _contractRepository.GetContractsInOrganization(fromSystemUsage.OrganizationId).OrderBy(c => c.Name).ToList();
 
                             return new RelationOptionsDTO(fromSystemUsage, toSystemUsage, exposedInterfaces, contracts, availableFrequencyTypes);
                         },

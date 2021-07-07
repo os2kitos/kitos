@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.DomainModel.ItContract;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 

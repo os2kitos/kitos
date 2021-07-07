@@ -67,6 +67,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             HasMany(x => x.DataProcessingRegistrations)
                 .WithMany(x => x.AssociatedContracts);
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_Contract_Uuid", 0);
         }
     }
 }
