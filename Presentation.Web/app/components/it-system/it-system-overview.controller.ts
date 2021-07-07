@@ -489,7 +489,7 @@
                             const decorationClass = dataItem.MainContractIsActive
                                 ? "fa-file text-success"
                                 : "fa-file-o text-muted";
-                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
+                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
                         })
                         .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : ""))
                 .withColumn(builder =>
