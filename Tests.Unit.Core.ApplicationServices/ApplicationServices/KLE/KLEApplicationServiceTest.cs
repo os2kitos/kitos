@@ -6,6 +6,7 @@ using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.KLE;
+using Core.DomainServices.Repositories.TaskRefs;
 using Moq;
 using Xunit;
 
@@ -17,13 +18,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private readonly KLEApplicationService _sut;
         private readonly Mock<IOrganizationalUserContext> _mockOrganizationalUserContext;
         private readonly Mock<IKLEUpdateHistoryItemRepository> _mockUpdateHistoryItemRepository;
+        private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
 
         public KLEApplicationServiceTest()
         {
             _mockKleStandardRepository = new Mock<IKLEStandardRepository>();
             _mockUpdateHistoryItemRepository = new Mock<IKLEUpdateHistoryItemRepository>();
             _mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
-            _sut = new KLEApplicationService(_mockOrganizationalUserContext.Object, _mockKleStandardRepository.Object, _mockUpdateHistoryItemRepository.Object);
+            _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
+            _sut = new KLEApplicationService(_mockOrganizationalUserContext.Object, _mockKleStandardRepository.Object, _mockUpdateHistoryItemRepository.Object, _taskRefRepositoryMock.Object);
 
         }
 
