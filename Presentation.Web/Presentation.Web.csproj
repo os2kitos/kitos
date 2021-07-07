@@ -369,6 +369,9 @@
     <Compile Include="Models\External\V2\Response\Contract\ItContractResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal - Copy.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\External\V2\Types\OrganizationType.cs" />
     <Compile Include="Models\External\V2\Types\OrganizationUserRole.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />

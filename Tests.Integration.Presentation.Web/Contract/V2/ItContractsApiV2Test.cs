@@ -181,14 +181,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expected.Name, actual.Name);
 
             Assert.Equal(expected.Concluded, actual.ValidFrom);
-            Assert.Equal(expected.ExpirationDate, actual.ExpiresAt);
+            Assert.Equal(expected.ExpirationDate, actual.ValidTo);
             Assert.Equal(expected.Terminated, actual.TerminatedAt);
-            Assert.Equal(expected.IsActive, actual.IsActive);
+            Assert.Equal(expected.IsActive, actual.IsValid);
 
             if (expected.SupplierId.HasValue)
             {
                 Assert.Equal(expected.SupplierName, actual.Supplier.Name);
-                Assert.Equal(DatabaseAccess.GetEntityUuid<Organization>(expected.SupplierId.Value), actual.Supplier.Uuid);
+                Assert.Equal(expected.SupplierUuid, actual.Supplier.Uuid);
             }
             else
             {
@@ -198,7 +198,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             if (expected.ContractTypeId.HasValue)
             {
                 Assert.Equal(expected.ContractTypeName, actual.ContractType.Name);
-                Assert.Equal(DatabaseAccess.GetEntityUuid<ItContractType>(expected.ContractTypeId.Value), actual.ContractType.Uuid);
+                Assert.Equal(expected.ContractTypeUuid, actual.ContractType.Uuid);
             }
             else
             {

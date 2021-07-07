@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Presentation.Web.Models.External.V2.SharedProperties;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
 namespace Presentation.Web.Models.External.V2.Response.Contract
 {
-    public class ItContractResponseDTO
+    public class ItContractResponseDTO : IHasNameExternal, IHasUuidExternal, IHasValidationExternal
     {
         /// <summary>
         /// UUID for IT-Contract
@@ -40,7 +41,7 @@ namespace Presentation.Web.Models.External.V2.Response.Contract
         /// <summary>
         /// Date when IT-Contract will expire
         /// </summary>
-        public DateTime? ExpiresAt { get; set; }
+        public DateTime? ValidTo { get; set; }
 
         /// <summary>
         /// Date when IT-Contract is terminated
@@ -50,6 +51,6 @@ namespace Presentation.Web.Models.External.V2.Response.Contract
         /// <summary>
         /// Whether the IT-Contract is active or not
         /// </summary>
-        public bool IsActive { get; set; }
+        public bool IsValid { get; set; }
     }
 }

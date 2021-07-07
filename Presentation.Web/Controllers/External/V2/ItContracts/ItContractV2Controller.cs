@@ -103,9 +103,9 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapIdentityNamePairDTO() : null,
                 AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.MapIdentityNamePairDTO()),
                 ValidFrom = contract.Concluded,
-                ExpiresAt = contract.ExpirationDate,
+                ValidTo = contract.ExpirationDate,
                 TerminatedAt = contract.Terminated,
-                IsActive = contract.IsActive
+                IsValid = contract.IsActive
             };
         }
     }

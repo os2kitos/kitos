@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Presentation.Web.Models.External.V2.SharedProperties;
+using System;
 
 namespace Presentation.Web.Models.External.V2.Response.Interface
 {
-    public abstract class BaseItInterfaceResponseDTO
+    public abstract class BaseItInterfaceResponseDTO : IHasNameExternal, IHasUuidExternal
     {
         /// <summary>
         /// UUID for IT-Interface
