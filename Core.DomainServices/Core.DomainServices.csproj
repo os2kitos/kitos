@@ -98,6 +98,10 @@
     <Compile Include="Queries\Interface\QueryByRightsHolder.cs" />
     <Compile Include="Queries\Interface\QueryByRightsHolderIdsOrOwnOrganizationIds.cs" />
     <Compile Include="Queries\Interface\QueryByExposingSystem.cs" />
+    <Compile Include="Queries\KLE\QueryByDescriptionContent.cs" />
+    <Compile Include="Queries\KLE\QueryByKeyPrefix.cs" />
+    <Compile Include="Queries\KLE\QueryByParentKey.cs" />
+    <Compile Include="Queries\KLE\QueryByParentUuid.cs" />
     <Compile Include="Queries\Organization\QueryByCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryOrganizationByIdsOrSharedAccess.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />

@@ -206,6 +206,10 @@
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
+    <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
+    <Compile Include="DomainServices\KLE\QueryByKeyPrefixTest.cs" />
+    <Compile Include="DomainServices\KLE\QueryByParentKeyTest.cs" />
+    <Compile Include="DomainServices\KLE\QueryByParentUuidTest.cs" />
     <Compile Include="DomainServices\QueryByAccessModifierTest.cs" />
     <Compile Include="DomainServices\QueryByBusinessTypeTest.cs" />
     <Compile Include="DomainServices\QueryByCvrContentTest.cs" />

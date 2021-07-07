@@ -96,6 +96,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [Route("organizations/{organizationUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [DenyRightsHoldersAccess]
@@ -232,6 +233,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [HttpGet]
         [Route("rightsholder/organizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ShallowOrganizationResponseDTO>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetOrganizationsAsRightsHolder([FromUri] StandardPaginationQuery pagination = null)
         {

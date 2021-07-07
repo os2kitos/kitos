@@ -1,7 +1,6 @@
 ﻿using Core.ApplicationServices.Project;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
@@ -12,7 +11,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 
 namespace Presentation.Web.Controllers.External.V2.ItProjects
