@@ -16,9 +16,9 @@ namespace Core.DomainServices.Repositories.TaskRefs
             _repository = repository;
         }
 
-        public IQueryable<TaskRef> Query(params IDomainQuery<TaskRef>[] criteria)
+        public IQueryable<TaskRef> Query(params IDomainQuery<TaskRef>[] conditions)
         {
-            return _repository.AsQueryable().Transform(new IntersectionQuery<TaskRef>(criteria).Apply);
+            return _repository.AsQueryable().Transform(new IntersectionQuery<TaskRef>(conditions).Apply);
         }
 
         public Maybe<TaskRef> GetTaskRef(int id)

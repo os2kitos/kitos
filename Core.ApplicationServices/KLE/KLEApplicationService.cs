@@ -65,10 +65,10 @@ namespace Core.ApplicationServices.KLE
             return KLEUpdateStatus.Ok;
         }
 
-        public Result<(Maybe<DateTime> updateReference, IQueryable<TaskRef> contents), OperationError> SearchKle(params IDomainQuery<TaskRef>[] criteria)
+        public Result<(Maybe<DateTime> updateReference, IQueryable<TaskRef> contents), OperationError> SearchKle(params IDomainQuery<TaskRef>[] conditions)
         {
             var lastUpdated = _kleUpdateHistoryItemRepository.GetLastUpdated();
-            var taskRefs = _taskRefRepository.Query(criteria);
+            var taskRefs = _taskRefRepository.Query(conditions);
             return (lastUpdated, taskRefs);
         }
 

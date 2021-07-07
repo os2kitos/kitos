@@ -18,9 +18,9 @@ namespace Core.ApplicationServices.KLE
         /// <summary>
         /// Performs KLE search and responds with a versioned result set
         /// </summary>
-        /// <param name="criteria"></param>
+        /// <param name="conditions"></param>
         /// <returns></returns>
-        Result<(Maybe<DateTime> updateReference, IQueryable<TaskRef> contents), OperationError> SearchKle(params IDomainQuery<TaskRef>[] criteria);
+        Result<(Maybe<DateTime> updateReference, IQueryable<TaskRef> contents), OperationError> SearchKle(params IDomainQuery<TaskRef>[] conditions);
 
         Result<(Maybe<DateTime> updateReference, TaskRef kle), OperationError> GetKle(Guid kleUuid);
     }
