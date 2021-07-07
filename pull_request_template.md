@@ -5,7 +5,7 @@ The following procedure dictates the steps needed before a Pull request can be m
       *All requirements are implemented and unit tests are green*
       
 - [ ] **Merge master into branch / rebase with master**: 
-      *Make sure you are testing your changes and how co-exist with the latest version of master*
+      *Make sure you are testing your changes and how they co-exist with the latest version of master*
       
 - [ ] **Green on integration**: 
       *All integration tests are green on integration*
@@ -20,7 +20,7 @@ The following procedure dictates the steps needed before a Pull request can be m
       *PR owner and reviewer agrees on which changes must be made and the changes are committed.*
       
 - [ ] **Merge master into branch / rebase with master**: 
-      *Make sure you are testing your changes and how co-exist with the latest version of master*
+      *Make sure you are testing your changes and how they co-exist with the latest version of master*
       
 - [ ] **Green on integration**: 
       *All integration tests are green on integration*
