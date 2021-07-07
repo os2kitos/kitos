@@ -5,15 +5,18 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Result;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.TaskRefs;
 using Infrastructure.Services.Types;
 using Moq;
+using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Core.ApplicationServices.KLE
 {
-    public class KLEApplicationServiceTest
+    public class KLEApplicationServiceTest : WithAutoFixture
     {
         private readonly Mock<IKLEStandardRepository> _mockKleStandardRepository;
         private readonly KLEApplicationService _sut;
@@ -64,7 +67,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             // Arrange
             _mockKleStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
-                new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
+                new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = A<string>(), UpdatedDescription = A<string>()}
             }.OrderBy(c => c.TaskKey));
             _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(role == OrganizationRole.GlobalAdmin);
 
@@ -97,9 +100,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             );
             _mockKleStandardRepository.Setup(r => r.GetKLEChangeSummary()).Returns(new List<KLEChange>
             {
-                new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = "dummy", UpdatedDescription = "dummy"}
+                new KLEChange { ChangeType = KLEChangeType.Added, TaskKey = A<string>(), UpdatedDescription = A<string>()}
             }.OrderBy(c => c.TaskKey));
-            
+
             // Act
             var result = _sut.UpdateKLE(activeOrganizationId);
 
@@ -125,13 +128,69 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
                     Published = publishedDate
                 }
             );
-            
+
             // Act
             var result = _sut.UpdateKLE(activeOrganizationId);
-            
+
             // Assert
             Assert.False(result.Ok);
             _mockUpdateHistoryItemRepository.Verify(r => r.Insert(publishedDate), Times.Never());
+        }
+
+        [Fact]
+        public void SearchKle_Returns_Filtered_Kle()
+        {
+            //Arrange
+            var expectedResult = new TaskRef[] { new(), new(), new() }.AsQueryable();
+            var filter = new Mock<IDomainQuery<TaskRef>>();
+            _taskRefRepositoryMock.Setup(x => x.Query(filter.Object)).Returns(expectedResult);
+            Maybe<DateTime> updatedAt = A<DateTime>();
+            _mockUpdateHistoryItemRepository.Setup(x => x.GetLastUpdated()).Returns(updatedAt);
+
+            //Act
+            var result = _sut.SearchKle(filter.Object);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(expectedResult, result.Value.contents);
+            Assert.Equal(updatedAt, result.Value.updateReference);
+        }
+
+        [Fact]
+        public void GetKle_Returns_Ok()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            TaskRef expectedMatch = new() { Uuid = uuid };
+            var all = new[] { new(), expectedMatch, new() }.AsQueryable();
+            Maybe<DateTime> updatedAt = A<DateTime>();
+            _taskRefRepositoryMock.Setup(x => x.Query()).Returns(all);
+            _mockUpdateHistoryItemRepository.Setup(x => x.GetLastUpdated()).Returns(updatedAt);
+
+            //Act
+            var result = _sut.GetKle(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(expectedMatch, result.Value.kle);
+            Assert.Equal(updatedAt, result.Value.updateReference);
+        }
+
+        [Fact]
+        public void GetKle_Returns_NotFound()
+        {
+            //Arrange
+            var all = new TaskRef[] { new(), new() }.AsQueryable();
+            Maybe<DateTime> updatedAt = A<DateTime>();
+            _taskRefRepositoryMock.Setup(x => x.Query()).Returns(all);
+            _mockUpdateHistoryItemRepository.Setup(x => x.GetLastUpdated()).Returns(updatedAt);
+
+            //Act
+            var result = _sut.GetKle(A<Guid>());
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
     }
 }
