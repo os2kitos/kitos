@@ -12,7 +12,6 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.KLE;
-using Presentation.Web.Models.External.V2.Types;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.KLE
@@ -51,6 +50,9 @@ namespace Presentation.Web.Controllers.External.V2.KLE
             string kleDescriptionContent = null,
             [FromUri] StandardPaginationQuery pagination = null)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             var criteria = new List<IDomainQuery<TaskRef>>();
 
             if (parentKleUuid.HasValue)
@@ -89,6 +91,9 @@ namespace Presentation.Web.Controllers.External.V2.KLE
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult Get([NonEmptyGuid] Guid kleUuid)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             return _kleApplicationService.GetKle(kleUuid).Select(result => new VersionedKLEResponseDTO<KLEDetailsDTO>()
             {
                 ReferenceVersion = result.updateReference.GetValueOrFallback(DateTime.MinValue),
