@@ -7,6 +7,7 @@ using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.TaskRefs;
+using Infrastructure.Services.Types;
 using Moq;
 using Xunit;
 
@@ -87,7 +88,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockKleStandardRepository
                 .Setup(r => r.UpdateKLE(activeOrganizationId))
                 .Returns(publishedDate);
-            _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<DateTime>())).Returns(
+            _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<Maybe<DateTime>>())).Returns(
                 new KLEStatus
                 {
                     UpToDate = false,
@@ -117,7 +118,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             _mockKleStandardRepository
                 .Setup(r => r.UpdateKLE(activeOrganizationId))
                 .Returns(publishedDate);
-            _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<DateTime>())).Returns(
+            _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<Maybe<DateTime>>())).Returns(
                 new KLEStatus
                 {
                     UpToDate = true,
