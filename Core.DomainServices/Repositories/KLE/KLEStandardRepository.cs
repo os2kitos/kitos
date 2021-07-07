@@ -12,6 +12,7 @@ using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.KLEDataBridge;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.DomainServices.Repositories.KLE
@@ -53,13 +54,15 @@ namespace Core.DomainServices.Repositories.KLE
             _taskUsageRepository = taskUsageRepository;
         }
 
-        public KLEStatus GetKLEStatus(DateTime lastUpdated)
+        public KLEStatus GetKLEStatus(Maybe<DateTime> lastUpdated)
         {
             var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var publishedDate = GetPublishedDate(kleXmlData);
             return new KLEStatus
             {
-                UpToDate = lastUpdated >= publishedDate.Date,
+                UpToDate = lastUpdated
+                    .Select(updatedAt => updatedAt.Date >= publishedDate.Date)
+                    .GetValueOrFallback(false),
                 Published = publishedDate
             };
         }
@@ -84,7 +87,7 @@ namespace Core.DomainServices.Repositories.KLE
         {
             var result = new List<KLEChange>();
             var mostRecentTaskRefs = _kleConverterHelper.ConvertToTaskRefs(kleXmlData);
-            
+
             foreach (var existingTaskRef in _existingTaskRefRepository.Get())
             {
                 if (mostRecentTaskRefs.TryGet(existingTaskRef.TaskKey, out var mostRecentTaskRef))
@@ -230,7 +233,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveTaskUsageTaskRef(IEnumerable<KLEChange> kleChanges)
         {
-            var keys = kleChanges.Select(x=>x.TaskKey).ToList();
+            var keys = kleChanges.Select(x => x.TaskKey).ToList();
             var taskUsages = _taskUsageRepository
                 .GetWithReferencePreload(t => t.TaskRef)
                 .Where(t => keys.Contains(t.TaskRef.TaskKey))

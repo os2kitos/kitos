@@ -1,5 +1,4 @@
 ﻿using System;
-using Presentation.Web.Models.External.V2.Types;
 
 namespace Presentation.Web.Models.External.V2.Response.KLE
 {
@@ -17,10 +16,6 @@ namespace Presentation.Web.Models.External.V2.Response.KLE
         /// KLE description from KLE-Online
         /// </summary>
         public string Description { get; set; }
-        /// <summary>
-        /// KLE category to distinguish between roots, groups and subjects.
-        /// </summary>
-        public KleCategory Category { get; set; }
         /// <summary>
         /// Optional parent KLE
         /// </summary>

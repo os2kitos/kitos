@@ -28,7 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void Get_Returns_All_UpdateHistoryItems()
+        public void Get_Returns_All_UpdateHistoryItems()
         {
             //Arrange
             mockGenericUpdateHistoryItemRepository.Setup(
@@ -49,7 +49,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         }
 
         [Fact]
-        private void GetLastest_Returns_LastChanged_UpdateHistoryItem()
+        public void GetLastest_Returns_LastChanged_UpdateHistoryItem()
         {
             //Arrange
             var expectedLastUpdate = DateTime.Today;
@@ -62,11 +62,11 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var result = sut.GetLastUpdated();
 
             //Assert
-            Assert.Equal(expectedLastUpdate, result);
+            Assert.Equal(expectedLastUpdate, result.Value);
         }
 
         [Fact]
-        private void Insert_Updates_And_Remembers()
+        public void Insert_Updates_And_Remembers()
         {
             //Arrange
             mockGenericUpdateHistoryItemRepository.Setup(r => r.Insert(It.IsAny<KLEUpdateHistoryItem>()));

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Core.DomainModel.KLE;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.KLE
 {
@@ -24,19 +25,16 @@ namespace Core.DomainServices.Repositories.KLE
 
         public KLEUpdateHistoryItem Insert(DateTime version)
         {
-            KLEUpdateHistoryItem result;
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
-            {
-                result = _updateHistoryItems.Insert(new KLEUpdateHistoryItem(version));
-                _updateHistoryItems.Save();
-                transaction.Commit();
-            }
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            var result = _updateHistoryItems.Insert(new KLEUpdateHistoryItem(version));
+            _updateHistoryItems.Save();
+            transaction.Commit();
             return result;
         }
 
-        public DateTime GetLastUpdated()
+        public Maybe<DateTime> GetLastUpdated()
         {
-            var lastUpdated = DateTime.MinValue;
+            var lastUpdated = Maybe<DateTime>.None;
             if (_updateHistoryItems.Count > 0)
             {
                 lastUpdated = _updateHistoryItems.GetMax(item => item.Version);

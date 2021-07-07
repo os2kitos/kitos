@@ -11,7 +11,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
     public class KLEConverterHelperTest
     {
         [Fact]
-        private void ConvertToTaskRefs_Given_Sample_Creates_Valid_TaskRefs()
+        public void ConvertToTaskRefs_Given_Sample_Creates_Valid_TaskRefs()
         {
             //Arrange
             var mockKLEDataBridge = new Mock<IKLEDataBridge>();
