@@ -354,6 +354,9 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItSystemUsage, ArchiveTestLocation, LocalArchiveTestLocation>(kernel);
 
             RegisterOptionsService<ItSystemUsage, RegisterType, LocalRegisterType>(kernel);
+
+            //IT-Contract
+            RegisterOptionsService<ItContract, ItContractType, LocalItContractType>(kernel);
         }
 
         private void RegisterOptionsService<TParent, TOption, TLocalOption>(IKernel kernel)

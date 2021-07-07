@@ -4,6 +4,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Contract
 {
@@ -50,7 +51,7 @@ namespace Core.DomainServices.Repositories.Contract
             return _contractRepository.AsQueryable().ById(contractId);
         }
 
-        public IQueryable<ItContract> GetByOrganizationId(int organizationId)
+        public IQueryable<ItContract> GetContractsInOrganization(int organizationId)
         {
             return _contractRepository
                 .AsQueryable()
@@ -67,6 +68,11 @@ namespace Core.DomainServices.Repositories.Contract
         {
             _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
             _contractRepository.Save();
+        }
+
+        public Maybe<ItContract> GetContract(Guid uuid)
+        {
+            return _contractRepository.AsQueryable().ByUuid(uuid).FromNullable();
         }
     }
 }

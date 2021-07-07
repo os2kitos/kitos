@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Presentation.Web.Models.External.V2.SharedProperties;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Presentation.Web.Models.External.V2.Response
 {
-    public class IdentityNamePairResponseDTO
+    public class IdentityNamePairResponseDTO : IHasNameExternal, IHasUuidExternal
     {
         /// <summary>
         /// UUID which is unique within collection of entities of the same type

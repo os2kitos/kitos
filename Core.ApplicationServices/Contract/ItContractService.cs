@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.System;
+using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.Contract
@@ -29,6 +32,7 @@ namespace Core.ApplicationServices.Contract
         private readonly IItContractRepository _repository;
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
+        private readonly IOrganizationService _organizationService;
 
         public ItContractService(
             IItContractRepository repository,
@@ -38,7 +42,8 @@ namespace Core.ApplicationServices.Contract
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext,
             ILogger logger,
-            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService)
+            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
+            IOrganizationService organizationService)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -48,11 +53,12 @@ namespace Core.ApplicationServices.Contract
             _authorizationContext = authorizationContext; 
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
+            _organizationService = organizationService;
         }
 
         public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
         {
-            var contracts = _repository.GetByOrganizationId(orgId);
+            var contracts = _repository.GetContractsInOrganization(orgId);
 
             if (!string.IsNullOrWhiteSpace(optionalNameSearch))
             {
@@ -134,6 +140,33 @@ namespace Core.ApplicationServices.Contract
                     .ToList()
             );
         }
+
+        public Result<IQueryable<ItContract>, OperationError> GetContractsInOrganization(Guid organizationUuid, params IDomainQuery<ItContract>[] conditions)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization =>
+                {
+                    var query = new IntersectionQuery<ItContract>(conditions);
+
+                    return _repository
+                        .GetContractsInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<ItContract>, OperationError>.Success);
+                });
+        }
+
+        public Result<ItContract, OperationError> GetContract(Guid uuid)
+        {
+            return _repository
+                .GetContract(uuid)
+                .Match
+                (
+                    contract => _authorizationContext.AllowReads(contract) ? Result<ItContract, OperationError>.Success(contract) : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
 
         private static IEnumerable<EconomyStream> GetEconomyStreams(ItContract contract)
         {
