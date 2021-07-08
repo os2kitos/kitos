@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [DenyRightsHoldersAccess]
-        public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvrContent = null, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvrContent = null, [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -130,7 +130,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
             [NonEmptyGuid] Guid organizationUuid,
             string nameOrEmailQuery = null,
             OrganizationUserRole? roleQuery = null,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             var queries = new List<IDomainQuery<User>>();
 
@@ -188,7 +188,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         public IHttpActionResult GetOrganizationUnits(
             [NonEmptyGuid] Guid organizationUuid,
             string nameQuery = null,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             var queries = new List<IDomainQuery<OrganizationUnit>>();
 
@@ -235,7 +235,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ShallowOrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetOrganizationsAsRightsHolder([FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetOrganizationsAsRightsHolder([FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

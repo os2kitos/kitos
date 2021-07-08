@@ -80,7 +80,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         public IHttpActionResult GetItInterfacesAsRightsHolder(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool includeDeactivated = false,
-            [FromUri] StandardPaginationQuery pagination = null)
+            [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -193,7 +193,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         public IHttpActionResult GetItInterfaces(
             [NonEmptyGuid] Guid? exposedBySystemUuid = null,
             bool includeDeactivated = false,
-            [FromUri] StandardPaginationQuery pagination = null)
+            [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

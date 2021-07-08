@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
             [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
             bool includeDeactivated = false,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
             bool includeDeactivated = false,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -305,7 +305,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
                 .Where(_authorizationContext.AllowReads)// Only accessible interfaces may be referenced here
                 .Select(x => x.MapIdentityNamePairDTO())
                 .ToList();
-            dto.RecommendedArchiveDutyResponse =
+            dto.RecommendedArchiveDuty =
                 new RecommendedArchiveDutyResponseDTO(arg.ArchiveDutyComment, arg.ArchiveDuty.ToDTOType());
             dto.KLE = arg
                 .TaskRefs

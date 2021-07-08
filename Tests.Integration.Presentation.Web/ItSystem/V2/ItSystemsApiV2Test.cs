@@ -969,8 +969,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(dbSystem.Created, systemDTO.Created);
             Assert.Equal(dbSystem.ObjectOwner.Uuid, systemDTO.CreatedBy.Uuid);
             Assert.Equal(dbSystem.ObjectOwner.GetFullName(), systemDTO.CreatedBy.Name);
-            Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDutyResponse.Id.ToString("G"));
-            Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDutyResponse.Comment);
+            Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDuty.Id.ToString("G"));
+            Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDuty.Comment);
             Assert.Equal(dbSystem.Parent.Uuid, systemDTO.ParentSystem.Uuid);
             Assert.Equal(dbSystem.Parent.Name, systemDTO.ParentSystem.Name);
             Assert.Equal(dbSystem.BelongsTo.Uuid, systemDTO.RightsHolder.Uuid);
