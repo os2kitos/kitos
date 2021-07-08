@@ -13,7 +13,6 @@ using System.Web.Http;
 namespace Presentation.Web.Controllers.External.V2.ItContracts
 {
     [RoutePrefix("api/v2/it-contract-contract-types")]
-    [DenyRightsHoldersAccess]
     public class ItContractContractTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, ItContractType>
     {
         public ItContractContractTypeV2Controller(IOptionsApplicationService<ItContract, ItContractType> optionService)

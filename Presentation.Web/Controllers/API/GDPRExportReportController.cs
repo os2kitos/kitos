@@ -8,7 +8,6 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [RoutePrefix("api/v1/gdpr-report")]
-    [DenyRightsHoldersAccess]
     public class GdprExportReportController : BaseApiController
     {
         private readonly IGDPRExportService _gdprExportService;

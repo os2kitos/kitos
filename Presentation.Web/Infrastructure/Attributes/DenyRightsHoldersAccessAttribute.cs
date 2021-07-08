@@ -1,10 +1,10 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.Organization;
-using Infrastructure.Services.Types;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
@@ -16,31 +16,25 @@ namespace Presentation.Web.Infrastructure.Attributes
     {
         private readonly string _alternativeRoute;
 
-        public DenyRightsHoldersAccessAttribute(string alternativeRoute = null)
-        {
-            _alternativeRoute = alternativeRoute;
-        }
-
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var authContext = (IOrganizationalUserContext)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(IOrganizationalUserContext));
 
             if (authContext.HasRoleInAnyOrganization(OrganizationRole.RightsHolderAccess))
             {
-                actionContext.Response = new HttpResponseMessage
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Content = new StringContent(GetErrorMessage())
-                };
+                if (!Skip(actionContext))
+                    actionContext.Response = new HttpResponseMessage
+                    {
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Content = new StringContent("Users with assigned rights holders access in one or more organizations are not allowed to use this API. Please refer to the rights holders guide on KITOS Confluence or reach out to info@kitos.dk for assistance")
+                    };
 
             }
             base.OnActionExecuting(actionContext);
         }
 
-        private string GetErrorMessage()
-        {
-            return _alternativeRoute?.Transform(route => $"Users with assigned rights holders access in one or more organizations must use '{_alternativeRoute}'") ??
-                   "Users with assigned rights holders access in one or more organizations are not allowed to use this API. Please refer to the rights holders guide on KITOS Confluence or reach out to info@kitos.dk for assistance";
-        }
+        private static bool Skip(HttpActionContext actionContext) =>
+            actionContext.ActionDescriptor.GetCustomAttributes<AllowRightsHoldersAccessAttribute>().Any() ||
+            actionContext.ControllerContext.ControllerDescriptor.GetCustomAttributes<AllowRightsHoldersAccessAttribute>().Any();
     }
 }

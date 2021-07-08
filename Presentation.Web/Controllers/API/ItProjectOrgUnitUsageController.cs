@@ -12,7 +12,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [DenyRightsHoldersAccess]
     public class ItProjectOrgUnitUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItProjectOrgUnitUsage> _responsibleOrgUnitRepository;

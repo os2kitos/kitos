@@ -8,7 +8,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [PublicApi]
-    [DenyRightsHoldersAccess]
     public class ItContractItSystemUsageController : BaseApiController
     {
         private readonly IGenericRepository<ItContractItSystemUsage> _repository;

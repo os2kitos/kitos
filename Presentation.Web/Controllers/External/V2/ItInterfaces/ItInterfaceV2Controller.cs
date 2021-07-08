@@ -38,6 +38,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="request">A collection of specific IT-Interface values</param>
         /// <returns>Location header is set to uri for newly created IT-Interface</returns>
         [HttpPost]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces")]
         [SwaggerResponseRemoveDefaults]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(RightsHolderItInterfaceResponseDTO))]
@@ -72,6 +73,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RightsHolderItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -108,6 +110,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -128,6 +131,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>The updated IT-Interface</returns>
         [HttpPut]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -160,6 +164,7 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="deactivationReasonDTO">Reason for deactivation</param>
         /// <returns>No content</returns>
         [HttpDelete]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.NoContent)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -184,7 +189,6 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
         /// <returns></returns>
         [HttpGet]
-        [DenyRightsHoldersAccess("api/v2/rightsholder/it-interfaces")]
         [Route("it-interfaces")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItInterfaceResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
@@ -221,7 +225,6 @@ namespace Presentation.Web.Controllers.External.V2.ItInterfaces
         /// <param name="uuid">Specific IT-Interface UUID</param>
         /// <returns>Specific data related to the IT-Interface</returns>
         [HttpGet]
-        [DenyRightsHoldersAccess("api/v2/rightsholder/it-interfaces/{uuid}")]
         [Route("it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]

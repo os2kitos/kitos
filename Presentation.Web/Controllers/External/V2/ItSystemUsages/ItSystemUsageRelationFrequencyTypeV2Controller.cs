@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-relation-frequency-types")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageRelationFrequencyTypeV2Controller : BaseRegularOptionTypeV2Controller<SystemRelation, RelationFrequencyType>
     {
         public ItSystemUsageRelationFrequencyTypeV2Controller(IOptionsApplicationService<SystemRelation, RelationFrequencyType> optionService)

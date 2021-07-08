@@ -9,7 +9,6 @@ namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
     [RoutePrefix("api/v1/itsystemusage")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageDataSensitivityLevelController : BaseApiController
     {
 

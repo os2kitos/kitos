@@ -827,6 +827,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
+        [Fact]
+        public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendGetStakeholderInterfacesAsync(token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
         private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, Organization rightsHolderOrganization)
         {
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Public);

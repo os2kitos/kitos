@@ -953,6 +953,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
         }
 
+        [Fact]
+        public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
+        {
+            //Arrange
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendGetManyAsync(token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
             var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);

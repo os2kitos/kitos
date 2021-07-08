@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-test-location-types")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageArchiveTestLocationTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveTestLocation>
     {
         public ItSystemUsageArchiveTestLocationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveTestLocation> optionService)
