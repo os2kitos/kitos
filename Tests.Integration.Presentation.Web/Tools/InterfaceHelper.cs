@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -120,6 +122,20 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return response;
             }
+        }
+
+        public static async Task<IEnumerable<ItInterfaceDTO>> GetInterfacesAsync(Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadOdataListResponseBodyAsAsync<ItInterfaceDTO>();
+            }
+
         }
     }
 }

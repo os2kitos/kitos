@@ -42,5 +42,6 @@ namespace Presentation.Web.Models
         public bool? IsUsed { get; set; }
 
         public bool Disabled { get; set; }
+        public IEnumerable<string> UsedByOrganizationNames { get; set; }
     }
 }

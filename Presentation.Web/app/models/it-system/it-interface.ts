@@ -14,5 +14,7 @@
         CanBeUsedBy: Array<IItInterfaceUse>;
         /** Gets or sets it system that exhibits this interface instance. */
         ExhibitedBy: IItInterfaceExhibit;
+        /** Names of organizations that uses the interface as CSV */
+        UsedByOrganizationNames: string[];
     }
 }

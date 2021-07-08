@@ -4,7 +4,8 @@
     export interface ICatalogController {
         mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
-
+        usedByOrganizationNamesGrid: kendo.ui.Grid;
+        usedByOrganizationNamesModal: kendo.ui.Window;
         saveGridProfile(): void;
         loadGridProfile(): void;
         clearGridProfile(): void;
@@ -15,6 +16,9 @@
     export class CatalogController implements ICatalogController {
         private storageKey = "it-interface-catalog-options";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
+
+        public usedByOrganizationNamesGrid: kendo.ui.Grid;
+        public usedByOrganizationNamesModal: kendo.ui.Window;
         public mainGrid: IKendoGrid<Models.ItSystem.IItInterface>;
         public mainGridOptions: IKendoGridOptions<Models.ItSystem.IItInterface>;
 
@@ -51,7 +55,8 @@
             private $modal,
             private $http,
             private exportGridToExcelService,
-            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private itInterfaceId: number) {
             $rootScope.page.title = "Snitflade - Katalog";
 
             $scope.$on("kendoWidgetCreated",
@@ -449,6 +454,23 @@
                                 operator: "contains"
                             }
                         }
+                    },
+                    {
+                        field: "UsedByOrganizationNames", title: "Anvender kommune (r)", width: 150,
+                        persistId: "UsedByOrganization", // DON'T YOU DARE RENAME!
+                        template: dataItem => this.showUsedByOrganizationNames(dataItem.UsedByOrganizationNames.length, dataItem.Name, dataItem.Id),
+                        excelTemplate: dataItem => dataItem.UsedByOrganizationNames.length.toString(),
+                        filterable: false,
+                        sortable: false,
+                    }
+                ],
+                excelOnlyColumns: [
+                    {
+                        persistId: "UsedByOrganizationNames",
+                        title: "Anvender kommune(r) (navn)",
+                        width: 150,
+                        template: dataItem => dataItem.UsedByOrganizationNames.join(", "),
+                        dependOnColumnPersistId: "UsedByOrganization"
                     }
                 ]
             };
@@ -620,8 +642,55 @@
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItInterface>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.mainGridOptions.excelOnlyColumns);
         }
+
+        private showUsedByOrganizationNames(numberOfOrgs: number, interfaceName: string, interfaceId: number): string {
+            if (numberOfOrgs > 0) {
+                return `<a class="col-xs-7 text-center" data-ng-click="interfaceCatalogVm.showOrganizationNames('${interfaceName}', ${interfaceId})">${numberOfOrgs}</a>`;
+            }
+            else {
+                return ``;
+            }
+        };
+
+        public showOrganizationNames(interfaceName: string, interfaceId: number) {
+            this.itInterfaceId = interfaceId;
+            this.usedByOrganizationNamesGrid.dataSource.fetch(() => {
+                this.usedByOrganizationNamesModal.setOptions({
+                    close: (_) => true,
+                    resizable: false,
+                    title: `Organisationer der anvender snitfladen: ${interfaceName}`
+                });
+                this.usedByOrganizationNamesModal.center().open();
+            });
+            this.usedByOrganizationNamesModal.center().open();
+        }
+
+        public usedByOrganizationNamesDetailsGrid: kendo.ui.GridOptions = {
+            dataSource: {
+                transport:
+                {
+                    read: {
+                        url: () => `/odata/ItInterfaces(${this.itInterfaceId})`,
+                        dataType: "json"
+                    }
+                },
+                schema: {
+                    data: (response: Kitos.Models.ItSystem.IItInterface) => response.UsedByOrganizationNames
+                },
+            },
+            autoBind: false,
+            columns: [
+                {
+                    title: "Organisation",
+                    template: orgName => {
+                        return `<p>${orgName}</p>`;
+                    },
+                }
+            ],
+        };
+
     }
 
     angular
