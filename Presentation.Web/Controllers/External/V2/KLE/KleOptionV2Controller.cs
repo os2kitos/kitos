@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.External.V2.KLE
             string parentKleNumber = null,
             string kleNumberPrefix = null,
             string kleDescriptionContent = null,
-            [FromUri] StandardPaginationQuery pagination = null)
+            [FromUri] UnboundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

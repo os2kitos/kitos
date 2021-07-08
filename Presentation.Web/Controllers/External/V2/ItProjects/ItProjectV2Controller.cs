@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
         public IHttpActionResult GetItProjects(
             [NonEmptyGuid] Guid organizationUuid,
             string nameContent = null,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

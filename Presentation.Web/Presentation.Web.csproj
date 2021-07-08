@@ -363,6 +363,8 @@
     <Compile Include="Controllers\External\V2\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Models\External\V2\Request\UnBoundedPaginationQuery.cs" />
+    <Compile Include="Models\External\V2\Request\IStandardPaginationQueryParameters.cs" />
     <Compile Include="Models\External\V2\Response\KLE\KLEDetailsDTO.cs" />
     <Compile Include="Models\External\V2\Response\KLE\VersionedKLEResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Options\IOptionAvailability.cs" />
@@ -386,7 +388,7 @@
     <Compile Include="Infrastructure\KitosConstants.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderCreateItInterfaceRequestDTO.cs" />
     <Compile Include="Models\External\V2\Request\RightsHolderWritableITSystemPropertiesDTO.cs" />
-    <Compile Include="Models\External\V2\Request\StandardPaginationQuery.cs" />
+    <Compile Include="Models\External\V2\Request\BoundedPaginationQuery.cs" />
     <Compile Include="Models\External\V2\Response\System\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\ItInterfaceResponseDTO.cs" />

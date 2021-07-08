@@ -1,16 +1,13 @@
 ﻿using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 
 namespace Presentation.Web.Controllers.External.V2.ItContracts
@@ -35,7 +32,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult Get([NonEmptyGuid] Guid organizationUuid, [FromUri] UnboundedPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }

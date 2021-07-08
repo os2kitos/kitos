@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web.Http;
-using Core.ApplicationServices.OptionTypes;
+﻿using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
-using Presentation.Web.Extensions;
-using Presentation.Web.Models.External.V2;
-using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Options;
 

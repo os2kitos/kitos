@@ -75,6 +75,6 @@ namespace Presentation.Web.Models.External.V2.Response.System
         /// <summary>
         /// Archive duty recommendation from "Rigsarkivet"
         /// </summary>
-        public RecommendedArchiveDutyResponseDTO RecommendedArchiveDutyResponse { get; set; }
+        public RecommendedArchiveDutyResponseDTO RecommendedArchiveDuty { get; set; }
     }
 }

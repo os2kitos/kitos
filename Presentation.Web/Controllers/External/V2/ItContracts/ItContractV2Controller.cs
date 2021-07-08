@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
             [NonEmptyGuid] Guid organizationUuid,
             [NonEmptyGuid] Guid? systemUuid = null,
             string nameContent = null,
-            [FromUri] StandardPaginationQuery paginationQuery = null)
+            [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
