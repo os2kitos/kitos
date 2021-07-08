@@ -11,6 +11,7 @@ namespace Presentation.Web.Models.External.V2.Request
     {
         /// <summary>
         /// 0-based page number. Use this parameter to page through the requested collection.
+        /// Offset in the source collection will be (pageSize * page)
         /// Range: [0,2^31] Default: 0
         /// </summary>
         [Range(0, int.MaxValue)]
