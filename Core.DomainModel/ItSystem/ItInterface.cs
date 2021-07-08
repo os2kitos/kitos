@@ -110,7 +110,7 @@ namespace Core.DomainModel.ItSystem
         {
             get
             {
-                return AssociatedSystemRelations.Select(x => x.FromSystemUsage.Organization.Name).Distinct().OrderBy(x => x);
+                return AssociatedSystemRelations.GroupBy(x => (x.FromSystemUsage.Organization.Id, x.FromSystemUsage.Organization.Name)).Distinct().Select(x => x.Key.Name).OrderBy(x => x).ToList();
             }
         }
     }

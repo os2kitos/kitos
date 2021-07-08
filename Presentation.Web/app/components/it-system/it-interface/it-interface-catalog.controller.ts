@@ -456,8 +456,8 @@
                         }
                     },
                     {
-                        field: "UsedByOrganizationNames", title: "Anvender kommune (r)", width: 150,
-                        persistId: "UsedByOrganization", // DON'T YOU DARE RENAME!
+                        field: "UsedByOrganizationNames", title: "Snitfladen anvendes af", width: 150,
+                        persistId: "UsedByOrganizations", 
                         template: dataItem => this.showUsedByOrganizationNames(dataItem.UsedByOrganizationNames.length, dataItem.Name, dataItem.Id),
                         excelTemplate: dataItem => dataItem.UsedByOrganizationNames.length.toString(),
                         filterable: false,
@@ -467,10 +467,10 @@
                 excelOnlyColumns: [
                     {
                         persistId: "UsedByOrganizationNames",
-                        title: "Anvender kommune(r) (navn)",
+                        title: "Snitfladen anvendes af (navne)",
                         width: 150,
                         template: dataItem => dataItem.UsedByOrganizationNames.join(", "),
-                        dependOnColumnPersistId: "UsedByOrganization"
+                        dependOnColumnPersistId: "UsedByOrganizations"
                     }
                 ]
             };
