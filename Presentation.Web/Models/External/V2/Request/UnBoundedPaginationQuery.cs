@@ -4,9 +4,9 @@ using Core.ApplicationServices.Shared;
 namespace Presentation.Web.Models.External.V2.Request
 {
     /// <summary>
-    /// Defines the a bounded pagination query parameter set
+    /// Defines the an unbounded pagination query parameter set
     /// </summary>
-    public class BoundedPaginationQuery : IStandardPaginationQueryParameters
+    public class UnboundedPaginationQuery : IStandardPaginationQueryParameters
 
     {
         /// <summary>
@@ -18,7 +18,8 @@ namespace Presentation.Web.Models.External.V2.Request
 
         /// <summary>
         /// Size of the page referred by 'page'.
-        /// Range: [1,100] Default: 100.
+        /// Range: [1,2^31] Default: null.
+        /// If left unspecified, the entire result set will be returned.
         /// </summary>
         [Range(PagingContraints.MinPageSize, PagingContraints.MaxPageSize)]
         public int? PageSize { get; set; } = null;

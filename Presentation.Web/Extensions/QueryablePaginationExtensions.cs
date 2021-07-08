@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Shared;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models.External.V2.Request;
 
 namespace Presentation.Web.Extensions
@@ -23,24 +24,52 @@ namespace Presentation.Web.Extensions
             return src.Skip(page * paginationPageSize).Take(paginationPageSize);
         }
 
-        private static int GetPaginationPage(BoundedPaginationQuery pagination)
+        public static IQueryable<T> Page<T>(this IQueryable<T> src, UnboundedPaginationQuery pagination)
         {
-            return pagination?.Page ?? 0;
+            return pagination
+                .FromNullable()
+                .Match
+                (pagingParameters =>
+                    {
+                        var page = GetPaginationPage(pagingParameters);
+
+                        var offSetResult = src.Skip(page * pagingParameters.PageSize.GetValueOrDefault(0));
+
+                        return pagingParameters.PageSize.HasValue
+                            ? offSetResult.Take(pagingParameters.PageSize.Value)
+                            : offSetResult;
+                    },
+                    () => src
+                );
+        }
+
+        public static IEnumerable<T> Page<T>(this IEnumerable<T> src, UnboundedPaginationQuery pagination)
+        {
+            return pagination
+                .FromNullable()
+                .Match
+                (pagingParameters =>
+                    {
+                        var page = GetPaginationPage(pagingParameters);
+
+                        var offSetResult = src.Skip(page * pagingParameters.PageSize.GetValueOrDefault(0));
+
+                        return pagingParameters.PageSize.HasValue
+                            ? offSetResult.Take(pagingParameters.PageSize.Value)
+                            : offSetResult;
+                    },
+                    () => src
+                );
         }
 
         private static int GetPaginationPageSize(BoundedPaginationQuery pagination)
         {
-            return pagination?.PageSize ?? PagingContraints.MaxPageSize;
+            return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
         }
 
-        //private static int GetPaginationPage(BoundedPaginationQuery pagination)
-        //{
-        //    return pagination?.Page.GetValueOrDefault(0) ?? 0;
-        //}
-
-        //private static int GetPaginationPageSize(BoundedPaginationQuery pagination)
-        //{
-        //    return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
-        //}
+        private static int GetPaginationPage(IStandardPaginationQueryParameters pagination)
+        {
+            return pagination?.Page.GetValueOrDefault(0) ?? 0;
+        }
     }
 }
