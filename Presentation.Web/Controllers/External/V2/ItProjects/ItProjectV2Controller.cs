@@ -19,7 +19,6 @@ namespace Presentation.Web.Controllers.External.V2.ItProjects
     /// API for the projects stored in KITOS.
     /// </summary>
     [RoutePrefix("api/v2")]
-    [DenyRightsHoldersAccess]
     public class ItProjectV2Controller : ExternalBaseController
     {
         private readonly IItProjectService _itProjectService;

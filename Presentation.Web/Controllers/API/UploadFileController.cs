@@ -6,7 +6,6 @@ using Presentation.Web.Infrastructure.Attributes;
 namespace Presentation.Web.Controllers.API
 {
     [InternalApi]
-    [DenyRightsHoldersAccess]
     public class UploadFileController : BaseApiController
     {
         public HttpResponseMessage Post()

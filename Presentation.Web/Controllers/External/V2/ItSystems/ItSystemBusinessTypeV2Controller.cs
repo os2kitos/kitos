@@ -13,6 +13,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystems
 {
     [RoutePrefix("api/v2/business-types")]
+    [AllowRightsHoldersAccess]
     public class ItSystemBusinessTypeV2Controller: BaseRegularOptionTypeV2Controller<ItSystem,BusinessType>
     {
         public ItSystemBusinessTypeV2Controller(IOptionsApplicationService<ItSystem, BusinessType> optionService)

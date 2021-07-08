@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-data-classification-types")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageDataClassificationTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ItSystemCategories>
     {
         public ItSystemUsageDataClassificationTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ItSystemCategories> optionService) 

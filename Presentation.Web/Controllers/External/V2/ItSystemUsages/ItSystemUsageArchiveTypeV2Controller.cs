@@ -14,7 +14,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-archive-types")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageArchiveTypeV2Controller : BaseRegularOptionTypeV2Controller<ItSystemUsage, ArchiveType>
     {
         public ItSystemUsageArchiveTypeV2Controller(IOptionsApplicationService<ItSystemUsage, ArchiveType> optionService)

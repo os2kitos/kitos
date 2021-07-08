@@ -22,7 +22,6 @@ namespace Presentation.Web.Controllers.API
     /// </summary>
     [PublicApi]
     [RoutePrefix("api/v1/systemrelations")]
-    [DenyRightsHoldersAccess]
     public class SystemRelationController : BaseApiController
     {
         private readonly IItSystemUsageService _usageService;

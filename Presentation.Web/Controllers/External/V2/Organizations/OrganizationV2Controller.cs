@@ -61,7 +61,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<OrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizations(bool onlyWhereUserHasMembership = false, string nameContent = null, string cvrContent = null, [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -99,7 +98,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganization([NonEmptyGuid] Guid organizationUuid)
         {
             if (!ModelState.IsValid)
@@ -125,7 +123,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound, Description = "Organization provided does not exist")]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizationUsers(
             [NonEmptyGuid] Guid organizationUuid,
             string nameOrEmailQuery = null,
@@ -161,7 +158,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizationUser([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid userUuid)
         {
             return _userService
@@ -184,7 +180,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound, Description = "Organization provided does not exist")]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizationUnits(
             [NonEmptyGuid] Guid organizationUuid,
             string nameQuery = null,
@@ -216,7 +211,6 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [DenyRightsHoldersAccess]
         public IHttpActionResult GetOrganizationUnit([NonEmptyGuid] Guid organizationUuid, [NonEmptyGuid] Guid organizationUnitId)
         {
             return _organizationService
@@ -231,6 +225,7 @@ namespace Presentation.Web.Controllers.External.V2.Organizations
         /// </summary>
         /// <returns>A list of organizations formatted as uuid, cvr and name pairs</returns>
         [HttpGet]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/organizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ShallowOrganizationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]

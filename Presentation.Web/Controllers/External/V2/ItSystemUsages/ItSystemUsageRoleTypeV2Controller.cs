@@ -12,7 +12,6 @@ using Swashbuckle.Swagger.Annotations;
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
 {
     [RoutePrefix("api/v2/it-system-usage-role-types")]
-    [DenyRightsHoldersAccess]
     public class ItSystemUsageRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<ItSystemRight, ItSystemRole>
     {
         public ItSystemUsageRoleTypeV2Controller(IOptionsApplicationService<ItSystemRight, ItSystemRole> optionApplicationService)

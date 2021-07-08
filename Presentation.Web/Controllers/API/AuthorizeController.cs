@@ -106,6 +106,7 @@ namespace Presentation.Web.Controllers.API
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [IgnoreCSRFProtection]
+        [AllowRightsHoldersAccess]
         public HttpResponseMessage GetToken(LoginDTO loginDto)
         {
             if (loginDto == null)
@@ -162,7 +163,6 @@ namespace Presentation.Web.Controllers.API
 
         // POST api/Authorize
         [AllowAnonymous]
-        [DenyRightsHoldersAccess("api/authorize/GetToken")]
         public HttpResponseMessage PostLogin(LoginDTO loginDto)
         {
             if (loginDto == null)
@@ -182,6 +182,12 @@ namespace Presentation.Web.Controllers.API
                 }
 
                 var user = result.Value;
+                if (user.GetOrganizationIdsWhereRoleIsAssigned(OrganizationRole.RightsHolderAccess).Any())
+                {
+                    loginInfo = new { UserId = user.Id, LoginSuccessful = true };
+                    Logger.Info($"Rightsholder user blocked from login {loginInfo}");
+                    return Forbidden("Rights holders cannot login to KITOS. Please use the token endpoint at 'api/authorize/GetToken'");
+                }
 
                 _applicationAuthenticationState.SetAuthenticatedUser(user, loginDto.RememberMe ? AuthenticationScope.Persistent : AuthenticationScope.Session);
 
@@ -212,6 +218,7 @@ namespace Presentation.Web.Controllers.API
         }
 
         [AllowAnonymous]
+        [AllowRightsHoldersAccess]
         public HttpResponseMessage PostResetpassword(bool? resetPassword, ResetPasswordDTO dto)
         {
             try

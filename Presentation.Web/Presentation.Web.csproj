@@ -360,7 +360,9 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageV2Controller.cs" />
     <Compile Include="Controllers\External\V2\KLE\KleOptionV2Controller.cs" />
+    <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\External\V2\Request\UnBoundedPaginationQuery.cs" />
