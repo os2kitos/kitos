@@ -7,7 +7,7 @@ namespace Presentation.Web.Extensions
 {
     public static class QueryablePaginationExtensions
     {
-        public static IQueryable<T> Page<T>(this IQueryable<T> src, StandardPaginationQuery pagination)
+        public static IQueryable<T> Page<T>(this IQueryable<T> src, BoundedPaginationQuery pagination)
         {
             var paginationPageSize = GetPaginationPageSize(pagination);
             var page = GetPaginationPage(pagination);
@@ -15,7 +15,7 @@ namespace Presentation.Web.Extensions
             return src.Skip(page * paginationPageSize).Take(paginationPageSize);
         }
 
-        public static IEnumerable<T> Page<T>(this IEnumerable<T> src, StandardPaginationQuery pagination)
+        public static IEnumerable<T> Page<T>(this IEnumerable<T> src, BoundedPaginationQuery pagination)
         {
             var paginationPageSize = GetPaginationPageSize(pagination);
             var page = GetPaginationPage(pagination);
@@ -23,14 +23,24 @@ namespace Presentation.Web.Extensions
             return src.Skip(page * paginationPageSize).Take(paginationPageSize);
         }
 
-        private static int GetPaginationPage(StandardPaginationQuery pagination)
+        private static int GetPaginationPage(BoundedPaginationQuery pagination)
         {
-            return pagination?.Page.GetValueOrDefault(0) ?? 0;
+            return pagination?.Page ?? 0;
         }
 
-        private static int GetPaginationPageSize(StandardPaginationQuery pagination)
+        private static int GetPaginationPageSize(BoundedPaginationQuery pagination)
         {
-            return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
+            return pagination?.PageSize ?? PagingContraints.MaxPageSize;
         }
+
+        //private static int GetPaginationPage(BoundedPaginationQuery pagination)
+        //{
+        //    return pagination?.Page.GetValueOrDefault(0) ?? 0;
+        //}
+
+        //private static int GetPaginationPageSize(BoundedPaginationQuery pagination)
+        //{
+        //    return pagination?.PageSize.GetValueOrDefault(PagingContraints.MaxPageSize) ?? PagingContraints.MaxPageSize;
+        //}
     }
 }

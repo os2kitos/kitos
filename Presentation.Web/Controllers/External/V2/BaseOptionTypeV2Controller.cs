@@ -18,7 +18,7 @@ namespace Presentation.Web.Controllers.External.V2
             _optionApplicationService = optionApplicationService;
         }
 
-        protected IHttpActionResult GetAll(Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        protected IHttpActionResult GetAll(Guid organizationUuid, [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

@@ -32,7 +32,7 @@ namespace Presentation.Web.Controllers.External.V2.ItSystems
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult GetBusinessTypes([NonEmptyGuid] Guid organizationUuid, [FromUri] StandardPaginationQuery pagination = null)
+        public IHttpActionResult GetBusinessTypes([NonEmptyGuid] Guid organizationUuid, [FromUri] BoundedPaginationQuery pagination = null)
         {
             return GetAll(organizationUuid, pagination);
         }
