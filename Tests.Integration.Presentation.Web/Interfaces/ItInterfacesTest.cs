@@ -6,6 +6,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -149,6 +150,30 @@ namespace Tests.Integration.Presentation.Web.Interfaces
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Get_OrganizationName_Of_Organizations_Which_Use_The_Interface()
+        {
+            //Arrange
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organization.Id, AccessModifier.Public));
+            var exhibitingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            var exhibitingSystemUsage = await ItSystemHelper.TakeIntoUseAsync(exhibitingSystem.Id, organization.Id);
+            var exhibit = await InterfaceExhibitHelper.CreateExhibit(exhibitingSystem.Id, itInterface.Id);
+
+            var usingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            var usingSystemUsage = await ItSystemHelper.TakeIntoUseAsync(usingSystem.Id, organization.Id);
+
+            var relation = await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO() { FromUsageId = usingSystemUsage.Id, ToUsageId = exhibitingSystemUsage.Id, InterfaceId = itInterface.Id });
+
+            //Act
+            var interfaces = await InterfaceHelper.GetInterfacesAsync();
+
+            //Assert
+            var interfaceResult = Assert.Single(interfaces.Where(x => x.Id == itInterface.Id));
+            var orgName = Assert.Single(interfaceResult.UsedByOrganizationNames);
+            Assert.Equal(organization.Name, orgName);
         }
 
         private string CreateInterFacePrefixName()
