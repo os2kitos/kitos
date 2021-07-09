@@ -546,6 +546,17 @@
                         },
                     },
                     {
+                        field: "Usages.length",
+                        persistId: `numberOfUsages_ExcelOnly${new Date().getTime()}`,
+                        title: "Antal anvendere",
+                        width: 95,
+                        excelTemplate: dataItem => dataItem.Usages.length.toString(),
+                        filterable: false,
+                        sortable: false,
+                        hidden: true,
+                        menu: false //Only excel
+                    },
+                    {
                         field: "Organization.Name",
                         title: "Oprettet af: Organisation",
                         width: 150,
@@ -704,15 +715,6 @@
                         template: dataItem => dataItem.ArchiveDutyComment ? dataItem.ArchiveDutyComment : "",
                         attributes: { "class": "might-overflow" },
                         hidden: true
-                    }
-                ],
-                excelOnlyColumns: [
-                    {
-                        persistId: "numberOfUsages",
-                        title: "Antal anvendere",
-                        width: 95,
-                        template: dataItem => dataItem.Usages.length.toString(),
-                        dependOnColumnPersistId: "usages"
                     }
                 ]
             };
@@ -1006,7 +1008,7 @@
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.mainGridOptions.excelOnlyColumns);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
         // adds usage at selected system within current context

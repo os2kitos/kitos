@@ -369,8 +369,8 @@
                     .withExcelOnlyColumn(builder =>
                         builder
                             .withId(`systemUsage${getRoleKey(role)}_emails`)
+                            .withDataSourceName(getRoleKey(role))
                             .withTitle(`${role.name} Email"`)
-                            .dependOnColumnWithId(`systemUsage${getRoleKey(role)}`)
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToEmailMap[dataItem.Id][role.id]))
                     )
             );
