@@ -119,11 +119,11 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("excelOutput", this.excelOutput);
 
             return {
-                field: `${this.dataSourceName}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")
+                field: this.dataSourceName,
                 title: this.title,
                 attributes: [],
                 width: this.standardWidth,
-                persistId: this.id,
+                persistId: `${this.id}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")this.id,
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: false,
                 sortable: false,
