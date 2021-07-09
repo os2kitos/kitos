@@ -1,4 +1,4 @@
-﻿using Presentation.Web.Models.External.V2.Types;
+﻿using Presentation.Web.Models.External.V2.Types.Shared;
 
 namespace Presentation.Web.Models.External.V2.Response.System
 {

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.External.V2.Types.Organization;
 
 namespace Presentation.Web.Models.External.V2.Response.Organization
 {

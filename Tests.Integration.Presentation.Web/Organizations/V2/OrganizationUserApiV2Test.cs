@@ -8,6 +8,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.External.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;

@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 Uuid = contract.Uuid,
                 Name = contract.Name,
                 ContractType = contract.ContractTypeId.HasValue ? contract.ContractType.MapIdentityNamePairDTO() : null,
-                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapIdentityNamePairDTO() : null,
+                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapToShallowOrganizationDTO() : null,
                 AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.MapIdentityNamePairDTO()),
                 ValidFrom = contract.Concluded,
                 ValidTo = contract.ExpirationDate,

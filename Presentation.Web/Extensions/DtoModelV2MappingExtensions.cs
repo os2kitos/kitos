@@ -4,6 +4,7 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.External.V2.Types.Shared;
 
 namespace Presentation.Web.Extensions
 {

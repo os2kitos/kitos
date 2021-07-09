@@ -11,7 +11,7 @@ using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using OrganizationType = Presentation.Web.Models.External.V2.Types.OrganizationType;
+using OrganizationType = Presentation.Web.Models.External.V2.Types.Organization.OrganizationType;
 
 namespace Tests.Integration.Presentation.Web.Organizations.V2
 {

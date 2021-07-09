@@ -367,6 +367,7 @@
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\External\V2\Request\UnBoundedPaginationQuery.cs" />
     <Compile Include="Models\External\V2\Request\IStandardPaginationQueryParameters.cs" />
+    <Compile Include="Models\External\V2\Response\ExternalReferenceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\KLE\KLEDetailsDTO.cs" />
     <Compile Include="Models\External\V2\Response\KLE\VersionedKLEResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Options\IOptionAvailability.cs" />
@@ -376,11 +377,16 @@
     <Compile Include="Models\External\V2\Response\Contract\ItContractResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\OrganizationUserResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\RoleAssignmentResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\ItSystemUsageResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\LocalKLEDeviations.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal - Copy.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasNameExternal.cs" />
-    <Compile Include="Models\External\V2\Types\OrganizationType.cs" />
-    <Compile Include="Models\External\V2\Types\OrganizationUserRole.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\ExpectedUsersIntervalResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Types\Organization\OrganizationType.cs" />
+    <Compile Include="Models\External\V2\Types\Organization\OrganizationUserRole.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
@@ -394,7 +400,7 @@
     <Compile Include="Models\External\V2\Response\System\RightsHolderItSystemResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\RightsHolderItInterfaceResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\Interface\ItInterfaceResponseDTO.cs" />
-    <Compile Include="Models\External\V2\Types\ArchiveDutyChoice.cs" />
+    <Compile Include="Models\External\V2\Types\Shared\ArchiveDutyChoice.cs" />
     <Compile Include="Models\External\V2\Response\Options\RegularOptionExtendedResponseDTO.cs" />
     <Compile Include="Models\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\KendoOrganizationalConfigurationDTO.cs" />

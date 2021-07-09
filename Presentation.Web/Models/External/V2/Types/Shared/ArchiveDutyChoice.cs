@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Models.External.V2.Types
+﻿namespace Presentation.Web.Models.External.V2.Types.Shared
 {
     public enum RecommendedArchiveDuty
     {

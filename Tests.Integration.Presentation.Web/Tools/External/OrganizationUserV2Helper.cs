@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.External.V2.Types.Organization;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External

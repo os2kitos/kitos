@@ -20,9 +20,10 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.External.V2.Types.Organization;
 using Serilog;
 using Swashbuckle.Swagger.Annotations;
-using OrganizationType = Presentation.Web.Models.External.V2.Types.OrganizationType;
+using OrganizationType = Presentation.Web.Models.External.V2.Types.Organization.OrganizationType;
 
 namespace Presentation.Web.Controllers.External.V2.Organizations
 {

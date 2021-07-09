@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Models.External.V2.Types
+﻿namespace Presentation.Web.Models.External.V2.Types.Organization
 {
     /// <summary>
     /// Defines a stable API enumeration over the organization types found in KITOS
