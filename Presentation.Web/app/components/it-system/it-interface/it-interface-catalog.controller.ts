@@ -657,13 +657,11 @@
 
         public showOrganizationNames(interfaceName: string, interfaceId: number) {
             this.itInterfaceId = interfaceId;
-            this.usedByOrganizationNamesGrid.dataSource.fetch(() => {
-                this.usedByOrganizationNamesModal.setOptions({
-                    close: (_) => true,
-                    resizable: false,
-                    title: `Organisationer der anvender snitfladen: ${interfaceName}`
-                });
-                this.usedByOrganizationNamesModal.center().open();
+            this.usedByOrganizationNamesGrid.dataSource.read();
+            this.usedByOrganizationNamesModal.setOptions({
+                close: (_) => true,
+                resizable: false,
+                title: `Organisationer der anvender snitfladen: ${interfaceName}`
             });
             this.usedByOrganizationNamesModal.center().open();
         }
