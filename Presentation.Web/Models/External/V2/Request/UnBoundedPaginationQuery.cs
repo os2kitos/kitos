@@ -23,7 +23,7 @@ namespace Presentation.Web.Models.External.V2.Request
         /// Range: [1,2^31] Default: null.
         /// If left unspecified, the entire result set will be returned.
         /// </summary>
-        [Range(PagingContraints.MinPageSize, PagingContraints.MaxPageSize)]
+        [Range(PagingContraints.MinPageSize, int.MaxValue)]
         public int? PageSize { get; set; } = null;
     }
 }
