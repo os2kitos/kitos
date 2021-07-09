@@ -29,14 +29,6 @@ module Kitos.Utility.KendoGrid {
         schemaMutation: (map: any) => void;
     }
 
-    export interface IKendoGridExcelOnlyColumn<TDataSource> {
-        id: string;
-        title: string;
-        width: number;
-        template: (dataItem: TDataSource) => string;
-        dependOnColumnId: string | null;
-    }
-
     export interface IKendoParameter {
         textValue: string;
         remoteValue: any;
@@ -51,11 +43,11 @@ module Kitos.Utility.KendoGrid {
 
     export interface IKendoGridExcelOnlyColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
-        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
-        build(): IKendoGridExcelOnlyColumn<TDataSource>;
+        build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -81,7 +73,7 @@ module Kitos.Utility.KendoGrid {
         private standardWidth: number = 150;
         private title: string = null;
         private id: string = null;
-        private dependOnColumnId: string = null;
+        private dataSourceName: string = null;
         private excelOutput: (source: TDataSource) => string = null;
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
@@ -93,6 +85,12 @@ module Kitos.Utility.KendoGrid {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
             if (id == null) throw "id must be defined";
             this.id = id;
+            return this;
+        }
+
+        withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (name == null) throw "name must be defined";
+            this.dataSourceName = name;
             return this;
         }
 
@@ -108,30 +106,31 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
-            if (columnId == null) throw "columnId must be defined";
-            this.dependOnColumnId = columnId;
-            return this;
-        }
-
         private checkRequiredField(name: string, value: any) {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
             }
         }
 
-        build(): IKendoGridExcelOnlyColumn<TDataSource> {
+        build(): IExtendedKendoGridColumn<TDataSource> {
             this.checkRequiredField("title", this.title);
             this.checkRequiredField("id", this.id);
+            this.checkRequiredField("dataSourceName", this.dataSourceName);
             this.checkRequiredField("excelOutput", this.excelOutput);
 
             return {
+                field: `${this.dataSourceName}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")
                 title: this.title,
+                attributes: [],
                 width: this.standardWidth,
-                id: this.id,
-                template: (dataItem => this.excelOutput(dataItem)),
-                dependOnColumnId: this.dependOnColumnId
-            } as IKendoGridExcelOnlyColumn<TDataSource>;
+                persistId: this.id,
+                excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
+                filterable: false,
+                sortable: false,
+                hidden: true, // Always invisible
+                menu: false, //Never selectable in menu or visible in anything but excel sheets
+                schemaMutation: () => {}
+            } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
 
@@ -465,8 +464,7 @@ module Kitos.Utility.KendoGrid {
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
-        private columns: ColumnConstruction<TDataSource>[] = [];
-        private excelOnlyColumns: ExcelOnlyColumnConstruction<TDataSource>[] = [];
+        private columnFactories: (()=>IExtendedKendoGridColumn<TDataSource>)[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
@@ -504,13 +502,21 @@ module Kitos.Utility.KendoGrid {
 
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource> {
             if (!build) throw "build must be defined";
-            this.columns.push(build);
+            this.columnFactories.push(() => {
+                const builder = new KendoGridColumnBuilder<TDataSource>();
+                build(builder);
+                return builder.build();
+            });
             return this;
         }
 
         withExcelOnlyColumn(build: (builder: IKendoGridExcelOnlyColumnBuilder<TDataSource>) => void): IKendoGridLauncher<TDataSource> {
             if (!build) throw "build must be defined";
-            this.excelOnlyColumns.push(build);
+            this.columnFactories.push(() => {
+                const builder = new KendoGridExcelOnlyColumnBuilder<TDataSource>();
+                build(builder);
+                return builder.build();
+            });
             return this;
         }
 
@@ -631,22 +637,7 @@ module Kitos.Utility.KendoGrid {
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-            var additionalColumns = [];
-            this._.forEach(this.excelOnlyColumns,
-                build => {
-                    const builder = new KendoGridExcelOnlyColumnBuilder<TDataSource>();
-                    build(builder);
-                    const column = builder.build();
-                    additionalColumns.push({
-                        title: column.title,
-                        persistId: column.id,
-                        width: column.width,
-                        template: (dataItem: any) => column.template(dataItem),
-                        dependOnColumnPersistId: column.dependOnColumnId
-                    });
-                });
-
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, additionalColumns);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
         }
 
         private checkRequiredField(name: string, value: any) {
@@ -780,11 +771,9 @@ module Kitos.Utility.KendoGrid {
             //Build the columns
             var columns = [];
             var schemaFields = {};
-            this._.forEach(this.columns,
-                build => {
-                    const builder = new KendoGridColumnBuilder<TDataSource>();
-                    build(builder);
-                    const gridColumn = builder.build();
+            this._.forEach(this.columnFactories,
+                factory => {
+                    const gridColumn = factory();
                     gridColumn.schemaMutation(schemaFields);
                     columns.push(gridColumn);
                 });
