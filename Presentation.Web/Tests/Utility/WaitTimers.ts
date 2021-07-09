@@ -5,6 +5,8 @@
 
     public twentySeconds = 20 * 1000;
 
+    public fourtySeconds = 40 * 1000;
+
     public twoMinutes = 2 * 60 * 1000;
     
 }
