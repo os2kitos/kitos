@@ -462,15 +462,16 @@
                         excelTemplate: dataItem => dataItem.UsedByOrganizationNames.length.toString(),
                         filterable: false,
                         sortable: false,
-                    }
-                ],
-                excelOnlyColumns: [
+                    },
                     {
-                        persistId: "UsedByOrganizationNames",
-                        title: "Snitfladen anvendes af (navne)",
-                        width: 150,
-                        template: dataItem => dataItem.UsedByOrganizationNames.join(", "),
-                        dependOnColumnPersistId: "UsedByOrganizations"
+
+                        field: "UsedByOrganizationNames", title: "Snitfladen anvendes af (navne)", width: 150,
+                        persistId: `UsedByOrganizationNames_ExcelOnly${new Date().getTime()}`, 
+                        excelTemplate: dataItem => dataItem.UsedByOrganizationNames.join(", "),
+                        hidden: true,
+                        filterable: false,
+                        sortable: false,
+                        menu: false //Only used in excel output!
                     }
                 ]
             };
@@ -642,7 +643,7 @@
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItInterface>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.mainGridOptions.excelOnlyColumns);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
         private showUsedByOrganizationNames(numberOfOrgs: number, interfaceName: string, interfaceId: number): string {
