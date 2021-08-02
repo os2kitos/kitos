@@ -31,6 +31,7 @@
         "notify",
         "kleService",
         "$window",
+        "$uibModal",
         "brokenLinkStatus",
         "usersWithRightsholderAccess",
         "usersWithCrossAccess",
@@ -44,6 +45,7 @@
             notify,
             kleService,
             $window,
+            $uibModal: ng.ui.bootstrap.IModalService,
             brokenLinkStatus: Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO,
             usersWithRightsholderAccess: Kitos.Models.Api.IUserWithOrganizationName[],
             usersWithCrossAccess: Kitos.Models.Api.IUserWithCrossAccess[]) => {
@@ -53,6 +55,20 @@
             $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
             $scope.usersWithRightsholderAccess = usersWithRightsholderAccess;
             $scope.usersWithCrossAccess = usersWithCrossAccess;
+
+            $scope.showOrgsWhereUserActive = (activeOrgNames: string[]) => {
+                console.log(activeOrgNames);
+                $uibModal.open({
+                    templateUrl: "app/components/global-admin/global-admin-organizations-where-user-rights.modal.view.html",
+                    windowClass: "modal fade in",
+                    resolve: {
+                        orgNames: [() => activeOrgNames],
+                    },
+                    controller: ["$scope", "orgNames", ($scope, orgNames: string[]) => {
+                        $scope.orgNames = orgNames;
+                    }]
+                });
+            }
 
             getKleStatus();
             function getKleStatus() {

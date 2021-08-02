@@ -81,11 +81,11 @@
         <table class="full-width table table-striped">
             <thead>
                 <tr>
-                    <th width="35%">Navn</th>
-                    <th width="35%">Email</th>
+                    <th width="30%">Navn</th>
+                    <th width="30%">Email</th>
                     <th class="centeredContent" width="15%">API adgang</th>
                     <th class="centeredContent" width="15%">Interessentadgang</th>
-                    <th></th> <!-- Empty header as we need the extra row for a button-->
+                    <th class="centeredContent" width="10%"></th> <!-- Empty header as we need the extra row for a button-->
                 </tr>
             </thead>
             <!-- for each right -->
@@ -95,7 +95,7 @@
                     <td>{{ userWithCrossAccess.email }}</td>
                     <td class="centeredContent"><i ng-if="userWithCrossAccess.apiAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.apiAccess" class="text-danger fa fa-times"></i></td>
                     <td class="centeredContent"><i ng-if="userWithCrossAccess.stakeholderAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.stakeholderAccess" class="text-danger fa fa-times"></i></td>
-                    <td></td>
+                    <td class="centeredContent"><button class="btn btn-success btn-sm" ng-click="showOrgsWhereUserActive(userWithCrossAccess.organizationsWhereActive)">Organisationer</button></td>
                 </tr>
             </tbody>
         </table>
