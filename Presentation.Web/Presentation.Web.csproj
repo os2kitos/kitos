@@ -385,6 +385,7 @@
     <Compile Include="Models\External\V2\Response\SystemUsage\LocalKLEDeviationsResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\SystemUsage\ArchivingRegistrationsResponseDTO.cs" />
     <Compile Include="Models\External\V2\Response\SystemUsage\SimpleLinkResponseDTO.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\SystemRelationResponseDTO.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasValidationExternal.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\External\V2\SharedProperties\IHasNameExternal.cs" />

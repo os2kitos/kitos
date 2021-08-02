@@ -89,5 +89,9 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// GDPR-specific registrations
         /// </summary>
         public GDPRRegistrationsResponseDTO GDPR { get; set; }
+        /// <summary>
+        /// Contains registered relations to other system usages within the organization
+        /// </summary>
+        public SystemRelationResponseDTO OutgoingSystemRelations { get; set; }
     }
 }
