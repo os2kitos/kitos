@@ -143,6 +143,16 @@ namespace Core.DomainModel
                 .Distinct();
         }
 
+        public IEnumerable<string> GetOrganizationNames()
+        {
+            return OrganizationRights
+                .GroupBy(x => (x.Organization.Id, x.Organization.Name))
+                .Distinct()
+                .Select(x => x.Key.Name)
+                .OrderBy(x => x)
+                .ToList();
+        }
+
         public IEnumerable<OrganizationRole> GetRolesInOrganization(Guid organizationUuid)
         {
             return OrganizationRights

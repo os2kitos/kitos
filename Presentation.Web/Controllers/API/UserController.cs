@@ -217,7 +217,7 @@ namespace Presentation.Web.Controllers.API
 
         private static UserWithOrganizationDTO ToUserWithOrgDTO(UserRoleAssociationDTO dto)
         {
-            return new(dto.User.Id, dto.User.GetFullName(), dto.User.Email, dto.Organization.Name);
+            return new(dto.User.Id, dto.User.GetFullName(), dto.User.Email, dto.Organization.Name, dto.User.HasApiAccess.GetValueOrDefault(false));
         }
 
         private static IEnumerable<UserWithCrossOrganizationalRightsDTO> ToUserWithCrossRightsDTOs(IEnumerable<User> users)
@@ -227,7 +227,7 @@ namespace Presentation.Web.Controllers.API
 
         private static UserWithCrossOrganizationalRightsDTO ToUserWithCrossRightsDTO(User user)
         {
-            return new(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess);
+            return new(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess, user.GetOrganizationNames());
         }
     }
 }
