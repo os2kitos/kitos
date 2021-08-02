@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
@@ -9,14 +10,19 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
     {
         /// <summary>
         /// System Id assigned locally within the organization
+        /// Max length: 200
         /// </summary>
+        [MaxLength(200)]
         public string LocalSystemId { get; set; }
         /// <summary>
         /// Call name used locally within the organization
+        /// Max length: 100
         /// </summary>
+        [MaxLength(100)]
         public string LocalCallName { get; set; }
         /// <summary>
         /// Optional classification of the registered data
+        /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
         public Guid? DataClassificationUuid { get; set; }
@@ -26,7 +32,9 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         public string Notes { get; set; }
         /// <summary>
         /// Locally registered system version
+        /// Max length: 100
         /// </summary>
+        [MaxLength(100)]
         public string SystemVersion { get; set; }
         /// <summary>
         /// Interval which defines the number of expected users this system has within the organization
@@ -40,6 +48,7 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         public ValidityWriteRequestDTO Validity { get; set; }
         /// <summary>
         /// Defines the master contract for this system (many contracts can point to a system usage but only one can be the master contract)
+        /// Constraint: The contract provided MUST point to this system usage for it to be selected as "main contract".
         /// </summary>
         [NonEmptyGuid]
         public Guid? MainContractUuid { get; set; }
@@ -49,11 +58,13 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         public IEnumerable<Guid> UsingOrganizationUnitUuids { get; set; }
         /// <summary>
         /// Out of all of the using organization units, this one is responsible for the system within the organization.
+        /// Constraint: The uuid provided must also be present in UsingOrganizationUnitUuids
         /// </summary>
         [NonEmptyGuid]
         public Guid? ResponsibleOrganizationUnitUuid { get; set; }
         /// <summary>
         /// IT-Projects associated with this system usage
+        /// Constraint: Duplicates are not allowed
         /// </summary>
         public IEnumerable<Guid> AssociatedProjectUuids { get; set; }
     }

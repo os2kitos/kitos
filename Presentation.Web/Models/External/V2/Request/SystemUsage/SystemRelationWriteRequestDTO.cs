@@ -14,16 +14,19 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         public Guid ToSystemUsageUuid { get; set; }
         /// <summary>
         /// The relation uses the interface
+        /// The interface must be exposed by the system identified by ToSystemUsageUuid
         /// </summary>
         [NonEmptyGuid]
         public Guid? UsingInterfaceUuid { get; set; }
         /// <summary>
         /// The contract association of the system relation
+        /// The contract must be defined in the same organization as the it-system usages.
         /// </summary>
         [NonEmptyGuid]
         public Guid? AssociatedContractUuid { get; set; }
         /// <summary>
         /// Frequency of the relation
+        /// If part of a new relation or a change, the option must be enabled in the organization context.
         /// </summary>
         [NonEmptyGuid]
         public Guid? RelationFrequencyUuid { get; set; }

@@ -13,16 +13,19 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         public ArchiveDutyChoice? ArchiveDuty { get; set; }
         /// <summary>
         /// Defines the archiving type associated with the it-system
+        /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
         public Guid? ArchiveTypeUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for archive receiving the data
+        /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
         public Guid? ArchiveLocationUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for the archiving test
+        /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
         public Guid? ArchiveTestLocationUuid { get; set; }
