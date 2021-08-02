@@ -7,7 +7,6 @@ using System.Web.Http;
 using Core.DomainModel;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
-using Presentation.Web.Models.Exceptions;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
@@ -169,10 +168,6 @@ namespace Presentation.Web.Controllers.API
                 var savedItem = PostQuery(item);
                 RaiseNewObjectCreated(savedItem);
                 return NewObjectCreated(savedItem);
-            }
-            catch (ConflictException e)
-            {
-                return Conflict(e.Message);
             }
             catch (SecurityException e)
             {

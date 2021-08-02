@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Presentation.Web.Models.External.V2.Types.Shared;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.External.V2.Request.SystemUsage
@@ -14,15 +14,19 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         /// <summary>
         /// Defines the archiving type associated with the it-system
         /// </summary>
+        [NonEmptyGuid]
         public Guid? ArchiveTypeUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for archive receiving the data
         /// </summary>
+        [NonEmptyGuid]
         public Guid? ArchiveLocationUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for the archiving test
         /// </summary>
+        [NonEmptyGuid]
         public Guid? ArchiveTestLocationUuid { get; set; }
+        [NonEmptyGuid]
         public Guid? ArchiveSupplierOrganizationUuid { get; set; }
         /// <summary>
         /// Determines if any archiving has occurred from this system

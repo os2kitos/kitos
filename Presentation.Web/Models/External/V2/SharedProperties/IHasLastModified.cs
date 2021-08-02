@@ -1,9 +1,9 @@
 ﻿using System;
-using Presentation.Web.Models.External.V2.SharedProperties;
+using Presentation.Web.Models.External.V2.Response;
 
-namespace Presentation.Web.Models.External.V2.Response.Interface
+namespace Presentation.Web.Models.External.V2.SharedProperties
 {
-    public class ItInterfaceResponseDTO : BaseItInterfaceResponseDTO, IHasLastModified
+    public interface IHasLastModified
     {
         /// <summary>
         /// Time of last modification

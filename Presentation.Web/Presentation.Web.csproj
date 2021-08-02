@@ -367,7 +367,14 @@
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\External\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\External\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
-    <Compile Include="Models\External\V2\Types\Shared\ExternalReferenceDTO.cs" />
+    <Compile Include="Models\External\V2\Request\SystemUsage\GeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\External\V2\Request\SystemUsage\LocalKLEDeviationsRequestDTO.cs" />
+    <Compile Include="Models\External\V2\Request\SystemUsage\SystemRelationWriteRequestDTO.cs" />
+    <Compile Include="Models\External\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
+    <Compile Include="Models\External\V2\Response\SystemUsage\GeneralDataResponseDTO.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasEntityCreator.cs" />
+    <Compile Include="Models\External\V2\SharedProperties\IHasLastModified.cs" />
+    <Compile Include="Models\External\V2\Types\Shared\ExternalReferenceDataDTO.cs" />
     <Compile Include="Models\External\V2\Request\Generic\RoleAssignmentRequestDTO.cs" />
     <Compile Include="Models\External\V2\Request\SystemUsage\BaseItSystemUsageWriteRequestDTO.cs" />
     <Compile Include="Models\External\V2\Request\SystemUsage\CreateItSystemUsageRequestDTO.cs" />
@@ -858,7 +865,6 @@
     <Compile Include="Models\AdviceDTO.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\MappingConfig.cs" />
-    <Compile Include="Models\Exceptions\ConflictException.cs" />
     <Compile Include="Models\ItContractDTO.cs" />
     <Compile Include="Models\ItSystemUsageSimpleDTO.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />

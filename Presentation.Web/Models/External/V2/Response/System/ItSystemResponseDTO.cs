@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Presentation.Web.Models.External.V2.Response.Organization;
+using Presentation.Web.Models.External.V2.SharedProperties;
 
 namespace Presentation.Web.Models.External.V2.Response.System
 {
-    public class ItSystemResponseDTO: BaseItSystemResponseDTO
+    public class ItSystemResponseDTO: BaseItSystemResponseDTO, IHasLastModified
     {
         /// <summary>
         /// Organizations using this IT-System

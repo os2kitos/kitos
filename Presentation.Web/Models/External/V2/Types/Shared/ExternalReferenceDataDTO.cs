@@ -3,7 +3,7 @@
     /// <summary>
     /// User defined external references attached to a KITOS entity
     /// </summary>
-    public class ExternalReferenceDTO
+    public class ExternalReferenceDataDTO
     {
         /// <summary>
         /// Reference title as shown in KITOS UI

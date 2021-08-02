@@ -5,7 +5,7 @@ using Presentation.Web.Models.External.V2.SharedProperties;
 
 namespace Presentation.Web.Models.External.V2.Response.System
 {
-    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal
+    public abstract class BaseItSystemResponseDTO : IHasNameExternal, IHasUuidExternal, IHasEntityCreator
     {
         /// <summary>
         /// UUID for IT-System
