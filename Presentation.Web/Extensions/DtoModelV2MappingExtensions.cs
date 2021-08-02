@@ -30,19 +30,19 @@ namespace Presentation.Web.Extensions
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }
 
-        public static RecommendedArchiveDuty ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
+        public static RecommendedArchiveDutyChoice ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
         {
             switch (domainType)
             {
                 case null:
                 case ArchiveDutyRecommendationTypes.Undecided:
-                    return RecommendedArchiveDuty.Undecided;
+                    return RecommendedArchiveDutyChoice.Undecided;
                 case ArchiveDutyRecommendationTypes.B:
-                    return RecommendedArchiveDuty.B;
+                    return RecommendedArchiveDutyChoice.B;
                 case ArchiveDutyRecommendationTypes.K:
-                    return RecommendedArchiveDuty.K;
+                    return RecommendedArchiveDutyChoice.K;
                 case ArchiveDutyRecommendationTypes.NoRecommendation:
-                    return RecommendedArchiveDuty.NoRecommendation;
+                    return RecommendedArchiveDutyChoice.NoRecommendation;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainType), domainType, null);
             }

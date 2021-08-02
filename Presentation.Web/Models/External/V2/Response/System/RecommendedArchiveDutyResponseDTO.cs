@@ -4,7 +4,7 @@ namespace Presentation.Web.Models.External.V2.Response.System
 {
     public class RecommendedArchiveDutyResponseDTO
     {
-        public RecommendedArchiveDutyResponseDTO(string comment, RecommendedArchiveDuty id)
+        public RecommendedArchiveDutyResponseDTO(string comment, RecommendedArchiveDutyChoice id)
         {
             Comment = comment;
             Id = id;
@@ -18,6 +18,6 @@ namespace Presentation.Web.Models.External.V2.Response.System
         /// <summary>
         /// Archive duty recommendation identifier
         /// </summary>
-        public RecommendedArchiveDuty Id { get; }
+        public RecommendedArchiveDutyChoice Id { get; }
     }
 }

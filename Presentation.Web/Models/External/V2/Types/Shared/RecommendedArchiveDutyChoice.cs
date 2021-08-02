@@ -1,9 +1,9 @@
 ﻿namespace Presentation.Web.Models.External.V2.Types.Shared
 {
-    public enum ArchiveDutyChoice
+    public enum RecommendedArchiveDutyChoice
     {
         /// <summary>
-        /// Registration has been explicitly reset
+        /// Registration has been explicitly reset to "blank" by a user.
         /// </summary>
         Undecided = 0,
         /// <summary>
@@ -15,8 +15,8 @@
         /// </summary>
         K = 2,
         /// <summary>
-        /// Archive duty is unknown
+        /// No recommendation exists from the archiving authority
         /// </summary>
-        Unknown = 3
+        NoRecommendation = 3
     }
 }

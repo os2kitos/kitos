@@ -7,6 +7,7 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
 {
     /// <summary>
     /// NOTE: IT-System usages are registrations which extend those of a system within the context of a specific organization.
+    /// IT-System usages have their own lifecycle and identity but the human readable name is inherited from the system context.
     /// </summary>
     public class ItSystemUsageResponseDTO : IHasUuidExternal
     {
@@ -71,7 +72,7 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// <summary>
         /// Defines IT-System KLE deviations locally within an organization. All deviations are in the context of the inherited deviations which are found on the IT-System context
         /// </summary>
-        public LocalKLEDeviations LocalKLEDeviations { get; set; }
+        public LocalKLEDeviationsResponseDTO LocalKLEDeviations { get; set; }
         /// <summary>
         /// IT-Projects associated with this system usage
         /// </summary>
@@ -80,5 +81,13 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// User defined external references
         /// </summary>
         public IEnumerable<ExternalReferenceResponseDTO> ExternalReferences { get; set; }
+        /// <summary>
+        /// Archiving-specific registrations
+        /// </summary>
+        public ArchivingRegistrationsResponseDTO Archiving { get; set; }
+        /// <summary>
+        /// GDPR-specific registrations
+        /// </summary>
+        public GDPRRegistrationsResponseDTO GDPR { get; set; }
     }
 }
