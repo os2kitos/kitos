@@ -2,19 +2,15 @@
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Contract;
-using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
 using Presentation.Web.Models.External.V2.Response.Contract;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
 
 namespace Presentation.Web.Controllers.External.V2.ItContracts
@@ -100,7 +96,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
                 Uuid = contract.Uuid,
                 Name = contract.Name,
                 ContractType = contract.ContractTypeId.HasValue ? contract.ContractType.MapIdentityNamePairDTO() : null,
-                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapToShallowOrganizationDTO() : null,
+                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapShallowOrganizationResponseDTO() : null,
                 AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.MapIdentityNamePairDTO()),
                 ValidFrom = contract.Concluded,
                 ValidTo = contract.ExpirationDate,

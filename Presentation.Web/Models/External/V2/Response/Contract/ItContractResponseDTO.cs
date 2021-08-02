@@ -1,6 +1,7 @@
 ﻿using Presentation.Web.Models.External.V2.SharedProperties;
 using System;
 using System.Collections.Generic;
+using Presentation.Web.Models.External.V2.Response.Organization;
 
 namespace Presentation.Web.Models.External.V2.Response.Contract
 {
@@ -24,7 +25,7 @@ namespace Presentation.Web.Models.External.V2.Response.Contract
         /// <summary>
         /// Supplier of It-Contract
         /// </summary>
-        public ShallowOrganizationDTO Supplier { get; set; }
+        public ShallowOrganizationResponseDTO Supplier { get; set; }
 
         /// <summary>
         /// Agreement element option types set on the IT-Contract

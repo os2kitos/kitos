@@ -1,14 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.External.V2.SharedProperties;
 
 namespace Presentation.Web.Models.External.V2.Response.SystemUsage
 {
     /// <summary>
     /// NOTE: IT-System usages are registrations which extend those of a system within the context of a specific organization.
-    /// They don't have their own identity ensuring identity-stability across use/discard/use scenarios.
     /// </summary>
-    public class ItSystemUsageResponseDTO
+    public class ItSystemUsageResponseDTO : IHasUuidExternal
     {
+        /// <summary>
+        /// UUID of the IT-System usage registration instance
+        /// </summary>
+        public Guid Uuid { get; set; }
         /// <summary>
         /// IT-System which this organizational usage is based on
         /// </summary>
@@ -75,6 +80,5 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// User defined external references
         /// </summary>
         public IEnumerable<ExternalReferenceResponseDTO> ExternalReferences { get; set; }
-
     }
 }
