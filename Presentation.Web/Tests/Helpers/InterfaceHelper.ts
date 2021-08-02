@@ -16,8 +16,8 @@ class InterfaceHelper {
     public static writeDataToTable(data: string, dataType: string) {
         console.log(`Writing ${data} ${dataType} to table`);
         return element(this.cssHelper.byDataElementType(this.const.interfaceNewRowButton)).click()
-            .then(() => this.writeDataToTextInput(data, this.const.interfaceDataInput))
-            .then(() => this.selectDataFromNoSearchSelect2Field(dataType, this.const.interfaceSelectTableDataType));
+            .then(() => this.writeDataToTextInput(data, this.const.interfaceDataInput)
+                .then(() => this.selectDataFromNoSearchSelect2Field(dataType, this.const.interfaceSelectTableDataType)));
     }
 
     public static verifyDataFromTextInput(data: string, ele: string) {
