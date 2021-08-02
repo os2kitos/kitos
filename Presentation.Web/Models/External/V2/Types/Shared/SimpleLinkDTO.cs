@@ -1,6 +1,6 @@
-﻿namespace Presentation.Web.Models.External.V2.Response.SystemUsage
+﻿namespace Presentation.Web.Models.External.V2.Types.Shared
 {
-    public class SimpleLinkResponseDTO
+    public class SimpleLinkDTO
     {
         /// <summary>
         /// Name displayed to the user in kitos

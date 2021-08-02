@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Presentation.Web.Models.External.V2.Response.SystemUsage
+namespace Presentation.Web.Models.External.V2.Types.SystemUsage
 {
-    public class JournalPeriodResponseDTO
+    public class JournalPeriodDTO
     {
         public string ArchiveId { get; set; }
         public DateTime StartDate { get; set; }

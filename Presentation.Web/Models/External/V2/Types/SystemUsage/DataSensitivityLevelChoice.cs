@@ -1,4 +1,4 @@
-﻿namespace Presentation.Web.Models.External.V2.Types.Shared
+﻿namespace Presentation.Web.Models.External.V2.Types.SystemUsage
 {
     public enum DataSensitivityLevelChoice
     {

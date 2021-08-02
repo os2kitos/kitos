@@ -3,17 +3,17 @@ using System.Collections.Generic;
 using Presentation.Web.Models.External.V2.Types.Shared;
 using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
-namespace Presentation.Web.Models.External.V2.Response.SystemUsage
+namespace Presentation.Web.Models.External.V2.Request.SystemUsage
 {
-    public class GDPRRegistrationsResponseDTO
+    public class GDPRWriteRequestDTO
     {
         public string Purpose { get; set; }
         public YesNoExtendedChoice? BusinessCritical { get; set; }
         public HostingChoice? HostedAt { get; set; }
         public SimpleLinkDTO DirectoryDocumentation { get; set; }
         public IEnumerable<DataSensitivityLevelChoice> DataSensitivityLevels { get; set; }
-        public IEnumerable<IdentityNamePairResponseDTO> SensitivePersonData { get; set; }
-        public IEnumerable<IdentityNamePairResponseDTO> RegisteredDataCategories { get; set; }
+        public IEnumerable<Guid> SensitivePersonDataUuids { get; set; }
+        public IEnumerable<Guid> RegisteredDataCategorieUuids { get; set; }
         public YesNoExtendedChoice? TechnicalPrecautionsInPlace { get; set; }
         public IEnumerable<TechnicalPrecautionChoice> TechnicalPrecautionsApplied { get; set; }
         public SimpleLinkDTO TechnicalPrecautionsDocumentation { get; set; }
@@ -31,6 +31,5 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         public YesNoExtendedChoice? RetentionPeriodDefined { get; set; }
         public DateTime? NextDataRetentionEvaluationDate { get; set; }
         public int? DataRetentionEvaluationFrequencyInMonths { get; set; }
-
     }
 }

@@ -1,6 +1,6 @@
-﻿namespace Presentation.Web.Models.External.V2.Response.SystemUsage
+﻿namespace Presentation.Web.Models.External.V2.Types.SystemUsage
 {
-    public class ExpectedUsersIntervalResponseDTO
+    public class ExpectedUsersIntervalDTO
     {
         /// <summary>
         /// Optional lower bound.

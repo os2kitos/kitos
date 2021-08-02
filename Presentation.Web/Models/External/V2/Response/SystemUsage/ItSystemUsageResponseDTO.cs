@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.External.V2.SharedProperties;
+using Presentation.Web.Models.External.V2.Types.Shared;
+using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.External.V2.Response.SystemUsage
 {
@@ -48,7 +50,7 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// <summary>
         /// Interval which defines the number of expected users this system has within the organization
         /// </summary>
-        public ExpectedUsersIntervalResponseDTO NumberOfExpectedUsers { get; set; }
+        public ExpectedUsersIntervalDTO NumberOfExpectedUsers { get; set; }
         /// <summary>
         /// Specifies the validity of this system usage
         /// </summary>
@@ -80,7 +82,7 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// <summary>
         /// User defined external references
         /// </summary>
-        public IEnumerable<ExternalReferenceResponseDTO> ExternalReferences { get; set; }
+        public IEnumerable<ExternalReferenceDTO> ExternalReferences { get; set; }
         /// <summary>
         /// Archiving-specific registrations
         /// </summary>
