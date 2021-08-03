@@ -227,7 +227,16 @@ namespace Presentation.Web.Controllers.API
 
         private static UserWithCrossOrganizationalRightsDTO ToUserWithCrossRightsDTO(User user)
         {
-            return new(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess, user.GetOrganizationNames());
+            return new(user.Id, user.GetFullName(), user.Email, user.HasApiAccess.GetValueOrDefault(false), user.HasStakeHolderAccess, GetOrganizationNames(user));
+        }
+
+        private static IEnumerable<string> GetOrganizationNames(User user)
+        {
+            return user.GetOrganizations()
+                .GroupBy(x => (x.Id, x.Name))
+                .Distinct()
+                .Select(x => x.Key.Name)
+                .OrderBy(x => x);
         }
     }
 }
