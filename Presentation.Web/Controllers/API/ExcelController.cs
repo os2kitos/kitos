@@ -11,6 +11,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API
 {

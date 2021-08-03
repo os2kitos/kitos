@@ -11,7 +11,8 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
-using Presentation.Web.Models.SystemRelations;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

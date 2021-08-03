@@ -1,6 +1,6 @@
 ﻿using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
-using Presentation.Web.Models.External.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Response.Options;
 
 namespace Presentation.Web.Controllers.External.V2
 {

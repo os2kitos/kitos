@@ -4,7 +4,8 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
-using Presentation.Web.Models.SystemRelations;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools

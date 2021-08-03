@@ -14,8 +14,10 @@ using Core.DomainServices.Queries.ItSystem;
 using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response.System;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Response.System;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystems

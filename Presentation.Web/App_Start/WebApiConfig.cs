@@ -31,6 +31,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web
 {

@@ -7,7 +7,7 @@ using Core.DomainModel.Qa.References;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.Qa;
+using Presentation.Web.Models.API.V1.Qa;
 
 namespace Presentation.Web.Controllers.API
 {

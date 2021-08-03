@@ -2,7 +2,7 @@
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.ItSystemUsage.GDPR;
+using Presentation.Web.Models.API.V1.ItSystemUsage.GDPR;
 
 namespace Presentation.Web.Controllers.API
 {

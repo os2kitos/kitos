@@ -10,6 +10,7 @@ using Core.DomainServices.Repositories.Contract;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

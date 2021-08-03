@@ -5,6 +5,7 @@ using AutoFixture;
 using Core.DomainModel;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;

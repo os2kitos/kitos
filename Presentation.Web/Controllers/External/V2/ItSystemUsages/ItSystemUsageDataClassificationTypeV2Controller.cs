@@ -6,9 +6,11 @@ using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
-using Presentation.Web.Models.External.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages

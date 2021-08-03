@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Request.SystemUsage;
-using Presentation.Web.Models.External.V2.Response;
-using Presentation.Web.Models.External.V2.Response.SystemUsage;
-using Presentation.Web.Models.External.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Response;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.External.V2.ItSystemUsages

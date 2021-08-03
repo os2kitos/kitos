@@ -13,7 +13,8 @@ using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models;
-using Presentation.Web.Models.ItSystemUsage;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
 

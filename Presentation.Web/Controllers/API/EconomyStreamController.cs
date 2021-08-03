@@ -14,6 +14,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

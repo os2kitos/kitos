@@ -14,6 +14,7 @@ using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Ninject;
 using Presentation.Web.Infrastructure.Extensions;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API
 {

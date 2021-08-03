@@ -9,6 +9,7 @@ using Core.DomainServices;
 using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API
 {

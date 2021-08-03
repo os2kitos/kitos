@@ -1,14 +1,16 @@
 ﻿using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
-using Presentation.Web.Models.External.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Response;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.External.V2.ItContracts
 {

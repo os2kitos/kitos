@@ -18,7 +18,8 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
-using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystem;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

@@ -4,14 +4,15 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Contract;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Response.Contract;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Controllers.External.V2.ItContracts
 {

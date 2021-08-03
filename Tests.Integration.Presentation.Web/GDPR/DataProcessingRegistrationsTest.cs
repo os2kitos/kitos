@@ -9,10 +9,10 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Organization;
 using ExpectedObjects;
+using Presentation.Web.Models.API.V1.GDPR;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
-using Presentation.Web.Models.GDPR;
 
 namespace Tests.Integration.Presentation.Web.GDPR
 {

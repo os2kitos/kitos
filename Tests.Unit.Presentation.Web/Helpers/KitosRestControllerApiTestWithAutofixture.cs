@@ -8,6 +8,7 @@ using Core.DomainModel;
 using Moq;
 using Presentation.Web.Controllers.API;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

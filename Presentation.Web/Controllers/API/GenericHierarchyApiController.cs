@@ -5,6 +5,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API
 {

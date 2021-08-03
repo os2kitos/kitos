@@ -16,9 +16,10 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
-using Presentation.Web.Models.GDPR;
-using Presentation.Web.Models.References;
-using Presentation.Web.Models.Shared;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.GDPR;
+using Presentation.Web.Models.API.V1.References;
+using Presentation.Web.Models.API.V1.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

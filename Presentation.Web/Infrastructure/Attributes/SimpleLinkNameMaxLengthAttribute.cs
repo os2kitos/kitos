@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using Presentation.Web.Models.External.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {

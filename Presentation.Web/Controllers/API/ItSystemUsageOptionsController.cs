@@ -11,6 +11,7 @@ using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API
 {

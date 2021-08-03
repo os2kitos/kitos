@@ -9,6 +9,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 

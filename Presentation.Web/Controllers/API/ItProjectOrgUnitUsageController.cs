@@ -7,6 +7,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API

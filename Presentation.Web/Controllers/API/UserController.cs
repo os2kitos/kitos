@@ -16,7 +16,8 @@ using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
-using Presentation.Web.Models.Users;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Users;
 
 namespace Presentation.Web.Controllers.API
 {

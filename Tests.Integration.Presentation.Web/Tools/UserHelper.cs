@@ -1,9 +1,9 @@
 ﻿using Core.DomainModel.Organization;
-using Presentation.Web.Models.Users;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools

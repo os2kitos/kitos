@@ -16,6 +16,7 @@ using Infrastructure.Services.Types;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 

@@ -12,7 +12,8 @@ using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models.ItSystemUsage;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
@@ -197,12 +198,6 @@ namespace Presentation.Web
                       opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null))
                   .ReverseMap()
                   .IgnoreDestinationEntityFields();
-
-            CreateMap<User, UserOverviewDTO>()
-                .ForMember(dest => dest.DefaultOrganizationUnitId,
-                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
-                  .ForMember(dest => dest.DefaultOrganizationUnitName,
-                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null));
 
             CreateMap<Organization, OrganizationDTO>()
                 .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
@@ -439,14 +434,7 @@ namespace Presentation.Web
                 .ReverseMap();
 
             //Output only - this mapping should not be reversed
-            CreateMap<ItProject, ItProjectCatalogDTO>();
-
-            //Output only - this mapping should not be reversed
             CreateMap<ItProject, ItProjectSimpleDTO>();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItProject, ItProjectOverviewDTO>()
-                .ForMember(dest => dest.ResponsibleOrgUnitName, opt => opt.MapFrom(src => src.ResponsibleUsage.OrganizationUnit.Name));
 
             CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
@@ -464,12 +452,6 @@ namespace Presentation.Web
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItContract, ItContractOverviewDTO>();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItContract, ItContractPlanDTO>();
 
             //Output only - this mapping should not be reversed
             CreateMap<ItContract, ItContractSystemDTO>()
