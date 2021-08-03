@@ -363,6 +363,7 @@
     <Compile Include="Controllers\External\V2\ItSystemUsages\ItSystemUsageV2Controller.cs" />
     <Compile Include="Controllers\External\V2\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
+    <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\External\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />

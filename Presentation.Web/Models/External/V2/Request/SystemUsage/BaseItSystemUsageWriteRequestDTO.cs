@@ -4,7 +4,7 @@ using Presentation.Web.Models.External.V2.Types.Shared;
 
 namespace Presentation.Web.Models.External.V2.Request.SystemUsage
 {
-    public class BaseItSystemUsageWriteRequestDTO
+    public abstract class BaseItSystemUsageWriteRequestDTO
     {
         public GeneralDataWriteRequestDTO General { get; set; }
         /// <summary>

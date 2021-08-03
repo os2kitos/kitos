@@ -1,13 +1,17 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using Presentation.Web.Models.External.V2.Types.Shared;
 
 namespace Presentation.Web.Infrastructure.Attributes
 {
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
-    public class NonEmptyGuidAttribute : ValidationAttribute
+    public class SimpleLinkNameMaxLengthAttribute : ValidationAttribute
     {
-        private const string DefaultErrorMessage = "The {0} field must not be an empty GUID";
-        public NonEmptyGuidAttribute() : base(DefaultErrorMessage) { }
+        private readonly int _maxLength;
+        public SimpleLinkNameMaxLengthAttribute(int maxLength) : base($"The field {{0}} has a max length of {maxLength} characters")
+        {
+            _maxLength = maxLength;
+        }
 
         public override bool IsValid(object value)
         {
@@ -19,7 +23,7 @@ namespace Presentation.Web.Infrastructure.Attributes
 
             return value switch
             {
-                Guid guid => guid != Guid.Empty,
+                SimpleLinkDTO link => link.Name?.Length <= _maxLength,
                 _ => false
             };
         }

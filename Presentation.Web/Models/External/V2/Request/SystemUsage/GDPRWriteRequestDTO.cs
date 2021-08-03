@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.External.V2.Types.Shared;
 using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
@@ -13,6 +14,7 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         /// <summary>
         /// Constraints: Name: 150 characters
         /// </summary>
+        [SimpleLinkNameMaxLength(150)]
         public SimpleLinkDTO DirectoryDocumentation { get; set; }
         /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
@@ -58,6 +60,7 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         /// - Name: 150 characters
         /// - RiskAssessmentConducted must be set to Yes
         /// </summary>
+        [SimpleLinkNameMaxLength(150)]
         public SimpleLinkDTO RiskAssessmentDocumentation { get; set; }
         /// <summary>
         /// Constraint: RiskAssessmentConducted must be set to Yes
