@@ -412,6 +412,7 @@
     <Compile Include="Models\External\V2\Types\SystemUsage\RiskLevelChoice.cs" />
     <Compile Include="Models\External\V2\Types\SystemUsage\TechnicalPrecautionChoice.cs" />
     <Compile Include="Models\External\V2\Types\Shared\YesNoChoice.cs" />
+    <Compile Include="Models\Users\UserWithApiAccessDTO.cs" />
     <Compile Include="Models\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\Users\UserWithOrganizationDTO.cs" />
     <Compile Include="Extensions\DtoModelV2MappingExtensions.cs" />
@@ -456,6 +457,7 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-main.view.html" />
