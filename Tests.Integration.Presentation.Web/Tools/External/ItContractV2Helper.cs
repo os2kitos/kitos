@@ -1,4 +1,4 @@
-﻿using Presentation.Web.Models.External.V2.Response.Contract;
+﻿using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Collections.Generic;
 using System.Linq;

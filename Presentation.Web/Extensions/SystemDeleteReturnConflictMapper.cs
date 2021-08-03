@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.ApplicationServices.Model.System;
-using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.API.V1.ItSystem;
 
 namespace Presentation.Web.Extensions
 {

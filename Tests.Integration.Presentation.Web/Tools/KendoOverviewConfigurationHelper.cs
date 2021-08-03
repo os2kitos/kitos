@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {

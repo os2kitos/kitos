@@ -15,6 +15,7 @@ using ExpectedObjects;
 using Infrastructure.DataAccess;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;

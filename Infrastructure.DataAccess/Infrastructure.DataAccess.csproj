@@ -769,6 +769,10 @@
     <Compile Include="Migrations\202107060957327_Added_Uuid_To_ItContract.designer.cs">
       <DependentUpon>202107060957327_Added_Uuid_To_ItContract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202108030546068_ITSystemUsage_Add_Uuid.cs" />
+    <Compile Include="Migrations\202108030546068_ITSystemUsage_Add_Uuid.designer.cs">
+      <DependentUpon>202108030546068_ITSystemUsage_Add_Uuid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1259,6 +1263,9 @@
     <EmbeddedResource Include="Migrations\202107060957327_Added_Uuid_To_ItContract.resx">
       <DependentUpon>202107060957327_Added_Uuid_To_ItContract.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108030546068_ITSystemUsage_Add_Uuid.resx">
+      <DependentUpon>202108030546068_ITSystemUsage_Add_Uuid.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1307,6 +1314,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_Contract.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_ItSystemUsage.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

@@ -2,11 +2,12 @@
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
-using Presentation.Web.Models.External.V2.Response.Contract;
+using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;

@@ -23,12 +23,12 @@ namespace Core.DomainModel.ItSystemUsage
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices, IEntityWithUserNotification
+    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
         public const int LinkNameMaxLength = 150;
-        
+
 
         public ItSystemUsage()
         {
@@ -44,6 +44,7 @@ namespace Core.DomainModel.ItSystemUsage
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
             UserNotifications = new List<UserNotification>();
+            Uuid = Guid.NewGuid();
         }
 
         public bool IsActive
@@ -550,5 +551,7 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == sensitiveDataLevel);
         }
+
+        public Guid Uuid { get; set; }
     }
 }

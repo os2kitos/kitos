@@ -6,7 +6,7 @@ namespace Presentation.Web.Infrastructure.Attributes
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter, AllowMultiple = false)]
     public class NonEmptyGuidAttribute : ValidationAttribute
     {
-        public const string DefaultErrorMessage = "The {0} field must not be an empty GUID";
+        private const string DefaultErrorMessage = "The {0} field must not be an empty GUID";
         public NonEmptyGuidAttribute() : base(DefaultErrorMessage) { }
 
         public override bool IsValid(object value)

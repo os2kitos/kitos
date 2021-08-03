@@ -9,16 +9,16 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
-using Presentation.Web.Controllers.OData;
-using Presentation.Web.Controllers.OData.LocalOptionControllers;
+using Presentation.Web.Controllers.API.V1.OData;
+using Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
-using Presentation.Web.Controllers.OData.OptionControllers;
+using Presentation.Web.Controllers.API.V1.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Presentation.Web.Controllers.OData.ReportsControllers;
+using Presentation.Web.Controllers.API.V1.OData.ReportsControllers;
 using Presentation.Web.Models;
-using Presentation.Web.Controllers.OData.AttachedOptions;
+using Presentation.Web.Controllers.API.V1.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
@@ -31,6 +31,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web
 {

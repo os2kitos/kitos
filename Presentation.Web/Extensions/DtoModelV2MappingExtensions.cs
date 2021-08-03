@@ -1,9 +1,11 @@
 ﻿using System;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.External.V2.Response;
-using Presentation.Web.Models.External.V2.Response.Organization;
-using Presentation.Web.Models.External.V2.Types;
+using Presentation.Web.Models.API.V2.Response;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Extensions
 {
@@ -29,19 +31,19 @@ namespace Presentation.Web.Extensions
             return new(organization.Uuid, organization.Name, organization.GetActiveCvr());
         }
 
-        public static RecommendedArchiveDuty ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
+        public static RecommendedArchiveDutyChoice ToDTOType(this ArchiveDutyRecommendationTypes? domainType)
         {
             switch (domainType)
             {
                 case null:
                 case ArchiveDutyRecommendationTypes.Undecided:
-                    return RecommendedArchiveDuty.Undecided;
+                    return RecommendedArchiveDutyChoice.Undecided;
                 case ArchiveDutyRecommendationTypes.B:
-                    return RecommendedArchiveDuty.B;
+                    return RecommendedArchiveDutyChoice.B;
                 case ArchiveDutyRecommendationTypes.K:
-                    return RecommendedArchiveDuty.K;
+                    return RecommendedArchiveDutyChoice.K;
                 case ArchiveDutyRecommendationTypes.NoRecommendation:
-                    return RecommendedArchiveDuty.NoRecommendation;
+                    return RecommendedArchiveDutyChoice.NoRecommendation;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(domainType), domainType, null);
             }

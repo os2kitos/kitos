@@ -1,7 +1,7 @@
 ﻿using System;
 using Core.ApplicationServices.Model.System;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.API.V1.ItSystem;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Extensions
