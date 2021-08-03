@@ -45,6 +45,7 @@
         <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
     </div>
 
+    <h3>Oversigt over brugere med API relaterede rettigheder</h3>
     <div class="panel panel-default">
         <div class="panel-heading">
             <i class="glyphicon glyphicon-user"></i>
@@ -53,9 +54,10 @@
         <table class="full-width table table-striped">
             <thead>
                 <tr>
-                    <th width="33%">Organisation</th>
-                    <th width="33%">Navn</th>
-                    <th width="33%">Email</th>
+                    <th width="28%">Organisation</th>
+                    <th width="28%">Navn</th>
+                    <th width="28%">Email</th>
+                    <th class="centeredContent" width="15%">API adgang</th>
                 </tr>
             </thead>
             <!-- for each right -->
@@ -64,6 +66,7 @@
                     <td>{{ userWithRightsholderAccess.orgName }}</td>
                     <td>{{ userWithRightsholderAccess.name }}</td>
                     <td>{{ userWithRightsholderAccess.email }}</td>
+                    <td class="centeredContent"><i ng-if="userWithRightsholderAccess.apiAccess" class="text-success fa fa-check"></i><i ng-if="!userWithRightsholderAccess.apiAccess" class="text-danger fa fa-times"></i></td>
                 </tr>
             </tbody>
 
@@ -78,10 +81,11 @@
         <table class="full-width table table-striped">
             <thead>
                 <tr>
-                    <th width="35%">Navn</th>
-                    <th width="35%">Email</th>
-                    <th width="15%">API adgang</th>
-                    <th width="15%">Interessentadgang</th>
+                    <th width="30%">Navn</th>
+                    <th width="30%">Email</th>
+                    <th class="centeredContent" width="15%">API adgang</th>
+                    <th class="centeredContent" width="15%">Interessentadgang</th>
+                    <th class="centeredContent" width="10%"></th> <!-- Empty header as we need the extra row for a button-->
                 </tr>
             </thead>
             <!-- for each right -->
@@ -89,8 +93,9 @@
                 <tr data-ng-repeat="userWithCrossAccess in usersWithCrossAccess">
                     <td>{{ userWithCrossAccess.name }}</td>
                     <td>{{ userWithCrossAccess.email }}</td>
-                    <td><i ng-if="userWithCrossAccess.apiAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.apiAccess" class="text-danger fa fa-times"></i></td>
-                    <td><i ng-if="userWithCrossAccess.stakeholderAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.stakeholderAccess" class="text-danger fa fa-times"></i></td>
+                    <td class="centeredContent"><i ng-if="userWithCrossAccess.apiAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.apiAccess" class="text-danger fa fa-times"></i></td>
+                    <td class="centeredContent"><i ng-if="userWithCrossAccess.stakeholderAccess" class="text-success fa fa-check"></i><i ng-if="!userWithCrossAccess.stakeholderAccess" class="text-danger fa fa-times"></i></td>
+                    <td class="centeredContent"><button class="btn btn-success btn-sm" ng-click="showOrgsWhereUserActive(userWithCrossAccess.organizationsWhereActive)">Organisationer</button></td>
                 </tr>
             </tbody>
         </table>

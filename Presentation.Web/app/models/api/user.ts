@@ -14,12 +14,16 @@
         email: string,
     }
 
-    export interface IUserWithCrossAccess extends IUserWithEmail {
-        apiAccess: boolean,
-        stakeholderAccess: boolean
+    export interface IUserWithApiAccessModifier extends IUserWithEmail {
+        apiAccess: boolean
     }
 
-    export interface IUserWithOrganizationName extends IUserWithEmail {
+    export interface IUserWithCrossAccess extends IUserWithApiAccessModifier {
+        stakeholderAccess: boolean,
+        organizationsWithRights: string[]
+    }
+
+    export interface IUserWithOrganizationName extends IUserWithApiAccessModifier {
         orgName: string
     }
 }

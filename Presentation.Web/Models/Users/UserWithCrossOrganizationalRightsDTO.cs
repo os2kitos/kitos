@@ -1,14 +1,16 @@
-﻿namespace Presentation.Web.Models.Users
-{
-    public class UserWithCrossOrganizationalRightsDTO : UserWithEmailDTO
-    {
-        public bool ApiAccess { get; set; }
-        public bool StakeholderAccess { get; set; }
+﻿using System.Collections.Generic;
 
-        public UserWithCrossOrganizationalRightsDTO(int id, string fullName, string email, bool apiAccess, bool stakeholderAccess) : base(id, fullName, email)
+namespace Presentation.Web.Models.Users
+{
+    public class UserWithCrossOrganizationalRightsDTO : UserWithApiAccessDTO
+    {
+        public bool StakeholderAccess { get; set; }
+        public IEnumerable<string> OrganizationsWhereActive { get; set; }
+
+        public UserWithCrossOrganizationalRightsDTO(int id, string fullName, string email, bool apiAccess, bool stakeholderAccess, IEnumerable<string> organizationsWhereActive) : base(id, fullName, email, apiAccess)
         {
-            ApiAccess = apiAccess;
             StakeholderAccess = stakeholderAccess;
+            OrganizationsWhereActive = organizationsWhereActive;
         }
     }
 }
