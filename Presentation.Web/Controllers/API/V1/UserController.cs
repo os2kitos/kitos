@@ -237,7 +237,8 @@ namespace Presentation.Web.Controllers.API.V1
                 .GroupBy(x => (x.Id, x.Name))
                 .Distinct()
                 .Select(x => x.Key.Name)
-                .OrderBy(x => x);
+                .OrderBy(x => x)
+                .ToList();
         }
     }
 }
