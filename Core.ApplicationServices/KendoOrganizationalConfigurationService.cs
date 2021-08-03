@@ -25,7 +25,7 @@ namespace Core.ApplicationServices
                 : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string configuration)
+        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string visibleColumnsCsv)
         {
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
@@ -35,7 +35,8 @@ namespace Core.ApplicationServices
                 if (!_authorizationContext.AllowModify(modifiedConfig))
                     return new OperationError(OperationFailure.Forbidden);
 
-                modifiedConfig.Configuration = configuration;
+                modifiedConfig.VisibleColumnsCsv = visibleColumnsCsv;
+                modifiedConfig.UpdateVersion();
                 _kendoOrganizationRepository.Update(modifiedConfig);
                 return modifiedConfig;
             }
@@ -47,8 +48,9 @@ namespace Core.ApplicationServices
             {
                 OrganizationId = organizationId,
                 OverviewType = overviewType,
-                Configuration = configuration
+                VisibleColumnsCsv = visibleColumnsCsv,
             };
+            createdConfig.UpdateVersion();
             var created = _kendoOrganizationRepository.Add(createdConfig);
             return created;
         }

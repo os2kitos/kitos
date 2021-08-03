@@ -85,22 +85,22 @@
                     return;
                 }
 
-                KendoFilterService
-                    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
-                    .then((result) => {
-                        if (result.status === 200) {
-                            const orgStorageItem = result.data.response.configuration;
-                            if (orgStorageItem) {
-                                $window.sessionStorage.setItem(orgStorageKey, orgStorageItem);
-                            }
-                        }
-                    })
-                    .catch((result) => {
-                        if (result.status === 404) {
-                            // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
-                            $window.sessionStorage.removeItem(orgStorageKey);
-                        }
-                    });
+                //KendoFilterService
+                //    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
+                //    .then((result) => {
+                //        if (result.status === 200) {
+                //            const orgStorageItem = result.data.response.configuration;
+                //            if (orgStorageItem) {
+                //                $window.sessionStorage.setItem(orgStorageKey, orgStorageItem);
+                //            }
+                //        }
+                //    })
+                //    .catch((result) => {
+                //        if (result.status === 404) {
+                //            // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
+                //            $window.sessionStorage.removeItem(orgStorageKey);
+                //        }
+                //    });
             } 
 
             // saves grid state to localStorage
@@ -283,9 +283,9 @@
                     pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
                 }
 
-                var jsonString = JSONfn.stringify(pickedOptions);
+                var visibleColumns = options.columns.filter(column => !column.hidden).map(column => column.persistId);
 
-                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, jsonString)
+                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, visibleColumns.join(", "))
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt for organisationen");

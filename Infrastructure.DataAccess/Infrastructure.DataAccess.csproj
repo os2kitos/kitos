@@ -769,6 +769,10 @@
     <Compile Include="Migrations\202107060957327_Added_Uuid_To_ItContract.designer.cs">
       <DependentUpon>202107060957327_Added_Uuid_To_ItContract.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202108030858375_Changed_Kendo_Configuration.cs" />
+    <Compile Include="Migrations\202108030858375_Changed_Kendo_Configuration.designer.cs">
+      <DependentUpon>202108030858375_Changed_Kendo_Configuration.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1258,6 +1262,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202107060957327_Added_Uuid_To_ItContract.resx">
       <DependentUpon>202107060957327_Added_Uuid_To_ItContract.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108030858375_Changed_Kendo_Configuration.resx">
+      <DependentUpon>202108030858375_Changed_Kendo_Configuration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -11,123 +11,123 @@ namespace Tests.Integration.Presentation.Web.Kendo
 {
     public class KendoOverviewConfigurationTest : WithAutoFixture
     {
-        [Fact]
-        public async Task Can_Save_Configuration()
-        {
-            //Arrange
-            var overviewType = A<OverviewType>();
-            var config = A<string>();
+        //[Fact]
+        //public async Task Can_Save_Configuration()
+        //{
+        //    //Arrange
+        //    var overviewType = A<OverviewType>();
+        //    var config = A<string>();
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
-            Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
-            Assert.Equal(overviewType, kendoConfig.OverviewType);
-            Assert.Equal(config, kendoConfig.Configuration);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        //    var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
+        //    Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
+        //    Assert.Equal(overviewType, kendoConfig.OverviewType);
+        //    Assert.Equal(config, kendoConfig.Configuration);
+        //}
 
-        [Fact]
-        public async Task Can_Get_Configuration()
-        {
-            //Arrange
-            var overviewType = A<OverviewType>();
-            var config = A<string>();
+        //[Fact]
+        //public async Task Can_Get_Configuration()
+        //{
+        //    //Arrange
+        //    var overviewType = A<OverviewType>();
+        //    var config = A<string>();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
-            Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
+        //    var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+        //    Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
-            Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
-            Assert.Equal(overviewType, kendoConfig.OverviewType);
-            Assert.Equal(config, kendoConfig.Configuration);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        //    var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
+        //    Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
+        //    Assert.Equal(overviewType, kendoConfig.OverviewType);
+        //    Assert.Equal(config, kendoConfig.Configuration);
+        //}
 
-        [Fact]
-        public async Task Can_Delete_Configuration()
-        {
-            //Arrange
-            var overviewType = A<OverviewType>();
-            var config = A<string>();
+        //[Fact]
+        //public async Task Can_Delete_Configuration()
+        //{
+        //    //Arrange
+        //    var overviewType = A<OverviewType>();
+        //    var config = A<string>();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
-            Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
+        //    var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+        //    Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        //}
 
-        [Fact]
-        public async Task Can_Not_Get_Configuration_If_None_Exists()
-        {
-            //Arrange
-            var orgId = int.MaxValue;
-            var overviewType = A<OverviewType>();
+        //[Fact]
+        //public async Task Can_Not_Get_Configuration_If_None_Exists()
+        //{
+        //    //Arrange
+        //    var orgId = int.MaxValue;
+        //    var overviewType = A<OverviewType>();
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(orgId, overviewType);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendGetConfigurationRequestAsync(orgId, overviewType);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        //}
 
-        [Theory]
-        [InlineData(OrganizationRole.User)]
-        public async Task Can_Not_Save_Configuration_If_Not_Allowed(OrganizationRole orgRole)
-        {
-            //Arrange
-            var overviewType = A<OverviewType>();
-            var config = A<string>();
-            var cookie = await HttpApi.GetCookieAsync(orgRole);
+        //[Theory]
+        //[InlineData(OrganizationRole.User)]
+        //public async Task Can_Not_Save_Configuration_If_Not_Allowed(OrganizationRole orgRole)
+        //{
+        //    //Arrange
+        //    var overviewType = A<OverviewType>();
+        //    var config = A<string>();
+        //    var cookie = await HttpApi.GetCookieAsync(orgRole);
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config, cookie);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config, cookie);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        //}
 
-        [Fact]
-        public async Task Can_Not_Delete_Configuration_If_None_Exists()
-        {
-            //Arrange
-            var orgId = int.MaxValue;
-            var overviewType = A<OverviewType>();
+        //[Fact]
+        //public async Task Can_Not_Delete_Configuration_If_None_Exists()
+        //{
+        //    //Arrange
+        //    var orgId = int.MaxValue;
+        //    var overviewType = A<OverviewType>();
 
-            //Act
-            using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(orgId, overviewType);
+        //    //Act
+        //    using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(orgId, overviewType);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        //}
 
-        [Theory]
-        [InlineData(OrganizationRole.User)]
-        public async Task Can_Not_Delete_Configuration_If_Not_Allowed(OrganizationRole orgRole)
-        {
-            //Arrange
-            var overviewType = A<OverviewType>();
-            var config = A<string>();
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
-            Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
+        //[Theory]
+        //[InlineData(OrganizationRole.User)]
+        //public async Task Can_Not_Delete_Configuration_If_Not_Allowed(OrganizationRole orgRole)
+        //{
+        //    //Arrange
+        //    var overviewType = A<OverviewType>();
+        //    var config = A<string>();
+        //    var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+        //    Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
-            var cookie = await HttpApi.GetCookieAsync(orgRole);
+        //    var cookie = await HttpApi.GetCookieAsync(orgRole);
 
-            //Act
-            var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, cookie);
+        //    //Act
+        //    var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, cookie);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        }
+        //    //Assert
+        //    Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        //}
     }
 }

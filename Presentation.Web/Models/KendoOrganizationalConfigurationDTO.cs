@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Models
 {
@@ -6,6 +7,7 @@ namespace Presentation.Web.Models
     {
         public int OrganizationId { get; set; }
         public OverviewType OverviewType { get; set; }
-        public string Configuration { get; set; }
+        public string VisibleColumnsCsv { get; set; }
+        public int Version { get; set; }
     }
 }

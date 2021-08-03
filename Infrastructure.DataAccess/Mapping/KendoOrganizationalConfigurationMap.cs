@@ -11,7 +11,7 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.OverviewType)
                 .IsRequired();
 
-            Property(x => x.Configuration)
+            Property(x => x.Version)
                 .IsRequired();
 
             Property(x => x.OrganizationId)

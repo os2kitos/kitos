@@ -6,7 +6,8 @@
     export interface IKendoOrganizationalConfigurationDTO {
         orgId: number,
         overviewType: OverviewType,
-        configuration: string,
+        visibleColumnsCsv: string,
+        version: number
     }
 
 }

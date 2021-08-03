@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.API
                 return BadRequest("No input parameters provided");
 
             return _kendoOrganizationalConfigurationService
-                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, dto.Configuration)
+                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, dto.VisibleColumnsCsv)
                 .Match(value => Ok(Map(value)), FromOperationError);
         }
 
@@ -73,7 +73,8 @@ namespace Presentation.Web.Controllers.API
             {
                 OrganizationId = value.OrganizationId,
                 OverviewType = value.OverviewType,
-                Configuration = value.Configuration
+                VisibleColumnsCsv = value.VisibleColumnsCsv,
+                Version = value.Version
             };
         }
     }
