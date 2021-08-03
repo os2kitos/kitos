@@ -6,6 +6,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Extensions
 {

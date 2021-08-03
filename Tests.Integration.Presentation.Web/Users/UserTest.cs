@@ -80,6 +80,29 @@ namespace Tests.Integration.Presentation.Web.Users
             Assert.Empty(result.Where(x => x.Id == userId4));
         }
 
+        [Fact]
+        public async Task Can_Get_Users_Where_User_Has_StakeHolder_Or_ApiAccess_Returns_Distinct_Organisations_Only()
+        {
+            //Arrange
+            var email = CreateEmail();
+            var organization = await CreateOrganizationAsync();
+            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, true, true), OrganizationRole.User, organization.Id);
+            using var assignRoleResult = await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.LocalAdmin, organization.Id); // Add extra role in organisation to have 2 organisation roles. 
+            Assert.Equal(HttpStatusCode.Created, assignRoleResult.StatusCode);
+
+            //Act
+            var result = await UserHelper.GetUsersWithCrossAccessAsync();
+
+            //Assert
+            var userOrgDTO = Assert.Single(result.Where(x => x.Id == userId));
+            Assert.Equal(email, userOrgDTO.Email);
+            Assert.True(userOrgDTO.StakeholderAccess);
+            Assert.True(userOrgDTO.ApiAccess);
+            var orgWhereActive = Assert.Single(userOrgDTO.OrganizationsWhereActive);
+            Assert.Equal(organization.Name, orgWhereActive);
+
+        }
+
         [Theory]
         [InlineData(OrganizationRole.LocalAdmin)]
         [InlineData(OrganizationRole.User)]

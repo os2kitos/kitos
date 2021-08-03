@@ -57,7 +57,6 @@
             $scope.usersWithCrossAccess = usersWithCrossAccess;
 
             $scope.showOrgsWhereUserActive = (activeOrgNames: string[]) => {
-                console.log(activeOrgNames);
                 $uibModal.open({
                     templateUrl: "app/components/global-admin/global-admin-organizations-where-user-rights.modal.view.html",
                     windowClass: "modal fade in",
@@ -67,6 +66,9 @@
                     controller: ["$scope", "orgNames", ($scope, orgNames: string[]) => {
                         $scope.orgNames = orgNames;
                     }]
+                }).result.then(function onSuccess() {
+                }, function onError(error) {
+                    // Swallow unhandled rejection errors.
                 });
             }
 

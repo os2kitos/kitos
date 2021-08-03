@@ -1,11 +1,12 @@
 ﻿using Core.DomainModel.Organization;
-using Presentation.Web.Models.External.V2;
-using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.API.V2;
+using Presentation.Web.Models.API.V2.Response;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Presentation.Web.Models.External.V2.Response.Options;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External

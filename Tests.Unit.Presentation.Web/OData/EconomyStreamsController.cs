@@ -8,7 +8,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Moq;
-using Presentation.Web.Controllers.OData;
+using Presentation.Web.Controllers.API.V1.OData;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

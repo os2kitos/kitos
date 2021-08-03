@@ -89,6 +89,7 @@
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Organizations\OrgUnitService.cs" />
+    <Compile Include="Queries\Contract\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUuid.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />
     <Compile Include="Queries\ItSystem\QueryByNumberOfUsages.cs" />

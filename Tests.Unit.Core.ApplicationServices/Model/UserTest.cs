@@ -13,31 +13,6 @@ namespace Tests.Unit.Core.Model
         public void GetOrganizationNames_Returns_OrganizationNames()
         {
             //Arrange
-            var organization = CreateOrganization();
-            var user = new User()
-            {
-                Id = A<int>()
-            };
-            var organizationRights = new List<OrganizationRight>()
-            { 
-                CreateOrgRight(organization, user)
-            };
-
-            user.OrganizationRights = organizationRights;
-
-            //Act
-            var orgNamesResult = user.GetOrganizationNames();
-
-            //Assert
-            var orgNameResult = Assert.Single(orgNamesResult);
-
-            Assert.Equal(organization.Name, orgNameResult);
-        }
-
-        [Fact]
-        public void GetOrganizationNames_Returns_Only_Distinct_OrganizationNames()
-        {
-            //Arrange
             Organization organization1 = CreateOrganization();
             var organization2 = CreateOrganization();
             var user = new User()
@@ -54,13 +29,14 @@ namespace Tests.Unit.Core.Model
             user.OrganizationRights = organizationRights;
 
             //Act
-            var orgNamesResult = user.GetOrganizationNames();
+            var orgNamesResult = user.GetOrganizations();
 
             //Assert
-            Assert.Equal(2, orgNamesResult.Count());
+            Assert.Equal(3, orgNamesResult.Count());
 
-            Assert.Equal(organization1.Name, orgNamesResult.First(x => x.Equals(organization1.Name)));
-            Assert.Equal(organization2.Name, orgNamesResult.First(x => x.Equals(organization2.Name)));
+            Assert.Equal(2, orgNamesResult.Where(x => x.Name.Equals(organization1.Name)).Count());
+            Assert.Same(organization1, orgNamesResult.First(x => x.Name.Equals(organization1.Name)));
+            Assert.Same(organization2, orgNamesResult.First(x => x.Name.Equals(organization2.Name)));
         }
 
         private Organization CreateOrganization()

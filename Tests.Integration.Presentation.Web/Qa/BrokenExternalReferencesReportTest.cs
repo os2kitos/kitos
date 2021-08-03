@@ -11,7 +11,7 @@ using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Infrastructure.Services.Types;
-using Presentation.Web.Models.Qa;
+using Presentation.Web.Models.API.V1.Qa;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
