@@ -13,6 +13,10 @@ namespace Presentation.Web.Models.External.V2.Request.SystemUsage
         /// </summary>
         public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
         /// <summary>
+        /// Contains organizational references for the system usage
+        /// </summary>
+        public OrganizationUsageWriteRequestDTO OrganizationUsage { get; set; }
+        /// <summary>
         /// Added/removed KLE when compared to inherited KLE from the IT-System
         /// </summary>
         public LocalKLEDeviationsRequestDTO LocalKleDeviations { get; set; }

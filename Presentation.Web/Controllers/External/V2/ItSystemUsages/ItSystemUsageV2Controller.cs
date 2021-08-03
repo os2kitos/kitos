@@ -249,6 +249,26 @@ namespace Presentation.Web.Controllers.External.V2.ItSystemUsages
         }
 
         /// <summary>
+        /// Updates the organizational references for the system usage
+        /// </summary>
+        /// <param name="systemUsageUuid"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{systemUsageUuid}/organization-usage")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutSystemUsageOrganizationUsage([NonEmptyGuid] Guid systemUsageUuid, [FromBody] OrganizationUsageWriteRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            throw new System.NotImplementedException();
+        }
+
+        /// <summary>
         /// Creates a system relation
         /// </summary>
         /// <param name="systemUsageUuid"></param>

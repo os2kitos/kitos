@@ -4,7 +4,6 @@ using System.ComponentModel.DataAnnotations;
 using Presentation.Web.Models.External.V2.Response.Organization;
 using Presentation.Web.Models.External.V2.SharedProperties;
 using Presentation.Web.Models.External.V2.Types.Shared;
-using Presentation.Web.Models.External.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Models.External.V2.Response.SystemUsage
 {
@@ -49,6 +48,10 @@ namespace Presentation.Web.Models.External.V2.Response.SystemUsage
         /// A collection of IT-System usage role option assignments
         /// </summary>
         public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
+        /// <summary>
+        /// Defines the use of the system within the organization
+        /// </summary>
+        public OrganizationUsageResponseDTO OrganizationUsage { get; set; }
         /// <summary>
         /// Defines IT-System KLE deviations locally within an organization. All deviations are in the context of the inherited deviations which are found on the IT-System context
         /// </summary>
