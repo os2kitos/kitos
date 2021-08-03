@@ -33,6 +33,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         /// </summary>
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">Associated system UUID filter</param>
+        /// <param name="systemUsageUuid">Associated system usage UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
         /// <returns></returns>
         [HttpGet]
@@ -44,6 +45,7 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
         public IHttpActionResult GetItContracts(
             [NonEmptyGuid] Guid organizationUuid,
             [NonEmptyGuid] Guid? systemUuid = null,
+            [NonEmptyGuid] Guid? systemUsageUuid = null,
             string nameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
@@ -54,6 +56,9 @@ namespace Presentation.Web.Controllers.External.V2.ItContracts
 
             if (systemUuid.HasValue)
                 refinements.Add(new QueryBySystemUuid(systemUuid.Value));
+
+            if (systemUsageUuid.HasValue)
+                refinements.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
 
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItContract>(nameContent));

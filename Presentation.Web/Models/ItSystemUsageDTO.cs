@@ -12,6 +12,7 @@ namespace Presentation.Web.Models
     {
         public ItSystemUsageDTO(){
         }
+        public Guid Uuid { get; set; }
         public int Id { get; set; }
         public DateTime LastChanged { get; set; }
         public bool IsStatusActive { get; set; }
