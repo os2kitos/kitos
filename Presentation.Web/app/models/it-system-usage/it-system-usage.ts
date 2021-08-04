@@ -12,8 +12,6 @@
         EsdhRef: string;
         /** Gets or sets a reference to relevant documents in an extern CMDB system. */
         CmdbRef: string;
-        /** Gets or sets a path or url to relevant documents. */
-        DirectoryOrUrlRef: string;
         /** Gets or sets the local call system. */
         LocalCallName: string;
         /** Organization Unit responsible for this system usage. */

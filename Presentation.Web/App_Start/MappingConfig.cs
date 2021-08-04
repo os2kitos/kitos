@@ -284,7 +284,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.ItSystemUsageVersion, opt => opt.MapFrom(src => src.Object.Version))
                .ForMember(dto => dto.ItSystemUsageEsdhRef, opt => opt.MapFrom(src => src.Object.EsdhRef))
                .ForMember(dto => dto.ItSystemUsageCmdbRef, opt => opt.MapFrom(src => src.Object.CmdbRef))
-               .ForMember(dto => dto.ItSystemUsageDirectoryOrUrlRef, opt => opt.MapFrom(src => src.Object.DirectoryOrUrlRef))
                .ForMember(dto => dto.ItSystemUsageLocalCallName, opt => opt.MapFrom(src => src.Object.LocalCallName))
                .ForMember(dto => dto.ItSystemUsageOrganizationId, opt => opt.MapFrom(src => src.Object.OrganizationId))
                .ForMember(dto => dto.ItSystemUsageItSystemId, opt => opt.MapFrom(src => src.Object.ItSystemId))

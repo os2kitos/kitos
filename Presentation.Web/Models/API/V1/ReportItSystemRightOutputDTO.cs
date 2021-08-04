@@ -48,7 +48,6 @@ namespace Presentation.Web.Models.API.V1
         public string ItSystemUsageVersion { get; set; }
         public string ItSystemUsageEsdhRef { get; set; }
         public string ItSystemUsageCmdbRef { get; set; }
-        public string ItSystemUsageDirectoryOrUrlRef { get; set; }
         public string ItSystemUsageLocalCallName { get; set; }
         public int ItSystemUsageOrganizationId { get; set; }
         public int ItSystemUsageItSystemId { get; set; }

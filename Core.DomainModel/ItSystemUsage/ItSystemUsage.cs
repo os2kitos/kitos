@@ -164,13 +164,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public string CmdbRef { get; set; }
         /// <summary>
-        /// Gets or sets a path or url to relevant documents.
-        /// </summary>
-        /// <value>
-        /// Path or url relevant documents.
-        /// </value>
-        public string DirectoryOrUrlRef { get; set; }
-        /// <summary>
         /// Gets or sets the local call system.
         /// </summary>
         /// <value>

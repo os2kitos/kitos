@@ -95,6 +95,7 @@ using Core.ApplicationServices.OptionTypes;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.ApplicationServices.Rights;
 using Core.DomainServices.Organizations;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -229,10 +230,16 @@ namespace Presentation.Web.Ninject
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
+            RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
+        }
+
+        private void RegisterMappers(IKernel kernel)
+        {
+            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -344,7 +351,7 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>(kernel);
 
             RegisterOptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>(kernel);
-            
+
             RegisterOptionsService<ItSystemUsage, ItSystemCategories, LocalItSystemCategories>(kernel);
 
             RegisterOptionsService<ItSystemUsage, ArchiveType, LocalArchiveType>(kernel);

@@ -16,7 +16,6 @@ namespace Presentation.Web.Models.API.V1
         public string Version { get; set; }
         public string EsdhRef { get; set; }
         public string CmdbRef { get; set; }
-        public string DirectoryOrUrlRef { get; set; }
         public string LocalCallName { get; set; }
         public int? SensitiveDataTypeId { get; set; }
         public string SensitiveDataTypeName { get; set; }

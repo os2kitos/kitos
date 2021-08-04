@@ -36,11 +36,14 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
-            var itSystems = _systemUsageRepository.GetSystemUsagesFromOrganization(organizationId);
-            var attachedOptions = _attachedOptionRepository.GetAttachedOptions();
+            var systemUsages = _systemUsageRepository.GetSystemUsagesFromOrganization(organizationId);
             var sensitivePersonalDataTypes = _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes();
 
-            var gdpExportReports = itSystems.AsEnumerable().Select(x => Map(x, attachedOptions, sensitivePersonalDataTypes));
+            var gdpExportReports = systemUsages
+                .AsEnumerable()
+                .Select(systemUsage => Map(systemUsage, _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id), sensitivePersonalDataTypes))
+                .ToList();
+
             return Result<IEnumerable<GDPRExportReport>, OperationError>.Success(gdpExportReports);
         }
 
@@ -48,7 +51,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             IEnumerable<AttachedOption> attachedOptions,
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
-            return new GDPRExportReport
+            return new()
             {
                 SystemUuid = input.ItSystem.Uuid.ToString("D"),
                 BusinessCritical = input.isBusinessCritical,
@@ -63,9 +66,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 SystemName = $"{input.ItSystem.Name}{(input.ItSystem.Disabled ? " (Ikke aktivt)" : "")}",
-                SensitiveDataTypes = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA)
-                        ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes)
-                        : new List<string>()
+                SensitiveDataTypes = GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes)
             };
         }
 
@@ -75,14 +76,12 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
             return attachedOptions
-                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE &&
-                            x.ObjectId == usageId &&
-                            x.OptionType == OptionType.SENSITIVEPERSONALDATA)
-                .Select(x => x.OptionId)
+                .Where(attachedOption => attachedOption.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                .Select(attachedOption => attachedOption.OptionId)
                 .Join(sensitivePersonalDataTypes,
                     optionId => optionId,
                     sensitivePersonalDataType => sensitivePersonalDataType.Id,
-                    (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name);
+                    (_, sensitivePersonalDataType) => sensitivePersonalDataType.Name).ToList();
         }
     }
 }

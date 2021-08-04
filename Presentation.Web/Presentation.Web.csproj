@@ -361,7 +361,8 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ItSystemUsageResponseMapping.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\IItSystemUsageResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ItSystemUsageResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />

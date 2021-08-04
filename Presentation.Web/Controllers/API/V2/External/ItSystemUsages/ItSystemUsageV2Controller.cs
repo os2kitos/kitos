@@ -4,14 +4,10 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
-using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -19,7 +15,6 @@ using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
@@ -32,10 +27,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
     public class ItSystemUsageV2Controller : ExternalBaseController
     {
         private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IItSystemUsageResponseMapper _responseMapper;
 
-        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService)
+        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper)
         {
             _itSystemUsageService = itSystemUsageService;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -84,7 +81,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 .Query(conditions.ToArray())
                 .Select(usages => usages.OrderBy(itSystemUsage => itSystemUsage.Id))
                 .Select(usages => usages.Page(paginationQuery).AsEnumerable())
-                .Select(usages => usages.Select(ItSystemUsageResponseMapping.MapSystemUsageDTO).ToList())
+                .Select(usages => usages.Select(_responseMapper.MapSystemUsageDTO).ToList())
                 .Match(Ok, FromOperationError);
         }
 
@@ -107,7 +104,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _itSystemUsageService
                 .GetByUuid(systemUsageUuid)
-                .Select(ItSystemUsageResponseMapping.MapSystemUsageDTO)
+                .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
         }
 

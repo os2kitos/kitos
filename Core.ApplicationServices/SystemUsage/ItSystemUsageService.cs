@@ -18,6 +18,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -39,6 +40,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IAttachedOptionRepository _attachedOptionRepository;
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
 
@@ -55,7 +57,8 @@ namespace Core.ApplicationServices.SystemUsage
             IDomainEvents domainEvents,
             ILogger logger,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IAttachedOptionRepository attachedOptionRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -70,6 +73,7 @@ namespace Core.ApplicationServices.SystemUsage
             _logger = logger;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _userContext = userContext;
+            _attachedOptionRepository = attachedOptionRepository;
         }
 
         public Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -157,6 +161,9 @@ namespace Core.ApplicationServices.SystemUsage
                     transaction.Rollback();
                     return deleteBySystemUsageId.Error;
                 }
+
+                _attachedOptionRepository.DeleteBySystemUsageId(id);
+
                 _domainEvents.Raise(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
                 _usageRepository.DeleteByKeyWithReferencePreload(id);
                 _usageRepository.Save();
