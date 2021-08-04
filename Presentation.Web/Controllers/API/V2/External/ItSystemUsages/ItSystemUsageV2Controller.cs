@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
@@ -420,8 +422,52 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                         ValidTo = systemUsage.ExpirationDate
                     }
                 },
-                //TODO: All the rest
+                Roles = systemUsage.Rights.Select(ToRoleResponseDTO).ToList(),
+                LocalKLEDeviations = new LocalKLEDeviationsResponseDTO
+                {
+                    AddedKLE = systemUsage.TaskRefs.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList(),
+                    RemovedKLE = systemUsage.TaskRefsOptOut.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList()
+                },
+                OrganizationUsage = new OrganizationUsageResponseDTO
+                {
+                    ResponsibleOrganizationUnit = systemUsage.ResponsibleUsage?.OrganizationUnit?.MapIdentityNamePairDTO(),
+                    UsingOrganizationUnits = systemUsage.UsedBy.Select(x => x.OrganizationUnit.MapIdentityNamePairDTO()).ToList()
+                },
+                ExternalReferences = systemUsage.ExternalReferences.Select(reference => MapExternalReferenceDTO(systemUsage, reference)).ToList(),
+                OutgoingSystemRelations = systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList(),
+                Archiving = new ArchivingRegistrationsResponseDTO(), //TODO
+                GDPR = new GDPRRegistrationsResponseDTO()//TODO
             };
+        }
+
+        private static SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation arg)
+        {
+            return new()
+            {
+                Uuid = arg.Uuid,
+                Description = arg.Description,
+                UrlReference = arg.Reference,
+                AssociatedContract = arg.AssociatedContract?.MapIdentityNamePairDTO(),
+                RelationFrequency = arg.UsageFrequency?.MapIdentityNamePairDTO(),
+                UsingInterface = arg.RelationInterface?.MapIdentityNamePairDTO(),
+                ToSystemUsage = arg.ToSystemUsage?.MapIdentityNamePairDTO()
+            };
+        }
+
+        private static ExternalReferenceDataDTO MapExternalReferenceDTO(ItSystemUsage systemUsage, ExternalReference reference)
+        {
+            return new ExternalReferenceDataDTO
+            {
+                DocumentId = reference.ExternalReferenceId,
+                Title = reference.Title,
+                Url = reference.URL,
+                MasterReference = systemUsage.Reference?.Id.Equals(reference.Id) == true
+            };
+        }
+
+        private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)
+        {
+            return new() { Role = right.Role.MapIdentityNamePairDTO(), User = right.User.MapIdentityNamePairDTO() };
         }
 
         private static ExpectedUsersIntervalDTO MapExpectedUsers(ItSystemUsage systemUsage)

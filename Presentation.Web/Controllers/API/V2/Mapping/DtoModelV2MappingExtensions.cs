@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.DomainModel;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -17,6 +18,11 @@ namespace Presentation.Web.Controllers.API.V2.Mapping
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
         {
             return new(source.Uuid, $"{source.TaskKey} - {source.Description}");
+        }
+
+        public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this ItSystemUsage source)
+        {
+            return new(source.Uuid, source.ItSystem.Name);
         }
 
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this User source)

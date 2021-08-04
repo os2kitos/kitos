@@ -32,13 +32,13 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ItSystemUsage()
         {
-            this.Contracts = new List<ItContractItSystemUsage>();
-            this.ArchivePeriods = new List<ArchivePeriod>();
-            this.TaskRefs = new List<TaskRef>();
-            this.AccessTypes = new List<AccessType>();
-            this.TaskRefsOptOut = new List<TaskRef>();
-            this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
-            this.ItProjects = new List<ItProject.ItProject>();
+            Contracts = new List<ItContractItSystemUsage>();
+            ArchivePeriods = new List<ArchivePeriod>();
+            TaskRefs = new List<TaskRef>();
+            AccessTypes = new List<AccessType>();
+            TaskRefsOptOut = new List<TaskRef>();
+            UsedBy = new List<ItSystemUsageOrgUnitUsage>();
+            ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
