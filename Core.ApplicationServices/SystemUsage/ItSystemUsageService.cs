@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -15,6 +16,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Options;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
@@ -36,6 +38,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IGenericRepository<SystemRelation> _relationRepository;
         private readonly IGenericRepository<ItInterface> _interfaceRepository;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
+        private readonly IOrganizationalUserContext _userContext;
         private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
 
@@ -51,7 +54,8 @@ namespace Core.ApplicationServices.SystemUsage
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             ILogger logger,
-            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository)
+            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
+            IOrganizationalUserContext userContext)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -65,6 +69,22 @@ namespace Core.ApplicationServices.SystemUsage
             _referenceService = referenceService;
             _logger = logger;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
+            _userContext = userContext;
+        }
+
+        public Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions)
+        {
+            var baseQuery = _usageRepository.AsQueryable();
+            var subQueries = new List<IDomainQuery<ItSystemUsage>>();
+
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+                subQueries.Add(new QueryByOrganizationIds<ItSystemUsage>(_userContext.OrganizationIds));
+
+            subQueries.AddRange(conditions);
+
+            var filteredQuery = new IntersectionQuery<ItSystemUsage>(subQueries).Apply(baseQuery);
+
+            return Result<IQueryable<ItSystemUsage>, OperationError>.Success(filteredQuery);
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage)
@@ -158,6 +178,19 @@ namespace Core.ApplicationServices.SystemUsage
             return _usageRepository.GetByKey(usageId);
         }
 
+        public Result<ItSystemUsage, OperationError> GetByUuid(Guid uuid)
+        {
+            return _usageRepository
+                .AsQueryable()
+                .ByUuid(uuid)
+                .FromNullable()
+                .Match<Result<ItSystemUsage, OperationError>>
+                (
+                    systemUsage => _authorizationContext.AllowReads(systemUsage) ? systemUsage : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
         public Result<SystemRelation, OperationError> AddRelation(
             int fromSystemUsageId,
             int toSystemUsageId,
@@ -221,7 +254,7 @@ namespace Core.ApplicationServices.SystemUsage
 
             var originalToSystemUsage = _relationRepository.GetByKey(relationId)?.ToSystemUsage;
 
-            if(originalToSystemUsage == null)
+            if (originalToSystemUsage == null)
             {
                 return Result<SystemRelation, OperationError>.Failure(OperationFailure.NotFound);
             }
@@ -249,9 +282,9 @@ namespace Core.ApplicationServices.SystemUsage
                                 (
                                     onSuccess: modifiedRelation =>
                                     {
-                                        if(originalToSystemUsage.Id != toSystemUsageId)
+                                        if (originalToSystemUsage.Id != toSystemUsageId)
                                         {
-                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage)); 
+                                            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(originalToSystemUsage));
                                         }
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(fromSystemUsage));
                                         _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(toSystemUsage));

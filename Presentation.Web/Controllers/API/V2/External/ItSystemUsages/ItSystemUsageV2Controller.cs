@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Queries;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.SystemUsage;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -22,6 +24,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
     [RoutePrefix("api/v2/it-system-usages")]
     public class ItSystemUsageV2Controller : ExternalBaseController
     {
+        private readonly IItSystemUsageService _itSystemUsageService;
+
+        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService)
+        {
+            _itSystemUsageService = itSystemUsageService;
+        }
+
         /// <summary>
         /// Returns all IT-System usages available to the current user in the specified organization context
         /// </summary>
@@ -47,7 +56,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            var conditions = new List<IDomainQuery<ItSystemUsage>>();
+
+            if (organizationUuid.HasValue)
+                conditions.Add(new QueryByOrganizationUuid<ItSystemUsage>(organizationUuid.Value));
+
+            //TODO: Conditions
+
+            return _itSystemUsageService
+                .Query(conditions.ToArray())
+                .Select(usages => usages.OrderBy(itSystemUsage => itSystemUsage.Id))
+                .Select(usages => usages.Page(paginationQuery))
+                .Select(usages => usages.ToList())
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -67,7 +88,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _itSystemUsageService
+                .GetByUuid(systemUsageUuid)
+                .Select(ToSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -100,10 +124,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [Route("")]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict,description:"Another system usage has already been created for the system within the specified organization")]
+        [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostItSystemUsage([FromBody]CreateItSystemUsageRequestDTO request)
+        public IHttpActionResult PostItSystemUsage([FromBody] CreateItSystemUsageRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -352,6 +376,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             throw new System.NotImplementedException();
+        }
+
+        private static ItSystemUsageResponseDTO ToSystemUsageDTO(ItSystemUsage arg)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// UUID of the IT-System usage registration instance
         /// </summary>
         public Guid Uuid { get; set; }
-        
+
         /// <summary>
         /// User who created the system usage
         /// </summary>
