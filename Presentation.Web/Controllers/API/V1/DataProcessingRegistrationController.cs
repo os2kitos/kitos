@@ -13,6 +13,7 @@ using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model.Options;
 using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;

@@ -18,6 +18,7 @@ using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Ninject.Infrastructure.Language;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;

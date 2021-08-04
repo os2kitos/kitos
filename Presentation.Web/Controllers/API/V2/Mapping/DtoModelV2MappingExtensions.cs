@@ -1,13 +1,11 @@
 ﻿using System;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
-namespace Presentation.Web.Extensions
+namespace Presentation.Web.Controllers.API.V2.Mapping
 {
     public static class DtoModelV2MappingExtensions
     {

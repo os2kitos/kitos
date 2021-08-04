@@ -6,6 +6,8 @@ using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.SystemUsage;
+using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -36,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// </summary>
         /// <param name="organizationUuid">Query usages within a specific organization</param>
         /// <param name="relatedToSystemUuid">Query by systems related to another system</param>
-        /// <param name="relatedToSystemUsageUuid">Query by system usages related to a specific system usage</param>
+        /// <param name="relatedToSystemUsageUuid">Query by system usages related to a specific system usage (more narrow search than using system id)</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
@@ -61,7 +63,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (organizationUuid.HasValue)
                 conditions.Add(new QueryByOrganizationUuid<ItSystemUsage>(organizationUuid.Value));
 
-            //TODO: Conditions
+            if (relatedToSystemUuid.HasValue)
+                conditions.Add(new QueryByRelationToSystem(relatedToSystemUuid.Value));
+
+            if (relatedToSystemUsageUuid.HasValue)
+                conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
+
+            if (systemUuid.HasValue)
+                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
+
+            if (!string.IsNullOrWhiteSpace(systemNameContent))
+                conditions.Add(new QueryBySystemNameContent(systemNameContent));
 
             return _itSystemUsageService
                 .Query(conditions.ToArray())
@@ -380,7 +392,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
         private static ItSystemUsageResponseDTO ToSystemUsageDTO(ItSystemUsage arg)
         {
-            throw new NotImplementedException();
+            return new()
+            {
+                Uuid = arg.Uuid,
+                SystemContext = arg.ItSystem.MapIdentityNamePairDTO(),
+                OrganizationContext = arg.Organization.MapShallowOrganizationResponseDTO()
+            //TODO - the rest for the best
+            };
         }
     }
 }

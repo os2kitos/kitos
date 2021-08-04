@@ -66,8 +66,10 @@ namespace Tests.Unit.Core.ApplicationServices
                 _transactionManager.Object,
                 _domainEvents.Object,
                 Mock.Of<ILogger>(),
-                _sensitiveDataLevelRepository.Object);
+                _sensitiveDataLevelRepository.Object,
+                new Mock<IOrganizationalUserContext>().Object);
         }
+        //TODO: Extend with the two new methods
 
         [Fact]
         public void Add_Returns_Conflict_If_System_Already_In_Use()

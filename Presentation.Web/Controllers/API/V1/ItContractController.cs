@@ -13,6 +13,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Presentation.Web.Extensions;
 using Core.DomainServices.Authorization;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;

@@ -46,6 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _mockSensitiveDataLevelRepository;
+        private readonly Mock<IOrganizationalUserContext> _organizationUserContextMock;
 
         public ItSystemUsageServiceRelationTest()
         {
@@ -61,6 +62,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _mockOptionsService.Setup(x => x.GetAvailableOption(It.IsAny<int>(), It.IsAny<int>())).Returns(Maybe<RelationFrequencyType>.None);
             _referenceService = new Mock<IReferenceService>();
+            _organizationUserContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItSystemUsageService(
                 _mockSystemUsageRepository.Object,
                 _mockAuthorizationContext.Object,
@@ -69,11 +71,12 @@ namespace Tests.Unit.Core.ApplicationServices
                 _mockOptionsService.Object,
                 _mockSystemRelationRepository.Object,
                 _interfaceRepository.Object,
-                _referenceService.Object, 
+                _referenceService.Object,
                 _mockTransactionManager.Object,
                 Mock.Of<IDomainEvents>(),
                 _mockLogger.Object,
-                _mockSensitiveDataLevelRepository.Object);
+                _mockSensitiveDataLevelRepository.Object,
+                _organizationUserContextMock.Object);
         }
 
         [Theory]
@@ -124,7 +127,7 @@ namespace Tests.Unit.Core.ApplicationServices
             // Arrange
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
             SetupSystemUsageRepository(systemUsages);
-            _interfaceRepository.Setup(x => x.GetByKey(Interface2Id)).Returns(new ItInterface(){Id = Interface2Id});
+            _interfaceRepository.Setup(x => x.GetByKey(Interface2Id)).Returns(new ItInterface() { Id = Interface2Id });
 
             // Act
             var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "", Interface2Id, null, null);
@@ -155,7 +158,7 @@ namespace Tests.Unit.Core.ApplicationServices
         {
             var systemUsages = SetupSystemRelationWithIngredients(out var mockFromSystemUsage);
             SetupSystemUsageRepository(systemUsages);
-            _mockOptionsService.Setup(x => x.GetAvailableOption(It.IsAny<int>(), FrequencyType2Id)).Returns(new RelationFrequencyType(){Id = FrequencyType2Id});
+            _mockOptionsService.Setup(x => x.GetAvailableOption(It.IsAny<int>(), FrequencyType2Id)).Returns(new RelationFrequencyType() { Id = FrequencyType2Id });
 
             // Act
             var result = _sut.ModifyRelation(FromSystemUsageId, FromSystemRelationId, ToSystemUsageId, "", "",
@@ -245,7 +248,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _mockContractRepository.Setup(r => r.GetById(It.IsAny<int>()))
                 .Returns((int key) => contracts[key]);
         }
-        
+
         private static SystemRelation GetModifiedSystemRelation(IMock<ItSystemUsage> mockFromSystemUsage)
         {
             var modifiedSystemRelation = mockFromSystemUsage.Object.UsageRelations.First(r => r.Id == FromSystemRelationId);
