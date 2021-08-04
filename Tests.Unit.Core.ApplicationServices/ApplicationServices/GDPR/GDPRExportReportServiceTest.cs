@@ -299,13 +299,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
         private ItSystemUsage CreateSystemUsage(ItSystem system, ItContract contract, int orgId)
         {
-            return new ItSystemUsage()
+            return new()
             {
                 Id = Math.Abs(A<int>()),
                 ItSystem = system,
                 Contracts = contract != null ? new List<ItContractItSystemUsage>()
                 {
-                    new ItContractItSystemUsage()
+                    new()
                     {
                         ItContract = contract
                     },
@@ -319,7 +319,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 preriskAssessment = A<RiskLevel>(),
                 SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>()
                 {
-                    new ItSystemUsageSensitiveDataLevel()
+                    new()
                     {
                         SensitivityDataLevel = A<SensitiveDataLevel>()
                     }

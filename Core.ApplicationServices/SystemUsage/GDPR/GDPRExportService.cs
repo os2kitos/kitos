@@ -51,6 +51,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
             IEnumerable<AttachedOption> attachedOptions,
             IEnumerable<SensitivePersonalDataType> sensitivePersonalDataTypes)
         {
+            var hasSensitiveData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA);
             return new()
             {
                 SystemUuid = input.ItSystem.Uuid.ToString("D"),
@@ -60,13 +61,13 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
                 HostedAt = input.HostedAt,
                 NoData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.NONE),
                 PersonalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.PERSONALDATA),
-                SensitiveData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.SENSITIVEDATA),
+                SensitiveData = hasSensitiveData,
                 LegalData = input.SensitiveDataLevels.Any(x => x.SensitivityDataLevel == SensitiveDataLevel.LEGALDATA),
                 LinkToDirectory = !string.IsNullOrEmpty(input.LinkToDirectoryUrl),
                 PreRiskAssessment = input.preriskAssessment,
                 RiskAssessment = input.riskAssessment,
                 SystemName = $"{input.ItSystem.Name}{(input.ItSystem.Disabled ? " (Ikke aktivt)" : "")}",
-                SensitiveDataTypes = GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes)
+                SensitiveDataTypes = hasSensitiveData ? GetSensitiveDataTypes(input.Id, attachedOptions, sensitivePersonalDataTypes) : new List<string>()
             };
         }
 
