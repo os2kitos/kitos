@@ -78,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
-            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, CreateName(), organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType,CreateName(), organizationId);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {
@@ -574,7 +574,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(input.BusinessTypeUuid, createdSystem.BusinessType?.Uuid);
 
             if (withKleNumbers)
-                Assert.Equal(input.KLENumbers, createdSystem.KLE.Select(x => x.Name.Split(new[] { " - " }, StringSplitOptions.RemoveEmptyEntries)[0]));
+                Assert.Equal(input.KLENumbers, createdSystem.KLE.Select(x => x.Name));
             if (withKleUuid)
                 Assert.Equal(input.KLEUuids, createdSystem.KLE.Select(x => x.Uuid));
             if (!withKleUuid && !withKleNumbers)
@@ -893,7 +893,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
 
-            var reason = new DeactivationReasonRequestDTO() { DeactivationReason = string.Empty };
+            var reason = new DeactivationReasonRequestDTO() {DeactivationReason = string.Empty};
 
             //Act
             using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, createdSystem.Uuid, reason);
@@ -943,7 +943,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
             var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
-            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository => repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository=>repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
 
             var reason = A<DeactivationReasonRequestDTO>();
 
@@ -969,8 +969,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
         {
-            var expectedKleNames = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => $"{x.TaskKey} - {x.Description}");
-            var dtoKleNames = systemDTO.KLE.ToDictionary(x => x.Uuid, x => x.Name);
+            var dbTaskKeys = dbSystem.TaskRefs.ToDictionary(x => x.Uuid, x => x.TaskKey);
+            var dtoTaskKeys = systemDTO.KLE.ToDictionary(x => x.Uuid, x => x.Name);
 
             var dbInterfaces = dbSystem.ItInterfaceExhibits.Select(x => x.ItInterface).ToDictionary(x => x.Uuid, x => x.Name);
             var dtoInterfaces = systemDTO.ExposedInterfaces.ToDictionary(x => x.Uuid, x => x.Name);
@@ -992,7 +992,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(dbSystem.BelongsTo.GetActiveCvr(), systemDTO.RightsHolder.Cvr);
             Assert.Equal(dbSystem.BusinessType.Uuid, systemDTO.BusinessType.Uuid);
             Assert.Equal(dbSystem.BusinessType.Name, systemDTO.BusinessType.Name);
-            Assert.Equal(expectedKleNames, dtoKleNames);
+            Assert.Equal(dbTaskKeys, dtoTaskKeys);
             Assert.Equal(dbInterfaces, dtoInterfaces);
             Assert.Equal(dbSystem.Reference.URL, systemDTO.UrlReference);
         }

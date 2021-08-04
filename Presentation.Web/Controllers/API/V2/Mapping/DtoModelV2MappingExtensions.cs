@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.Mapping
 
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
         {
-            return new(source.Uuid, $"{source.TaskKey} - {source.Description}");
+            return new(source.Uuid, source.TaskKey);
         }
 
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this ItSystemUsage source)
