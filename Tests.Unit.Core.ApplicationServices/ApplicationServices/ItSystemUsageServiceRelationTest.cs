@@ -11,6 +11,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -76,7 +77,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 Mock.Of<IDomainEvents>(),
                 _mockLogger.Object,
                 _mockSensitiveDataLevelRepository.Object,
-                _organizationUserContextMock.Object);
+                _organizationUserContextMock.Object,
+                new Mock<IAttachedOptionRepository>().Object);
         }
 
         [Theory]

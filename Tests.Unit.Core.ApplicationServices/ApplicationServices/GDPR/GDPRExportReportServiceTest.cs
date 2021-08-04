@@ -99,8 +99,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             _usageRepository.Setup(x => x.GetSystemUsagesFromOrganization(orgId))
                 .Returns(itSystemUsages);
-            _attachedOptionRepository.Setup(x => x.GetAttachedOptions())
+            _attachedOptionRepository.Setup(x => x.GetBySystemUsageId(usage.Id))
                 .Returns(attachedOptions);
+            _attachedOptionRepository.Setup(x => x.GetBySystemUsageId(usage2.Id))
+                .Returns(new List<AttachedOption>());
             _sensitivePersonalDataTypeRepository.Setup(x => x.GetSensitivePersonalDataTypes())
                 .Returns(sensitivePersonalDataTypes);
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId))
@@ -155,8 +157,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             _usageRepository.Setup(x => x.GetSystemUsagesFromOrganization(orgId))
                 .Returns(itSystemUsages);
-            _attachedOptionRepository.Setup(x => x.GetAttachedOptions())
+            _attachedOptionRepository.Setup(x => x.GetBySystemUsageId(usage.Id))
                 .Returns(attachedOptions);
+            _attachedOptionRepository.Setup(x => x.GetBySystemUsageId(usage2.Id))
+                .Returns(new List<AttachedOption>());
             _sensitivePersonalDataTypeRepository.Setup(x => x.GetSensitivePersonalDataTypes())
                 .Returns(sensitivePersonalDataTypes);
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(orgId))

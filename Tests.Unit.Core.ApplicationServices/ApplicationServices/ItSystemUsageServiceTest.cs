@@ -15,6 +15,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Contract;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -67,7 +68,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEvents.Object,
                 Mock.Of<ILogger>(),
                 _sensitiveDataLevelRepository.Object,
-                new Mock<IOrganizationalUserContext>().Object);
+                new Mock<IOrganizationalUserContext>().Object,
+                new Mock<IAttachedOptionRepository>().Object);
         }
         //TODO: Extend with the two new methods
 
