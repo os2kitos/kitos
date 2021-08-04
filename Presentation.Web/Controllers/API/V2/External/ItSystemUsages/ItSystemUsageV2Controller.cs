@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
@@ -15,6 +16,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
@@ -390,14 +392,47 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             throw new System.NotImplementedException();
         }
 
-        private static ItSystemUsageResponseDTO ToSystemUsageDTO(ItSystemUsage arg)
+        private static ItSystemUsageResponseDTO ToSystemUsageDTO(ItSystemUsage systemUsage)
         {
             return new()
             {
-                Uuid = arg.Uuid,
-                SystemContext = arg.ItSystem.MapIdentityNamePairDTO(),
-                OrganizationContext = arg.Organization.MapShallowOrganizationResponseDTO()
-            //TODO - the rest for the best
+                Uuid = systemUsage.Uuid,
+                SystemContext = systemUsage.ItSystem.MapIdentityNamePairDTO(),
+                OrganizationContext = systemUsage.Organization.MapShallowOrganizationResponseDTO(),
+                CreatedBy = systemUsage.ObjectOwner.MapIdentityNamePairDTO(),
+                LastModified = systemUsage.LastChanged,
+                LastModifiedBy = systemUsage.LastChangedByUser.MapIdentityNamePairDTO(),
+                General = new()
+                {
+                    LocalCallName = systemUsage.LocalCallName,
+                    LocalSystemId = systemUsage.LocalSystemId,
+                    Notes = systemUsage.Note,
+                    MainContract = systemUsage.MainContract?.ItContract?.MapIdentityNamePairDTO(),
+                    DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
+                    AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
+                    NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
+                    SystemVersion = systemUsage.Version,
+                    Validity = new ItSystemUsageValidityResponseDTO
+                    {
+                        EnforcedValid = systemUsage.Active,
+                        Valid = systemUsage.IsActive,
+                        ValidFrom = systemUsage.Concluded,
+                        ValidTo = systemUsage.ExpirationDate
+                    }
+                },
+                //TODO: All the rest
+            };
+        }
+
+        private static ExpectedUsersIntervalDTO MapExpectedUsers(ItSystemUsage systemUsage)
+        {
+            return systemUsage.UserCount switch
+            {
+                UserCount.BELOWTEN => new ExpectedUsersIntervalDTO { LowerBound = 0, UpperBound = 9 },
+                UserCount.TENTOFIFTY => new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
+                UserCount.FIFTYTOHUNDRED => new ExpectedUsersIntervalDTO { LowerBound = 50, UpperBound = 100 },
+                UserCount.HUNDREDPLUS => new ExpectedUsersIntervalDTO { LowerBound = 100 },
+                _ => throw new ArgumentOutOfRangeException(nameof(systemUsage.UserCount))
             };
         }
     }

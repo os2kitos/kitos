@@ -2,8 +2,6 @@
     import ItSystem = Models.ItSystem.IItSystem;
 
     export interface IItSystemUsage extends IEntity {
-        /** Gets or sets a value indicating whether this instance's status is active. */
-        IsStatusActive: boolean;
         /** Gets or sets the note. */
         Note: string;
         /** Gets or sets the user defined local system identifier. */

@@ -43,7 +43,6 @@ namespace Presentation.Web.Models.API.V1
         public string userDefaultUserStartPreference { get; set; }
 
         public int ItSystemUsageId { get; set; }
-        public bool ItSystemUsageIsStatusActive { get; set; }
         public string ItSystemUsageNote { get; set; }
         public string ItSystemUsageLocalSystemId { get; set; }
         public string ItSystemUsageVersion { get; set; }

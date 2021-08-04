@@ -7,7 +7,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
@@ -280,7 +279,6 @@ namespace Presentation.Web
                .ForMember(dto => dto.userFailedAttempts, opt => opt.MapFrom(src => src.User.FailedAttempts))
                .ForMember(dto => dto.userDefaultUserStartPreference, opt => opt.MapFrom(src => src.User.DefaultUserStartPreference))
                .ForMember(dto => dto.ItSystemUsageId, opt => opt.MapFrom(src => src.Object.Id))
-               .ForMember(dto => dto.ItSystemUsageIsStatusActive, opt => opt.MapFrom(src => src.Object.IsStatusActive))
                .ForMember(dto => dto.ItSystemUsageNote, opt => opt.MapFrom(src => src.Object.Note))
                .ForMember(dto => dto.ItSystemUsageLocalSystemId, opt => opt.MapFrom(src => src.Object.LocalSystemId))
                .ForMember(dto => dto.ItSystemUsageVersion, opt => opt.MapFrom(src => src.Object.Version))

@@ -38,7 +38,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         public string SystemVersion { get; set; }
         /// <summary>
         /// Interval which defines the number of expected users this system has within the organization
-        /// NOTE: This property is currently constrained to accept only the following values [LowerBound,UpperBound]: {[0,10],[10,50],[50,100],[100,null]}
+        /// NOTE: This property is currently constrained to accept only the following values [LowerBound,UpperBound]: {[0,9],[10,50],[50,100],[100,null]}
         /// We expect this to change in later releases of KITOS and for that reason we do not expose an enumeration field.
         /// </summary>
         public ExpectedUsersIntervalDTO NumberOfExpectedUsers { get; set; }

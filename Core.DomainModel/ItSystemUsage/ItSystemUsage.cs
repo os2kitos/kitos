@@ -126,13 +126,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public virtual TerminationDeadlineTypesInSystem TerminationDeadlineInSystem { get; set; }
         /// <summary>
-        /// Gets or sets a value indicating whether this instance's status is active.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance's status is active; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsStatusActive { get; set; }
-        /// <summary>
         /// Gets or sets the note.
         /// </summary>
         /// <value>
@@ -336,13 +329,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-
-
-
         public UserCount UserCount { get; set; }
-
-        public string systemCategories { get; set; }
-
 
         #region GDPR
         public string GeneralPurpose { get; set; }

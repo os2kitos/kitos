@@ -8,12 +8,9 @@ namespace Presentation.Web.Models.API.V1
 {
     public class ItSystemUsageDTO
     {
-        public ItSystemUsageDTO(){
-        }
         public Guid Uuid { get; set; }
         public int Id { get; set; }
         public DateTime LastChanged { get; set; }
-        public bool IsStatusActive { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
         public string Version { get; set; }
