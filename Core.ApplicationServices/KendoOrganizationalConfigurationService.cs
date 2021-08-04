@@ -2,6 +2,8 @@
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Kendo;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Core.ApplicationServices
 {
@@ -25,7 +27,7 @@ namespace Core.ApplicationServices
                 : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string visibleColumnsCsv)
+        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
@@ -35,7 +37,14 @@ namespace Core.ApplicationServices
                 if (!_authorizationContext.AllowModify(modifiedConfig))
                     return new OperationError(OperationFailure.Forbidden);
 
-                modifiedConfig.VisibleColumnsCsv = visibleColumnsCsv;
+                modifiedConfig.Columns.Clear();
+
+                columns.ToList().ForEach(x => 
+                {
+                    x.KendoOrganizationalConfigurationId = modifiedConfig.Id;
+                    modifiedConfig.Columns.Add(x);
+                });
+
                 modifiedConfig.UpdateVersion();
                 _kendoOrganizationRepository.Update(modifiedConfig);
                 return modifiedConfig;
@@ -47,11 +56,19 @@ namespace Core.ApplicationServices
             var createdConfig = new KendoOrganizationalConfiguration
             {
                 OrganizationId = organizationId,
-                OverviewType = overviewType,
-                VisibleColumnsCsv = visibleColumnsCsv,
+                OverviewType = overviewType
             };
-            createdConfig.UpdateVersion();
+            createdConfig.UpdateVersion(); // Version is required on the entity
             var created = _kendoOrganizationRepository.Add(createdConfig);
+
+            columns.ToList().ForEach(x =>
+            {
+                x.KendoOrganizationalConfigurationId = created.Id;
+                created.Columns.Add(x);
+            });
+            created.UpdateVersion();
+            _kendoOrganizationRepository.Update(created);
+
             return created;
         }
 

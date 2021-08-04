@@ -16,6 +16,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             Property(x => x.OrganizationId)
                 .IsRequired();
+
+            HasMany(x => x.Columns)
+                .WithRequired(x => x.KendoOrganizationalConfiguration)
+                .HasForeignKey(x => x.KendoOrganizationalConfigurationId);
         }
     }
 }

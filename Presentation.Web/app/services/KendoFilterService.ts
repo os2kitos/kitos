@@ -14,11 +14,11 @@
                     `api/v1/kendo-organizational-configuration?organizationId=${orgId}&overviewType=${overviewType}`);
         }
 
-        PostConfigurationFromOrg = (orgId: number, overviewType: Models.Generic.OverviewType, visibleColumnsCsv: string) => {
+        PostConfigurationFromOrg = (orgId: number, overviewType: Models.Generic.OverviewType, columns: Models.Generic.IKendoColumnConfigurationDTO[]) => {
 
             var payload = {
                 OverviewType: overviewType,
-                VisibleColumnsCsv: visibleColumnsCsv,
+                Columns: columns,
                 OrganizationId: orgId
             }
             return this.$http.post(`api/v1/kendo-organizational-configuration`, payload);

@@ -56,9 +56,10 @@
 
             storageKey = user.id+"-"+storageKey;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageKey = storageKey + "-OrgProfile";
+            var orgStorageColumnsKey = storageKey + "-OrgProfile";
+            var versionKey = storageKey + "-version";
             // Consider this in: https://os2web.atlassian.net/browse/KITOSUDV-1674. Notice. This is an async method and is not handled as such. Do not make async call in the factory
-            //getOrgFilterOptions(overviewType);
+            getOrgFilterOptions(overviewType);
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -80,27 +81,30 @@
                 }
 
                 //If org filter options has already been loaded skip this api call
-                var dataExist = $window.sessionStorage.getItem(orgStorageKey);
+                var dataExist = $window.sessionStorage.getItem(orgStorageColumnsKey);
                 if (dataExist) {
                     return;
                 }
 
-                //KendoFilterService
-                //    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
-                //    .then((result) => {
-                //        if (result.status === 200) {
-                //            const orgStorageItem = result.data.response.configuration;
-                //            if (orgStorageItem) {
-                //                $window.sessionStorage.setItem(orgStorageKey, orgStorageItem);
-                //            }
-                //        }
-                //    })
-                //    .catch((result) => {
-                //        if (result.status === 404) {
-                //            // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
-                //            $window.sessionStorage.removeItem(orgStorageKey);
-                //        }
-                //    });
+                KendoFilterService
+                    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
+                    .then((result) => {
+                        if (result.status === 200) {
+                            const version = result.data.response.version;
+                            const localVersion = $window.sessionStorage.getItem(versionKey);
+                            if (version !== localVersion) {
+                                const columns = result.data.response.columns;
+                                $window.sessionStorage.setItem(orgStorageColumnsKey, JSONfn.stringify(columns));
+                                $window.sessionStorage.setItem(versionKey, version);
+                            }
+                        }
+                    })
+                    .catch((result) => {
+                        if (result.status === 404) {
+                            // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
+                            $window.sessionStorage.removeItem(orgStorageColumnsKey);
+                        }
+                    });
             } 
 
             // saves grid state to localStorage
@@ -188,10 +192,10 @@
             // them together so that the correct options are overwritten
             function getStoredOptions(): IGridSavedState {
                 // load options from org storage
-                var orgOptions;
-                var orgStorageItem = $window.sessionStorage.getItem(orgStorageKey);
-                if (orgStorageItem) {
-                    orgOptions = JSONfn.parse(orgStorageItem, true);
+                var orgStorageColumns: Models.Generic.IKendoColumnConfigurationDTO[];
+                var orgStorageColumnsItem = $window.sessionStorage.getItem(orgStorageColumnsKey);
+                if (orgStorageColumnsItem) {
+                    orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]> JSONfn.parse(orgStorageColumnsItem, true);
                 }
 
                 // load options from local storage
@@ -215,7 +219,7 @@
                     sessionOptions = JSONfn.parse(sessionStorageItem, true);
                 }
 
-                var options: IGridSavedState = {};
+                var options: IGridSavedState = { columnState : null };
 
 
                 if (sessionOptions) {
@@ -230,9 +234,16 @@
                     // note the order the options are merged in (below) is important!
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
                 }
-                else if (orgOptions) {
-                    options = <IGridSavedState>_.merge(options, localOptions, orgOptions);
+
+                if (orgStorageColumns) {
+                    orgStorageColumns.forEach(x => {
+                        if (options.columnState[x.persistId]) {
+                            options.columnState[x.persistId].index = x.index;
+                            options.columnState[x.persistId].hidden = x.hidden;
+                        }
+                    });
                 }
+
                 return options;
             }
 
@@ -273,19 +284,14 @@
 
             function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): void {
                 var options = grid.getOptions();
-                var pickedOptions: IGridSavedState = {};
-                pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "pageSize"]);
 
-                // save column state - dont use the kendo function for it as it breaks more than it fixes...
-                pickedOptions.columnState = {};
+                var columns: Models.Generic.IKendoColumnConfigurationDTO[] = [];
                 for (var i = 0; i < options.columns.length; i++) {
                     var column = options.columns[i];
-                    pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
+                    columns.push({ persistId: column.persistId, index: i, hidden: column.hidden });
                 }
 
-                var visibleColumns = options.columns.filter(column => !column.hidden).map(column => column.persistId);
-
-                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, visibleColumns.join(", "))
+                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
@@ -325,7 +331,8 @@
 
             function removeSession(): void {
                 $window.sessionStorage.removeItem(storageKey);
-                $window.sessionStorage.removeItem(orgStorageKey);
+                $window.sessionStorage.removeItem(orgStorageColumnsKey);
+                $window.sessionStorage.removeItem(versionKey);
             }
 
             function removeLocal(): void {

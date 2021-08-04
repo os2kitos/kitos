@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
@@ -33,8 +35,14 @@ namespace Presentation.Web.Controllers.API.V1
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
+            var columns = dto.Columns.Select(x => new KendoColumnConfiguration(){
+                PersistId = x.PersistId,
+                Index = x.Index,
+                Hidden = x.Hidden
+                });
+
             return _kendoOrganizationalConfigurationService
-                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, dto.VisibleColumnsCsv)
+                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, columns)
                 .Match(value => Ok(Map(value)), FromOperationError);
         }
 
@@ -74,8 +82,18 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 OrganizationId = value.OrganizationId,
                 OverviewType = value.OverviewType,
-                VisibleColumnsCsv = value.VisibleColumnsCsv,
+                Columns = value.Columns.Select(x => Map(x)).ToList(),
                 Version = value.Version
+            };
+        }
+
+        private static KendoColumnConfigurationDTO Map(KendoColumnConfiguration value)
+        {
+            return new KendoColumnConfigurationDTO
+            {
+                PersistId = value.PersistId,
+                Index = value.Index,
+                Hidden = value.Hidden
             };
         }
     }

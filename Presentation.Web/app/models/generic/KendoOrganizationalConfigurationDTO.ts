@@ -6,8 +6,13 @@
     export interface IKendoOrganizationalConfigurationDTO {
         orgId: number,
         overviewType: OverviewType,
-        visibleColumnsCsv: string,
-        version: number
+        columns: IKendoColumnConfigurationDTO[],
+        version: string
     }
 
+    export interface IKendoColumnConfigurationDTO {
+        persistId: string,
+        index: number,
+        hidden: boolean
+    }
 }
