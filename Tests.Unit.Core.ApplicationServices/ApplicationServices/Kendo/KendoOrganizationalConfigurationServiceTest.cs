@@ -71,7 +71,8 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var updateResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
 
             //Assert
-            _repository.Verify(x => x.Update(It.IsAny<KendoOrganizationalConfiguration>()), Times.Exactly(2));
+            _repository.Verify(x => x.DeleteChilds(It.IsAny<KendoOrganizationalConfiguration>()), Times.Once);
+            _repository.Verify(x => x.Update(It.IsAny<KendoOrganizationalConfiguration>()), Times.Once);
 
             Assert.True(updateResult.Ok);
             var configuration = updateResult.Value;
