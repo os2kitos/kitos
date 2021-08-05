@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class test : DbMigration
+    public partial class Changed_Kendo_Configuration : DbMigration
     {
         public override void Up()
         {
@@ -21,16 +21,16 @@
                 .ForeignKey("dbo.KendoOrganizationalConfigurations", t => t.KendoOrganizationalConfigurationId, cascadeDelete: true)
                 .Index(t => t.KendoOrganizationalConfigurationId);
             
-            AlterColumn("dbo.KendoOrganizationalConfigurations", "Version", c => c.String(nullable: false));
-            DropColumn("dbo.KendoOrganizationalConfigurations", "VisibleColumnsCsv");
+            AddColumn("dbo.KendoOrganizationalConfigurations", "Version", c => c.String(nullable: false));
+            DropColumn("dbo.KendoOrganizationalConfigurations", "Configuration");
         }
         
         public override void Down()
         {
-            AddColumn("dbo.KendoOrganizationalConfigurations", "VisibleColumnsCsv", c => c.String());
+            AddColumn("dbo.KendoOrganizationalConfigurations", "Configuration", c => c.String(nullable: false));
             DropForeignKey("dbo.KendoColumnConfigurations", "KendoOrganizationalConfigurationId", "dbo.KendoOrganizationalConfigurations");
             DropIndex("dbo.KendoColumnConfigurations", new[] { "KendoOrganizationalConfigurationId" });
-            AlterColumn("dbo.KendoOrganizationalConfigurations", "Version", c => c.Int(nullable: false));
+            DropColumn("dbo.KendoOrganizationalConfigurations", "Version");
             DropTable("dbo.KendoColumnConfigurations");
         }
     }

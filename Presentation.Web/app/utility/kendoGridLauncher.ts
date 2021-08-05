@@ -645,6 +645,10 @@ module Kitos.Utility.KendoGrid {
             return this.gridState.canDeleteGridProfileForOrg();
         }
 
+        doesGridDivergeFromDefault() {
+            return this.gridState.doesGridDivergeFromDefault(this.overviewType);
+        }
+
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
             this.gridState.removeProfile();
@@ -711,16 +715,18 @@ module Kitos.Utility.KendoGrid {
                     saveGridForOrganization: () => this.saveGridForOrganization(),
                     clearGridForOrganization: () => this.clearGridForOrganization(),
                     showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
-                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization()
+                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
+                    doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
+                    gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan standardopsætning' for at benytte den gældende opsætning" : ""
                 }
             };
 
             var toolbar = [
                 {
                     name: "clearFilter",
-                    text: "Gendan standardopsætning",
+                    text: "Gendan standardopsætning ",
                     template:
-                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
+                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-show='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
                 {
                     name: "saveFilter",

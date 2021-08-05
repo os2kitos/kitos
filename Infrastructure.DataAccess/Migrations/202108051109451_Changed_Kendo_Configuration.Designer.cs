@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202108032112283_Changed_Kendo_Configuration"; }
+            get { return "202108051109451_Changed_Kendo_Configuration"; }
         }
         
         string IMigrationMetadata.Source

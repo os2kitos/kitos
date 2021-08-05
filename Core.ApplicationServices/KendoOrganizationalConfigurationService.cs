@@ -38,6 +38,7 @@ namespace Core.ApplicationServices
                     return new OperationError(OperationFailure.Forbidden);
 
                 modifiedConfig.Columns.Clear();
+                _kendoOrganizationRepository.Update(modifiedConfig); //Clean-out the old entries
 
                 columns.ToList().ForEach(x => 
                 {

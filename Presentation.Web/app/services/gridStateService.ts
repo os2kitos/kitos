@@ -362,9 +362,14 @@
                     return false; // No defaults defined for this overview type
                 }
 
+                if (!orgStorageExists) {
+                    return false;
+                }
+
                 if ($window.sessionStorage.getItem(versionKey) === null) {
                     return true;
                 }
+
                 return false;
             }
 
