@@ -345,23 +345,23 @@
   <ItemGroup>
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
-    <Compile Include="Controllers\API\V2\BaseRoleOptionTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\BaseRegularOptionTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\BaseOptionTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItContracts\ItContractContractTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItContracts\ItContractV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItProjects\ItProjectV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageArchiveTestLocationTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageArchiveLocationTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageArchiveTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystems\ItSystemV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\ItSystemUsages\ItSystemUsageV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\KLE\KleOptionV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageArchiveTestLocationTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageArchiveLocationTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageArchiveTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageDataClassificationTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
@@ -432,16 +432,16 @@
     <Compile Include="Models\API\V2\Response\Options\RegularOptionExtendedResponseDTO.cs" />
     <Compile Include="Models\API\V1\UserNotification\UserNotificationDTO.cs" />
     <Compile Include="Models\API\V1\KendoOrganizationalConfigurationDTO.cs" />
-    <Compile Include="Controllers\API\V2\ExternalBaseController.cs" />
-    <Compile Include="Controllers\API\V2\Organizations\OrganizationV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ExternalBaseController.cs" />
+    <Compile Include="Controllers\API\V2\External\Organizations\OrganizationV2Controller.cs" />
     <Compile Include="Helpers\StringHelpers.cs" />
     <Compile Include="Models\API\V2\Response\System\ItSystemResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\System\BaseItSystemResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Interface\BaseItInterfaceResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Interface\RightsHolderWritableItInterfacePropertiesDTO.cs" />
-    <Compile Include="Controllers\API\V2\ItInterfaces\ItInterfaceV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\ItInterfaceV2Controller.cs" />
     <Compile Include="Models\API\V2\Request\DeactivationReasonRequestDTO.cs" />
-    <Compile Include="Controllers\API\V2\ItSystems\ItSystemBusinessTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemBusinessTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageOptionsController.cs" />
     <Compile Include="Controllers\API\V1\OData\BaseOdataController.cs" />
     <Compile Include="Controllers\API\V1\BrokenExternalReferencesReportController.cs" />
@@ -1597,7 +1597,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\API\V2\External\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Tests\Models\" />
   </ItemGroup>
