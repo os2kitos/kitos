@@ -10,5 +10,6 @@ namespace Core.DomainServices.Repositories.Kendo
         public void Update(KendoOrganizationalConfiguration modifiedConfig);
         public KendoOrganizationalConfiguration Add(KendoOrganizationalConfiguration createdConfig);
         void Delete(KendoOrganizationalConfiguration configToDelete);
+        void DeleteChilds(KendoOrganizationalConfiguration configWithChildsToBeDeleted);
     }
 }

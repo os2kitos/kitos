@@ -36,9 +36,8 @@ namespace Core.ApplicationServices
                 var modifiedConfig = currentConfig.Value;
                 if (!_authorizationContext.AllowModify(modifiedConfig))
                     return new OperationError(OperationFailure.Forbidden);
-
-                modifiedConfig.Columns.Clear();
-                _kendoOrganizationRepository.Update(modifiedConfig); //Clean-out the old entries
+                
+                _kendoOrganizationRepository.DeleteChilds(modifiedConfig); //Clean-out the old entries
 
                 columns.ToList().ForEach(x => 
                 {

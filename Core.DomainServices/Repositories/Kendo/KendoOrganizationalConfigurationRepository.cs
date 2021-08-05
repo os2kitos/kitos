@@ -7,10 +7,12 @@ namespace Core.DomainServices.Repositories.Kendo
     public class KendoOrganizationalConfigurationRepository : IKendoOrganizationalConfigurationRepository
     {
         private readonly IGenericRepository<KendoOrganizationalConfiguration> _repository;
+        private readonly IGenericRepository<KendoColumnConfiguration> _columnRepository;
 
-        public KendoOrganizationalConfigurationRepository(IGenericRepository<KendoOrganizationalConfiguration> repository)
+        public KendoOrganizationalConfigurationRepository(IGenericRepository<KendoOrganizationalConfiguration> repository, IGenericRepository<KendoColumnConfiguration> columnRepository)
         {
             _repository = repository;
+            _columnRepository = columnRepository;
         }
 
         public KendoOrganizationalConfiguration Add(KendoOrganizationalConfiguration createdConfig)
@@ -35,6 +37,12 @@ namespace Core.DomainServices.Repositories.Kendo
         {
             _repository.Update(modifiedConfig);
             _repository.Save();
+        }
+
+        public void DeleteChilds(KendoOrganizationalConfiguration configWithChildsToBeDeleted)
+        {
+            _columnRepository.RemoveRange(configWithChildsToBeDeleted.Columns);
+            _columnRepository.Save();
         }
     }
 }
