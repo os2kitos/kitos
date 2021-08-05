@@ -622,12 +622,35 @@ module Kitos.Utility.KendoGrid {
             return this.gridState.doesGridProfileExist();
         }
 
+        saveGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
+                this.gridState.saveGridProfileForOrg(this.gridBinding.mainGrid, this.overviewType);
+            }
+        }
+
+        clearGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil slette standard opsætningen af felter til ${this.user.currentOrganizationName}`)) {
+                this.gridState.deleteGridProfileForOrg(this.overviewType);
+            }
+        }
+
+        showGridForOrganizationButtons() {
+            if (this.overviewType !== null) {
+                return this.user.isLocalAdmin;
+            }
+            return false;
+        }
+
+        canDeleteGridForOrganization() {
+            return this.gridState.canDeleteGridProfileForOrg();
+        }
+
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
             this.gridState.removeProfile();
             this.gridState.removeLocal();
             this.gridState.removeSession();
-            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge gendannet til standardopsætning ");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
@@ -684,14 +707,18 @@ module Kitos.Utility.KendoGrid {
                     saveGridProfile: () => this.saveGridProfile(),
                     loadGridProfile: () => this.loadGridProfile(),
                     clearGridProfile: () => this.clearGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist()
+                    doesGridProfileExist: () => this.doesGridProfileExist(),
+                    saveGridForOrganization: () => this.saveGridForOrganization(),
+                    clearGridForOrganization: () => this.clearGridForOrganization(),
+                    showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
+                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization()
                 }
             };
 
             var toolbar = [
                 {
                     name: "clearFilter",
-                    text: "Nulstil",
+                    text: "Gendan standardopsætning",
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
                 },
@@ -712,6 +739,16 @@ module Kitos.Utility.KendoGrid {
                     text: "Slet filter",
                     template:
                         "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
+                },
+                {
+                    name: "filterOrg",
+                    text: "Gem filter for organisation",
+                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem filter for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
+                },
+                {
+                    name: "removeFilterOrg",
+                    text: "Slet filter for organisation",
+                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet filter for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
 

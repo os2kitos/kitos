@@ -50,7 +50,7 @@
                     Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
             // Re-enable as part of: https://os2web.atlassian.net/browse/KITOSUDV-1674
-            var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
+            //var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -188,35 +188,35 @@
 
                 // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
 
-                .withToolbarEntry({
-                    id: "filterOrg",
-                    title: "Gem filter for organisation",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => true,
-                    onClick: () => {
-                        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
-                            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
-                        }
+                //.withToolbarEntry({
+                //    id: "filterOrg",
+                //    title: "Gem filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
+                //            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
+                //        }
 
-                    },
-                    show: user.isLocalAdmin,
-                } as Utility.KendoGrid.IKendoToolbarEntry)
-                .withToolbarEntry({
-                    id: "removeFilterOrg",
-                    title: "Slet filter for organisation",
-                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                    enabled: () => true,
-                    onClick: () => {
-                        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
-                            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
-                        }
-                    },
-                    show: user.isLocalAdmin,
-                } as Utility.KendoGrid.IKendoToolbarEntry)
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
+                //.withToolbarEntry({
+                //    id: "removeFilterOrg",
+                //    title: "Slet filter for organisation",
+                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
+                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
+                //    enabled: () => true,
+                //    onClick: () => {
+                //        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
+                //            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
+                //        }
+                //    },
+                //    show: user.isLocalAdmin,
+                //} as Utility.KendoGrid.IKendoToolbarEntry)
 
 
                 .withToolbarEntry({

@@ -19,7 +19,7 @@ namespace Core.DomainModel
 
         public void UpdateVersion()
         {
-            Version = string.Join("", Columns.Where(x => !x.Hidden).OrderBy(x => x.Index).Select(x => x.PersistId)).GetHashCode().ToString();
+            Version = string.Join("", Columns.Where(x => !x.Hidden).OrderBy(x => x.Index).Select(x => x.PersistId));
         }
     }
 
