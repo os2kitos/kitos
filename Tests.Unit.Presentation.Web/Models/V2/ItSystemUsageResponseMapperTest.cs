@@ -147,17 +147,30 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [Fact]
         public void MapSystemUsageDTO_Maps_OrganizationalUsage_Properties_Section()
         {
-            //TODO:
-            ////Arrange
-            //var itSystemUsage = new ItSystemUsage();
-            //AssignBasicProperties(itSystemUsage);
-            //itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage(){}
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            var responsibleUsage = CreateOrganizationUnit();
+            itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = responsibleUsage };
+            itSystemUsage.UsedBy = new[] { CreateOrganizationUnit(), CreateOrganizationUnit(), responsibleUsage }.Select(unit => new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit }).ToList();
 
-            ////Act
-            //var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
 
-            ////Assert
-            
+            //Assert
+            AssertIdentity(itSystemUsage.ResponsibleUsage.OrganizationUnit, dto.OrganizationUsage.ResponsibleOrganizationUnit);
+            var expectedUnits = itSystemUsage.UsedBy.Select(x => x.OrganizationUnit).OrderBy(x => x.Name).ToList();
+            var actualUnits = dto.OrganizationUsage.UsingOrganizationUnits.OrderBy(x=>x.Name).ToList();
+            Assert.Equal(expectedUnits.Count, actualUnits.Count);
+            foreach (var comparison in expectedUnits.Zip(actualUnits, (expected, actual) => new { expected, actual }).ToList())
+            {
+                AssertIdentity(comparison.expected, comparison.actual);
+            }
+        }
+
+        private OrganizationUnit CreateOrganizationUnit()
+        {
+            return new OrganizationUnit { Name = A<string>(), Uuid = A<Guid>() };
         }
 
         private void AssignKle(ItSystemUsage itSystemUsage)
