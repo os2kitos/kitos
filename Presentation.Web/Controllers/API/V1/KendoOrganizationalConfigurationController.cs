@@ -53,6 +53,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
         {
+            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
             if (organizationId == null || overviewType == null)
                 return BadRequest("Please provide both organizationId and overviewType");
 
@@ -68,11 +69,12 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetConfigurationVersion([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
         {
+            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
             if (organizationId == null || overviewType == null)
                 return BadRequest("Please provide both organizationId and overviewType");
 
             return _kendoOrganizationalConfigurationService
-                .GetVersion(organizationId.Value, overviewType.Value)
+                .GetVersion(organizationId.Value, overviewType.Value) //TODO: JMO - bare kald Get(...).Select(x=>x.Version)-...
                 .Match(Ok, FromOperationError);
         }
 
@@ -83,6 +85,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage DeleteConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
         {
+            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
             if (organizationId == null || overviewType == null)
                 return BadRequest("Please provide both organizationId and overviewType");
 

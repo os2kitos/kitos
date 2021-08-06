@@ -17,6 +17,7 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.OrganizationId)
                 .IsRequired();
 
+            //TODO: JMO- der mangler indexes på de properties du søger på - det er nok kun overviewtype du mangler index på men kig det lige efter
             HasMany(x => x.Columns)
                 .WithRequired(x => x.KendoOrganizationalConfiguration)
                 .HasForeignKey(x => x.KendoOrganizationalConfigurationId);

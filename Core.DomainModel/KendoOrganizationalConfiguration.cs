@@ -15,10 +15,15 @@ namespace Core.DomainModel
         public int OrganizationId { get; set; }
         public Organization.Organization Organization { get; set; }
 
-        public virtual ICollection<KendoColumnConfiguration> Columns { get; set; }
+        public virtual ICollection<KendoColumnConfiguration> Columns { get; set; } //TODO JMO: Rename til VisibleColmns
 
+        /// <summary>
+        /// TODO JMO: Det giver ikke mening at klienten skal kalde den her kode. Lav i stedet en metode der opdaterer "Columns" dvs. UpdateColumns(columns). Den opdaterer så propertien "Columns" og genberegner dernæst versionen
+        /// </summary>
         public void UpdateVersion()
         {
+            //TODO: JMO - det skal være en hash - ikke bare ebn kæmpe string
+            //TODO: JMO: Order by name i stedet. Index hører ikke hjemme her
             Version = string.Join("", Columns.Where(x => !x.Hidden).OrderBy(x => x.Index).Select(x => x.PersistId));
         }
     }
@@ -28,12 +33,13 @@ namespace Core.DomainModel
         ItSystemUsage = 0
     }
 
+    //TODO: JMO lad os få enum og klassen her ud i egne filer
     public class KendoColumnConfiguration : IHasId
     {
         public int Id { get; set; }
         public string PersistId { get; set; }
-        public int Index { get; set; }
-        public bool Hidden { get; set; }
+        public int Index { get; set; } //TODO: JMO - det ´her er ikke relevant for konfigurationen. Det er ikke rækkefølgen men derimod bare "hvilke" kolonner de ser på
+        public bool Hidden { get; set; } //TODO: JMO - det er ikke relevant. Hvis ikke den "er her" så er den ikke synlig
 
         public int KendoOrganizationalConfigurationId { get; set; }
         public virtual KendoOrganizationalConfiguration KendoOrganizationalConfiguration { get; set; }
