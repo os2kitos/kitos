@@ -34,7 +34,7 @@
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
             _,
-            gridStateService: Services.IGridStateFactory
+            gridStateService: Services.IGridStateFactory //TODO: JMO - fjern denne + fra injection array
         ) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
@@ -185,7 +185,7 @@
                     });
                     return response;
                 })
-
+                //TODO JMO: remove this
                 // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
 
                 //.withToolbarEntry({

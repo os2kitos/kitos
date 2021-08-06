@@ -103,6 +103,7 @@
                     saveGridStateForSession(options);
 
                     // Compare the order of the visible columns with the order last retrieved from the server.
+                    //TODO: JMO husk at orderby persistid inden
                     const version = options.columns.filter(x => !x.hidden).map(x => x.persistId).join("");
                     const localVersion = $window.sessionStorage.getItem(versionKey);
                     if (localVersion !== null && version !== localVersion) {
