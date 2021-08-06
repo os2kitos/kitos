@@ -23,6 +23,7 @@ namespace Core.DomainModel
         public void UpdateVersion()
         {
             //TODO: JMO - det skal være en hash - ikke bare ebn kæmpe string
+            //TODO: JMO - order by name og hold index ude af ligningen.
             Version = string.Join("", Columns.Where(x => !x.Hidden).OrderBy(x => x.Index).Select(x => x.PersistId));
         }
     }
