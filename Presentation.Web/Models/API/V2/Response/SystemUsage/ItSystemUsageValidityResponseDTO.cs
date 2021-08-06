@@ -5,7 +5,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
     public class ItSystemUsageValidityResponseDTO
     {
         /// <summary>
-        /// Determines if the system is considered valid
+        /// Determines if the system is considered valid. This is computed from both "EnforcedValid" as well as ValidFrom/To
         /// </summary>
         public bool Valid { get; set; }
         /// <summary>

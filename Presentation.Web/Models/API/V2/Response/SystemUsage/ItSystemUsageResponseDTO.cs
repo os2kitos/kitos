@@ -19,7 +19,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// UUID of the IT-System usage registration instance
         /// </summary>
         public Guid Uuid { get; set; }
-
         /// <summary>
         /// User who created the system usage
         /// </summary>
@@ -28,7 +27,6 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// Time of last modification
         /// </summary>
         public DateTime LastModified { get; set; }
-
         /// <summary>
         /// Responsible for last modification
         /// </summary>
@@ -43,8 +41,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// </summary>
         [Required]
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
-
-
+        
         public GeneralDataResponseDTO General { get; set; }
         /// <summary>
         /// A collection of IT-System usage role option assignments

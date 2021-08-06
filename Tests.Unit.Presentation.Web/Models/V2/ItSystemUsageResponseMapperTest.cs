@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -10,6 +15,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -38,18 +44,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
-        public void MapSystemUsageDTO_Maps_Basic_Properties()
+        public void MapSystemUsageDTO_Maps_Root_Properties()
         {
             //Arrange
-            var itSystemUsage = new ItSystemUsage
-            {
-                LastChanged = A<DateTime>(),
-                Uuid = A<Guid>(),
-                ObjectOwner = CreateUser(),
-                LastChangedByUser = CreateUser(),
-                ItSystem = CreateSystem(),
-                Organization = CreateOrganization()
-            };
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -61,10 +60,131 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertUser(itSystemUsage.LastChangedByUser, dto.LastModifiedBy);
             AssertIdentity(itSystemUsage.ItSystem, dto.SystemContext);
             AssertOrganization(itSystemUsage.Organization, dto.OrganizationContext);
-
         }
 
-        private void AssertOrganization(Organization organization, ShallowOrganizationResponseDTO dtoOrganizationContext)
+        [Fact]
+        public void MapSystemUsageDTO_Maps_General_Properties_Section()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignGeneralPropertiesSection(itSystemUsage);
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            Assert.Equal(itSystemUsage.LocalSystemId, dto.General.LocalSystemId);
+            Assert.Equal(itSystemUsage.LocalCallName, dto.General.LocalCallName);
+            Assert.Equal(itSystemUsage.Note, dto.General.Notes);
+            AssertUserCount(itSystemUsage, dto.General.NumberOfExpectedUsers);
+            Assert.Equal(itSystemUsage.Version, dto.General.SystemVersion);
+            AssertIdentity(itSystemUsage.MainContract.ItContract, dto.General.MainContract);
+            Assert.Equal(itSystemUsage.Concluded, dto.General.Validity.ValidFrom);
+            Assert.Equal(itSystemUsage.ExpirationDate, dto.General.Validity.ValidTo);
+            Assert.Equal(itSystemUsage.Active, dto.General.Validity.EnforcedValid);
+            Assert.Equal(itSystemUsage.IsActive, dto.General.Validity.Valid);
+            AssertIdentities(itSystemUsage.ItProjects, dto.General.AssociatedProjects);
+        }
+
+        [Fact]
+        public void MapSystemUsageDTO_Maps_Role_Assignment_Section()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignRoles(itSystemUsage);
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            var expected = itSystemUsage.Rights.Select(right => new
+            {
+                roleId = right.Role.Uuid,
+                roleName = right.Role.Name,
+                userId = right.User.Uuid,
+                userName = right.User.GetFullName()
+            }).ToList();
+            var actual = dto.Roles.Select(roleAssignment => new
+            {
+                roleId = roleAssignment.Role.Uuid,
+                roleName = roleAssignment.Role.Name,
+                userId = roleAssignment.User.Uuid,
+                userName = roleAssignment.User.Name
+            }).ToList();
+            Assert.Equal(expected.Count, actual.Count);
+            foreach (var comparison in expected.Zip(actual, (expectedEntry, actualEntry) => new { expectedEntry, actualEntry }).ToList())
+            {
+                Assert.Equal(comparison.expectedEntry.roleId,comparison.actualEntry.roleId);
+                Assert.Equal(comparison.expectedEntry.roleName,comparison.actualEntry.roleName);
+                Assert.Equal(comparison.expectedEntry.userId,comparison.actualEntry.userId);
+                Assert.Equal(comparison.expectedEntry.userName,comparison.actualEntry.userName);
+            }
+        }
+
+        private void AssignRoles(ItSystemUsage itSystemUsage)
+        {
+            var rights = Many<Guid>().Select(id => new ItSystemRight()
+            {
+                User = CreateUser(),
+                Role = new ItSystemRole() { Name = A<string>(), Uuid = id }
+            }).ToList();
+            itSystemUsage.Rights = rights;
+        }
+
+        private static void AssertUserCount(ItSystemUsage itSystemUsage, ExpectedUsersIntervalDTO generalNumberOfExpectedUsers)
+        {
+            (int? from, int? to) expected = itSystemUsage.UserCount switch
+            {
+                UserCount.BELOWTEN => (0, 9),
+                UserCount.TENTOFIFTY => (10, 50),
+                UserCount.FIFTYTOHUNDRED => (50, 100),
+                UserCount.HUNDREDPLUS => (100, null),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+            Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
+        }
+
+        private static void AssertIdentities<T>(ICollection<T> sourceCollection, IEnumerable<IdentityNamePairResponseDTO> dtoCollection) where T : IHasUuid, IHasName
+        {
+            var expectedValues = sourceCollection.OrderBy(x => x.Name).ToList();
+            var actualValues = dtoCollection.OrderBy(x => x.Name).ToList();
+
+            Assert.Equal(expectedValues.Count, actualValues.Count);
+
+            foreach (var comparison in expectedValues.Zip(actualValues, (expected, actual) => new { expected, actual }).ToList())
+            {
+                AssertIdentity(comparison.expected, comparison.actual);
+            }
+        }
+
+        private void AssignGeneralPropertiesSection(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.LocalSystemId = A<string>();
+            itSystemUsage.LocalCallName = A<string>();
+            itSystemUsage.Note = A<string>();
+            itSystemUsage.UserCount = A<UserCount>();
+            itSystemUsage.Version = A<string>();
+            itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
+            itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
+            itSystemUsage.ItProjects = Many<string>().Select(name => new ItProject() { Name = name, Uuid = new Guid() }).ToList();
+            itSystemUsage.Active = A<bool>();
+            itSystemUsage.Concluded = A<DateTime>();
+            itSystemUsage.ExpirationDate = A<DateTime>();
+        }
+
+        private void AssignBasicProperties(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.LastChanged = A<DateTime>();
+            itSystemUsage.Uuid = A<Guid>();
+            itSystemUsage.ObjectOwner = CreateUser();
+            itSystemUsage.LastChangedByUser = CreateUser();
+            itSystemUsage.ItSystem = CreateSystem();
+            itSystemUsage.Organization = CreateOrganization();
+        }
+
+        private static void AssertOrganization(Organization organization, ShallowOrganizationResponseDTO dtoOrganizationContext)
         {
             AssertIdentity(organization, dtoOrganizationContext);
             Assert.Equal(organization.Cvr, dtoOrganizationContext.Cvr);
