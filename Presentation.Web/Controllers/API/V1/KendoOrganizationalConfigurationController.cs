@@ -61,6 +61,21 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(value => Ok(Map(value)), FromOperationError);
         }
 
+        [HttpGet]
+        [Route("version")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<string>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetConfigurationVersion([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        {
+            if (organizationId == null || overviewType == null)
+                return BadRequest("Please provide both organizationId and overviewType");
+
+            return _kendoOrganizationalConfigurationService
+                .GetVersion(organizationId.Value, overviewType.Value)
+                .Match(Ok, FromOperationError);
+        }
+
         [HttpDelete]
         [Route]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]

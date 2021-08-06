@@ -14,6 +14,12 @@
                     `api/v1/kendo-organizational-configuration?organizationId=${orgId}&overviewType=${overviewType}`);
         }
 
+        GetConfigurationVersion = (orgId: number, overviewType: Models.Generic.OverviewType) => {
+            return this.$http
+                .get<API.Models.IApiWrapper<string>>(
+                    `api/v1/kendo-organizational-configuration/version?organizationId=${orgId}&overviewType=${overviewType}`);
+        }
+
         PostConfigurationFromOrg = (orgId: number, overviewType: Models.Generic.OverviewType, columns: Models.Generic.IKendoColumnConfigurationDTO[]) => {
 
             var payload = {

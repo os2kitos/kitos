@@ -27,6 +27,14 @@ namespace Core.ApplicationServices
                 : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
         }
 
+        public Result<string, OperationError> GetVersion(int organizationId, OverviewType overviewType)
+        {
+            var config = _kendoOrganizationRepository.Get(organizationId, overviewType);
+            return config.HasValue
+                ? config.Value.Version
+                : Result<string, OperationError>.Failure(OperationFailure.NotFound);
+        }
+
         public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);

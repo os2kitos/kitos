@@ -8,6 +8,7 @@ namespace Core.ApplicationServices
     {
         public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns);
         public Result<KendoOrganizationalConfiguration, OperationError> Get(int organizationId, OverviewType overviewType);
+        public Result<string, OperationError> GetVersion(int organizationId, OverviewType overviewType);
         public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId, OverviewType overviewType);
     }
 }

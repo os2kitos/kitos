@@ -85,7 +85,11 @@
                     return;
                 }
 
-                getGridProfileForOrg();
+                getGridVersion().then((result) => {
+                    if (result !== null && result !== $window.sessionStorage.getItem(versionKey)) {
+                        getGridProfileForOrg();
+                    }
+                });
             } 
 
             // saves grid state to localStorage
@@ -98,6 +102,7 @@
                     saveGridStateForever(options);
                     saveGridStateForSession(options);
 
+                    // Compare the order of the visible columns with the order last retrieved from the server.
                     const version = options.columns.filter(x => !x.hidden).map(x => x.persistId).join("");
                     const localVersion = $window.sessionStorage.getItem(versionKey);
                     if (localVersion !== null && version !== localVersion) {
@@ -112,8 +117,8 @@
                 var storedState = getStoredOptions(grid);
                 var columnState = <IGridSavedState> _.pick(storedState, "columnState");
 
-                var gridOptionsWithInitialFitler = _.merge({ dataSource: { filter: initialFilter } }, storedState);
-                var gridOptions = _.omit(gridOptionsWithInitialFitler, "columnState");
+                var gridOptionsWithInitialFilter = _.merge({ dataSource: { filter: initialFilter } }, storedState);
+                var gridOptions = _.omit(gridOptionsWithInitialFilter, "columnState");
 
                 var visableColumnIndex = 0;
                 _.forEach(columnState.columnState, (state, key) => {
@@ -273,6 +278,18 @@
                 pickedOptions.dataSource = <kendo.data.DataSourceOptions> _.pick(options.dataSource, ["filter", "sort"]);
 
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
+            }
+
+            function getGridVersion(): ng.IPromise<string> { 
+                return KendoFilterService
+                    .GetConfigurationVersion(user.currentOrganizationId, overviewType)
+                    .then((result) => {
+                        if (result.status === 200) {
+                            return result.data.response;
+                        }
+                        return null;
+                    },
+                        () => null);
             }
 
             function getGridProfileForOrg() {
