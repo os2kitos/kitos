@@ -12,7 +12,7 @@ namespace Core.ApplicationServices.SystemUsage
 {
     public interface IItSystemUsageService
     {
-        Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions);
+        IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions);
 
         Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage usage);
         Result<ItSystemUsage, OperationFailure> Delete(int id);

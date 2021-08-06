@@ -76,7 +76,7 @@ namespace Core.ApplicationServices.SystemUsage
             _attachedOptionRepository = attachedOptionRepository;
         }
 
-        public Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions)
+        public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
         {
             var baseQuery = _usageRepository.AsQueryable();
             var subQueries = new List<IDomainQuery<ItSystemUsage>>();
@@ -86,9 +86,11 @@ namespace Core.ApplicationServices.SystemUsage
 
             subQueries.AddRange(conditions);
 
-            var filteredQuery = new IntersectionQuery<ItSystemUsage>(subQueries).Apply(baseQuery);
+            var result = subQueries.Any()
+                ? new IntersectionQuery<ItSystemUsage>(subQueries).Apply(baseQuery)
+                : baseQuery;
 
-            return Result<IQueryable<ItSystemUsage>, OperationError>.Success(filteredQuery);
+            return result;
         }
 
         public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage)

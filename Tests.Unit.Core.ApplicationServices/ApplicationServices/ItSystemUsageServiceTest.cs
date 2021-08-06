@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Linq;
@@ -14,6 +15,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
@@ -41,6 +43,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
+        private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public ItSystemUsageServiceTest()
         {
@@ -55,6 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _domainEvents = new Mock<IDomainEvents>();
             _referenceService = new Mock<IReferenceService>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
+            _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -68,10 +72,138 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEvents.Object,
                 Mock.Of<ILogger>(),
                 _sensitiveDataLevelRepository.Object,
-                new Mock<IOrganizationalUserContext>().Object,
+                _userContextMock.Object,
                 new Mock<IAttachedOptionRepository>().Object);
         }
         //TODO: Extend with the two new methods
+
+        /*
+         * public Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions)
+        {
+            var baseQuery = _usageRepository.AsQueryable();
+            var subQueries = new List<IDomainQuery<ItSystemUsage>>();
+
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+                subQueries.Add(new QueryByOrganizationIds<ItSystemUsage>(_userContext.OrganizationIds));
+
+            subQueries.AddRange(conditions);
+
+            var filteredQuery = new IntersectionQuery<ItSystemUsage>(subQueries).Apply(baseQuery);
+
+            return Result<IQueryable<ItSystemUsage>, OperationError>.Success(filteredQuery);
+        }
+         
+         *
+         */
+
+        [Fact]
+        public void Query_Returns_All_If_User_Has_Full_CrossOrgAccess()
+        {
+            //Arrange
+            var itSystemUsage1 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage2 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage3 = CreateSystemUsage(A<int>(), CreateItSystem());
+            ExpectUsageRepositoryAsQueryable(itSystemUsage1, itSystemUsage2, itSystemUsage3);
+            ExpectGetCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.Query();
+
+            //Assert
+            Assert.Equal(new[]{itSystemUsage1,itSystemUsage2,itSystemUsage3},result.ToList());
+        }
+
+        [Theory]
+        [InlineData(CrossOrganizationDataReadAccessLevel.None)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.Public)]
+        [InlineData(CrossOrganizationDataReadAccessLevel.RightsHolder)]
+        public void Query_Returns_All_From_Own_Organizations_If_User_Has_Less_Than_Full_CrossOrgAccess(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            //Arrange
+            var itSystemUsage1 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage2 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage3 = CreateSystemUsage(A<int>(), CreateItSystem());
+            ExpectUsageRepositoryAsQueryable(itSystemUsage1, itSystemUsage2, itSystemUsage3);
+            ExpectGetCrossOrganizationReadAccessReturns(accessLevel);
+            _userContextMock.Setup(x=>x.OrganizationIds).Returns(new []{itSystemUsage1.OrganizationId, itSystemUsage3.OrganizationId});
+
+            //Act
+            var result = _sut.Query();
+
+            //Assert that only usages from orgs with membership are included
+            Assert.Equal(new[] { itSystemUsage1, itSystemUsage3 }, result.ToList());
+        }
+
+        [Fact]
+        public void Query_Applies_SubQueries()
+        {
+            //Arrange
+            var itSystemUsage1 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage2 = CreateSystemUsage(A<int>(), CreateItSystem());
+            var itSystemUsage3 = CreateSystemUsage(A<int>(), CreateItSystem());
+            ExpectUsageRepositoryAsQueryable(itSystemUsage1, itSystemUsage2, itSystemUsage3);
+            ExpectGetCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel.All);
+            var subQuery1 = new Mock<IDomainQuery<ItSystemUsage>>();
+            var subQuery2 = new Mock<IDomainQuery<ItSystemUsage>>();
+            subQuery1.Setup(x => x.Apply(It.IsAny<IQueryable<ItSystemUsage>>())).Returns<IQueryable<ItSystemUsage>>(input => input.Skip(1));
+            subQuery2.Setup(x => x.Apply(It.IsAny<IQueryable<ItSystemUsage>>())).Returns<IQueryable<ItSystemUsage>>(input => input.Skip(1));
+
+            //Act
+            var result = _sut.Query(subQuery1.Object,subQuery2.Object);
+
+            //Assert
+            Assert.Equal(new[] { itSystemUsage3 }, result.ToList());
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_ItSystemUsage()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Uuid = uuid };
+            ExpectUsageRepositoryAsQueryable(itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, true);
+
+            //Act
+            var result = _sut.GetByUuid(uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(itSystemUsage, result.Value);
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_NotFound()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Uuid = A<Guid>() };
+            ExpectUsageRepositoryAsQueryable(itSystemUsage);
+
+            //Act
+            var result = _sut.GetByUuid(uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_Forbidden()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Uuid = uuid };
+            ExpectUsageRepositoryAsQueryable(itSystemUsage);
+            ExpectAllowReadReturns(itSystemUsage, false);
+
+            //Act
+            var result = _sut.GetByUuid(uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
 
         [Fact]
         public void Add_Returns_Conflict_If_System_Already_In_Use()
@@ -1001,6 +1133,11 @@ namespace Tests.Unit.Core.ApplicationServices
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(accessLevelInOrganization);
         }
 
+        private void ExpectGetCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
+        {
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
+        }
+
         private ItSystemUsage CreateSystemUsage(int organizationId, ItSystem itSystem)
         {
             return new ItSystemUsage
@@ -1069,6 +1206,11 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectAllowReadReturns(IEntity entity, bool value)
         {
             _authorizationContext.Setup(x => x.AllowReads(entity)).Returns(value);
+        }
+
+        private void ExpectUsageRepositoryAsQueryable(params ItSystemUsage[] itSystemUsages)
+        {
+            _usageRepository.Setup(x => x.AsQueryable()).Returns(itSystemUsages.AsQueryable());
         }
     }
 }

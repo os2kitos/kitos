@@ -7,6 +7,7 @@ using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
+using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -36,7 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns all IT-System usages available to the current user in the specified organization context
+        /// Returns all IT-System usages available to the current user
         /// </summary>
         /// <param name="organizationUuid">Query usages within a specific organization</param>
         /// <param name="relatedToSystemUuid">Query by systems related to another system</param>
@@ -48,7 +49,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemUsageResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemUsages(
             [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
@@ -79,10 +79,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _itSystemUsageService
                 .Query(conditions.ToArray())
-                .Select(usages => usages.OrderBy(itSystemUsage => itSystemUsage.Id))
-                .Select(usages => usages.Page(paginationQuery).AsEnumerable())
-                .Select(usages => usages.Select(_responseMapper.MapSystemUsageDTO).ToList())
-                .Match(Ok, FromOperationError);
+                .OrderBy(itSystemUsage => itSystemUsage.Id)
+                .Page(paginationQuery).AsEnumerable()
+                .Select(_responseMapper.MapSystemUsageDTO).ToList()
+                .Transform(Ok);
         }
 
         /// <summary>
