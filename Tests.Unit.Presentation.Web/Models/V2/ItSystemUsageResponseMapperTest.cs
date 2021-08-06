@@ -204,6 +204,84 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MapSystemUsageDTO_Maps_Archiving_Properties_Section(bool withCrossReferences)
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignArchiving(itSystemUsage, withCrossReferences);
+            Organization supplierOrganization = default;
+            if (withCrossReferences)
+            {
+                supplierOrganization = CreateOrganization();
+                _organizationRepositoryMock.Setup(x => x.GetById(itSystemUsage.SupplierId.Value)).Returns(supplierOrganization);
+            }
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            Assert.Equal(itSystemUsage.ArchiveFromSystem, dto.Archiving.Active);
+            Assert.Equal(itSystemUsage.ArchiveNotes, dto.Archiving.Notes);
+            Assert.Equal(itSystemUsage.Registertype, dto.Archiving.DocumentBearing);
+            Assert.Equal(itSystemUsage.ArchiveFreq, dto.Archiving.FrequencyInMonths);
+            AssertOptionalIdentity(itSystemUsage.ArchiveLocation, dto.Archiving.Location);
+            AssertOptionalIdentity(itSystemUsage.ArchiveTestLocation, dto.Archiving.TestLocation);
+            AssertOptionalIdentity(itSystemUsage.ArchiveType, dto.Archiving.Type);
+            AssertOptionalIdentity(supplierOrganization, dto.Archiving.Supplier);
+            var expectedArchivePeriods = itSystemUsage.ArchivePeriods.OrderBy(x => x.UniqueArchiveId).ToList();
+            var actualJournalPeriods = dto.Archiving.JournalPeriods.OrderBy(x => x.ArchiveId).ToList();
+            Assert.Equal(expectedArchivePeriods.Count, actualJournalPeriods.Count);
+            foreach (var comparison in expectedArchivePeriods.Zip(actualJournalPeriods, (expected, actual) => new { expected, actual }).ToList())
+            {
+                Assert.Equal(comparison.expected.Approved, comparison.actual.Approved);
+                Assert.Equal(comparison.expected.StartDate, comparison.actual.StartDate);
+                Assert.Equal(comparison.expected.EndDate, comparison.actual.EndDate);
+                Assert.Equal(comparison.expected.UniqueArchiveId, comparison.actual.ArchiveId);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MapSystemUsageDTO_Maps_GDPR_Properties_Section(bool withCrossReferences)
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            //AssignGDPR(itSystemUsage, withCrossReferences); //TODO
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            //TODO
+        }
+
+        private void AssignArchiving(ItSystemUsage itSystemUsage, bool withOptionalCrossReferences)
+        {
+            itSystemUsage.ArchiveFromSystem = A<bool?>();
+            itSystemUsage.ArchiveNotes = A<string>();
+            itSystemUsage.Registertype = A<bool?>();
+            itSystemUsage.ArchiveFreq = A<int?>();
+            itSystemUsage.ArchiveLocation = withOptionalCrossReferences
+                ? new ArchiveLocation { Uuid = A<Guid>(), Name = A<string>() }
+                : null;
+            itSystemUsage.ArchiveTestLocation = withOptionalCrossReferences ? new ArchiveTestLocation { Uuid = A<Guid>(), Name = A<string>() } : null;
+            itSystemUsage.ArchiveType = withOptionalCrossReferences ? new ArchiveType { Uuid = A<Guid>(), Name = A<string>() } : null;
+            itSystemUsage.SupplierId = withOptionalCrossReferences ? A<int>() : null;
+            itSystemUsage.ArchivePeriods = Many<string>().Select(id => new ArchivePeriod
+            {
+                Approved = A<bool>(),
+                StartDate = A<DateTime>(),
+                EndDate = A<DateTime>(),
+                UniqueArchiveId = id
+            }).ToList();
+        }
+
         private static void AssertRelation(SystemRelation expected, SystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
