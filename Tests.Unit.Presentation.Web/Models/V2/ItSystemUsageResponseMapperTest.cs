@@ -116,11 +116,38 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.Count, actual.Count);
             foreach (var comparison in expected.Zip(actual, (expectedEntry, actualEntry) => new { expectedEntry, actualEntry }).ToList())
             {
-                Assert.Equal(comparison.expectedEntry.roleId,comparison.actualEntry.roleId);
-                Assert.Equal(comparison.expectedEntry.roleName,comparison.actualEntry.roleName);
-                Assert.Equal(comparison.expectedEntry.userId,comparison.actualEntry.userId);
-                Assert.Equal(comparison.expectedEntry.userName,comparison.actualEntry.userName);
+                Assert.Equal(comparison.expectedEntry.roleId, comparison.actualEntry.roleId);
+                Assert.Equal(comparison.expectedEntry.roleName, comparison.actualEntry.roleName);
+                Assert.Equal(comparison.expectedEntry.userId, comparison.actualEntry.userId);
+                Assert.Equal(comparison.expectedEntry.userName, comparison.actualEntry.userName);
             }
+        }
+
+        [Fact]
+        public void MapSystemUsageDTO_Maps_LocalKLEDeviations_Properties_Section()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignKle(itSystemUsage);
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            var expectedAdditions = itSystemUsage.TaskRefs.Select(tr => (tr.TaskKey, tr.Uuid)).ToList();
+            var actualAdditions = dto.LocalKLEDeviations.AddedKLE.Select(kle => (kle.Name, kle.Uuid)).ToList();
+            Assert.Equal(expectedAdditions, actualAdditions);
+
+            var expectedRemovals = itSystemUsage.TaskRefsOptOut.Select(tr => (tr.TaskKey, tr.Uuid)).ToList();
+            var actualRemovals = dto.LocalKLEDeviations.RemovedKLE.Select(kle => (kle.Name, kle.Uuid)).ToList();
+            Assert.Equal(expectedRemovals, actualRemovals);
+        }
+
+        private void AssignKle(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.TaskRefs = Many<Guid>().Select(x => new TaskRef() { TaskKey = A<string>(), Uuid = A<Guid>() }).ToList();
+            itSystemUsage.TaskRefsOptOut = Many<Guid>().Select(x => new TaskRef() { TaskKey = A<string>(), Uuid = A<Guid>() }).ToList();
         }
 
         private void AssignRoles(ItSystemUsage itSystemUsage)
