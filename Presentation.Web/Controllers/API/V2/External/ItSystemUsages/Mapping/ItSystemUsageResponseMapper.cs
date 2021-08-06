@@ -39,11 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         public ItSystemUsageResponseDTO MapSystemUsageDTO(ItSystemUsage systemUsage)
         {
-            var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
-            var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
-            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
-
-            return new()
+            return new ItSystemUsageResponseDTO
             {
                 Uuid = systemUsage.Uuid,
                 SystemContext = systemUsage.ItSystem.MapIdentityNamePairDTO(),
@@ -51,97 +47,141 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 CreatedBy = systemUsage.ObjectOwner.MapIdentityNamePairDTO(),
                 LastModified = systemUsage.LastChanged,
                 LastModifiedBy = systemUsage.LastChangedByUser.MapIdentityNamePairDTO(),
-                General = new()
+                General = MapGeneral(systemUsage),
+                Roles = MapRoles(systemUsage),
+                LocalKLEDeviations = MapKle(systemUsage),
+                OrganizationUsage = MapOrganizationUsage(systemUsage),
+                ExternalReferences = MapExternalReferences(systemUsage),
+                OutgoingSystemRelations = MapOutgoingSystemRelations(systemUsage),
+                Archiving = MapArchiving(systemUsage),
+                GDPR = MapGDPR(systemUsage)
+            };
+        }
+
+        private GDPRRegistrationsResponseDTO MapGDPR(ItSystemUsage systemUsage)
+        {
+            var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
+            var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
+            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
+
+            return new GDPRRegistrationsResponseDTO
+            {
+                Purpose = systemUsage.GeneralPurpose,
+                BusinessCritical = MapYesNoExtended(systemUsage.isBusinessCritical),
+                DPIAConducted = MapYesNoExtended(systemUsage.DPIA),
+                DPIADate = systemUsage.DPIADateFor,
+                DPIADocumentation = MapSimpleLink(systemUsage.DPIASupervisionDocumentationUrlName, systemUsage.DPIASupervisionDocumentationUrl),
+                HostedAt = MapHosting(systemUsage),
+                DirectoryDocumentation = MapSimpleLink(systemUsage.LinkToDirectoryUrlName, systemUsage.LinkToDirectoryUrl),
+                DataSensitivityLevels = systemUsage
+                    .SensitiveDataLevels
+                    .Select(MapDataSensitivity)
+                    .Where(level => level.HasValue)
+                    .Select(level => level.Value)
+                    .ToList(),
+                SensitivePersonData = attachedOptions
+                    .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                    .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                RegisteredDataCategories = attachedOptions
+                    .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
+                    .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                TechnicalPrecautionsInPlace = MapYesNoExtended(systemUsage.precautions),
+                TechnicalPrecautionsApplied = MapPrecautions(systemUsage).ToList(),
+                TechnicalPrecautionsDocumentation = MapSimpleLink(systemUsage.TechnicalSupervisionDocumentationUrlName, systemUsage.TechnicalSupervisionDocumentationUrl),
+                RetentionPeriodDefined = MapYesNoExtended(systemUsage.answeringDataDPIA),
+                DataRetentionEvaluationFrequencyInMonths = systemUsage.numberDPIA,
+                NextDataRetentionEvaluationDate = systemUsage.DPIAdeleteDate,
+                RiskAssessmentConducted = MapYesNoExtended(systemUsage.riskAssessment),
+                RiskAssessmentConductedDate = systemUsage.riskAssesmentDate,
+                RiskAssessmentDocumentation = MapSimpleLink(systemUsage.RiskSupervisionDocumentationUrlName, systemUsage.RiskSupervisionDocumentationUrl),
+                RiskAssessmentNotes = systemUsage.noteRisks,
+                RiskAssessmentResult = MapRiskAssessment(systemUsage),
+                UserSupervision = MapYesNoExtended(systemUsage.UserSupervision),
+                UserSupervisionDate = systemUsage.UserSupervisionDate,
+                UserSupervisionDocumentation = MapSimpleLink(systemUsage.UserSupervisionDocumentationUrlName, systemUsage.UserSupervisionDocumentationUrl)
+            };
+        }
+
+        private ArchivingRegistrationsResponseDTO MapArchiving(ItSystemUsage systemUsage)
+        {
+            return new ArchivingRegistrationsResponseDTO
+            {
+                Active = systemUsage.ArchiveFromSystem,
+                Notes = systemUsage.ArchiveNotes,
+                ArchiveDuty = MapArchiveDuty(systemUsage),
+                DocumentBearing = systemUsage.Registertype,
+                FrequencyInMonths = systemUsage.ArchiveFreq,
+                Location = systemUsage.ArchiveLocation?.MapIdentityNamePairDTO(),
+                TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
+                Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
+                //TODO: Simplify mapping once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+                Supplier = systemUsage
+                    .SupplierId?
+                    .Transform(id => _organizationRepository.GetById(id).Select(org => org.MapShallowOrganizationResponseDTO()))?
+                    .GetValueOrDefault(),
+                JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
                 {
-                    LocalCallName = systemUsage.LocalCallName,
-                    LocalSystemId = systemUsage.LocalSystemId,
-                    Notes = systemUsage.Note,
-                    MainContract = systemUsage.MainContract?.ItContract?.MapIdentityNamePairDTO(),
-                    DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
-                    AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
-                    NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
-                    SystemVersion = systemUsage.Version,
-                    Validity = new()
-                    {
-                        EnforcedValid = systemUsage.Active,
-                        Valid = systemUsage.IsActive,
-                        ValidFrom = systemUsage.Concluded,
-                        ValidTo = systemUsage.ExpirationDate
-                    }
-                },
-                Roles = systemUsage.Rights.Select(ToRoleResponseDTO).ToList(),
-                LocalKLEDeviations = new()
+                    Approved = period.Approved,
+                    ArchiveId = period.UniqueArchiveId,
+                    StartDate = period.StartDate,
+                    EndDate = period.EndDate
+                }).ToList()
+            };
+        }
+
+        private IEnumerable<SystemRelationResponseDTO> MapOutgoingSystemRelations(ItSystemUsage systemUsage)
+        {
+            return systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList();
+        }
+
+        private static IEnumerable<ExternalReferenceDataDTO> MapExternalReferences(ItSystemUsage systemUsage)
+        {
+            return systemUsage.ExternalReferences.Select(reference => MapExternalReferenceDTO(systemUsage, reference)).ToList();
+        }
+
+        private static OrganizationUsageResponseDTO MapOrganizationUsage(ItSystemUsage systemUsage)
+        {
+            return new OrganizationUsageResponseDTO
+            {
+                ResponsibleOrganizationUnit = systemUsage.ResponsibleUsage?.OrganizationUnit?.MapIdentityNamePairDTO(),
+                UsingOrganizationUnits = systemUsage.UsedBy.Select(x => x.OrganizationUnit.MapIdentityNamePairDTO()).ToList()
+            };
+        }
+
+        private static LocalKLEDeviationsResponseDTO MapKle(ItSystemUsage systemUsage)
+        {
+            return new LocalKLEDeviationsResponseDTO
+            {
+                AddedKLE = systemUsage.TaskRefs.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList(),
+                RemovedKLE = systemUsage.TaskRefsOptOut.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList()
+            };
+        }
+
+        private static List<RoleAssignmentResponseDTO> MapRoles(ItSystemUsage systemUsage)
+        {
+            return systemUsage.Rights.Select(ToRoleResponseDTO).ToList();
+        }
+
+        private static GeneralDataResponseDTO MapGeneral(ItSystemUsage systemUsage)
+        {
+            return new GeneralDataResponseDTO
+            {
+                LocalCallName = systemUsage.LocalCallName,
+                LocalSystemId = systemUsage.LocalSystemId,
+                Notes = systemUsage.Note,
+                MainContract = systemUsage.MainContract?.ItContract?.MapIdentityNamePairDTO(),
+                DataClassification = systemUsage.ItSystemCategories?.MapIdentityNamePairDTO(),
+                AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
+                NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
+                SystemVersion = systemUsage.Version,
+                Validity = new ItSystemUsageValidityResponseDTO
                 {
-                    AddedKLE = systemUsage.TaskRefs.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList(),
-                    RemovedKLE = systemUsage.TaskRefsOptOut.Select(taskRef => taskRef.MapIdentityNamePairDTO()).ToList()
-                },
-                OrganizationUsage = new()
-                {
-                    ResponsibleOrganizationUnit = systemUsage.ResponsibleUsage?.OrganizationUnit?.MapIdentityNamePairDTO(),
-                    UsingOrganizationUnits = systemUsage.UsedBy.Select(x => x.OrganizationUnit.MapIdentityNamePairDTO()).ToList()
-                },
-                ExternalReferences = systemUsage.ExternalReferences.Select(reference => MapExternalReferenceDTO(systemUsage, reference)).ToList(),
-                OutgoingSystemRelations = systemUsage.UsageRelations.Select(MapSystemRelationDTO).ToList(),
-                Archiving = new()
-                {
-                    Active = systemUsage.ArchiveFromSystem,
-                    Notes = systemUsage.ArchiveNotes,
-                    ArchiveDuty = MapArchiveDuty(systemUsage),
-                    DocumentBearing = systemUsage.Registertype,
-                    FrequencyInMonths = systemUsage.ArchiveFreq,
-                    Location = systemUsage.ArchiveLocation?.MapIdentityNamePairDTO(),
-                    TestLocation = systemUsage.ArchiveTestLocation?.MapIdentityNamePairDTO(),
-                    Type = systemUsage.ArchiveType?.MapIdentityNamePairDTO(),
-                    //TODO: Simplify mapping once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
-                    Supplier = systemUsage
-                        .SupplierId?
-                        .Transform(id => _organizationRepository.GetById(id).Select(org => org.MapShallowOrganizationResponseDTO()))?
-                        .GetValueOrDefault(),
-                    JournalPeriods = systemUsage.ArchivePeriods.Select(period => new JournalPeriodDTO
-                    {
-                        Approved = period.Approved,
-                        ArchiveId = period.UniqueArchiveId,
-                        StartDate = period.StartDate,
-                        EndDate = period.EndDate
-                    }).ToList()
-                },
-                GDPR = new()
-                {
-                    Purpose = systemUsage.GeneralPurpose,
-                    BusinessCritical = MapYesNoExtended(systemUsage.isBusinessCritical),
-                    DPIAConducted = MapYesNoExtended(systemUsage.DPIA),
-                    DPIADate = systemUsage.DPIADateFor,
-                    DPIADocumentation = MapSimpleLink(systemUsage.DPIASupervisionDocumentationUrlName, systemUsage.DPIASupervisionDocumentationUrl),
-                    HostedAt = MapHosting(systemUsage),
-                    DirectoryDocumentation = MapSimpleLink(systemUsage.LinkToDirectoryUrlName, systemUsage.LinkToDirectoryUrl),
-                    DataSensitivityLevels = systemUsage
-                        .SensitiveDataLevels
-                        .Select(MapDataSensitivity)
-                        .Where(level => level.HasValue)
-                        .Select(level => level.Value)
-                        .ToList(),
-                    SensitivePersonData = attachedOptions
-                        .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
-                        .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
-                        .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
-                    RegisteredDataCategories = attachedOptions
-                        .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
-                        .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
-                        .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
-                    TechnicalPrecautionsInPlace = MapYesNoExtended(systemUsage.precautions),
-                    TechnicalPrecautionsApplied = MapPrecautions(systemUsage).ToList(),
-                    TechnicalPrecautionsDocumentation = MapSimpleLink(systemUsage.TechnicalSupervisionDocumentationUrlName, systemUsage.TechnicalSupervisionDocumentationUrl),
-                    RetentionPeriodDefined = MapYesNoExtended(systemUsage.answeringDataDPIA),
-                    DataRetentionEvaluationFrequencyInMonths = systemUsage.numberDPIA,
-                    NextDataRetentionEvaluationDate = systemUsage.DPIAdeleteDate,
-                    RiskAssessmentConducted = MapYesNoExtended(systemUsage.riskAssessment),
-                    RiskAssessmentConductedDate = systemUsage.riskAssesmentDate,
-                    RiskAssessmentDocumentation = MapSimpleLink(systemUsage.RiskSupervisionDocumentationUrlName, systemUsage.RiskSupervisionDocumentationUrl),
-                    RiskAssessmentNotes = systemUsage.noteRisks,
-                    RiskAssessmentResult = MapRiskAssessment(systemUsage),
-                    UserSupervision = MapYesNoExtended(systemUsage.UserSupervision),
-                    UserSupervisionDate = systemUsage.UserSupervisionDate,
-                    UserSupervisionDocumentation = MapSimpleLink(systemUsage.UserSupervisionDocumentationUrlName, systemUsage.UserSupervisionDocumentationUrl)
+                    EnforcedValid = systemUsage.Active,
+                    Valid = systemUsage.IsActive,
+                    ValidFrom = systemUsage.Concluded,
+                    ValidTo = systemUsage.ExpirationDate
                 }
             };
         }
@@ -257,7 +297,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         private static RoleAssignmentResponseDTO ToRoleResponseDTO(ItSystemRight right)
         {
-            return new() { Role = right.Role.MapIdentityNamePairDTO(), User = right.User.MapIdentityNamePairDTO() };
+            return new()
+            {
+                Role = right.Role.MapIdentityNamePairDTO(),
+                User = right.User.MapIdentityNamePairDTO()
+            };
         }
 
         private static ExpectedUsersIntervalDTO MapExpectedUsers(ItSystemUsage systemUsage)
