@@ -144,6 +144,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expectedRemovals, actualRemovals);
         }
 
+        [Fact]
+        public void MapSystemUsageDTO_Maps_OrganizationalUsage_Properties_Section()
+        {
+            //TODO:
+            ////Arrange
+            //var itSystemUsage = new ItSystemUsage();
+            //AssignBasicProperties(itSystemUsage);
+            //itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage(){}
+
+            ////Act
+            //var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            ////Assert
+            
+        }
+
         private void AssignKle(ItSystemUsage itSystemUsage)
         {
             itSystemUsage.TaskRefs = Many<Guid>().Select(x => new TaskRef() { TaskKey = A<string>(), Uuid = A<Guid>() }).ToList();
