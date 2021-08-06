@@ -15,6 +15,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -150,9 +151,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            var responsibleUsage = CreateOrganizationUnit();
-            itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = responsibleUsage };
-            itSystemUsage.UsedBy = new[] { CreateOrganizationUnit(), CreateOrganizationUnit(), responsibleUsage }.Select(unit => new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit }).ToList();
+            AssignOrganizationalUsage(itSystemUsage);
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -160,12 +159,68 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertIdentity(itSystemUsage.ResponsibleUsage.OrganizationUnit, dto.OrganizationUsage.ResponsibleOrganizationUnit);
             var expectedUnits = itSystemUsage.UsedBy.Select(x => x.OrganizationUnit).OrderBy(x => x.Name).ToList();
-            var actualUnits = dto.OrganizationUsage.UsingOrganizationUnits.OrderBy(x=>x.Name).ToList();
+            var actualUnits = dto.OrganizationUsage.UsingOrganizationUnits.OrderBy(x => x.Name).ToList();
             Assert.Equal(expectedUnits.Count, actualUnits.Count);
             foreach (var comparison in expectedUnits.Zip(actualUnits, (expected, actual) => new { expected, actual }).ToList())
             {
                 AssertIdentity(comparison.expected, comparison.actual);
             }
+        }
+
+        [Fact]
+        public void MapSystemUsageDTO_Maps_ExternalReferences_Properties_Section()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignExternalReferences(itSystemUsage);
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            AssertExternalReferences(itSystemUsage, dto.ExternalReferences.ToList());
+        }
+
+        private static void AssertExternalReferences(ItSystemUsage itSystemUsage, List<ExternalReferenceDataDTO> dtoExternalReferences)
+        {
+            var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
+            AssertExternalReference(itSystemUsage.Reference, actualMaster);
+            Assert.Equal(itSystemUsage.ExternalReferences.Count, dtoExternalReferences.Count);
+
+            foreach (var comparison in itSystemUsage.ExternalReferences.OrderBy(x => x.Title)
+                .Zip(dtoExternalReferences.OrderBy(x => x.Title), (expected, actual) => new { expected, actual })
+                .ToList())
+            {
+                AssertExternalReference(comparison.expected, comparison.actual);
+            }
+        }
+
+        private static void AssertExternalReference(ExternalReference reference, ExternalReferenceDataDTO actualMaster)
+        {
+            Assert.Equal(reference.Title, actualMaster.Title);
+            Assert.Equal(reference.URL, actualMaster.Url);
+            Assert.Equal(reference.ExternalReferenceId, actualMaster.DocumentId);
+        }
+
+        private void AssignExternalReferences(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.ExternalReferences = Many<string>().Select((title, i) => new ExternalReference
+            {
+                Title = title,
+                URL = A<string>(),
+                ExternalReferenceId = A<string>(),
+                Id = i
+            }).ToList();
+            itSystemUsage.Reference = itSystemUsage.ExternalReferences.OrderBy(x => A<int>()).First();
+        }
+
+        private void AssignOrganizationalUsage(ItSystemUsage itSystemUsage)
+        {
+            var responsibleUsage = CreateOrganizationUnit();
+            itSystemUsage.ResponsibleUsage = new ItSystemUsageOrgUnitUsage { OrganizationUnit = responsibleUsage };
+            itSystemUsage.UsedBy = new[] { CreateOrganizationUnit(), CreateOrganizationUnit(), responsibleUsage }
+                .Select(unit => new ItSystemUsageOrgUnitUsage { OrganizationUnit = unit }).ToList();
         }
 
         private OrganizationUnit CreateOrganizationUnit()
