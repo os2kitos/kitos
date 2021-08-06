@@ -15,6 +15,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Toolkit.Patterns;
@@ -182,6 +183,71 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertExternalReferences(itSystemUsage, dto.ExternalReferences.ToList());
         }
 
+        [Fact]
+        public void MapSystemUsageDTO_Maps_OutgoingSystemRelations_Properties_Section()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage();
+            AssignBasicProperties(itSystemUsage);
+            AssignSystemRelations(itSystemUsage);
+
+            //Act
+            var dto = _sut.MapSystemUsageDTO(itSystemUsage);
+
+            //Assert
+            var expectedRelations = itSystemUsage.UsageRelations.ToList();
+            var actualRelations = dto.OutgoingSystemRelations.ToList();
+            Assert.Equal(expectedRelations.Count, actualRelations.Count);
+            foreach (var comparison in expectedRelations.OrderBy(x => x.Uuid).Zip(actualRelations.OrderBy(x => x.Uuid), (expected, actual) => new { expected, actual }).ToList())
+            {
+                AssertRelation(comparison.expected, comparison.actual);
+            }
+        }
+
+        private static void AssertRelation(SystemRelation expected, SystemRelationResponseDTO actual)
+        {
+            Assert.Equal(expected.Uuid, actual.Uuid);
+            Assert.Equal(expected.Description, actual.Description);
+            Assert.Equal(expected.Reference, actual.UrlReference);
+            AssertIdentity(expected.ToSystemUsage, actual.ToSystemUsage);
+            AssertOptionalIdentity(expected.AssociatedContract, actual.AssociatedContract);
+            AssertOptionalIdentity(expected.UsageFrequency, actual.RelationFrequency);
+            AssertOptionalIdentity(expected.RelationInterface, actual.UsingInterface);
+        }
+
+        private static void AssertOptionalIdentity<T>(T optionalExpectedIdentity, IdentityNamePairResponseDTO actualIdentity) where T : IHasUuid, IHasName
+        {
+            if (optionalExpectedIdentity == null)
+                Assert.Null(actualIdentity);
+            else
+                AssertIdentity(optionalExpectedIdentity, actualIdentity);
+        }
+
+        private void AssignSystemRelations(ItSystemUsage itSystemUsage)
+        {
+            itSystemUsage.UsageRelations = new[]
+            {
+                CreateSystemRelation(itSystemUsage,false,false,false),
+                CreateSystemRelation(itSystemUsage,false,false,true),
+                CreateSystemRelation(itSystemUsage,false,true,true),
+                CreateSystemRelation(itSystemUsage,true,true,true)
+            }.ToList();
+        }
+
+        private SystemRelation CreateSystemRelation(ItSystemUsage itSystemUsage, bool withContract = false, bool withFrequency = false, bool withInterface = false)
+        {
+            return new SystemRelation(itSystemUsage)
+            {
+                Uuid = A<Guid>(),
+                Reference = A<string>(),
+                AssociatedContract = withContract ? new ItContract() { Uuid = A<Guid>(), Name = A<string>() } : null,
+                RelationInterface = withInterface ? new ItInterface { Uuid = A<Guid>(), Name = A<string>() } : null,
+                UsageFrequency = withFrequency ? new RelationFrequencyType() { Uuid = A<Guid>(), Name = A<string>() } : null,
+                ToSystemUsage = new ItSystemUsage() { Uuid = A<Guid>(), ItSystem = new ItSystem() { Name = A<string>() } },
+                Description = A<string>()
+            };
+        }
+
         private static void AssertExternalReferences(ItSystemUsage itSystemUsage, List<ExternalReferenceDataDTO> dtoExternalReferences)
         {
             var actualMaster = Assert.Single(dtoExternalReferences, reference => reference.MasterReference);
@@ -243,7 +309,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }).ToList();
             itSystemUsage.Rights = rights;
         }
-
         private static void AssertUserCount(ItSystemUsage itSystemUsage, ExpectedUsersIntervalDTO generalNumberOfExpectedUsers)
         {
             (int? from, int? to) expected = itSystemUsage.UserCount switch
@@ -299,6 +364,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             AssertIdentity(organization, dtoOrganizationContext);
             Assert.Equal(organization.Cvr, dtoOrganizationContext.Cvr);
+        }
+
+        private static void AssertIdentity(ItSystemUsage sourceIdentity, IdentityNamePairResponseDTO dto)
+        {
+            Assert.Equal(sourceIdentity.ItSystem.Name, dto.Name);
+            Assert.Equal(sourceIdentity.Uuid, dto.Uuid);
         }
 
         private static void AssertIdentity<T>(T sourceIdentity, IdentityNamePairResponseDTO dto) where T : IHasUuid, IHasName
