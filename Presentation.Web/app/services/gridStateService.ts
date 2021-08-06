@@ -207,7 +207,7 @@
                 }
 
                 var options: IGridSavedState = { columnState : null };
-
+                
 
                 if (sessionOptions) {
                     // if session options are set then use them
@@ -222,15 +222,19 @@
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
                 }
 
-                else if (orgStorageColumns) {
-                    var columns: { [persistId: string]: { index: number; width: number, hidden?: boolean } } = {};
-                    orgStorageColumns.forEach(x => {
-                        var column = grid.columns.filter(y => y.persistId === x.persistId);
-                        if (column.length === 1) {
-                            columns[x.persistId] = { index: x.index, width: column[0].width as number, hidden: x.hidden };
-                        }
-                    });
-                    options.columnState = columns;
+                if ($window.sessionStorage.getItem(versionKey) !== null) {
+                    // Session updates has not changed the grid as updates to the grid which changes the columns causes the version to be deleted
+                    // So we use the local organization configuration if it exists
+                    if (orgStorageColumns) {
+                        var columns: { [persistId: string]: { index: number; width: number, hidden?: boolean } } = {};
+                        orgStorageColumns.forEach(x => {
+                            var column = grid.columns.filter(y => y.persistId === x.persistId);
+                            if (column.length === 1) {
+                                columns[x.persistId] = { index: x.index, width: column[0].width as number, hidden: x.hidden };
+                            }
+                        });
+                        options.columnState = columns;
+                    }
                 }
 
                 return options;
