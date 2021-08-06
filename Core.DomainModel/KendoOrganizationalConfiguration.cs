@@ -23,7 +23,6 @@ namespace Core.DomainModel
         public void UpdateVersion()
         {
             //TODO: JMO - det skal være en hash - ikke bare ebn kæmpe string
-            //TODO: JMO: Order by name i stedet. Index hører ikke hjemme her
             Version = string.Join("", Columns.Where(x => !x.Hidden).OrderBy(x => x.Index).Select(x => x.PersistId));
         }
     }
@@ -38,7 +37,7 @@ namespace Core.DomainModel
     {
         public int Id { get; set; }
         public string PersistId { get; set; }
-        public int Index { get; set; } //TODO: JMO - det ´her er ikke relevant for konfigurationen. Det er ikke rækkefølgen men derimod bare "hvilke" kolonner de ser på
+        public int Index { get; set; }
         public bool Hidden { get; set; } //TODO: JMO - det er ikke relevant. Hvis ikke den "er her" så er den ikke synlig
 
         public int KendoOrganizationalConfigurationId { get; set; }
