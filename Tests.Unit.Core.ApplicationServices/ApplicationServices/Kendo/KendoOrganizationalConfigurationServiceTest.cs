@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Data;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
@@ -37,13 +38,13 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var kendoConfig = new KendoOrganizationalConfiguration
             {
                 OrganizationId = orgId,
-                OverviewType = overviewType,
-                VisibleColumns = kendoColumns
+                OverviewType = overviewType
             };
-            kendoConfig.UpdateVersion();
+            kendoConfig.AddColumns(kendoColumns);
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
             _repository.Setup(x => x.Add(It.IsAny<KendoOrganizationalConfiguration>())).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowCreate<KendoOrganizationalConfiguration>(orgId)).Returns(true);
+            var transaction = ExpectTransaction();
 
             //Act
             var createResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
@@ -52,6 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             Assert.True(createResult.Ok);
             var configuration = createResult.Value;
             Assert.Same(configuration, kendoConfig);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -69,6 +71,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowModify(kendoConfig)).Returns(true);
+            var transaction = ExpectTransaction();
 
             //Act
             var updateResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
@@ -81,6 +84,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var configuration = updateResult.Value;
             Assert.Equal(configuration.OrganizationId, orgId);
             Assert.Equal(configuration.OverviewType, overviewType);
+            transaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -93,9 +97,10 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var kendoConfig = new KendoOrganizationalConfiguration
             {
                 OrganizationId = orgId,
-                OverviewType = overviewType,
-                VisibleColumns = kendoColumns
+                OverviewType = overviewType
             };
+            kendoConfig.AddColumns(kendoColumns);
+            _authorizationContext.Setup(x => x.AllowReads(kendoConfig)).Returns(true);
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
 
             //Act
@@ -146,6 +151,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
             _repository.Setup(x => x.Add(It.IsAny<KendoOrganizationalConfiguration>())).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowCreate<KendoOrganizationalConfiguration>(orgId)).Returns(false);
+            var transaction = ExpectTransaction();
 
             //Act
             var createResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
@@ -153,6 +159,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             //Assert
             Assert.True(createResult.Failed);
             Assert.Equal(OperationFailure.Forbidden, createResult.Error.FailureType);
+            transaction.Verify(x => x.Rollback());
         }
 
         [Fact]
@@ -170,6 +177,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowModify(kendoConfig)).Returns(false);
+            var transaction = ExpectTransaction();
 
             //Act
             var updateResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
@@ -178,6 +186,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             Assert.True(updateResult.Failed);
             Assert.Equal(OperationFailure.Forbidden, updateResult.Error.FailureType);
             _repository.Verify(x => x.Update(It.IsAny<KendoOrganizationalConfiguration>()), Times.Never);
+            transaction.Verify(x => x.Rollback());
         }
 
         [Fact]
@@ -186,6 +195,13 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             //Arrange
             var orgId = A<int>();
             var overviewType = A<OverviewType>();
+            var kendoColumns = CreateColumnConfigurations();
+            var kendoConfig = new KendoOrganizationalConfiguration
+            {
+                OrganizationId = orgId,
+                OverviewType = overviewType,
+                VisibleColumns = kendoColumns
+            };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
 
             //Act
@@ -194,6 +210,30 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             //Assert
             Assert.True(getResult.Failed);
             Assert.Equal(OperationFailure.NotFound, getResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void Get_Fails_If_Not_Allowed_To_Read()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var overviewType = A<OverviewType>();
+            var kendoColumns = CreateColumnConfigurations();
+            var kendoConfig = new KendoOrganizationalConfiguration
+            {
+                OrganizationId = orgId,
+                OverviewType = overviewType
+            };
+            kendoConfig.AddColumns(kendoColumns);
+            _authorizationContext.Setup(x => x.AllowReads(kendoConfig)).Returns(false);
+            _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
+
+            //Act
+            var getResult = _sut.Get(orgId, overviewType);
+
+            //Assert
+            Assert.True(getResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, getResult.Error.FailureType);
         }
 
         [Fact]
@@ -237,7 +277,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             Assert.Equal(OperationFailure.NotFound, deleteResult.Error.FailureType);
         }
 
-        public List<KendoColumnConfiguration> CreateColumnConfigurations()
+        private List<KendoColumnConfiguration> CreateColumnConfigurations()
         {
             return new List<KendoColumnConfiguration>()
             {
@@ -250,6 +290,13 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
                     PersistId = A<string>()
                 }
             };
+        }
+
+        private Mock<IDatabaseTransaction> ExpectTransaction()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            return transaction;
         }
     }
 }
