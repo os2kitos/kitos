@@ -168,7 +168,7 @@
                     },
                     {
                         name: "clearFilter",
-                        text: "Nulstil",
+                        text: "Gendan kolonneopsætning",
                         template: "<button type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='interfaceCatalogVm.clearOptions()'>#: text #</button>"
                     },
                     {
