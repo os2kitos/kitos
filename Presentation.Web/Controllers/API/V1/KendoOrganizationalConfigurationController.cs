@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -35,10 +36,9 @@ namespace Presentation.Web.Controllers.API.V1
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
-            var columns = dto.Columns.Select(x => new KendoColumnConfiguration(){
+            var columns = dto.VisibleColumns.Select(x => new KendoColumnConfiguration(){
                 PersistId = x.PersistId,
-                Index = x.Index,
-                Hidden = x.Hidden
+                Index = x.Index
                 });
 
             return _kendoOrganizationalConfigurationService
@@ -51,11 +51,10 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        public HttpResponseMessage GetConfiguration([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
         {
-            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
-            if (organizationId == null || overviewType == null)
-                return BadRequest("Please provide both organizationId and overviewType");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
                 .Get(organizationId.Value, overviewType.Value)
@@ -67,14 +66,14 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<string>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetConfigurationVersion([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        public HttpResponseMessage GetConfigurationVersion([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
         {
-            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
-            if (organizationId == null || overviewType == null)
-                return BadRequest("Please provide both organizationId and overviewType");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .GetVersion(organizationId.Value, overviewType.Value) //TODO: JMO - bare kald Get(...).Select(x=>x.Version)-...
+                .Get(organizationId.Value, overviewType.Value)
+                .Select(x => x.Version)
                 .Match(Ok, FromOperationError);
         }
 
@@ -83,11 +82,10 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        public HttpResponseMessage DeleteConfiguration([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
         {
-            //TODO: JMO - sæt Required prop på og brug model state validatoin. Så får de en god fejl.
-            if (organizationId == null || overviewType == null)
-                return BadRequest("Please provide both organizationId and overviewType");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
                 .Delete(organizationId.Value, overviewType.Value)
@@ -100,7 +98,7 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 OrganizationId = value.OrganizationId,
                 OverviewType = value.OverviewType,
-                Columns = value.Columns.Select(x => Map(x)).ToList(),
+                VisibleColumns = value.VisibleColumns.Select(x => Map(x)).ToList(),
                 Version = value.Version
             };
         }
@@ -110,8 +108,7 @@ namespace Presentation.Web.Controllers.API.V1
             return new KendoColumnConfigurationDTO
             {
                 PersistId = value.PersistId,
-                Index = value.Index,
-                Hidden = value.Hidden
+                Index = value.Index
             };
         }
     }

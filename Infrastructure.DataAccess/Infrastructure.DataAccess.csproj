@@ -773,9 +773,9 @@
     <Compile Include="Migrations\202108030546068_ITSystemUsage_Add_Uuid.designer.cs">
       <DependentUpon>202108030546068_ITSystemUsage_Add_Uuid.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202108051109451_Changed_Kendo_Configuration.cs" />
-    <Compile Include="Migrations\202108051109451_Changed_Kendo_Configuration.designer.cs">
-      <DependentUpon>202108051109451_Changed_Kendo_Configuration.cs</DependentUpon>
+    <Compile Include="Migrations\202108090753257_Changed_Kendo_Configuration.cs" />
+    <Compile Include="Migrations\202108090753257_Changed_Kendo_Configuration.designer.cs">
+      <DependentUpon>202108090753257_Changed_Kendo_Configuration.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1270,8 +1270,8 @@
     <EmbeddedResource Include="Migrations\202108030546068_ITSystemUsage_Add_Uuid.resx">
       <DependentUpon>202108030546068_ITSystemUsage_Add_Uuid.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202108051109451_Changed_Kendo_Configuration.resx">
-      <DependentUpon>202108051109451_Changed_Kendo_Configuration.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202108090753257_Changed_Kendo_Configuration.resx">
+      <DependentUpon>202108090753257_Changed_Kendo_Configuration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

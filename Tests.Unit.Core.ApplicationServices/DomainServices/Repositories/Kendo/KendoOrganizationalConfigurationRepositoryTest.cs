@@ -56,11 +56,11 @@ namespace Tests.Unit.Core.DomainServices.Repositories.Kendo
             var config = new KendoOrganizationalConfiguration();
 
             //Act
-            _sut.DeleteChilds(config);
+            _sut.DeleteColumns(config);
 
             //Assert
             _columnRepository.Verify(x => x.Save(), Times.Once);
-            _columnRepository.Verify(x => x.RemoveRange(config.Columns), Times.Once);
+            _columnRepository.Verify(x => x.RemoveRange(config.VisibleColumns), Times.Once);
         }
 
         private void VerifySaved()

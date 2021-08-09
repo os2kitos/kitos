@@ -39,10 +39,9 @@ namespace Core.DomainServices.Repositories.Kendo
             _repository.Save();
         }
 
-        public void DeleteChilds(KendoOrganizationalConfiguration configWithChildsToBeDeleted)
+        public void DeleteColumns(KendoOrganizationalConfiguration configWithChildsToBeDeleted)
         {
-            //TODO: JMO - behøves vi der her skridt? Kan vi ikke bare slette i collection og så tilføje bagefter. 
-            _columnRepository.RemoveRange(configWithChildsToBeDeleted.Columns);
+            _columnRepository.RemoveRange(configWithChildsToBeDeleted.VisibleColumns);
             _columnRepository.Save();
         }
     }

@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 OverviewType = overviewType,
                 OrganizationId = orgId,
-                Columns = columns
+                VisibleColumns = columns
             };
 
             return await HttpApi.PostWithCookieAsync(url, cookie, body);

@@ -4,6 +4,7 @@ using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Kendo;
+using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -16,12 +17,14 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
         private readonly KendoOrganizationalConfigurationService _sut;
         private readonly Mock<IKendoOrganizationalConfigurationRepository> _repository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
+        private readonly Mock<ITransactionManager> _transactionManager;
 
         public KendoOrganizationalConfigurationServiceTest()
         {
             _repository = new Mock<IKendoOrganizationalConfigurationRepository>();
             _authorizationContext = new Mock<IAuthorizationContext>();
-            _sut = new KendoOrganizationalConfigurationService(_authorizationContext.Object, _repository.Object);
+            _transactionManager = new Mock<ITransactionManager>();
+            _sut = new KendoOrganizationalConfigurationService(_authorizationContext.Object, _repository.Object, _transactionManager.Object);
         }
 
         [Fact]
@@ -35,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             kendoConfig.UpdateVersion();
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
@@ -62,7 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowModify(kendoConfig)).Returns(true);
@@ -71,7 +74,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             var updateResult = _sut.CreateOrUpdate(orgId, overviewType, kendoColumns);
 
             //Assert
-            _repository.Verify(x => x.DeleteChilds(It.IsAny<KendoOrganizationalConfiguration>()), Times.Once);
+            _repository.Verify(x => x.DeleteColumns(It.IsAny<KendoOrganizationalConfiguration>()), Times.Once);
             _repository.Verify(x => x.Update(It.IsAny<KendoOrganizationalConfiguration>()), Times.Once);
 
             Assert.True(updateResult.Ok);
@@ -91,7 +94,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
 
@@ -114,7 +117,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(true);
@@ -138,7 +141,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(Maybe<KendoOrganizationalConfiguration>.None);
             _repository.Setup(x => x.Add(It.IsAny<KendoOrganizationalConfiguration>())).Returns(kendoConfig);
@@ -163,7 +166,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowModify(kendoConfig)).Returns(false);
@@ -204,7 +207,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
             {
                 OrganizationId = orgId,
                 OverviewType = overviewType,
-                Columns = kendoColumns
+                VisibleColumns = kendoColumns
             };
             _repository.Setup(x => x.Get(orgId, overviewType)).Returns(kendoConfig);
             _authorizationContext.Setup(x => x.AllowDelete(kendoConfig)).Returns(false);

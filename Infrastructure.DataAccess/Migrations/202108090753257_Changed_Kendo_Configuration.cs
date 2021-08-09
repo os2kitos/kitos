@@ -14,7 +14,6 @@
                         Id = c.Int(nullable: false, identity: true),
                         PersistId = c.String(),
                         Index = c.Int(nullable: false),
-                        Hidden = c.Boolean(nullable: false),
                         KendoOrganizationalConfigurationId = c.Int(nullable: false),
                     })
                 .PrimaryKey(t => t.Id)
@@ -22,6 +21,7 @@
                 .Index(t => t.KendoOrganizationalConfigurationId);
             
             AddColumn("dbo.KendoOrganizationalConfigurations", "Version", c => c.String(nullable: false));
+            CreateIndex("dbo.KendoOrganizationalConfigurations", "OverviewType", name: "KendoOrganizationalConfiguration_OverviewType");
             DropColumn("dbo.KendoOrganizationalConfigurations", "Configuration");
         }
         
@@ -30,6 +30,7 @@
             AddColumn("dbo.KendoOrganizationalConfigurations", "Configuration", c => c.String(nullable: false));
             DropForeignKey("dbo.KendoColumnConfigurations", "KendoOrganizationalConfigurationId", "dbo.KendoOrganizationalConfigurations");
             DropIndex("dbo.KendoColumnConfigurations", new[] { "KendoOrganizationalConfigurationId" });
+            DropIndex("dbo.KendoOrganizationalConfigurations", "KendoOrganizationalConfiguration_OverviewType");
             DropColumn("dbo.KendoOrganizationalConfigurations", "Version");
             DropTable("dbo.KendoColumnConfigurations");
         }

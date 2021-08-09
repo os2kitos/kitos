@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(overviewType, kendoConfig.OverviewType);
             columns.ForEach(x =>
             {
-                Assert.Contains(x.PersistId, kendoConfig.Columns.Select(y => y.PersistId));
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
             });
         }
 
@@ -48,7 +48,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(overviewType, kendoConfig.OverviewType);
             columns.ForEach(x =>
             {
-                Assert.Contains(x.PersistId, kendoConfig.Columns.Select(y => y.PersistId));
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
             });
 
             var newColumns = CreateColumnConfigurations();
@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(overviewType, updatedKendoConfig.OverviewType);
             newColumns.ForEach(x =>
             {
-                Assert.Contains(x.PersistId, updatedKendoConfig.Columns.Select(y => y.PersistId));
+                Assert.Contains(x.PersistId, updatedKendoConfig.VisibleColumns.Select(y => y.PersistId));
             });
 
         }
@@ -88,7 +88,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             Assert.Equal(overviewType, kendoConfig.OverviewType);
             columns.ForEach(x =>
             {
-                Assert.Contains(x.PersistId, kendoConfig.Columns.Select(y => y.PersistId));
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
             });
         }
 

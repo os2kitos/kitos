@@ -717,14 +717,14 @@ module Kitos.Utility.KendoGrid {
                     showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
                     canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
                     doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
-                    gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan standardopsætning' for at benytte den gældende opsætning" : ""
+                    gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan kolonneopsætning' for at benytte den gældende opsætning" : ""
                 }
             };
 
             var toolbar = [
                 {
                     name: "clearFilter",
-                    text: "Gendan standardopsætning ",
+                    text: "Gendan kolonneopsætning ",
                     template:
                         "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-show='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },

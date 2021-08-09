@@ -102,9 +102,8 @@
                     saveGridStateForever(options);
                     saveGridStateForSession(options);
 
-                    // Compare the order of the visible columns with the order last retrieved from the server.
-                    //TODO: JMO husk at orderby persistid inden
-                    const version = options.columns.filter(x => !x.hidden).map(x => x.persistId).join("");
+                    // Compare the visible columns with the visible columns retrieved from the server.
+                    const version = options.columns.filter(x => !x.hidden).map(x => x.persistId).sort().join("");
                     const localVersion = $window.sessionStorage.getItem(versionKey);
                     if (localVersion !== null && version !== localVersion) {
                         $window.sessionStorage.removeItem(versionKey);
@@ -233,10 +232,17 @@
                     // So we use the local organization configuration if it exists
                     if (orgStorageColumns) {
                         var columns: { [persistId: string]: { index: number; width: number, hidden?: boolean } } = {};
+
+                        // Hide all columns to begin with
+                        grid.columns.forEach(x => {
+                            x.hidden = true;
+                        });
+
+                        // The visible columns from the server are then made visible 
                         orgStorageColumns.forEach(x => {
                             var column = grid.columns.filter(y => y.persistId === x.persistId);
-                            if (column.length === 1) {
-                                columns[x.persistId] = { index: x.index, width: column[0].width as number, hidden: x.hidden };
+                            if (column.length === 1) { // If this value is not 1 the column doesn't seem to exist and therefore we don't make it visible.
+                                columns[x.persistId] = { index: x.index, width: column[0].width as number, hidden: false };
                             }
                         });
                         options.columnState = columns;
@@ -283,7 +289,7 @@
 
             function getGridVersion(): ng.IPromise<string> { 
                 return KendoFilterService
-                    .GetConfigurationVersion(user.currentOrganizationId, overviewType)
+                    .getConfigurationVersion(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
                             return result.data.response;
@@ -295,14 +301,14 @@
 
             function getGridProfileForOrg() {
                 KendoFilterService
-                    .GetConfigurationFromOrg(user.currentOrganizationId, overviewType)
+                    .getConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
                             orgStorageExists = true;
                             const version = result.data.response.version;
                             const localVersion = $window.sessionStorage.getItem(versionKey);
                             if (version !== localVersion) {
-                                const columns = result.data.response.columns;
+                                const columns = result.data.response.visibleColumns;
                                 $window.sessionStorage.setItem(orgStorageColumnsKey, JSONfn.stringify(columns));
                                 $window.sessionStorage.setItem(versionKey, version);
                             }
@@ -323,10 +329,12 @@
                 var columns: Models.Generic.IKendoColumnConfigurationDTO[] = [];
                 for (var i = 0; i < options.columns.length; i++) {
                     var column = options.columns[i];
-                    columns.push({ persistId: column.persistId, index: i, hidden: column.hidden });
+                    if (column.hidden)
+                        continue;
+                    columns.push({ persistId: column.persistId, index: i });
                 }
 
-                KendoFilterService.PostConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
+                KendoFilterService.postConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
@@ -339,7 +347,7 @@
             }
 
             function deleteGridProfileForOrg(overviewType: Models.Generic.OverviewType) {
-                KendoFilterService.DeleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
+                KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Organisationens gemte filtre og sorteringer er slettet");
