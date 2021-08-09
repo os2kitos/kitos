@@ -60,7 +60,7 @@
             var profileStorageKey = storageKey + "-profile";
             var orgStorageColumnsKey = storageKey + "-OrgProfile";
             var versionKey = storageKey + "-version";
-            // Consider this in: https://os2web.atlassian.net/browse/KITOSUDV-1674. Notice. This is an async method and is not handled as such. Do not make async call in the factory
+
             getOrgFilterOptions(overviewType);
 
             var service: IGridStateService = {

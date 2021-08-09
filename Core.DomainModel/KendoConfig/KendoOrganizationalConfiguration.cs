@@ -24,7 +24,7 @@ namespace Core.DomainModel
                 VisibleColumns.Add(x);
             });
 
-            //TODO: JMO - det skal være en hash - ikke bare ebn kæmpe string
+
             Version = string.Join("", VisibleColumns.OrderBy(x => x.PersistId).Select(x => x.PersistId));
         }
     }
