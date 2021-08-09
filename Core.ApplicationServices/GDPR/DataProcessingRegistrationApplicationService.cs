@@ -20,6 +20,7 @@ using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Options;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -502,6 +503,21 @@ namespace Core.ApplicationServices.GDPR
                 registration.OversightCompletedRemark = remark;
                 return registration;
             });
+        }
+
+        public IQueryable<DataProcessingRegistration> GetDataProcessingRegistrationsByOrganization(int orgId, params IDomainQuery<DataProcessingRegistration>[] conditions)
+        {
+            var baseQuery = _repository.GetDataProcessingRegistrationsFromOrganization(orgId);
+
+            var subQueries = new List<IDomainQuery<DataProcessingRegistration>>();
+
+            subQueries.AddRange(conditions);
+
+            var result = subQueries.Any()
+                ? new IntersectionQuery<DataProcessingRegistration>(subQueries).Apply(baseQuery)
+                : baseQuery;
+
+            return result;
         }
     }
 }

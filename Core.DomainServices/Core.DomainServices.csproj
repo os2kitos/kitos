@@ -91,7 +91,8 @@
     <Compile Include="Organizations\OrgUnitService.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUuid.cs" />
-    <Compile Include="Queries\SystemUsage\QueryByRelationToSystem.cs" />
+    <Compile Include="Queries\DPR\QueryBySystemUsageUuid.cs" />
+    <Compile Include="Queries\DPR\QueryBySystemUuid.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />
     <Compile Include="Queries\ItSystem\QueryByNumberOfUsages.cs" />
     <Compile Include="Queries\ItSystem\QueryByRightsHolderIdOrOwnOrganizationIds.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
     <Compile Include="Queries\QueryByOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
+    <Compile Include="Queries\SystemUsage\QueryByRelationToSystem.cs" />
     <Compile Include="Queries\SystemUsage\QueryByRelationToSystemUsage.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemNameContent.cs" />
     <Compile Include="Queries\SystemUsage\QueryBySystemUuid.cs" />

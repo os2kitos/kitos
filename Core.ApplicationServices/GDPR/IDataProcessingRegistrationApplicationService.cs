@@ -7,6 +7,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
+using Core.DomainServices.Queries;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.GDPR
@@ -55,5 +56,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(int id, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
+
+        IQueryable<DataProcessingRegistration> GetDataProcessingRegistrationsByOrganization(int orgId, params IDomainQuery<DataProcessingRegistration>[] conditions);
     }
 }

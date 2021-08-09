@@ -344,10 +344,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
+    <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
@@ -364,6 +366,7 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\IItSystemUsageResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ItSystemUsageResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
@@ -419,7 +422,6 @@
     <Compile Include="Models\API\V1\Users\UserWithApiAccessDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithOrganizationDTO.cs" />
-    <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Extensions\QueryablePaginationExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\DenyRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Filters\AdvisSendFailureFilter.cs" />
@@ -538,7 +540,6 @@
     <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsItSystemRolesController.cs" />
     <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsItSystemsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
-    <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />

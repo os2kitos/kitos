@@ -205,6 +205,8 @@
     <Compile Include="Controllers\CronStringHelperTests.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUsageUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryBySystemUsageUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
     <Compile Include="DomainServices\KLE\QueryByDescriptionContentTest.cs" />
