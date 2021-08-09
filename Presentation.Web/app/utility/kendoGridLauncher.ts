@@ -801,6 +801,7 @@ module Kitos.Utility.KendoGrid {
                                         var selectedId = e.sender.value();
                                         const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
                                         entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                        this.saveGridOptions();
                                     }
                                 }
                             }

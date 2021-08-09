@@ -60,9 +60,9 @@
             var profileStorageKey = storageKey + "-profile";
             var orgStorageColumnsKey = storageKey + "-OrgProfile";
             var versionKey = storageKey + "-version";
-            var orgStorageExists: boolean = false;
             // Consider this in: https://os2web.atlassian.net/browse/KITOSUDV-1674. Notice. This is an async method and is not handled as such. Do not make async call in the factory
             getOrgFilterOptions(overviewType);
+
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -88,7 +88,7 @@
                 getGridVersion().then((result) => {
                     if (result !== null && result !== $window.sessionStorage.getItem(versionKey)) {
                         getGridProfileForOrg();
-                    }
+                    } 
                 });
             } 
 
@@ -304,7 +304,6 @@
                     .getConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
-                            orgStorageExists = true;
                             const version = result.data.response.version;
                             const localVersion = $window.sessionStorage.getItem(versionKey);
                             if (version !== localVersion) {
@@ -316,7 +315,6 @@
                     })
                     .catch((result) => {
                         if (result.status === 404) {
-                            orgStorageExists = false;
                             // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
                             $window.sessionStorage.removeItem(orgStorageColumnsKey);
                         }
@@ -392,7 +390,7 @@
                     return false; // No defaults defined for this overview type
                 }
 
-                if (!orgStorageExists) {
+                if ($window.sessionStorage.getItem(orgStorageColumnsKey) === null) {
                     return false;
                 }
 
@@ -404,7 +402,7 @@
             }
 
             function canDeleteGridProfileForOrg() {
-                return orgStorageExists;
+                return $window.sessionStorage.getItem(orgStorageColumnsKey) !== null;
             }
         }
     }
