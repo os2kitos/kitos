@@ -785,9 +785,9 @@
     <Compile Include="Migrations\202108040928328_ITSystemUsage_Remove_DirectoryOrUrlRef.designer.cs">
       <DependentUpon>202108040928328_ITSystemUsage_Remove_DirectoryOrUrlRef.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202108100824321_DataProcessingRegistration_Added_Uuid.cs" />
-    <Compile Include="Migrations\202108100824321_DataProcessingRegistration_Added_Uuid.designer.cs">
-      <DependentUpon>202108100824321_DataProcessingRegistration_Added_Uuid.cs</DependentUpon>
+    <Compile Include="Migrations\202108101254107_DataProcessingRegistration_Added_Uuid.cs" />
+    <Compile Include="Migrations\202108101254107_DataProcessingRegistration_Added_Uuid.designer.cs">
+      <DependentUpon>202108101254107_DataProcessingRegistration_Added_Uuid.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1291,8 +1291,8 @@
     <EmbeddedResource Include="Migrations\202108040928328_ITSystemUsage_Remove_DirectoryOrUrlRef.resx">
       <DependentUpon>202108040928328_ITSystemUsage_Remove_DirectoryOrUrlRef.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202108100824321_DataProcessingRegistration_Added_Uuid.resx">
-      <DependentUpon>202108100824321_DataProcessingRegistration_Added_Uuid.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202108101254107_DataProcessingRegistration_Added_Uuid.resx">
+      <DependentUpon>202108101254107_DataProcessingRegistration_Added_Uuid.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

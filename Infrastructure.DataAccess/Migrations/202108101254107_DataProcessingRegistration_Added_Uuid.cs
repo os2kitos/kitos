@@ -1,6 +1,7 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+
+namespace Infrastructure.DataAccess.Migrations
 {
-    using Infrastructure.DataAccess.Tools;
     using System;
     using System.Data.Entity.Migrations;
     
@@ -10,10 +11,12 @@
         {
             AddColumn("dbo.DataProcessingRegistrations", "Uuid", c => c.Guid(nullable: false));
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Patch_Uuid_DataProcessingRegistration.sql"));
+            CreateIndex("dbo.DataProcessingRegistrations", "Uuid", unique: true, name: "UX_DataProcessingRegistration_Uuid");
         }
         
         public override void Down()
         {
+            DropIndex("dbo.DataProcessingRegistrations", "UX_DataProcessingRegistration_Uuid");
             DropColumn("dbo.DataProcessingRegistrations", "Uuid");
         }
     }
