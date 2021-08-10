@@ -1620,12 +1620,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var registration1 = new DataProcessingRegistration() { Id = A<int>(), Organization = org1 };
             var registration2 = new DataProcessingRegistration() { Id = A<int>(), Organization = org2 };
 
-            var registrations = new List<DataProcessingRegistration>() { registration1, registration2, new DataProcessingRegistration { Id = A<int>() } };
+            var registrations = new List<DataProcessingRegistration>() { registration1, registration2, new DataProcessingRegistration { Id = A<int>() } }.AsQueryable();
             var queryMock = new Mock<IDomainQuery<DataProcessingRegistration>>();
-            queryMock.Setup(x => x.Apply(registrations.AsQueryable())).Returns(new List<DataProcessingRegistration>() { registration1 }.AsQueryable());
+            queryMock.Setup(x => x.Apply(registrations)).Returns(new List<DataProcessingRegistration>() { registration1 }.AsQueryable());
             var conditions = new List<IDomainQuery<DataProcessingRegistration>>() { queryMock.Object };
 
-            _repositoryMock.Setup(x => x.AsQueryable()).Returns(registrations.AsQueryable());
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(registrations);
             ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
