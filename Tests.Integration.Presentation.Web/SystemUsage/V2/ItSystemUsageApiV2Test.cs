@@ -173,10 +173,28 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         public async Task Can_Get_All_ItSystemUsages_Filtered_By_SystemNameContent()
         {
             //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var organization1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization1);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization1.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+
+            var system1 = await CreateSystemAsync(organization1.Id, AccessModifier.Public, $"{content}ONE");
+            var system2 = await CreateSystemAsync(organization2.Id, AccessModifier.Public, $"TWO{content}");
+            var system3 = await CreateSystemAsync(organization2.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization1.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization1.Id);
+            await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization2.Id);
 
             //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, systemNameContentFilter: content)).ToList();
 
             //Assert
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, dtos);
         }
 
         [Fact]
@@ -224,9 +242,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(expectedContent.ItSystem.Name, dto.SystemContext.Name);
 
         }
-        private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier)
+        private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier, string name = null)
         {
-            var systemName = CreateName();
+            var systemName = name ?? CreateName();
             var createdSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, accessModifier);
             var entityUuid = DatabaseAccess.GetEntityUuid<Core.DomainModel.ItSystem.ItSystem>(createdSystem.Id);
 

@@ -29,7 +29,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? organizationFilter = null, 
             Guid? systemUuidFilter = null,
             Guid? relationToSystemUuidFilter = null,
-            Guid? relationToSystemUsageUuidFilter = null)
+            Guid? relationToSystemUsageUuidFilter = null,
+            string systemNameContentFilter = null)
         {
             var criteria = new List<KeyValuePair<string, string>>();
 
@@ -44,6 +45,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (relationToSystemUsageUuidFilter.HasValue)
                 criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString("N")));
+
+            if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
+                criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
 
             var joinedCriteria = string.Join("&", criteria.Select(x => $"{x.Key}={x.Value}"));
             var queryString = joinedCriteria.Any() ? $"?{joinedCriteria}" : string.Empty;
