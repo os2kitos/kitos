@@ -253,7 +253,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            AssignGDPR(itSystemUsage, withCrossReferences); //TODO
+            var (sensitivePersonData, registerTypeData) = AssignGDPR(itSystemUsage, withCrossReferences); 
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -274,7 +274,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.LinkToDirectoryUrlName = A<string>();
             itSystemUsage.LinkToDirectoryUrl = A<string>();
             itSystemUsage.SensitiveDataLevels = Many<SensitiveDataLevel>().Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel() { SensitivityDataLevel = sensitiveDataLevel }).ToList();
-            //TODO: Attached options - cross reference - change from void to (sensitivepersondata and registertypedata)
             itSystemUsage.precautions = A<DataOptions>();
             itSystemUsage.precautionsOptionsAccessControl = A<bool>();
             itSystemUsage.precautionsOptionsEncryption = A<bool>();
@@ -296,9 +295,25 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.UserSupervisionDocumentationUrlName = A<string>();
             itSystemUsage.UserSupervisionDocumentationUrl = A<string>();
 
-            var sensitivePersonalDataTypes = Many<Guid>().Select(uuid => new SensitivePersonalDataType() { Id = A<int>(), Uuid = uuid, Name = A<string>() });
-            var registerTypes = Many<Guid>().Select(uuid => new RegisterType() { Id = A<int>(), Uuid = uuid, Name = A<string>() });
+            var sensitivePersonalDataTypes = Many<Guid>(10).Select(uuid => new SensitivePersonalDataType() { Id = A<int>(), Uuid = uuid, Name = A<string>() }).ToList();
+            var registerTypes = Many<Guid>(10).Select(uuid => new RegisterType() { Id = A<int>(), Uuid = uuid, Name = A<string>() }).ToList();
+            _sensitivePersonalDataTypeRepositoryMock.Setup(x => x.GetSensitivePersonalDataTypes()).Returns(sensitivePersonalDataTypes);
+            _registerTypeRepositoryMock.Setup(x => x.Get(null, null, "")).Returns(registerTypes);
+            var usedSensitivePersonalDataTypes = sensitivePersonalDataTypes
+                .OrderBy(_ => A<int>())
+                .Take(withCrossReferences ? sensitivePersonalDataTypes.Count / 2 : 0)
+                .Select(x => new AttachedOption() { Id = A<int>(), OptionType = OptionType.SENSITIVEPERSONALDATA, OptionId = x.Id })
+                .ToList()
+                .AsReadOnly();
+            var usedRegisterTypes = registerTypes.OrderBy(_ => A<int>())
+                .Take(withCrossReferences ? registerTypes.Count / 2 : 0)
+                .Select(x => new AttachedOption() { Id = A<int>(), OptionType = OptionType.REGISTERTYPEDATA, OptionId = x.Id })
+                .ToList()
+                .AsReadOnly();
 
+            _attachedOptionsRepositoryMock.Setup(x => x.GetBySystemUsageId(itSystemUsage.Id)).Returns(usedSensitivePersonalDataTypes.Concat(usedRegisterTypes));
+
+            return (usedSensitivePersonalDataTypes, usedRegisterTypes);
         }
 
         /*
@@ -491,6 +506,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void AssignBasicProperties(ItSystemUsage itSystemUsage)
         {
+            itSystemUsage.Id = A<int>();
             itSystemUsage.LastChanged = A<DateTime>();
             itSystemUsage.Uuid = A<Guid>();
             itSystemUsage.ObjectOwner = CreateUser();
