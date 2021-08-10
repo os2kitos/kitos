@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using Core.DomainModel.KendoConfig;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Kendo;
 using Moq;
@@ -50,7 +51,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories.Kendo
         }
 
         [Fact]
-        public void Can_DeleteChilds()
+        public void Can_DeleteColumns()
         {
             //Arrange
             var config = new KendoOrganizationalConfiguration();

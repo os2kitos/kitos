@@ -15,14 +15,14 @@
         loadGridOptions: (grid: Kitos.IKendoGrid<any>, initialFilter?) => void;
         saveGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
         loadGridProfile: (grid: Kitos.IKendoGrid<any>) => void;
-        saveGridProfileForOrg: (grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType) => void;
+        saveGridOrganizationalConfiguration: (grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType) => void;
         doesGridProfileExist: () => boolean;
         removeProfile: () => void;
         removeLocal: () => void;
         removeSession: () => void;
-        deleteGridProfileForOrg: (overviewType: Models.Generic.OverviewType) => void;
-        doesGridDivergeFromDefault: (overviewType: Models.Generic.OverviewType) => boolean;
-        canDeleteGridProfileForOrg: () => boolean;
+        deleteGridOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => void;
+        doesGridDivergeFromOrganizationalConfiguration: (overviewType: Models.Generic.OverviewType) => boolean;
+        canDeleteGridOrganizationalConfiguration: () => boolean;
     }
 
     gridStateService.$inject = [
@@ -58,8 +58,8 @@
 
             storageKey = `${user.id}-${user.currentOrganizationId}-${storageKey}`;
             var profileStorageKey = storageKey + "-profile";
-            var orgStorageColumnsKey = storageKey + "-OrgProfile";
-            var versionKey = storageKey + "-version";
+            var organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
+            var organizationalConfigurationVersionKey = storageKey + "-version";
 
             getOrgFilterOptions(overviewType);
 
@@ -68,14 +68,14 @@
                 loadGridOptions: loadGridOptions,
                 saveGridProfile: saveGridProfile,
                 loadGridProfile: loadGridProfile,
-                saveGridProfileForOrg: saveGridProfileForOrg,
+                saveGridOrganizationalConfiguration: saveGridOrganizationalConfiguration,
                 doesGridProfileExist: doesGridProfileExist,
                 removeProfile: removeProfile,
                 removeLocal: removeLocal,
                 removeSession: removeSession,
-                deleteGridProfileForOrg: deleteGridProfileForOrg,
-                doesGridDivergeFromDefault: doesGridDivergeFromDefault,
-                canDeleteGridProfileForOrg: canDeleteGridProfileForOrg
+                deleteGridOrganizationalConfiguration: deleteGridOrganizationalConfiguration,
+                doesGridDivergeFromOrganizationalConfiguration: doesGridDivergeFromOrganizationalConfiguration,
+                canDeleteGridOrganizationalConfiguration: canDeleteGridOrganizationalConfiguration
             };
             return service;
 
@@ -86,8 +86,8 @@
                 }
 
                 getGridVersion().then((result) => {
-                    if (result !== null && result !== $window.sessionStorage.getItem(versionKey)) {
-                        getGridProfileForOrg();
+                    if (result !== null && result !== $window.sessionStorage.getItem(organizationalConfigurationVersionKey)) {
+                        getGridOrganizationalConfiguration();
                     } 
                 });
             } 
@@ -104,9 +104,9 @@
 
                     // Compare the visible columns with the visible columns retrieved from the server.
                     const version = options.columns.filter(x => !x.hidden).map(x => x.persistId).sort().join("");
-                    const localVersion = $window.sessionStorage.getItem(versionKey);
+                    const localVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
                     if (localVersion !== null && version !== localVersion) {
-                        $window.sessionStorage.removeItem(versionKey);
+                        $window.sessionStorage.removeItem(organizationalConfigurationVersionKey);
                     }
                 });
             }
@@ -185,7 +185,7 @@
             function getStoredOptions(grid: Kitos.IKendoGrid<any>): IGridSavedState {
                 // load options from org storage
                 var orgStorageColumns: Models.Generic.IKendoColumnConfigurationDTO[];
-                var orgStorageColumnsItem = $window.sessionStorage.getItem(orgStorageColumnsKey);
+                var orgStorageColumnsItem = $window.sessionStorage.getItem(organizationalConfigurationColumnsKey);
                 if (orgStorageColumnsItem) {
                     orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]> JSONfn.parse(orgStorageColumnsItem, true);
                 }
@@ -227,7 +227,7 @@
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
                 }
 
-                if ($window.sessionStorage.getItem(versionKey) !== null) {
+                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) !== null) {
                     // Session updates has not changed the grid as updates to the grid which changes the columns causes the version to be deleted
                     // So we use the local organization configuration if it exists
                     if (orgStorageColumns) {
@@ -299,29 +299,29 @@
                         () => null);
             }
 
-            function getGridProfileForOrg() {
+            function getGridOrganizationalConfiguration() {
                 KendoFilterService
                     .getConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
                             const version = result.data.response.version;
-                            const localVersion = $window.sessionStorage.getItem(versionKey);
+                            const localVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
                             if (version !== localVersion) {
                                 const columns = result.data.response.visibleColumns;
-                                $window.sessionStorage.setItem(orgStorageColumnsKey, JSONfn.stringify(columns));
-                                $window.sessionStorage.setItem(versionKey, version);
+                                $window.sessionStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
+                                $window.sessionStorage.setItem(organizationalConfigurationVersionKey, version);
                             }
                         }
                     })
                     .catch((result) => {
                         if (result.status === 404) {
                             // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
-                            $window.sessionStorage.removeItem(orgStorageColumnsKey);
+                            $window.sessionStorage.removeItem(organizationalConfigurationColumnsKey);
                         }
                     });
             }
 
-            function saveGridProfileForOrg(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): void {
+            function saveGridOrganizationalConfiguration(grid: Kitos.IKendoGrid<any>, overviewType: Models.Generic.OverviewType): void {
                 var options = grid.getOptions();
 
                 var columns: Models.Generic.IKendoColumnConfigurationDTO[] = [];
@@ -336,7 +336,7 @@
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
-                            getGridProfileForOrg(); // Load the newly saved grid
+                            getGridOrganizationalConfiguration(); // Load the newly saved grid
                         }
                     })
                     .catch((res) => {
@@ -344,7 +344,7 @@
                     });
             }
 
-            function deleteGridProfileForOrg(overviewType: Models.Generic.OverviewType) {
+            function deleteGridOrganizationalConfiguration(overviewType: Models.Generic.OverviewType) {
                 KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
@@ -373,8 +373,8 @@
 
             function removeSession(): void {
                 $window.sessionStorage.removeItem(storageKey);
-                $window.sessionStorage.removeItem(orgStorageColumnsKey);
-                $window.sessionStorage.removeItem(versionKey);
+                $window.sessionStorage.removeItem(organizationalConfigurationColumnsKey);
+                $window.sessionStorage.removeItem(organizationalConfigurationVersionKey);
             }
 
             function removeLocal(): void {
@@ -385,24 +385,24 @@
                 $window.localStorage.removeItem(profileStorageKey);
             }
 
-            function doesGridDivergeFromDefault(overviewType: Models.Generic.OverviewType): boolean {
+            function doesGridDivergeFromOrganizationalConfiguration(overviewType: Models.Generic.OverviewType): boolean {
                 if (overviewType === null || overviewType === undefined) {
                     return false; // No defaults defined for this overview type
                 }
 
-                if ($window.sessionStorage.getItem(orgStorageColumnsKey) === null) {
+                if ($window.sessionStorage.getItem(organizationalConfigurationColumnsKey) === null) {
                     return false;
                 }
 
-                if ($window.sessionStorage.getItem(versionKey) === null) {
+                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) === null) {
                     return true;
                 }
 
                 return false;
             }
 
-            function canDeleteGridProfileForOrg() {
-                return $window.sessionStorage.getItem(orgStorageColumnsKey) !== null;
+            function canDeleteGridOrganizationalConfiguration() {
+                return $window.sessionStorage.getItem(organizationalConfigurationColumnsKey) !== null;
             }
         }
     }

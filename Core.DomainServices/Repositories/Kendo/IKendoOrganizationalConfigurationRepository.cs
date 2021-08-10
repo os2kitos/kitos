@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.KendoConfig;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.Kendo
@@ -10,6 +11,6 @@ namespace Core.DomainServices.Repositories.Kendo
         public void Update(KendoOrganizationalConfiguration modifiedConfig);
         public KendoOrganizationalConfiguration Add(KendoOrganizationalConfiguration createdConfig);
         void Delete(KendoOrganizationalConfiguration configToDelete);
-        void DeleteColumns(KendoOrganizationalConfiguration configWithChildsToBeDeleted);
+        void DeleteColumns(KendoOrganizationalConfiguration configWithColumnsToBeDeleted);
     }
 }

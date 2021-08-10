@@ -624,13 +624,13 @@ module Kitos.Utility.KendoGrid {
 
         saveGridForOrganization() {
             if (confirm(`Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
-                this.gridState.saveGridProfileForOrg(this.gridBinding.mainGrid, this.overviewType);
+                this.gridState.saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType);
             }
         }
 
         clearGridForOrganization() {
             if (confirm(`Er du sikker på at du vil slette standard opsætningen af felter til ${this.user.currentOrganizationName}`)) {
-                this.gridState.deleteGridProfileForOrg(this.overviewType);
+                this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
             }
         }
 
@@ -642,11 +642,11 @@ module Kitos.Utility.KendoGrid {
         }
 
         canDeleteGridForOrganization() {
-            return this.gridState.canDeleteGridProfileForOrg();
+            return this.gridState.canDeleteGridOrganizationalConfiguration();
         }
 
         doesGridDivergeFromDefault() {
-            return this.gridState.doesGridDivergeFromDefault(this.overviewType);
+            return this.gridState.doesGridDivergeFromOrganizationalConfiguration(this.overviewType);
         }
 
         // clears grid filters by removing the localStorageItem and reloading the page

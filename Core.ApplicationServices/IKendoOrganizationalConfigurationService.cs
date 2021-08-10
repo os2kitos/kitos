@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Result;
 using System.Collections.Generic;
+using Core.DomainModel.KendoConfig;
 
 namespace Core.ApplicationServices
 {

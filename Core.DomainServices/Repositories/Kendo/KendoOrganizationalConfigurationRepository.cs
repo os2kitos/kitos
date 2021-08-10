@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
 using Infrastructure.Services.Types;
 using System.Linq;
+using Core.DomainModel.KendoConfig;
 
 namespace Core.DomainServices.Repositories.Kendo
 {
@@ -39,9 +40,9 @@ namespace Core.DomainServices.Repositories.Kendo
             _repository.Save();
         }
 
-        public void DeleteColumns(KendoOrganizationalConfiguration configWithChildsToBeDeleted)
+        public void DeleteColumns(KendoOrganizationalConfiguration configWithColumnsToBeDeleted)
         {
-            _columnRepository.RemoveRange(configWithChildsToBeDeleted.VisibleColumns);
+            _columnRepository.RemoveRange(configWithColumnsToBeDeleted.VisibleColumns);
             _columnRepository.Save();
         }
     }

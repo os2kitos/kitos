@@ -366,6 +366,7 @@
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataWriteRequestDTO.cs" />

@@ -118,7 +118,12 @@ namespace Presentation.Web.Controllers.API.V1
 
         protected new virtual HttpResponseMessage BadRequest(ModelStateDictionary modelState)
         {
-            return Request.CreateErrorResponse(HttpStatusCode.BadRequest, modelState);
+            var errorDictionary = modelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+            return BadRequest(string.Join("; ", errorDictionary));
         }
 
         protected virtual HttpResponseMessage Unauthorized()

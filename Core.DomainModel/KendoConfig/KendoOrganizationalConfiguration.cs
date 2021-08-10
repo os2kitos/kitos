@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Core.DomainModel
+namespace Core.DomainModel.KendoConfig
 {
     public class KendoOrganizationalConfiguration : Entity, IOwnedByOrganization
     {
@@ -26,6 +26,15 @@ namespace Core.DomainModel
 
 
             Version = string.Join("", VisibleColumns.OrderBy(x => x.PersistId).Select(x => x.PersistId));
+        }
+
+        public static KendoOrganizationalConfiguration CreateConfiguration(int orgId, OverviewType overviewType)
+        {
+            return new ()
+            {
+                OrganizationId = orgId,
+                OverviewType = overviewType
+            };
         }
     }
 }

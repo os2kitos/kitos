@@ -4,6 +4,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Kendo;
 using System.Collections.Generic;
 using System.Data;
+using Core.DomainModel.KendoConfig;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices
@@ -31,12 +32,12 @@ namespace Core.ApplicationServices
 
             if (config.IsNone)
             {
-                return Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
+                return new OperationError(OperationFailure.NotFound);
             }
 
             return _authorizationContext.AllowReads(config.Value)
                 ? config.Value
-                : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.Forbidden);
+                : new OperationError(OperationFailure.Forbidden);
         }
 
         public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId,
@@ -99,11 +100,8 @@ namespace Core.ApplicationServices
 
         private Result<KendoOrganizationalConfiguration, OperationError> CreateConfig(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
-            var createdConfig = new KendoOrganizationalConfiguration
-            {
-                OrganizationId = organizationId,
-                OverviewType = overviewType
-            };
+
+            var createdConfig = KendoOrganizationalConfiguration.CreateConfiguration(organizationId, overviewType);
             createdConfig.AddColumns(columns);
             var created = _kendoOrganizationRepository.Add(createdConfig);
             return created;

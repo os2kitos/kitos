@@ -1,4 +1,6 @@
-﻿namespace Core.DomainModel
+﻿using Core.DomainModel.KendoConfig;
+
+namespace Core.DomainModel
 {
     public class KendoColumnConfiguration : IHasId
     {

@@ -10,10 +10,4 @@ namespace Presentation.Web.Models.API.V1
         public string Version { get; set; }
         public IEnumerable<KendoColumnConfigurationDTO> VisibleColumns { get; set; }
     }
-
-    public class KendoColumnConfigurationDTO
-    {
-        public string PersistId { get; set; } 
-        public int Index { get; set; }
-    }
 }
