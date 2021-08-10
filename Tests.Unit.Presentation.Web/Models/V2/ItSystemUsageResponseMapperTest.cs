@@ -7,6 +7,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
@@ -252,7 +253,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            //AssignGDPR(itSystemUsage, withCrossReferences); //TODO
+            AssignGDPR(itSystemUsage, withCrossReferences); //TODO
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
@@ -260,6 +261,66 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             //TODO
         }
+
+        private (IReadOnlyList<AttachedOption> sensitivePersonData, IReadOnlyList<AttachedOption> registerTypeData) AssignGDPR(ItSystemUsage itSystemUsage, bool withCrossReferences)
+        {
+            itSystemUsage.GeneralPurpose = A<string>();
+            itSystemUsage.isBusinessCritical = A<DataOptions>();
+            itSystemUsage.DPIA = A<DataOptions>();
+            itSystemUsage.DPIADateFor = A<DateTime>();
+            itSystemUsage.DPIASupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.DPIASupervisionDocumentationUrl = A<string>();
+            itSystemUsage.HostedAt = A<HostedAt>();
+            itSystemUsage.LinkToDirectoryUrlName = A<string>();
+            itSystemUsage.LinkToDirectoryUrl = A<string>();
+            itSystemUsage.SensitiveDataLevels = Many<SensitiveDataLevel>().Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel() { SensitivityDataLevel = sensitiveDataLevel }).ToList();
+            //TODO: Attached options - cross reference - change from void to (sensitivepersondata and registertypedata)
+            itSystemUsage.precautions = A<DataOptions>();
+            itSystemUsage.precautionsOptionsAccessControl = A<bool>();
+            itSystemUsage.precautionsOptionsEncryption = A<bool>();
+            itSystemUsage.precautionsOptionsLogning = A<bool>();
+            itSystemUsage.precautionsOptionsPseudonomisering = A<bool>();
+            itSystemUsage.TechnicalSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.TechnicalSupervisionDocumentationUrl = A<string>();
+            itSystemUsage.answeringDataDPIA = A<DataOptions>();
+            itSystemUsage.DPIAdeleteDate = A<DateTime>();
+            itSystemUsage.numberDPIA = A<int>();
+            itSystemUsage.riskAssessment = A<DataOptions>();
+            itSystemUsage.riskAssesmentDate = A<DateTime>();
+            itSystemUsage.RiskSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.RiskSupervisionDocumentationUrl = A<string>();
+            itSystemUsage.noteRisks = A<string>();
+            itSystemUsage.preriskAssessment = A<RiskLevel>();
+            itSystemUsage.UserSupervision = A<DataOptions>();
+            itSystemUsage.UserSupervisionDate = A<DateTime>();
+            itSystemUsage.UserSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.UserSupervisionDocumentationUrl = A<string>();
+
+            var sensitivePersonalDataTypes = Many<Guid>().Select(uuid => new SensitivePersonalDataType() { Id = A<int>(), Uuid = uuid, Name = A<string>() });
+            var registerTypes = Many<Guid>().Select(uuid => new RegisterType() { Id = A<int>(), Uuid = uuid, Name = A<string>() });
+
+        }
+
+        /*
+         *   private GDPRRegistrationsResponseDTO MapGDPR(ItSystemUsage systemUsage)
+        {
+            var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
+            var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
+            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
+
+            return new GDPRRegistrationsResponseDTO
+            {
+                SensitivePersonData = attachedOptions
+                    .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                    .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                RegisteredDataCategories = attachedOptions
+                    .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
+                    .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+            };
+        }
+         */
 
         private void AssignArchiving(ItSystemUsage itSystemUsage, bool withOptionalCrossReferences)
         {
