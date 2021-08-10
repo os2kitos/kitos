@@ -4,6 +4,7 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KLE;
@@ -197,6 +198,7 @@ namespace Core.DomainServices.Repositories.KLE
             foreach (var itProject in removedTaskRef.ItProjects.ToList())
             {
                 itProject.TaskRefs.Remove(removedTaskRef);
+                _domainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
             }
         }
 
@@ -216,6 +218,7 @@ namespace Core.DomainServices.Repositories.KLE
             foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut.ToList())
             {
                 itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsageOptOut));
             }
         }
 
@@ -228,6 +231,7 @@ namespace Core.DomainServices.Repositories.KLE
                 {
                     systemUsage.TaskRefs.Remove(taskRef);
                 }
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
             }
         }
 

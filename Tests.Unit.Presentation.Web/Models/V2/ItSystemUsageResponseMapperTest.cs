@@ -7,6 +7,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
@@ -252,14 +253,182 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
             var itSystemUsage = new ItSystemUsage();
             AssignBasicProperties(itSystemUsage);
-            //AssignGDPR(itSystemUsage, withCrossReferences); //TODO
+            var (expectedSensitivePersonData, expectedRegisterTypes) = AssignGDPR(itSystemUsage, withCrossReferences);
 
             //Act
             var dto = _sut.MapSystemUsageDTO(itSystemUsage);
 
             //Assert
-            //TODO
+            Assert.Equal(dto.GDPR.Purpose, itSystemUsage.GeneralPurpose);
+            AssertYesNoExtended(dto.GDPR.BusinessCritical, itSystemUsage.isBusinessCritical);
+            AssertYesNoExtended(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
+            AssertSimpleLink(dto.GDPR.DPIADocumentation, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
+            AssertHostedAt(dto.GDPR.HostedAt, itSystemUsage.HostedAt);
+            AssertSimpleLink(dto.GDPR.DirectoryDocumentation, itSystemUsage.LinkToDirectoryUrlName, itSystemUsage.LinkToDirectoryUrl);
+            Assert.Equal(dto.GDPR.DataSensitivityLevels.Select(MapDataSensitivity).OrderBy(x => x).ToList(), itSystemUsage.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).OrderBy(x => x).ToList());
+            AssertYesNoExtended(dto.GDPR.TechnicalPrecautionsInPlace, itSystemUsage.precautions);
+            AssertAppliedPrecautions(dto.GDPR.TechnicalPrecautionsApplied, itSystemUsage);
+            AssertSimpleLink(dto.GDPR.TechnicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
+            AssertYesNoExtended(dto.GDPR.DPIAConducted, itSystemUsage.DPIA);
+            Assert.Equal(dto.GDPR.DPIADate, itSystemUsage.DPIADateFor);
+            AssertYesNoExtended(dto.GDPR.RetentionPeriodDefined, itSystemUsage.answeringDataDPIA);
+            Assert.Equal(dto.GDPR.DataRetentionEvaluationFrequencyInMonths, itSystemUsage.numberDPIA);
+            Assert.Equal(dto.GDPR.NextDataRetentionEvaluationDate, itSystemUsage.DPIAdeleteDate);
+            AssertYesNoExtended(dto.GDPR.UserSupervision, itSystemUsage.UserSupervision);
+            Assert.Equal(dto.GDPR.UserSupervisionDate, itSystemUsage.UserSupervisionDate);
+            AssertSimpleLink(dto.GDPR.UserSupervisionDocumentation, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
+            AssertYesNoExtended(dto.GDPR.RiskAssessmentConducted, itSystemUsage.riskAssessment);
+            Assert.Equal(dto.GDPR.RiskAssessmentConductedDate, itSystemUsage.riskAssesmentDate);
+            AssertSimpleLink(dto.GDPR.RiskAssessmentDocumentation, itSystemUsage.RiskSupervisionDocumentationUrlName, itSystemUsage.RiskSupervisionDocumentationUrl);
+            Assert.Equal(dto.GDPR.RiskAssessmentNotes, itSystemUsage.noteRisks);
+            AssertRiskLevel(dto.GDPR.RiskAssessmentResult, itSystemUsage.preriskAssessment);
+
+            Assert.Equal(dto.GDPR.SensitivePersonData.Count(),expectedSensitivePersonData.Count);
+            Assert.Equal(dto.GDPR.RegisteredDataCategories.Count(),expectedRegisterTypes.Count);
+            foreach (var comparison in expectedSensitivePersonData.OrderBy(x=>x.Name).Zip(dto.GDPR.SensitivePersonData.OrderBy(x=>x.Name), (expected, actual) => new { expected, actual }))
+            {
+                AssertIdentity(comparison.expected,comparison.actual);
+            }
+
+            foreach (var comparison in expectedRegisterTypes.OrderBy(x => x.Name).Zip(dto.GDPR.RegisteredDataCategories.OrderBy(x => x.Name), (expected, actual) => new { expected, actual }))
+            {
+                AssertIdentity(comparison.expected, comparison.actual);
+            }
         }
+
+        private static void AssertRiskLevel(RiskLevelChoice? actual, RiskLevel? sourceValue)
+        {
+            RiskLevelChoice? expected = sourceValue switch
+            {
+                RiskLevel.LOW => RiskLevelChoice.Low,
+                RiskLevel.MIDDLE => RiskLevelChoice.Middle,
+                RiskLevel.HIGH => RiskLevelChoice.High,
+                RiskLevel.UNDECIDED => RiskLevelChoice.Undecided,
+                null => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(sourceValue), sourceValue, null)
+            };
+            Assert.Equal(expected, actual);
+        }
+
+        private void AssertAppliedPrecautions(IEnumerable<TechnicalPrecautionChoice> actual, ItSystemUsage source)
+        {
+            var expectedChoices = new List<TechnicalPrecautionChoice>();
+            if (source.precautionsOptionsAccessControl)
+                expectedChoices.Add(TechnicalPrecautionChoice.AccessControl);
+            if (source.precautionsOptionsEncryption)
+                expectedChoices.Add(TechnicalPrecautionChoice.Encryption);
+            if (source.precautionsOptionsLogning)
+                expectedChoices.Add(TechnicalPrecautionChoice.Logging);
+            if (source.precautionsOptionsPseudonomisering)
+                expectedChoices.Add(TechnicalPrecautionChoice.Pseudonymization);
+            Assert.Equal(expectedChoices.OrderBy(x => x).ToList(), actual.OrderBy(x => x).ToList());
+        }
+
+        private static SensitiveDataLevel MapDataSensitivity(DataSensitivityLevelChoice actual)
+        {
+            return actual switch
+            {
+                DataSensitivityLevelChoice.None => SensitiveDataLevel.NONE,
+                DataSensitivityLevelChoice.PersonData => SensitiveDataLevel.PERSONALDATA,
+                DataSensitivityLevelChoice.SensitiveData => SensitiveDataLevel.SENSITIVEDATA,
+                DataSensitivityLevelChoice.LegalData => SensitiveDataLevel.LEGALDATA,
+                _ => throw new ArgumentOutOfRangeException(nameof(actual), actual, null)
+            };
+        }
+
+        private void AssertHostedAt(HostingChoice? actual, HostedAt? sourceValue)
+        {
+            HostingChoice? expected = sourceValue switch
+            {
+                HostedAt.UNDECIDED => HostingChoice.Undecided,
+                HostedAt.ONPREMISE => HostingChoice.OnPremise,
+                HostedAt.EXTERNAL => HostingChoice.External,
+                null => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(sourceValue), sourceValue, null)
+            };
+            Assert.Equal(expected, actual);
+        }
+
+        private static void AssertSimpleLink(SimpleLinkDTO actual, string expectedName, string expectedUrl)
+        {
+            Assert.Equal(expectedName, actual.Name);
+            Assert.Equal(expectedUrl, actual.Url);
+        }
+
+        private (IReadOnlyList<SensitivePersonalDataType> sensitivePersonData, IReadOnlyList<RegisterType> registerTypeData) AssignGDPR(ItSystemUsage itSystemUsage, bool withCrossReferences)
+        {
+            itSystemUsage.GeneralPurpose = A<string>();
+            itSystemUsage.isBusinessCritical = A<DataOptions>();
+            itSystemUsage.DPIA = A<DataOptions>();
+            itSystemUsage.DPIADateFor = A<DateTime>();
+            itSystemUsage.DPIASupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.DPIASupervisionDocumentationUrl = A<string>();
+            itSystemUsage.HostedAt = A<HostedAt>();
+            itSystemUsage.LinkToDirectoryUrlName = A<string>();
+            itSystemUsage.LinkToDirectoryUrl = A<string>();
+            itSystemUsage.SensitiveDataLevels = Many<SensitiveDataLevel>().Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel() { SensitivityDataLevel = sensitiveDataLevel }).ToList();
+            itSystemUsage.precautions = A<DataOptions>();
+            itSystemUsage.precautionsOptionsAccessControl = A<bool>();
+            itSystemUsage.precautionsOptionsEncryption = A<bool>();
+            itSystemUsage.precautionsOptionsLogning = A<bool>();
+            itSystemUsage.precautionsOptionsPseudonomisering = A<bool>();
+            itSystemUsage.TechnicalSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.TechnicalSupervisionDocumentationUrl = A<string>();
+            itSystemUsage.answeringDataDPIA = A<DataOptions>();
+            itSystemUsage.DPIAdeleteDate = A<DateTime>();
+            itSystemUsage.numberDPIA = A<int>();
+            itSystemUsage.riskAssessment = A<DataOptions>();
+            itSystemUsage.riskAssesmentDate = A<DateTime>();
+            itSystemUsage.RiskSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.RiskSupervisionDocumentationUrl = A<string>();
+            itSystemUsage.noteRisks = A<string>();
+            itSystemUsage.preriskAssessment = A<RiskLevel>();
+            itSystemUsage.UserSupervision = A<DataOptions>();
+            itSystemUsage.UserSupervisionDate = A<DateTime>();
+            itSystemUsage.UserSupervisionDocumentationUrlName = A<string>();
+            itSystemUsage.UserSupervisionDocumentationUrl = A<string>();
+
+            var sensitivePersonalDataTypes = Many<Guid>(10).Select(uuid => new SensitivePersonalDataType() { Id = A<int>(), Uuid = uuid, Name = A<string>() }).ToList();
+            var registerTypes = Many<Guid>(10).Select(uuid => new RegisterType() { Id = A<int>(), Uuid = uuid, Name = A<string>() }).ToList();
+            _sensitivePersonalDataTypeRepositoryMock.Setup(x => x.GetSensitivePersonalDataTypes()).Returns(sensitivePersonalDataTypes);
+            _registerTypeRepositoryMock.Setup(x => x.Get(null, null, "")).Returns(registerTypes);
+            var usedPersonalDataTypes = sensitivePersonalDataTypes
+                .OrderBy(_ => A<int>())
+                .Take(withCrossReferences ? sensitivePersonalDataTypes.Count / 2 : 0)
+                .ToList();
+            var usedSensitivePersonalDataTypesOptions = usedPersonalDataTypes
+                .Select(x => new AttachedOption { Id = A<int>(), OptionType = OptionType.SENSITIVEPERSONALDATA, OptionId = x.Id });
+            var usedRegisterTypes = registerTypes.OrderBy(_ => A<int>())
+                .Take(withCrossReferences ? registerTypes.Count / 2 : 0)
+                .ToList();
+            var usedRegisterTypesOptions = usedRegisterTypes
+                .Select(x => new AttachedOption { Id = A<int>(), OptionType = OptionType.REGISTERTYPEDATA, OptionId = x.Id });
+
+            _attachedOptionsRepositoryMock.Setup(x => x.GetBySystemUsageId(itSystemUsage.Id)).Returns(usedSensitivePersonalDataTypesOptions.Concat(usedRegisterTypesOptions));
+
+            return (usedPersonalDataTypes, usedRegisterTypes);
+        }
+
+        /*
+         *   private GDPRRegistrationsResponseDTO MapGDPR(ItSystemUsage systemUsage)
+        {
+            var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
+            var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
+            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
+
+            return new GDPRRegistrationsResponseDTO
+            {
+                SensitivePersonData = attachedOptions
+                    .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                    .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                RegisteredDataCategories = attachedOptions
+                    .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
+                    .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
+                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+            };
+        }
+         */
 
         private void AssignArchiving(ItSystemUsage itSystemUsage, bool withOptionalCrossReferences)
         {
@@ -400,6 +569,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
         }
 
+        private static void AssertYesNoExtended(YesNoExtendedChoice? actual, DataOptions? expectedFromSource)
+        {
+            YesNoExtendedChoice? expected = expectedFromSource switch
+            {
+                DataOptions.NO => YesNoExtendedChoice.No,
+                DataOptions.YES => YesNoExtendedChoice.Yes,
+                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
+                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
+                null => null,
+                _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
+            };
+            Assert.Equal(expected, actual);
+        }
+
         private static void AssertIdentities<T>(ICollection<T> sourceCollection, IEnumerable<IdentityNamePairResponseDTO> dtoCollection) where T : IHasUuid, IHasName
         {
             var expectedValues = sourceCollection.OrderBy(x => x.Name).ToList();
@@ -430,6 +613,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private void AssignBasicProperties(ItSystemUsage itSystemUsage)
         {
+            itSystemUsage.Id = A<int>();
             itSystemUsage.LastChanged = A<DateTime>();
             itSystemUsage.Uuid = A<Guid>();
             itSystemUsage.ObjectOwner = CreateUser();

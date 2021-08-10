@@ -82,11 +82,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 SensitivePersonData = attachedOptions
                     .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
                     .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
-                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO())
+                    .ToList(),
                 RegisteredDataCategories = attachedOptions
                     .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
                     .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
-                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
+                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO())
+                    .ToList(),
                 TechnicalPrecautionsInPlace = MapYesNoExtended(systemUsage.precautions),
                 TechnicalPrecautionsApplied = MapPrecautions(systemUsage).ToList(),
                 TechnicalPrecautionsDocumentation = MapSimpleLink(systemUsage.TechnicalSupervisionDocumentationUrlName, systemUsage.TechnicalSupervisionDocumentationUrl),
