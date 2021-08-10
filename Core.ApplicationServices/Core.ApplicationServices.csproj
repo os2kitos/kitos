@@ -113,11 +113,9 @@
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
-    <Compile Include="GDPR\DataProcessingRegistrationUuidExtensionService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationOptionsApplicationService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
-    <Compile Include="GDPR\IDataProcessingRegistrationUuidExtensionService.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />

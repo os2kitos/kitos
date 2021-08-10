@@ -837,6 +837,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
+                Uuid = value.Uuid,
                 AssignedRoles = value.Rights.Select(dataProcessingRegistrationRight => new AssignedRoleDTO
                 {
                     Role = ToDTO(dataProcessingRegistrationRight.Role, localDescriptionOverrides, idsOfAvailableRoles),

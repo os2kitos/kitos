@@ -2,6 +2,7 @@
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.DPR;
+using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -23,9 +24,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
     [RoutePrefix("api/v2/data-processing-registrations")]
     public class DataProcessingRegistrationV2Controller : ExternalBaseController
     {
-        private readonly IDataProcessingRegistrationUuidExtensionService _dataProcessingRegistrationService;
+        private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
 
-        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationUuidExtensionService dataProcessingRegistrationService)
+        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
         }
@@ -44,15 +45,18 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetDataProcessingRegistrations(
-            [NonEmptyGuid] Guid organizationUuid,
-            [NonEmptyGuid] Guid? systemUuid,
-            [NonEmptyGuid] Guid? systemUsageUuid,
+            [NonEmptyGuid] Guid? organizationUuid = null,
+            [NonEmptyGuid] Guid? systemUuid = null,
+            [NonEmptyGuid] Guid? systemUsageUuid = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             var conditions = new List<IDomainQuery<DataProcessingRegistration>>();
+
+            if(organizationUuid.HasValue)
+                conditions.Add(new QueryByOrganizationUuid<DataProcessingRegistration>(organizationUuid.Value));
 
             if (systemUuid.HasValue)
                 conditions.Add(new QueryBySystemUuid(systemUuid.Value));
@@ -61,10 +65,34 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 conditions.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
 
             return _dataProcessingRegistrationService
-                .GetDataProcessingRegistrationsByOrganization(organizationUuid, conditions.ToArray())
-                .Select(x => x.OrderBy(dpr => dpr.Id))
-                .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(x => x.MapIdentityNamePairDTO()))
+                .Query(conditions.ToArray())
+                .OrderBy(dpr => dpr.Id)
+                .Page(paginationQuery)
+                .ToList()
+                .Select(x => x.MapIdentityNamePairDTO())
+                .Transform(Ok);
+        }
+
+        /// <summary>
+        /// Returns a specific Data-Processing-Registration
+        /// </summary>
+        /// <param name="dataProcessingRegistraionUuid">UUID of Data-Processing-Registration entity</param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("{dataProcessingRegistraionUuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult GetItSystemUsage([NonEmptyGuid] Guid dataProcessingRegistraionUuid)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _dataProcessingRegistrationService
+                .GetByUuid(dataProcessingRegistraionUuid)
+                .Select(x => x.MapIdentityNamePairDTO())
                 .Match(Ok, FromOperationError);
         }
 

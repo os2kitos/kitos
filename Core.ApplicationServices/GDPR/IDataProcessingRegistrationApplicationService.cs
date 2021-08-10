@@ -57,6 +57,7 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingRegistrationOversightDate, OperationError> ModifyOversightDate(int id, int oversightDateId, DateTime oversightDate, string oversightRemark);
         Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int id, int oversightDateId);
 
-        IQueryable<DataProcessingRegistration> GetDataProcessingRegistrationsByOrganization(int orgId, params IDomainQuery<DataProcessingRegistration>[] conditions);
+        IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions);
+        Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid);
     }
 }
