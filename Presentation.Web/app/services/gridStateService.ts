@@ -61,7 +61,7 @@
             var organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
             var organizationalConfigurationVersionKey = storageKey + "-version";
 
-            getOrgFilterOptions(overviewType);
+            
 
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
@@ -82,12 +82,12 @@
             function getOrgFilterOptions(overviewType: Models.Generic.OverviewType) {
                 // Organizational configuration not yet activated for overview
                 if (overviewType === null || overviewType === undefined) {
-                    return;
+                    return null;
                 }
 
-                getGridVersion().then((result) => {
+                return getGridVersion().then((result) => {
                     if (result !== null && result !== $window.sessionStorage.getItem(organizationalConfigurationVersionKey)) {
-                        getGridOrganizationalConfiguration();
+                        return getGridOrganizationalConfiguration();
                     } 
                 });
             } 
@@ -113,71 +113,74 @@
 
             // loads kendo grid options from localStorage
             function loadGridOptions(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters): void {
-                var gridId = grid.element[0].id;
-                var storedState = getStoredOptions(grid);
-                var columnState = <IGridSavedState> _.pick(storedState, "columnState");
+                // Wait for the data from the server before updating the grid.
+                getOrgFilterOptions(overviewType).finally(() => {
+                    var gridId = grid.element[0].id;
+                    var storedState = getStoredOptions(grid);
+                    var columnState = <IGridSavedState>_.pick(storedState, "columnState");
 
-                var gridOptionsWithInitialFilter = _.merge({ dataSource: { filter: initialFilter } }, storedState);
-                var gridOptions = _.omit(gridOptionsWithInitialFilter, "columnState");
+                    var gridOptionsWithInitialFilter = _.merge({ dataSource: { filter: initialFilter } }, storedState);
+                    var gridOptions = _.omit(gridOptionsWithInitialFilter, "columnState");
 
-                var visableColumnIndex = 0;
-                _.forEach(columnState.columnState, (state, key) => {
-                    var columnIndex = _.findIndex(grid.columns, column => {
-                        if (!column.hasOwnProperty("persistId")) {
-                            console.error(`Unable to find persistId property in grid column with field=${column.field}`);
-                            return false;
+                    var visableColumnIndex = 0;
+                    _.forEach(columnState.columnState, (state, key) => {
+                        var columnIndex = _.findIndex(grid.columns, column => {
+                            if (!column.hasOwnProperty("persistId")) {
+                                console.error(`Unable to find persistId property in grid column with field=${column.field}`);
+                                return false;
+                            }
+
+                            return column.persistId === key;
+                        });
+
+                        if (columnIndex !== -1) {
+                            var columnObj = grid.columns[columnIndex];
+                            // reorder column
+                            if (state.index !== columnIndex) {
+                                // check if index is out of bounds
+                                if (state.index < grid.columns.length) {
+                                    grid.reorderColumn(state.index, columnObj);
+                                }
+                            }
+
+                            // show / hide column
+                            if (state.hidden !== columnObj.hidden) {
+                                if (state.hidden) {
+                                    grid.hideColumn(columnObj);
+                                } else {
+                                    grid.showColumn(columnObj);
+                                }
+                            }
+
+                            if (!columnObj.hidden) {
+                                visableColumnIndex++;
+                            }
+
+                            // resize column
+                            if (state.width !== columnObj.width) {
+                                // manually set the width on the column, cause changing the css doesn't update it
+                                columnObj.width = state.width;
+                                // $timeout is required here, else the jQuery select doesn't work
+                                $timeout(() => {
+                                    // set width of column header
+                                    $(`#${gridId} .k-grid-header`)
+                                        .find("colgroup col")
+                                        .eq(visableColumnIndex)
+                                        .width(state.width);
+
+                                    // set width of column
+                                    $(`#${gridId} .k-grid-content`)
+                                        .find("colgroup col")
+                                        .eq(visableColumnIndex)
+                                        .width(state.width);
+                                });
+                            }
                         }
-
-                        return column.persistId === key;
                     });
 
-                    if (columnIndex !== -1) {
-                        var columnObj = grid.columns[columnIndex];
-                        // reorder column
-                        if (state.index !== columnIndex) {
-                            // check if index is out of bounds
-                            if (state.index < grid.columns.length) {
-                                grid.reorderColumn(state.index, columnObj);
-                            }
-                        }
-
-                        // show / hide column
-                        if (state.hidden !== columnObj.hidden) {
-                            if (state.hidden) {
-                                grid.hideColumn(columnObj);
-                            } else {
-                                grid.showColumn(columnObj);
-                            }
-                        }
-
-                        if (!columnObj.hidden) {
-                            visableColumnIndex++;
-                        }
-
-                        // resize column
-                        if (state.width !== columnObj.width) {
-                            // manually set the width on the column, cause changing the css doesn't update it
-                            columnObj.width = state.width;
-                            // $timeout is required here, else the jQuery select doesn't work
-                            $timeout(() => {
-                                // set width of column header
-                                $(`#${gridId} .k-grid-header`)
-                                    .find("colgroup col")
-                                    .eq(visableColumnIndex)
-                                    .width(state.width);
-
-                                // set width of column
-                                $(`#${gridId} .k-grid-content`)
-                                    .find("colgroup col")
-                                    .eq(visableColumnIndex)
-                                    .width(state.width);
-                            });
-                        }
-                    }
+                    grid.setOptions(gridOptions);
+                    grid.dataSource.pageSize(grid.dataSource.options.pageSize);
                 });
-
-                grid.setOptions(gridOptions);
-                grid.dataSource.pageSize(grid.dataSource.options.pageSize);
             }
 
             // gets all the saved options, both session and local, and merges
@@ -300,7 +303,7 @@
             }
 
             function getGridOrganizationalConfiguration() {
-                KendoFilterService
+                return KendoFilterService
                     .getConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
