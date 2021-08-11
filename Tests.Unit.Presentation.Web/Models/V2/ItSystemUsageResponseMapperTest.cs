@@ -409,27 +409,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return (usedPersonalDataTypes, usedRegisterTypes);
         }
 
-        /*
-         *   private GDPRRegistrationsResponseDTO MapGDPR(ItSystemUsage systemUsage)
-        {
-            var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
-            var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
-            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
-
-            return new GDPRRegistrationsResponseDTO
-            {
-                SensitivePersonData = attachedOptions
-                    .Where(option => option.OptionType == OptionType.SENSITIVEPERSONALDATA)
-                    .Where(option => personDataTypesMap.Value.ContainsKey(option.OptionId))
-                    .Select(option => personDataTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
-                RegisteredDataCategories = attachedOptions
-                    .Where(option => option.OptionType == OptionType.REGISTERTYPEDATA)
-                    .Where(option => registerTypesMap.Value.ContainsKey(option.OptionId))
-                    .Select(option => registerTypesMap.Value[option.OptionId].MapIdentityNamePairDTO()),
-            };
-        }
-         */
-
         private void AssignArchiving(ItSystemUsage itSystemUsage, bool withOptionalCrossReferences)
         {
             itSystemUsage.ArchiveFromSystem = A<bool?>();

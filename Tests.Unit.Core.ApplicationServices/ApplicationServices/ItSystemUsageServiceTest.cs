@@ -75,26 +75,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _userContextMock.Object,
                 new Mock<IAttachedOptionRepository>().Object);
         }
-        //TODO: Extend with the two new methods
-
-        /*
-         * public Result<IQueryable<ItSystemUsage>, OperationError> Query(params IDomainQuery<ItSystemUsage>[] conditions)
-        {
-            var baseQuery = _usageRepository.AsQueryable();
-            var subQueries = new List<IDomainQuery<ItSystemUsage>>();
-
-            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
-                subQueries.Add(new QueryByOrganizationIds<ItSystemUsage>(_userContext.OrganizationIds));
-
-            subQueries.AddRange(conditions);
-
-            var filteredQuery = new IntersectionQuery<ItSystemUsage>(subQueries).Apply(baseQuery);
-
-            return Result<IQueryable<ItSystemUsage>, OperationError>.Success(filteredQuery);
-        }
-         
-         *
-         */
 
         [Fact]
         public void Query_Returns_All_If_User_Has_Full_CrossOrgAccess()

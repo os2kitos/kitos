@@ -39,16 +39,16 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             var criteria = new List<KeyValuePair<string, string>>();
 
             if (organizationFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("organizationUuid", organizationFilter.Value.ToString("N")));
+                criteria.Add(new KeyValuePair<string, string>("organizationUuid", organizationFilter.Value.ToString()));
 
             if (systemUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("systemUuid", systemUuidFilter.Value.ToString("N")));
+                criteria.Add(new KeyValuePair<string, string>("systemUuid", systemUuidFilter.Value.ToString()));
 
             if (relationToSystemUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUuid", relationToSystemUuidFilter.Value.ToString("N")));
+                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUuid", relationToSystemUuidFilter.Value.ToString()));
 
             if (relationToSystemUsageUuidFilter.HasValue)
-                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString("N")));
+                criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString()));
 
             if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
                 criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
