@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel;
 
 namespace Core.DomainServices.Repositories.GDPR
@@ -12,9 +13,22 @@ namespace Core.DomainServices.Repositories.GDPR
             _attachedOptionRepository = attachedOptionRepository;
         }
 
-        public IEnumerable<AttachedOption> GetAttachedOptions()
+        public IEnumerable<AttachedOption> GetBySystemUsageId(int systemUsageId)
         {
-            return _attachedOptionRepository.Get();
+            return _attachedOptionRepository
+                .AsQueryable()
+                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && x.ObjectId == systemUsageId)
+                .ToList();
+        }
+
+        public void DeleteBySystemUsageId(int systemUsageId)
+        {
+            var attachedOptions = GetBySystemUsageId(systemUsageId);
+
+            foreach (var attachedOption in attachedOptions)
+                _attachedOptionRepository.Delete(attachedOption);
+
+            _attachedOptionRepository.Save();
         }
     }
 }

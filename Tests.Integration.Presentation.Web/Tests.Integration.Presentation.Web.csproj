@@ -111,6 +111,9 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
+    <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
     <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />
     <Compile Include="Contract\V2\ItContractsApiV2Test.cs" />
     <Compile Include="Options\V2\OptionV2ApiTests.cs" />
@@ -156,6 +159,7 @@
     <Compile Include="Tools\EntityOptionHelper.cs" />
     <Compile Include="Tools\External\ItContractV2Helper.cs" />
     <Compile Include="Tools\External\ItProjectV2Helper.cs" />
+    <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
     <Compile Include="Tools\External\KleOptionV2Helper.cs" />
     <Compile Include="Tools\External\OptionV2ApiHelper.cs" />
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />

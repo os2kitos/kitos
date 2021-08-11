@@ -2,7 +2,6 @@
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
@@ -19,7 +18,7 @@ using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Options;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -39,6 +38,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
+        private readonly IOrganizationalUserContext _userContext;
 
 
         public DataProcessingRegistrationApplicationService(
@@ -55,7 +55,8 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
-            IGenericRepository<DataProcessingRegistrationRight> rightRepository)
+            IGenericRepository<DataProcessingRegistrationRight> rightRepository, 
+            IOrganizationalUserContext userContext)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -71,6 +72,7 @@ namespace Core.ApplicationServices.GDPR
             _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
             _rightRepository = rightRepository;
+            _userContext = userContext;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -87,7 +89,8 @@ namespace Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration
             {
                 OrganizationId = organizationId,
-                Name = name
+                Name = name,
+                Uuid = Guid.NewGuid()
             };
 
             var dataProcessingRegistration = _repository.Add(registration);
@@ -502,6 +505,36 @@ namespace Core.ApplicationServices.GDPR
                 registration.OversightCompletedRemark = remark;
                 return registration;
             });
+        }
+
+        public IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions)
+        {
+            var baseQuery = _repository.AsQueryable();
+            var subQueries = new List<IDomainQuery<DataProcessingRegistration>>();
+
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+                subQueries.Add(new QueryByOrganizationIds<DataProcessingRegistration>(_userContext.OrganizationIds));
+
+            subQueries.AddRange(conditions);
+
+            var result = subQueries.Any()
+                ? new IntersectionQuery<DataProcessingRegistration>(subQueries).Apply(baseQuery)
+                : baseQuery;
+
+            return result;
+        }
+
+        public Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid)
+        {
+            return _repository
+                .AsQueryable()
+                .ByUuid(uuid)
+                .FromNullable()
+                .Match<Result<DataProcessingRegistration, OperationError>>
+                (
+                    dpr => _authorizationContext.AllowReads(dpr) ? dpr : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
         }
     }
 }

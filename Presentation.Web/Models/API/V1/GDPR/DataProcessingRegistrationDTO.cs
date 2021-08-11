@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1.References;
 using Presentation.Web.Models.API.V1.Shared;
+using System;
 
 namespace Presentation.Web.Models.API.V1.GDPR
 {
@@ -10,6 +11,8 @@ namespace Presentation.Web.Models.API.V1.GDPR
             : base(id, name)
         {
         }
+
+        public Guid Uuid { get; set; }
 
         public AssignedRoleDTO[] AssignedRoles { get; set; }
 

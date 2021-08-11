@@ -14,6 +14,7 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
@@ -41,6 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationBasisForTransferAssignmentService> _basisForTransferAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
+        private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -58,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _basisForTransferAssignmentServiceMock = new Mock<IDataProcessingRegistrationBasisForTransferAssignmentService>();
             _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
             _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
+            _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -72,7 +75,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightOptionAssignmentServiceMock.Object,
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
-                _rightsRepositoryMock.Object);
+                _rightsRepositoryMock.Object,
+                _userContextMock.Object);
         }
 
         [Fact]
@@ -1563,6 +1567,137 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.UpdateOversightCompletedRemark(id, A<string>()));
         }
 
+        [Fact]
+        public void Query_Returns_All_DPRs()
+        {
+            //Arrange
+            var numberOfDPRS = Math.Abs(A<int>());
+            var registrations = CreateListOfDPR(numberOfDPRS);
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(registrations.AsQueryable());
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var dprs = _sut.Query();
+
+            //Assert
+            Assert.Equal(numberOfDPRS, dprs.Count());
+        }
+
+        [Fact]
+        public void Query_Returns_All_DPRs_From_Organizations_Where_User_Has_Access()
+        {
+            //Arrange
+            var org1 = A<int>();
+            var org2 = A<int>();
+            var registration1 = new DataProcessingRegistration() { Id = A<int>(), OrganizationId = org1 };
+            var registration2 = new DataProcessingRegistration() { Id = A<int>(), OrganizationId = org2 };
+
+            var registrations = new List<DataProcessingRegistration>() { registration1, registration2, new DataProcessingRegistration { Id = A<int>() } };
+
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(registrations.AsQueryable());
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.None);
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { org1, org2 });
+
+            //Act
+            var dprs = _sut.Query();
+
+            //Assert
+            Assert.Equal(2, dprs.Count());
+            var result1 = Assert.Single(dprs.Where(x => x.OrganizationId == org1));
+            Assert.Same(registration1, result1);
+
+            var result2 = Assert.Single(dprs.Where(x => x.OrganizationId == org2));
+            Assert.Same(registration2, result2);
+        }
+
+        [Fact]
+        public void Query_Returns_DPRs_Which_Satisfies_Conditions()
+        {
+            //Arrange
+            var org1 = new Organization() { Id = A<int>(), Uuid = A<Guid>() };
+            var org2 = new Organization() { Id = A<int>(), Uuid = A<Guid>() };
+
+            var registration1 = new DataProcessingRegistration() { Id = A<int>(), Organization = org1 };
+            var registration2 = new DataProcessingRegistration() { Id = A<int>(), Organization = org2 };
+
+            var registrations = new List<DataProcessingRegistration>() { registration1, registration2, new DataProcessingRegistration { Id = A<int>() } }.AsQueryable();
+            var queryMock = new Mock<IDomainQuery<DataProcessingRegistration>>();
+            queryMock.Setup(x => x.Apply(registrations)).Returns(new List<DataProcessingRegistration>() { registration1 }.AsQueryable());
+            var conditions = new List<IDomainQuery<DataProcessingRegistration>>() { queryMock.Object };
+
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(registrations);
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var dprs = _sut.Query(conditions.ToArray());
+
+            //Assert
+            var result = Assert.Single(dprs);
+            Assert.Same(registration1, result);
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_DPR()
+        {
+            //Arrange
+            var registration = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>()};
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
+            ExpectAllowReadReturns(registration, true);
+
+            //Act
+            var dpr = _sut.GetByUuid(registration.Uuid);
+
+            //Assert
+            Assert.True(dpr.Ok);
+            Assert.Same(registration, dpr.Value);
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_NotFound()
+        {
+            //Arrange
+            var registration = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
+
+            //Act
+            var dpr = _sut.GetByUuid(A<Guid>());
+
+            //Assert
+            Assert.True(dpr.Failed);
+            Assert.Equal(OperationFailure.NotFound, dpr.Error.FailureType);
+        }
+
+        [Fact]
+        public void GetByUuid_Returns_Forbidden()
+        {
+            //Arrange
+            var registration = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(CreateListOfDPRFromDpr(registration).AsQueryable());
+            ExpectAllowReadReturns(registration, false);
+
+            //Act
+            var dpr = _sut.GetByUuid(registration.Uuid);
+
+            //Assert
+            Assert.True(dpr.Failed);
+            Assert.Equal(OperationFailure.Forbidden, dpr.Error.FailureType);
+        }
+
+        private List<DataProcessingRegistration> CreateListOfDPRFromDpr(DataProcessingRegistration DPR)
+        {
+            return new List<DataProcessingRegistration>() { DPR, new DataProcessingRegistration { Id = A<int>() } };
+        }
+
+        private List<DataProcessingRegistration> CreateListOfDPR(int numberOfItems)
+        {
+            var dprs = new List<DataProcessingRegistration>();
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                dprs.Add(new DataProcessingRegistration() { Id = A<int>() });
+            }
+            return dprs;
+        }
+
         /// <summary>
         /// Helper test to make it easy to cover the "Modify succeeds" case
         /// </summary>
@@ -1655,6 +1790,11 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private void ExpectOrganizationalReadAccess(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContextMock.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(organizationDataReadAccessLevel);
+        }
+
+        private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
+        {
+            _authorizationContextMock.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(crossOrganizationReadAccessLevel);
         }
 
         private void ExpectAllowModifyReturns(DataProcessingRegistration dataProcessingRegistration, bool value)
