@@ -16,7 +16,6 @@ namespace Core.DomainModel.ItSystemUsage
     using Core.DomainModel.Notification;
     using ItSystem.DataTypes;
     using System;
-    using System.ComponentModel.DataAnnotations.Schema;
 
     using ItSystem = Core.DomainModel.ItSystem.ItSystem;
 
@@ -229,10 +228,6 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-        public string DocketNo { get; set; }
-
-        [Column(TypeName = "date")]
-        public DateTime? ArchivedDate { get; set; }
 
         public string ArchiveNotes { get; set; }
 

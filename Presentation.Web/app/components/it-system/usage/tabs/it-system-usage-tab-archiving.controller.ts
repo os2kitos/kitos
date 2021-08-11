@@ -39,7 +39,6 @@
             $scope.archiveTestLocations = archiveTestLocations;
             $scope.usageId = $stateParams.id;
             $scope.systemUsage = systemUsage;
-            $scope.ArchivedDate = systemUsage.ArchivedDate;
             $scope.archivePeriods = archivePeriod;
             $scope.hasWriteAccessAndArchived = systemUsage.Archived;
             $scope.ArchiveDuty = systemUsage.ArchiveDuty;
