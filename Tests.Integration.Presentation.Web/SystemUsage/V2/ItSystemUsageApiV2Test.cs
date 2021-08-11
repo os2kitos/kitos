@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -45,6 +46,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertExpectedUsageShallow(system2UsageOrg1, dtos);
             AssertExpectedUsageShallow(system2UsageOrg2, dtos);
             AssertExpectedUsageShallow(system3UsageOrg2, dtos);
+        }
+
+        [Fact]
+        public async Task Can_Get_All_ItSystemUsages_With_Paging()
+        {
+            //Arrange
+            var organization1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization1);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization1.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+
+            var system1 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization2.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization2.Id, AccessModifier.Public);
+
+            var system1UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization1.Id);
+            var system2UsageOrg1 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization1.Id);
+            var system2UsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization2.Id);
+            var system3UsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization2.Id);
+
+            //Act
+            var page1Dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, page: 0, pageSize: 2)).ToList();
+            var page2Dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, page: 1, pageSize: 2)).ToList();
+
+            //Assert
+            Assert.Equal(2, page1Dtos.Count);
+            Assert.Equal(2, page2Dtos.Count);
+            AssertExpectedUsageShallow(system1UsageOrg1, page1Dtos);
+            AssertExpectedUsageShallow(system2UsageOrg1, page1Dtos);
+            AssertExpectedUsageShallow(system2UsageOrg2, page2Dtos);
+            AssertExpectedUsageShallow(system3UsageOrg2, page2Dtos);
         }
 
         [Fact]
@@ -201,30 +234,60 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         public async Task Can_Get_Specific_ItSystemUsage()
         {
             //Arrange
+            var organization1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization1);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization1.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+
+            var system = await CreateSystemAsync(organization2.Id, AccessModifier.Public);
+
+            await ItSystemHelper.TakeIntoUseAsync(system.dbId, organization1.Id);
+            var systemUsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system.dbId, organization2.Id);
 
             //Act
+            var dto = (await ItSystemUsageV2Helper.GetSingleAsync(token,systemUsageOrg2.Uuid));
 
-            //Assert TODO: Assert a full dto here to make sure everything is mapped correctly over the wire
+            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            AssertExpectedUsageShallow(systemUsageOrg2, dto);
         }
 
         [Fact]
         public async Task Cannot_Get_Unknown_ItSystemUsage()
         {
             //Arrange
+            var organization1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization1);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization1.Id).DisposeAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
 
             //Act
+            using var response = (await ItSystemUsageV2Helper.SendGetSingleAsync(token, A<Guid>()));
 
             //Assert
+            Assert.Equal(HttpStatusCode.NotFound,response.StatusCode);
         }
 
         [Fact]
         public async Task Cannot_Get_ItSystemUsage_If_NotAllowedTo()
         {
             //Arrange
+            var organization1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization1);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization1.Id).DisposeAsync();
+
+            var system = await CreateSystemAsync(organization2.Id, AccessModifier.Public);
+
+            await ItSystemHelper.TakeIntoUseAsync(system.dbId, organization1.Id);
+            var systemUsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system.dbId, organization2.Id);
 
             //Act
+            using var response = (await ItSystemUsageV2Helper.SendGetSingleAsync(token, systemUsageOrg2.Uuid));
 
-            //Assert
+            //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
         private string CreateEmail()
@@ -235,13 +298,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, IEnumerable<ItSystemUsageResponseDTO> dtos)
         {
             var dto = Assert.Single(dtos, usage => usage.Uuid == expectedContent.Uuid);
+            AssertExpectedUsageShallow(expectedContent, dto);
+        }
+
+        private static void AssertExpectedUsageShallow(ItSystemUsageDTO expectedContent, ItSystemUsageResponseDTO dto)
+        {
             Assert.Equal(expectedContent.Organization.Uuid, dto.OrganizationContext.Uuid);
             Assert.Equal(expectedContent.Organization.Name, dto.OrganizationContext.Name);
             Assert.Equal(expectedContent.Organization.Cvr, dto.OrganizationContext.Cvr);
             Assert.Equal(expectedContent.ItSystem.Uuid, dto.SystemContext.Uuid);
             Assert.Equal(expectedContent.ItSystem.Name, dto.SystemContext.Name);
-
         }
+
         private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier, string name = null)
         {
             var systemName = name ?? CreateName();

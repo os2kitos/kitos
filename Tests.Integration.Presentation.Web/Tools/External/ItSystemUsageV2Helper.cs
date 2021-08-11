@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Xunit;
+using Xunit.Sdk;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
@@ -30,7 +32,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? systemUuidFilter = null,
             Guid? relationToSystemUuidFilter = null,
             Guid? relationToSystemUsageUuidFilter = null,
-            string systemNameContentFilter = null)
+            string systemNameContentFilter = null,
+            int? page = null,
+            int? pageSize = null)
         {
             var criteria = new List<KeyValuePair<string, string>>();
 
@@ -49,10 +53,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
                 criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
 
+            if(page.HasValue)
+                criteria.Add(new KeyValuePair<string, string>("page", page.Value.ToString("D")));
+
+            if (pageSize.HasValue)
+                criteria.Add(new KeyValuePair<string, string>("pageSize", pageSize.Value.ToString("D")));
+
             var joinedCriteria = string.Join("&", criteria.Select(x => $"{x.Key}={x.Value}"));
             var queryString = joinedCriteria.Any() ? $"?{joinedCriteria}" : string.Empty;
             using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages{queryString}"), token);
+            
+            if(!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemUsageResponseDTO>>();
         }
