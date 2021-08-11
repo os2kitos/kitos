@@ -65,7 +65,6 @@ namespace Presentation.Web.Models.API.V1
         public UserCount UserCount { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-        public bool? ReportedToDPA { get; set; }
         public string DocketNo { get; set; }
         public string ArchiveNotes { get; set; }
         public int? ArchiveFreq { get; set; }

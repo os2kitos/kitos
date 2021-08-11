@@ -229,9 +229,6 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-
-        public bool? ReportedToDPA { get; set; }
-
         public string DocketNo { get; set; }
 
         [Column(TypeName = "date")]
