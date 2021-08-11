@@ -535,11 +535,6 @@
     <Compile Include="Controllers\API\V1\OData\ItContractItSystemUsagesController.cs" />
     <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitiveDataTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsControllers\BaseOdataAuthorizationController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsITSystemContactsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsItSystemRolesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsItSystemsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsControllers\ReportsMunicipalitiesController.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapper.cs" />
@@ -562,7 +557,6 @@
     <Compile Include="Models\API\V1\Qa\BrokenExternalReferencesReportCsvMapper.cs" />
     <Compile Include="Models\API\V1\Qa\BrokenExternalReferencesReportStatusDTO.cs" />
     <Compile Include="Models\API\V1\References\ReferenceDTO.cs" />
-    <Compile Include="Models\API\V1\ReportItSystemRightOutputDTO.cs" />
     <Compile Include="Models\API\V1\ShallowOrganizationDTO.cs" />
     <Compile Include="Models\API\V1\Shared\OptionWithDescriptionDTO.cs" />
     <Compile Include="Models\API\V1\Shared\OptionWithDescriptionAndExpirationDTO.cs" />

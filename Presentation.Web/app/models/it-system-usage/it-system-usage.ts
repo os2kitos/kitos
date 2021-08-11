@@ -8,8 +8,6 @@
         LocalSystemId: string;
         /** Gets or sets the version. */
         Version: string;
-        /** Gets or sets a reference to relevant documents in an extern ESDH system. */
-        EsdhRef: string;
         /** Gets or sets a reference to relevant documents in an extern CMDB system. */
         CmdbRef: string;
         /** Gets or sets the local call system. */

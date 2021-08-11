@@ -150,13 +150,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public string Version { get; set; }
         /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern ESDH system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to ESDH system.
-        /// </value>
-        public string EsdhRef { get; set; }
-        /// <summary>
         /// Gets or sets a reference to relevant documents in an extern CMDB system.
         /// </summary>
         /// <value>
