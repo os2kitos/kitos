@@ -62,14 +62,6 @@ namespace Core.DomainModel.ItSystemUsage
                         endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
 
-                    if (this.Terminated.HasValue)
-                    {
-                        var terminationDate = this.Terminated;
-                        
-                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
                     // indgået-dato <= dags dato <= udløbs-dato
                     return today >= startDate.Date && today <= endDate;
                 }
@@ -101,13 +93,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public DateTime? ExpirationDate { get; set; }
 
-        /// <summary>
-        ///     Date the system ends. (opsagt)
-        /// </summary>
-        /// <value>
-        ///     The termination date.
-        /// </value>
-        public DateTime? Terminated { get; set; }
         /// <summary>
         /// Gets or sets the note.
         /// </summary>
