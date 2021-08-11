@@ -29,9 +29,6 @@
 
         SensitiveDataTypeId: number;
         SensitiveDataType: ItSystem.ISensitiveDataType;
-        OverviewId: number;
-        /** Gets or sets the it system usage that is set to be displayed on the it system overview page. */
-        Overview: IItSystemUsage;
         /** Gets or sets the main it contract for this instance.The it contract is used to determine whether this instanceis marked as active/inactive. */
         MainContract: ItContract.IItContractItSystemUsage;
         /** Gets or sets it contracts associated with this instance. */

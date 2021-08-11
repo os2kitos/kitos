@@ -156,18 +156,6 @@ namespace Core.DomainModel.ItSystemUsage
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
 
-        public int? OverviewId { get; set; }
-        /// <summary>
-        /// Gets or sets the it system usage that is set to be displayed on the it system overview page.
-        /// </summary>
-        /// <remarks>
-        /// It's the it system name that is actually displayed.
-        /// </remarks>
-        /// <value>
-        /// The overview it system.
-        /// </value>
-        public virtual ItSystemUsage Overview { get; set; }
-
         /// <summary>
         /// Gets or sets the main it contract for this instance.
         /// The it contract is used to determine whether this instance
