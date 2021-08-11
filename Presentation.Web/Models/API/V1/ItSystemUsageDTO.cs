@@ -14,7 +14,6 @@ namespace Presentation.Web.Models.API.V1
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
         public string Version { get; set; }
-        public string CmdbRef { get; set; }
         public string LocalCallName { get; set; }
         public int? SensitiveDataTypeId { get; set; }
         public string SensitiveDataTypeName { get; set; }

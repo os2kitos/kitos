@@ -118,13 +118,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public string Version { get; set; }
         /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern CMDB system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to CMDB system.
-        /// </value>
-        public string CmdbRef { get; set; }
-        /// <summary>
         /// Gets or sets the local call system.
         /// </summary>
         /// <value>
