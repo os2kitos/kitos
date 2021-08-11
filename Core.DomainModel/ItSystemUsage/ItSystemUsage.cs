@@ -65,12 +65,7 @@ namespace Core.DomainModel.ItSystemUsage
                     if (this.Terminated.HasValue)
                     {
                         var terminationDate = this.Terminated;
-                        if (this.TerminationDeadlineInSystem != null)
-                        {
-                            int deadline;
-                            int.TryParse(this.TerminationDeadlineInSystem.Name, out deadline);
-                            terminationDate = this.Terminated.Value.AddMonths(deadline);
-                        }
+                        
                         // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
                         return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
@@ -113,18 +108,6 @@ namespace Core.DomainModel.ItSystemUsage
         ///     The termination date.
         /// </value>
         public DateTime? Terminated { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the termination deadline option. (opsigelsesfrist)
-        /// </summary>
-        /// <remarks>
-        ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
-        ///     It's a string but should be treated as an int.
-        /// </remarks>
-        /// <value>
-        ///     The termination deadline.
-        /// </value>
-        public virtual TerminationDeadlineTypesInSystem TerminationDeadlineInSystem { get; set; }
         /// <summary>
         /// Gets or sets the note.
         /// </summary>
