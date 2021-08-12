@@ -260,7 +260,7 @@
                         if (result.status === 200) {
                             const version = result.data.response.version;
                             const localVersion = $window.localStorage.getItem(organizationalConfigurationVersionKey);
-                            if (localVersion !== versionChanged && localVersion !== version) {
+                            if (localVersion !== version) {
                                 const columns = result.data.response.visibleColumns;
                                 $window.localStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
                                 $window.localStorage.setItem(organizationalConfigurationVersionKey, version);
