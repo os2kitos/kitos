@@ -10,19 +10,23 @@ using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
+using Core.DomainModel.Notification;
+using System;
+using Core.DomainModel.ItSystem.DataTypes;
 
 namespace Core.DomainModel.ItSystemUsage
 {
-    using Core.DomainModel.Notification;
-    using ItSystem.DataTypes;
-    using System;
-
-    using ItSystem = Core.DomainModel.ItSystem.ItSystem;
-
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
+    public class ItSystemUsage :
+        HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>,
+        ISystemModule,
+        IEntityWithExternalReferences,
+        IHasAttachedOptions,
+        IEntityWithAdvices,
+        IEntityWithUserNotification,
+        IHasUuid
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
@@ -69,7 +73,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         /// <summary>
-        ///     Gets or sets Active.
+        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
         /// </summary>
         /// <value>
         ///   Active.
@@ -147,7 +151,7 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// It system.
         /// </value>
-        public virtual ItSystem ItSystem { get; set; }
+        public virtual ItSystem.ItSystem ItSystem { get; set; }
 
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
