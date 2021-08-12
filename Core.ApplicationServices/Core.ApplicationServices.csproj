@@ -198,8 +198,10 @@
     <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
     <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
     <Compile Include="SystemUsage\IItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\IItsystemUsageRelationsService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
     <Compile Include="SystemUsage\ItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\ItsystemUsageRelationsService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
