@@ -80,18 +80,23 @@
             };
             return service;
 
-            function getOrgFilterOptions(overviewType: Models.Generic.OverviewType) {
+            async function getOrgFilterOptions(overviewType: Models.Generic.OverviewType) {
                 // Organizational configuration not yet activated for overview
                 if (overviewType === null || overviewType === undefined) {
                     return null;
                 }
 
+                if ($window.localStorage.getItem(organizationalConfigurationVersionKey) === versionChanged) {
+                    return null;
+                }
+
                 return getGridVersion().then((result) => {
-                    if (result !== null && result !== $window.sessionStorage.getItem(organizationalConfigurationVersionKey)) {
+                    if (result !== null && result !== $window.localStorage.getItem(organizationalConfigurationVersionKey)) {
                         return getGridOrganizationalConfiguration();
-                    } 
+                    }
+                    return null;
                 });
-            } 
+            }
 
             // saves grid state to localStorage
             function saveGridOptions(grid: Kitos.IKendoGrid<any>) {
@@ -105,9 +110,9 @@
                     
                     // Compare the visible columns with the visible columns retrieved from the server.
                     const localVersion = sha256(options.columns.filter(x => !x.hidden).map(x => x.persistId).sort().join(""));
-                    const organizationalConfigurationVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
+                    const organizationalConfigurationVersion = $window.localStorage.getItem(organizationalConfigurationVersionKey);
                     if (organizationalConfigurationVersion !== null && localVersion !== organizationalConfigurationVersion) {
-                        $window.sessionStorage.setItem(organizationalConfigurationVersionKey, versionChanged);
+                        $window.localStorage.setItem(organizationalConfigurationVersionKey, versionChanged);
                     }
                 });
             }
@@ -130,7 +135,7 @@
             function getStoredOptions(grid: Kitos.IKendoGrid<any>): IGridSavedState {
                 // load options from org storage
                 var orgStorageColumns: Models.Generic.IKendoColumnConfigurationDTO[];
-                var orgStorageColumnsItem = $window.sessionStorage.getItem(organizationalConfigurationColumnsKey);
+                var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
                 if (orgStorageColumnsItem) {
                     orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]> JSONfn.parse(orgStorageColumnsItem, true);
                 }
@@ -171,8 +176,11 @@
                     // note the order the options are merged in (below) is important!
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
                 }
+                else if (localOptions) {
+                    options = <IGridSavedState> localOptions;
+                }
 
-                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) !== versionChanged) {
+                if ($window.localStorage.getItem(organizationalConfigurationVersionKey) !== versionChanged) {
                     // Session updates has not changed the grid as updates to the grid which changes the columns causes the version to be deleted
                     // So we use the local organization configuration if it exists
                     if (orgStorageColumns) {
@@ -251,18 +259,18 @@
                     .then((result) => {
                         if (result.status === 200) {
                             const version = result.data.response.version;
-                            const localVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
+                            const localVersion = $window.localStorage.getItem(organizationalConfigurationVersionKey);
                             if (localVersion !== versionChanged && localVersion !== version) {
                                 const columns = result.data.response.visibleColumns;
-                                $window.sessionStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
-                                $window.sessionStorage.setItem(organizationalConfigurationVersionKey, version);
+                                $window.localStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
+                                $window.localStorage.setItem(organizationalConfigurationVersionKey, version);
                             }
                         }
                     })
                     .catch((result) => {
                         if (result.status === 404) {
                             // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
-                            $window.sessionStorage.removeItem(organizationalConfigurationColumnsKey);
+                            $window.localStorage.removeItem(organizationalConfigurationColumnsKey);
                         }
                     });
             }
@@ -319,12 +327,12 @@
 
             function removeSession(): void {
                 $window.sessionStorage.removeItem(storageKey);
-                $window.sessionStorage.removeItem(organizationalConfigurationColumnsKey);
-                $window.sessionStorage.removeItem(organizationalConfigurationVersionKey);
             }
 
             function removeLocal(): void {
                 $window.localStorage.removeItem(storageKey);
+                $window.localStorage.removeItem(organizationalConfigurationColumnsKey);
+                $window.localStorage.removeItem(organizationalConfigurationVersionKey);
             }
 
             function removeProfile(): void {
@@ -336,11 +344,11 @@
                     return false; // No defaults defined for this overview type
                 }
 
-                if ($window.sessionStorage.getItem(organizationalConfigurationColumnsKey) === null) {
+                if ($window.localStorage.getItem(organizationalConfigurationColumnsKey) === null) {
                     return false;
                 }
 
-                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) === null || $window.sessionStorage.getItem(organizationalConfigurationVersionKey) === versionChanged) {
+                if ($window.localStorage.getItem(organizationalConfigurationVersionKey) === null || $window.localStorage.getItem(organizationalConfigurationVersionKey) === versionChanged) {
                     return true;
                 }
 
@@ -348,7 +356,7 @@
             }
 
             function canDeleteGridOrganizationalConfiguration() {
-                return $window.sessionStorage.getItem(organizationalConfigurationColumnsKey) !== null;
+                return $window.localStorage.getItem(organizationalConfigurationColumnsKey) !== null;
             }
 
 
