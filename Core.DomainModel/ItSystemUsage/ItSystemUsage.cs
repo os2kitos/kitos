@@ -517,5 +517,87 @@ namespace Core.DomainModel.ItSystemUsage
             }
             return Maybe<OperationError>.None;
         }
+
+        public void ResetUserCount()
+        {
+            UserCount = UserCount.BELOWTEN;
+        }
+
+        public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
+        {
+            switch (newIntervalValue)
+            {
+                case (0, 9):
+                    UserCount = UserCount.BELOWTEN;
+                    break;
+                case (10, 50):
+                    UserCount = UserCount.TENTOFIFTY;
+                    break;
+                case (50, 100):
+                    UserCount = UserCount.FIFTYTOHUNDRED;
+                    break;
+                case (100, null):
+                case (100, int.MaxValue):
+                    UserCount = UserCount.HUNDREDPLUS;
+                    break;
+                default:
+                    return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetMainContract()
+        {
+            MainContract?.Track();
+            MainContract = null;
+        }
+
+        public Maybe<OperationError> SetMainContract(ItContract.ItContract contract)
+        {
+            if (contract == null)
+                throw new ArgumentNullException(nameof(contract));
+
+            if (contract.OrganizationId != OrganizationId)
+                return new OperationError("Contract must belong to same organization as this usage", OperationFailure.BadInput);
+
+            var contractAssociation = Contracts.FirstOrDefault(c => c.ItContractId == contract.Id);
+
+            if (contractAssociation == null)
+                return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
+
+            MainContract = contractAssociation;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetProjectAssociations()
+        {
+            ItProjects.Clear();
+            //TODO: If the above does not work, use the stuff below
+            //foreach (var itProject in ItProjects.ToList())
+            //    itProject.ItSystemUsages.Remove(this);
+        }
+
+        public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
+        {
+            var itProjects = projects.ToList();
+            
+            if (itProjects.Select(x => x.Uuid).Distinct().Count() != itProjects.Count)
+                return new OperationError("projects must not contain duplicates", OperationFailure.BadInput);
+
+            if (itProjects.Any(project => project.OrganizationId != OrganizationId))
+                return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
+            
+            ResetProjectAssociations();
+            
+            itProjects.ForEach(ItProjects.Add);
+            //TODO: If above solution does not work, use the code below
+            //foreach (var itProject in itProjects)
+            //{
+            //    var result = itProject.AddSystemUsage(this);
+            //}
+
+            return Maybe<OperationError>.None;
+        }
     }
 }

@@ -12,7 +12,5 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters);
 
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
-        //TODO: Add the Maybe<Value<T>> In the contract types and add modification methods for it
-        //TODO: Relations delegate to the relations service but exposes more or less the same interface (except for all of the GET methods used by ui).
     }
 }

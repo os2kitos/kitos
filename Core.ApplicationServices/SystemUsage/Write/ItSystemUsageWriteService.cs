@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
@@ -24,6 +29,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOrganizationService _organizationService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOptionsService<ItSystemUsage, ItSystemCategories> _systemCategoriesOptionsService;
+        private readonly IItContractService _contractService;
+        private readonly IItProjectService _projectService;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
 
@@ -34,6 +41,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOrganizationService organizationService,
             IAuthorizationContext authorizationContext,
             IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
+            IItContractService contractService,
+            IItProjectService projectService,
             IDomainEvents domainEvents,
             ILogger logger)
         {
@@ -43,6 +52,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _organizationService = organizationService;
             _authorizationContext = authorizationContext;
             _systemCategoriesOptionsService = systemCategoriesOptionsService;
+            _contractService = contractService;
+            _projectService = projectService;
             _domainEvents = domainEvents;
             _logger = logger;
         }
@@ -99,7 +110,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
                     .Bind(usage => WithOptionalUpdate(usage, parameters.GeneralProperties, PerformRoleAssignmentUpdates));
-        }//TODO: PLaceholder methods so that we can work in parallel
+        }
 
         private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageGeneralProperties> newPropertyValues)
         {
@@ -109,10 +120,58 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.LocalSystemId, (systemUsage, localSystemId) => systemUsage.UpdateLocalSystemId(localSystemId)))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.DataClassificationUuid, UpdateDataClassification))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)));
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.ValidFrom, (systemUsage, validFrom) => systemUsage.Concluded = validFrom.Match(date => date, () => (DateTime?)null)))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.ValidTo, (systemUsage, validTo) => systemUsage.ExpirationDate = validTo.Match(date => date, () => (DateTime?)null)))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.MainContractUuid, UpdateMainContract))
+                .Bind(usage => WithOptionalUpdate(usage, generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
+        }
 
-            //TODO: Add the rest as above
+        private Result<ItSystemUsage, OperationError> UpdateProjectAssociations(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> projectUuids)
+        {
+            if (projectUuids.IsNone)
+            {
+                systemUsage.ResetProjectAssociations();
+                return systemUsage;
+            }
 
+            var itProjects = new List<ItProject>();
+            foreach (var uuid in projectUuids.Value)
+            {
+                var result = _projectService.GetProject(uuid);
+
+                if (result.Failed)
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message}", result.Error.FailureType);
+
+                itProjects.Add(result.Value);
+            }
+
+            return systemUsage.SetProjectAssociations(itProjects).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateMainContract(ItSystemUsage systemUsage, Maybe<Guid> contractId)
+        {
+            if (contractId.IsNone)
+            {
+                systemUsage.ResetMainContract();
+                return systemUsage;
+            }
+
+            var contractResult = _contractService.GetContract(contractId.Value);
+            if (contractResult.Failed)
+                return new OperationError("Failure getting the contract:" + contractResult.Error.Message, contractResult.Error.FailureType);
+
+            return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateExpectedUsersInterval(ItSystemUsage systemUsage, Maybe<(int lower, int? upperBound)> newInterval)
+        {
+            if (newInterval.IsNone)
+                systemUsage.ResetUserCount();
+
+            return systemUsage.SetExpectedUsersInterval(newInterval.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Maybe<OperationError> UpdateDataClassification(ItSystemUsage systemUsage, Maybe<Guid> dataClassificationOptionId)
@@ -134,19 +193,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
 
-        /*
-        public Maybe<ChangedValue<Maybe<(int lower, int? upperBound)>>> NumberOfExpectedUsersInterval { get; set; } = Maybe<ChangedValue<Maybe<(int lower, int? upperBound)>>>.None;
-        public Maybe<ChangedValue<Maybe<bool>>> EnforceActive { get; set; } = Maybe<ChangedValue<Maybe<bool>>>.None;
-        public Maybe<ChangedValue<Maybe<DateTime>>> ValidFrom { get; set; } = Maybe<ChangedValue<Maybe<DateTime>>>.None;
-        public Maybe<ChangedValue<Maybe<DateTime>>> ValidTo { get; set; } = Maybe<ChangedValue<Maybe<DateTime>>>.None;
-        public Maybe<ChangedValue<Maybe<Guid>>> MainContractUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> AssociatedProjectUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
-         */
-
         private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageGeneralProperties> newPropertyValues)
         {
             return itSystemUsage; //TODO: Redefine signature. This method is just here to show how all updates are combined into one
-
         }
 
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
@@ -190,7 +239,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
-            throw new NotImplementedException();
+            return _systemService.GetSystem(itSystemUsageUuid)
+                .Select(systemUsage => _systemService.Delete(systemUsage.Id))
+                .Match(systemDeleteResult =>
+                {
+                    return systemDeleteResult switch
+                    {
+                        SystemDeleteResult.Ok => Maybe<OperationError>.None,
+                        SystemDeleteResult.Forbidden => new OperationError(OperationFailure.Forbidden),
+                        SystemDeleteResult.NotFound => new OperationError(OperationFailure.NotFound),
+                        _ => new OperationError($"Failed to delete system usage:{systemDeleteResult:G}",
+                            OperationFailure.UnknownError)
+                    };
+                }, error => error);
         }
     }
 }

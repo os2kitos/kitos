@@ -217,5 +217,6 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
 
         #endregion
+        
     }
 }
