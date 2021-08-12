@@ -467,5 +467,27 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         public Guid Uuid { get; set; }
+
+        public Maybe<OperationError> UpdateLocalCallName(string localCallName)
+        {
+            if (LocalCallName != localCallName)
+            {
+                if (localCallName is { Length: > DefaultMaxLength })
+                    return new OperationError($"{nameof(localCallName)} is too large", OperationFailure.BadInput);
+                LocalCallName = localCallName;
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateLocalSystemId(string localSystemId)
+        {
+            if (LocalSystemId != localSystemId)
+            {
+                if (localSystemId is { Length: > LongProperyMaxLength })
+                    return new OperationError($"{nameof(localSystemId)} is too large", OperationFailure.BadInput);
+                LocalSystemId = localSystemId;
+            }
+            return Maybe<OperationError>.None;
+        }
     }
 }
