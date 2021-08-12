@@ -13,6 +13,7 @@ using Infrastructure.Services.Types;
 using Core.DomainModel.Notification;
 using System;
 using Core.DomainModel.ItSystem.DataTypes;
+using Infrastructure.Services.Extensions;
 
 namespace Core.DomainModel.ItSystemUsage
 {
@@ -490,6 +491,29 @@ namespace Core.DomainModel.ItSystemUsage
                 if (localSystemId is { Length: > LongProperyMaxLength })
                     return new OperationError($"{nameof(localSystemId)} is too large", OperationFailure.BadInput);
                 LocalSystemId = localSystemId;
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSystemCategories()
+        {
+            ItSystemCategoriesId = null;
+        }
+
+        public Maybe<OperationError> UpdateSystemCategories(ItSystemCategories newValue)
+        {
+            ItSystemCategories = newValue ?? throw new ArgumentNullException(nameof(newValue));
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateSystemVersion(string version)
+        {
+            if (Version != version)
+            {
+                if (version is { Length: > DefaultMaxLength })
+                    return new OperationError($"{nameof(version)} is too large", OperationFailure.BadInput);
+                Version = version;
             }
             return Maybe<OperationError>.None;
         }
