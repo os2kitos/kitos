@@ -2,7 +2,7 @@
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Result;
 
-namespace Core.ApplicationServices.SystemUsage
+namespace Core.ApplicationServices.SystemUsage.ReadModels
 {
     public interface IItsystemUsageOverviewReadModelsService
     {

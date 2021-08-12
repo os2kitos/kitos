@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.SystemUsage.Migration

@@ -19,7 +19,7 @@ using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Serilog;
 
-namespace Core.ApplicationServices.SystemUsage
+namespace Core.ApplicationServices.SystemUsage.Relations
 {
     public class ItsystemUsageRelationsService : IItsystemUsageRelationsService
     {

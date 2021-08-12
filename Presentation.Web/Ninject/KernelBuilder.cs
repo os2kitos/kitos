@@ -94,6 +94,8 @@ using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.ApplicationServices.Rights;
+using Core.ApplicationServices.SystemUsage.ReadModels;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainServices.Organizations;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 

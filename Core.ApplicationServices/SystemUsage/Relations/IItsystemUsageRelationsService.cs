@@ -4,7 +4,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 
-namespace Core.ApplicationServices.SystemUsage
+namespace Core.ApplicationServices.SystemUsage.Relations
 {
     public interface IItsystemUsageRelationsService
     {
