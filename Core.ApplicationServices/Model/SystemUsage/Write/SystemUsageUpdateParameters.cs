@@ -1,5 +1,4 @@
 ﻿using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.SystemUsage.Write;
 using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Model.SystemUsage.Write
