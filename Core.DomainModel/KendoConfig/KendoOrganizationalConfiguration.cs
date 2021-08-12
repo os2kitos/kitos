@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Core.DomainModel.KendoConfig
 {
@@ -25,7 +27,7 @@ namespace Core.DomainModel.KendoConfig
             });
 
 
-            Version = string.Join("", VisibleColumns.OrderBy(x => x.PersistId).Select(x => x.PersistId));
+            Version = ComputeVersion();
         }
 
         public static KendoOrganizationalConfiguration CreateConfiguration(int orgId, OverviewType overviewType)
@@ -35,6 +37,25 @@ namespace Core.DomainModel.KendoConfig
                 OrganizationId = orgId,
                 OverviewType = overviewType
             };
+        }
+
+        private string ComputeVersion()
+        {
+            var visibleColumnsAsString = string.Join("", VisibleColumns.OrderBy(x => x.PersistId).Select(x => x.PersistId));
+            return Hash(visibleColumnsAsString);
+        }
+
+        private static string Hash(string input)
+        {
+            using var sha256Hash = SHA256.Create();
+            var bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+            var builder = new StringBuilder();
+            foreach (var b in bytes)
+            {
+                builder.Append(b.ToString("x2"));
+            }
+            return builder.ToString();
         }
     }
 }
