@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
@@ -29,11 +31,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
     {
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IItSystemUsageResponseMapper _responseMapper;
+        private readonly IItSystemUsageWriteService _writeService;
 
-        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper)
+        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper, IItSystemUsageWriteService writeService)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -126,7 +130,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Delete(systemUsageUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         /// <summary>
@@ -146,7 +152,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateUpdateParameters(request)))
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -166,7 +175,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            var updateParameters = CreateUpdateParameters(request);
+
+            if (updateParameters.IsNone)
+                return BadRequest("No updates provided");
+
+            return _writeService
+                .Update(updateParameters.Value)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -186,6 +202,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -205,7 +222,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -225,7 +242,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -245,7 +262,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -265,7 +282,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -281,11 +298,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageArchiving([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GDPRWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGdpr([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GDPRWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -305,7 +322,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
+            //TODO: Make wrapper methods yo provide a delta object with only the selected section
             throw new System.NotImplementedException();
         }
 
@@ -390,6 +407,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             throw new System.NotImplementedException();
+        }
+
+        private Maybe<SystemUsageUpdateParameters> CreateUpdateParameters(BaseItSystemUsageWriteRequestDTO request)
+        {
+            //TODO: Implement
+            return Maybe<SystemUsageUpdateParameters>.None;
+        }
+
+        private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

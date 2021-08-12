@@ -213,6 +213,7 @@
     <Compile Include="Contract\ItContractService.cs" />
     <Compile Include="Project\ItProjectService.cs" />
     <Compile Include="Interface\ItInterfaceService.cs" />
+    <Compile Include="SystemUsage\Write\IItSystemUsageWriteService.cs" />
     <Compile Include="System\IItSystemService.cs" />
     <Compile Include="References\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />
