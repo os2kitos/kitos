@@ -1,20 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using Core.ApplicationServices.Model.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.SystemUsage
 {
     public interface IItSystemUsageService
     {
         IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions);
-
-        Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage usage);
+        Result<ItSystemUsage, OperationError> CreateNew(int itSystemId, int organizationId);
         Result<ItSystemUsage, OperationFailure> Delete(int id);
         ItSystemUsage GetByOrganizationAndSystemId(int organizationId, int systemId);
         ItSystemUsage GetById(int usageId);

@@ -4,6 +4,9 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
@@ -153,7 +156,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateUpdateParameters(request)))
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateFullUpdateParameters(request)))
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
@@ -175,13 +178,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updateParameters = CreateUpdateParameters(request);
-
-            if (updateParameters.IsNone)
-                return BadRequest("No updates provided");
+            var updateParameters = CreateFullUpdateParameters(request);
 
             return _writeService
-                .Update(updateParameters.Value)
+                .Update(systemUsageUuid, updateParameters)
                 .Match(Ok, FromOperationError);
         }
 
@@ -202,8 +202,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters()
+                {
+                    GeneralProperties = MapGeneralData(request).FromNullable().AsChangedValue()
+                })
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -409,10 +413,44 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             throw new System.NotImplementedException();
         }
 
-        private Maybe<SystemUsageUpdateParameters> CreateUpdateParameters(BaseItSystemUsageWriteRequestDTO request)
+        /// <summary>
+        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        private static SystemUsageUpdateParameters CreateFullUpdateParameters(BaseItSystemUsageWriteRequestDTO request)
         {
-            //TODO: Implement
-            return Maybe<SystemUsageUpdateParameters>.None;
+            //TODO: Extract it all into a mapper object which is to be unit tested!
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = request
+                    .General
+                    .FromNullable()
+                    .Select(MapGeneralData)
+                    .Match(changes => changes.FromNullable().AsChangedValue(), () => new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(Maybe<UpdatedSystemUsageGeneralProperties>.None))
+            };
+        }
+
+        private static UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData)
+        {
+            return new UpdatedSystemUsageGeneralProperties
+            {
+                LocalCallName = generalData.LocalCallName.AsChangedValue(),
+                LocalSystemId = generalData.LocalSystemId.AsChangedValue(),
+                Notes = generalData.Notes.AsChangedValue(),
+                SystemVersion = generalData.SystemVersion.AsChangedValue(),
+                DataClassificationUuid = (generalData.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                NumberOfExpectedUsersInterval = generalData
+                    .NumberOfExpectedUsers?
+                    .FromNullable()
+                    .Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)).Match(interval => interval, () => Maybe<(int, int?)>.None)
+                    .AsChangedValue(),
+                EnforceActive = ((generalData.Validity?.EnforcedValid)?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
+                ValidFrom = (generalData.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                ValidTo = (generalData.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                AssociatedProjectUuids = (generalData.AssociatedProjectUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
+            };
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)

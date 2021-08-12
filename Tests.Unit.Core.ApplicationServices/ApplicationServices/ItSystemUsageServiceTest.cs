@@ -1,29 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
 using Moq;
-using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -35,11 +29,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<ItSystemUsage>> _usageRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
-        private readonly Mock<IItContractRepository> _contractRepository;
-        private readonly Mock<IOptionsService<SystemRelation, RelationFrequencyType>> _optionsService;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<IGenericRepository<SystemRelation>> _relationRepositoryMock;
-        private readonly Mock<IGenericRepository<ItInterface>> _interfaceRepository;
         private readonly Mock<IDomainEvents> _domainEvents;
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
@@ -50,11 +40,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _usageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
             _authorizationContext = new Mock<IAuthorizationContext>();
             _systemRepository = new Mock<IItSystemRepository>();
-            _contractRepository = new Mock<IItContractRepository>();
-            _optionsService = new Mock<IOptionsService<SystemRelation, RelationFrequencyType>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _relationRepositoryMock = new Mock<IGenericRepository<SystemRelation>>();
-            _interfaceRepository = new Mock<IGenericRepository<ItInterface>>();
             _domainEvents = new Mock<IDomainEvents>();
             _referenceService = new Mock<IReferenceService>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
@@ -63,14 +49,9 @@ namespace Tests.Unit.Core.ApplicationServices
                 _usageRepository.Object,
                 _authorizationContext.Object,
                 _systemRepository.Object,
-                _contractRepository.Object,
-                _optionsService.Object,
-                _relationRepositoryMock.Object,
-                _interfaceRepository.Object,
                 _referenceService.Object,
                 _transactionManager.Object,
                 _domainEvents.Object,
-                Mock.Of<ILogger>(),
                 _sensitiveDataLevelRepository.Object,
                 _userContextMock.Object,
                 new Mock<IAttachedOptionRepository>().Object);
@@ -198,7 +179,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Conflict, result.Error);
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
         }
 
         [Fact]
@@ -214,7 +195,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -231,7 +212,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.BadInput, result.Error);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         [Fact]
@@ -250,7 +231,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]
@@ -269,7 +250,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Theory]

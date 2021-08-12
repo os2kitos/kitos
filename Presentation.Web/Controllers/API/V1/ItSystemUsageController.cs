@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.API.V1
                     return Forbidden();
                 }
 
-                var sysUsageResult = _itSystemUsageService.Add(systemUsage);
+                var sysUsageResult = _itSystemUsageService.CreateNew(systemUsage.ItSystemId,systemUsage.OrganizationId);
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
@@ -154,7 +154,7 @@ namespace Presentation.Web.Controllers.API.V1
                     return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }
 
-                return FromOperationFailure(sysUsageResult.Error);
+                return FromOperationError(sysUsageResult.Error);
             }
             catch (Exception e)
             {

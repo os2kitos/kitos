@@ -108,6 +108,7 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Extensions\ChangedValueExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
@@ -123,6 +124,9 @@
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />
@@ -214,6 +218,7 @@
     <Compile Include="Project\ItProjectService.cs" />
     <Compile Include="Interface\ItInterfaceService.cs" />
     <Compile Include="SystemUsage\Write\IItSystemUsageWriteService.cs" />
+    <Compile Include="SystemUsage\Write\ItSystemUsageWriteService.cs" />
     <Compile Include="System\IItSystemService.cs" />
     <Compile Include="References\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />

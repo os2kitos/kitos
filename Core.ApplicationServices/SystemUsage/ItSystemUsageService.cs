@@ -12,15 +12,12 @@ using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Options;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
-using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage
 {
@@ -40,14 +37,9 @@ namespace Core.ApplicationServices.SystemUsage
             IGenericRepository<ItSystemUsage> usageRepository,
             IAuthorizationContext authorizationContext,
             IItSystemRepository systemRepository,
-            IItContractRepository contractRepository,
-            IOptionsService<SystemRelation, RelationFrequencyType> frequencyService,
-            IGenericRepository<SystemRelation> relationRepository,
-            IGenericRepository<ItInterface> interfaceRepository,
             IReferenceService referenceService,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            ILogger logger,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
             IAttachedOptionRepository attachedOptionRepository)
@@ -80,35 +72,48 @@ namespace Core.ApplicationServices.SystemUsage
             return result;
         }
 
-        public Result<ItSystemUsage, OperationFailure> Add(ItSystemUsage newSystemUsage)
+        public Result<ItSystemUsage, OperationError> CreateNew(int itSystemId, int organizationId)
         {
+            var input = new ItSystemUsage
+            {
+                ItSystemId = itSystemId,
+                OrganizationId = organizationId
+            };
+            return Add(input);
+        }
+
+        public Result<ItSystemUsage, OperationError> Add(ItSystemUsage newSystemUsage)
+        {
+            if (newSystemUsage == null)
+                throw new ArgumentNullException(nameof(newSystemUsage));
+
             // create the system usage
             var existing = GetByOrganizationAndSystemId(newSystemUsage.OrganizationId, newSystemUsage.ItSystemId);
             if (existing != null)
             {
-                return OperationFailure.Conflict;
+                return new OperationError("Only one system usage per it-system is allowed per organization", OperationFailure.Conflict);
             }
 
             if (!_authorizationContext.AllowCreate<ItSystemUsage>(newSystemUsage.OrganizationId, newSystemUsage))
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("User is not allowed to create itsystem usages", OperationFailure.Forbidden);
             }
 
             var itSystem = _systemRepository.GetSystem(newSystemUsage.ItSystemId);
             if (itSystem == null)
             {
-                return OperationFailure.BadInput;
+                return new OperationError("System not found", OperationFailure.BadInput);
             }
 
             if (!_authorizationContext.AllowReads(itSystem))
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("User does not have access to the target system", OperationFailure.Forbidden);
             }
 
             //Cannot create system usage in an org where the logical it system is unavailable to the users.
             if (!AllowUsageInTargetOrganization(newSystemUsage, itSystem))
             {
-                return OperationFailure.Forbidden;
+                return new OperationError("Users in target organization do not have access to the system", OperationFailure.Forbidden);
             }
 
             var usage = _usageRepository.Create();
