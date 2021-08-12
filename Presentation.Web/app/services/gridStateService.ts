@@ -62,8 +62,7 @@
             var profileStorageKey = storageKey + "-profile";
             var organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
             var organizationalConfigurationVersionKey = storageKey + "-version";
-
-            
+            var versionChanged = "changed";
 
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
@@ -108,7 +107,7 @@
                     const localVersion = sha256(options.columns.filter(x => !x.hidden).map(x => x.persistId).sort().join(""));
                     const organizationalConfigurationVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
                     if (organizationalConfigurationVersion !== null && localVersion !== organizationalConfigurationVersion) {
-                        $window.sessionStorage.removeItem(organizationalConfigurationVersionKey);
+                        $window.sessionStorage.setItem(organizationalConfigurationVersionKey, versionChanged);
                     }
                 });
             }
@@ -119,7 +118,7 @@
                 // Update the grid regardless of the callback from the server response as we always need to load the grid.
                 getOrgFilterOptions(overviewType).then(
                     () => {
-                    loadGrid(grid, initialFilter);
+                        loadGrid(grid, initialFilter);
                     },
                     () => {
                         loadGrid(grid, initialFilter);
@@ -173,7 +172,7 @@
                     options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
                 }
 
-                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) !== null) {
+                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) !== versionChanged) {
                     // Session updates has not changed the grid as updates to the grid which changes the columns causes the version to be deleted
                     // So we use the local organization configuration if it exists
                     if (orgStorageColumns) {
@@ -221,6 +220,7 @@
                     }
 
                     $window.localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
+
                 }
             }
 
@@ -252,7 +252,7 @@
                         if (result.status === 200) {
                             const version = result.data.response.version;
                             const localVersion = $window.sessionStorage.getItem(organizationalConfigurationVersionKey);
-                            if (version !== localVersion) {
+                            if (localVersion !== versionChanged && localVersion !== version) {
                                 const columns = result.data.response.visibleColumns;
                                 $window.sessionStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
                                 $window.sessionStorage.setItem(organizationalConfigurationVersionKey, version);
@@ -340,7 +340,7 @@
                     return false;
                 }
 
-                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) === null) {
+                if ($window.sessionStorage.getItem(organizationalConfigurationVersionKey) === null || $window.sessionStorage.getItem(organizationalConfigurationVersionKey) === versionChanged) {
                     return true;
                 }
 
