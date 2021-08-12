@@ -16,7 +16,6 @@ using Presentation.Web.Controllers.API.V1.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Presentation.Web.Controllers.API.V1.OData.ReportsControllers;
 using Presentation.Web.Models;
 using Presentation.Web.Controllers.API.V1.OData.AttachedOptions;
 using Microsoft.OData;
@@ -159,23 +158,6 @@ namespace Presentation.Web
             var taskRefs = builder.EntitySet<TaskRef>("TaskRefs"); // no controller yet
             taskRefs.HasManyBinding(t => t.ItSystems, entitySetItSystems);
             taskRefs.EntityType.HasKey(x => x.Id);
-
-            var reportsMunicipalities = BindEntitySet<Organization, ReportsMunicipalitiesController>(builder);
-            reportsMunicipalities.HasManyBinding(o => o.ItSystems, entitySetItSystems);
-            reportsMunicipalities.HasManyBinding(o => o.BelongingSystems, entitySetItSystems);
-
-            var reportsItSystems = BindEntitySet<ItSystem, ReportsItSystemsController>(builder);
-            reportsItSystems.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            reportsItSystems.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
-            reportsItSystems.HasManyBinding(i => i.Children, entitySetItSystems);
-            reportsItSystems.HasRequiredBinding(i => i.Parent, entitySetItSystems);
-
-            //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
-            BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
-
-            //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
-            var reportsItSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder);
-            reportsItSystemContacts.EntityType.HasKey(x => x.roleId);
 
             var orgNameSpace = entitySetOrganizations;
 

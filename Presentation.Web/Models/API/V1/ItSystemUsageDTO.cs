@@ -8,18 +8,12 @@ namespace Presentation.Web.Models.API.V1
 {
     public class ItSystemUsageDTO
     {
-        public ItSystemUsageDTO(){
-        }
         public Guid Uuid { get; set; }
         public int Id { get; set; }
         public DateTime LastChanged { get; set; }
-        public bool IsStatusActive { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
         public string Version { get; set; }
-        public string EsdhRef { get; set; }
-        public string CmdbRef { get; set; }
-        public string DirectoryOrUrlRef { get; set; }
         public string LocalCallName { get; set; }
         public int? SensitiveDataTypeId { get; set; }
         public string SensitiveDataTypeName { get; set; }
@@ -29,7 +23,7 @@ namespace Presentation.Web.Models.API.V1
         public string ArchiveLocationName { get; set; }
         public int? ArchiveTestLocationId { get; set; }
         public string ArchiveTestLocationName { get; set; }
-        public string ArchiveSupplier { get; set; }
+        public string ArchiveSupplier { get; set; } //TODO: Remove once https://os2web.atlassian.net/browse/KITOSUDV-2118 is fixed
         public int SupplierId { get; set; }
         public string ResponsibleOrgUnitName { get; set; }
         public int OrganizationId { get; set; }
@@ -71,8 +65,6 @@ namespace Presentation.Web.Models.API.V1
         public UserCount UserCount { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-        public bool? ReportedToDPA { get; set; }
-        public string DocketNo { get; set; }
         public string ArchiveNotes { get; set; }
         public int? ArchiveFreq { get; set; }
         public bool? Registertype { get; set; }

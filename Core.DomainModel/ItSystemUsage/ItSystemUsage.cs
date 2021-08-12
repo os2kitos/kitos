@@ -16,7 +16,6 @@ namespace Core.DomainModel.ItSystemUsage
     using Core.DomainModel.Notification;
     using ItSystem.DataTypes;
     using System;
-    using System.ComponentModel.DataAnnotations.Schema;
 
     using ItSystem = Core.DomainModel.ItSystem.ItSystem;
 
@@ -32,13 +31,13 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ItSystemUsage()
         {
-            this.Contracts = new List<ItContractItSystemUsage>();
-            this.ArchivePeriods = new List<ArchivePeriod>();
-            this.TaskRefs = new List<TaskRef>();
-            this.AccessTypes = new List<AccessType>();
-            this.TaskRefsOptOut = new List<TaskRef>();
-            this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
-            this.ItProjects = new List<ItProject.ItProject>();
+            Contracts = new List<ItContractItSystemUsage>();
+            ArchivePeriods = new List<ArchivePeriod>();
+            TaskRefs = new List<TaskRef>();
+            AccessTypes = new List<AccessType>();
+            TaskRefsOptOut = new List<TaskRef>();
+            UsedBy = new List<ItSystemUsageOrgUnitUsage>();
+            ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
@@ -60,19 +59,6 @@ namespace Core.DomainModel.ItSystemUsage
                     if (ExpirationDate.HasValue && ExpirationDate.Value != DateTime.MaxValue)
                     {
                         endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
-                    if (this.Terminated.HasValue)
-                    {
-                        var terminationDate = this.Terminated;
-                        if (this.TerminationDeadlineInSystem != null)
-                        {
-                            int deadline;
-                            int.TryParse(this.TerminationDeadlineInSystem.Name, out deadline);
-                            terminationDate = this.Terminated.Value.AddMonths(deadline);
-                        }
-                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
 
                     // indgået-dato <= dags dato <= udløbs-dato
@@ -107,32 +93,6 @@ namespace Core.DomainModel.ItSystemUsage
         public DateTime? ExpirationDate { get; set; }
 
         /// <summary>
-        ///     Date the system ends. (opsagt)
-        /// </summary>
-        /// <value>
-        ///     The termination date.
-        /// </value>
-        public DateTime? Terminated { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the termination deadline option. (opsigelsesfrist)
-        /// </summary>
-        /// <remarks>
-        ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
-        ///     It's a string but should be treated as an int.
-        /// </remarks>
-        /// <value>
-        ///     The termination deadline.
-        /// </value>
-        public virtual TerminationDeadlineTypesInSystem TerminationDeadlineInSystem { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance's status is active.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance's status is active; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsStatusActive { get; set; }
-        /// <summary>
         /// Gets or sets the note.
         /// </summary>
         /// <value>
@@ -156,27 +116,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The version.
         /// </value>
         public string Version { get; set; }
-        /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern ESDH system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to ESDH system.
-        /// </value>
-        public string EsdhRef { get; set; }
-        /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern CMDB system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to CMDB system.
-        /// </value>
-        public string CmdbRef { get; set; }
-        /// <summary>
-        /// Gets or sets a path or url to relevant documents.
-        /// </summary>
-        /// <value>
-        /// Path or url relevant documents.
-        /// </value>
-        public string DirectoryOrUrlRef { get; set; }
         /// <summary>
         /// Gets or sets the local call system.
         /// </summary>
@@ -215,18 +154,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
-
-        public int? OverviewId { get; set; }
-        /// <summary>
-        /// Gets or sets the it system usage that is set to be displayed on the it system overview page.
-        /// </summary>
-        /// <remarks>
-        /// It's the it system name that is actually displayed.
-        /// </remarks>
-        /// <value>
-        /// The overview it system.
-        /// </value>
-        public virtual ItSystemUsage Overview { get; set; }
 
         /// <summary>
         /// Gets or sets the main it contract for this instance.
@@ -302,13 +229,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
 
-        public bool? ReportedToDPA { get; set; }
-
-        public string DocketNo { get; set; }
-
-        [Column(TypeName = "date")]
-        public DateTime? ArchivedDate { get; set; }
-
         public string ArchiveNotes { get; set; }
 
         public int? ArchiveFreq { get; set; }
@@ -336,13 +256,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-
-
-
         public UserCount UserCount { get; set; }
-
-        public string systemCategories { get; set; }
-
 
         #region GDPR
         public string GeneralPurpose { get; set; }

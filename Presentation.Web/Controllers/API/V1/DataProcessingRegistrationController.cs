@@ -13,6 +13,7 @@ using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model.Options;
 using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models;
@@ -836,6 +837,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             return new DataProcessingRegistrationDTO(value.Id, value.Name)
             {
+                Uuid = value.Uuid,
                 AssignedRoles = value.Rights.Select(dataProcessingRegistrationRight => new AssignedRoleDTO
                 {
                     Role = ToDTO(dataProcessingRegistrationRight.Role, localDescriptionOverrides, idsOfAvailableRoles),

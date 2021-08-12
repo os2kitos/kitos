@@ -1,13 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.SystemUsage;
+using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.SystemUsage;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -22,12 +27,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
     [RoutePrefix("api/v2/it-system-usages")]
     public class ItSystemUsageV2Controller : ExternalBaseController
     {
+        private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IItSystemUsageResponseMapper _responseMapper;
+
+        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper)
+        {
+            _itSystemUsageService = itSystemUsageService;
+            _responseMapper = responseMapper;
+        }
+
         /// <summary>
-        /// Returns all IT-System usages available to the current user in the specified organization context
+        /// Returns all IT-System usages available to the current user
         /// </summary>
         /// <param name="organizationUuid">Query usages within a specific organization</param>
-        /// <param name="relatedToSystemUuid">Query by systems related to another system</param>
-        /// <param name="relatedToSystemUsageUuid">Query by system usages related to a specific system usage</param>
+        /// <param name="relatedToSystemUuid">Query by systems with outgoing relations related to another system</param>
+        /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
@@ -35,7 +49,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemUsageResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemUsages(
             [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
@@ -47,7 +60,29 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            var conditions = new List<IDomainQuery<ItSystemUsage>>();
+
+            if (organizationUuid.HasValue)
+                conditions.Add(new QueryByOrganizationUuid<ItSystemUsage>(organizationUuid.Value));
+
+            if (relatedToSystemUuid.HasValue)
+                conditions.Add(new QueryByRelationToSystem(relatedToSystemUuid.Value));
+
+            if (relatedToSystemUsageUuid.HasValue)
+                conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
+
+            if (systemUuid.HasValue)
+                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
+
+            if (!string.IsNullOrWhiteSpace(systemNameContent))
+                conditions.Add(new QueryBySystemNameContent(systemNameContent));
+
+            return _itSystemUsageService
+                .Query(conditions.ToArray())
+                .OrderBy(itSystemUsage => itSystemUsage.Id)
+                .Page(paginationQuery).AsEnumerable()
+                .Select(_responseMapper.MapSystemUsageDTO).ToList()
+                .Transform(Ok);
         }
 
         /// <summary>
@@ -67,7 +102,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _itSystemUsageService
+                .GetByUuid(systemUsageUuid)
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -100,10 +138,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [Route("")]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict,description:"Another system usage has already been created for the system within the specified organization")]
+        [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostItSystemUsage([FromBody]CreateItSystemUsageRequestDTO request)
+        public IHttpActionResult PostItSystemUsage([FromBody] CreateItSystemUsageRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

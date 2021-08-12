@@ -18,7 +18,8 @@ namespace Core.DomainModel.GDPR
         IDataProcessingModule,
         IEntityWithExternalReferences,
         IEntityWithAdvices,
-        IEntityWithUserNotification
+        IEntityWithUserNotification,
+        IHasUuid
     {
         public DataProcessingRegistration()
         {
@@ -31,7 +32,10 @@ namespace Core.DomainModel.GDPR
             AssociatedContracts = new List<ItContract.ItContract>();
             OversightDates = new List<DataProcessingRegistrationOversightDate>();
             UserNotifications = new List<UserNotification>();
+            Uuid = Guid.NewGuid();
         }
+
+        public Guid Uuid { get; set; }
 
         public static bool IsNameValid(string name) => !string.IsNullOrWhiteSpace(name) &&
                                                        name.Length <= DataProcessingRegistrationConstraints.MaxNameLength;

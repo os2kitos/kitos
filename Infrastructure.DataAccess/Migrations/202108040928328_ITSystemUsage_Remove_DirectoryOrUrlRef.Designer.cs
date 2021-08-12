@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Changed_Kendo_Configuration : IMigrationMetadata
+    public sealed partial class ITSystemUsage_Remove_DirectoryOrUrlRef : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Changed_Kendo_Configuration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(ITSystemUsage_Remove_DirectoryOrUrlRef));
         
         string IMigrationMetadata.Id
         {
-            get { return "202108090753257_Changed_Kendo_Configuration"; }
+            get { return "202108040928328_ITSystemUsage_Remove_DirectoryOrUrlRef"; }
         }
         
         string IMigrationMetadata.Source

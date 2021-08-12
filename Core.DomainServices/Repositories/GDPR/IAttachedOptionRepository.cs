@@ -5,6 +5,7 @@ namespace Core.DomainServices.Repositories.GDPR
 {
     public interface IAttachedOptionRepository
     {
-        IEnumerable<AttachedOption> GetAttachedOptions();
+        IEnumerable<AttachedOption> GetBySystemUsageId(int systemUsageId);
+        void DeleteBySystemUsageId(int systemUsageId);
     }
 }

@@ -2,7 +2,6 @@
 using System.Linq;
 using Core.ApplicationServices.Shared;
 using Infrastructure.Services.Types;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Extensions

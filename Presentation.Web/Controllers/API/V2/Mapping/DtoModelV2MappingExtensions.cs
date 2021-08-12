@@ -1,13 +1,12 @@
 ﻿using System;
 using Core.DomainModel;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
-namespace Presentation.Web.Extensions
+namespace Presentation.Web.Controllers.API.V2.Mapping
 {
     public static class DtoModelV2MappingExtensions
     {
@@ -19,6 +18,11 @@ namespace Presentation.Web.Extensions
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this TaskRef source)
         {
             return new(source.Uuid, source.TaskKey);
+        }
+
+        public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this ItSystemUsage source)
+        {
+            return new(source.Uuid, source.ItSystem.Name);
         }
 
         public static IdentityNamePairResponseDTO MapIdentityNamePairDTO(this User source)
