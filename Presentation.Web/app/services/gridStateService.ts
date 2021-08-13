@@ -318,6 +318,7 @@
                         if (res.status === 200) {
                             notify.addSuccessMessage("Organisationens gemte filtre og sorteringer er slettet");
                             removeSession();
+                            removeLocal();
                             $state.go(".", null, { reload: true });
                         }
                     })
