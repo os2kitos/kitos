@@ -602,13 +602,17 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Maybe<OperationError> UpdateSystemValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
         {
-            if (newValidFrom.HasValue && newValidTo.HasValue && newValidFrom.Value > newValidTo.Value)
+            var validFromDate = newValidFrom?.Date;
+            var validToDate = newValidTo?.Date;
+
+            if (validFromDate.HasValue && validToDate.HasValue && validFromDate.Value.Date > validToDate.Value.Date)
             {
                 return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
             }
-
-            Concluded = newValidFrom;
-            ExpirationDate = newValidTo;
+            
+            Concluded = validFromDate;
+            
+            ExpirationDate = validToDate;
 
             return Maybe<OperationError>.None;
         }

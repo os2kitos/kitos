@@ -25,7 +25,6 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
-using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -78,14 +77,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUuid = A<Guid>();
             var organizationUuid = A<Guid>();
             var transactionMock = ExpectTransaction();
-            var organization = new Organization { Id = A<int>() };
+            var organization = CreateOrganization();
             var itSystem = new ItSystem { Id = A<int>() };
             var itSystemUsage = new ItSystemUsage();
 
-            ExpectGetOrganizationReturns(organizationUuid, organization);
-            ExpectGetSystemReturns(systemUuid, itSystem);
-            ExpectCreateNewReturns(itSystem, organization, itSystemUsage);
-            ExpectAllowModifyReturns(itSystemUsage, true);
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
@@ -103,7 +99,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var systemUuid = A<Guid>();
             var organizationUuid = A<Guid>();
             var transactionMock = ExpectTransaction();
-            var organization = new Organization { Id = A<int>() };
+            var organization = CreateOrganization();
             var itSystem = new ItSystem { Id = A<int>() };
             var error = A<OperationError>();
 
@@ -171,22 +167,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         public void Can_Create_With_General_Data_With_All_Data_Defined(int minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
         {
             //Arrange
-            var systemUuid = A<Guid>();
-            var organizationUuid = A<Guid>();
-            var transactionMock = ExpectTransaction();
-            var organization = new Organization { Id = A<int>() };
-            var itSystem = new ItSystem { Id = A<int>() };
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
             var newContractId = A<Guid>();
             var newContract = CreateItContract(organization, newContractId);
-            var itSystemUsage = new ItSystemUsage
-            {
-                OrganizationId = organization.Id,
-                Contracts =
-                {
-                    CreateContractAssociation(organization),
-                    CreateContractAssociation(organization,newContract)
-                }
-            };
+            itSystemUsage.Contracts.Add(CreateContractAssociation(organization));
+            itSystemUsage.Contracts.Add(CreateContractAssociation(organization, newContract));
             var projectUuids = Many<Guid>().ToList();
             var dataClassificationId = A<Guid>();
             var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
@@ -208,10 +193,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 })
             };
 
-            ExpectGetOrganizationReturns(organizationUuid, organization);
-            ExpectGetSystemReturns(systemUuid, itSystem);
-            ExpectCreateNewReturns(itSystem, organization, itSystemUsage);
-            ExpectAllowModifyReturns(itSystemUsage, true);
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
             ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, (itSystemCategories, true));
             ExpectGetContractReturns(newContractId, newContract);
             foreach (var projectUuid in projectUuids)
@@ -232,10 +214,262 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.Notes.Value.Value, itSystemUsage.Note);
             Assert.Equal(generalProperties.EnforceActive.Value.Value, itSystemUsage.Active);
             Assert.Equal(generalProperties.DataClassificationUuid.Value.Value, itSystemUsage.ItSystemCategories.Uuid);
-            Assert.Equal(generalProperties.ValidFrom.Value.Value, itSystemUsage.Concluded);
-            Assert.Equal(generalProperties.ValidTo.Value.Value, itSystemUsage.ExpirationDate);
+            Assert.Equal(generalProperties.ValidFrom.Value.Value.Value.Date, itSystemUsage.Concluded);
+            Assert.Equal(generalProperties.ValidTo.Value.Value.Value.Date, itSystemUsage.ExpirationDate);
             Assert.Equal(generalProperties.MainContractUuid.Value.Value, itSystemUsage.MainContract.ItContract.Uuid);
             Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
+        }
+
+        [Fact]
+        public void Cannot_Create_With_UnAvailable_SystemCategory()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var dataClassificationId = A<Guid>();
+            var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, (itSystemCategories, false));
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Unknown_SystemCategory()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var dataClassificationId = A<Guid>();
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, Maybe<(ItSystemCategories, bool)>.None);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_Contract_ErrorResponse()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var newContractId = A<Guid>();
+            var operationError = A<OperationError>();
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectGetContractReturns(newContractId, operationError);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
+            Assert.EndsWith(operationError.Message.Value, createResult.Error.Message.Value);
+            AssertTransactionNotCommitted(transactionMock);
+
+        }
+
+        [Fact]
+        public void Cannot_Create_If_SelectedMainContract_Is_Not_In_Same_Organization_As_ItSystemUsage()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var wrongOrganization = CreateOrganization();
+            var newContractId = A<Guid>();
+            var contract = CreateItContract(wrongOrganization, newContractId);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectGetContractReturns(newContractId, contract);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_SelectedMainContract_Is_Not_Associated_To_ItSystemUsage()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            itSystemUsage.Contracts.Add(CreateContractAssociation(organization));
+            var newContractId = A<Guid>();
+            var contract = CreateItContract(organization, newContractId);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectGetContractReturns(newContractId, contract);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_Projects_Are_Not_Unique()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var projectUuids = Many<Guid>().ToList();
+            projectUuids.Add(projectUuids.Last()); //add a duplicatge
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            foreach (var projectUuid in projectUuids)
+                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_Project_Is_In_Wrong_Organization()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var wrongOrganization = CreateOrganization();
+            var projectUuids = Many<Guid>().ToList();
+            var badProjectUuid = A<Guid>();
+            projectUuids.Add(badProjectUuid); //Add a project which is in the wrong org (not the same as itsystem usage)
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            foreach (var projectUuid in projectUuids)
+                ExpectGetProjectReturns(projectUuid, CreateItProject(projectUuid == badProjectUuid ? wrongOrganization : organization, projectUuid));
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_ValidFrom_Is_After_ValidTo()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var validFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue();
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    ValidFrom = validFrom,
+                    ValidTo = validFrom.Value.Select(x => x.Date.AddDays(-1)).AsChangedValue()
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Theory]
+        [InlineData(-1, null)]
+        [InlineData(0, null)]
+        [InlineData(101, 102)]
+        public void Cannot_Create_If_User_Count_Us_Not_Supported(int lower, int? upper)
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    NumberOfExpectedUsersInterval = (lower, upper).FromNullable().AsChangedValue()
+                })
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
         }
 
         [Fact]
@@ -252,10 +486,39 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         //TODO: Simulate optional properties as well (if not set to maybe.some(change) it will remain untouched!)
 
+        private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
+        {
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var transactionMock = ExpectTransaction();
+            var organization = CreateOrganization();
+            var itSystem = new ItSystem { Id = A<int>() };
+            var itSystemUsage = new ItSystemUsage
+            {
+                OrganizationId = organization.Id
+            };
+
+            return (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage);
+        }
+
+        private void SetupBasicCreateThenUpdatePrerequisites(Guid organizationUuid, Organization organization, Guid systemUuid,
+            ItSystem itSystem, ItSystemUsage itSystemUsage)
+        {
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectGetSystemReturns(systemUuid, itSystem);
+            ExpectCreateNewReturns(itSystem, organization, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+        }
+
         private void ExpectGetProjectReturns(Guid projectUuid, Result<ItProject, OperationError> result)
         {
             _projectServiceMock.Setup(x => x.GetProject(projectUuid))
                 .Returns(result);
+        }
+
+        private Organization CreateOrganization()
+        {
+            return new Organization { Id = A<int>() };
         }
 
         private static ItProject CreateItProject(Organization organization, Guid projectUuid)
