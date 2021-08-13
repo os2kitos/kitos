@@ -203,7 +203,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters()
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
                     GeneralProperties = MapGeneralData(request)
                 })
