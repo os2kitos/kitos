@@ -156,7 +156,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateFullUpdateParameters(request)))
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateFullUpdateParameters(request, false))) //Undefined sections are left out from the spec of additional data
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
@@ -178,7 +178,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updateParameters = CreateFullUpdateParameters(request);
+            var updateParameters = CreateFullUpdateParameters(request, true); //Enforce data reset in sections which are undefined in the input since this is PUT
 
             return _writeService
                 .Update(systemUsageUuid, updateParameters)
@@ -417,13 +417,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
         /// </summary>
         /// <param name="request"></param>
+        /// <param name="b"></param>
         /// <returns></returns>
-        private static SystemUsageUpdateParameters CreateFullUpdateParameters(BaseItSystemUsageWriteRequestDTO request)
+        private static SystemUsageUpdateParameters CreateFullUpdateParameters(BaseItSystemUsageWriteRequestDTO request, bool enforceUndefinedSections)
         {
-            var generalDataInput = request.General ?? new GeneralDataWriteRequestDTO(); //Fallback to empty input in this FULL UPDATE strategy
+            var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = generalDataInput.Transform(MapGeneralData)
+                GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralData)
             };
         }
 
