@@ -63,6 +63,7 @@
             var profileStorageKey = storageKey + "-profile";
             var organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
             var organizationalConfigurationVersionKey = storageKey + "-version";
+            var nonExistingOrganizationalConfigurationColumnsKey = storageKey + "-NonExistingColumns";
 
             var badOrganizationalConfigExists = false;
 
@@ -195,6 +196,7 @@
 
                         // Keep track of how many columns are being set
                         var columnsBeingSet = 0;
+                        var nonExistingColumns: string[] = [];
 
                         // The visible columns from the server are then made visible 
                         orgStorageColumns.forEach(x => {
@@ -202,8 +204,13 @@
                             if (gridWidth !== undefined && gridWidth !== null) {
                                 columns[x.persistId] = { index: x.index, width: gridWidth.width, hidden: false };
                                 columnsBeingSet ++;
+                            }else{
+                                nonExistingColumns.push(x.persistId);
                             }
                         });
+
+                        $window.localStorage.setItem(nonExistingOrganizationalConfigurationColumnsKey, JSONfn.stringify(nonExistingColumns));
+
                         if (columnsBeingSet === 0) {
                             badOrganizationalConfigExists = true;
                             removeOrgConfig(); // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
@@ -246,6 +253,8 @@
                     $window.localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
                     if (!isOrgConfigServerVersionEqualToLocalGrid(options)) {
                         $window.localStorage.setItem(locallyChangedKey, "true");
+                    } else {
+                        $window.localStorage.removeItem(locallyChangedKey);
                     }
                 }
             }
@@ -285,6 +294,7 @@
                                 const columns = result.data.response.visibleColumns;
                                 $window.localStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
                                 $window.localStorage.setItem(organizationalConfigurationVersionKey, version);
+                                $window.localStorage.removeItem(nonExistingOrganizationalConfigurationColumnsKey);
                             }
                         }
                     })
@@ -354,6 +364,7 @@
             function removeLocal(): void {
                 $window.localStorage.removeItem(storageKey);
                 $window.localStorage.removeItem(locallyChangedKey);
+                $window.localStorage.removeItem(nonExistingOrganizationalConfigurationColumnsKey);
                 removeOrgConfig();
             }
 
@@ -393,7 +404,16 @@
             }
 
             function computeGridVersion(options: Kitos.IKendoGridOptions<any>) {
-                return sha256(options.columns.filter(x => !x.hidden).map(x => x.persistId).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).join(""));
+                var gridColumnsPersistIds = options.columns.filter(x => !x.hidden).map(x => x.persistId);
+
+                // Add items from the server which doesn't exist in kendogrid to be able to calculate the same version as the backend.
+                var nonExistingColumnsItem = $window.localStorage.getItem(nonExistingOrganizationalConfigurationColumnsKey);
+                if (nonExistingColumnsItem) {
+                    var nonExistingColumns = <string[]>JSONfn.parse(nonExistingColumnsItem, true);
+                    gridColumnsPersistIds.pushArray(nonExistingColumns);
+                }
+                
+                return sha256(gridColumnsPersistIds.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).join(""));
             }
 
             function canDeleteGridOrganizationalConfiguration() {
