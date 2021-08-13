@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .Update(systemUsageUuid, new SystemUsageUpdateParameters()
                 {
-                    GeneralProperties = MapGeneralData(request).FromNullable().AsChangedValue()
+                    GeneralProperties = MapGeneralData(request)
                 })
                 .Match(Ok, FromOperationError);
         }
@@ -420,14 +420,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         private static SystemUsageUpdateParameters CreateFullUpdateParameters(BaseItSystemUsageWriteRequestDTO request)
         {
-            //TODO: Extract it all into a mapper object which is to be unit tested!
+            var generalDataInput = request.General ?? new GeneralDataWriteRequestDTO(); //Fallback to empty input in this FULL UPDATE strategy
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = request
-                    .General
-                    .FromNullable()
-                    .Select(MapGeneralData)
-                    .Match(changes => changes.FromNullable().AsChangedValue(), () => new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(Maybe<UpdatedSystemUsageGeneralProperties>.None))
+                GeneralProperties = generalDataInput.Transform(MapGeneralData)
             };
         }
 
