@@ -188,9 +188,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 }
             };
             var projectUuids = Many<Guid>().ToList();
-            foreach (var projectUuid in projectUuids)
-                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
-
             var dataClassificationId = A<Guid>();
             var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
             var input = new SystemUsageUpdateParameters
@@ -217,6 +214,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, true);
             ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, (itSystemCategories, true));
             ExpectGetContractReturns(newContractId, newContract);
+            foreach (var projectUuid in projectUuids)
+                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
@@ -241,6 +240,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         [Fact]
         public void Can_Create_With_GeneralData_Changed_To_None_Resets_Target_Data()
+        {
+            throw new NotImplementedException();
+        }
+
+        [Fact]
+        public void Can_Create_With_GeneralData_WithoutDefinedChanges_Leaves_Properties_Untouched()
         {
             throw new NotImplementedException();
         }
