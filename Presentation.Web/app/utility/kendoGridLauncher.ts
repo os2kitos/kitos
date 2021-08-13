@@ -646,7 +646,7 @@ module Kitos.Utility.KendoGrid {
         }
 
         doesGridDivergeFromDefault() {
-            return this.gridState.doesGridDivergeFromOrganizationalConfiguration(this.overviewType);
+            return this.gridState.doesGridDivergeFromOrganizationalConfiguration(this.overviewType, this.gridBinding.mainGrid);
         }
 
         // clears grid filters by removing the localStorageItem and reloading the page
