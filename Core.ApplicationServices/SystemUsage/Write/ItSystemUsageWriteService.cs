@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Security.AccessControl;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Shared;
@@ -65,19 +66,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (systemResult.Failed)
             {
                 _logger.Error("Failed to retrieve itSystem with id {uuid}. Error {error}", parameters.SystemUuid, systemResult.Error.ToString());
-                return new OperationError("Unable to resolve IT-System:" + systemResult.Error.Message, systemResult.Error.FailureType);
+                return new OperationError("Unable to resolve IT-System:" + systemResult.Error.Message.GetValueOrFallback(string.Empty), systemResult.Error.FailureType);
             }
 
             var organizationResult = _organizationService.GetOrganization(parameters.OrganizationUuid);
             if (organizationResult.Failed)
             {
                 _logger.Error("Failed to retrieve organization with id {uuid}. Error {error}", parameters.OrganizationUuid, organizationResult.Error.ToString());
-                return new OperationError("Unable to resolve IT-System:" + organizationResult.Error.Message, organizationResult.Error.FailureType);
+                return new OperationError("Unable to resolve IT-System:" + organizationResult.Error.Message.GetValueOrFallback(string.Empty), organizationResult.Error.FailureType);
             }
 
             var creationResult = _systemUsageService
                 .CreateNew(systemResult.Value.Id, organizationResult.Value.Id)
-                .Bind(createdSystemUsage => Update(createdSystemUsage.Uuid, parameters.AdditionalValues));
+                .Bind(createdSystemUsage => Update(() => createdSystemUsage, parameters.AdditionalValues));
 
             if (creationResult.Ok)
             {
@@ -89,12 +90,15 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters)
         {
+            return Update(() => _systemUsageService.GetByUuid(systemUsageUuid), parameters);
+        }
+        private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
+        {
             using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
-            var result = _systemUsageService
-                .GetByUuid(systemUsageUuid)
-                .Bind(WithWriteAccess)
-                .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
+            var result = getItSystemUsage()
+                    .Bind(WithWriteAccess)
+                    .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
 
             if (result.Ok)
             {
@@ -143,7 +147,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var result = _projectService.GetProject(uuid);
 
                 if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message}", result.Error.FailureType);
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
 
                 itProjects.Add(result.Value);
             }
@@ -161,7 +165,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             var contractResult = _contractService.GetContract(contractId.Value);
             if (contractResult.Failed)
-                return new OperationError("Failure getting the contract:" + contractResult.Error.Message, contractResult.Error.FailureType);
+                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrFallback(string.Empty)}", contractResult.Error.FailureType);
 
             return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
