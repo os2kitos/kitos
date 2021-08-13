@@ -96,6 +96,7 @@ using Core.DomainServices.Repositories.TaskRefs;
 using Core.ApplicationServices.Rights;
 using Core.ApplicationServices.SystemUsage.ReadModels;
 using Core.ApplicationServices.SystemUsage.Relations;
+using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainServices.Organizations;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
@@ -184,6 +185,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
             kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();

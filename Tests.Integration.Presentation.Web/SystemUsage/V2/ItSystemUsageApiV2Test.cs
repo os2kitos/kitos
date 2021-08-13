@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -246,7 +248,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var systemUsageOrg2 = await ItSystemHelper.TakeIntoUseAsync(system.dbId, organization2.Id);
 
             //Act
-            var dto = (await ItSystemUsageV2Helper.GetSingleAsync(token,systemUsageOrg2.Uuid));
+            var dto = (await ItSystemUsageV2Helper.GetSingleAsync(token, systemUsageOrg2.Uuid));
 
             //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
             AssertExpectedUsageShallow(systemUsageOrg2, dto);
@@ -266,7 +268,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             using var response = (await ItSystemUsageV2Helper.SendGetSingleAsync(token, A<Guid>()));
 
             //Assert
-            Assert.Equal(HttpStatusCode.NotFound,response.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
@@ -288,6 +290,62 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert - exhaustive content assertions are done in the read-after-write assertion tests (POST/PUT)
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_No_Additional_Data()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Assert
+            Assert.Equal(organization.Uuid, newUsage.OrganizationContext.Uuid);
+            Assert.Equal(organization.Name, newUsage.OrganizationContext.Name);
+            Assert.Equal(organization.Cvr, newUsage.OrganizationContext.Cvr);
+            Assert.Equal(system.Uuid, newUsage.SystemContext.Uuid);
+            Assert.Equal(system.Name, newUsage.SystemContext.Name);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_Duplicate_With_No_Additional_Data()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            //Act
+            await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var newUsage = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, newUsage.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_Full_General_Data_Section()
+        {
+            //Arrange 
+            //TODO
+            //Act
+
+            //Assert
+        }
+
+        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId)
+        {
+            return new CreateItSystemUsageRequestDTO
+            {
+                OrganizationUuid = organizationId,
+                SystemUuid = systemId
+            };
         }
 
         private string CreateEmail()
@@ -312,11 +370,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private async Task<(Guid uuid, int dbId)> CreateSystemAsync(int organizationId, AccessModifier accessModifier, string name = null)
         {
+            var createdSystem = await CreateSystemAndGetAsync(organizationId, accessModifier, name);
+
+            return (createdSystem.Uuid, createdSystem.Id);
+        }
+
+        private async Task<ItSystemDTO> CreateSystemAndGetAsync(int organizationId, AccessModifier accessModifier, string name = null)
+        {
             var systemName = name ?? CreateName();
             var createdSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, accessModifier);
-            var entityUuid = DatabaseAccess.GetEntityUuid<Core.DomainModel.ItSystem.ItSystem>(createdSystem.Id);
 
-            return (entityUuid, createdSystem.Id);
+            return createdSystem;
         }
 
         private async Task<(User user, string token)> CreateApiUser(Organization organization)
