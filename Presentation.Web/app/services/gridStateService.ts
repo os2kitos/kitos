@@ -67,6 +67,8 @@
 
             var badOrganizationalConfigExists = false;
 
+            var gridLoading = true;
+
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
                 loadGridOptions: loadGridOptions,
@@ -180,9 +182,15 @@
                     options = <IGridSavedState> localOptions;
                 }
 
+
+                // Session updates has not changed the grid as updates to the grid which changes the columns causes the "locallyChangedKey" flag to be set
                 if ($window.localStorage.getItem(locallyChangedKey) !== "true") {
-                    // Session updates has not changed the grid as updates to the grid which changes the columns causes the version to be deleted
-                    // So we use the local organization configuration if it exists
+
+                    if (shouldUseLocalIndexes(grid.getOptions())) {
+                        return options;
+                    }
+
+                    // We use the organization configuration if it exists
                     if (orgStorageColumns) {
                         var columns: { [persistId: string]: { index: number; width: number, hidden?: boolean } } = {};
 
@@ -390,6 +398,10 @@
                     return false;
                 }
 
+                if (gridLoading) {
+                    return false;
+                }
+
                 var options = grid.getOptions();
                 return !isOrgConfigServerVersionEqualToLocalGrid(options);
             }
@@ -414,6 +426,25 @@
                 }
                 
                 return sha256(gridColumnsPersistIds.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).join(""));
+            }
+
+            function shouldUseLocalIndexes() {
+
+                var localStorageItem = $window.localStorage.getItem(storageKey);
+                if (!localStorageItem) {
+                    return false;
+                }
+                var localColumns = <IGridSavedState> JSONfn.parse(localStorageItem, true);
+
+                var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
+                if (orgStorageColumnsItem) {
+                    var orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]>JSONfn.parse(orgStorageColumnsItem, true);
+
+                    // If the indexes are not equal we should use the local indexes.
+                    return !orgStorageColumns.sort(x => x.index).every((column, index) => localColumns.columnState[column.persistId].index === index);
+                }
+
+                return false; // We only have 1 set of indexes so we just use those.
             }
 
             function canDeleteGridOrganizationalConfiguration() {
@@ -489,8 +520,9 @@
                 });
                
                 grid.setOptions(gridOptions);
-                grid.dataSource.pageSize(grid.dataSource.options.pageSize);
-            }
+               grid.dataSource.pageSize(grid.dataSource.options.pageSize);
+               gridLoading = false;
+           }
         }
     }
 

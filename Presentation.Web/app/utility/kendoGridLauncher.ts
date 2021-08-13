@@ -726,7 +726,7 @@ module Kitos.Utility.KendoGrid {
                     name: "clearFilter",
                     text: "Gendan kolonneopsætning",
                     template:
-                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-show='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
+                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
                 {
                     name: "saveFilter",
