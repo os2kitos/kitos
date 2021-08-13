@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
@@ -11,7 +13,10 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -158,8 +163,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionNotCommitted(transactionMock);
         }
 
-        [Fact]
-        public void Can_Create_With_General_Data()
+        [Theory]
+        [InlineData(0, 9, UserCount.BELOWTEN)]
+        [InlineData(10, 50, UserCount.TENTOFIFTY)]
+        [InlineData(50, 100, UserCount.FIFTYTOHUNDRED)]
+        [InlineData(100, null, UserCount.HUNDREDPLUS)]
+        public void Can_Create_With_General_Data_With_All_Data_Defined(int minimumNumberOfUsers, int? maxNumberOfUsers, UserCount expectedNumberOfUsers)
         {
             //Arrange
             var systemUuid = A<Guid>();
@@ -167,8 +176,24 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var transactionMock = ExpectTransaction();
             var organization = new Organization { Id = A<int>() };
             var itSystem = new ItSystem { Id = A<int>() };
-            var itSystemUsage = new ItSystemUsage();
-            var input = new SystemUsageUpdateParameters()
+            var newContractId = A<Guid>();
+            var newContract = CreateItContract(organization, newContractId);
+            var itSystemUsage = new ItSystemUsage
+            {
+                OrganizationId = organization.Id,
+                Contracts =
+                {
+                    CreateContractAssociation(organization),
+                    CreateContractAssociation(organization,newContract)
+                }
+            };
+            var projectUuids = Many<Guid>().ToList();
+            foreach (var projectUuid in projectUuids)
+                ExpectGetProjectReturns(projectUuid, CreateItProject(organization));
+
+            var dataClassificationId = A<Guid>();
+            var itSystemCategories = new ItSystemCategories { Id = A<int>() };
+            var input = new SystemUsageUpdateParameters
             {
                 GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
                 {
@@ -177,12 +202,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     SystemVersion = A<string>().AsChangedValue(),
                     Notes = A<string>().AsChangedValue(),
                     EnforceActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
-                    //DataClassificationUuid = Maybe<Guid>.Some(A<Guid>()).AsChangedValue(),
+                    DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
                     ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
-                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue()
-                    //MainContractUuid = ,
-                    //AssociatedProjectUuids = ,
-                    //NumberOfExpectedUsersInterval = ,
+                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue(),
+                    MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
+                    AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
+                    NumberOfExpectedUsersInterval = Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
                 })
             };
 
@@ -190,6 +215,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectGetSystemReturns(systemUuid, itSystem);
             ExpectCreateNewReturns(itSystem, organization, itSystemUsage);
             ExpectAllowModifyReturns(itSystemUsage, true);
+            ExpectGetItSystemCategoryReturns(itSystemUsage.OrganizationId, dataClassificationId, (itSystemCategories, true));
+            ExpectGetContractReturns(newContractId, newContract);
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
@@ -198,15 +225,57 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(createResult.Ok);
             Assert.Same(itSystemUsage, createResult.Value);
             AssertTransactionCommitted(transactionMock);
+            Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
+            //TODO: Assert properties
         }
 
         [Fact]
         public void Can_Create_With_GeneralData_Changed_To_None_Resets_Target_Data()
         {
-            throw new ArgumentNullException();
+            throw new NotImplementedException();
         }
 
-        //TODO: With none, resets the values in the usage!
+        private void ExpectGetProjectReturns(Guid projectUuid, Result<ItProject, OperationError> result)
+        {
+            _projectServiceMock.Setup(x => x.GetProject(projectUuid))
+                .Returns(result);
+        }
+
+        private static ItProject CreateItProject(Organization organization)
+        {
+            return new ItProject { OrganizationId = organization.Id, Organization = organization };
+        }
+
+        private void ExpectGetContractReturns(Guid newContractId, Result<ItContract, OperationError> result)
+        {
+            _contractServiceMock.Setup(x => x.GetContract(newContractId)).Returns(result);
+        }
+
+        private ItContractItSystemUsage CreateContractAssociation(Organization parentOrganization, ItContract newContract = null)
+        {
+            var itContract = newContract ?? CreateItContract(parentOrganization, Maybe<Guid>.None);
+            return new ItContractItSystemUsage
+            {
+                ItContract = itContract,
+                ItContractId = itContract.Id
+            };
+        }
+
+        private ItContract CreateItContract(Organization parentOrganization, Maybe<Guid> uuid)
+        {
+            return new ItContract
+            {
+                Id = A<int>(),
+                Uuid = uuid.Match(val => val, A<Guid>),
+                Organization = parentOrganization,
+                OrganizationId = parentOrganization.Id
+            };
+        }
+
+        private void ExpectGetItSystemCategoryReturns(int organizationId, Guid dataClassificationId, Maybe<(ItSystemCategories, bool)> result)
+        {
+            _systemCatategoriesOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, dataClassificationId)).Returns(result);
+        }
 
         private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
         {
