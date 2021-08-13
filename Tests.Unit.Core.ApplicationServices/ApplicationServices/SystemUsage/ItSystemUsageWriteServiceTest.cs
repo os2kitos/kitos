@@ -189,10 +189,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
             var projectUuids = Many<Guid>().ToList();
             foreach (var projectUuid in projectUuids)
-                ExpectGetProjectReturns(projectUuid, CreateItProject(organization));
+                ExpectGetProjectReturns(projectUuid, CreateItProject(organization, projectUuid));
 
             var dataClassificationId = A<Guid>();
-            var itSystemCategories = new ItSystemCategories { Id = A<int>() };
+            var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
             var input = new SystemUsageUpdateParameters
             {
                 GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
@@ -226,7 +226,17 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Same(itSystemUsage, createResult.Value);
             AssertTransactionCommitted(transactionMock);
             Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
-            //TODO: Assert properties
+            var generalProperties = input.GeneralProperties.Value.Value.Value;
+            Assert.Equal(generalProperties.LocalCallName.Value.Value, itSystemUsage.LocalCallName);
+            Assert.Equal(generalProperties.LocalSystemId.Value.Value, itSystemUsage.LocalSystemId);
+            Assert.Equal(generalProperties.SystemVersion.Value.Value, itSystemUsage.Version);
+            Assert.Equal(generalProperties.Notes.Value.Value, itSystemUsage.Note);
+            Assert.Equal(generalProperties.EnforceActive.Value.Value, itSystemUsage.Active);
+            Assert.Equal(generalProperties.DataClassificationUuid.Value.Value, itSystemUsage.ItSystemCategories.Uuid);
+            Assert.Equal(generalProperties.ValidFrom.Value.Value, itSystemUsage.Concluded);
+            Assert.Equal(generalProperties.ValidTo.Value.Value, itSystemUsage.ExpirationDate);
+            Assert.Equal(generalProperties.MainContractUuid.Value.Value, itSystemUsage.MainContract.ItContract.Uuid);
+            Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
         }
 
         [Fact]
@@ -235,15 +245,17 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             throw new NotImplementedException();
         }
 
+        //TODO: Simulate optional properties as well (if not set to maybe.some(change) it will remain untouched!)
+
         private void ExpectGetProjectReturns(Guid projectUuid, Result<ItProject, OperationError> result)
         {
             _projectServiceMock.Setup(x => x.GetProject(projectUuid))
                 .Returns(result);
         }
 
-        private static ItProject CreateItProject(Organization organization)
+        private static ItProject CreateItProject(Organization organization, Guid projectUuid)
         {
-            return new ItProject { OrganizationId = organization.Id, Organization = organization };
+            return new ItProject { OrganizationId = organization.Id, Organization = organization, Uuid = projectUuid };
         }
 
         private void ExpectGetContractReturns(Guid newContractId, Result<ItContract, OperationError> result)
@@ -313,7 +325,5 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(trasactionMock.Object);
             return trasactionMock;
         }
-
-        //TODO: Simulate optional properties as well
     }
 }
