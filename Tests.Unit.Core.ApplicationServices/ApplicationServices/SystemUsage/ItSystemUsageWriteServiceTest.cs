@@ -6,7 +6,6 @@ using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -177,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     LocalCallName = A<string>().AsChangedValue(),
                     LocalSystemId = A<string>().AsChangedValue(),
@@ -190,7 +189,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue(),
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
                     NumberOfExpectedUsersInterval = Maybe<(int lower, int? upperBound)>.Some((minimumNumberOfUsers, maxNumberOfUsers)).AsChangedValue(),
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -207,7 +206,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Same(itSystemUsage, createResult.Value);
             AssertTransactionCommitted(transactionMock);
             Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
-            var generalProperties = input.GeneralProperties.Value.Value.Value;
+            var generalProperties = input.GeneralProperties.Value;
             Assert.Equal(generalProperties.LocalCallName.Value.Value, itSystemUsage.LocalCallName);
             Assert.Equal(generalProperties.LocalSystemId.Value.Value, itSystemUsage.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.Value.Value, itSystemUsage.Version);
@@ -229,10 +228,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemCategories = new ItSystemCategories { Id = A<int>(), Uuid = dataClassificationId };
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -255,10 +254,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var dataClassificationId = A<Guid>();
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     DataClassificationUuid = Maybe<Guid>.Some(dataClassificationId).AsChangedValue(),
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -282,10 +281,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var operationError = A<OperationError>();
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -313,10 +312,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -342,10 +341,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     MainContractUuid = Maybe<Guid>.Some(newContractId).AsChangedValue()
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -369,10 +368,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             projectUuids.Add(projectUuids.Last()); //add a duplicatge
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -399,10 +398,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             projectUuids.Add(badProjectUuid); //Add a project which is in the wrong org (not the same as itsystem usage)
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     AssociatedProjectUuids = Maybe<IEnumerable<Guid>>.Some(projectUuids).AsChangedValue(),
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -426,11 +425,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var validFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue();
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     ValidFrom = validFrom,
                     ValidTo = validFrom.Value.Select(x => x.Date.AddDays(-1)).AsChangedValue()
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -455,10 +454,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             var input = new SystemUsageUpdateParameters
             {
-                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
                 {
                     NumberOfExpectedUsersInterval = (lower, upper).FromNullable().AsChangedValue()
-                })
+                }
             };
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -472,19 +471,66 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionNotCommitted(transactionMock);
         }
 
-        [Fact]
-        public void Can_Create_With_GeneralData_Changed_To_None_Resets_Target_Data()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_WithoutDefinedChanges_Leaves_Properties_Untouched(bool entireSectionNone)
         {
-            throw new NotImplementedException();
-        }
+            //Arrange - simulate that the created system has some initial values
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-        [Fact]
-        public void Can_Create_With_GeneralData_WithoutDefinedChanges_Leaves_Properties_Untouched()
-        {
-            throw new NotImplementedException();
-        }
+            var localCallName = A<string>();
+            var localSystemId = A<string>();
+            var version = A<string>();
+            var note = A<string>();
+            var active = A<bool>();
+            var concluded = A<DateTime>();
+            var expirationDate = A<DateTime>();
+            var userCount = A<UserCount>();
+            var itSystemCategories = new ItSystemCategories();
+            var itContractItSystemUsage = new ItContractItSystemUsage();
+            var itProjects = Many<Guid>().Select(x => CreateItProject(organization, x)).ToList();
+            
+            itSystemUsage.LocalCallName = localCallName;
+            itSystemUsage.LocalSystemId = localSystemId;
+            itSystemUsage.Version = version;
+            itSystemUsage.Note = note;
+            itSystemUsage.Active = active;
+            itSystemUsage.Concluded = concluded;
+            itSystemUsage.ExpirationDate = expirationDate;
+            itSystemUsage.UserCount = userCount;
+            itSystemUsage.ItSystemCategories = itSystemCategories;
+            itSystemUsage.MainContract = itContractItSystemUsage;
+            itSystemUsage.ItProjects = itProjects;
 
-        //TODO: Simulate optional properties as well (if not set to maybe.some(change) it will remain untouched!)
+            var input = new SystemUsageUpdateParameters
+            {
+                GeneralProperties = entireSectionNone ?
+                    Maybe<UpdatedSystemUsageGeneralProperties>.None : //No changes on the root level of the section
+                    new UpdatedSystemUsageGeneralProperties() //No changes defined within should have the same effect as the None case
+            };
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert that values have not been modified
+            Assert.True(createResult.Ok);
+            Assert.Same(itSystemUsage, createResult.Value);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(localCallName,itSystemUsage.LocalCallName);
+            Assert.Equal(localSystemId,itSystemUsage.LocalSystemId);
+            Assert.Equal(version,itSystemUsage.Version);
+            Assert.Equal(note,itSystemUsage.Note);
+            Assert.Equal(active,itSystemUsage.Active);
+            Assert.Equal(expirationDate,itSystemUsage.ExpirationDate);
+            Assert.Equal(concluded,itSystemUsage.Concluded);
+            Assert.Equal(userCount,itSystemUsage.UserCount);
+            Assert.Equal(itSystemCategories,itSystemUsage.ItSystemCategories);
+            Assert.Equal(itContractItSystemUsage,itSystemUsage.MainContract);
+            Assert.Equal(itProjects,itSystemUsage.ItProjects);
+        }
 
         private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
         {

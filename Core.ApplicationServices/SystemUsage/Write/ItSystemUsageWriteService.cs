@@ -116,10 +116,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     .Bind(usage => WithOptionalUpdate(usage, parameters.GeneralProperties, PerformRoleAssignmentUpdates));
         }
 
-        private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageGeneralProperties> newPropertyValues)
+        private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
-            //if not defined we fallback to an empty input (because the values were provided as None = reset)
-            var generalProperties = newPropertyValues.Match(definedValues => definedValues, () => new UpdatedSystemUsageGeneralProperties());
             return WithOptionalUpdate(itSystemUsage, generalProperties.LocalCallName, (systemUsage, localCallName) => systemUsage.UpdateLocalCallName(localCallName))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.LocalSystemId, (systemUsage, localSystemId) => systemUsage.UpdateLocalSystemId(localSystemId)))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.DataClassificationUuid, UpdateDataClassification))
@@ -220,7 +218,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
 
-        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageGeneralProperties> newPropertyValues)
+        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties newPropertyValues)
         {
             return itSystemUsage; //TODO: Redefine signature. This method is just here to show how all updates are combined into one
         }
@@ -232,6 +230,16 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return optionalUpdate
                 .Select(changedValue => updateCommand(systemUsage, changedValue.Value))
+                .Match(updateResult => updateResult, () => systemUsage);
+        }
+
+        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
+            ItSystemUsage systemUsage,
+            Maybe<TValue> optionalUpdate,
+            Func<ItSystemUsage, TValue, Result<ItSystemUsage, OperationError>> updateCommand)
+        {
+            return optionalUpdate
+                .Select(changedValue => updateCommand(systemUsage, changedValue))
                 .Match(updateResult => updateResult, () => systemUsage);
         }
 
