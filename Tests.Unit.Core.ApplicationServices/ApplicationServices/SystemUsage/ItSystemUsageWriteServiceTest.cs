@@ -3,6 +3,8 @@ using System.Data;
 using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -16,6 +18,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Moq.Language.Flow;
 using Serilog;
@@ -155,12 +158,55 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionNotCommitted(transactionMock);
         }
 
-
         [Fact]
         public void Can_Create_With_General_Data()
         {
+            //Arrange
+            var systemUuid = A<Guid>();
+            var organizationUuid = A<Guid>();
+            var transactionMock = ExpectTransaction();
+            var organization = new Organization { Id = A<int>() };
+            var itSystem = new ItSystem { Id = A<int>() };
+            var itSystemUsage = new ItSystemUsage();
+            var input = new SystemUsageUpdateParameters()
+            {
+                GeneralProperties = new ChangedValue<Maybe<UpdatedSystemUsageGeneralProperties>>(new UpdatedSystemUsageGeneralProperties
+                {
+                    LocalCallName = A<string>().AsChangedValue(),
+                    LocalSystemId = A<string>().AsChangedValue(),
+                    SystemVersion = A<string>().AsChangedValue(),
+                    Notes = A<string>().AsChangedValue(),
+                    EnforceActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                    //DataClassificationUuid = Maybe<Guid>.Some(A<Guid>()).AsChangedValue(),
+                    ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
+                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue()
+                    //MainContractUuid = ,
+                    //AssociatedProjectUuids = ,
+                    //NumberOfExpectedUsersInterval = ,
+                })
+            };
 
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectGetSystemReturns(systemUuid, itSystem);
+            ExpectCreateNewReturns(itSystem, organization, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            Assert.Same(itSystemUsage, createResult.Value);
+            AssertTransactionCommitted(transactionMock);
         }
+
+        [Fact]
+        public void Can_Create_With_GeneralData_Changed_To_None_Resets_Target_Data()
+        {
+            throw new ArgumentNullException();
+        }
+
+        //TODO: With none, resets the values in the usage!
 
         private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
         {
@@ -187,7 +233,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemServiceMock.Setup(x => x.GetSystem(systemUuid)).Returns(result);
         }
 
-        private void ExpectGetOrganizationReturns(Guid organizationUuid, Result<Organization,OperationError> organizationResult)
+        private void ExpectGetOrganizationReturns(Guid organizationUuid, Result<Organization, OperationError> organizationResult)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationUuid, null)).Returns(organizationResult);
         }

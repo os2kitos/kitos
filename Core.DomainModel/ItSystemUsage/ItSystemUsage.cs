@@ -581,21 +581,34 @@ namespace Core.DomainModel.ItSystemUsage
         public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
         {
             var itProjects = projects.ToList();
-            
+
             if (itProjects.Select(x => x.Uuid).Distinct().Count() != itProjects.Count)
                 return new OperationError("projects must not contain duplicates", OperationFailure.BadInput);
 
             if (itProjects.Any(project => project.OrganizationId != OrganizationId))
                 return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
-            
+
             ResetProjectAssociations();
-            
+
             itProjects.ForEach(ItProjects.Add);
             //TODO: If above solution does not work, use the code below
             //foreach (var itProject in itProjects)
             //{
             //    var result = itProject.AddSystemUsage(this);
             //}
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateSystemValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
+        {
+            if (newValidFrom.HasValue && newValidTo.HasValue && newValidFrom.Value > newValidTo.Value)
+            {
+                return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
+            }
+
+            Concluded = newValidFrom;
+            ExpirationDate = newValidTo;
 
             return Maybe<OperationError>.None;
         }

@@ -127,10 +127,33 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.ValidFrom, (systemUsage, validFrom) => systemUsage.Concluded = validFrom.Match(date => date, () => (DateTime?)null)))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.ValidTo, (systemUsage, validTo) => systemUsage.ExpirationDate = validTo.Match(date => date, () => (DateTime?)null)))
+                .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.MainContractUuid, UpdateMainContract))
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
+        {
+            if (generalProperties.ValidFrom.IsNone && generalProperties.ValidTo.IsNone)
+                return usage; //Not changes provided
+
+            var newValidFrom = MapDataTimeOptionalChangeWithFallback(generalProperties.ValidFrom, usage.Concluded);
+            var newValidTo = MapDataTimeOptionalChangeWithFallback(generalProperties.ValidTo, usage.ExpirationDate);
+
+            return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
+        }
+
+        private static DateTime? MapDataTimeOptionalChangeWithFallback(Maybe<ChangedValue<Maybe<DateTime>>> optionalChange, DateTime? fallback)
+        {
+            return optionalChange
+                .Select(x => x.Value)
+                .Match(changeTo =>
+                        changeTo.Match
+                        (
+                            newValue => newValue, //Client set new value
+                            () => (DateTime?)null), //Changed to null by client
+                    () => fallback // No change provided - use the fallback
+                );
         }
 
         private Result<ItSystemUsage, OperationError> UpdateProjectAssociations(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> projectUuids)
