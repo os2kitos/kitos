@@ -174,7 +174,7 @@
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
-    <Compile Include="ApplicationServices\ItSystemUsageServiceTest.cs" />
+    <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
     <Compile Include="ApplicationServices\KLE\KLEApplicationServiceTest.cs" />
@@ -183,12 +183,13 @@
     <Compile Include="ApplicationServices\KLE\KLEStandardRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\KLEUpdateHistoryItemRepositoryTest.cs" />
     <Compile Include="ApplicationServices\KLE\MostRecentKLETest.cs" />
-    <Compile Include="ApplicationServices\ItSystemUsageServiceRelationTest.cs" />
+    <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceRelationTest.cs" />
     <Compile Include="ApplicationServices\Notification\UserNotificationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionsServiceTest.cs" />
     <Compile Include="ApplicationServices\RightsHolders\ItInterfaceRightsHolderServiceTest.cs" />
     <Compile Include="ApplicationServices\RightsHolders\RightsHolderSystemServiceTest.cs" />
     <Compile Include="ApplicationServices\OptionTypes\OptionsApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\UserRightsServiceTest.cs" />
     <Compile Include="ApplicationServices\UserServiceTest.cs" />
     <Compile Include="DomainServices\Notification\UserNotificationServiceTest.cs" />

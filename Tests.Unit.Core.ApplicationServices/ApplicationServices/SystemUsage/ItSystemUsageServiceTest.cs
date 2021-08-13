@@ -21,7 +21,7 @@ using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.ApplicationServices
+namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 {
     public class ItSystemUsageServiceTest : WithAutoFixture
     {
