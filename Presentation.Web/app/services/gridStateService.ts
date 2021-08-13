@@ -194,11 +194,22 @@
                             gridColumnWidths[x.persistId] = { width: x.width as number };
                         });
 
+                        // Keep track of how many columns are being set
+                        var columnsBeingSet = 0;
+
                         // The visible columns from the server are then made visible 
                         orgStorageColumns.forEach(x => {
-                            columns[x.persistId] = { index: x.index, width: gridColumnWidths[x.persistId].width, hidden: false };
+                            var gridWidth = gridColumnWidths[x.persistId];
+                            if (gridWidth !== undefined && gridWidth !== null) {
+                                columns[x.persistId] = { index: x.index, width: gridWidth.width, hidden: false };
+                                columnsBeingSet ++;
+                            }
                         });
-                        options.columnState = columns;
+                        if (columnsBeingSet === 0) {
+                            removeOrgConfig(); // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
+                        } else {
+                            options.columnState = columns;
+                        }
                     }
                 }
 
@@ -250,7 +261,10 @@
                         }
                         return null;
                     },
-                        () => null);
+                        () => {
+                            removeOrgConfig(); // If we can't get a version from the server we remove the locally saved data as it will be invalid.
+                            return null;
+                        });
             }
 
             function getGridOrganizationalConfiguration() {
@@ -331,12 +345,16 @@
 
             function removeLocal(): void {
                 $window.localStorage.removeItem(storageKey);
-                $window.localStorage.removeItem(organizationalConfigurationColumnsKey);
-                $window.localStorage.removeItem(organizationalConfigurationVersionKey);
+                removeOrgConfig();
             }
 
             function removeProfile(): void {
                 $window.localStorage.removeItem(profileStorageKey);
+            }
+
+            function removeOrgConfig(): void {
+                $window.localStorage.removeItem(organizationalConfigurationColumnsKey);
+                $window.localStorage.removeItem(organizationalConfigurationVersionKey);
             }
 
             function doesGridDivergeFromOrganizationalConfiguration(overviewType: Models.Generic.OverviewType): boolean {
