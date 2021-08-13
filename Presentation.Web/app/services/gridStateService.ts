@@ -186,7 +186,7 @@
                 // Session updates has not changed the grid as updates to the grid which changes the columns causes the "locallyChangedKey" flag to be set
                 if ($window.localStorage.getItem(locallyChangedKey) !== "true") {
 
-                    if (shouldUseLocalIndexes(grid.getOptions())) {
+                    if (shouldUseLocalIndexes()) {
                         return options;
                     }
 
