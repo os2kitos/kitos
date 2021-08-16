@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.AccessControl;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Model.Shared;
@@ -10,13 +11,11 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
-using Core.DomainServices;
 using Core.DomainServices.Options;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -35,8 +34,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOptionsService<ItSystemUsage, ItSystemCategories> _systemCategoriesOptionsService;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
-        private readonly IGenericRepository<ItContractItSystemUsage> _contractItSystemUsageRepository;
-        private readonly IDatabaseControl _databaseControl;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
 
@@ -49,8 +46,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
             IItContractService contractService,
             IItProjectService projectService,
-            IGenericRepository<ItContractItSystemUsage> contractItSystemUsageRepository,
-            IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
         {
@@ -62,8 +57,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _systemCategoriesOptionsService = systemCategoriesOptionsService;
             _contractService = contractService;
             _projectService = projectService;
-            _contractItSystemUsageRepository = contractItSystemUsageRepository;
-            _databaseControl = databaseControl;
             _domainEvents = domainEvents;
             _logger = logger;
         }
@@ -91,7 +84,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (creationResult.Ok)
             {
-                _databaseControl.SaveChanges();
                 transaction.Commit();
             }
 
@@ -113,7 +105,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (result.Ok)
             {
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
-                _databaseControl.SaveChanges();
                 transaction.Commit();
             }
 
@@ -238,14 +229,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> UpdateMainContract(ItSystemUsage systemUsage, Maybe<Guid> contractId)
         {
-            var mainContractBefore = systemUsage.MainContract;
             if (contractId.IsNone)
             {
                 systemUsage.ResetMainContract();
-                if (mainContractBefore != null)
-                {
-                    _contractItSystemUsageRepository.Delete(mainContractBefore);
-                }
                 return systemUsage;
             }
 
@@ -253,14 +239,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (contractResult.Failed)
                 return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrFallback(string.Empty)}", contractResult.Error.FailureType);
 
-            return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () =>
-            {
-                if (mainContractBefore != null && mainContractBefore.ItContract.Uuid != systemUsage.MainContract.ItContract.Uuid)
-                {
-                    _contractItSystemUsageRepository.Delete(mainContractBefore);
-                }
-                return systemUsage;
-            });
+            return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> UpdateExpectedUsersInterval(ItSystemUsage systemUsage, Maybe<(int lower, int? upperBound)> newInterval)
