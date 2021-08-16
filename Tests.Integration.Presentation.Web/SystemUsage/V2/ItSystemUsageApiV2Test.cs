@@ -419,6 +419,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
             using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()); //Reset main contract
             Assert.Equal(HttpStatusCode.OK, resetResponse.StatusCode);
+            //TODO: Stuff is leaking when reset for the optional relationships!!!!
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);

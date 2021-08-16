@@ -565,6 +565,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (contractAssociation == null)
                 return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
 
+            ResetMainContract();
             MainContract = contractAssociation;
 
             return Maybe<OperationError>.None;
