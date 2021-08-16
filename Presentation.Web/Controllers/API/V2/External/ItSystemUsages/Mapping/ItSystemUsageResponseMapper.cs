@@ -201,7 +201,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private IEnumerable<TechnicalPrecautionChoice> MapPrecautions(ItSystemUsage systemUsage)
+        private static IEnumerable<TechnicalPrecautionChoice> MapPrecautions(ItSystemUsage systemUsage)
         {
             if (systemUsage.precautionsOptionsAccessControl)
                 yield return TechnicalPrecautionChoice.AccessControl;

@@ -13,5 +13,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         [Required]
         [NonEmptyGuid]
         public Guid OrganizationUuid { get; set; }
+
+        public GeneralDataWriteRequestDTO General { get; set; }
     }
 }

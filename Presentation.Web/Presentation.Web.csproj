@@ -373,6 +373,7 @@
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataUpdateRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\LocalKLEDeviationsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\OrganizationUsageWriteRequestDTO.cs" />

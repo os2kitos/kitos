@@ -1,6 +1,4 @@
 ﻿using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V2;
-using Presentation.Web.Models.API.V2.Response;
 using System;
 using System.Collections.Generic;
 using System.Net;

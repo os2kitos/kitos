@@ -6,7 +6,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public abstract class BaseItSystemUsageWriteRequestDTO
     {
-        public GeneralDataWriteRequestDTO General { get; set; }
         /// <summary>
         /// A collection of IT-System usage role option assignments
         /// Constraint: Duplicates are not allowed

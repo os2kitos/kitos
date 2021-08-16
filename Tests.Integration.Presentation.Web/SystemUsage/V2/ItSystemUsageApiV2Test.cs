@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -332,19 +333,82 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         [Fact]
         public async Task Can_POST_With_Full_General_Data_Section()
         {
-            //Arrange 
-            //TODO
-            //Act
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
+            var request = CreatePostRequest(organization.Uuid, system.Uuid, new GeneralDataWriteRequestDTO
+            {
+                LocalCallName = A<string>(),
+                LocalSystemId = A<string>(),
+                SystemVersion = A<string>(),
+                Notes = A<string>(),
+                AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid },
+                DataClassificationUuid = dataClassification.Uuid,
+                NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
+                Validity = new ValidityWriteRequestDTO
+                {
+                    EnforcedValid = A<bool>(),
+                    ValidFrom = DateTime.UtcNow.Date,
+                    ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
+                },
+            });
 
-            //Assert
+            //Act
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert a fresh GET DTO
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            Assert.Equal(request.General.LocalCallName, freshReadDTO.General.LocalCallName);
+            Assert.Equal(request.General.LocalSystemId, freshReadDTO.General.LocalSystemId);
+            Assert.Equal(request.General.SystemVersion, freshReadDTO.General.SystemVersion);
+            Assert.Equal(request.General.Notes, freshReadDTO.General.Notes);
+            Assert.Equal(request.General.NumberOfExpectedUsers.LowerBound, freshReadDTO.General.NumberOfExpectedUsers.LowerBound);
+            Assert.Equal(request.General.NumberOfExpectedUsers.UpperBound, freshReadDTO.General.NumberOfExpectedUsers.UpperBound);
+            Assert.Equal(request.General.Validity.EnforcedValid, freshReadDTO.General.Validity.EnforcedValid);
+            Assert.Equal(request.General.Validity.ValidFrom.GetValueOrDefault().Date, freshReadDTO.General.Validity.ValidFrom.GetValueOrDefault().Date);
+            Assert.Equal(request.General.Validity.ValidTo.GetValueOrDefault().Date, freshReadDTO.General.Validity.ValidTo.GetValueOrDefault().Date);
+            Assert.Equal(dataClassification.Uuid, freshReadDTO.General.DataClassification.Uuid);
+            Assert.Equal(dataClassification.Name, freshReadDTO.General.DataClassification.Name);
+            var expectedProjects = new[] { new { Uuid = project1.Uuid, Name = project1.Name }, new { Uuid = project2.Uuid, Name = project2.Name } }.OrderBy(x => x.Uuid);
+            var actualProjects = freshReadDTO.General.AssociatedProjects.Select(x => new { Uuid = x.Uuid, Name = x.Name }).OrderBy(x => x.Uuid);
+            Assert.Equal(expectedProjects, actualProjects);
         }
 
-        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId)
+        [Fact]
+        public async Task Can_PUT_MainContract()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
+
+            //Act
+            using var response = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(contract.Uuid, freshReadDTO.General.MainContract.Uuid);
+            Assert.Equal(contract.Name, freshReadDTO.General.MainContract.Name);
+        }
+
+        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
                 OrganizationUuid = organizationId,
-                SystemUuid = systemId
+                SystemUuid = systemId,
+                General = generalSection
             };
         }
 

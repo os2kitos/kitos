@@ -182,6 +182,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             return _writeService
                 .Update(systemUsageUuid, updateParameters)
+                .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -197,7 +198,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGeneralProperties([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GeneralDataWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGeneralProperties([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GeneralDataUpdateRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -205,8 +206,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
-                    GeneralProperties = MapGeneralData(request)
+                    GeneralProperties = MapFullUpdateGeneralData(request)
                 })
+                .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -419,16 +421,43 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="request"></param>
         /// <param name="b"></param>
         /// <returns></returns>
-        private static SystemUsageUpdateParameters CreateFullUpdateParameters(BaseItSystemUsageWriteRequestDTO request, bool enforceUndefinedSections)
+        private static SystemUsageUpdateParameters CreateFullUpdateParameters(CreateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
         {
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralData)
+                GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData)
             };
         }
 
-        private static UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData)
+        /// <summary>
+        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        private static SystemUsageUpdateParameters CreateFullUpdateParameters(UpdateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
+        {
+            var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataUpdateRequestDTO() : null);
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData)
+            };
+        }
+
+        /// <summary>
+        /// Maps a complete update of the general data update request. Nulled sections are interpreted as intentionally reset
+        /// </summary>
+        /// <param name="generalData"></param>
+        /// <returns></returns>
+        private static UpdatedSystemUsageGeneralProperties MapFullUpdateGeneralData(GeneralDataUpdateRequestDTO generalData)
+        {
+            var generalProperties = MapFullCommonGeneralData(generalData);
+            generalProperties.MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue();
+            return generalProperties;
+        }
+
+        private static UpdatedSystemUsageGeneralProperties MapFullCommonGeneralData(GeneralDataWriteRequestDTO generalData)
         {
             return new UpdatedSystemUsageGeneralProperties
             {
@@ -437,7 +466,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 Notes = generalData.Notes.AsChangedValue(),
                 SystemVersion = generalData.SystemVersion.AsChangedValue(),
                 DataClassificationUuid = (generalData.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 NumberOfExpectedUsersInterval = generalData
                     .NumberOfExpectedUsers?
                     .FromNullable()

@@ -2,5 +2,6 @@
 {
     public class UpdateItSystemUsageRequestDTO : BaseItSystemUsageWriteRequestDTO
     {
+        public GeneralDataUpdateRequestDTO General { get; set; }
     }
 }
