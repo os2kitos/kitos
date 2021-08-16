@@ -60,13 +60,14 @@
 
             storageKey = `${user.id}-${user.currentOrganizationId}-${storageKey}`;
             const locallyChangedKey = storageKey + "-changed";
-            var profileStorageKey = storageKey + "-profile";
-            var organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
-            var organizationalConfigurationVersionKey = storageKey + "-version";
-            var nonExistingOrganizationalConfigurationColumnsKey = storageKey + "-NonExistingColumns";
+            const profileStorageKey = storageKey + "-profile";
+            const organizationalConfigurationColumnsKey = storageKey + "-OrgProfile";
+            const organizationalConfigurationVersionKey = storageKey + "-version";
+            const nonExistingOrganizationalConfigurationColumnsKey = storageKey + "-NonExistingColumns";
+
+            const locallyChangedValue = "true";
 
             var badOrganizationalConfigExists = false;
-
             var gridLoading = true;
 
             var service: IGridStateService = {
@@ -184,7 +185,7 @@
 
 
                 // Session updates has not changed the grid as updates to the grid which changes the columns causes the "locallyChangedKey" flag to be set
-                if ($window.localStorage.getItem(locallyChangedKey) !== "true") {
+                if ($window.localStorage.getItem(locallyChangedKey) !== locallyChangedValue) {
 
                     if (shouldUseLocalIndexes()) {
                         return options;
@@ -260,7 +261,7 @@
 
                     $window.localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
                     if (!isOrgConfigServerVersionEqualToLocalGrid(options)) {
-                        $window.localStorage.setItem(locallyChangedKey, "true");
+                        $window.localStorage.setItem(locallyChangedKey, locallyChangedValue);
                     } else {
                         $window.localStorage.removeItem(locallyChangedKey);
                     }
