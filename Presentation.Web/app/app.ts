@@ -18,7 +18,8 @@ var app = angular.module("app", [
 app.constant("JSONfn", JSONfn)
     .constant("moment", moment)
     .constant("$", $)
-    .constant("_", _);
+    .constant("_", _)
+    .constant("sha256", sha256);
 
 app.config([
     "$urlRouterProvider", ($urlRouterProvider: angular.ui.IUrlRouterProvider) => {
