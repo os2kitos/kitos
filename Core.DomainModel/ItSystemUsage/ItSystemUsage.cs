@@ -548,7 +548,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetMainContract()
         {
-            MainContract?.Track();
+            MainContract?.Track(); //TODO: Must be verified - may have to be deleted manually because it is it's own entity
             MainContract = null;
         }
 
@@ -573,9 +573,6 @@ namespace Core.DomainModel.ItSystemUsage
         public void ResetProjectAssociations()
         {
             ItProjects.Clear();
-            //TODO: If the above does not work, use the stuff below
-            //foreach (var itProject in ItProjects.ToList())
-            //    itProject.ItSystemUsages.Remove(this);
         }
 
         public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
@@ -591,11 +588,6 @@ namespace Core.DomainModel.ItSystemUsage
             ResetProjectAssociations();
 
             itProjects.ForEach(ItProjects.Add);
-            //TODO: If above solution does not work, use the code below
-            //foreach (var itProject in itProjects)
-            //{
-            //    var result = itProject.AddSystemUsage(this);
-            //}
 
             return Maybe<OperationError>.None;
         }
@@ -609,12 +601,19 @@ namespace Core.DomainModel.ItSystemUsage
             {
                 return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
             }
-            
+
             Concluded = validFromDate;
-            
+
             ExpirationDate = validToDate;
 
             return Maybe<OperationError>.None;
+        }
+
+        public void ResetOrganizationalUsage()
+        {
+            UsedBy.Clear();
+            ResponsibleUsage.Track(); //TODO: Must be verified in test that this actually works as expected! - it may have to be deleted
+            ResponsibleUsage = null;
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Core.ApplicationServices.Organizations
         public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
         public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
 
-        public Result<IQueryable<OrganizationUnit>,OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria);
+        public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria);
+        public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid);
     }
 }

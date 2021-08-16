@@ -232,5 +232,17 @@ namespace Core.ApplicationServices.Organizations
                 .Select(_orgUnitService.GetOrganizationUnits)
                 .Select(new IntersectionQuery<OrganizationUnit>(criteria).Apply);
         }
+
+        public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid)
+        {
+            return
+                _orgUnitService
+                    .GetOrganizationUnit(organizationUnitUuid)
+                    .Match<Result<OrganizationUnit, OperationError>>(
+                        unit => _authorizationContext.AllowReads(unit)
+                            ? unit
+                            : new OperationError(OperationFailure.Forbidden),
+                        () => new OperationError(OperationFailure.NotFound));
+        }
     }
 }
