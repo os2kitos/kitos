@@ -612,8 +612,36 @@ namespace Core.DomainModel.ItSystemUsage
         public void ResetOrganizationalUsage()
         {
             UsedBy.Clear();
-            ResponsibleUsage.Track(); //TODO: Must be verified in test that this actually works as expected! - it may have to be deleted
+            ResponsibleUsage.Track(); 
             ResponsibleUsage = null;
+        }
+
+        public Maybe<OperationError> UpdateOrganizationalUsage(IEnumerable<OrganizationUnit> usingOrganizationUnits, Maybe<OrganizationUnit> responsibleOrgUnit)
+        {
+            var organizationUnits = usingOrganizationUnits?.ToList();
+            if (organizationUnits == null)
+                throw new ArgumentNullException(nameof(organizationUnits));
+
+            if (organizationUnits.Any(x => x.OrganizationId != OrganizationId))
+                return new OperationError("Using Organization units must belong to the same organization as the system usage", OperationFailure.BadInput);
+
+            if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
+                return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
+
+            ResetOrganizationalUsage(); //TODO: Must be verified in test that this actually works as expected! - it may have to be deleted
+
+            var itSystemUsageOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage()
+            {
+                ItSystemUsage = this,
+                OrganizationUnit = organizationUnit
+            }).ToList();
+
+            itSystemUsageOrgUnitUsages.ForEach(UsedBy.Add);
+            ResponsibleUsage = responsibleOrgUnit
+                .Select(orgUnit => itSystemUsageOrgUnitUsages.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
+                .GetValueOrDefault();
+
+            return Maybe<OperationError>.None;
         }
     }
 }

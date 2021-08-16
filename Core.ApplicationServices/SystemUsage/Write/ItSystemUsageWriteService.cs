@@ -133,33 +133,29 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     nextResponsibleOrg = organizationUnitResult.Value;
                 }
                 var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
-                var nextUsingOrganizationUnits = Maybe<IEnumerable<OrganizationUnit>>.None;
+                var nextUsingOrganizationUnits = new List<OrganizationUnit>();
                 if (usingOrganizationUnits.HasValue)
                 {
-                    //TODO:
+                    var usingOrgUnitUuids = usingOrganizationUnits.Value.ToList();
+                    if (usingOrgUnitUuids.Any())
+                    {
+                        foreach (var usingOrgUnitUuid in usingOrgUnitUuids)
+                        {
+                            var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
+                            if (result.Failed)
+                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                            nextUsingOrganizationUnits.Add(result.Value);
+                        }
+                    }
                 }
 
+                return systemUsage
+                    .UpdateOrganizationalUsage(nextUsingOrganizationUnits, nextResponsibleOrg)
+                    .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
             }
             //No changes provided - skip
             return systemUsage;
         }
-
-        //private Maybe<OperationError> UpdateResponsibleOrganizationUnit(ItSystemUsage arg1, Maybe<Guid> newResponsibleOrganizationUnit)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
-        //private Maybe<OperationError> UpdateOrganizationalUsage(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> organizationUnitIds)
-        //{
-        //    if (organizationUnitIds.IsNone)
-        //    {
-        //        systemUsage.ResetOrganizationalUsage();
-        //        return Maybe<OperationError>.None;
-        //    }
-
-        //    var organizationUnits = new List<OrganizationUnit>();
-        //    organizationUnits.
-        //}
 
         private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
