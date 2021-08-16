@@ -222,34 +222,32 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
 
-        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageRoles> usageRoles)
+        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageRoles usageRoles)
         {
-            return itSystemUsage; //TODO: Redefine signature. This method is just here to show how all updates are combined into one
+            return WithOptionalUpdate(itSystemUsage, usageRoles.UserRolePairs, UpdateRoles);
         }
 
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
+            // Clean the old roles first 
+            systemUsage.ResetRoles();
+
             if (userRolePairs.IsNone)
             {
-                return _roleAssignmentService.RemoveAllRoles(systemUsage);
+                return systemUsage;
             }
 
             var systemUsageRoles = new List<ItSystemRight>();
             foreach (var userRolePair in userRolePairs.Value)
             {
-                var role = ;
-                var user = ;
-
-                if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
-
-                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, role.Id, user.Id);
+                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (assignmentResult.Failed)
                     return assignmentResult.Error;
 
                 systemUsageRoles.Add(assignmentResult.Value);
             }
+            systemUsage.Rights = systemUsageRoles;
 
             return systemUsage;
         }

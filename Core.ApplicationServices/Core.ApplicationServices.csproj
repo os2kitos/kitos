@@ -221,6 +221,7 @@
     <Compile Include="Interface\ItInterfaceService.cs" />
     <Compile Include="SystemUsage\Write\IItSystemUsageWriteService.cs" />
     <Compile Include="SystemUsage\Write\IItSystemUsageRoleAssignmentService.cs" />
+    <Compile Include="SystemUsage\Write\ItSystemUsageRoleAssignmentService.cs" />
     <Compile Include="SystemUsage\Write\ItSystemUsageWriteService.cs" />
     <Compile Include="System\IItSystemService.cs" />
     <Compile Include="References\IReferenceService.cs" />

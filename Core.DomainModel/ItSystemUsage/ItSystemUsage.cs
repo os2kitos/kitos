@@ -616,5 +616,69 @@ namespace Core.DomainModel.ItSystemUsage
 
             return Maybe<OperationError>.None;
         }
+
+        #region Roles (Could maybe be moved to HasRightsEntity class)
+
+        public IEnumerable<ItSystemRight> GetRights(int roleId)
+        {
+            return Rights.Where(x => x.RoleId == roleId);
+        }
+
+        public Result<ItSystemRight, OperationError> AssignRole(ItSystemRole role, User user)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            if (HasRight(role, user))
+                return new OperationError("Existing right for same role found for the same user", OperationFailure.Conflict);
+
+            var newRight = new ItSystemRight
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+
+            Rights.Add(newRight);
+
+            return newRight;
+        }
+
+        public Result<ItSystemRight, OperationError> RemoveRole(ItSystemRole role, User user)
+        {
+            if (role == null) throw new ArgumentNullException(nameof(role));
+            if (user == null) throw new ArgumentNullException(nameof(user));
+
+            return GetRight(role, user)
+                .Match<Result<ItSystemRight, OperationError>>
+                (
+                    right =>
+                    {
+                        Rights.Remove(right);
+                        return right;
+                    },
+                    () => new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}",
+                        OperationFailure.BadInput)
+                );
+
+        }
+
+        public void ResetRoles()
+        {
+            Rights.Clear();
+        }
+
+        private bool HasRight(ItSystemRole role, User user)
+        {
+            return GetRight(role, user).HasValue;
+        }
+
+        private Maybe<ItSystemRight> GetRight(ItSystemRole role, User user)
+        {
+            return GetRights(role.Id).FirstOrDefault(x => x.UserId == user.Id);
+        }
+        
+
+        #endregion
     }
 }
