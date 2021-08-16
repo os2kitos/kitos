@@ -329,6 +329,7 @@
                     .then((res) => {
                         if (res.status === 200) {
                             notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
+                            $window.localStorage.removeItem(locallyChangedKey);
                             getGridOrganizationalConfiguration(); // Load the newly saved grid
                         }
                     })
@@ -439,6 +440,17 @@
                 var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
                 if (orgStorageColumnsItem) {
                     var orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]>JSONfn.parse(orgStorageColumnsItem, true);
+
+                    var numberOfVisibleLocalColumnStates = 0;
+                    _.forEach(localColumns.columnState, (state, key) => {
+                        if (!state.hidden) {
+                            numberOfVisibleLocalColumnStates ++;
+                        }
+                    });
+
+                    if (numberOfVisibleLocalColumnStates !== orgStorageColumns.length) {
+                        return false; // Not same amount of visible columns
+                    }
 
                     // If the indexes are not equal we should use the local indexes.
                     return !orgStorageColumns.sort(x => x.index).every((column, index) => localColumns.columnState[column.persistId].index === index);
