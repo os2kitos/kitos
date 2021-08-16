@@ -388,18 +388,29 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var contract1 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var contract2 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
             var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
-            await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract1.Id, usageId, organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
 
             //Act
-            using var response = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid });
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            Assert.Equal(contract.Uuid, freshReadDTO.General.MainContract.Uuid);
-            Assert.Equal(contract.Name, freshReadDTO.General.MainContract.Name);
+            Assert.Equal(contract1.Uuid, freshReadDTO.General.MainContract.Uuid);
+            Assert.Equal(contract1.Name, freshReadDTO.General.MainContract.Name);
+
+            //Act - set to another contract
+            using var response2 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid });
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(contract2.Uuid, freshReadDTO.General.MainContract.Uuid);
+            Assert.Equal(contract2.Name, freshReadDTO.General.MainContract.Name);
         }
 
         [Fact]
@@ -419,11 +430,41 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
             using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()); //Reset main contract
             Assert.Equal(HttpStatusCode.OK, resetResponse.StatusCode);
-            //TODO: Stuff is leaking when reset for the optional relationships!!!!
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             Assert.Null(freshReadDTO.General.MainContract);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_Projects()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid } });
+            using var modifyResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid } }); //Remove one project
+            Assert.Equal(HttpStatusCode.OK, modifyResponse.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            var project = Assert.Single(freshReadDTO.General.AssociatedProjects);
+            Assert.Equal(project1.Uuid, project.Uuid);
+
+            //Act - reset
+            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO());
+            Assert.Equal(HttpStatusCode.OK, modifyResponse.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Empty(freshReadDTO.General.AssociatedProjects);
         }
 
         private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
