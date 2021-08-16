@@ -67,8 +67,8 @@
 
             const locallyChangedValue = "true";
 
-            var badOrganizationalConfigExists = false;
-            var gridLoading = true;
+            var badOrganizationalConfigExists: boolean = false;
+            var gridLoading: boolean = true;
 
             var service: IGridStateService = {
                 saveGridOptions: saveGridOptions,
@@ -86,17 +86,17 @@
             };
             return service;
 
-            async function getOrgFilterOptions(overviewType: Models.Generic.OverviewType) {
+            async function checkServerGridConfig(overviewType: Models.Generic.OverviewType) {
                 // Organizational configuration not yet activated for overview
                 if (overviewType === null || overviewType === undefined) {
-                    return null;
+                    return false;
                 }
 
-                return getGridVersion().then((result) => {
+                return await getGridVersion().then((result) => {
                     if (result !== null && result !== $window.localStorage.getItem(organizationalConfigurationVersionKey)) {
                         return getGridOrganizationalConfiguration();
                     }
-                    return null;
+                    return false;
                 });
             }
 
@@ -109,33 +109,33 @@
 
                     saveGridStateForever(options);
                     saveGridStateForSession(options);
-                    
-                    // Compare the visible columns with the visible columns retrieved from the server. The sort is made case insensitive as the backend ignores case.
-                    
                 });
             }
 
             // loads kendo grid options from localStorage
             function loadGridOptions(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters): void {
-                // Wait for the data from the server before updating the grid.
-                // Update the grid regardless of the callback from the server response as we always need to load the grid.
-                getOrgFilterOptions(overviewType).then(
-                    () => {
-                        loadGrid(grid, initialFilter);
+                // load grid immediately from local storage data
+                loadGrid(grid, initialFilter);
+                
+                // Check with server if grid has updates, and apply them if needed
+                checkServerGridConfig(overviewType).then(
+                    (remoteConfigurationSaved : boolean) => {
+                        //Reload the grid if the server had changes, after these changes are saved locally.
+                        if (remoteConfigurationSaved) {
+                            loadGrid(grid, initialFilter);
+                        }
                     },
-                    () => {
-                        loadGrid(grid, initialFilter);
-                    });
+                    () => { });
             }
 
             // gets all the saved options, both session and local, and merges
             // them together so that the correct options are overwritten
             function getStoredOptions(grid: Kitos.IKendoGrid<any>): IGridSavedState {
-                // load options from org storage
+                // load options from organization configuration storage
                 var orgStorageColumns: Models.Generic.IKendoColumnConfigurationDTO[];
                 var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
                 if (orgStorageColumnsItem) {
-                    orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]> JSONfn.parse(orgStorageColumnsItem, true);
+                    orgStorageColumns = <Models.Generic.IKendoColumnConfigurationDTO[]>JSONfn.parse(orgStorageColumnsItem, true);
                 }
 
                 // load options from local storage
@@ -159,8 +159,8 @@
                     sessionOptions = JSONfn.parse(sessionStorageItem, true);
                 }
 
-                var options: IGridSavedState = { columnState : null };
-                
+                var options: IGridSavedState = { columnState: null };
+
 
                 if (sessionOptions) {
                     // if session options are set then use them
@@ -172,27 +172,28 @@
                     // this should only happen the first time the page loads
                     // or when the session optinos are deleted
                     // note the order the options are merged in (below) is important!
-                    options = <IGridSavedState> _.merge({}, localOptions, profileOptions);
+                    options = <IGridSavedState>_.merge({}, localOptions, profileOptions);
                 }
                 else if (localOptions) {
                     options = <IGridSavedState> localOptions;
                 }
 
 
-                // Session updates has not changed the grid as updates to the grid which changes the columns causes the "locallyChangedKey" flag to be set
+                // If user has not made local changes to the grid we update it according to the server configuration 
                 if ($window.localStorage.getItem(locallyChangedKey) !== locallyChangedValue) {
 
+                    // If user has only changed the index of the columns we don't force the server indexes to be applied
                     if (shouldUseLocalIndexes()) {
                         return options;
                     }
 
-                    // We use the organization configuration if it exists
+                    // We make sure the organization configuration exists
                     if (orgStorageColumns) {
                         var columns: { [persistId: string]: { index: number; width: number, hidden?: boolean } } = {};
 
                         var gridColumnWidths: { [persistId: string]: { width: number, originallyHidden: boolean } } = {};
 
-                        // We need to iterate over all columns to hide them. During the iteration we also store the column widths and original hidden value in a map
+                        // We need to iterate over all columns to hide them. During the iteration we also store the column widths and original hidden value in a map (In case we have a bad configuration and need to rebuild the old configuration)
                         grid.columns.forEach(x => {
                             gridColumnWidths[x.persistId] = { width: x.width as number, originallyHidden: x.hidden };
                             x.hidden = true;
@@ -202,22 +203,24 @@
                         var columnsBeingSet = 0;
                         var nonExistingColumns: string[] = [];
 
-                        // The visible columns from the server are then made visible 
+                        // The visible columns from the server are then made visible and given the index of the server 
                         orgStorageColumns.forEach(x => {
                             var gridWidth = gridColumnWidths[x.persistId];
                             if (gridWidth !== undefined && gridWidth !== null) {
                                 columns[x.persistId] = { index: x.index, width: gridWidth.width, hidden: false };
-                                columnsBeingSet ++;
-                            }else{
+                                columnsBeingSet++;
+                            } else {
                                 nonExistingColumns.push(x.persistId);
                             }
                         });
 
+                        // We save the "bad" columns from the server as we need them to correctly calculate the version in the frontend
                         $window.localStorage.setItem(nonExistingOrganizationalConfigurationColumnsKey, JSONfn.stringify(nonExistingColumns));
 
                         if (columnsBeingSet === 0) {
                             badOrganizationalConfigExists = true;
-                            removeOrgConfig(); // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
+                            // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
+                            removeOrgConfig(); 
                             // We have to make the original columns visible again in order to not break the grid
                             grid.columns.forEach(x => {
                                 x.hidden = gridColumnWidths[x.persistId].originallyHidden;
@@ -236,7 +239,7 @@
             function saveGridStateForSession(options: Kitos.IKendoGridOptions<any>): void {
                 var pickedOptions: IGridSavedState = {};
                 // save filter, sort and page
-                pickedOptions.dataSource = <kendo.data.DataSourceOptions> _.pick(options.dataSource, ["filter", "sort", "page"]);
+                pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort", "page"]);
                 $window.sessionStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
             }
 
@@ -245,16 +248,18 @@
                 if (options) {
                     var pickedOptions: IGridSavedState = {};
                     // save pageSize
-                    pickedOptions.dataSource = <kendo.data.DataSourceOptions> _.pick(options.dataSource, ["pageSize"]);
+                    pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["pageSize"]);
 
                     // save column state - dont use the kendo function for it as it breaks more than it fixes...
                     pickedOptions.columnState = {};
                     for (var i = 0; i < options.columns.length; i++) {
                         var column = options.columns[i];
-                        pickedOptions.columnState[column.persistId] = { index: i, width: <number> column.width, hidden: column.hidden };
+                        pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
                     }
-
+                    
                     $window.localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
+
+                    // We check if the changes causes the grid to deviate from the server configuration
                     if (!isOrgConfigServerVersionEqualToLocalGrid(options)) {
                         $window.localStorage.setItem(locallyChangedKey, locallyChangedValue);
                     } else {
@@ -267,12 +272,12 @@
                 var options = grid.getOptions();
                 var pickedOptions: IGridSavedState = {};
                 // save filter and sort
-                pickedOptions.dataSource = <kendo.data.DataSourceOptions> _.pick(options.dataSource, ["filter", "sort"]);
+                pickedOptions.dataSource = <kendo.data.DataSourceOptions>_.pick(options.dataSource, ["filter", "sort"]);
 
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function getGridVersion(): ng.IPromise<string> { 
+            function getGridVersion(): ng.IPromise<string> {
                 return KendoFilterService
                     .getConfigurationVersion(user.currentOrganizationId, overviewType)
                     .then((result) => {
@@ -295,18 +300,19 @@
                             const version = result.data.response.version;
                             const localVersion = $window.localStorage.getItem(organizationalConfigurationVersionKey);
                             if (localVersion !== version) {
+                                // If no or new version we store the data locally to be reused.
                                 const columns = result.data.response.visibleColumns;
                                 $window.localStorage.setItem(organizationalConfigurationColumnsKey, JSONfn.stringify(columns));
                                 $window.localStorage.setItem(organizationalConfigurationVersionKey, version);
                                 $window.localStorage.removeItem(nonExistingOrganizationalConfigurationColumnsKey);
+                                return true;
                             }
                         }
+                        return false;
                     })
                     .catch((result) => {
-                        if (result.status === 404) {
-                            // Make sure there is no data as we can't find an organizational configuration for the kendo grid.
-                            removeOrgConfig();
-                        }
+                        removeOrgConfig();
+                        return false;
                     });
             }
 
@@ -388,14 +394,14 @@
                 }
 
                 if ($window.localStorage.getItem(organizationalConfigurationColumnsKey) === null) {
-                    return false; 
+                    return false;
                 }
 
                 if (grid === undefined || grid === null) { // The grid is not always initialized the first time this code is called.
                     return false;
                 }
 
-                if (gridLoading) {
+                if (gridLoading) { // If grid is still loading we can't correctly calculate if it is deviating
                     return false;
                 }
 
@@ -421,7 +427,7 @@
                     var nonExistingColumns = <string[]>JSONfn.parse(nonExistingColumnsItem, true);
                     gridColumnsPersistIds.pushArray(nonExistingColumns);
                 }
-                
+
                 return sha256(gridColumnsPersistIds.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase())).join(""));
             }
 
@@ -431,7 +437,7 @@
                 if (!localStorageItem) {
                     return false;
                 }
-                var localColumns = <IGridSavedState> JSONfn.parse(localStorageItem, true);
+                var localColumns = <IGridSavedState>JSONfn.parse(localStorageItem, true);
 
                 var orgStorageColumnsItem = $window.localStorage.getItem(organizationalConfigurationColumnsKey);
                 if (orgStorageColumnsItem) {
@@ -440,7 +446,7 @@
                     var numberOfVisibleLocalColumnStates = 0;
                     _.forEach(localColumns.columnState, (state, key) => {
                         if (!state.hidden) {
-                            numberOfVisibleLocalColumnStates ++;
+                            numberOfVisibleLocalColumnStates++;
                         }
                     });
 
@@ -456,6 +462,7 @@
             }
 
             function canDeleteGridOrganizationalConfiguration() {
+                // As we remove the bad configurations from the local storage, we use this flag to allow admins to delete a bad configuration.
                 if (badOrganizationalConfigExists) {
                     return true;
                 }
@@ -463,7 +470,7 @@
             }
 
 
-           function loadGrid(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters) {
+            function loadGrid(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters) {
                 var gridId = grid.element[0].id;
                 var storedState = getStoredOptions(grid);
                 var columnState = <IGridSavedState>_.pick(storedState, "columnState");
@@ -526,11 +533,11 @@
                         }
                     }
                 });
-               
+
                 grid.setOptions(gridOptions);
-               grid.dataSource.pageSize(grid.dataSource.options.pageSize);
-               gridLoading = false;
-           }
+                grid.dataSource.pageSize(grid.dataSource.options.pageSize);
+                gridLoading = false;
+            }
         }
     }
 
