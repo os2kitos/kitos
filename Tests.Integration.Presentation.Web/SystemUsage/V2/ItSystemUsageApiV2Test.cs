@@ -467,15 +467,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(freshReadDTO.General.AssociatedProjects);
         }
 
-        [Theory]
-        public async Task Can_POST_With_OrganizationalUsage(bool withResponsible)
-        {
-            //Arrange
+        //[Theory]
+        //public async Task Can_POST_With_OrganizationalUsage(bool withResponsible)
+        //{
+        //    //Arrange
 
-            //Act
+        //    //Act
 
-            //Assert
-        }
+        //    //Assert
+        //}
 
         private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
         {
