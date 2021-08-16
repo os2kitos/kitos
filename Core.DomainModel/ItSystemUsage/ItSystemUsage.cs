@@ -632,7 +632,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
 
-            ResetOrganizationalUsage(); //TODO: Must be verified in test that this actually works as expected! - it may have to be deleted
+            ResetOrganizationalUsage();
 
             var itSystemUsageOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage()
             {
