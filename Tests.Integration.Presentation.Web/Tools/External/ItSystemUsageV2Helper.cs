@@ -91,5 +91,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/general"), token, dto);
         }
+
+        public static async Task<HttpResponseMessage> SendPutOrganizationalUsage(string token, Guid uuid, OrganizationUsageWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/organization-usage"), token, dto);
+        }
     }
 }

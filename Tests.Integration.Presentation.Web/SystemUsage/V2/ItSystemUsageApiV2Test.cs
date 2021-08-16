@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -467,23 +468,132 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(freshReadDTO.General.AssociatedProjects);
         }
 
-        //[Theory]
-        //public async Task Can_POST_With_OrganizationalUsage(bool withResponsible)
-        //{
-        //    //Arrange
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_POST_With_OrganizationalUsage(bool withResponsible)
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
 
-        //    //Act
+            var units = new[] { unit1, unit2, unit3 }.OrderBy(x => A<int>()).Take(2).ToList();
+            var responsible = units.First();
 
-        //    //Assert
-        //}
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, organizationalUsageSection: new OrganizationUsageWriteRequestDTO()
+            {
+                UsingOrganizationUnitUuids = units.Select(x => x.Uuid).ToList(),
+                ResponsibleOrganizationUnitUuid = withResponsible ? responsible.Uuid : null
+            }));
 
-        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, units, responsible);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_OrganizationalUsage()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Act
+            using var modificationResponse1 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid },
+                    ResponsibleOrganizationUnitUuid = unit2.Uuid
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse1.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, unit2);
+
+            //Act - swap one unit as well as responsible
+            using var modificationResponse2 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit3.Uuid },
+                    ResponsibleOrganizationUnitUuid = unit3.Uuid
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse2.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit3 }, unit3);
+
+            //Act - reset all
+            using var modificationResponse3 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO());
+            Assert.Equal(HttpStatusCode.OK, modificationResponse3.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, Enumerable.Empty<OrgUnitDTO>(), null);
+
+            //Act - set using orgs but no responsible
+            using var modificationResponse4 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid }
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse4.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, null);
+        }
+
+        private static async Task AssertOrganizationalUsage(string token, Guid systemUsageUuid, IEnumerable<OrgUnitDTO> expectedUnits, OrgUnitDTO expectedResponsible)
+        {
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, systemUsageUuid);
+            var expectedOrgUnits = expectedUnits
+                .Select(unitDto => new { Uuid = unitDto.Uuid, Name = unitDto.Name })
+                .OrderBy(x => x.Uuid)
+                .ToList();
+
+            var actualOrgUnits = dto
+                .OrganizationUsage
+                .UsingOrganizationUnits
+                .Select(x => new { Uuid = x.Uuid, Name = x.Name })
+                .OrderBy(x => x.Uuid)
+                .ToList();
+
+            Assert.Equal(expectedOrgUnits, actualOrgUnits);
+            if (expectedResponsible != null)
+            {
+                Assert.NotNull(dto.OrganizationUsage.ResponsibleOrganizationUnit);
+                Assert.Equal(expectedResponsible.Uuid, dto.OrganizationUsage.ResponsibleOrganizationUnit.Uuid);
+                Assert.Equal(expectedResponsible.Name, dto.OrganizationUsage.ResponsibleOrganizationUnit.Name);
+            }
+            else
+            {
+                Assert.Null(dto.OrganizationUsage.ResponsibleOrganizationUnit);
+            }
+        }
+
+        private static CreateItSystemUsageRequestDTO CreatePostRequest(
+            Guid organizationId,
+            Guid systemId,
+            GeneralDataWriteRequestDTO generalSection = null,
+            OrganizationUsageWriteRequestDTO organizationalUsageSection = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
                 OrganizationUuid = organizationId,
                 SystemUuid = systemId,
-                General = generalSection
+                General = generalSection,
+                OrganizationUsage = organizationalUsageSection
             };
         }
 
