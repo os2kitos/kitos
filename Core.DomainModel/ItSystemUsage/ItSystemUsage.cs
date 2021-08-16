@@ -548,7 +548,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetMainContract()
         {
-            MainContract?.Track(); //TODO: Must be verified - may have to be deleted manually because it is it's own entity
+            MainContract?.Track();
             MainContract = null;
         }
 

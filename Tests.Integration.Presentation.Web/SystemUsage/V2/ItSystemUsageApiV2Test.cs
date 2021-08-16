@@ -402,6 +402,29 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(contract.Name, freshReadDTO.General.MainContract.Name);
         }
 
+        [Fact]
+        public async Task Can_PUT_Reset_MainContract()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
+            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()); //Reset main contract
+            Assert.Equal(HttpStatusCode.OK, resetResponse.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Null(freshReadDTO.General.MainContract);
+        }
+
         private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
         {
             return new CreateItSystemUsageRequestDTO
