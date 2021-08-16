@@ -92,11 +92,6 @@
                     return null;
                 }
 
-                if ($window.localStorage.getItem(locallyChangedKey)) {
-                    // User has at some point made local changes so we don't override these until the user resets to default settings
-                    return null;
-                }
-
                 return getGridVersion().then((result) => {
                     if (result !== null && result !== $window.localStorage.getItem(organizationalConfigurationVersionKey)) {
                         return getGridOrganizationalConfiguration();
