@@ -613,7 +613,7 @@ namespace Core.DomainModel.ItSystemUsage
         public void ResetOrganizationalUsage()
         {
             UsedBy.Clear();
-            ResponsibleUsage.Track(); 
+            ResponsibleUsage.Track();
             ResponsibleUsage = null;
         }
 
@@ -625,6 +625,9 @@ namespace Core.DomainModel.ItSystemUsage
 
             if (organizationUnits.Any(x => x.OrganizationId != OrganizationId))
                 return new OperationError("Using Organization units must belong to the same organization as the system usage", OperationFailure.BadInput);
+
+            if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
+                return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
 
             if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
