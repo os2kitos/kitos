@@ -43,6 +43,7 @@ namespace Core.DomainServices.Repositories.Kendo
         public void DeleteColumns(KendoOrganizationalConfiguration configWithColumnsToBeDeleted)
         {
             _columnRepository.RemoveRange(configWithColumnsToBeDeleted.VisibleColumns);
+            configWithColumnsToBeDeleted.VisibleColumns.Clear();
             _columnRepository.Save();
         }
     }

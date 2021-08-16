@@ -100,7 +100,6 @@ namespace Core.ApplicationServices
 
         private Result<KendoOrganizationalConfiguration, OperationError> CreateConfig(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
-
             var createdConfig = KendoOrganizationalConfiguration.CreateConfiguration(organizationId, overviewType);
             createdConfig.AddColumns(columns);
             var created = _kendoOrganizationRepository.Add(createdConfig);

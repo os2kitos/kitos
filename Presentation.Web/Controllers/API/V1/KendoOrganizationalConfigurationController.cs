@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,7 +7,6 @@ using Core.ApplicationServices;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -52,13 +50,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetConfiguration([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
+        public HttpResponseMessage GetConfiguration([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .Get(organizationId.Value, overviewType.Value)
+                .Get(organizationId, overviewType)
                 .Match(value => Ok(Map(value)), FromOperationError);
         }
 
@@ -67,13 +65,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<string>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetConfigurationVersion([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
+        public HttpResponseMessage GetConfigurationVersion([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .Get(organizationId.Value, overviewType.Value)
+                .Get(organizationId, overviewType)
                 .Select(x => x.Version)
                 .Match(Ok, FromOperationError);
         }
@@ -83,13 +81,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteConfiguration([FromUri][Required] int? organizationId, [FromUri][Required] OverviewType? overviewType)
+        public HttpResponseMessage DeleteConfiguration([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .Delete(organizationId.Value, overviewType.Value)
+                .Delete(organizationId, overviewType)
                 .Match(_ => Ok(), FromOperationError);
         }
 

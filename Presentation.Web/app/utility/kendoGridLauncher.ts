@@ -623,13 +623,13 @@ module Kitos.Utility.KendoGrid {
         }
 
         saveGridForOrganization() {
-            if (confirm(`Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
+            if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
                 this.gridState.saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType);
             }
         }
 
         clearGridForOrganization() {
-            if (confirm(`Er du sikker på at du vil slette standard opsætningen af felter til ${this.user.currentOrganizationName}`)) {
+            if (confirm(`Er du sikker på at du vil slette standard kolonneopsætning af felter til ${this.user.currentOrganizationName}`)) {
                 this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
             }
         }
@@ -748,13 +748,13 @@ module Kitos.Utility.KendoGrid {
                 },
                 {
                     name: "filterOrg",
-                    text: "Gem filter for organisation",
-                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem filter for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
+                    text: "Gem kolonneopsætning for organisation",
+                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 },
                 {
                     name: "removeFilterOrg",
-                    text: "Slet filter for organisation",
-                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet filter for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
+                    text: "Slet kolonneopsætning for organisation",
+                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
 

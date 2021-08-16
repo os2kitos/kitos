@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -20,6 +21,9 @@ namespace Core.DomainModel.KendoConfig
 
         public void AddColumns(IEnumerable<KendoColumnConfiguration> newColumns)
         {
+            if (newColumns == null)
+                throw new ArgumentNullException(nameof(newColumns));
+
             newColumns.ToList().ForEach(x =>
             {
                 x.KendoOrganizationalConfigurationId = Id;
@@ -41,7 +45,7 @@ namespace Core.DomainModel.KendoConfig
 
         private string ComputeVersion()
         {
-            var visibleColumnsAsString = string.Join("", VisibleColumns.OrderBy(x => x.PersistId).Select(x => x.PersistId));
+            var visibleColumnsAsString = string.Join("", VisibleColumns.OrderBy(x => x.PersistId.ToLower()).Select(x => x.PersistId));
             return Hash(visibleColumnsAsString);
         }
 

@@ -116,10 +116,10 @@
             function loadGridOptions(grid: Kitos.IKendoGrid<any>, initialFilter?: kendo.data.DataSourceFilters): void {
                 // load grid immediately from local storage data
                 loadGrid(grid, initialFilter);
-                
+
                 // Check with server if grid has updates, and apply them if needed
                 checkServerGridConfig(overviewType).then(
-                    (remoteConfigurationSaved : boolean) => {
+                    (remoteConfigurationSaved: boolean) => {
                         //Reload the grid if the server had changes, after these changes are saved locally.
                         if (remoteConfigurationSaved) {
                             loadGrid(grid, initialFilter);
@@ -175,7 +175,7 @@
                     options = <IGridSavedState>_.merge({}, localOptions, profileOptions);
                 }
                 else if (localOptions) {
-                    options = <IGridSavedState> localOptions;
+                    options = <IGridSavedState>localOptions;
                 }
 
 
@@ -220,7 +220,7 @@
                         if (columnsBeingSet === 0) {
                             badOrganizationalConfigExists = true;
                             // Remove the saved data from the server as the grid don't have any similar fields and is therefore invalid.
-                            removeOrgConfig(); 
+                            removeOrgConfig();
                             // We have to make the original columns visible again in order to not break the grid
                             grid.columns.forEach(x => {
                                 x.hidden = gridColumnWidths[x.persistId].originallyHidden;
@@ -256,7 +256,7 @@
                         var column = options.columns[i];
                         pickedOptions.columnState[column.persistId] = { index: i, width: <number>column.width, hidden: column.hidden };
                     }
-                    
+
                     $window.localStorage.setItem(storageKey, JSONfn.stringify(pickedOptions));
 
                     // We check if the changes causes the grid to deviate from the server configuration
@@ -277,7 +277,7 @@
                 $window.localStorage.setItem(profileStorageKey, JSONfn.stringify(pickedOptions));
             }
 
-            function getGridVersion(): ng.IPromise<string> {
+            function getGridVersion(): ng.IPromise<string | null> {
                 return KendoFilterService
                     .getConfigurationVersion(user.currentOrganizationId, overviewType)
                     .then((result) => {
@@ -292,13 +292,14 @@
                         });
             }
 
-            function getGridOrganizationalConfiguration() {
+            function getGridOrganizationalConfiguration(): ng.IPromise<boolean> {
                 return KendoFilterService
                     .getConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((result) => {
                         if (result.status === 200) {
                             const version = result.data.response.version;
-                            const localVersion = $window.localStorage.getItem(organizationalConfigurationVersionKey);
+                            const localVersion =
+                                $window.localStorage.getItem(organizationalConfigurationVersionKey);
                             if (localVersion !== version) {
                                 // If no or new version we store the data locally to be reused.
                                 const columns = result.data.response.visibleColumns;
@@ -309,8 +310,7 @@
                             }
                         }
                         return false;
-                    })
-                    .catch((result) => {
+                    }, (error) => {
                         removeOrgConfig();
                         return false;
                     });
@@ -330,13 +330,12 @@
                 KendoFilterService.postConfigurationFromOrg(user.currentOrganizationId, overviewType, columns)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Filtre og sortering gemt for organisationen");
+                            notify.addSuccessMessage("Kolonneopsætningen er gemt for organisationen");
                             $window.localStorage.removeItem(locallyChangedKey);
                             getGridOrganizationalConfiguration(); // Load the newly saved grid
                         }
-                    })
-                    .catch((res) => {
-                        notify.addErrorMessage("Der opstod en fejl i forsøget på at gemme det nye filter");
+                    }, (error) => {
+                        notify.addErrorMessage("Der opstod en fejl i forsøget på at gemme den nye kolonneopsætning");
                     });
             }
 
@@ -344,14 +343,13 @@
                 KendoFilterService.deleteConfigurationFromOrg(user.currentOrganizationId, overviewType)
                     .then((res) => {
                         if (res.status === 200) {
-                            notify.addSuccessMessage("Organisationens gemte filtre og sorteringer er slettet");
+                            notify.addSuccessMessage("Organisationens kolonneopsætningen er slettet");
                             removeSession();
                             removeLocal();
                             $state.go(".", null, { reload: true });
                         }
-                    })
-                    .catch((res) => {
-                        notify.addErrorMessage("Der opstod en fejl i forsøget på at slette det gemte filter");
+                    }, (error) => {
+                        notify.addErrorMessage("Der opstod en fejl i forsøget på at slette den gemte kolonneopsætningen");
                     });
             }
 
