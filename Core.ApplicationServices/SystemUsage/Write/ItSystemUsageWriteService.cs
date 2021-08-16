@@ -15,6 +15,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
+using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -34,6 +35,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IItProjectService _projectService;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
+        private readonly IItSystemUsageRoleAssignmentService _roleAssignmentService;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -45,7 +47,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IItContractService contractService,
             IItProjectService projectService,
             IDomainEvents domainEvents,
-            ILogger logger)
+            ILogger logger, 
+            IItSystemUsageRoleAssignmentService roleAssignmentService)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -57,6 +60,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _projectService = projectService;
             _domainEvents = domainEvents;
             _logger = logger;
+            _roleAssignmentService = roleAssignmentService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -113,7 +117,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.GeneralProperties, PerformRoleAssignmentUpdates));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates));
         }
 
         private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties generalProperties)
@@ -218,9 +222,36 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
 
-        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties newPropertyValues)
+        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, Maybe<UpdatedSystemUsageRoles> usageRoles)
         {
             return itSystemUsage; //TODO: Redefine signature. This method is just here to show how all updates are combined into one
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
+        {
+            if (userRolePairs.IsNone)
+            {
+                return _roleAssignmentService.RemoveAllRoles(systemUsage);
+            }
+
+            var systemUsageRoles = new List<ItSystemRight>();
+            foreach (var userRolePair in userRolePairs.Value)
+            {
+                var role = ;
+                var user = ;
+
+                if (result.Failed)
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+
+                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, role.Id, user.Id);
+
+                if (assignmentResult.Failed)
+                    return assignmentResult.Error;
+
+                systemUsageRoles.Add(assignmentResult.Value);
+            }
+
+            return systemUsage;
         }
 
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
