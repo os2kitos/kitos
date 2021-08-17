@@ -595,7 +595,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (itProjects.Any(project => project.OrganizationId != OrganizationId))
                 return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
 
-            itProjects.MergeInto(ItProjects, p => p.Uuid);
+            itProjects.MirrorTo(ItProjects, p => p.Uuid);
 
             return Maybe<OperationError>.None;
         }
@@ -645,7 +645,7 @@ namespace Core.DomainModel.ItSystemUsage
                 OrganizationUnit = organizationUnit
             }).ToList();
 
-            newOrgUnitUsages.MergeInto(UsedBy, usedBy => usedBy.OrganizationUnit.Uuid);
+            newOrgUnitUsages.MirrorTo(UsedBy, usedBy => usedBy.OrganizationUnit.Uuid);
 
             ResponsibleUsage = responsibleOrgUnit
                 .Select(orgUnit => UsedBy.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
@@ -685,8 +685,8 @@ namespace Core.DomainModel.ItSystemUsage
             if (optOutIds.Any(id => systemTaskRefIds.Contains(id) == false))
                 return new OperationError("Cannot Remove KLE which is not present in the system context", OperationFailure.BadInput);
 
-            optIn.MergeInto(TaskRefs, x => x.Uuid);
-            optOut.MergeInto(TaskRefsOptOut, x => x.Uuid);
+            optIn.MirrorTo(TaskRefs, x => x.Uuid);
+            optOut.MirrorTo(TaskRefsOptOut, x => x.Uuid);
 
             return Maybe<OperationError>.None;
         }

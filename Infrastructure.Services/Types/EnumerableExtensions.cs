@@ -12,10 +12,28 @@ namespace Infrastructure.Services.Types
             Removed
         }
 
+        /// <summary>
+        /// Computes the deltas between two collections of unique items
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TIdentity"></typeparam>
+        /// <param name="currentCollectionState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
+        /// <param name="nextCollectionState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
+        /// <param name="withIdentity"></param>
+        /// <returns></returns>
         public static IEnumerable<(EnumerableDelta delta, T item)> ComputeDelta<T, TIdentity>(this IEnumerable<T> currentCollectionState, IEnumerable<T> nextCollectionState, Func<T, TIdentity> withIdentity)
         {
-            var newState = nextCollectionState.ToDictionary(withIdentity);
-            var existingState = currentCollectionState.ToDictionary(withIdentity);
+            var next = nextCollectionState.ToList();
+            var current = currentCollectionState.ToList();
+
+            if (next.Select(withIdentity).Distinct().Count() != next.Count)
+                throw new ArgumentException("Duplicates are not supported", nameof(nextCollectionState));
+
+            if (current.Select(withIdentity).Distinct().Count() != current.Count)
+                throw new ArgumentException("Duplicates are not supported", nameof(nextCollectionState));
+
+            var newState = next.ToDictionary(withIdentity);
+            var existingState = current.ToDictionary(withIdentity);
 
             //Compute removals
             var removals = existingState
@@ -53,8 +71,15 @@ namespace Infrastructure.Services.Types
                 }
             }
         }
-
-        public static void MergeInto<T, TIdentity>(this IEnumerable<T> newState, ICollection<T> existingState, Func<T, TIdentity> withIdentity)
+        /// <summary>
+        /// Applies a new representation of <see cref="existingState"/> and performs additions/removals into from <see cref="newState"/> into <see cref="existingState"/>
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TIdentity">This is used to extract the identity of the source type iow. the value derived from the instance which can be used to distinguish it from other instances of the same type.</typeparam>
+        /// <param name="newState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
+        /// <param name="existingState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
+        /// <param name="withIdentity"></param>
+        public static void MirrorTo<T, TIdentity>(this IEnumerable<T> newState, ICollection<T> existingState, Func<T, TIdentity> withIdentity)
         {
             existingState
                 .ComputeDelta(newState, withIdentity)
