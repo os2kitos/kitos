@@ -52,8 +52,10 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
+    <Compile Include="KendoConfig\OverviewType.cs" />
     <Compile Include="Shared\RelatedEntityType.cs" />
     <Compile Include="ArchiveDutyRecommendationTypes.cs" />
     <Compile Include="ArchiveDutyTypes.cs" />
@@ -114,7 +116,7 @@
     <Compile Include="ItSystem\RelationFrequencyType.cs" />
     <Compile Include="ItSystem\ArchivePeriod.cs" />
     <Compile Include="ItSystemUsage\RegisterType.cs" />
-    <Compile Include="KendoOrganizationalConfiguration.cs" />
+    <Compile Include="KendoConfig\KendoOrganizationalConfiguration.cs" />
     <Compile Include="KLE\KLEChange.cs" />
     <Compile Include="KLE\KLEChangeType.cs" />
     <Compile Include="KLE\KLEMostRecent.cs" />

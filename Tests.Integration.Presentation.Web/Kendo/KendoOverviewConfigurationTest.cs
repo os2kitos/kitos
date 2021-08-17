@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -17,17 +19,53 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var config = A<string>();
+            var columns = CreateColumnConfigurations();
 
             //Act
-            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
             Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
             Assert.Equal(overviewType, kendoConfig.OverviewType);
-            Assert.Equal(config, kendoConfig.Configuration);
+            columns.ForEach(x =>
+            {
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
+            });
+        }
+
+        [Fact]
+        public async Task Can_Update_Configuration()
+        {
+            //Arrange
+            var overviewType = A<OverviewType>();
+            var columns = CreateColumnConfigurations();
+            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
+            Assert.Equal(overviewType, kendoConfig.OverviewType);
+            columns.ForEach(x =>
+            {
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
+            });
+
+            var newColumns = CreateColumnConfigurations();
+
+            //Act
+            using var updateResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, newColumns);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
+            var updatedKendoConfig = await updateResponse.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, updatedKendoConfig.OrganizationId);
+            Assert.Equal(overviewType, updatedKendoConfig.OverviewType);
+            newColumns.ForEach(x =>
+            {
+                Assert.Contains(x.PersistId, updatedKendoConfig.VisibleColumns.Select(y => y.PersistId));
+            });
+
         }
 
         [Fact]
@@ -35,9 +73,9 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var config = A<string>();
+            var columns = CreateColumnConfigurations();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
@@ -48,7 +86,10 @@ namespace Tests.Integration.Presentation.Web.Kendo
             var kendoConfig = await response.ReadResponseBodyAsKitosApiResponseAsync<KendoOrganizationalConfigurationDTO>();
             Assert.Equal(TestEnvironment.DefaultOrganizationId, kendoConfig.OrganizationId);
             Assert.Equal(overviewType, kendoConfig.OverviewType);
-            Assert.Equal(config, kendoConfig.Configuration);
+            columns.ForEach(x =>
+            {
+                Assert.Contains(x.PersistId, kendoConfig.VisibleColumns.Select(y => y.PersistId));
+            });
         }
 
         [Fact]
@@ -56,9 +97,8 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var config = A<string>();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
@@ -88,11 +128,11 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var config = A<string>();
+            var columns = CreateColumnConfigurations();
             var cookie = await HttpApi.GetCookieAsync(orgRole);
 
             //Act
-            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config, cookie);
+            using var response = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -118,8 +158,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var config = A<string>();
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, config);
+            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             var cookie = await HttpApi.GetCookieAsync(orgRole);
@@ -129,6 +168,21 @@ namespace Tests.Integration.Presentation.Web.Kendo
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        public List<KendoColumnConfigurationDTO> CreateColumnConfigurations()
+        {
+            return new List<KendoColumnConfigurationDTO>()
+            {
+                new KendoColumnConfigurationDTO()
+                {
+                    PersistId = A<string>()
+                },
+                new KendoColumnConfigurationDTO()
+                {
+                    PersistId = A<string>()
+                }
+            };
         }
     }
 }

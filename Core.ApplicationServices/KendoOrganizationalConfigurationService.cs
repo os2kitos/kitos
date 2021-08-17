@@ -2,6 +2,10 @@
 using Core.DomainModel;
 using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Kendo;
+using System.Collections.Generic;
+using System.Data;
+using Core.DomainModel.KendoConfig;
+using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices
 {
@@ -9,51 +13,66 @@ namespace Core.ApplicationServices
     {
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IKendoOrganizationalConfigurationRepository _kendoOrganizationRepository;
+        private readonly ITransactionManager _transactionManager;
+
         public KendoOrganizationalConfigurationService(
-            IAuthorizationContext authorizationContext, 
-            IKendoOrganizationalConfigurationRepository kendoOrganizationRepository)
+            IAuthorizationContext authorizationContext,
+            IKendoOrganizationalConfigurationRepository kendoOrganizationRepository,
+            ITransactionManager transactionManager)
         {
             _authorizationContext = authorizationContext;
             _kendoOrganizationRepository = kendoOrganizationRepository;
+            _transactionManager = transactionManager;
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationError> Get(int organizationId, OverviewType overviewType)
+        public Result<KendoOrganizationalConfiguration, OperationError> Get(int organizationId,
+            OverviewType overviewType)
         {
             var config = _kendoOrganizationRepository.Get(organizationId, overviewType);
-            return config.HasValue
+
+            if (config.IsNone)
+            {
+                return new OperationError(OperationFailure.NotFound);
+            }
+
+            return _authorizationContext.AllowReads(config.Value)
                 ? config.Value
-                : Result<KendoOrganizationalConfiguration, OperationError>.Failure(OperationFailure.NotFound);
+                : new OperationError(OperationFailure.Forbidden);
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId, OverviewType overviewType, string configuration)
+        public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId,
+            OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
+            var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
             if (currentConfig.HasValue)
             {
-                var modifiedConfig = currentConfig.Value;
-                if (!_authorizationContext.AllowModify(modifiedConfig))
+                var configToUpdate = currentConfig.Value;
+                if (!_authorizationContext.AllowModify(configToUpdate))
+                {
+                    transaction.Rollback();
                     return new OperationError(OperationFailure.Forbidden);
+                }
 
-                modifiedConfig.Configuration = configuration;
-                _kendoOrganizationRepository.Update(modifiedConfig);
+                var modifiedConfig = UpdateConfig(configToUpdate, columns);
+                transaction.Commit();
                 return modifiedConfig;
             }
 
             if (!_authorizationContext.AllowCreate<KendoOrganizationalConfiguration>(organizationId))
-                return new OperationError(OperationFailure.Forbidden);
-
-            var createdConfig = new KendoOrganizationalConfiguration
             {
-                OrganizationId = organizationId,
-                OverviewType = overviewType,
-                Configuration = configuration
-            };
-            var created = _kendoOrganizationRepository.Add(createdConfig);
+                transaction.Rollback();
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            var created = CreateConfig(organizationId, overviewType, columns);
+            transaction.Commit();
             return created;
         }
 
-        public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId, OverviewType overviewType)
+        public Result<KendoOrganizationalConfiguration, OperationError> Delete(int organizationId,
+            OverviewType overviewType)
         {
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
@@ -68,6 +87,23 @@ namespace Core.ApplicationServices
             }
 
             return new OperationError(OperationFailure.NotFound);
+        }
+
+        private Result<KendoOrganizationalConfiguration, OperationError> UpdateConfig(
+            KendoOrganizationalConfiguration modifiedConfig, IEnumerable<KendoColumnConfiguration> columns)
+        {
+            _kendoOrganizationRepository.DeleteColumns(modifiedConfig); //Clean-out the old entries
+            modifiedConfig.AddColumns(columns);
+            _kendoOrganizationRepository.Update(modifiedConfig);
+            return modifiedConfig;
+        }
+
+        private Result<KendoOrganizationalConfiguration, OperationError> CreateConfig(int organizationId, OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
+        {
+            var createdConfig = KendoOrganizationalConfiguration.CreateConfiguration(organizationId, overviewType);
+            createdConfig.AddColumns(columns);
+            var created = _kendoOrganizationRepository.Add(createdConfig);
+            return created;
         }
     }
 }
