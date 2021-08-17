@@ -602,9 +602,69 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(withRemovals, potentialRemovals, dto.LocalKLEDeviations.RemovedKLE);
         }
 
+        [Fact]
+        public async Task Can_PUT_KLE()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+
+            var additionalTaskRefs = Many<Guid>(2).ToList();
+            var taskRefsOnSystem = Many<Guid>(3).ToList();
+            var potentialRemovals = taskRefsOnSystem.Take(2).ToList();
+
+            AddTaskRefsInDatabase(additionalTaskRefs.Concat(taskRefsOnSystem));
+            var dbIdsOfSystemTaskRefs = DatabaseAccess.MapFromEntitySet<TaskRef, int[]>(all => all.AsQueryable().Where(s => taskRefsOnSystem.Contains(s.Uuid)).Select(x => x.Id).ToArray());
+
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            foreach (var taskRefId in dbIdsOfSystemTaskRefs)
+            {
+                using var addTaskRefResponse = await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRefId, organization.Id);
+                Assert.Equal(HttpStatusCode.OK, addTaskRefResponse.StatusCode);
+            }
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Act - add one addition
+            using var put1 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs.Take(1) });
+            Assert.Equal(HttpStatusCode.OK, put1.StatusCode);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertKLEDeviation(true, additionalTaskRefs.Take(1), dto.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
+
+            //Act - add another one
+            using var put2 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs });
+            Assert.Equal(HttpStatusCode.OK, put2.StatusCode);
+
+            //Assert
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertKLEDeviation(true, additionalTaskRefs, dto.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
+
+            //Act - remove some
+            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals});
+            Assert.Equal(HttpStatusCode.OK, put3.StatusCode);
+
+            //Assert
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertKLEDeviation(true, additionalTaskRefs, dto.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(true, potentialRemovals, dto.LocalKLEDeviations.RemovedKLE);
+
+            //Act - reset
+            using var put4 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO());
+            Assert.Equal(HttpStatusCode.OK, put4.StatusCode);
+
+            //Assert
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertKLEDeviation(false, null, dto.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
+        }
+
         //TODO: PUT modify
 
-        private static void AssertKLEDeviation(bool withDeviation, List<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
+        private static void AssertKLEDeviation(bool withDeviation, IEnumerable<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
         {
             if (withDeviation)
             {
