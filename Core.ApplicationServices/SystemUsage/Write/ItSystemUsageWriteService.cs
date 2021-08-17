@@ -326,31 +326,43 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
-            // Clean the old roles first 
-            foreach (var systemUsageRight in systemUsage.Rights.ToList())
+            if (userRolePairs.IsNone)
             {
-                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, systemUsageRight.Role.Uuid, systemUsageRight.User.Uuid);
+                // Remove all
+                foreach (var systemUsageRight in systemUsage.Rights.ToList())
+                {
+                    var removeResult = _roleAssignmentService.RemoveRole(systemUsage, systemUsageRight.Role.Uuid, systemUsageRight.User.Uuid);
+                    if (removeResult.Failed)
+                        return removeResult.Error;
+                }
+
+                return systemUsage;
+            }
+
+            // TODO JMO: Test if the model can do the changes and then just manually delete to ones being removed, as this otherwise causes EF exception with child not being deleted.
+
+            // Compare lists to find which needs to be remove and which need to be added
+            var rightsKeys = systemUsage.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+            var userRoleKeys = userRolePairs.Value;
+
+            var toRemove = rightsKeys.Except(userRoleKeys);
+            var toAdd = userRoleKeys.Except(rightsKeys);
+
+            foreach (var userRolePair in toRemove)
+            {
+                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
+
                 if (removeResult.Failed)
                     return removeResult.Error;
             }
 
-            if (userRolePairs.IsNone)
-            {
-                systemUsage.Rights.Clear();
-                return systemUsage;
-            }
-
-            var systemUsageRoles = new List<ItSystemRight>();
-            foreach (var userRolePair in userRolePairs.Value)
+            foreach (var userRolePair in toAdd)
             {
                 var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (assignmentResult.Failed)
                     return assignmentResult.Error;
-
-                systemUsageRoles.Add(assignmentResult.Value);
             }
-            systemUsage.Rights = systemUsageRoles;
 
             return systemUsage;
         }

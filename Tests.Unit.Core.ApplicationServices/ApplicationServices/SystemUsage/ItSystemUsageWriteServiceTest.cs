@@ -727,7 +727,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Failed);
             AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             Assert.Contains("Duplicates in KLE", createResult.Error.Message.GetValueOrFallback(string.Empty));
         }
 
@@ -800,7 +800,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(createResult.Failed);
             AssertTransactionNotCommitted(transactionMock);
             Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot Remove KLE which is not present in the system context",createResult.Error.Message.GetValueOrDefault());
+            Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
         }
 
         private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
@@ -858,7 +858,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
-            
+
             var input = new SystemUsageUpdateParameters()
             {
                 Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
@@ -871,7 +871,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
             ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
- 
+
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
@@ -971,7 +971,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                     UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.Some(Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue())
                 })
             };
-            _roleAssignmentService.Setup(x => x.RemoveRole(It.IsAny<ItSystemUsage>(), It.IsAny<Guid>(), It.IsAny<Guid>())).Returns(createdRight);
+            ExpectRoleRemoveReturns(itSystemUsage, roleUuid, userUuid, createdRight);
             ExpectGetSystemUsageReturns(createResult.Value.Uuid, createResult.Value);
 
             //Act
@@ -1002,7 +1002,24 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectRoleAssignmentReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
         {
-            _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
+            _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Callback(() =>
+            {
+                if (result.Ok)
+                {
+                    itSystemUsage.Rights.Add(result.Value);
+                }
+            }).Returns(result);
+        }
+
+        private void ExpectRoleRemoveReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
+        {
+            _roleAssignmentService.Setup(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid)).Callback(() =>
+            {
+                if (result.Ok)
+                {
+                    itSystemUsage.Rights.Remove(result.Value);
+                }
+            }).Returns(result);
         }
 
         private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
