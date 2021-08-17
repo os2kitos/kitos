@@ -502,7 +502,13 @@ namespace Core.DomainModel.ItSystemUsage
 
         public Maybe<OperationError> UpdateSystemCategories(ItSystemCategories newValue)
         {
-            ItSystemCategories = newValue ?? throw new ArgumentNullException(nameof(newValue));
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ItSystemCategories == null || ItSystemCategories.Id != newValue.Id)
+            {
+                ItSystemCategories = newValue;
+            }
 
             return Maybe<OperationError>.None;
         }
@@ -557,16 +563,19 @@ namespace Core.DomainModel.ItSystemUsage
             if (contract == null)
                 throw new ArgumentNullException(nameof(contract));
 
-            if (contract.OrganizationId != OrganizationId)
-                return new OperationError("Contract must belong to same organization as this usage", OperationFailure.BadInput);
+            if (MainContract == null || contract.Id != MainContract.ItContractId)
+            {
+                if (contract.OrganizationId != OrganizationId)
+                    return new OperationError("Contract must belong to same organization as this usage", OperationFailure.BadInput);
 
-            var contractAssociation = Contracts.FirstOrDefault(c => c.ItContractId == contract.Id);
+                var contractAssociation = Contracts.FirstOrDefault(c => c.ItContractId == contract.Id);
 
-            if (contractAssociation == null)
-                return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
+                if (contractAssociation == null)
+                    return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
 
-            ResetMainContract();
-            MainContract = contractAssociation;
+                ResetMainContract();
+                MainContract = contractAssociation;
+            }
 
             return Maybe<OperationError>.None;
         }
@@ -586,9 +595,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (itProjects.Any(project => project.OrganizationId != OrganizationId))
                 return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
 
-            ResetProjectAssociations();
-
-            itProjects.ForEach(ItProjects.Add);
+            itProjects.MirrorTo(ItProjects, p => p.Uuid);
 
             return Maybe<OperationError>.None;
         }
@@ -632,18 +639,54 @@ namespace Core.DomainModel.ItSystemUsage
             if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
                 return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
 
-            ResetOrganizationalUsage();
-
-            var itSystemUsageOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage()
+            var newOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage
             {
                 ItSystemUsage = this,
                 OrganizationUnit = organizationUnit
             }).ToList();
 
-            itSystemUsageOrgUnitUsages.ForEach(UsedBy.Add);
+            newOrgUnitUsages.MirrorTo(UsedBy, usedBy => usedBy.OrganizationUnit.Uuid);
+
             ResponsibleUsage = responsibleOrgUnit
-                .Select(orgUnit => itSystemUsageOrgUnitUsages.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
+                .Select(orgUnit => UsedBy.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
                 .GetValueOrDefault();
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
+        {
+            if (additions == null)
+                throw new ArgumentNullException(nameof(additions));
+
+            if (removals == null)
+                throw new ArgumentNullException(nameof(removals));
+
+            var optIn = additions.ToList();
+            var optOut = removals.ToList();
+
+            var optInIds = optIn.Select(x => x.Uuid).Distinct().ToList();
+            var optOutIds = optOut.Select(x => x.Uuid).Distinct().ToList();
+
+            if (optInIds.Count != optIn.Count)
+                return new OperationError("Duplicates in KLE Additions are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Count != optOut.Count)
+                return new OperationError("Duplicates in KLE Removals are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Intersect(optInIds).Any())
+                return new OperationError("KLE cannot be both added and removed", OperationFailure.BadInput);
+
+            var systemTaskRefIds = ItSystem.TaskRefs.Select(x => x.Uuid).ToHashSet();
+
+            if (optInIds.Any(systemTaskRefIds.Contains))
+                return new OperationError("Cannot ADD KLE which is already present in the system context", OperationFailure.BadInput);
+
+            if (optOutIds.Any(id => systemTaskRefIds.Contains(id) == false))
+                return new OperationError("Cannot Remove KLE which is not present in the system context", OperationFailure.BadInput);
+
+            optIn.MirrorTo(TaskRefs, x => x.Uuid);
+            optOut.MirrorTo(TaskRefsOptOut, x => x.Uuid);
 
             return Maybe<OperationError>.None;
         }
