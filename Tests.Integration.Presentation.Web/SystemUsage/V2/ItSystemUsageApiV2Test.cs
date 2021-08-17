@@ -1,20 +1,27 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.ItSystem;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -544,7 +551,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act - set using orgs but no responsible
             using var modificationResponse4 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
-                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO
                 {
                     UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid }
                 });
@@ -552,6 +559,104 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, null);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        public async Task Can_POST_With_KLE_Deviations(bool withAdditions, bool withRemovals)
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+
+            var additionalTaskRefs = Many<Guid>(2).ToList();
+            var taskRefsOnSystem = Many<Guid>(3).ToList();
+            var potentialRemovals = taskRefsOnSystem.Take(2).ToList();
+
+            AddTaskRefsInDatabase(additionalTaskRefs.Concat(taskRefsOnSystem));
+            var dbIdsOfSystemTaskRefs = DatabaseAccess.MapFromEntitySet<TaskRef, int[]>(all => all.AsQueryable().Where(s => taskRefsOnSystem.Contains(s.Uuid)).Select(x => x.Id).ToArray());
+
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            foreach (var taskRefId in dbIdsOfSystemTaskRefs)
+            {
+                using var addTaskRefResponse = await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRefId, organization.Id);
+                Assert.Equal(HttpStatusCode.OK, addTaskRefResponse.StatusCode);
+            }
+
+            var request = CreatePostRequest(organization.Uuid, system.Uuid, kleDeviationsRequest: new LocalKLEDeviationsRequestDTO
+            {
+                AddedKLEUuids = withAdditions ? additionalTaskRefs : null,
+                RemovedKLEUuids = withRemovals ? potentialRemovals : null
+            });
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertKLEDeviation(withAdditions, additionalTaskRefs, dto.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(withRemovals, potentialRemovals, dto.LocalKLEDeviations.RemovedKLE);
+        }
+
+        //TODO: PUT modify
+
+        private static void AssertKLEDeviation(bool withDeviation, List<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
+        {
+            if (withDeviation)
+            {
+                Assert.Equal(expectedDeviation.OrderBy(uuid => uuid),
+                    actualDeviation.Select(x => x.Uuid).OrderBy(uuid => uuid));
+            }
+            else
+                Assert.Empty(actualDeviation);
+        }
+
+        private int TaskKeyIndex = 0;
+        private readonly object TaskKeyLock = new object();
+
+        private string ReserveKey()
+        {
+            const string prefix = "V2:";
+            lock (TaskKeyLock)
+            {
+                bool exists;
+                string currentKey;
+                do
+                {
+                    currentKey = $"{prefix}{TaskKeyIndex++}";
+                    var matchKey = currentKey;
+                    exists = DatabaseAccess.MapFromEntitySet<TaskRef, bool>(all => all.AsQueryable().Any(taskRef => taskRef.TaskKey == matchKey));
+                } while (exists);
+
+                return currentKey;
+            }
+        }
+
+        private void AddTaskRefsInDatabase(IEnumerable<Guid> idsOfTaskRefsToAdd)
+        {
+            var uuidToKeys = idsOfTaskRefsToAdd.ToDictionary(id => id, _ => ReserveKey());
+
+            var orgUnitId = DatabaseAccess.MapFromEntitySet<OrganizationUnit, int>(all => all.AsQueryable().First().Id);
+            DatabaseAccess.MutateEntitySet<TaskRef>(all =>
+            {
+                var taskRefs = uuidToKeys
+                    .Keys
+                    .Select(uuid => new TaskRef
+                    {
+                        Uuid = uuid,
+                        Description = A<string>(),
+                        TaskKey = uuidToKeys[uuid],
+                        OwnedByOrganizationUnitId = orgUnitId,
+                        ObjectOwnerId = TestEnvironment.DefaultUserId,
+                        LastChangedByUserId = TestEnvironment.DefaultUserId
+                    })
+                    .ToList();
+                all.AddRange(taskRefs);
+            });
         }
 
         private static async Task AssertOrganizationalUsage(string token, Guid systemUsageUuid, IEnumerable<OrgUnitDTO> expectedUnits, OrgUnitDTO expectedResponsible)
@@ -586,14 +691,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Guid organizationId,
             Guid systemId,
             GeneralDataWriteRequestDTO generalSection = null,
-            OrganizationUsageWriteRequestDTO organizationalUsageSection = null)
+            OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
+            LocalKLEDeviationsRequestDTO kleDeviationsRequest = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
                 OrganizationUuid = organizationId,
                 SystemUuid = systemId,
                 General = generalSection,
-                OrganizationUsage = organizationalUsageSection
+                OrganizationUsage = organizationalUsageSection,
+                LocalKleDeviations = kleDeviationsRequest
             };
         }
 
