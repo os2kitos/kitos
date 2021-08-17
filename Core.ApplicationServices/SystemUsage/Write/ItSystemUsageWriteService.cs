@@ -234,13 +234,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
             // Clean the old roles first 
             foreach (var systemUsageRight in systemUsage.Rights.ToList())
             {
-                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, systemUsageRight.RoleId, systemUsageRight.UserId);
+                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, systemUsageRight.Role.Uuid, systemUsageRight.User.Uuid);
                 if (removeResult.Failed)
                     return removeResult.Error;
             }
 
             if (userRolePairs.IsNone)
             {
+                systemUsage.Rights.Clear();
                 return systemUsage;
             }
 
@@ -254,6 +255,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
                 systemUsageRoles.Add(assignmentResult.Value);
             }
+            systemUsage.Rights = systemUsageRoles;
 
             return systemUsage;
         }
