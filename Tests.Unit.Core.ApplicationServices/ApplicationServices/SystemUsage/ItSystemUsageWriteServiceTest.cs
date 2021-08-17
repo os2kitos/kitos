@@ -6,6 +6,7 @@ using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -37,7 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IOptionsService<ItSystemUsage, ItSystemCategories>> _systemCatategoriesOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItSystemUsage, ItSystemCategories>> _systemCatagoriesOptionsServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
         private readonly Mock<IItProjectService> _projectServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
@@ -50,14 +51,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemServiceMock = new Mock<IItSystemService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _systemCatategoriesOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ItSystemCategories>>();
+            _systemCatagoriesOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ItSystemCategories>>();
             _contractServiceMock = new Mock<IItContractService>();
             _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
-                _systemCatategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _domainEventsMock.Object, Mock.Of<ILogger>());
+                _systemCatagoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
+                Mock.Of<IKLEApplicationService>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -603,7 +604,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transactionMock);
         }
 
@@ -750,7 +751,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectGetItSystemCategoryReturns(int organizationId, Guid dataClassificationId, Maybe<(ItSystemCategories, bool)> result)
         {
-            _systemCatategoriesOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, dataClassificationId)).Returns(result);
+            _systemCatagoriesOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, dataClassificationId)).Returns(result);
         }
 
         private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)

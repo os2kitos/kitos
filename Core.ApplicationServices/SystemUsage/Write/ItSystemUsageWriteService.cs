@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Security.AccessControl;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
@@ -34,6 +34,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOptionsService<ItSystemUsage, ItSystemCategories> _systemCategoriesOptionsService;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
+        private readonly IKLEApplicationService _kleApplicationService;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
 
@@ -46,6 +47,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ItSystemCategories> systemCategoriesOptionsService,
             IItContractService contractService,
             IItProjectService projectService,
+            IKLEApplicationService kleApplicationService,
             IDomainEvents domainEvents,
             ILogger logger)
         {
@@ -57,6 +59,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _systemCategoriesOptionsService = systemCategoriesOptionsService;
             _contractService = contractService;
             _projectService = projectService;
+            _kleApplicationService = kleApplicationService;
             _domainEvents = domainEvents;
             _logger = logger;
         }
@@ -115,7 +118,43 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformKLEUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageKLEDeviationParameters changes)
+        {
+            if (changes.AddedKLEUuids.HasValue || changes.RemovedKLEUuids.HasValue)
+            {
+                var addedTaskRefs = MapOptionalChangeWithFallback(changes.AddedKLEUuids, systemUsage.TaskRefs.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
+                var removedTaskRefs = MapOptionalChangeWithFallback(changes.RemovedKLEUuids, systemUsage.TaskRefsOptOut.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
+
+                var additions = new List<TaskRef>();
+                foreach (var uuid in addedTaskRefs)
+                {
+                    var result = _kleApplicationService.GetKle(uuid);
+                    if (result.Failed)
+                    {
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                    }
+                    additions.Add(result.Value.kle);
+                }
+
+                var removals = new List<TaskRef>();
+                foreach (var uuid in removedTaskRefs)
+                {
+                    var result = _kleApplicationService.GetKle(uuid);
+                    if (result.Failed)
+                    {
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                    }
+                    removals.Add(result.Value.kle);
+                }
+
+                return systemUsage.UpdateLocalKLE(additions, removals).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+            }
+
+            return systemUsage;
         }
 
         private Result<ItSystemUsage, OperationError> PerformOrganizationalUsageUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageOrganizationalUseParameters updatedParameters)

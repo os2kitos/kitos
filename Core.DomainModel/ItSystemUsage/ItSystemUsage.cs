@@ -653,5 +653,24 @@ namespace Core.DomainModel.ItSystemUsage
 
             return Maybe<OperationError>.None;
         }
+
+        public Maybe<OperationError> UpdateLocalKLE(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
+        {
+            if (additions == null)
+                throw new ArgumentNullException(nameof(additions));
+
+            if (removals == null)
+                throw new ArgumentNullException(nameof(removals));
+
+            /*
+             * * Handled in system usage:
+             *   * - No duplicates
+                 * - No intersections of collections
+                 * - Additions must not be in system context
+                 * - Removals must be in system context
+            *
+            */
+            throw new NotImplementedException();
+        }
     }
 }
