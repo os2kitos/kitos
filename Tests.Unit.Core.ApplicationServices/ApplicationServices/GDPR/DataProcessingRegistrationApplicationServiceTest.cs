@@ -17,6 +17,7 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -31,7 +32,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingRegistrationRepository> _repositoryMock;
         private readonly Mock<IDataProcessingRegistrationNamingService> _namingServiceMock;
-        private readonly Mock<IDataProcessingRegistrationRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>> _roleAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataResponsibleAssignmentService> _dataResponsibleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
@@ -49,7 +50,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _namingServiceMock = new Mock<IDataProcessingRegistrationNamingService>();
-            _roleAssignmentServiceMock = new Mock<IDataProcessingRegistrationRoleAssignmentsService>();
+            _roleAssignmentServiceMock = new Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>>();
             _dataResponsibleAssignmentServiceMock = new Mock<IDataProcessingRegistrationDataResponsibleAssignmentService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();

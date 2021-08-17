@@ -200,7 +200,7 @@
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataResponsibleAssigmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationNamingServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationOversightOptionsAssignmentServiceTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationRoleAssignmentsServiceTest.cs" />
+    <Compile Include="DomainServices\Role\RoleAssignmentsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationOptionRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />

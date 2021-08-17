@@ -19,6 +19,7 @@ using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
+using Core.DomainServices.Role;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -27,7 +28,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingRegistrationRepository _repository;
         private readonly IDataProcessingRegistrationNamingService _namingService;
-        private readonly IDataProcessingRegistrationRoleAssignmentsService _roleAssignmentsService;
+        private readonly IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> _roleAssignmentsService;
         private readonly IDataProcessingRegistrationDataResponsibleAssignmentService _dataResponsibleAssigmentService;
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
@@ -45,7 +46,7 @@ namespace Core.ApplicationServices.GDPR
             IAuthorizationContext authorizationContext,
             IDataProcessingRegistrationRepository repository,
             IDataProcessingRegistrationNamingService namingService,
-            IDataProcessingRegistrationRoleAssignmentsService roleAssignmentsService,
+            IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> roleAssignmentsService,
             IReferenceRepository referenceRepository,
             IDataProcessingRegistrationDataResponsibleAssignmentService dataResponsibleAssigmentService,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
@@ -205,17 +206,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId)
         {
-            return Modify(id, registration =>
-            {
-                var removeResult = _roleAssignmentsService.RemoveRole(registration, roleId, userId);
-
-                if (removeResult.Ok)
-                {
-                    _rightRepository.Delete(removeResult.Value);
-                }
-
-                return removeResult;
-            });
+            return Modify(id, registration => _roleAssignmentsService.RemoveRole(registration, roleId, userId));
         }
 
         public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)

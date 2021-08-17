@@ -4,16 +4,19 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Model;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -402,13 +405,121 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(contract.Name, freshReadDTO.General.MainContract.Name);
         }
 
-        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null)
+        [Fact]
+        public async Task Can_POST_With_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new RoleAssignmentRequestDTO()
+                {
+                    RoleUuid = role.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new RoleAssignmentRequestDTO()
+                {
+                    RoleUuid = role.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+
+            //Act
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, roles: roles));
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            Assert.Equal(2, freshReadDTO.Roles.Count());
+            var right1 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
+            Assert.Equal(role.Name, right1.Role.Name);
+            Assert.Equal(role.Uuid, right1.Role.Uuid);
+            Assert.Equal(user1.GetFullName(), right1.User.Name);
+            var right2 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
+            Assert.Equal(role.Name, right2.Role.Name);
+            Assert.Equal(role.Uuid, right2.Role.Uuid);
+            Assert.Equal(user2.GetFullName(), right2.User.Name);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_Roles()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            var initialRoles = new List<RoleAssignmentRequestDTO>
+            {
+                new RoleAssignmentRequestDTO()
+                {
+                    RoleUuid = role.Uuid,
+                    UserUuid = user1.Uuid
+                }
+            };
+            var modifyRoles = new List<RoleAssignmentRequestDTO>
+            {
+                new RoleAssignmentRequestDTO()
+                {
+                    RoleUuid = role.Uuid,
+                    UserUuid = user2.Uuid
+                }
+            };
+
+            //Act - Add role
+            var addInitialRolesRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, initialRoles);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, addInitialRolesRequest.StatusCode);
+            var initialRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            var initialRight = Assert.Single(initialRoleResponse.Roles);
+            Assert.Equal(role.Name, initialRight.Role.Name);
+            Assert.Equal(role.Uuid, initialRight.Role.Uuid);
+            Assert.Equal(user1.Uuid, initialRight.User.Uuid);
+            Assert.Equal(user1.GetFullName(), initialRight.User.Name);
+
+            //Act - Modify role
+            var modifiedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, modifyRoles);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, modifiedRequest.StatusCode);
+            var modifiedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            var modifiedRight = Assert.Single(modifiedRoleResponse.Roles);
+            Assert.Equal(role.Name, modifiedRight.Role.Name);
+            Assert.Equal(role.Uuid, modifiedRight.Role.Uuid);
+            Assert.Equal(user2.Uuid, modifiedRight.User.Uuid);
+            Assert.Equal(user2.GetFullName(), modifiedRight.User.Name);
+            
+            //Act - Remove role
+            var removedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, removedRequest.StatusCode);
+            var removedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            Assert.Empty(removedRoleResponse.Roles);
+        }
+
+        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null, IEnumerable<RoleAssignmentRequestDTO> roles = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
                 OrganizationUuid = organizationId,
                 SystemUuid = systemId,
-                General = generalSection
+                General = generalSection,
+                Roles = roles
             };
         }
 
@@ -452,6 +563,13 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
+        }
+
+        private async Task<User> CreateUser(Organization organization)
+        {
+            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, organization.Id);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
+            return user;
         }
 
         private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)

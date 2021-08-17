@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Security.AccessControl;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
@@ -15,6 +16,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
+using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -35,7 +37,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IItProjectService _projectService;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
-        private readonly IItSystemUsageRoleAssignmentService _roleAssignmentService;
+        private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -47,8 +49,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IItContractService contractService,
             IItProjectService projectService,
             IDomainEvents domainEvents,
-            ILogger logger, 
-            IItSystemUsageRoleAssignmentService roleAssignmentService)
+            ILogger logger,
+            IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -230,7 +232,12 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
             // Clean the old roles first 
-            systemUsage.ResetRoles();
+            foreach (var systemUsageRight in systemUsage.Rights.ToList())
+            {
+                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, systemUsageRight.RoleId, systemUsageRight.UserId);
+                if (removeResult.Failed)
+                    return removeResult.Error;
+            }
 
             if (userRolePairs.IsNone)
             {
@@ -247,7 +254,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
                 systemUsageRoles.Add(assignmentResult.Value);
             }
-            systemUsage.Rights = systemUsageRoles;
 
             return systemUsage;
         }

@@ -1,31 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Core.DomainServices.GDPR;
 using Core.DomainServices.Options;
+using Core.DomainServices.Role;
 using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.DomainServices.GDPR
+namespace Tests.Unit.Core.DomainServices.Role
 {
-    public class DataProcessingRegistrationRoleAssignmentsServiceTest : WithAutoFixture
+    public class RoleAssignmentsServiceTest : WithAutoFixture
     {
-        private readonly DataProcessingRegistrationRoleAssignmentsService _sut;
+        private readonly RoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> _sut;
         private readonly Mock<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>> _optionsServiceMock;
         private readonly Mock<IUserRepository> _userRepository;
+        private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightRepositoryMock;
 
-        public DataProcessingRegistrationRoleAssignmentsServiceTest()
+        public RoleAssignmentsServiceTest()
         {
             _optionsServiceMock = new Mock<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>>();
             _userRepository = new Mock<IUserRepository>();
-            _sut = new DataProcessingRegistrationRoleAssignmentsService(
+            _rightRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
+            _sut = new RoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(
                 _optionsServiceMock.Object,
-                _userRepository.Object);
+                _userRepository.Object,
+                _rightRepositoryMock.Object);
         }
 
         [Fact]
@@ -179,7 +183,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             var removedRight = result.Value;
             Assert.Equal(roleId, removedRight.RoleId);
             Assert.Equal(userId, removedRight.UserId);
-
+            _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
         }
 
         [Fact]
@@ -197,7 +201,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-
+            _rightRepositoryMock.Verify(x => x.Delete(It.IsAny<DataProcessingRegistrationRight>()), Times.Never);
         }
 
         [Fact]
@@ -217,7 +221,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-
+            _rightRepositoryMock.Verify(x => x.Delete(It.IsAny<DataProcessingRegistrationRight>()), Times.Never);
         }
 
         [Fact]
@@ -238,7 +242,155 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             //Assert
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            _rightRepositoryMock.Verify(x => x.Delete(It.IsAny<DataProcessingRegistrationRight>()), Times.Never);
+        }
 
+        [Fact]
+        public void Can_AssignRole_Using_Uuid()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((A<int>(), userId));
+            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>()}, new User { Id = userId, Uuid = userUuid } };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectAvailableOption(registration, roleId, agreementRole);
+            ExpectOrganizationUsers(registration, Maybe<string>.None, users);
+            ExpectGetUserByUuid(userUuid, users.First(x => x.Uuid == userUuid));
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, agreementRole);
+
+            //Act
+            var result = _sut.AssignRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(roleId, result.Value.Role.Id);
+            Assert.Equal(userId, result.Value.User.Id);
+        }
+
+        [Fact]
+        public void Cannot_AssignRole_Using_Uuid_If_User_Does_Not_Exist()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((A<int>(), userId));
+            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>() }, new User { Id = userId, Uuid = userUuid } };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectAvailableOption(registration, roleId, agreementRole);
+            ExpectOrganizationUsers(registration, Maybe<string>.None, users);
+            ExpectGetUserByUuid(userUuid, Maybe<User>.None);
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, agreementRole);
+
+            //Act
+            var result = _sut.AssignRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_AssignRole_Using_Uuid_If_Role_Does_Not_Exist()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((A<int>(), userId));
+            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>() }, new User { Id = userId, Uuid = userUuid } };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectAvailableOption(registration, roleId, agreementRole);
+            ExpectOrganizationUsers(registration, Maybe<string>.None, users);
+            ExpectGetUserByUuid(userUuid, users.First(x => x.Uuid == userUuid));
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, Maybe<DataProcessingRegistrationRole>.None);
+
+            //Act
+            var result = _sut.AssignRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveRole_Using_Uuid()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((roleId, userId));
+            var user = new User { Id = userId, Uuid = userUuid };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectOption(registration, roleId, agreementRole);
+            ExpectGetUser(userId, user);
+            ExpectGetUserByUuid(userUuid, user);
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, agreementRole);
+
+            //Act
+            var result = _sut.RemoveRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var removedRight = result.Value;
+            Assert.Equal(roleId, removedRight.RoleId);
+            Assert.Equal(userId, removedRight.UserId);
+            _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
+        }
+
+        [Fact]
+        public void Can_RemoveRole_Using_Uuid_If_User_Does_Not_Exist()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((roleId, userId));
+            var user = new User { Id = userId, Uuid = userUuid };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectOption(registration, roleId, agreementRole);
+            ExpectGetUser(userId, user);
+            ExpectGetUserByUuid(userUuid, Maybe<User>.None);
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, agreementRole);
+
+            //Act
+            var result = _sut.RemoveRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveRole_Using_Uuid_If_Role_Does_Not_Exist()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var userId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+            var registration = CreateDpa((roleId, userId));
+            var user = new User { Id = userId, Uuid = userUuid };
+            var agreementRole = new DataProcessingRegistrationRole { Id = roleId, Uuid = roleUuid };
+            ExpectOption(registration, roleId, agreementRole);
+            ExpectGetUser(userId, user);
+            ExpectGetUserByUuid(userUuid, user);
+            ExpectGetRoleByUuid(registration.OrganizationId, roleUuid, Maybe<DataProcessingRegistrationRole>.None);
+
+            //Act
+            var result = _sut.RemoveRole(registration, roleUuid, userUuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
         private void ExpectAvailableRoles(DataProcessingRegistration dataProcessingRegistration,
@@ -286,6 +438,31 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         private void ExpectGetUser(int userId, User user)
         {
             _userRepository.Setup(x => x.GetById(userId)).Returns(user);
+        }
+
+        private void ExpectGetUserByUuid(Guid userUuid, Maybe<User> user)
+        {
+            if (user.HasValue)
+            {
+                _userRepository.Setup(x => x.GetByUuid(userUuid)).Returns(user);
+            }
+            else
+            {
+                _userRepository.Setup(x => x.GetByUuid(userUuid)).Returns(Maybe<User>.None);
+            }
+        }
+
+        private void ExpectGetRoleByUuid(int orgId, Guid roleUuid, Maybe<DataProcessingRegistrationRole> role)
+        {
+            if (role.HasValue)
+            {
+                _optionsServiceMock.Setup(x => x.GetOptionByUuid(orgId, roleUuid)).Returns(Maybe<(DataProcessingRegistrationRole option, bool available)>.Some((role.Value, true)));
+            }
+            else
+            {
+                _optionsServiceMock.Setup(x => x.GetOptionByUuid(orgId, roleUuid)).Returns(Maybe<(DataProcessingRegistrationRole option, bool available)>.None);
+            }
+            
         }
     }
 }

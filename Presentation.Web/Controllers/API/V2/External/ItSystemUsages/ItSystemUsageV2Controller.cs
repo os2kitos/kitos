@@ -431,9 +431,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private static SystemUsageUpdateParameters CreateFullUpdateParameters(CreateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
         {
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
+            var roles = request.Roles ?? (enforceUndefinedSections ? new List<RoleAssignmentRequestDTO>() : null);
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData)
+                GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData),
+                Roles = roles.FromNullable().Select(MapRoles)
             };
         }
 
