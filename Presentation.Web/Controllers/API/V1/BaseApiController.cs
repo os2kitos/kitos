@@ -21,6 +21,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 using Presentation.Web.Models.API.V1;
+using System.Web.Http.ModelBinding;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -113,6 +114,16 @@ namespace Presentation.Web.Controllers.API.V1
         protected new virtual HttpResponseMessage BadRequest(string message = "")
         {
             return CreateResponse(HttpStatusCode.BadRequest, message);
+        }
+
+        protected new virtual HttpResponseMessage BadRequest(ModelStateDictionary modelState)
+        {
+            var errorDictionary = modelState.ToDictionary(
+                kvp => kvp.Key,
+                kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+            );
+
+            return BadRequest(string.Join("; ", errorDictionary));
         }
 
         protected virtual HttpResponseMessage Unauthorized()

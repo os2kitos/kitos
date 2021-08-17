@@ -565,6 +565,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (contractAssociation == null)
                 return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
 
+            ResetMainContract();
             MainContract = contractAssociation;
 
             return Maybe<OperationError>.None;
@@ -573,9 +574,6 @@ namespace Core.DomainModel.ItSystemUsage
         public void ResetProjectAssociations()
         {
             ItProjects.Clear();
-            //TODO: If the above does not work, use the stuff below
-            //foreach (var itProject in ItProjects.ToList())
-            //    itProject.ItSystemUsages.Remove(this);
         }
 
         public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
@@ -591,11 +589,6 @@ namespace Core.DomainModel.ItSystemUsage
             ResetProjectAssociations();
 
             itProjects.ForEach(ItProjects.Add);
-            //TODO: If above solution does not work, use the code below
-            //foreach (var itProject in itProjects)
-            //{
-            //    var result = itProject.AddSystemUsage(this);
-            //}
 
             return Maybe<OperationError>.None;
         }
@@ -609,10 +602,48 @@ namespace Core.DomainModel.ItSystemUsage
             {
                 return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
             }
-            
+
             Concluded = validFromDate;
-            
+
             ExpirationDate = validToDate;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetOrganizationalUsage()
+        {
+            UsedBy.Clear();
+            ResponsibleUsage.Track();
+            ResponsibleUsage = null;
+        }
+
+        public Maybe<OperationError> UpdateOrganizationalUsage(IEnumerable<OrganizationUnit> usingOrganizationUnits, Maybe<OrganizationUnit> responsibleOrgUnit)
+        {
+            var organizationUnits = usingOrganizationUnits?.ToList();
+            if (organizationUnits == null)
+                throw new ArgumentNullException(nameof(organizationUnits));
+
+            if (organizationUnits.Any(x => x.OrganizationId != OrganizationId))
+                return new OperationError("Using Organization units must belong to the same organization as the system usage", OperationFailure.BadInput);
+
+            if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
+                return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
+
+            if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
+                return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
+
+            ResetOrganizationalUsage();
+
+            var itSystemUsageOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage()
+            {
+                ItSystemUsage = this,
+                OrganizationUnit = organizationUnit
+            }).ToList();
+
+            itSystemUsageOrgUnitUsages.ForEach(UsedBy.Add);
+            ResponsibleUsage = responsibleOrgUnit
+                .Select(orgUnit => itSystemUsageOrgUnitUsages.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
+                .GetValueOrDefault();
 
             return Maybe<OperationError>.None;
         }

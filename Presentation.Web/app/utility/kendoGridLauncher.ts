@@ -622,12 +622,39 @@ module Kitos.Utility.KendoGrid {
             return this.gridState.doesGridProfileExist();
         }
 
+        saveGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
+                this.gridState.saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType);
+            }
+        }
+
+        clearGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil slette standard kolonneopsætning af felter til ${this.user.currentOrganizationName}`)) {
+                this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
+            }
+        }
+
+        showGridForOrganizationButtons() {
+            if (this.overviewType !== null) {
+                return this.user.isLocalAdmin;
+            }
+            return false;
+        }
+
+        canDeleteGridForOrganization() {
+            return this.gridState.canDeleteGridOrganizationalConfiguration();
+        }
+
+        doesGridDivergeFromDefault() {
+            return this.gridState.doesGridDivergeFromOrganizationalConfiguration(this.overviewType, this.gridBinding.mainGrid);
+        }
+
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
             this.gridState.removeProfile();
             this.gridState.removeLocal();
             this.gridState.removeSession();
-            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge gendannet til standardopsætning ");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
@@ -684,16 +711,22 @@ module Kitos.Utility.KendoGrid {
                     saveGridProfile: () => this.saveGridProfile(),
                     loadGridProfile: () => this.loadGridProfile(),
                     clearGridProfile: () => this.clearGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist()
+                    doesGridProfileExist: () => this.doesGridProfileExist(),
+                    saveGridForOrganization: () => this.saveGridForOrganization(),
+                    clearGridForOrganization: () => this.clearGridForOrganization(),
+                    showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
+                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
+                    doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
+                    gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan kolonneopsætning' for at benytte den gældende opsætning" : ""
                 }
             };
 
             var toolbar = [
                 {
                     name: "clearFilter",
-                    text: "Nulstil",
+                    text: "Gendan kolonneopsætning",
                     template:
-                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
+                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
                 {
                     name: "saveFilter",
@@ -712,6 +745,16 @@ module Kitos.Utility.KendoGrid {
                     text: "Slet filter",
                     template:
                         "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
+                },
+                {
+                    name: "filterOrg",
+                    text: "Gem kolonneopsætning for organisation",
+                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
+                },
+                {
+                    name: "removeFilterOrg",
+                    text: "Slet kolonneopsætning for organisation",
+                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
 
@@ -758,6 +801,7 @@ module Kitos.Utility.KendoGrid {
                                         var selectedId = e.sender.value();
                                         const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
                                         entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                        this.saveGridOptions();
                                     }
                                 }
                             }

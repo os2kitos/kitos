@@ -36,7 +36,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationDataResponsibleAssignmentService> _dataResponsibleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
         private readonly Mock<IDataProcessingRegistrationSystemAssignmentService> _systemAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
@@ -54,7 +53,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dataResponsibleAssignmentServiceMock = new Mock<IDataProcessingRegistrationDataResponsibleAssignmentService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
             _systemAssignmentServiceMock = new Mock<IDataProcessingRegistrationSystemAssignmentService>();
             _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
@@ -76,7 +74,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightOptionAssignmentServiceMock.Object,
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
-                _rightsRepositoryMock.Object,
                 _userContextMock.Object);
         }
 
@@ -446,7 +443,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(serviceSucceeds, result.Ok);
             Assert.Same(serviceResult, result);
             VerifyExpectedDbSideEffect(serviceSucceeds, registration, transaction);
-            _rightsRepositoryMock.Verify(x => x.Delete(agreementRight), serviceSucceeds ? Times.Once() : Times.Never());
         }
 
         [Fact]

@@ -127,6 +127,7 @@
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
     <Compile Include="Model\SystemUsage\Write\UserRolePair.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />

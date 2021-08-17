@@ -5,6 +5,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Organizations
 {
@@ -145,6 +146,11 @@ namespace Core.DomainServices.Organizations
         public IQueryable<OrganizationUnit> GetOrganizationUnits(Organization organization)
         {
             return _orgUnitRepository.AsQueryable().ByOrganizationId(organization.Id);
+        }
+
+        public Maybe<OrganizationUnit> GetOrganizationUnit(Guid uuid)
+        {
+            return _orgUnitRepository.AsQueryable().ByUuid(uuid).FromNullable();
         }
     }
 }

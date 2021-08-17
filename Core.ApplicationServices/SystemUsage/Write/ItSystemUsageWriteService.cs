@@ -14,6 +14,7 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
@@ -119,7 +120,47 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformOrganizationalUsageUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageOrganizationalUseParameters updatedParameters)
+        {
+            if (updatedParameters.ResponsibleOrganizationUnitUuid.HasValue ||
+                updatedParameters.UsingOrganizationUnitUuids.HasValue)
+            {
+                var nextResponsibleOrgUuid = MapOptionalChangeWithFallback(updatedParameters.ResponsibleOrganizationUnitUuid, systemUsage.ResponsibleUsage.FromNullable().Select(x => x.OrganizationUnit.Uuid));
+                var nextResponsibleOrg = Maybe<OrganizationUnit>.None;
+                if (nextResponsibleOrgUuid.HasValue)
+                {
+                    var organizationUnitResult = _organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
+                    if (organizationUnitResult.Failed)
+                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrFallback(string.Empty)}", organizationUnitResult.Error.FailureType);
+                    nextResponsibleOrg = organizationUnitResult.Value;
+                }
+                var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
+                var nextUsingOrganizationUnits = new List<OrganizationUnit>();
+                if (usingOrganizationUnits.HasValue)
+                {
+                    var usingOrgUnitUuids = usingOrganizationUnits.Value.ToList();
+                    if (usingOrgUnitUuids.Any())
+                    {
+                        foreach (var usingOrgUnitUuid in usingOrgUnitUuids)
+                        {
+                            var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
+                            if (result.Failed)
+                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                            nextUsingOrganizationUnits.Add(result.Value);
+                        }
+                    }
+                }
+
+                return systemUsage
+                    .UpdateOrganizationalUsage(nextUsingOrganizationUnits, nextResponsibleOrg)
+                    .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+            }
+            //No changes provided - skip
+            return systemUsage;
         }
 
         private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties generalProperties)
@@ -136,7 +177,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
         }
 
-        private Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
+        private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
             if (generalProperties.ValidFrom.IsNone && generalProperties.ValidTo.IsNone)
                 return usage; //Not changes provided
@@ -156,6 +197,16 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         (
                             newValue => newValue, //Client set new value
                             () => (DateTime?)null), //Changed to null by client
+                    () => fallback // No change provided - use the fallback
+                );
+        }
+
+        private static T MapOptionalChangeWithFallback<T>(Maybe<ChangedValue<T>> optionalChange, T fallback)
+        {
+            return optionalChange
+                .Select(x => x.Value)
+                .Match(changeTo =>
+                        changeTo, //Changed to null by client
                     () => fallback // No change provided - use the fallback
                 );
         }

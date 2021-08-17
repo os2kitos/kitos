@@ -496,7 +496,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemCategories = new ItSystemCategories();
             var itContractItSystemUsage = new ItContractItSystemUsage();
             var itProjects = Many<Guid>().Select(x => CreateItProject(organization, x)).ToList();
-            
+
             itSystemUsage.LocalCallName = localCallName;
             itSystemUsage.LocalSystemId = localSystemId;
             itSystemUsage.Version = version;
@@ -525,17 +525,167 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(createResult.Ok);
             Assert.Same(itSystemUsage, createResult.Value);
             AssertTransactionCommitted(transactionMock);
-            Assert.Equal(localCallName,itSystemUsage.LocalCallName);
-            Assert.Equal(localSystemId,itSystemUsage.LocalSystemId);
-            Assert.Equal(version,itSystemUsage.Version);
-            Assert.Equal(note,itSystemUsage.Note);
-            Assert.Equal(active,itSystemUsage.Active);
-            Assert.Equal(expirationDate,itSystemUsage.ExpirationDate);
-            Assert.Equal(concluded,itSystemUsage.Concluded);
-            Assert.Equal(userCount,itSystemUsage.UserCount);
-            Assert.Equal(itSystemCategories,itSystemUsage.ItSystemCategories);
-            Assert.Equal(itContractItSystemUsage,itSystemUsage.MainContract);
-            Assert.Equal(itProjects,itSystemUsage.ItProjects);
+            Assert.Equal(localCallName, itSystemUsage.LocalCallName);
+            Assert.Equal(localSystemId, itSystemUsage.LocalSystemId);
+            Assert.Equal(version, itSystemUsage.Version);
+            Assert.Equal(note, itSystemUsage.Note);
+            Assert.Equal(active, itSystemUsage.Active);
+            Assert.Equal(expirationDate, itSystemUsage.ExpirationDate);
+            Assert.Equal(concluded, itSystemUsage.Concluded);
+            Assert.Equal(userCount, itSystemUsage.UserCount);
+            Assert.Equal(itSystemCategories, itSystemUsage.ItSystemCategories);
+            Assert.Equal(itContractItSystemUsage, itSystemUsage.MainContract);
+            Assert.Equal(itProjects, itSystemUsage.ItProjects);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OrganizationalUsage(bool withResponsible)
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var organizationUnits = Many<Guid>().Select(uuid => CreateOrganizationUnit(uuid, organization)).ToList();
+            var responsible = withResponsible ? organizationUnits.OrderBy(_ => A<int>()).First() : null;
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            foreach (var organizationUnit in organizationUnits)
+                ExpectGetOrganizationUnitReturns(organizationUnit.Uuid, organizationUnit);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                OrganizationalUsage = new UpdatedSystemUsageOrganizationalUseParameters
+                {
+                    UsingOrganizationUnitUuids = organizationUnits.Select(x => x.Uuid).ToList().FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                    ResponsibleOrganizationUnitUuid = (responsible?.Uuid.FromNullable() ?? Maybe<Guid>.None).AsChangedValue()
+                }
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            Assert.Same(itSystemUsage, createResult.Value);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(organizationUnits, itSystemUsage.UsedBy.Select(x => x.OrganizationUnit));
+            if (withResponsible)
+            {
+                Assert.NotNull(itSystemUsage.ResponsibleUsage);
+                Assert.Equal(responsible, itSystemUsage.ResponsibleUsage.OrganizationUnit);
+            }
+            else
+            {
+                Assert.Null(itSystemUsage.ResponsibleUsage);
+            }
+        }
+
+        [Fact]
+        public void CannotCreate_With_OrganizationalUsage_When_Responsible_Usage_Is_Not_Part_Of_Using_Orgs()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var organizationUnits = Many<Guid>().Select(uuid => CreateOrganizationUnit(uuid, organization)).ToList();
+            var responsible = organizationUnits.Take(1).Single();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            foreach (var organizationUnit in organizationUnits)
+                ExpectGetOrganizationUnitReturns(organizationUnit.Uuid, organizationUnit);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                OrganizationalUsage = new UpdatedSystemUsageOrganizationalUseParameters
+                {
+                    //Skip the "responsible" from the unit-user list
+                    UsingOrganizationUnitUuids = organizationUnits.Skip(1).Select(x => x.Uuid).ToList().FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                    ResponsibleOrganizationUnitUuid = responsible.Uuid.FromNullable().AsChangedValue()
+                }
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void CannotCreate_With_OrganizationalUsage_When_UsingOrgs_Contains_Duplicates()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var organizationUnits = Many<Guid>().Select(uuid => CreateOrganizationUnit(uuid, organization)).ToList();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            foreach (var organizationUnit in organizationUnits)
+                ExpectGetOrganizationUnitReturns(organizationUnit.Uuid, organizationUnit);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                OrganizationalUsage = new UpdatedSystemUsageOrganizationalUseParameters
+                {
+                    UsingOrganizationUnitUuids = organizationUnits.Concat(organizationUnits.Take(1)).Select(x => x.Uuid).ToList().FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                }
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void CannotCreate_With_OrganizationalUsage_When_Org_Units_Are_In_Different_Organization_Than_Usage()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var anotherOrg = CreateOrganization();
+            var organizationUnits = Many<Guid>().Select(uuid => CreateOrganizationUnit(uuid, anotherOrg)).ToList();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            foreach (var organizationUnit in organizationUnits)
+                ExpectGetOrganizationUnitReturns(organizationUnit.Uuid, organizationUnit);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                OrganizationalUsage = new UpdatedSystemUsageOrganizationalUseParameters
+                {
+                    UsingOrganizationUnitUuids = organizationUnits.Select(x => x.Uuid).ToList().FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                }
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        private void ExpectGetOrganizationUnitReturns(Guid orgUnitId, Result<OrganizationUnit, OperationError> organizationUnit)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(orgUnitId)).Returns(organizationUnit);
+        }
+
+        private OrganizationUnit CreateOrganizationUnit(Guid uuid, Organization organization)
+        {
+            return new OrganizationUnit
+            {
+                Uuid = uuid,
+                Name = A<string>(),
+                OrganizationId = organization.Id,
+                Organization = organization
+            };
         }
 
         [Fact]

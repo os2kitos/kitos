@@ -1,10 +1,12 @@
-﻿using System.Net;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.DomainModel;
+using Core.DomainModel.KendoConfig;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -33,8 +35,13 @@ namespace Presentation.Web.Controllers.API.V1
             if (dto == null)
                 return BadRequest("No input parameters provided");
 
+            var columns = dto.VisibleColumns.Select(x => new KendoColumnConfiguration(){
+                PersistId = x.PersistId,
+                Index = x.Index
+                });
+
             return _kendoOrganizationalConfigurationService
-                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, dto.Configuration)
+                .CreateOrUpdate(dto.OrganizationId, dto.OverviewType, columns)
                 .Match(value => Ok(Map(value)), FromOperationError);
         }
 
@@ -43,14 +50,30 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        public HttpResponseMessage GetConfiguration([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
         {
-            if (organizationId == null || overviewType == null)
-                return BadRequest("Please provide both organizationId and overviewType");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .Get(organizationId.Value, overviewType.Value)
+                .Get(organizationId, overviewType)
                 .Match(value => Ok(Map(value)), FromOperationError);
+        }
+
+        [HttpGet]
+        [Route("version")]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<string>))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public HttpResponseMessage GetConfigurationVersion([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _kendoOrganizationalConfigurationService
+                .Get(organizationId, overviewType)
+                .Select(x => x.Version)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpDelete]
@@ -58,13 +81,13 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ApiReturnDTO<KendoOrganizationalConfigurationDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage DeleteConfiguration([FromUri] int? organizationId, [FromUri] OverviewType? overviewType)
+        public HttpResponseMessage DeleteConfiguration([FromUri][Required] int organizationId, [FromUri][Required] OverviewType overviewType)
         {
-            if (organizationId == null || overviewType == null)
-                return BadRequest("Please provide both organizationId and overviewType");
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             return _kendoOrganizationalConfigurationService
-                .Delete(organizationId.Value, overviewType.Value)
+                .Delete(organizationId, overviewType)
                 .Match(_ => Ok(), FromOperationError);
         }
 
@@ -74,7 +97,17 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 OrganizationId = value.OrganizationId,
                 OverviewType = value.OverviewType,
-                Configuration = value.Configuration
+                VisibleColumns = value.VisibleColumns.Select(x => Map(x)).ToList(),
+                Version = value.Version
+            };
+        }
+
+        private static KendoColumnConfigurationDTO Map(KendoColumnConfiguration value)
+        {
+            return new KendoColumnConfigurationDTO
+            {
+                PersistId = value.PersistId,
+                Index = value.Index
             };
         }
     }

@@ -335,8 +335,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    OrganizationalUsage = MapOrganizationalUsage(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -431,10 +437,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private static SystemUsageUpdateParameters CreateFullUpdateParameters(CreateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
         {
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
+            var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
             var roles = request.Roles ?? (enforceUndefinedSections ? new List<RoleAssignmentRequestDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData),
+                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
                 Roles = roles.FromNullable().Select(MapRoles)
             };
         }
@@ -448,10 +456,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private static SystemUsageUpdateParameters CreateFullUpdateParameters(UpdateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
         {
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataUpdateRequestDTO() : null);
+            var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
             var roles = request.Roles ?? (enforceUndefinedSections ? new List<RoleAssignmentRequestDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
+                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
                 Roles = roles.FromNullable().Select<UpdatedSystemUsageRoles>(MapRoles)
             };
         }
@@ -466,6 +476,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             var generalProperties = MapFullCommonGeneralData(generalData);
             generalProperties.MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue();
             return generalProperties;
+        }
+
+        private static UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input)
+        {
+            return new UpdatedSystemUsageOrganizationalUseParameters
+            {
+                ResponsibleOrganizationUnitUuid = (input.ResponsibleOrganizationUnitUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                UsingOrganizationUnitUuids = (input.UsingOrganizationUnitUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
+            };
         }
 
         private static UpdatedSystemUsageRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)

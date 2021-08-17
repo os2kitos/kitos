@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel;
+using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -6,6 +7,7 @@ namespace Presentation.Web.Models.API.V1
     {
         public int OrganizationId { get; set; }
         public OverviewType OverviewType { get; set; }
-        public string Configuration { get; set; }
+        public string Version { get; set; }
+        public IEnumerable<KendoColumnConfigurationDTO> VisibleColumns { get; set; }
     }
 }

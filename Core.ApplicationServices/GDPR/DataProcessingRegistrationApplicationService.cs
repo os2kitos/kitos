@@ -38,7 +38,6 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationOversightOptionsAssignmentService _oversightOptionAssignmentService;
         private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
-        private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
         private readonly IOrganizationalUserContext _userContext;
 
 
@@ -56,7 +55,6 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
-            IGenericRepository<DataProcessingRegistrationRight> rightRepository, 
             IOrganizationalUserContext userContext)
         {
             _authorizationContext = authorizationContext;
@@ -72,7 +70,6 @@ namespace Core.ApplicationServices.GDPR
             _oversightOptionAssignmentService = oversightOptionAssignmentService;
             _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
-            _rightRepository = rightRepository;
             _userContext = userContext;
         }
 

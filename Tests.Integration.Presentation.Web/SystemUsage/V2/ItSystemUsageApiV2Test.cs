@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -391,18 +392,197 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var contract1 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var contract2 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
+            await ItContractHelper.AddItSystemUsage(contract1.Id, usageId, organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid });
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(contract1.Uuid, freshReadDTO.General.MainContract.Uuid);
+            Assert.Equal(contract1.Name, freshReadDTO.General.MainContract.Name);
+
+            //Act - set to another contract
+            using var response2 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid });
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(contract2.Uuid, freshReadDTO.General.MainContract.Uuid);
+            Assert.Equal(contract2.Name, freshReadDTO.General.MainContract.Name);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Reset_MainContract()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
             var usageId = DatabaseAccess.MapFromEntitySet<ItSystemUsage, int>(all => all.AsQueryable().ByUuid(newUsage.Uuid).Id);
             await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
 
             //Act
-            using var response = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid });
+            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()); //Reset main contract
+            Assert.Equal(HttpStatusCode.OK, resetResponse.StatusCode);
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            Assert.Equal(contract.Uuid, freshReadDTO.General.MainContract.Uuid);
-            Assert.Equal(contract.Name, freshReadDTO.General.MainContract.Name);
+            Assert.Null(freshReadDTO.General.MainContract);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_Projects()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid } });
+            using var modifyResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid } }); //Remove one project
+            Assert.Equal(HttpStatusCode.OK, modifyResponse.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            var project = Assert.Single(freshReadDTO.General.AssociatedProjects);
+            Assert.Equal(project1.Uuid, project.Uuid);
+
+            //Act - reset
+            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO());
+            Assert.Equal(HttpStatusCode.OK, modifyResponse.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Empty(freshReadDTO.General.AssociatedProjects);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_POST_With_OrganizationalUsage(bool withResponsible)
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+
+            var units = new[] { unit1, unit2, unit3 }.OrderBy(x => A<int>()).Take(2).ToList();
+            var responsible = units.First();
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, organizationalUsageSection: new OrganizationUsageWriteRequestDTO()
+            {
+                UsingOrganizationUnitUuids = units.Select(x => x.Uuid).ToList(),
+                ResponsibleOrganizationUnitUuid = withResponsible ? responsible.Uuid : null
+            }));
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, units, responsible);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_OrganizationalUsage()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var unit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+            var unit3 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName(), unit1.Id);
+
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Act
+            using var modificationResponse1 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid },
+                    ResponsibleOrganizationUnitUuid = unit2.Uuid
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse1.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, unit2);
+
+            //Act - swap one unit as well as responsible
+            using var modificationResponse2 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit3.Uuid },
+                    ResponsibleOrganizationUnitUuid = unit3.Uuid
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse2.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit3 }, unit3);
+
+            //Act - reset all
+            using var modificationResponse3 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO());
+            Assert.Equal(HttpStatusCode.OK, modificationResponse3.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, Enumerable.Empty<OrgUnitDTO>(), null);
+
+            //Act - set using orgs but no responsible
+            using var modificationResponse4 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
+                {
+                    UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid }
+                });
+            Assert.Equal(HttpStatusCode.OK, modificationResponse4.StatusCode);
+
+            //Assert
+            await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, null);
+        }
+
+        private static async Task AssertOrganizationalUsage(string token, Guid systemUsageUuid, IEnumerable<OrgUnitDTO> expectedUnits, OrgUnitDTO expectedResponsible)
+        {
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, systemUsageUuid);
+            var expectedOrgUnits = expectedUnits
+                .Select(unitDto => new { Uuid = unitDto.Uuid, Name = unitDto.Name })
+                .OrderBy(x => x.Uuid)
+                .ToList();
+
+            var actualOrgUnits = dto
+                .OrganizationUsage
+                .UsingOrganizationUnits
+                .Select(x => new { Uuid = x.Uuid, Name = x.Name })
+                .OrderBy(x => x.Uuid)
+                .ToList();
+
+            Assert.Equal(expectedOrgUnits, actualOrgUnits);
+            if (expectedResponsible != null)
+            {
+                Assert.NotNull(dto.OrganizationUsage.ResponsibleOrganizationUnit);
+                Assert.Equal(expectedResponsible.Uuid, dto.OrganizationUsage.ResponsibleOrganizationUnit.Uuid);
+                Assert.Equal(expectedResponsible.Name, dto.OrganizationUsage.ResponsibleOrganizationUnit.Name);
+            }
+            else
+            {
+                Assert.Null(dto.OrganizationUsage.ResponsibleOrganizationUnit);
+            }
         }
 
         [Fact]
@@ -512,13 +692,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(removedRoleResponse.Roles);
         }
 
-        private static CreateItSystemUsageRequestDTO CreatePostRequest(Guid organizationId, Guid systemId, GeneralDataWriteRequestDTO generalSection = null, IEnumerable<RoleAssignmentRequestDTO> roles = null)
+        private static CreateItSystemUsageRequestDTO CreatePostRequest(
+            Guid organizationId,
+            Guid systemId,
+            GeneralDataWriteRequestDTO generalSection = null,
+            OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
+            IEnumerable<RoleAssignmentRequestDTO> roles = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
                 OrganizationUuid = organizationId,
                 SystemUuid = systemId,
                 General = generalSection,
+                OrganizationUsage = organizationalUsageSection,
                 Roles = roles
             };
         }
