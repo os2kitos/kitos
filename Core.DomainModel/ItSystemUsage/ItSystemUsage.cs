@@ -654,7 +654,7 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> UpdateLocalKLE(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
+        public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
         {
             if (additions == null)
                 throw new ArgumentNullException(nameof(additions));
@@ -662,15 +662,33 @@ namespace Core.DomainModel.ItSystemUsage
             if (removals == null)
                 throw new ArgumentNullException(nameof(removals));
 
-            /*
-             * * Handled in system usage:
-             *   * - No duplicates
-                 * - No intersections of collections
-                 * - Additions must not be in system context
-                 * - Removals must be in system context
-            *
-            */
-            throw new NotImplementedException();
+            var optIn = additions.ToList();
+            var optOut = removals.ToList();
+
+            var optInIds = optIn.Select(x => x.Id).Distinct().ToList();
+            var optOutIds = optOut.Select(x => x.Id).Distinct().ToList();
+
+            if (optInIds.Count != optIn.Count)
+                return new OperationError("Duplicates in KLE Additions are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Count != optOut.Count)
+                return new OperationError("Duplicates in KLE Removals are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Intersect(optInIds).Any())
+                return new OperationError("KLE cannot be both added and removed", OperationFailure.BadInput);
+
+            var systemTaskRefIds = ItSystem.TaskRefs.Select(x => x.Id).ToHashSet();
+
+            if (optInIds.Any(systemTaskRefIds.Contains))
+                return new OperationError("Cannot ADD KLE which is already present in the system context", OperationFailure.BadInput);
+
+            if (optOutIds.Any(id => systemTaskRefIds.Contains(id) == false))
+                return new OperationError("Cannot Remove KLE which is not present in the system context", OperationFailure.BadInput);
+
+            optIn.MergeInto(TaskRefs, x => x.Uuid);
+            optOut.MergeInto(TaskRefsOptOut, x => x.Uuid);
+
+            return Maybe<OperationError>.None;
         }
     }
 }

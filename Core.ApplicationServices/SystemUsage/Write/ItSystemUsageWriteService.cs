@@ -151,7 +151,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     removals.Add(result.Value.kle);
                 }
 
-                return systemUsage.UpdateLocalKLE(additions, removals).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
+                return systemUsage.UpdateKLEDeviations(additions, removals).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
             }
 
             return systemUsage;
