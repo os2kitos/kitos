@@ -493,7 +493,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             }));
 
             //Assert
-            await AssertOrganizationalUsage(token, newUsage.Uuid, units, responsible);
+            await AssertOrganizationalUsage(token, newUsage.Uuid, units, withResponsible ? responsible : null);
         }
 
         [Fact]

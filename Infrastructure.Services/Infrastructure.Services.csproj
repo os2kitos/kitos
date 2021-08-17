@@ -92,6 +92,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="Types\EnumerableExtensions.cs" />
     <Compile Include="Types\Maybe.cs" />
     <Compile Include="Types\ObjectExtensions.cs" />
     <Compile Include="Types\TypeHierarchyExtensions.cs" />
