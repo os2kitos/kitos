@@ -35,6 +35,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
+        private readonly IDatabaseControl _databaseControl;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
 
@@ -48,6 +49,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IItContractService contractService,
             IItProjectService projectService,
             IKLEApplicationService kleApplicationService,
+            IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
         {
@@ -60,6 +62,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _contractService = contractService;
             _projectService = projectService;
             _kleApplicationService = kleApplicationService;
+            _databaseControl = databaseControl;
             _domainEvents = domainEvents;
             _logger = logger;
         }
@@ -87,6 +90,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (creationResult.Ok)
             {
+                _databaseControl.SaveChanges();
                 transaction.Commit();
             }
 
@@ -108,6 +112,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (result.Ok)
             {
                 _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(result.Value));
+                _databaseControl.SaveChanges();
                 transaction.Commit();
             }
 

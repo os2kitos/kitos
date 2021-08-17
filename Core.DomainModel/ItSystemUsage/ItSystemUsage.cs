@@ -665,8 +665,8 @@ namespace Core.DomainModel.ItSystemUsage
             var optIn = additions.ToList();
             var optOut = removals.ToList();
 
-            var optInIds = optIn.Select(x => x.Id).Distinct().ToList();
-            var optOutIds = optOut.Select(x => x.Id).Distinct().ToList();
+            var optInIds = optIn.Select(x => x.Uuid).Distinct().ToList();
+            var optOutIds = optOut.Select(x => x.Uuid).Distinct().ToList();
 
             if (optInIds.Count != optIn.Count)
                 return new OperationError("Duplicates in KLE Additions are not allowed", OperationFailure.BadInput);
@@ -677,7 +677,7 @@ namespace Core.DomainModel.ItSystemUsage
             if (optOutIds.Intersect(optInIds).Any())
                 return new OperationError("KLE cannot be both added and removed", OperationFailure.BadInput);
 
-            var systemTaskRefIds = ItSystem.TaskRefs.Select(x => x.Id).ToHashSet();
+            var systemTaskRefIds = ItSystem.TaskRefs.Select(x => x.Uuid).ToHashSet();
 
             if (optInIds.Any(systemTaskRefIds.Contains))
                 return new OperationError("Cannot ADD KLE which is already present in the system context", OperationFailure.BadInput);
