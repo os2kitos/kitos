@@ -5,7 +5,6 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -19,7 +18,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -255,8 +253,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    KLE = MapKle(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -436,13 +440,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         private static SystemUsageUpdateParameters CreateFullUpdateParameters(CreateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
         {
+            //TODO: Merge this method with the other one - the general section is the issue and the one that diverges based on create vs update
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
             var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
+            var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
             var roles = request.Roles ?? (enforceUndefinedSections ? new List<RoleAssignmentRequestDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
+                KLE = kleInput.FromNullable().Select(MapKle),
                 Roles = roles.FromNullable().Select(MapRoles)
             };
         }
@@ -457,12 +464,23 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataUpdateRequestDTO() : null);
             var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
+            var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
             var roles = request.Roles ?? (enforceUndefinedSections ? new List<RoleAssignmentRequestDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
+                KLE = kleInput.FromNullable().Select(MapKle),
                 Roles = roles.FromNullable().Select<UpdatedSystemUsageRoles>(MapRoles)
+            };
+        }
+
+        private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
+        {
+            return new UpdatedSystemUsageKLEDeviationParameters()
+            {
+                AddedKLEUuids = kle.AddedKLEUuids.FromNullable().AsChangedValue(),
+                RemovedKLEUuids = kle.RemovedKLEUuids.FromNullable().AsChangedValue()
             };
         }
 

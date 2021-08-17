@@ -6,6 +6,7 @@ using AutoFixture;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -41,12 +42,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IItSystemService> _itSystemServiceMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
-        private readonly Mock<IOptionsService<ItSystemUsage, ItSystemCategories>> _systemCatategoriesOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItSystemUsage, ItSystemCategories>> _systemCategoriesOptionsServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
         private readonly Mock<IItProjectService> _projectServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>> _roleAssignmentService;
         private readonly ItSystemUsageWriteService _sut;
+        private readonly Mock<IKLEApplicationService> _kleServiceMock;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -55,15 +57,16 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemServiceMock = new Mock<IItSystemService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
-            _systemCatategoriesOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ItSystemCategories>>();
+            _systemCategoriesOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ItSystemCategories>>();
             _contractServiceMock = new Mock<IItContractService>();
             _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
+            _kleServiceMock = new Mock<IKLEApplicationService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
-                _systemCatategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _domainEventsMock.Object, Mock.Of<ILogger>(), _roleAssignmentService.Object);
+                _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
+                _kleServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(), _roleAssignmentService.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -609,7 +612,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transactionMock);
         }
 
@@ -670,6 +673,166 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(createResult.Failed);
             Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Can_Create_With_KLEDeviations(bool withAdditions, bool withRemovals)
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            itSystem.TaskRefs = CreateTaskRefs(3);
+            var additionalTaskRefs = CreateTaskRefs(withAdditions ? 2 : 0);
+            var tasksToRemove = itSystem.TaskRefs.Take(withRemovals ? 2 : 0).ToList();
+
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var input = SetupKLEInputExpectations(additionalTaskRefs, tasksToRemove);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(additionalTaskRefs, itSystemUsage.TaskRefs);
+            Assert.Equal(tasksToRemove, itSystemUsage.TaskRefsOptOut);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Cannot_Create_With_KLEDeviations_With_Duplicates(bool inAdditions, bool inRemovals)
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            itSystem.TaskRefs = CreateTaskRefs(3);
+            var additionalTaskRefs = CreateTaskRefs(1).Transform(refs => inAdditions ? refs.Append(refs.First()) : refs).ToList();
+            var tasksToRemove = itSystem.TaskRefs.Take(1).ToList().Transform(refs => inRemovals ? refs.Append(refs.First()) : refs).ToList();
+
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var input = SetupKLEInputExpectations(additionalTaskRefs, tasksToRemove);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            Assert.Contains("Duplicates in KLE", createResult.Error.Message.GetValueOrFallback(string.Empty));
+        }
+
+        [Fact]
+        public void Cannot_Create_With_KLEDeviations_If_Additions_And_Removals_Intersect()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            itSystem.TaskRefs = CreateTaskRefs(3);
+            var additionalTaskRefs = CreateTaskRefs(1).Append(itSystem.TaskRefs.First()).ToList();
+            var tasksToRemove = itSystem.TaskRefs.Take(2).ToList(); //First one is in both collections
+
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var input = SetupKLEInputExpectations(additionalTaskRefs, tasksToRemove);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            Assert.EndsWith("KLE cannot be both added and removed", createResult.Error.Message.GetValueOrDefault());
+        }
+
+        [Fact]
+        public void Cannot_Create_With_KLEDeviations_If_Additions_Exist_In_SystemContext()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            itSystem.TaskRefs = CreateTaskRefs(3);
+            var additionalTaskRefs = CreateTaskRefs(1).Append(itSystem.TaskRefs.First()).ToList(); //Add one from the system context
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var input = SetupKLEInputExpectations(additionalTaskRefs, Enumerable.Empty<TaskRef>().ToList());
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            Assert.EndsWith("Cannot ADD KLE which is already present in the system context", createResult.Error.Message.GetValueOrDefault());
+        }
+
+        [Fact]
+        public void Cannot_Create_With_KLEDeviations_If_RemovedKLE_Do_Not_Exist_On_System_Context()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            itSystem.TaskRefs = CreateTaskRefs(3);
+            var tasksToRemove = itSystem.TaskRefs.Take(1).Concat(CreateTaskRefs(1)).ToList(); //One exists on system context and the other one does not
+
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var input = SetupKLEInputExpectations(Enumerable.Empty<TaskRef>().ToList(), tasksToRemove);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            Assert.EndsWith("Cannot Remove KLE which is not present in the system context",createResult.Error.Message.GetValueOrDefault());
+        }
+
+        private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
+        {
+            var input = new SystemUsageUpdateParameters
+            {
+                KLE = new UpdatedSystemUsageKLEDeviationParameters
+                {
+                    AddedKLEUuids = additionalTaskRefs.Select(x => x.Uuid).FromNullable().AsChangedValue(),
+                    RemovedKLEUuids = tasksToRemove.Select(x => x.Uuid).FromNullable().AsChangedValue()
+                }
+            };
+
+            foreach (var taskRef in additionalTaskRefs.Concat(tasksToRemove))
+                ExpectGetKLEReturns(taskRef.Uuid, (Maybe<DateTime>.None, taskRef));
+
+            return input;
+        }
+
+        private void ExpectGetKLEReturns(Guid uuid, Result<(Maybe<DateTime> updateReference, TaskRef kle), OperationError> result)
+        {
+            _kleServiceMock.Setup(x => x.GetKle(uuid)).Returns(result);
+        }
+
+        private List<TaskRef> CreateTaskRefs(int howMany)
+        {
+            return Many<Guid>(howMany).Select(CreateTaskRef).ToList();
+        }
+
+        private static TaskRef CreateTaskRef(Guid uuid)
+        {
+            return new TaskRef() { Uuid = uuid };
         }
 
         private void ExpectGetOrganizationUnitReturns(Guid orgUnitId, Result<OrganizationUnit, OperationError> organizationUnit)
@@ -851,7 +1014,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystem = new ItSystem { Id = A<int>() };
             var itSystemUsage = new ItSystemUsage
             {
-                OrganizationId = organization.Id
+                OrganizationId = organization.Id,
+                ItSystem = itSystem
             };
 
             return (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage);
@@ -922,7 +1086,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectGetItSystemCategoryReturns(int organizationId, Guid dataClassificationId, Maybe<(ItSystemCategories, bool)> result)
         {
-            _systemCatategoriesOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, dataClassificationId)).Returns(result);
+            _systemCategoriesOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, dataClassificationId)).Returns(result);
         }
 
         private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)

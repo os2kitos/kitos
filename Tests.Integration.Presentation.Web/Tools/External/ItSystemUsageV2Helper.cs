@@ -98,6 +98,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/organization-usage"), token, dto);
         }
 
+        public static async Task<HttpResponseMessage> SendPutKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/kle"), token, dto);
+        }
+
         public static async Task<HttpResponseMessage> SendPutRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles"), token, dto);
