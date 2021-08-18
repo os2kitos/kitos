@@ -113,9 +113,7 @@ namespace Core.DomainModel.Organization
             return new OrganizationUnitRight()
             {
                 Role = role,
-                RoleId = role.Id,
                 User = user,
-                UserId = user.Id,
                 Object = this
             };
         }

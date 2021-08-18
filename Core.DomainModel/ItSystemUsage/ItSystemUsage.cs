@@ -697,9 +697,7 @@ namespace Core.DomainModel.ItSystemUsage
             return new ItSystemRight()
             {
                 Role = role,
-                RoleId = role.Id,
                 User = user,
-                UserId = user.Id,
                 Object = this
             };
         }

@@ -19,6 +19,7 @@ using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
@@ -782,14 +783,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
             Assert.Equal(2, freshReadDTO.Roles.Count());
-            var right1 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
-            Assert.Equal(role.Name, right1.Role.Name);
-            Assert.Equal(role.Uuid, right1.Role.Uuid);
-            Assert.Equal(user1.GetFullName(), right1.User.Name);
-            var right2 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
-            Assert.Equal(role.Name, right2.Role.Name);
-            Assert.Equal(role.Uuid, right2.Role.Uuid);
-            Assert.Equal(user2.GetFullName(), right2.User.Name);
+            AssertSingleRight(role, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
+            AssertSingleRight(role, user2, freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
         }
 
         [Fact]
@@ -830,11 +825,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             Assert.Equal(HttpStatusCode.OK, addInitialRolesRequest.StatusCode);
             var initialRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
-            var initialRight = Assert.Single(initialRoleResponse.Roles);
-            Assert.Equal(role.Name, initialRight.Role.Name);
-            Assert.Equal(role.Uuid, initialRight.Role.Uuid);
-            Assert.Equal(user1.Uuid, initialRight.User.Uuid);
-            Assert.Equal(user1.GetFullName(), initialRight.User.Name);
+            AssertSingleRight(role, user1, initialRoleResponse.Roles);
 
             //Act - Modify role
             var modifiedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, modifyRoles);
@@ -842,11 +833,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             Assert.Equal(HttpStatusCode.OK, modifiedRequest.StatusCode);
             var modifiedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
-            var modifiedRight = Assert.Single(modifiedRoleResponse.Roles);
-            Assert.Equal(role.Name, modifiedRight.Role.Name);
-            Assert.Equal(role.Uuid, modifiedRight.Role.Uuid);
-            Assert.Equal(user2.Uuid, modifiedRight.User.Uuid);
-            Assert.Equal(user2.GetFullName(), modifiedRight.User.Name);
+            AssertSingleRight(role, user2, modifiedRoleResponse.Roles);
             
             //Act - Remove role
             var removedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>());
@@ -855,6 +842,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.OK, removedRequest.StatusCode);
             var removedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
             Assert.Empty(removedRoleResponse.Roles);
+        }
+
+        private static void AssertSingleRight(ItSystemRole expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
+        {
+            var actualRight = Assert.Single(rightList);
+            Assert.Equal(expectedRole.Name, actualRight.Role.Name);
+            Assert.Equal(expectedRole.Uuid, actualRight.Role.Uuid);
+            Assert.Equal(expectedUser.Uuid, actualRight.User.Uuid);
+            Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
         }
 
         private static CreateItSystemUsageRequestDTO CreatePostRequest(
