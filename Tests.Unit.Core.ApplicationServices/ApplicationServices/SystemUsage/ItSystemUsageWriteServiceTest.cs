@@ -859,15 +859,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
 
-            var input = new SystemUsageUpdateParameters()
-            {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = CreateUserRolePairList(roleUuid, userUuid).AsChangedValue()
-                })
-            };
+            var input = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
 
-            var right = createRight(itSystemUsage, roleUuid, userUuid);
+            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
             ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
@@ -878,9 +872,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            Assert.Same(itSystemUsage, createResult.Value);
-            var createdRight = Assert.Single(createResult.Value.Rights);
-            Assert.Same(right, createdRight);
         }
 
         [Fact]
@@ -889,13 +880,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            var input = new SystemUsageUpdateParameters()
-            {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.Some(Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue())
-                })
-            };
+            var input = CreateSystemUsageUpdateParametersWithoutData();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
 
@@ -905,8 +890,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            Assert.Same(itSystemUsage, createResult.Value);
-            Assert.Empty(createResult.Value.Rights);
         }
 
         [Fact]
@@ -917,13 +900,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
 
-            var input = new SystemUsageUpdateParameters()
-            {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = CreateUserRolePairList(roleUuid, userUuid).AsChangedValue()
-                })
-            };
+            var input = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
             var error = A<OperationFailure>();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -946,32 +923,19 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
 
-            var addRoleInput = new SystemUsageUpdateParameters()
-            {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = CreateUserRolePairList(roleUuid, userUuid).AsChangedValue()
-                })
-            };
+            var addRoleInput = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
 
-            var right = createRight(itSystemUsage, roleUuid, userUuid);
+            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
             ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
 
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, addRoleInput));
             Assert.True(createResult.Ok);
-            var createdRight = Assert.Single(createResult.Value.Rights);
-            Assert.Same(right, createdRight);
+            AssertTransactionCommitted(transactionMock);
 
-            var removeRoleInput = new SystemUsageUpdateParameters()
-            {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
-                {
-                    UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.Some(Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue())
-                })
-            };
-            ExpectRoleRemoveReturns(itSystemUsage, roleUuid, userUuid, createdRight);
+            var removeRoleInput = CreateSystemUsageUpdateParametersWithoutData();
+            ExpectRoleRemoveReturns(itSystemUsage, roleUuid, userUuid, right);
             ExpectGetSystemUsageReturns(createResult.Value.Uuid, createResult.Value);
 
             //Act
@@ -979,10 +943,38 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.True(updateResult.Ok);
-            Assert.Empty(updateResult.Value.Rights);
+            AssertTransactionCommitted(transactionMock);
+        }
+        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
+        {
+            return new SystemUsageUpdateParameters()
+            {
+                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
+                {
+                    UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.Some(Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue())
+                })
+            };
         }
 
-        private ItSystemRight createRight(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
+        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithData(Guid roleUuid, Guid userUuid)
+        {
+            return new SystemUsageUpdateParameters()
+            {
+                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
+                {
+                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.Some(new List<UserRolePair>()
+                    {
+                        new UserRolePair()
+                        {
+                            RoleUuid = roleUuid,
+                            UserUuid = userUuid
+                        }
+                    }).AsChangedValue()
+                })
+            };
+        }
+
+        private ItSystemRight CreateRight(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
         {
             return new ItSystemRight()
             {
@@ -1002,24 +994,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void ExpectRoleAssignmentReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
         {
-            _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Callback(() =>
-            {
-                if (result.Ok)
-                {
-                    itSystemUsage.Rights.Add(result.Value);
-                }
-            }).Returns(result);
+            _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
         }
 
         private void ExpectRoleRemoveReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
         {
-            _roleAssignmentService.Setup(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid)).Callback(() =>
-            {
-                if (result.Ok)
-                {
-                    itSystemUsage.Rights.Remove(result.Value);
-                }
-            }).Returns(result);
+            _roleAssignmentService.Setup(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
         }
 
         private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
@@ -1087,18 +1067,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 Organization = parentOrganization,
                 OrganizationId = parentOrganization.Id
             };
-        }
-
-        private Maybe<IEnumerable<UserRolePair>> CreateUserRolePairList(Guid roleUuid, Guid userUuid)
-        {
-            return Maybe<IEnumerable<UserRolePair>>.Some(new List<UserRolePair>()
-            {
-                new UserRolePair()
-                {
-                    RoleUuid = roleUuid,
-                    UserUuid = userUuid
-                }
-            });
         }
 
         private void ExpectGetItSystemCategoryReturns(int organizationId, Guid dataClassificationId, Maybe<(ItSystemCategories, bool)> result)

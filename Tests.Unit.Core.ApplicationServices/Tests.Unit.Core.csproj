@@ -221,6 +221,7 @@
     <Compile Include="Infrastructure\EnumerableExtensionsTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
+    <Compile Include="Model\HasRightsEntityTest.cs" />
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />

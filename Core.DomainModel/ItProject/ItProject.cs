@@ -223,7 +223,9 @@ namespace Core.DomainModel.ItProject
             return new ItProjectRight()
             {
                 Role = role,
+                RoleId = role.Id,
                 User = user,
+                UserId = user.Id,
                 Object = this
             };
         }

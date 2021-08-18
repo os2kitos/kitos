@@ -3,7 +3,6 @@ using Core.DomainModel.Result;
 using Infrastructure.Services.Types;
 using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel.ItSystem;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -80,11 +79,6 @@ namespace Core.DomainModel
                         OperationFailure.BadInput)
                 );
 
-        }
-
-        public void ResetRoles()
-        {
-            Rights.Clear();
         }
 
         private bool HasRight(TRole role, User user)

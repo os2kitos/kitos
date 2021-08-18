@@ -338,12 +338,11 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
                 return systemUsage;
             }
-
-            // TODO JMO: Test if the model can do the changes and then just manually delete to ones being removed, as this otherwise causes EF exception with child not being deleted.
+            
 
             // Compare lists to find which needs to be remove and which need to be added
             var rightsKeys = systemUsage.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
-            var userRoleKeys = userRolePairs.Value;
+            var userRoleKeys = userRolePairs.Value.ToList();
 
             var toRemove = rightsKeys.Except(userRoleKeys);
             var toAdd = userRoleKeys.Except(rightsKeys);
