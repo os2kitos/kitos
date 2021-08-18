@@ -147,9 +147,16 @@ namespace Core.ApplicationServices.SystemUsage.Write
             foreach (var referenceProperties in newReferences)
             {
                 var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-                
+
                 if (result.Failed)
                     return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+
+                if (referenceProperties.MasterReference)
+                {
+                    var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
+                    if (masterReferenceResult.Failed)
+                        return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                }
             }
 
             return systemUsage;
