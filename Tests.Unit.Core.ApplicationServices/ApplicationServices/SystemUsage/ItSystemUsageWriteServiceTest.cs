@@ -10,6 +10,7 @@ using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -60,7 +61,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
+                _kleServiceMock.Object, Mock.Of<IReferenceService>(), Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -721,7 +722,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Failed);
             AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput,createResult.Error.FailureType);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
             Assert.Contains("Duplicates in KLE", createResult.Error.Message.GetValueOrFallback(string.Empty));
         }
 
@@ -794,7 +795,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.True(createResult.Failed);
             AssertTransactionNotCommitted(transactionMock);
             Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot Remove KLE which is not present in the system context",createResult.Error.Message.GetValueOrDefault());
+            Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
         }
 
         private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)

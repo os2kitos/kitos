@@ -89,7 +89,7 @@ namespace Tests.Integration.Presentation.Web.Qa
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
             var systemReferenceName = A<string>();
-            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            await ReferencesHelper.CreateReferenceAsync(systemReferenceName, null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);
@@ -115,8 +115,8 @@ namespace Tests.Integration.Presentation.Web.Qa
             PrepareForReportGeneration();
             PurgeBrokenExternalReferencesReportTable();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<Guid>().ToString("N"), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
-            await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
-            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, Display.Url, r => r.ItSystem_Id = system.Id);
+            await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
+            var referenceToBeExplicitlyDeleted = await ReferencesHelper.CreateReferenceAsync(A<string>(), null, SystemReferenceUrl, r => r.ItSystem_Id = system.Id);
 
             var interfaceDto = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
             interfaceDto = await InterfaceHelper.SetUrlAsync(interfaceDto.Id, InterfaceUrl);

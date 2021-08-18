@@ -61,8 +61,7 @@ namespace Core.ApplicationServices.References
             ReferenceRootType rootType,
             string title,
             string externalReferenceId,
-            string url,
-            Display display)
+            string url)
         {
             return _referenceRepository
                 .GetRootEntity(rootId, rootType)
@@ -81,7 +80,6 @@ namespace Core.ApplicationServices.References
                                 Title = title,
                                 ExternalReferenceId = externalReferenceId,
                                 URL = url,
-                                Display = display,
                                 Created = _operationClock.Now,
                             })
                             .Match<Result<ExternalReference, OperationError>>

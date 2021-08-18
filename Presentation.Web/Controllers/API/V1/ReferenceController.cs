@@ -61,8 +61,7 @@ namespace Presentation.Web.Controllers.API.V1
                                 typeAndId.Key,
                                 dto.Title,
                                 dto.ExternalReferenceId,
-                                dto.URL,
-                                dto.Display
+                                dto.URL
                             )
                             .Match
                             (

@@ -10,16 +10,20 @@ using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
+using Newtonsoft.Json;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.Write
@@ -35,6 +39,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
+        private readonly IReferenceService _referenceService;
         private readonly IDatabaseControl _databaseControl;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
@@ -49,6 +54,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IItContractService contractService,
             IItProjectService projectService,
             IKLEApplicationService kleApplicationService,
+            IReferenceService referenceService,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -62,6 +68,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _contractService = contractService;
             _projectService = projectService;
             _kleApplicationService = kleApplicationService;
+            _referenceService = referenceService;
             _databaseControl = databaseControl;
             _domainEvents = domainEvents;
             _logger = logger;
@@ -124,7 +131,28 @@ namespace Core.ApplicationServices.SystemUsage.Write
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
                     .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            //Clear existing state
+            _referenceService.DeleteBySystemUsageId(systemUsage.Id);
+
+            var newReferences = externalReferences.ToList();
+            if (newReferences.Count(x => x.MasterReference) > 1)
+                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
+
+            foreach (var referenceProperties in newReferences)
+            {
+                var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
+                
+                if (result.Failed)
+                    return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+            }
+
+            return systemUsage;
         }
 
         private Result<ItSystemUsage, OperationError> PerformKLEUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageKLEDeviationParameters changes)
