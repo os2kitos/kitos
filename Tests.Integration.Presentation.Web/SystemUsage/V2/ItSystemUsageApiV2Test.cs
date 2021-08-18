@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using AutoFixture;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.ItSystem;
+using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
-using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -644,7 +641,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
 
             //Act - remove some
-            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals});
+            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals });
             Assert.Equal(HttpStatusCode.OK, put3.StatusCode);
 
             //Assert
@@ -662,7 +659,75 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
         }
 
-        //TODO: PUT modify
+        [Fact]
+        public async Task Can_POST_With_ExternalReferences()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            Configure(f => f.Inject(false));
+            var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var request = CreatePostRequest(organization.Uuid, system.Uuid, referenceDataDtos: inputs);
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
+            AssertExternalReferenceResults(inputs, dto);
+        }
+
+        [Fact]
+        public async Task Can_PUT_ExternalReferences()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            Configure(f => f.Inject(false));
+            var request = CreatePostRequest(organization.Uuid, system.Uuid);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs1);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertExternalReferenceResults(inputs1, dto);
+
+            //Act - reset
+            var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+            using var response2 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs2);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertExternalReferenceResults(inputs2, dto);
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItSystemUsageResponseDTO actual)
+        {
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
 
         private static void AssertKLEDeviation(bool withDeviation, IEnumerable<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
         {
@@ -752,7 +817,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Guid systemId,
             GeneralDataWriteRequestDTO generalSection = null,
             OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
-            LocalKLEDeviationsRequestDTO kleDeviationsRequest = null)
+            LocalKLEDeviationsRequestDTO kleDeviationsRequest = null,
+            IEnumerable<ExternalReferenceDataDTO> referenceDataDtos = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
@@ -760,7 +826,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 SystemUuid = systemId,
                 General = generalSection,
                 OrganizationUsage = organizationalUsageSection,
-                LocalKleDeviations = kleDeviationsRequest
+                LocalKleDeviations = kleDeviationsRequest,
+                ExternalReferences = referenceDataDtos?.ToList()
             };
         }
 

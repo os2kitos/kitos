@@ -12,7 +12,6 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
-using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -138,24 +137,34 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
+            systemUsage.ClearMasterReference();
             _referenceService.DeleteBySystemUsageId(systemUsage.Id);
-
             var newReferences = externalReferences.ToList();
-            if (newReferences.Count(x => x.MasterReference) > 1)
-                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
-
-            foreach (var referenceProperties in newReferences)
+            if (newReferences.Any())
             {
-                var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-
-                if (result.Failed)
-                    return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
-
-                if (referenceProperties.MasterReference)
+                var masterReferencesCount = newReferences.Count(x => x.MasterReference);
+                
+                switch (masterReferencesCount)
                 {
-                    var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
-                    if (masterReferenceResult.Failed)
-                        return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                    case < 1:
+                        return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                    case > 1:
+                        return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
+                }
+
+                foreach (var referenceProperties in newReferences)
+                {
+                    var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
+
+                    if (result.Failed)
+                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+
+                    if (referenceProperties.MasterReference)
+                    {
+                        var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
+                        if (masterReferenceResult.Failed)
+                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                    }
                 }
             }
 

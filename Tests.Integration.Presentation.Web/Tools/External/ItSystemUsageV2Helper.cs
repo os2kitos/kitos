@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 using Xunit.Sdk;
 
@@ -100,6 +101,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/kle"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/external-references"), token, payload?.ToList() ?? new List<ExternalReferenceDataDTO>());
         }
     }
 }
