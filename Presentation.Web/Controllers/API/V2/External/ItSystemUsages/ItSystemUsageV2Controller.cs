@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -269,12 +270,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
+        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] IEnumerable<ExternalReferenceDataDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    ExternalReferences = MapReferences(request).FromNullable()
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -438,11 +445,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
             var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
             var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
+            var externalReferncesInput = request.ExternalReferences ?? (enforceUndefinedSections ? new List<ExternalReferenceDataDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(MapKle)
+                KLE = kleInput.FromNullable().Select(MapKle),
+                ExternalReferences = externalReferncesInput.FromNullable().Select(MapReferences)
             };
         }
 
@@ -457,12 +466,25 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataUpdateRequestDTO() : null);
             var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
             var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
+            var externalReferncesInput = request.ExternalReferences ?? (enforceUndefinedSections ? new List<ExternalReferenceDataDTO>() : null);
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(MapKle)
+                KLE = kleInput.FromNullable().Select(MapKle),
+                ExternalReferences = externalReferncesInput.FromNullable().Select(MapReferences)
             };
+        }
+
+        private static IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            return references.Select(x => new UpdatedExternalReferenceProperties
+            {
+                Title = x.Title,
+                DocumentId = x.DocumentId,
+                Url = x.Url,
+                MasterReference = x.MasterReference
+            });
         }
 
         private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
