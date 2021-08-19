@@ -690,5 +690,16 @@ namespace Core.DomainModel.ItSystemUsage
 
             return Maybe<OperationError>.None;
         }
+
+
+        public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
+        {
+            return new ItSystemRight()
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
     }
 }

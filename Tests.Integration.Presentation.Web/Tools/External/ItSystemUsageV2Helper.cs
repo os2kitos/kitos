@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Xunit;
@@ -100,6 +101,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/kle"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles"), token, dto);
         }
     }
 }

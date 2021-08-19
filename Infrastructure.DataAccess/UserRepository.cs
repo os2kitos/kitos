@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainServices;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -64,6 +65,11 @@ namespace Infrastructure.DataAccess
         public IQueryable<User> GetUsersInOrganization(int organizationId)
         {
             return AsQueryable().Where(user => user.OrganizationRights.Any(right => right.OrganizationId == organizationId));
+        }
+
+        public Maybe<User> GetByUuid(Guid uuid)
+        {
+            return AsQueryable().ByUuid(uuid);
         }
     }
 }

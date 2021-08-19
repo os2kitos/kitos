@@ -600,5 +600,14 @@ namespace Core.DomainModel.ItContract
             return DataProcessingRegistrations.FirstOrDefault(x => x.Id == dataProcessingRegistrationId).FromNullable();
         }
 
+        public override ItContractRight CreateNewRight(ItContractRole role, User user)
+        {
+            return new ItContractRight()
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
     }
 }

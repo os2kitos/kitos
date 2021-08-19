@@ -16,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V1
     public abstract class GenericRightsController<TObject, TRight, TRole> : BaseApiController
         where TObject : HasRightsEntity<TObject, TRight, TRole>, IOwnedByOrganization
         where TRight : Entity, IRight<TObject, TRight, TRole>
-        where TRole : IRoleEntity
+        where TRole : IRoleEntity, IHasId
     {
         protected readonly IGenericRepository<TRight> RightRepository;
         private readonly IGenericRepository<TObject> _objectRepository;

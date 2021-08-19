@@ -200,7 +200,11 @@
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationDataResponsibleAssigmentServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationNamingServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationOversightOptionsAssignmentServiceTest.cs" />
-    <Compile Include="DomainServices\GDPR\DataProcessingRegistrationRoleAssignmentsServiceTest.cs" />
+    <Compile Include="DomainServices\Role\DataProcessingRegistrationRoleAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Role\ItContractRoleAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Role\ItProjectRoleAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Role\ItSystemUsageRoleAssignmentServiceTest.cs" />
+    <Compile Include="DomainServices\Role\RoleAssignmentsServiceTest.cs" />
     <Compile Include="DomainServices\GDPR\DataProcessingRegistrationSystemAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationOptionRepositoryTest.cs" />
     <Compile Include="DomainServices\Repositories\DataProcessingRegistrationRepositoryTest.cs" />
@@ -221,6 +225,7 @@
     <Compile Include="Infrastructure\EnumerableExtensionsTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
+    <Compile Include="Model\HasRightsEntityTest.cs" />
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
