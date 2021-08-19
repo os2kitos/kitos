@@ -246,14 +246,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static YesNoExtendedChoice? MapYesNoExtended(DataOptions? input)
+        private static YesNoDontKnowChoice? MapYesNoExtended(DataOptions? input)
         {
             return input switch
             {
-                DataOptions.NO => YesNoExtendedChoice.No,
-                DataOptions.YES => YesNoExtendedChoice.Yes,
-                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
-                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
+                DataOptions.NO => YesNoDontKnowChoice.No,
+                DataOptions.YES => YesNoDontKnowChoice.Yes,
+                DataOptions.DONTKNOW => YesNoDontKnowChoice.DontKnow,
+                DataOptions.UNDECIDED => YesNoDontKnowChoice.Undecided,
                 null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(input), input, null)
             };

@@ -548,14 +548,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
         }
 
-        private static void AssertYesNoExtended(YesNoExtendedChoice? actual, DataOptions? expectedFromSource)
+        private static void AssertYesNoExtended(YesNoDontKnowChoice? actual, DataOptions? expectedFromSource)
         {
-            YesNoExtendedChoice? expected = expectedFromSource switch
+            YesNoDontKnowChoice? expected = expectedFromSource switch
             {
-                DataOptions.NO => YesNoExtendedChoice.No,
-                DataOptions.YES => YesNoExtendedChoice.Yes,
-                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
-                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
+                DataOptions.NO => YesNoDontKnowChoice.No,
+                DataOptions.YES => YesNoDontKnowChoice.Yes,
+                DataOptions.DONTKNOW => YesNoDontKnowChoice.DontKnow,
+                DataOptions.UNDECIDED => YesNoDontKnowChoice.Undecided,
                 null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
             };
