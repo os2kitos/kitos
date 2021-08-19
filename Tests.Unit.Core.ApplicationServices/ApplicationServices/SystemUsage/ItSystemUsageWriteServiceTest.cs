@@ -924,6 +924,468 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.EndsWith(operationError.Message.GetValueOrDefault(), result.Error.Message.GetValueOrDefault());
         }
 
+        [Fact]
+        public void Can_Create_With_Archiving()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.Some((archiveTestLocation, true)));
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectRemoveAllArchivePeriodsReturns(itSystemUsage.Id, new List<ArchivePeriod>());
+
+            Configure(f => f.Inject(new ArchivePeriod()
+            {
+                Approved = A<bool>(),
+                UniqueArchiveId = A<string>(),
+                StartDate = A<DateTime>(),
+                EndDate = A<DateTime>()
+            }));
+            ExpectAddArchivePeriodReturns(itSystemUsage.Id, Result<ArchivePeriod, OperationError>.Success(A<ArchivePeriod>()));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertArchivingParameters(archivingParameters, organization.Name, createResult.Value);
+        }
+
+        [Fact]
+        public void Can_Create_With_Archiving_With_Maybe_None_Values()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+
+            var archivingParameters = CreateEmptySystemUsageArchivingParameters();
+            ExpectRemoveAllArchivePeriodsReturns(itSystemUsage.Id, new List<ArchivePeriod>());
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertEmptyArchivingParameters(createResult.Value);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveTypeUuid_Not_Exists()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+            
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.None);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveTypeUuid_Not_Available_In_Org()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, false)));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveLocationUuid_Not_Exists()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.None);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveLocationUuid_Not_Available_In_Org()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, false)));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveTestLocationUuid_Not_Exists()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.None);
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_ArchiveTestLocationUuid_Not_Available_In_Org()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.Some((archiveTestLocation, false)));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_GetSupplierOrganizationByUuid_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.Some((archiveTestLocation, true)));
+            var failure = A<OperationFailure>();
+            ExpectGetOrganizationReturns(organizationUuid, new OperationError(failure));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(failure, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_RemoveAllArchivePeriods_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.Some((archiveTestLocation, true)));
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+
+            var failure = A<OperationFailure>();
+            _itSystemUsageServiceMock.Setup(x => x.RemoveAllArchivePeriods(itSystemUsage.Id))
+                .Returns(new OperationError(failure));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(failure, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Archiving_If_AddArchivePeriod_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var archiveTypeUuid = A<Guid>();
+            var archiveLocationUuid = A<Guid>();
+            var archiveTestLocationUuid = A<Guid>();
+
+            var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
+
+            var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
+            ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.Some((archiveType, true)));
+            var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
+            ExpectGetArchiveLocationReturns(organization.Id, archiveLocationUuid, Maybe<(ArchiveLocation, bool)>.Some((archiveLocation, true)));
+            var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
+            ExpectGetArchiveTestLocationReturns(organization.Id, archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)>.Some((archiveTestLocation, true)));
+            ExpectGetOrganizationReturns(organizationUuid, organization);
+            ExpectRemoveAllArchivePeriodsReturns(itSystemUsage.Id, new List<ArchivePeriod>());
+
+            var failure = A<OperationFailure>();
+            _itSystemUsageServiceMock.Setup(x => x.AddArchivePeriod(itSystemUsage.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>())).Returns(new OperationError(failure));
+
+            var input = new SystemUsageUpdateParameters
+            {
+                Archiving = archivingParameters
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(failure, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        private void AssertEmptyArchivingParameters(ItSystemUsage actual)
+        {
+            Assert.Null(actual.ArchiveDuty);
+            Assert.Null(actual.ArchiveType);
+            Assert.Null(actual.ArchiveLocation);
+            Assert.Null(actual.ArchiveTestLocation);
+            Assert.Equal("", actual.ArchiveSupplier);
+            Assert.Null(actual.ArchiveFromSystem);
+            Assert.Null(actual.Registertype);
+            Assert.Null(actual.ArchiveFreq);
+            Assert.Equal("", actual.ArchiveNotes); 
+            _itSystemUsageServiceMock.Verify(x => x.RemoveAllArchivePeriods(actual.Id), Times.Once);
+            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
+        }
+
+        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, ItSystemUsage actual)
+        {
+            Assert.Equal(expected.ArchiveDuty.Value.Value.Value, actual.ArchiveDuty);
+            Assert.Equal(expected.ArchiveTypeUuid.Value.Value.Value, actual.ArchiveType.Uuid);
+            Assert.Equal(expected.ArchiveLocationUuid.Value.Value.Value, actual.ArchiveLocation.Uuid);
+            Assert.Equal(expected.ArchiveTestLocationUuid.Value.Value.Value, actual.ArchiveTestLocation.Uuid);
+            Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
+            Assert.Equal(expected.ArchiveActive.Value.Value.Value, actual.ArchiveFromSystem);
+            Assert.Equal(expected.ArchiveDocumentBearing.Value.Value.Value, actual.Registertype);
+            Assert.Equal(expected.ArchiveFrequencyInMonths.Value.Value.Value, actual.ArchiveFreq);
+            Assert.Equal(expected.ArchiveNotes.Value.Value, actual.ArchiveNotes);
+            _itSystemUsageServiceMock.Verify(x => x.RemoveAllArchivePeriods(actual.Id), Times.Once);
+            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.Value.Value.Value.Count()));
+        }
+
+        private UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
+        {
+            return new UpdatedSystemUsageArchivingParameters()
+            {
+                ArchiveDuty = Maybe<ArchiveDutyTypes>.None.AsChangedValue(),
+                ArchiveTypeUuid = Maybe<Guid>.None.AsChangedValue(),
+                ArchiveLocationUuid = Maybe<Guid>.None.AsChangedValue(),
+                ArchiveTestLocationUuid = Maybe<Guid>.None.AsChangedValue(),
+                ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue(),
+                ArchiveActive = Maybe<bool>.None.AsChangedValue(),
+                ArchiveDocumentBearing = Maybe<bool>.None.AsChangedValue(),
+                ArchiveFrequencyInMonths = Maybe<int>.None.AsChangedValue(),
+                ArchiveNotes = "".AsChangedValue(),
+                ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriod>>.None.AsChangedValue()
+            };
+        }
+
+        private UpdatedSystemUsageArchivingParameters CreateSystemUsageArchivingParameters(Maybe<Guid> archiveTypeUuid, Maybe<Guid> archiveLocationUuid, Maybe<Guid> archiveTestLocationUuid, Maybe<Guid> archiveSupplierUuid)
+        {
+            return new UpdatedSystemUsageArchivingParameters()
+            {
+                ArchiveDuty = A<ArchiveDutyTypes>().FromNullable().AsChangedValue(),
+                ArchiveTypeUuid = archiveTypeUuid.AsChangedValue(),
+                ArchiveLocationUuid = archiveLocationUuid.AsChangedValue(),
+                ArchiveTestLocationUuid = archiveTestLocationUuid.AsChangedValue(),
+                ArchiveSupplierOrganizationUuid = archiveSupplierUuid.AsChangedValue(),
+                ArchiveActive = A<bool>().FromNullable().AsChangedValue(),
+                ArchiveDocumentBearing = A<bool>().FromNullable().AsChangedValue(),
+                ArchiveFrequencyInMonths = A<int>().FromNullable().AsChangedValue(),
+                ArchiveNotes = A<string>().AsChangedValue(),
+                ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
+            };
+        }
+
+        private void ExpectAddArchivePeriodReturns(int itSystemUsageId, Result<ArchivePeriod, OperationError> addResult)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.AddArchivePeriod(itSystemUsageId, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>())).Returns(addResult);
+        }
+
+        private void ExpectRemoveAllArchivePeriodsReturns(int itSystemUsageId, IEnumerable<ArchivePeriod> removedPeriods)
+        {
+            _itSystemUsageServiceMock.Setup(x => x.RemoveAllArchivePeriods(itSystemUsageId)).Returns(removedPeriods.ToList());
+        }
+
+        private void ExpectGetArchiveTestLocationReturns(int organizationId, Guid archiveTestLocationUuid, Maybe<(ArchiveTestLocation, bool)> result)
+        {
+            _archiveTestLocationOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, archiveTestLocationUuid)).Returns(result);
+        }
+
+        private void ExpectGetArchiveLocationReturns(int organizationId, Guid archiveLocationUuid, Maybe<(ArchiveLocation, bool)> result)
+        {
+            _archiveLocationOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, archiveLocationUuid)).Returns(result);
+        }
+
+        private void ExpectGetArchiveTypeReturns(int organizationId, Guid archiveTypeUuid, Maybe<(ArchiveType, bool)> result)
+        {
+            _archiveTypeOptionsServiceMock.Setup(x => x.GetOptionByUuid(organizationId, archiveTypeUuid)).Returns(result);
+        }
+
         private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
         {
             _referenceServiceMock
