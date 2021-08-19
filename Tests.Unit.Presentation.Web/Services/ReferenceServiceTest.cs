@@ -358,7 +358,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.None);
 
             //Act
-            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>(), A<Display>());
+            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>());
 
             //Assert
             Assert.True(result.Failed);
@@ -376,7 +376,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowModifyReturns(entity.Object, false);
 
             //Act
-            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>(), A<Display>());
+            var result = _sut.AddReference(id, rootType, A<string>(), A<string>(), A<string>());
 
             //Assert
             Assert.True(result.Failed);
@@ -392,14 +392,13 @@ namespace Tests.Unit.Presentation.Web.Services
             var title = A<string>();
             var externalReferenceId = A<string>();
             var url = A<string>();
-            var display = A<Display>();
             var entity = new Mock<IEntityWithExternalReferences>();
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
             ExpectAllowModifyReturns(entity.Object, true);
-            ExpectAddReferenceReturns(entity, title, externalReferenceId, url, display, new ExternalReference());
+            ExpectAddReferenceReturns(entity, title, externalReferenceId, url, new ExternalReference());
 
             //Act
-            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url, display);
+            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url);
 
             //Assert
             Assert.True(result.Ok);
@@ -415,15 +414,14 @@ namespace Tests.Unit.Presentation.Web.Services
             var title = A<string>();
             var externalReferenceId = A<string>();
             var url = A<string>();
-            var display = A<Display>();
             var entity = new Mock<IEntityWithExternalReferences>();
             ExpectGetRootEntityReturns(id, rootType, Maybe<IEntityWithExternalReferences>.Some(entity.Object));
             ExpectAllowModifyReturns(entity.Object, true);
             var operationError = A<OperationError>();
-            ExpectAddReferenceReturns(entity, title, externalReferenceId, url, display, operationError);
+            ExpectAddReferenceReturns(entity, title, externalReferenceId, url, operationError);
 
             //Act
-            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url, display);
+            var result = _sut.AddReference(id, rootType, title, externalReferenceId, url);
 
             //Assert
             Assert.True(result.Failed);
@@ -431,14 +429,12 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Never);
         }
 
-        private static void ExpectAddReferenceReturns(Mock<IEntityWithExternalReferences> entity, string title, string externalReferenceId, string url,
-            Display display, Result<ExternalReference, OperationError> result)
+        private static void ExpectAddReferenceReturns(Mock<IEntityWithExternalReferences> entity, string title, string externalReferenceId, string url, Result<ExternalReference, OperationError> result)
         {
             entity.Setup(x => x.AddExternalReference(It.Is<ExternalReference>(er =>
                     er.Title == title &&
                     er.ExternalReferenceId == externalReferenceId &&
-                    er.URL == url &&
-                    er.Display == display)))
+                    er.URL == url)))
                 .Returns(result);
         }
 

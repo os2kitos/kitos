@@ -247,9 +247,7 @@ namespace Core.DomainModel.GDPR
             return new DataProcessingRegistrationRight()
             {
                 Role = role,
-                RoleId = role.Id,
                 User = user,
-                UserId = user.Id,
                 Object = this
             };
         }

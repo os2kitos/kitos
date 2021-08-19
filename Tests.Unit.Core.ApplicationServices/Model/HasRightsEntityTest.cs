@@ -1,30 +1,54 @@
 ﻿using System;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Core.Model
 {
+    internal class ModelStub : HasRightsEntity<ModelStub, RightStub, RoleStub>
+    {
+        public override RightStub CreateNewRight(RoleStub role, User user)
+        {
+            return new RightStub()
+            {
+                Role = role,
+                RoleId = role.Id,
+                User = user,
+                UserId = user.Id,
+                Object = this
+            };
+        }
+    }
+
+    internal class RightStub : IRight<ModelStub, RightStub, RoleStub>
+    {
+        public int UserId { get; set; }
+        public User User { get; set; }
+        public int RoleId { get; set; }
+        public RoleStub Role { get; set; }
+        public int ObjectId { get; set; }
+        public ModelStub Object { get; set; }
+    }
+
+    internal class RoleStub : IRoleEntity, IHasId, IHasUuid
+    {
+        public bool HasReadAccess { get; set; }
+        public bool HasWriteAccess { get; set; }
+        public int Id { get; set; }
+        public Guid Uuid { get; set; }
+    }
+
+
     public class HasRightsEntityTest : WithAutoFixture
     {
         [Fact]
         public void Can_AssignRole()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var user = new User()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var user = CreateUser();
+            var sut = new ModelStub();
 
             //Act
             var assignResult = sut.AssignRole(role, user);
@@ -41,18 +65,10 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Cannot_AssignRole_If_Already_Assigned()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var user = new User()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var user = CreateUser();
+            var sut = new ModelStub();
             var initialAssignResult = sut.AssignRole(role, user);
             Assert.True(initialAssignResult.Ok);
 
@@ -67,18 +83,10 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_RemoveRole()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var user = new User()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var user = CreateUser();
+            var sut = new ModelStub();
             var initialAssignResult = sut.AssignRole(role, user);
             Assert.True(initialAssignResult.Ok);
             Assert.Single(sut.Rights);
@@ -94,18 +102,10 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Cannot_RemoveRole_If_Not_Assigned()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var user = new User()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var user = CreateUser();
+            var sut = new ModelStub();
 
             //Act
             var assignResult = sut.RemoveRole(role, user);
@@ -118,18 +118,10 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_GetRights()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var user = new User()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var user = CreateUser();
+            var sut = new ModelStub();
             var initialAssignResult = sut.AssignRole(role, user);
             Assert.True(initialAssignResult.Ok);
 
@@ -147,19 +139,33 @@ namespace Tests.Unit.Core.Model
         [Fact]
         public void Can_GetRights_Returns_Empty_If_No_Rights_For_Role()
         {
-            //Arrange - ItSystemUsage extends HasRightsEntity
-            var role = new ItSystemRole()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var sut = new ItSystemUsage();
+            //Arrange 
+            var role = CreateRole();
+            var sut = new ModelStub();
 
             //Act
             var rights = sut.GetRights(role.Id);
 
             //Assert
             Assert.Empty(rights);
+        }
+
+        private RoleStub CreateRole()
+        {
+            return new RoleStub
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
+        }
+
+        private User CreateUser()
+        {
+            return new User()
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
         }
     }
 }

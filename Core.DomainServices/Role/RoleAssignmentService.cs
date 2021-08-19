@@ -48,6 +48,9 @@ namespace Core.DomainServices.Role
 
         private static IEnumerable<int> GetIdsOfUsersAssignedToRole(TModel model, TRole role)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (role == null) throw new ArgumentNullException(nameof(role));
+
             return model.GetRights(role.Id).Select(x => x.UserId).Distinct();
         }
 
@@ -80,6 +83,8 @@ namespace Core.DomainServices.Role
 
         public Result<TRight, OperationError> AssignRole(TModel model, Guid roleUuid, Guid userUuid)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var userId = GetUserByUuid(userUuid);
             if (userId.Failed)
                 return userId.Error;
@@ -115,6 +120,8 @@ namespace Core.DomainServices.Role
 
         public Result<TRight, OperationError> RemoveRole(TModel model, Guid roleUuid, Guid userUuid)
         {
+            if (model == null) throw new ArgumentNullException(nameof(model));
+
             var userId = GetUserByUuid(userUuid);
             if (userId.Failed)
                 return userId.Error;

@@ -7,10 +7,10 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -21,10 +21,10 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -52,6 +52,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>> _roleAssignmentService;
         private readonly ItSystemUsageWriteService _sut;
         private readonly Mock<IKLEApplicationService> _kleServiceMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -68,12 +69,13 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _kleServiceMock = new Mock<IKLEApplicationService>();
+            _referenceServiceMock = new Mock<IReferenceService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(), 
-                _roleAssignmentService.Object, _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
+                _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(),
+                _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
                 _archiveTestLocationOptionsServiceMock.Object);
         }
 
@@ -811,6 +813,135 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
         }
 
+        [Fact]
+        public void Can_Create_With_ExternalReferences()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(expectedMaster.Title, result.Value.Reference.Title);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_But_No_Master()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_And_Multiple_Masters()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            //Set two masters
+            foreach (var master in externalReferences.Take(2))
+                master.MasterReference = true;
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_If_Add_Reference_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+            var operationError = A<OperationError>();
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+            foreach (var externalReference in externalReferences.Where(x => x.MasterReference == false))
+                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
+            ExpectAddExternalReferenceReturns(itSystemUsage, expectedMaster, operationError);
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(operationError.FailureType, result.Error.FailureType);
+            Assert.EndsWith(operationError.Message.GetValueOrDefault(), result.Error.Message.GetValueOrDefault());
+        }
+
+        private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.AddReference(itSystemUsage.Id, ReferenceRootType.SystemUsage, externalReference.Title, externalReference.DocumentId, externalReference.Url))
+                .Returns(value);
+        }
+
+        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
+        {
+            return new ExternalReference
+            {
+                Id = A<int>(),
+                Title = externalReference.Title,
+                ExternalReferenceId = externalReference.DocumentId,
+                URL = externalReference.Url
+            };
+        }
+
         private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
         {
             var input = new SystemUsageUpdateParameters
@@ -867,7 +998,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
 
-            var input = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
+            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                CreateUserRolePair(roleUuid, userUuid)
+            });
 
             var right = CreateRight(itSystemUsage, roleUuid, userUuid);
 
@@ -908,7 +1042,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
 
-            var input = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
+            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                CreateUserRolePair(roleUuid, userUuid)
+            });
             var error = A<OperationFailure>();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
@@ -928,57 +1065,68 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var roleUuid = A<Guid>();
-            var userUuid = A<Guid>();
 
-            var addRoleInput = CreateSystemUsageUpdateParametersWithData(roleUuid, userUuid);
-
-            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
+            var newRight = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var newUserRolePair = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
+            ExpectRoleAssignmentReturns(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid, newRight);
 
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, addRoleInput));
-            Assert.True(createResult.Ok);
-            AssertTransactionCommitted(transactionMock);
+            var rightToRemove1 = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var rightToKeep = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var userRolePairToKeep = CreateUserRolePair(rightToKeep.Role.Uuid, rightToKeep.User.Uuid);
+            itSystemUsage.Rights.Add(rightToRemove1);
+            itSystemUsage.Rights.Add(rightToKeep);
 
-            var removeRoleInput = CreateSystemUsageUpdateParametersWithoutData();
-            ExpectRoleRemoveReturns(itSystemUsage, roleUuid, userUuid, right);
-            ExpectGetSystemUsageReturns(createResult.Value.Uuid, createResult.Value);
+            var roleInput = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                newUserRolePair, userRolePairToKeep
+            });
+
+            ExpectRoleRemoveReturns(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid, rightToRemove1);
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
 
             //Act
-            var updateResult = _sut.Update(createResult.Value.Uuid, removeRoleInput);
+            var updateResult = _sut.Update(itSystemUsage.Uuid, roleInput);
 
             //Assert
             Assert.True(updateResult.Ok);
             AssertTransactionCommitted(transactionMock);
+            AssertRemoveRoleCalledOnce(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid);
+            AssertAssignRoleCalledOnce(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid);
         }
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
             return new SystemUsageUpdateParameters()
             {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
+                Roles = new UpdatedSystemUsageRoles()
                 {
-                    UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.Some(Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue())
-                })
+                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None
+                        .AsChangedValue()
+                        .FromNullable()
+                }
+                    .FromNullable()
             };
         }
 
-        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithData(Guid roleUuid, Guid userUuid)
+        private static UserRolePair CreateUserRolePair(Guid roleUuid, Guid userUuid)
+        {
+            return new UserRolePair()
+            {
+                RoleUuid = roleUuid,
+                UserUuid = userUuid
+            };
+        }
+
+        private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithData(IEnumerable<UserRolePair> userRolePairs)
         {
             return new SystemUsageUpdateParameters()
             {
-                Roles = Maybe<UpdatedSystemUsageRoles>.Some(new UpdatedSystemUsageRoles()
+                Roles = new UpdatedSystemUsageRoles()
                 {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.Some(new List<UserRolePair>()
-                    {
-                        new UserRolePair()
-                        {
-                            RoleUuid = roleUuid,
-                            UserUuid = userUuid
-                        }
-                    }).AsChangedValue()
-                })
+                    UserRolePairs = userRolePairs.FromNullable().AsChangedValue()
+                }
+                    .FromNullable()
             };
         }
 
@@ -1000,6 +1148,25 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
+        private void AssertAssignRoleCalledOnce(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
+        {
+            _roleAssignmentService.Verify(x => x.AssignRole(itSystemUsage, roleUuid, userUuid), Times.Once);
+        }
+
+        private void AssertAssignRoleNeverCalled()
+        {
+            _roleAssignmentService.Verify(x => x.AssignRole(It.IsAny<ItSystemUsage>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+        }
+
+        private void AssertRemoveRoleCalledOnce(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
+        {
+            _roleAssignmentService.Verify(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid), Times.Once);
+        }
+        private void AssertRemoveRoleNeverCalled()
+        {
+            _roleAssignmentService.Verify(x => x.RemoveRole(It.IsAny<ItSystemUsage>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
+        }
+
         private void ExpectRoleAssignmentReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
         {
             _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
@@ -1019,6 +1186,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystem = new ItSystem { Id = A<int>() };
             var itSystemUsage = new ItSystemUsage
             {
+                Id = A<int>(),
                 OrganizationId = organization.Id,
                 ItSystem = itSystem
             };

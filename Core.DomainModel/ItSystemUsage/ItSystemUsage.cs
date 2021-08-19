@@ -222,6 +222,12 @@ namespace Core.DomainModel.ItSystemUsage
             return new AddReferenceCommand(this).AddExternalReference(newReference);
         }
 
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
+        }
+
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
             Reference = newReference;
@@ -696,9 +702,7 @@ namespace Core.DomainModel.ItSystemUsage
             return new ItSystemRight()
             {
                 Role = role,
-                RoleId = role.Id,
                 User = user,
-                UserId = user.Id,
                 Object = this
             };
         }

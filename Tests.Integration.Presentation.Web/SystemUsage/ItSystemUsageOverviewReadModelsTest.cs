@@ -146,7 +146,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId); //Using default organization as responsible organization unit
 
             //References
-            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), A<Display>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
 
             //Main Contract
             var contract = await ItContractHelper.CreateContract(contractName, organizationId);

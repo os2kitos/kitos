@@ -605,9 +605,7 @@ namespace Core.DomainModel.ItContract
             return new ItContractRight()
             {
                 Role = role,
-                RoleId = role.Id,
                 User = user,
-                UserId = user.Id,
                 Object = this
             };
         }

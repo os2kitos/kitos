@@ -1,25 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using AutoFixture;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.ItSystem;
+using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -647,7 +646,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
 
             //Act - remove some
-            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals});
+            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals });
             Assert.Equal(HttpStatusCode.OK, put3.StatusCode);
 
             //Assert
@@ -665,7 +664,75 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
         }
 
-        //TODO: PUT modify
+        [Fact]
+        public async Task Can_POST_With_ExternalReferences()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var request = CreatePostRequest(organization.Uuid, system.Uuid, referenceDataDtos: inputs);
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
+            AssertExternalReferenceResults(inputs, dto);
+        }
+
+        [Fact]
+        public async Task Can_PUT_ExternalReferences()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var request = CreatePostRequest(organization.Uuid, system.Uuid);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            //Act
+            using var response1 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs1);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertExternalReferenceResults(inputs1, dto);
+
+            //Act - reset
+            var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+            using var response2 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs2);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertExternalReferenceResults(inputs2, dto);
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItSystemUsageResponseDTO actual)
+        {
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
 
         private static void AssertKLEDeviation(bool withDeviation, IEnumerable<Guid> expectedDeviation, IEnumerable<IdentityNamePairResponseDTO> actualDeviation)
         {
@@ -782,14 +849,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
             Assert.Equal(2, freshReadDTO.Roles.Count());
-            var right1 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
-            Assert.Equal(role.Name, right1.Role.Name);
-            Assert.Equal(role.Uuid, right1.Role.Uuid);
-            Assert.Equal(user1.GetFullName(), right1.User.Name);
-            var right2 = Assert.Single(freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
-            Assert.Equal(role.Name, right2.Role.Name);
-            Assert.Equal(role.Uuid, right2.Role.Uuid);
-            Assert.Equal(user2.GetFullName(), right2.User.Name);
+            AssertSingleRight(role, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
+            AssertSingleRight(role, user2, freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
         }
 
         [Fact]
@@ -830,11 +891,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             Assert.Equal(HttpStatusCode.OK, addInitialRolesRequest.StatusCode);
             var initialRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
-            var initialRight = Assert.Single(initialRoleResponse.Roles);
-            Assert.Equal(role.Name, initialRight.Role.Name);
-            Assert.Equal(role.Uuid, initialRight.Role.Uuid);
-            Assert.Equal(user1.Uuid, initialRight.User.Uuid);
-            Assert.Equal(user1.GetFullName(), initialRight.User.Name);
+            AssertSingleRight(role, user1, initialRoleResponse.Roles);
 
             //Act - Modify role
             var modifiedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, modifyRoles);
@@ -842,11 +899,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Assert
             Assert.Equal(HttpStatusCode.OK, modifiedRequest.StatusCode);
             var modifiedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
-            var modifiedRight = Assert.Single(modifiedRoleResponse.Roles);
-            Assert.Equal(role.Name, modifiedRight.Role.Name);
-            Assert.Equal(role.Uuid, modifiedRight.Role.Uuid);
-            Assert.Equal(user2.Uuid, modifiedRight.User.Uuid);
-            Assert.Equal(user2.GetFullName(), modifiedRight.User.Name);
+            AssertSingleRight(role, user2, modifiedRoleResponse.Roles);
             
             //Act - Remove role
             var removedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>());
@@ -857,12 +910,22 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Empty(removedRoleResponse.Roles);
         }
 
+        private static void AssertSingleRight(ItSystemRole expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
+        {
+            var actualRight = Assert.Single(rightList);
+            Assert.Equal(expectedRole.Name, actualRight.Role.Name);
+            Assert.Equal(expectedRole.Uuid, actualRight.Role.Uuid);
+            Assert.Equal(expectedUser.Uuid, actualRight.User.Uuid);
+            Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
+        }
+
         private static CreateItSystemUsageRequestDTO CreatePostRequest(
             Guid organizationId,
             Guid systemId,
             GeneralDataWriteRequestDTO generalSection = null,
             OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
             LocalKLEDeviationsRequestDTO kleDeviationsRequest = null,
+            IEnumerable<ExternalReferenceDataDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null)
         {
             return new CreateItSystemUsageRequestDTO
@@ -872,6 +935,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 General = generalSection,
                 OrganizationUsage = organizationalUsageSection,
                 LocalKleDeviations = kleDeviationsRequest,
+                ExternalReferences = referenceDataDtos?.ToList(),
                 Roles = roles
             };
         }

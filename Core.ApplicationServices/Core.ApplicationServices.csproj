@@ -127,6 +127,7 @@
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageArchivingParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageKLEDeviationParameters.cs" />

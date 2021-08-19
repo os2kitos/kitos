@@ -8,7 +8,6 @@ namespace Presentation.Web.Models.API.V1
         public string Title { get; set; }
         public string ExternalReferenceId { get; set; }
         public string URL { get; set; }
-        public Core.DomainModel.Display Display { get; set; }
         public int ObjectOwnerId { get; set; }
         public virtual UserDTO ObjectOwner { get; set; }
         public int? ItProject_Id { get; set; }
