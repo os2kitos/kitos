@@ -740,5 +740,54 @@ namespace Core.DomainModel.ItSystemUsage
 
             return Maybe<OperationError>.None;
         }
+
+        public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
+        {
+            if (technicalPrecautions == null)
+                throw new ArgumentNullException(nameof(technicalPrecautions));
+
+            var enabledPrecautions = technicalPrecautions.ToList();
+
+            if (enabledPrecautions.Count != enabledPrecautions.Distinct().Count())
+                return new OperationError("Duplicates are not allowed in technical precautions", OperationFailure.BadInput);
+
+            var disabledPrecautions = Enum.GetValues(typeof(TechnicalPrecaution)).Cast<TechnicalPrecaution>().Except(enabledPrecautions).ToList();
+
+            var changeSet = enabledPrecautions
+                .Select(p =>
+                    new
+                    {
+                        Enabled = true,
+                        Precaution = p
+                    }).Concat(disabledPrecautions.Select(p => new
+                    {
+                        Enabled = false,
+                        Precaution = p
+
+                    }));
+
+            foreach (var change in changeSet)
+            {
+                switch (change.Precaution)
+                {
+                    case TechnicalPrecaution.Encryption:
+                        precautionsOptionsEncryption = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Pseudonymization:
+                        precautionsOptionsPseudonomisering = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.AccessControl:
+                        precautionsOptionsAccessControl = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Logging:
+                        precautionsOptionsLogning = change.Enabled;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Maybe<OperationError>.None;
+        }
     }
 }

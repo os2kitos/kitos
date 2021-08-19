@@ -7,5 +7,7 @@ namespace Core.DomainServices.Repositories.GDPR
     {
         IEnumerable<AttachedOption> GetBySystemUsageId(int systemUsageId);
         void DeleteBySystemUsageId(int systemUsageId);
+        void DeleteAttachedOption(int systemUsageId, int optionId, OptionType optionType);
+        void AddAttachedOption(int systemUsageId, int optionId, OptionType optionType);
     }
 }

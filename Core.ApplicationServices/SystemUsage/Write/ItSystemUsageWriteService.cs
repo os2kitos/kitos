@@ -12,6 +12,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -20,6 +21,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -45,6 +47,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
         private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
+        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IOptionsService<ItSystem, SensitivePersonalDataType> _sensitivePersonDataOptionsService;
+        private readonly IOptionsService<ItSystemUsage, RegisterType> _registerTypeOptionsService;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -58,6 +63,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IKLEApplicationService kleApplicationService,
             IReferenceService referenceService,
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
+            IAttachedOptionRepository attachedOptionRepository,
+            IOptionsService<ItSystem, SensitivePersonalDataType> sensitivePersonDataOptionsService,
+            IOptionsService<ItSystemUsage, RegisterType> registerTypeOptionsService,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -76,6 +84,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _domainEvents = domainEvents;
             _logger = logger;
             _roleAssignmentService = roleAssignmentService;
+            _attachedOptionRepository = attachedOptionRepository;
+            _sensitivePersonDataOptionsService = sensitivePersonDataOptionsService;
+            _registerTypeOptionsService = registerTypeOptionsService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -207,19 +218,95 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
         }
 
-        private Maybe<OperationError> UpdateAppliedTechnicalPrecautions(ItSystemUsage arg1, Maybe<IEnumerable<TechnicalPrecaution>> arg2)
+        private static Maybe<OperationError> UpdateAppliedTechnicalPrecautions(ItSystemUsage systemUsage, Maybe<IEnumerable<TechnicalPrecaution>> newPrecautions)
         {
-            throw new NotImplementedException();
+            return systemUsage.UpdateTechnicalPrecautions(newPrecautions.GetValueOrFallback(new List<TechnicalPrecaution>()));
         }
 
-        private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage arg1, Maybe<IEnumerable<Guid>> arg2)
+            //TODO: Refactor this beast into a generic assignment service because this is crazy
+        private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> registerTypeUuids)
         {
-            throw new NotImplementedException();
+            var ids = registerTypeUuids.GetValueOrFallback(new List<Guid>()).ToList();
+
+            if (ids.Count != ids.Distinct().Count())
+                return new OperationError("Duplicates for registered data types are not allowed", OperationFailure.BadInput);
+
+            var existingRegisterTypeIds = _attachedOptionRepository
+                .GetBySystemUsageId(systemUsage.Id)
+                .Where(x => x.OptionType == OptionType.REGISTERTYPEDATA)
+                .Select(x => x.OptionId)
+                .ToHashSet();
+
+            var registerTypes = new List<RegisterType>();
+            foreach (var uuid in ids)
+            {
+                var optionResult = _registerTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
+                if (optionResult.IsNone)
+                    return new OperationError($"Registered data type option with id:{uuid} does not exist", OperationFailure.BadInput);
+
+                //Only apply org availability constraint if the type was added (compared to current state)
+                var registerType = optionResult.Value.option;
+
+                if (!existingRegisterTypeIds.Contains(registerType.Id) && !optionResult.Value.available)
+                    return new OperationError($"Registered data type option with id:{uuid} is not available in the organization", OperationFailure.BadInput);
+
+                registerTypes.Add(registerType);
+            }
+
+            //Compute deltas and apply changes
+            var idsOfTypesToRemove = existingRegisterTypeIds.Except(registerTypes.Select(x => x.Id)).ToList();
+            var registerTypesToAdd = registerTypes.Select(x => x.Id).Except(existingRegisterTypeIds).ToList();
+
+            foreach (var id in idsOfTypesToRemove)
+                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, OptionType.REGISTERTYPEDATA);
+
+            foreach (var id in registerTypesToAdd)
+                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, OptionType.REGISTERTYPEDATA);
+
+            return Maybe<OperationError>.None;
         }
 
-        private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage arg1, Maybe<IEnumerable<Guid>> arg2)
+            //TODO: Refactor this beast into a generic assignment service because this is crazy
+        private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
-            throw new NotImplementedException();
+            var ids = sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()).ToList();
+
+            if (ids.Count != ids.Distinct().Count())
+                return new OperationError("Duplicates for sensitive person data are not allowed", OperationFailure.BadInput);
+            
+            var existingIds = _attachedOptionRepository
+                .GetBySystemUsageId(systemUsage.Id)
+                .Where(x => x.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                .Select(x => x.OptionId)
+                .ToHashSet();
+
+            var personalDataTypes = new List<SensitivePersonalDataType>();
+            foreach (var uuid in ids)
+            {
+                var optionResult = _sensitivePersonDataOptionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
+                if (optionResult.IsNone)
+                    return new OperationError($"Sensitive person data option with id:{uuid} does not exist", OperationFailure.BadInput);
+
+                //Only apply org availability constraint if the type was added (compared to current state)
+                var registerType = optionResult.Value.option;
+
+                if (!existingIds.Contains(registerType.Id) && !optionResult.Value.available)
+                    return new OperationError($"Sensitive person data option with id:{uuid} is not available in the organization", OperationFailure.BadInput);
+
+                personalDataTypes.Add(registerType);
+            }
+
+            //Compute deltas and apply changes
+            var typesToRemove = existingIds.Except(personalDataTypes.Select(x => x.Id)).ToList();
+            var typesToAdd = personalDataTypes.Select(x => x.Id).Except(existingIds).ToList();
+
+            foreach (var id in typesToRemove)
+                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, OptionType.SENSITIVEPERSONALDATA);
+
+            foreach (var id in typesToAdd)
+                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, OptionType.SENSITIVEPERSONALDATA);
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -438,6 +525,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid option id", OperationFailure.BadInput);
+
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ItSystemCategoriesId != null && systemUsage.ItSystemCategoriesId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
 
             if (!optionByUuid.Value.available)
                 return new OperationError("Option is not available in the organization.", OperationFailure.BadInput);
