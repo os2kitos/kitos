@@ -122,6 +122,8 @@
     <Compile Include="Repositories\TaskRefs\TaskRefRepository.cs" />
     <Compile Include="Role\IRoleAssignmentService.cs" />
     <Compile Include="Role\RoleAssignmentService.cs" />
+    <Compile Include="SystemUsage\AttachedOptionsAssignmentService.cs" />
+    <Compile Include="SystemUsage\IAttachedOptionsAssignmentService.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />

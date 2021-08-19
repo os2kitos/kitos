@@ -373,6 +373,17 @@ namespace Presentation.Web.Ninject
 
             //IT-Contract
             RegisterOptionsService<ItContract, ItContractType, LocalItContractType>(kernel);
+
+            //Attached options services
+            kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>
+                new AttachedOptionsAssignmentService<RegisterType, ItSystemUsage>(OptionType.REGISTERTYPEDATA,
+                    ctx.Kernel.GetRequiredService<IAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IOptionsService<ItSystemUsage, RegisterType>>()));
+
+            kernel.Bind<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>().ToMethod(ctx =>
+                new AttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>(OptionType.SENSITIVEPERSONALDATA,
+                    ctx.Kernel.GetRequiredService<IAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IOptionsService<ItSystem, SensitivePersonalDataType>>()));
         }
 
         private void RegisterOptionsService<TParent, TOption, TLocalOption>(IKernel kernel)

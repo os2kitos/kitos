@@ -23,6 +23,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
+using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -47,9 +48,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
         private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
-        private readonly IOptionsService<ItSystem, SensitivePersonalDataType> _sensitivePersonDataOptionsService;
-        private readonly IOptionsService<ItSystemUsage, RegisterType> _registerTypeOptionsService;
+        private readonly IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> _sensitivePersonDataAssignmentService;
+        private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -63,9 +63,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IKLEApplicationService kleApplicationService,
             IReferenceService referenceService,
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
-            IAttachedOptionRepository attachedOptionRepository,
-            IOptionsService<ItSystem, SensitivePersonalDataType> sensitivePersonDataOptionsService,
-            IOptionsService<ItSystemUsage, RegisterType> registerTypeOptionsService,
+            IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> sensitivePersonDataAssignmentService,
+            IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> registerTypeAssignmentService,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -84,9 +83,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _domainEvents = domainEvents;
             _logger = logger;
             _roleAssignmentService = roleAssignmentService;
-            _attachedOptionRepository = attachedOptionRepository;
-            _sensitivePersonDataOptionsService = sensitivePersonDataOptionsService;
-            _registerTypeOptionsService = registerTypeOptionsService;
+            _sensitivePersonDataAssignmentService = sensitivePersonDataAssignmentService;
+            _registerTypeAssignmentService = registerTypeAssignmentService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -225,58 +223,16 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> registerTypeUuids)
         {
-            return UpdateAttachedOptionAssignment(systemUsage, registerTypeUuids, OptionType.REGISTERTYPEDATA, _registerTypeOptionsService.GetOptionByUuid);
+            return _registerTypeAssignmentService
+                .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
-            return UpdateAttachedOptionAssignment(systemUsage, sensitiveDataTypeUuids, OptionType.SENSITIVEPERSONALDATA, _sensitivePersonDataOptionsService.GetOptionByUuid);
-        }
-
-        private Maybe<OperationError> UpdateAttachedOptionAssignment<TOptionType>(
-            ItSystemUsage systemUsage,
-            Maybe<IEnumerable<Guid>> optionUuids,
-            OptionType attachedOptionType,
-            Func<int, Guid, Maybe<(TOptionType option, bool available)>> getOption)
-            where TOptionType : IHasId
-        {
-            var ids = optionUuids.GetValueOrFallback(new List<Guid>()).ToList();
-
-            if (ids.Count != ids.Distinct().Count())
-                return new OperationError($"Duplicates {attachedOptionType:G} are not allowed", OperationFailure.BadInput);
-
-            var existingIds = _attachedOptionRepository
-                .GetBySystemUsageIdAndOptionType(systemUsage.Id, attachedOptionType)
-                .Select(x => x.OptionId)
-                .ToHashSet();
-
-            var personalDataTypes = new List<TOptionType>();
-            foreach (var uuid in ids)
-            {
-                var optionResult = getOption(systemUsage.OrganizationId, uuid);
-                if (optionResult.IsNone)
-                    return new OperationError($"{attachedOptionType:G} with id:{uuid} does not exist", OperationFailure.BadInput);
-
-                //Only apply org availability constraint if the type was added (compared to current state)
-                var type = optionResult.Value.option;
-
-                if (!existingIds.Contains(type.Id) && !optionResult.Value.available)
-                    return new OperationError($"{attachedOptionType:G} with id:{uuid} is not available in the organization", OperationFailure.BadInput);
-
-                personalDataTypes.Add(type);
-            }
-
-            //Compute deltas and apply changes
-            var typesToRemove = existingIds.Except(personalDataTypes.Select(x => x.Id)).ToList();
-            var typesToAdd = personalDataTypes.Select(x => x.Id).Except(existingIds).ToList();
-
-            foreach (var id in typesToRemove)
-                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, attachedOptionType);
-
-            foreach (var id in typesToAdd)
-                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, attachedOptionType);
-
-            return Maybe<OperationError>.None;
+            return _sensitivePersonDataAssignmentService
+                .UpdateAssignedOptions(systemUsage, sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()))
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
