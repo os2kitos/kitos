@@ -301,7 +301,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             RiskLevelChoice? expected = sourceValue switch
             {
                 RiskLevel.LOW => RiskLevelChoice.Low,
-                RiskLevel.MIDDLE => RiskLevelChoice.Middle,
+                RiskLevel.MIDDLE => RiskLevelChoice.Medium,
                 RiskLevel.HIGH => RiskLevelChoice.High,
                 RiskLevel.UNDECIDED => RiskLevelChoice.Undecided,
                 null => null,

@@ -1,4 +1,4 @@
-﻿namespace Core.ApplicationServices.Model.SystemUsage.Write
+﻿namespace Core.DomainModel.ItSystemUsage
 {
     public enum TechnicalPrecaution
     {

@@ -127,7 +127,6 @@
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
-    <Compile Include="Model\SystemUsage\Write\TechnicalPrecaution.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
