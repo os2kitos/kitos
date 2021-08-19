@@ -19,10 +19,19 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public IEnumerable<AttachedOption> GetBySystemUsageId(int systemUsageId)
         {
+            return GetAttachedOptions(systemUsageId).ToList();
+        }
+
+        private IQueryable<AttachedOption> GetAttachedOptions(int systemUsageId)
+        {
             return _attachedOptionRepository
                 .AsQueryable()
-                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && x.ObjectId == systemUsageId)
-                .ToList();
+                .Where(x => x.ObjectType == EntityType.ITSYSTEMUSAGE && x.ObjectId == systemUsageId);
+        }
+
+        public IEnumerable<AttachedOption> GetBySystemUsageIdAndOptionType(int systemUsageId, OptionType type)
+        {
+            return GetAttachedOptions(systemUsageId).Where(x => x.OptionType == type).ToList();
         }
 
         public void DeleteBySystemUsageId(int systemUsageId)

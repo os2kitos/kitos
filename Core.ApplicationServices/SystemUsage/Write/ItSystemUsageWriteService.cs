@@ -223,77 +223,47 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage.UpdateTechnicalPrecautions(newPrecautions.GetValueOrFallback(new List<TechnicalPrecaution>()));
         }
 
-            //TODO: Refactor this beast into a generic assignment service because this is crazy
         private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> registerTypeUuids)
         {
-            var ids = registerTypeUuids.GetValueOrFallback(new List<Guid>()).ToList();
-
-            if (ids.Count != ids.Distinct().Count())
-                return new OperationError("Duplicates for registered data types are not allowed", OperationFailure.BadInput);
-
-            var existingRegisterTypeIds = _attachedOptionRepository
-                .GetBySystemUsageId(systemUsage.Id)
-                .Where(x => x.OptionType == OptionType.REGISTERTYPEDATA)
-                .Select(x => x.OptionId)
-                .ToHashSet();
-
-            var registerTypes = new List<RegisterType>();
-            foreach (var uuid in ids)
-            {
-                var optionResult = _registerTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
-                if (optionResult.IsNone)
-                    return new OperationError($"Registered data type option with id:{uuid} does not exist", OperationFailure.BadInput);
-
-                //Only apply org availability constraint if the type was added (compared to current state)
-                var registerType = optionResult.Value.option;
-
-                if (!existingRegisterTypeIds.Contains(registerType.Id) && !optionResult.Value.available)
-                    return new OperationError($"Registered data type option with id:{uuid} is not available in the organization", OperationFailure.BadInput);
-
-                registerTypes.Add(registerType);
-            }
-
-            //Compute deltas and apply changes
-            var idsOfTypesToRemove = existingRegisterTypeIds.Except(registerTypes.Select(x => x.Id)).ToList();
-            var registerTypesToAdd = registerTypes.Select(x => x.Id).Except(existingRegisterTypeIds).ToList();
-
-            foreach (var id in idsOfTypesToRemove)
-                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, OptionType.REGISTERTYPEDATA);
-
-            foreach (var id in registerTypesToAdd)
-                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, OptionType.REGISTERTYPEDATA);
-
-            return Maybe<OperationError>.None;
+            return UpdateAttachedOptionAssignment(systemUsage, registerTypeUuids, OptionType.REGISTERTYPEDATA, _registerTypeOptionsService.GetOptionByUuid);
         }
 
-            //TODO: Refactor this beast into a generic assignment service because this is crazy
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
-            var ids = sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()).ToList();
+            return UpdateAttachedOptionAssignment(systemUsage, sensitiveDataTypeUuids, OptionType.SENSITIVEPERSONALDATA, _sensitivePersonDataOptionsService.GetOptionByUuid);
+        }
+
+        private Maybe<OperationError> UpdateAttachedOptionAssignment<TOptionType>(
+            ItSystemUsage systemUsage,
+            Maybe<IEnumerable<Guid>> optionUuids,
+            OptionType attachedOptionType,
+            Func<int, Guid, Maybe<(TOptionType option, bool available)>> getOption)
+            where TOptionType : IHasId
+        {
+            var ids = optionUuids.GetValueOrFallback(new List<Guid>()).ToList();
 
             if (ids.Count != ids.Distinct().Count())
-                return new OperationError("Duplicates for sensitive person data are not allowed", OperationFailure.BadInput);
-            
+                return new OperationError($"Duplicates {attachedOptionType:G} are not allowed", OperationFailure.BadInput);
+
             var existingIds = _attachedOptionRepository
-                .GetBySystemUsageId(systemUsage.Id)
-                .Where(x => x.OptionType == OptionType.SENSITIVEPERSONALDATA)
+                .GetBySystemUsageIdAndOptionType(systemUsage.Id, attachedOptionType)
                 .Select(x => x.OptionId)
                 .ToHashSet();
 
-            var personalDataTypes = new List<SensitivePersonalDataType>();
+            var personalDataTypes = new List<TOptionType>();
             foreach (var uuid in ids)
             {
-                var optionResult = _sensitivePersonDataOptionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
+                var optionResult = getOption(systemUsage.OrganizationId, uuid);
                 if (optionResult.IsNone)
-                    return new OperationError($"Sensitive person data option with id:{uuid} does not exist", OperationFailure.BadInput);
+                    return new OperationError($"{attachedOptionType:G} with id:{uuid} does not exist", OperationFailure.BadInput);
 
                 //Only apply org availability constraint if the type was added (compared to current state)
-                var registerType = optionResult.Value.option;
+                var type = optionResult.Value.option;
 
-                if (!existingIds.Contains(registerType.Id) && !optionResult.Value.available)
-                    return new OperationError($"Sensitive person data option with id:{uuid} is not available in the organization", OperationFailure.BadInput);
+                if (!existingIds.Contains(type.Id) && !optionResult.Value.available)
+                    return new OperationError($"{attachedOptionType:G} with id:{uuid} is not available in the organization", OperationFailure.BadInput);
 
-                personalDataTypes.Add(registerType);
+                personalDataTypes.Add(type);
             }
 
             //Compute deltas and apply changes
@@ -301,10 +271,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var typesToAdd = personalDataTypes.Select(x => x.Id).Except(existingIds).ToList();
 
             foreach (var id in typesToRemove)
-                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, OptionType.SENSITIVEPERSONALDATA);
+                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, attachedOptionType);
 
             foreach (var id in typesToAdd)
-                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, OptionType.SENSITIVEPERSONALDATA);
+                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, attachedOptionType);
 
             return Maybe<OperationError>.None;
         }
