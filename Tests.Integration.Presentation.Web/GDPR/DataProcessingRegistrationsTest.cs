@@ -311,7 +311,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
-            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), Display.Url, r => r.DataProcessingRegistration_Id = registration.Id);
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), r => r.DataProcessingRegistration_Id = registration.Id);
 
             //Act - check its possible to set a reference as master in a data processing registration
             using var setMasterResponse = await DataProcessingRegistrationHelper.SendSetMasterReferenceRequestAsync(registration.Id, reference.Id);
@@ -355,7 +355,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Assert
             Assert.Equal(2, dtos.Count);
-            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] {new {usage1.Id, system1.Name}, new {usage2.Id, system2.Name}});
+            dtos.Select(x => new { x.Id, x.Name }).ToExpectedObject().ShouldMatch(new[] { new { usage1.Id, system1.Name }, new { usage2.Id, system2.Name } });
         }
 
         [Fact]
@@ -404,7 +404,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var response = await DataProcessingRegistrationHelper.SendChangeOversightIntervalOptionRequestAsync(dprDTO.Id, oversightInterval);
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(dprDTO.Id);
             Assert.Equal(dto.OversightInterval.Value.Value, oversightInterval);
         }
@@ -808,7 +808,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             using var response = await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registrationDto.Id, oversightDate, oversightRemark);
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registrationDto.Id);
             var oversightDateRemark = Assert.Single(dto.OversightDates);
             Assert.Equal(oversightDate, oversightDateRemark.OversightDate);

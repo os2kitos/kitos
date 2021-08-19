@@ -126,6 +126,7 @@
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedExternalReferenceProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageKLEDeviationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
