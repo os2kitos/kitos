@@ -712,12 +712,33 @@ namespace Core.DomainModel.ItSystemUsage
 
         public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
         {
-            return new ItSystemRight()
+            return new ItSystemRight
             {
                 Role = role,
                 User = user,
                 Object = this
             };
+        }
+
+        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        {
+            if (sensitiveDataLevels == null)
+                throw new ArgumentNullException(nameof(sensitiveDataLevels));
+
+            var levels = sensitiveDataLevels.ToList();
+
+            if (levels.Distinct().Count() != levels.Count)
+                return new OperationError("Duplicate sensitivity levels are not allowed", OperationFailure.BadInput);
+
+            var levelMappings = levels.Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            }).ToList();
+
+            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
+
+            return Maybe<OperationError>.None;
         }
     }
 }

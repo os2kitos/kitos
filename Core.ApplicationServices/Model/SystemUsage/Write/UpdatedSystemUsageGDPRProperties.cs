@@ -16,7 +16,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public Maybe<ChangedValue<Maybe<NamedLink>>> DirectoryDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
         public Maybe<ChangedValue<Maybe<IEnumerable<SensitiveDataLevel>>>> DataSensitivityLevels { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<SensitiveDataLevel>>>>.None;
         public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> SensitivePersonDataUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> RegisteredDataCategorieUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
+        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> RegisteredDataCategoryUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
         public Maybe<ChangedValue<DataOptions?>> TechnicalPrecautionsInPlace { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
         public Maybe<ChangedValue<Maybe<IEnumerable<TechnicalPrecaution>>>> TechnicalPrecautionsApplied { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<TechnicalPrecaution>>>>.None;
         public Maybe<ChangedValue<Maybe<NamedLink>>> TechnicalPrecautionsDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;

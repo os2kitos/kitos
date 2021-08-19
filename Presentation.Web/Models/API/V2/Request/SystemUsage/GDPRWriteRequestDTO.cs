@@ -24,7 +24,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// <summary>
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
-        public IEnumerable<Guid> RegisteredDataCategorieUuids { get; set; }
+        public IEnumerable<Guid> RegisteredDataCategoryUuids { get; set; }
         public YesNoDontKnowChoice? TechnicalPrecautionsInPlace { get; set; }
         public IEnumerable<TechnicalPrecautionChoice> TechnicalPrecautionsApplied { get; set; }
         public SimpleLinkDTO TechnicalPrecautionsDocumentation { get; set; }

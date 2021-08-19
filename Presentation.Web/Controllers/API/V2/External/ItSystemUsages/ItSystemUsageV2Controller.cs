@@ -502,7 +502,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 DirectoryDocumentation = MapLink(request.DirectoryDocumentation),
                 DataSensitivityLevels = MapEnumList(request.DataSensitivityLevels, SensitiveDataLevelMappingExtensions.ToSensitiveDataLevel),
                 SensitivePersonDataUuids = MapCrossReferences(request.SensitivePersonDataUuids),
-                RegisteredDataCategorieUuids = MapCrossReferences(request.RegisteredDataCategorieUuids),
+                RegisteredDataCategoryUuids = MapCrossReferences(request.RegisteredDataCategoryUuids),
                 TechnicalPrecautionsInPlace = MapYesNoDontKnow(request.TechnicalPrecautionsInPlace),
                 TechnicalPrecautionsApplied = MapEnumList(request.TechnicalPrecautionsApplied, TechnicalPrecautionMappingExtensions.ToTechnicalPrecaution),
                 TechnicalPrecautionsDocumentation = MapLink(request.TechnicalPrecautionsDocumentation),

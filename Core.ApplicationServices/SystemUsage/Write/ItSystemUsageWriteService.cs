@@ -15,12 +15,12 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -137,7 +137,89 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.GDPR, PerformGDPRUpdates));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformGDPRUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGDPRProperties parameters)
+        {
+            //General GDPR registrations
+            return WithOptionalUpdate(itSystemUsage, parameters.Purpose, (usage, newPurpose) => usage.GeneralPurpose = newPurpose)
+                .Bind(usage => WithOptionalUpdate(usage, parameters.BusinessCritical, (systemUsage, businessCritical) => systemUsage.isBusinessCritical = businessCritical))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DirectoryDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.LinkToDirectoryUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.LinkToDirectoryUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Registered data sensitivity
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) =>
+                   {
+                       var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
+                       return systemUsage.UpdateDataSensitivityLevels(newLevels);
+                   }))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
+
+                //Technical precautions
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsApplied, UpdateAppliedTechnicalPrecautions))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsDocumentation,
+                    (systemUsage, newLink) =>
+                    {
+                        systemUsage.TechnicalSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                        systemUsage.TechnicalSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                    }))
+
+                //User supervision
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UserSupervision = supervision))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UserSupervisionDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.UserSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.UserSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Risk assessments
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.riskAssessment = conducted))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.riskAssesmentDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.preriskAssessment = result))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.RiskSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.RiskSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
+
+                //DPIA
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADate, (systemUsage, date) => systemUsage.DPIADateFor = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.DPIASupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.DPIASupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Data retention
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.answeringDataDPIA = retentionPeriodDefined))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.DPIAdeleteDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
+        }
+
+        private Maybe<OperationError> UpdateAppliedTechnicalPrecautions(ItSystemUsage arg1, Maybe<IEnumerable<TechnicalPrecaution>> arg2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage arg1, Maybe<IEnumerable<Guid>> arg2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage arg1, Maybe<IEnumerable<Guid>> arg2)
+        {
+            throw new NotImplementedException();
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -149,7 +231,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (newReferences.Any())
             {
                 var masterReferencesCount = newReferences.Count(x => x.MasterReference);
-                
+
                 switch (masterReferencesCount)
                 {
                     case < 1:
