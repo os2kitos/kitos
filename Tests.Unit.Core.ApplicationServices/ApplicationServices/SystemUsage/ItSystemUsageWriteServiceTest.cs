@@ -43,6 +43,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOptionsService<ItSystemUsage, ItSystemCategories>> _systemCategoriesOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItSystemUsage, ArchiveType>> _archiveTypeOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItSystemUsage, ArchiveLocation>> _archiveLocationOptionsServiceMock;
+        private readonly Mock<IOptionsService<ItSystemUsage, ArchiveTestLocation>> _archiveTestLocationOptionsServiceMock;
         private readonly Mock<IItContractService> _contractServiceMock;
         private readonly Mock<IItProjectService> _projectServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
@@ -58,6 +61,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _organizationServiceMock = new Mock<IOrganizationService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _systemCategoriesOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ItSystemCategories>>();
+            _archiveTypeOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ArchiveType>>();
+            _archiveLocationOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ArchiveLocation>>();
+            _archiveTestLocationOptionsServiceMock = new Mock<IOptionsService<ItSystemUsage, ArchiveTestLocation>>();
             _contractServiceMock = new Mock<IItContractService>();
             _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
@@ -66,7 +72,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(), _roleAssignmentService.Object);
+                _kleServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(), 
+                _roleAssignmentService.Object, _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
+                _archiveTestLocationOptionsServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

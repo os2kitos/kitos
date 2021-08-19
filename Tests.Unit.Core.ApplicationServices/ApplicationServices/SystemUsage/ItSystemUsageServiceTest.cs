@@ -15,8 +15,10 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
+using FluentAssertions.Collections;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -34,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IGenericRepository<ArchivePeriod>> _archivePeriodRepositoryMock;
 
         public ItSystemUsageServiceTest()
         {
@@ -45,6 +48,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _referenceService = new Mock<IReferenceService>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _archivePeriodRepositoryMock = new Mock<IGenericRepository<ArchivePeriod>>();
             _sut = new ItSystemUsageService(
                 _usageRepository.Object,
                 _authorizationContext.Object,
@@ -54,7 +58,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _domainEvents.Object,
                 _sensitiveDataLevelRepository.Object,
                 _userContextMock.Object,
-                new Mock<IAttachedOptionRepository>().Object);
+                new Mock<IAttachedOptionRepository>().Object,
+                _archivePeriodRepositoryMock.Object);
         }
 
         [Fact]
@@ -517,6 +522,193 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             AssertSensitiveDataLevelError(result, OperationFailure.Forbidden);
+        }
+
+        [Fact]
+        public void RemoveAllArchivePeriods_Returns_List_Of_Removed_Periods()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+                CreateValidArchivePeriod()
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
+
+            //Assert
+            Assert.True(removeResult.Ok);
+            Assert.Equal(archivePeriods.Count(), removeResult.Value.Count());
+            for (var i = 0; i < archivePeriods.Count(); i++)
+            {
+                AssertArchivePeriod(archivePeriods[i], removeResult.Value.ToList()[i]);
+            }
+        }
+
+        [Fact]
+        public void RemoveAllArchivePeriods_Returns_NotFound()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+                CreateValidArchivePeriod()
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
+
+            //Assert
+            Assert.True(removeResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, removeResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void RemoveAllArchivePeriods_Returns_Forbidden()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriods = new List<ArchivePeriod>()
+            {
+                CreateValidArchivePeriod(),
+                CreateValidArchivePeriod()
+            };
+            itSystemUsage.ArchivePeriods = archivePeriods.ToList();
+
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
+
+            //Assert
+            Assert.True(removeResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, removeResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Returns_ArchivePeriod()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriod = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
+
+            //Assert
+            Assert.True(addResult.Ok);
+            AssertArchivePeriod(archivePeriod, addResult.Value);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Returns_NotFound()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriod = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
+
+            //Assert
+            Assert.True(addResult.Failed);
+            Assert.Equal(OperationFailure.NotFound, addResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Returns_Forbidden()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var archivePeriod = CreateValidArchivePeriod();
+
+            ExpectAllowModifyReturns(itSystemUsage, false);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
+
+            //Assert
+            Assert.True(addResult.Failed);
+            Assert.Equal(OperationFailure.Forbidden, addResult.Error.FailureType);
+        }
+
+        [Fact]
+        public void AddArchivePeriod_Returns_BadInput()
+        {
+            //Arrange
+            var itSystem = CreateItSystem();
+            var itSystemUsage = CreateSystemUsage(A<int>(), itSystem);
+            var startDate = A<DateTime>();
+            var endDate = startDate.AddDays(-1);
+            var archiveId = A<string>();
+            var approved = A<bool>();
+
+            ExpectAllowModifyReturns(itSystemUsage, true);
+            _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+
+            //Act
+            var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, startDate, endDate, archiveId, approved);
+
+            //Assert
+            Assert.True(addResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, addResult.Error.FailureType);
+        }
+
+        private static void AssertArchivePeriod(ArchivePeriod expected, ArchivePeriod actual)
+        {
+            Assert.Equal(expected.StartDate, actual.StartDate);
+            Assert.Equal(expected.EndDate, actual.EndDate);
+            Assert.Equal(expected.Approved, actual.Approved);
+            Assert.Equal(expected.UniqueArchiveId, actual.UniqueArchiveId);
+        }
+
+        private ArchivePeriod CreateValidArchivePeriod()
+        {
+            var startDate = A<DateTime>();
+            return new ArchivePeriod()
+            {
+                Approved = A<bool>(),
+                UniqueArchiveId = A<string>(),
+                StartDate = startDate,
+                EndDate = startDate.AddDays(1)
+            };
         }
 
         private void AssertSensitiveDataLevelError(

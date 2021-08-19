@@ -4,9 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
-using System.Web.WebPages;
 using Core.ApplicationServices.Extensions;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -15,7 +13,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
-using Microsoft.Ajax.Utilities;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -489,7 +486,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 Archiving = archiving.FromNullable().Select(MapArchiving)
             };
         }
-
 
         private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
         {

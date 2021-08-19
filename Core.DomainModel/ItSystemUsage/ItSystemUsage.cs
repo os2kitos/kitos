@@ -691,7 +691,6 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-
         public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
         {
             return new ItSystemRight()
@@ -702,6 +701,106 @@ namespace Core.DomainModel.ItSystemUsage
                 UserId = user.Id,
                 Object = this
             };
+        }
+
+        public void UpdateArchiveDuty(Maybe<ArchiveDutyTypes> archiveDuty)
+        {
+            if (archiveDuty.IsNone)
+            {
+                ArchiveDuty = null;
+            }
+            else
+            {
+                ArchiveDuty = archiveDuty.Value;
+            }
+        }
+
+        public void ResetArchiveType()
+        {
+            ArchiveTypeId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveType(ArchiveType newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveType == null || ArchiveType.Id != newValue.Id)
+            {
+                ArchiveType = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveLocation()
+        {
+            ArchiveLocationId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveLocation(ArchiveLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveLocation == null || ArchiveLocation.Id != newValue.Id)
+            {
+                ArchiveLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveTestLocation()
+        {
+            ArchiveTestLocationId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveTestLocation(ArchiveTestLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveTestLocation == null || ArchiveTestLocation.Id != newValue.Id)
+            {
+                ArchiveTestLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveSupplierOrganization()
+        {
+            ArchiveSupplier = "";
+        }
+
+        public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            ArchiveSupplier = newValue.Name;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveArchivePeriods()
+        {
+            var periodsToRemove = ArchivePeriods.ToList();
+            ArchivePeriods.Clear();
+            return periodsToRemove;
+        }
+
+        public Maybe<OperationError> AddArchivePeriod(ArchivePeriod newPeriod)
+        {
+            if (newPeriod == null)
+                throw new ArgumentNullException(nameof(newPeriod));
+
+            if(DateTime.Compare(newPeriod.StartDate, newPeriod.EndDate) > 0)
+                return new OperationError($"StartDate: {newPeriod.StartDate} cannot be before EndDate: {newPeriod.EndDate}", OperationFailure.BadInput);
+
+            ArchivePeriods.Add(newPeriod);
+            return Maybe<OperationError>.None;
         }
     }
 }

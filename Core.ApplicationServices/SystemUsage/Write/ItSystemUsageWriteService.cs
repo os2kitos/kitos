@@ -18,7 +18,6 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -34,6 +33,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOrganizationService _organizationService;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOptionsService<ItSystemUsage, ItSystemCategories> _systemCategoriesOptionsService;
+        private readonly IOptionsService<ItSystemUsage, ArchiveType> _archiveTypeOptionsService;
+        private readonly IOptionsService<ItSystemUsage, ArchiveLocation> _archiveLocationOptionsService;
+        private readonly IOptionsService<ItSystemUsage, ArchiveTestLocation> _archiveTestLocationOptionsService;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
@@ -55,7 +57,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger,
-            IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService)
+            IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService, 
+            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService, 
+            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService, 
+            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -70,6 +75,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _domainEvents = domainEvents;
             _logger = logger;
             _roleAssignmentService = roleAssignmentService;
+            _archiveTypeOptionsService = archiveTypeOptionsService;
+            _archiveLocationOptionsService = archiveLocationOptionsService;
+            _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -130,7 +138,123 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
                     .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.Archiving, PerformArchivingUpdate));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformArchivingUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageArchivingParameters archivingProperties)
+        {
+            return WithOptionalUpdate(itSystemUsage, archivingProperties.ArchiveDuty, (usage, archiveDuty) => usage.UpdateArchiveDuty(archiveDuty))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTypeUuid, UpdateArchiveType))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveLocationUuid, UpdateArchiveLocation))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTestLocationUuid, UpdateArchiveTestLocation))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveSupplierOrganizationUuid, UpdateArchiveSupplierOrganization))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveActive, (usage, archiveActive) => usage.ArchiveFromSystem = archiveActive.HasValue ? archiveActive.Value : null))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveNotes, (usage, archiveNotes) => usage.ArchiveNotes = archiveNotes))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveFrequencyInMonths, (usage, archiveFrequencyInMonths) => usage.ArchiveFreq = archiveFrequencyInMonths.HasValue ? archiveFrequencyInMonths.Value : null))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveDocumentBearing, (usage, archiveDocumentBearing) => usage.Registertype = archiveDocumentBearing.HasValue ? archiveDocumentBearing.Value : null))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
+        }
+
+        private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriod>> journalPeriods)
+        {
+            //Clear existing values
+            var removeResult = _systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
+            if (removeResult.Failed)
+                return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message}", removeResult.Error.FailureType);
+
+            if (journalPeriods.IsNone)
+            {
+                // No new journal periods
+                return Maybe<OperationError>.None;
+            }
+
+            var newPeriods = journalPeriods.Value.ToList();
+            foreach (var newPeriod in newPeriods)
+            {
+                var addResult = _systemUsageService.AddArchivePeriod(systemUsage.Id, newPeriod.StartDate,
+                    newPeriod.EndDate, newPeriod.ArchiveId, newPeriod.Approved);
+
+                if (addResult.Failed)
+                    return new OperationError(
+                        $"Failed to add ArchiveJournalPeriod as part of the update. Add error: {addResult.Error.Message}",
+                        addResult.Error.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateArchiveSupplierOrganization(ItSystemUsage systemUsage, Maybe<Guid> archiveSupplierOrganization)
+        {
+            if (archiveSupplierOrganization.IsNone)
+            {
+                systemUsage.ResetArchiveSupplierOrganization();
+                return Maybe<OperationError>.None;
+            }
+
+            var orgByUuid = _organizationService.GetOrganization(archiveSupplierOrganization.Value);
+
+            if (orgByUuid.Failed)
+                return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message}", orgByUuid.Error.FailureType);
+
+            return systemUsage.UpdateArchiveSupplierOrganization(orgByUuid.Value);
+        }
+
+        private Maybe<OperationError> UpdateArchiveTestLocation(ItSystemUsage systemUsage, Maybe<Guid> archiveTestLocation)
+        {
+            if (archiveTestLocation.IsNone)
+            {
+                systemUsage.ResetArchiveTestLocation();
+                return Maybe<OperationError>.None;
+            }
+
+            var optionByUuid = _archiveTestLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveTestLocation.Value);
+
+            if (optionByUuid.IsNone)
+                return new OperationError("Invalid ArchiveTestLocation Uuid", OperationFailure.BadInput);
+
+            if (!optionByUuid.Value.available)
+                return new OperationError("ArchiveTestLocation is not available in the organization.", OperationFailure.BadInput);
+
+            return systemUsage.UpdateArchiveTestLocation(optionByUuid.Value.option);
+        }
+
+        private Maybe<OperationError> UpdateArchiveLocation(ItSystemUsage systemUsage, Maybe<Guid> archiveLocation)
+        {
+            if (archiveLocation.IsNone)
+            {
+                systemUsage.ResetArchiveLocation();
+                return Maybe<OperationError>.None;
+            }
+
+            var optionByUuid = _archiveLocationOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveLocation.Value);
+
+            if (optionByUuid.IsNone)
+                return new OperationError("Invalid ArchiveLocation Uuid", OperationFailure.BadInput);
+
+            if (!optionByUuid.Value.available)
+                return new OperationError("ArchiveLocation is not available in the organization.", OperationFailure.BadInput);
+
+            return systemUsage.UpdateArchiveLocation(optionByUuid.Value.option);
+        }
+
+        private Maybe<OperationError> UpdateArchiveType(ItSystemUsage systemUsage, Maybe<Guid> archiveType)
+        {
+            if (archiveType.IsNone)
+            {
+                systemUsage.ResetArchiveType();
+                return Maybe<OperationError>.None;
+            }
+
+            var optionByUuid = _archiveTypeOptionsService.GetOptionByUuid(systemUsage.OrganizationId, archiveType.Value);
+
+            if (optionByUuid.IsNone)
+                return new OperationError("Invalid ArchiveType Uuid", OperationFailure.BadInput);
+
+            if (!optionByUuid.Value.available)
+                return new OperationError("ArchiveType is not available in the organization.", OperationFailure.BadInput);
+
+            return systemUsage.UpdateArchiveType(optionByUuid.Value.option);
         }
 
         private Result<ItSystemUsage, OperationError> PerformKLEUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageKLEDeviationParameters changes)
@@ -311,10 +435,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var optionByUuid = _systemCategoriesOptionsService.GetOptionByUuid(systemUsage.OrganizationId, dataClassificationOptionId.Value);
 
             if (optionByUuid.IsNone)
-                return new OperationError("Invalid option id", OperationFailure.BadInput);
+                return new OperationError("Invalid DataClassification Uuid", OperationFailure.BadInput);
 
             if (!optionByUuid.Value.available)
-                return new OperationError("Option is not available in the organization.", OperationFailure.BadInput);
+                return new OperationError("DataClassification is not available in the organization.", OperationFailure.BadInput);
 
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
         }
