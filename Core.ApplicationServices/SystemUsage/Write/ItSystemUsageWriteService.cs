@@ -19,6 +19,8 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
+using Core.DomainServices.Role;
+using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -42,6 +44,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IDatabaseControl _databaseControl;
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
+        private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -54,6 +57,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IItProjectService projectService,
             IKLEApplicationService kleApplicationService,
             IReferenceService referenceService,
+            IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -71,6 +75,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _databaseControl = databaseControl;
             _domainEvents = domainEvents;
             _logger = logger;
+            _roleAssignmentService = roleAssignmentService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -129,6 +134,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             //Optionally apply changes across the entire update specification
             return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate));
@@ -355,6 +361,39 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 return new OperationError("Option is not available in the organization.", OperationFailure.BadInput);
 
             return systemUsage.UpdateSystemCategories(optionByUuid.Value.option);
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageRoles usageRoles)
+        {
+            return WithOptionalUpdate(itSystemUsage, usageRoles.UserRolePairs, UpdateRoles);
+        }
+
+        private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
+        {
+            // Compare lists to find which needs to be remove and which need to be added
+            var rightsKeys = systemUsage.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+            var userRoleKeys = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+
+            var toRemove = rightsKeys.Except(userRoleKeys);
+            var toAdd = userRoleKeys.Except(rightsKeys);
+
+            foreach (var userRolePair in toRemove)
+            {
+                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
+
+                if (removeResult.Failed)
+                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message}", removeResult.Error.FailureType);
+            }
+
+            foreach (var userRolePair in toAdd)
+            {
+                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
+
+                if (assignmentResult.Failed)
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message}", assignmentResult.Error.FailureType);
+            }
+
+            return systemUsage;
         }
 
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(

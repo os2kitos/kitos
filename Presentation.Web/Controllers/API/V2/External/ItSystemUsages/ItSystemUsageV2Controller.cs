@@ -18,7 +18,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -224,12 +224,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentResponseDTO> request)
+        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters()
+                {
+                    Roles = MapRoles(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -446,7 +452,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 GeneralProperties = request.General.FromNullable().Select(MapFullCommonGeneralData),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
                 KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
-                ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences)
+				ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
+                Roles = request.Roles.FromNullable().Select(MapRoles)
             };
         }
 
@@ -458,16 +465,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         private static SystemUsageUpdateParameters CreateFullPUTParameters(UpdateItSystemUsageRequestDTO request)
         {
-            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
+            var generalDataInput = request.General ??new GeneralDataUpdateRequestDTO();
+            var orgUsageInput = request.OrganizationUsage ??  new OrganizationUsageWriteRequestDTO();
             var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var externalReferncesInput = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
+            var roles = request.Roles ??  new List<RoleAssignmentRequestDTO>();
+			var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
                 KLE = kleInput.FromNullable().Select(MapKle),
-                ExternalReferences = externalReferncesInput.FromNullable().Select(MapReferences)
+                ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
+                Roles = roles.FromNullable().Select(MapRoles)
             };
         }
 
@@ -509,6 +518,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             {
                 ResponsibleOrganizationUnitUuid = (input.ResponsibleOrganizationUnitUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 UsingOrganizationUnitUuids = (input.UsingOrganizationUnitUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
+            };
+        }
+
+        private static UpdatedSystemUsageRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
+        {
+            var roleAssignmentResponseDtos = roles.ToList();
+
+            return new UpdatedSystemUsageRoles
+            {
+                UserRolePairs = (roleAssignmentResponseDtos.Any() ?
+                    Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
+                    {
+                        RoleUuid = x.RoleUuid,
+                        UserUuid = x.UserUuid
+                    })) :
+                    Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue()
             };
         }
 

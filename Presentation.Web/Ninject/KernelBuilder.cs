@@ -98,6 +98,7 @@ using Core.ApplicationServices.SystemUsage.ReadModels;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Role;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -201,7 +202,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOptionsApplicationService>().To<DataProcessingRegistrationOptionsApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationNamingService>().To<DataProcessingRegistrationNamingService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationSystemAssignmentService>().To<DataProcessingRegistrationSystemAssignmentService>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingRegistrationRoleAssignmentsService>().To<DataProcessingRegistrationRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelService>().To<DataProcessingRegistrationReadModelService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationDataProcessorAssignmentService>().To<DataProcessingRegistrationDataProcessorAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationInsecureCountriesAssignmentService>().To<DataProcessingRegistrationInsecureCountriesAssignmentService>().InCommandScope(Mode);
@@ -219,6 +219,10 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
+
+            //Role assignment services
+            RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
+            RegisterRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(kernel);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -382,6 +386,15 @@ namespace Presentation.Web.Ninject
             //Application service
             kernel.Bind<IOptionsApplicationService<TParent, TOption>>()
                 .To<OptionsApplicationService<TParent, TOption>>().InCommandScope(Mode);
+        }
+
+        private void RegisterRoleAssignmentService<TRight, TRole, TModel>(IKernel kernel)
+            where TRight : Entity, IRight<TModel, TRight, TRole>
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
+        {
+            kernel.Bind<IRoleAssignmentService<TRight, TRole, TModel>>()
+                .To<RoleAssignmentService<TRight, TRole, TModel>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
