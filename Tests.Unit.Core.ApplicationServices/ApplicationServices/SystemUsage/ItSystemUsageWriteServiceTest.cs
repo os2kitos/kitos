@@ -7,7 +7,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -26,7 +25,6 @@ using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -814,7 +812,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
             var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
             expectedMaster.MasterReference = true;
@@ -842,7 +840,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
 
             var input = new SystemUsageUpdateParameters
@@ -866,7 +864,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
 
             //Set two masters
@@ -894,7 +892,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
             var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
             expectedMaster.MasterReference = true;

@@ -672,7 +672,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (user, token) = await CreateApiUser(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
             var request = CreatePostRequest(organization.Uuid, system.Uuid, referenceDataDtos: inputs);
@@ -694,7 +694,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (user, token) = await CreateApiUser(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
-            Configure(f => f.Inject(false));
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var request = CreatePostRequest(organization.Uuid, system.Uuid);
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
 
