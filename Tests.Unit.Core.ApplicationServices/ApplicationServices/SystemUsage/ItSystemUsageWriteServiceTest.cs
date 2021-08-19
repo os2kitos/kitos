@@ -14,12 +14,14 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Infrastructure.Services.DataAccess;
@@ -45,6 +47,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly ItSystemUsageWriteService _sut;
         private readonly Mock<IKLEApplicationService> _kleServiceMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -58,10 +61,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _projectServiceMock = new Mock<IItProjectService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _kleServiceMock = new Mock<IKLEApplicationService>();
+            _referenceServiceMock = new Mock<IReferenceService>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, Mock.Of<IReferenceService>(), Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
+                _kleServiceMock.Object, _referenceServiceMock.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -798,6 +802,135 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
         }
 
+        [Fact]
+        public void Can_Create_With_ExternalReferences()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false));
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(expectedMaster.Title, result.Value.Reference.Title);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_But_No_Master()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false));
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_And_Multiple_Masters()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false));
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            
+            //Set two masters
+            foreach (var master in externalReferences.Take(2))
+                master.MasterReference = true;
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_If_Add_Reference_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            Configure(f => f.Inject(false));
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+            var operationError = A<OperationError>();
+
+            var input = new SystemUsageUpdateParameters
+            {
+                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
+            };
+            foreach (var externalReference in externalReferences.Where(x=>x.MasterReference == false))
+                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
+            ExpectAddExternalReferenceReturns(itSystemUsage,expectedMaster,operationError);
+
+            //Act
+            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertTransactionNotCommitted(transactionMock);
+            Assert.Equal(operationError.FailureType,result.Error.FailureType);
+            Assert.EndsWith(operationError.Message.GetValueOrDefault(),result.Error.Message.GetValueOrDefault());
+        }
+
+        private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.AddReference(itSystemUsage.Id, ReferenceRootType.SystemUsage, externalReference.Title, externalReference.DocumentId, externalReference.Url))
+                .Returns(value);
+        }
+
+        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
+        {
+            return new ExternalReference
+            {
+                Id = A<int>(),
+                Title = externalReference.Title,
+                ExternalReferenceId = externalReference.DocumentId,
+                URL = externalReference.Url
+            };
+        }
+
         private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
         {
             var input = new SystemUsageUpdateParameters
@@ -855,6 +988,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystem = new ItSystem { Id = A<int>() };
             var itSystemUsage = new ItSystemUsage
             {
+                Id = A<int>(),
                 OrganizationId = organization.Id,
                 ItSystem = itSystem
             };
