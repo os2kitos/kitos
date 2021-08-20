@@ -739,18 +739,45 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
 
-            var gdpr = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            gdpr.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
-            //gdpr.SensitivePersonDataUuids
-            //gdpr.RegisteredDataCategoryUuids
-            gdpr.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+            var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
+            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
+            var registerTypes = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes, organization.Uuid, 10, 0);
+            var sensitiveTypes = await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes, organization.Uuid, 10, 0);
 
+            gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
+            gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
+            gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
 
             //Act
-            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: gdpr));
-
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: gdprInput));
 
             //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
+            var gdprResponse = dto.GDPR;
+            Assert.Equal(gdprInput.Purpose, gdprResponse.Purpose);
+            Assert.Equal(gdprInput.BusinessCritical, gdprResponse.BusinessCritical);
+            Assert.Equal(gdprInput.HostedAt, gdprResponse.HostedAt);
+            gdprInput.DirectoryDocumentation.ToExpectedObject().ShouldMatch(gdprResponse.DirectoryDocumentation);
+            Assert.Equal(gdprInput.DataSensitivityLevels.OrderBy(x => x), gdprResponse.DataSensitivityLevels.OrderBy(x => x));
+            Assert.Equal(gdprInput.SensitivePersonDataUuids.OrderBy(x=>x), gdprResponse.SensitivePersonData.Select(x=>x.Uuid).OrderBy(x=>x));
+            Assert.Equal(gdprInput.RegisteredDataCategoryUuids.OrderBy(x=>x), gdprResponse.RegisteredDataCategories.Select(x=>x.Uuid).OrderBy(x=>x));
+            Assert.Equal(gdprInput.TechnicalPrecautionsInPlace, gdprResponse.TechnicalPrecautionsInPlace);
+            Assert.Equal(gdprInput.TechnicalPrecautionsApplied.OrderBy(x => x), gdprResponse.TechnicalPrecautionsApplied.OrderBy(x => x));
+            gdprInput.TechnicalPrecautionsDocumentation.ToExpectedObject().ShouldMatch(gdprResponse.TechnicalPrecautionsDocumentation);
+            Assert.Equal(gdprInput.UserSupervision, gdprResponse.UserSupervision);
+            Assert.Equal(gdprInput.UserSupervisionDate, gdprResponse.UserSupervisionDate);
+            gdprInput.UserSupervisionDocumentation.ToExpectedObject().ShouldMatch(gdprResponse.UserSupervisionDocumentation);
+            Assert.Equal(gdprInput.RiskAssessmentConducted, gdprResponse.RiskAssessmentConducted);
+            Assert.Equal(gdprInput.RiskAssessmentConductedDate, gdprResponse.RiskAssessmentConductedDate);
+            Assert.Equal(gdprInput.RiskAssessmentResult, gdprResponse.RiskAssessmentResult);
+            gdprInput.RiskAssessmentDocumentation.ToExpectedObject().ShouldMatch(gdprResponse.RiskAssessmentDocumentation);
+            Assert.Equal(gdprInput.RiskAssessmentNotes, gdprResponse.RiskAssessmentNotes);
+            Assert.Equal(gdprInput.DPIAConducted, gdprResponse.DPIAConducted);
+            Assert.Equal(gdprInput.DPIADate, gdprResponse.DPIADate);
+            gdprInput.DPIADocumentation.ToExpectedObject().ShouldMatch(gdprResponse.DPIADocumentation);
+            Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
+            Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
+            Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
         }
 
         private async Task<(string token, User user, Organization organization, ItSystemDTO system)> CreatePrerequisitesAsync()
