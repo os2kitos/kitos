@@ -20,6 +20,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
@@ -50,6 +51,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
         private readonly IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> _sensitivePersonDataAssignmentService;
         private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
+        private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -65,6 +67,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
             IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> sensitivePersonDataAssignmentService,
             IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> registerTypeAssignmentService,
+            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -85,6 +88,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _roleAssignmentService = roleAssignmentService;
             _sensitivePersonDataAssignmentService = sensitivePersonDataAssignmentService;
             _registerTypeAssignmentService = registerTypeAssignmentService;
+            _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -166,7 +170,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) =>
                    {
                        var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
-                       return systemUsage.UpdateDataSensitivityLevels(newLevels);
+                       var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
+                       var error = systemUsage.UpdateDataSensitivityLevels(newLevels);
+                       if (error.HasValue)
+                           return error;
+                       
+                       var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
+                       
+                       foreach (var removedSensitiveDataLevel in levelsRemoved)
+                       {
+                           _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
+                       }
+
+                       return Maybe<OperationError>.None;
                    }))
                 .Bind(usage => WithOptionalUpdate(usage, parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => WithOptionalUpdate(usage, parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))

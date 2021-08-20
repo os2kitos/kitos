@@ -20,9 +20,11 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
@@ -73,6 +75,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object,
                 Mock.Of<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>(),
                 Mock.Of<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>(),
+                Mock.Of<IGenericRepository<ItSystemUsageSensitiveDataLevel>>(),
                 Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
