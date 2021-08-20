@@ -16,10 +16,10 @@ namespace Presentation.Web.Controllers.API.V2.Mapping
         {
             ApiToDataMap = new Dictionary<ArchiveDutyChoice, ArchiveDutyTypes>()
             {
-                { ArchiveDutyChoice.B ,ArchiveDutyTypes.B},
-                { ArchiveDutyChoice.K ,ArchiveDutyTypes.K},
-                { ArchiveDutyChoice.Undecided ,ArchiveDutyTypes.Undecided},
-                { ArchiveDutyChoice.Unknown ,ArchiveDutyTypes.Unknown}
+                { ArchiveDutyChoice.B, ArchiveDutyTypes.B },
+                { ArchiveDutyChoice.K, ArchiveDutyTypes.K },
+                { ArchiveDutyChoice.Undecided, ArchiveDutyTypes.Undecided },
+                { ArchiveDutyChoice.Unknown, ArchiveDutyTypes.Unknown }
             }.AsReadOnly();
             DataToApiMap = ApiToDataMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key).AsReadOnly();
         }
