@@ -270,8 +270,8 @@ namespace Core.ApplicationServices.SystemUsage
                         foreach (var removedPeriod in removed)
                         {
                             _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
-                            _archivePeriodRepository.Save();
                         }
+                        _archivePeriodRepository.Save();
                         return removed;
                     },
                     error => error);

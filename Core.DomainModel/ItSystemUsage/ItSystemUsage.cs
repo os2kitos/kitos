@@ -775,15 +775,23 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveSupplierOrganization()
         {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             ArchiveSupplier = "";
+            SupplierId = null;
         }
 
         public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
         {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
             if (newValue == null)
                 throw new ArgumentNullException(nameof(newValue));
 
             ArchiveSupplier = newValue.Name;
+
+            if (SupplierId != newValue.Id)
+            {
+                SupplierId = newValue.Id;
+            }
 
             return Maybe<OperationError>.None;
         }

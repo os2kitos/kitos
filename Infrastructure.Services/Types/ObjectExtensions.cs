@@ -15,6 +15,11 @@ namespace Infrastructure.Services.Types
             return string.IsNullOrEmpty(src) ? Maybe<string>.None : src;
         }
 
+        public static string GetValueOrEmptyString(this Maybe<string> src)
+        {
+            return src.Match(val => val, () => string.Empty);
+        }
+
         public static TOut Transform<TIn, TOut>(this TIn input, Func<TIn, TOut> transform)
         {
             return transform(input);

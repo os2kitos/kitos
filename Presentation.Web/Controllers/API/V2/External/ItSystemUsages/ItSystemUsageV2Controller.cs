@@ -6,6 +6,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -496,15 +497,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return new UpdatedSystemUsageArchivingParameters()
             {
                 ArchiveDuty = MapArchiveDuty(archiving.ArchiveDuty).AsChangedValue(),
-                ArchiveTypeUuid = (archiving.ArchiveTypeUuid?.FromNullable() ?? Guid.Empty).AsChangedValue(),
-                ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Guid.Empty).AsChangedValue(),
-                ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Guid.Empty).AsChangedValue(),
-                ArchiveSupplierOrganizationUuid = (archiving.ArchiveSupplierOrganizationUuid?.FromNullable() ?? Guid.Empty).AsChangedValue(),
+                ArchiveTypeUuid = (archiving.ArchiveTypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveSupplierOrganizationUuid = (archiving.ArchiveSupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 ArchiveActive = (archiving.ArchiveActive?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
                 ArchiveNotes = archiving.ArchiveNotes.AsChangedValue(),
                 ArchiveFrequencyInMonths = (archiving.ArchiveFrequencyInMonths?.FromNullable() ?? Maybe<int>.None).AsChangedValue(),
                 ArchiveDocumentBearing = (archiving.ArchiveDocumentBearing?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
-                ArchiveJournalPeriods = (archiving.ArchiveJournalPeriods.Any() ? Maybe<IEnumerable<SystemUsageJournalPeriod>>.Some(archiving.ArchiveJournalPeriods.Select(MapJournalPeriod)) : Maybe<IEnumerable<SystemUsageJournalPeriod>>.None).AsChangedValue()
+                ArchiveJournalPeriods = (archiving.ArchiveJournalPeriods.Any() ? Maybe<IEnumerable<SystemUsageJournalPeriod>>.Some(archiving.ArchiveJournalPeriods.Select(MapJournalPeriod)) : Maybe<IEnumerable<SystemUsageJournalPeriod>>.None ?? Maybe<IEnumerable<SystemUsageJournalPeriod>>.None).AsChangedValue()
             };
         }
 

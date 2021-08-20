@@ -93,14 +93,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (systemResult.Failed)
             {
                 _logger.Error("Failed to retrieve itSystem with id {uuid}. Error {error}", parameters.SystemUuid, systemResult.Error.ToString());
-                return new OperationError("Unable to resolve IT-System:" + systemResult.Error.Message.GetValueOrFallback(string.Empty), systemResult.Error.FailureType);
+                return new OperationError("Unable to resolve IT-System:" + systemResult.Error.Message.GetValueOrEmptyString(), systemResult.Error.FailureType);
             }
 
             var organizationResult = _organizationService.GetOrganization(parameters.OrganizationUuid);
             if (organizationResult.Failed)
             {
                 _logger.Error("Failed to retrieve organization with id {uuid}. Error {error}", parameters.OrganizationUuid, organizationResult.Error.ToString());
-                return new OperationError("Unable to resolve IT-System:" + organizationResult.Error.Message.GetValueOrFallback(string.Empty), organizationResult.Error.FailureType);
+                return new OperationError("Unable to resolve IT-System:" + organizationResult.Error.Message.GetValueOrEmptyString(), organizationResult.Error.FailureType);
             }
 
             var creationResult = _systemUsageService
@@ -172,13 +172,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
 
                     if (result.Failed)
-                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                     if (referenceProperties.MasterReference)
                     {
                         var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
                         if (masterReferenceResult.Failed)
-                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
                     }
                 }
             }
@@ -205,7 +205,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             //Clear existing values
             var removeResult = _systemUsageService.RemoveAllArchivePeriods(systemUsage.Id);
             if (removeResult.Failed)
-                return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message}", removeResult.Error.FailureType);
+                return new OperationError($"Failed to remove all ArchiveJournalPeriods as part of the update. Remove error: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
 
             if (journalPeriods.IsNone)
             {
@@ -221,7 +221,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
                 if (addResult.Failed)
                     return new OperationError(
-                        $"Failed to add ArchiveJournalPeriod as part of the update. Add error: {addResult.Error.Message}",
+                        $"Failed to add ArchiveJournalPeriod as part of the update. Add error: {addResult.Error.Message.GetValueOrEmptyString()}",
                         addResult.Error.FailureType);
             }
 
@@ -239,7 +239,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             var orgByUuid = _organizationService.GetOrganization(archiveSupplierOrganization.Value);
 
             if (orgByUuid.Failed)
-                return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message}", orgByUuid.Error.FailureType);
+                return new OperationError($"Failed to get organization for ArchiveSupplierOrganization. Original error message: {orgByUuid.Error.Message.GetValueOrEmptyString()}", orgByUuid.Error.FailureType);
 
             return systemUsage.UpdateArchiveSupplierOrganization(orgByUuid.Value);
         }
@@ -314,7 +314,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     additions.Add(result.Value.kle);
                 }
@@ -325,7 +325,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     removals.Add(result.Value.kle);
                 }
@@ -347,7 +347,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 {
                     var organizationUnitResult = _organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
                     if (organizationUnitResult.Failed)
-                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrFallback(string.Empty)}", organizationUnitResult.Error.FailureType);
+                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrEmptyString()}", organizationUnitResult.Error.FailureType);
                     nextResponsibleOrg = organizationUnitResult.Value;
                 }
                 var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
@@ -361,7 +361,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         {
                             var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
                             if (result.Failed)
-                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                             nextUsingOrganizationUnits.Add(result.Value);
                         }
                     }
@@ -437,7 +437,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var result = _projectService.GetProject(uuid);
 
                 if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                 itProjects.Add(result.Value);
             }
@@ -455,7 +455,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             var contractResult = _contractService.GetContract(contractId.Value);
             if (contractResult.Failed)
-                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrFallback(string.Empty)}", contractResult.Error.FailureType);
+                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrEmptyString()}", contractResult.Error.FailureType);
 
             return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
@@ -506,7 +506,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message}", removeResult.Error.FailureType);
+                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
             }
 
             foreach (var userRolePair in toAdd)
@@ -514,7 +514,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message}", assignmentResult.Error.FailureType);
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
             }
 
             return systemUsage;

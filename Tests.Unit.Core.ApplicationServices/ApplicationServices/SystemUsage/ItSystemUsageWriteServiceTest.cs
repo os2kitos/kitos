@@ -966,7 +966,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(createResult.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertArchivingParameters(archivingParameters, organization.Name, createResult.Value);
+            AssertArchivingParameters(archivingParameters, organization.Name, organization.Id, createResult.Value);
         }
 
         [Fact]
@@ -1304,6 +1304,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Null(actual.ArchiveLocation);
             Assert.Null(actual.ArchiveTestLocation);
             Assert.Equal("", actual.ArchiveSupplier);
+            Assert.Null(actual.SupplierId);
             Assert.Null(actual.ArchiveFromSystem);
             Assert.Null(actual.Registertype);
             Assert.Null(actual.ArchiveFreq);
@@ -1312,13 +1313,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Never);
         }
 
-        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, ItSystemUsage actual)
+        private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
         {
             Assert.Equal(expected.ArchiveDuty.Value.Value.Value, actual.ArchiveDuty);
             Assert.Equal(expected.ArchiveTypeUuid.Value.Value.Value, actual.ArchiveType.Uuid);
             Assert.Equal(expected.ArchiveLocationUuid.Value.Value.Value, actual.ArchiveLocation.Uuid);
             Assert.Equal(expected.ArchiveTestLocationUuid.Value.Value.Value, actual.ArchiveTestLocation.Uuid);
             Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
+            Assert.Equal(expectedSupplierId, actual.SupplierId);
             Assert.Equal(expected.ArchiveActive.Value.Value.Value, actual.ArchiveFromSystem);
             Assert.Equal(expected.ArchiveDocumentBearing.Value.Value.Value, actual.Registertype);
             Assert.Equal(expected.ArchiveFrequencyInMonths.Value.Value.Value, actual.ArchiveFreq);

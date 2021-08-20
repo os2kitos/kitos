@@ -729,14 +729,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
             var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
             var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
-            var startDate = A<DateTime>();
-            Configure(f => f.Inject(new JournalPeriodDTO()
-            {
-                Approved = A<bool>(),
-                ArchiveId = A<string>(),
-                StartDate = startDate,
-                EndDate = startDate.AddDays(A<int>())
-            }));
 
             var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
@@ -747,10 +739,60 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
-            AssertArchivingParameters(inputs, dto.Archiving);
+            AssertArchivingParametersSet(inputs, dto.Archiving);
         }
 
-        private static void AssertArchivingParameters(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
+        [Fact]
+        public async Task Can_PUT_With_Archiving()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var createRequest = CreatePostRequest(organization.Uuid, system.Uuid);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, createRequest);
+
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
+
+            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+
+            //Act - Add archiving data
+            var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, inputs);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
+            var addedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersSet(inputs, addedDTO.Archiving);
+
+            //Act - Remove archiving data
+            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ ArchiveJournalPeriods = new List<JournalPeriodDTO>()});
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
+            var removedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersNotSet(removedDTO.Archiving);
+        }
+
+        private static void AssertArchivingParametersNotSet(ArchivingRegistrationsResponseDTO actual)
+        {
+            Assert.Null(actual.ArchiveDuty);
+            Assert.Null(actual.Type);
+            Assert.Null(actual.Location);
+            Assert.Null(actual.TestLocation);
+            Assert.Null(actual.Supplier);
+            Assert.Null(actual.Active);
+            Assert.Null(actual.FrequencyInMonths);
+            Assert.Null(actual.DocumentBearing);
+            Assert.Null(actual.Notes);
+
+            Assert.Empty(actual.JournalPeriods);
+        }
+
+        private static void AssertArchivingParametersSet(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
         {
             Assert.Equal(expected.ArchiveDuty, actual.ArchiveDuty);
             Assert.Equal(expected.ArchiveTypeUuid, actual.Type.Uuid);
@@ -784,7 +826,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 ArchiveFrequencyInMonths = A<int>(),
                 ArchiveDocumentBearing = A<bool>(),
                 ArchiveNotes = A<string>(),
-                ArchiveJournalPeriods = Many<JournalPeriodDTO>()
+                ArchiveJournalPeriods = new Fixture()
+                    .Build<JournalPeriodDTO>()
+                    .Without(x => x.EndDate)
+                    .Without(x => x.StartDate)
+                    .Do(x =>
+                    {
+                        var startDate = A<DateTime>();
+                        x.StartDate = startDate;
+                        x.EndDate = startDate.AddDays(1);
+                    })
+                    .CreateMany()
             };
         }
 
