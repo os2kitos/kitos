@@ -65,12 +65,13 @@
                         "data-element-type": "referenceIdObject"
                     },
                 }, {
-                    field: "lastChanged",
-                    title: "ændret",
-                    template: "#= kendo.toString(kendo.parseDate(lastChanged, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
+                    field: "createdAt",
+                    title: "Oprettet",
+                        template: "#= kendo.toString(kendo.parseDate(createdAt, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
+
                 }, {
-                    field: "lastChangedByUser.name",
-                    title: "Senest ændret af",
+                    field: "createdByUser.name",
+                    title: "Oprettet af",
                     width: 150
                 }, {
                     title: "Rediger",
