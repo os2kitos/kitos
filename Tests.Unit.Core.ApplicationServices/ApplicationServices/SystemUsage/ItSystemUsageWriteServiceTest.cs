@@ -1135,6 +1135,118 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(evaluationFrequency, itSystemUsage.numberDPIA);
         }
 
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_SensitiveDataLevelsAreNotUnique()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var sensitiveDataLevels = Many<SensitiveDataLevel>().Distinct().ToList();
+            sensitiveDataLevels.Add(sensitiveDataLevels.First()); //Add duplicate
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                DataSensitivityLevels = sensitiveDataLevels.FromNullable<IEnumerable<SensitiveDataLevel>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            Assert.EndsWith("Duplicate sensitivity levels are not allowed", createResult.Error.Message.GetValueOrDefault());
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_AppliedTechnicalPrecutionsAreNotUnique()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var precautions = Many<TechnicalPrecaution>().Distinct().ToList();
+            precautions.Add(precautions.First()); //Add duplicate
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                TechnicalPrecautionsApplied = precautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            Assert.EndsWith("Duplicates are not allowed in technical precautions", createResult.Error.Message.GetValueOrDefault());
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_RegisterTypeUpdatesFails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var ids = Many<Guid>().ToList();
+            var operationError = A<OperationError>();
+            ExpectUpdateRegisterTypesReturns(itSystemUsage, ids, operationError);
+
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                RegisteredDataCategoryUuids = ids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
+            Assert.EndsWith(operationError.Message.GetValueOrDefault(), createResult.Error.Message.GetValueOrDefault());
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_SensitivePersonDataUpdateFails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var ids = Many<Guid>().ToList();
+            var operationError = A<OperationError>();
+            ExpectUpdateSensitiveDataTypesReturns(itSystemUsage, ids, operationError);
+
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                SensitivePersonDataUuids = ids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
+            Assert.EndsWith(operationError.Message.GetValueOrDefault(), createResult.Error.Message.GetValueOrDefault());
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
         private static void AssertLink(NamedLink expectedLink, string actualName, string actualUrl)
         {
             Assert.Equal(expectedLink.Name, actualName);
