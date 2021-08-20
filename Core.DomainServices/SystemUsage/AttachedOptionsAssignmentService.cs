@@ -37,7 +37,7 @@ namespace Core.DomainServices.SystemUsage
                 .Select(x => x.OptionId)
                 .ToHashSet();
 
-            var personalDataTypes = new List<TOption>();
+            var types = new List<TOption>();
             foreach (var uuid in ids)
             {
                 var optionResult = _optionsService.GetOptionByUuid(systemUsage.OrganizationId, uuid);
@@ -50,12 +50,12 @@ namespace Core.DomainServices.SystemUsage
                 if (!existingIds.Contains(type.Id) && !optionResult.Value.available)
                     return new OperationError($"{_optionType:G} with id:{uuid} is not available in the organization", OperationFailure.BadInput);
 
-                personalDataTypes.Add(type);
+                types.Add(type);
             }
 
             //Compute deltas and apply changes
-            var typesToRemove = existingIds.Except(personalDataTypes.Select(x => x.Id)).ToList();
-            var typesToAdd = personalDataTypes.Select(x => x.Id).Except(existingIds).ToList();
+            var typesToRemove = existingIds.Except(types.Select(x => x.Id)).ToList();
+            var typesToAdd = types.Select(x => x.Id).Except(existingIds).ToList();
 
             foreach (var id in typesToRemove)
                 _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, _optionType);
@@ -63,7 +63,7 @@ namespace Core.DomainServices.SystemUsage
             foreach (var id in typesToAdd)
                 _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, _optionType);
 
-            return personalDataTypes;
+            return types;
         }
     }
 }
