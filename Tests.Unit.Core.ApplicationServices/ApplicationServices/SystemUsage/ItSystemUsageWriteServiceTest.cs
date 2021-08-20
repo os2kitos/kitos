@@ -26,13 +26,13 @@ using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Options;
-using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
+using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -54,6 +54,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly ItSystemUsageWriteService _sut;
         private readonly Mock<IKLEApplicationService> _kleServiceMock;
         private readonly Mock<IReferenceService> _referenceServiceMock;
+        private readonly Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>> _sensitiveDataOptionsService;
+        private readonly Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>> _registerTypeOptionsService;
+        private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -69,13 +72,16 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _kleServiceMock = new Mock<IKLEApplicationService>();
             _referenceServiceMock = new Mock<IReferenceService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>();
+            _sensitiveDataOptionsService = new Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>();
+            _registerTypeOptionsService = new Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>();
+            _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
                 _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object,
-                Mock.Of<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>(),
-                Mock.Of<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>(),
-                Mock.Of<IGenericRepository<ItSystemUsageSensitiveDataLevel>>(),
+                _sensitiveDataOptionsService.Object,
+                _registerTypeOptionsService.Object,
+                _sensitiveDataLevelRepository.Object,
                 Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
@@ -924,72 +930,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.EndsWith(operationError.Message.GetValueOrDefault(), result.Error.Message.GetValueOrDefault());
         }
 
-        private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
-        {
-            _referenceServiceMock
-                .Setup(x => x.AddReference(itSystemUsage.Id, ReferenceRootType.SystemUsage, externalReference.Title, externalReference.DocumentId, externalReference.Url))
-                .Returns(value);
-        }
-
-        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
-        {
-            return new ExternalReference
-            {
-                Id = A<int>(),
-                Title = externalReference.Title,
-                ExternalReferenceId = externalReference.DocumentId,
-                URL = externalReference.Url
-            };
-        }
-
-        private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
-        {
-            var input = new SystemUsageUpdateParameters
-            {
-                KLE = new UpdatedSystemUsageKLEDeviationParameters
-                {
-                    AddedKLEUuids = additionalTaskRefs.Select(x => x.Uuid).FromNullable().AsChangedValue(),
-                    RemovedKLEUuids = tasksToRemove.Select(x => x.Uuid).FromNullable().AsChangedValue()
-                }
-            };
-
-            foreach (var taskRef in additionalTaskRefs.Concat(tasksToRemove))
-                ExpectGetKLEReturns(taskRef.Uuid, (Maybe<DateTime>.None, taskRef));
-
-            return input;
-        }
-
-        private void ExpectGetKLEReturns(Guid uuid, Result<(Maybe<DateTime> updateReference, TaskRef kle), OperationError> result)
-        {
-            _kleServiceMock.Setup(x => x.GetKle(uuid)).Returns(result);
-        }
-
-        private List<TaskRef> CreateTaskRefs(int howMany)
-        {
-            return Many<Guid>(howMany).Select(CreateTaskRef).ToList();
-        }
-
-        private static TaskRef CreateTaskRef(Guid uuid)
-        {
-            return new TaskRef() { Uuid = uuid };
-        }
-
-        private void ExpectGetOrganizationUnitReturns(Guid orgUnitId, Result<OrganizationUnit, OperationError> organizationUnit)
-        {
-            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(orgUnitId)).Returns(organizationUnit);
-        }
-
-        private OrganizationUnit CreateOrganizationUnit(Guid uuid, Organization organization)
-        {
-            return new OrganizationUnit
-            {
-                Uuid = uuid,
-                Name = A<string>(),
-                OrganizationId = organization.Id,
-                Organization = organization
-            };
-        }
-
         [Fact]
         public void Can_Create_With_Roles()
         {
@@ -1095,6 +1035,192 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertRemoveRoleCalledOnce(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid);
             AssertAssignRoleCalledOnce(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid);
         }
+
+        [Fact]
+        public void Can_Create_With_GDPR()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            var sensitiveDataTypeUuids = Many<Guid>().Distinct().ToList();
+            var registerTypeUuids = Many<Guid>().Distinct().ToList();
+
+            ExpectUpdateSensitiveDataTypesReturns(itSystemUsage, sensitiveDataTypeUuids, sensitiveDataTypeUuids.Select(uuid => new SensitivePersonalDataType { Uuid = uuid, Id = A<int>() }).ToList());
+            ExpectUpdateRegisterTypesReturns(itSystemUsage, registerTypeUuids, registerTypeUuids.Select(uuid => new RegisterType { Uuid = uuid, Id = A<int>() }).ToList());
+
+            var purpose = A<string>();
+            var businessCritical = A<DataOptions?>();
+            var hostedAt = A<HostedAt?>();
+            var directoryDoc = A<NamedLink>();
+            var sensitiveDataLevels = Many<SensitiveDataLevel>().Distinct().ToList();
+            var technicalPrecautionsInPlace = A<DataOptions?>();
+            var technicalPrecautions = Many<TechnicalPrecaution>().Distinct().ToList();
+            var technicalPrecautionsDocumentation = A<NamedLink>();
+            var userSupervision = A<DataOptions?>();
+            var supervisionDate = A<DateTime?>();
+            var supervisionDoc = A<NamedLink>();
+            var riskAssessmentConducted = A<DataOptions?>();
+            var riskAssessmentDate = A<DateTime?>();
+            var riskAssessmentDoc = A<NamedLink>();
+            var riskAssessmentNotes = A<string>();
+            var riskAssessmentResult = A<RiskLevel?>();
+            var dpiaConducted = A<DataOptions?>();
+            var dpiaDate = A<DateTime?>();
+            var dpiaDoc = A<NamedLink>();
+            var retentionPeriod = A<DataOptions?>();
+            var nextEvaluationDate = A<DateTime?>();
+            var evaluationFrequency = A<int?>();
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                Purpose = purpose.AsChangedValue(),
+                BusinessCritical = businessCritical.AsChangedValue(),
+                HostedAt = hostedAt.AsChangedValue(),
+                DirectoryDocumentation = directoryDoc.FromNullable().AsChangedValue(),
+                DataSensitivityLevels = sensitiveDataLevels.FromNullable<IEnumerable<SensitiveDataLevel>>().AsChangedValue(),
+                SensitivePersonDataUuids = sensitiveDataTypeUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                RegisteredDataCategoryUuids = registerTypeUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
+                TechnicalPrecautionsApplied = technicalPrecautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
+                TechnicalPrecautionsDocumentation = technicalPrecautionsDocumentation.FromNullable().AsChangedValue(),
+                UserSupervision = userSupervision.AsChangedValue(),
+                UserSupervisionDate = supervisionDate.AsChangedValue(),
+                UserSupervisionDocumentation = supervisionDoc.FromNullable().AsChangedValue(),
+                RiskAssessmentConducted = riskAssessmentConducted.AsChangedValue(),
+                RiskAssessmentConductedDate = riskAssessmentDate.AsChangedValue(),
+                RiskAssessmentDocumentation = riskAssessmentDoc.FromNullable().AsChangedValue(),
+                RiskAssessmentNotes = riskAssessmentNotes.AsChangedValue(),
+                RiskAssessmentResult = riskAssessmentResult.AsChangedValue(),
+                DPIAConducted = dpiaConducted.AsChangedValue(),
+                DPIADate = dpiaDate.AsChangedValue(),
+                DPIADocumentation = dpiaDoc.FromNullable().AsChangedValue(),
+                RetentionPeriodDefined = retentionPeriod.AsChangedValue(),
+                NextDataRetentionEvaluationDate = nextEvaluationDate.AsChangedValue(),
+                DataRetentionEvaluationFrequencyInMonths = evaluationFrequency.AsChangedValue()
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            Assert.Same(itSystemUsage, createResult.Value);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(purpose, itSystemUsage.GeneralPurpose);
+            Assert.Equal(businessCritical, itSystemUsage.isBusinessCritical);
+            Assert.Equal(hostedAt, itSystemUsage.HostedAt);
+            AssertLink(directoryDoc, itSystemUsage.LinkToDirectoryUrlName, itSystemUsage.LinkToDirectoryUrl);
+            Assert.Equal(sensitiveDataLevels.OrderBy(x => x), itSystemUsage.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).OrderBy(x => x));
+            _sensitiveDataOptionsService.Verify(x => x.UpdateAssignedOptions(itSystemUsage, sensitiveDataTypeUuids), Times.Once);
+            _registerTypeOptionsService.Verify(x => x.UpdateAssignedOptions(itSystemUsage, registerTypeUuids), Times.Once);
+            Assert.Equal(technicalPrecautionsInPlace, itSystemUsage.precautions);
+            Assert.Equal(technicalPrecautions.OrderBy(x => x), itSystemUsage.GetTechnicalPrecautions().OrderBy(x => x));
+            AssertLink(technicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
+            Assert.Equal(userSupervision, itSystemUsage.UserSupervision);
+            Assert.Equal(supervisionDate, itSystemUsage.UserSupervisionDate);
+            AssertLink(supervisionDoc, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
+            Assert.Equal(riskAssessmentConducted, itSystemUsage.riskAssessment);
+            Assert.Equal(riskAssessmentDate, itSystemUsage.riskAssesmentDate);
+            AssertLink(riskAssessmentDoc, itSystemUsage.RiskSupervisionDocumentationUrlName, itSystemUsage.RiskSupervisionDocumentationUrl);
+            Assert.Equal(riskAssessmentNotes, itSystemUsage.noteRisks);
+            Assert.Equal(riskAssessmentResult, itSystemUsage.preriskAssessment);
+            Assert.Equal(dpiaConducted, itSystemUsage.DPIA);
+            Assert.Equal(dpiaDate, itSystemUsage.DPIADateFor);
+            AssertLink(dpiaDoc, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
+            Assert.Equal(retentionPeriod, itSystemUsage.answeringDataDPIA);
+            Assert.Equal(nextEvaluationDate, itSystemUsage.DPIAdeleteDate);
+            Assert.Equal(evaluationFrequency, itSystemUsage.numberDPIA);
+        }
+
+        private static void AssertLink(NamedLink expectedLink, string actualName, string actualUrl)
+        {
+            Assert.Equal(expectedLink.Name, actualName);
+            Assert.Equal(expectedLink.Url, actualUrl);
+        }
+
+        private void ExpectUpdateSensitiveDataTypesReturns(ItSystemUsage itSystemUsage,
+            IReadOnlyCollection<Guid> sensitiveDataTypeUuids,
+            Result<IEnumerable<SensitivePersonalDataType>, OperationError> result)
+        {
+            _sensitiveDataOptionsService.Setup(x => x.UpdateAssignedOptions(itSystemUsage, sensitiveDataTypeUuids)).Returns(result);
+        }
+
+        private void ExpectUpdateRegisterTypesReturns(ItSystemUsage itSystemUsage,
+            IReadOnlyCollection<Guid> optionUuids,
+            Result<IEnumerable<RegisterType>, OperationError> result)
+        {
+            _registerTypeOptionsService.Setup(x => x.UpdateAssignedOptions(itSystemUsage, optionUuids)).Returns(result);
+        }
+
+        private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.AddReference(itSystemUsage.Id, ReferenceRootType.SystemUsage, externalReference.Title, externalReference.DocumentId, externalReference.Url))
+                .Returns(value);
+        }
+
+        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
+        {
+            return new ExternalReference
+            {
+                Id = A<int>(),
+                Title = externalReference.Title,
+                ExternalReferenceId = externalReference.DocumentId,
+                URL = externalReference.Url
+            };
+        }
+
+        private SystemUsageUpdateParameters SetupKLEInputExpectations(IReadOnlyCollection<TaskRef> additionalTaskRefs, IReadOnlyCollection<TaskRef> tasksToRemove)
+        {
+            var input = new SystemUsageUpdateParameters
+            {
+                KLE = new UpdatedSystemUsageKLEDeviationParameters
+                {
+                    AddedKLEUuids = additionalTaskRefs.Select(x => x.Uuid).FromNullable().AsChangedValue(),
+                    RemovedKLEUuids = tasksToRemove.Select(x => x.Uuid).FromNullable().AsChangedValue()
+                }
+            };
+
+            foreach (var taskRef in additionalTaskRefs.Concat(tasksToRemove))
+                ExpectGetKLEReturns(taskRef.Uuid, (Maybe<DateTime>.None, taskRef));
+
+            return input;
+        }
+
+        private void ExpectGetKLEReturns(Guid uuid, Result<(Maybe<DateTime> updateReference, TaskRef kle), OperationError> result)
+        {
+            _kleServiceMock.Setup(x => x.GetKle(uuid)).Returns(result);
+        }
+
+        private List<TaskRef> CreateTaskRefs(int howMany)
+        {
+            return Many<Guid>(howMany).Select(CreateTaskRef).ToList();
+        }
+
+        private static TaskRef CreateTaskRef(Guid uuid)
+        {
+            return new TaskRef() { Uuid = uuid };
+        }
+
+        private void ExpectGetOrganizationUnitReturns(Guid orgUnitId, Result<OrganizationUnit, OperationError> organizationUnit)
+        {
+            _organizationServiceMock.Setup(x => x.GetOrganizationUnit(orgUnitId)).Returns(organizationUnit);
+        }
+
+        private OrganizationUnit CreateOrganizationUnit(Guid uuid, Organization organization)
+        {
+            return new OrganizationUnit
+            {
+                Uuid = uuid,
+                Name = A<string>(),
+                OrganizationId = organization.Id,
+                Organization = organization
+            };
+        }
+
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
             return new SystemUsageUpdateParameters()
