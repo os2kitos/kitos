@@ -26,6 +26,7 @@ using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
+using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
@@ -69,13 +70,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object, 
-                Mock.Of<IAttachedOptionRepository>(),
-                Mock.Of<IOptionsService<ItSystem, SensitivePersonalDataType>>(),
-                Mock.Of<IOptionsService<ItSystemUsage, RegisterType>>(),
+                _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object,
+                Mock.Of<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>(),
+                Mock.Of<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>(),
                 Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
-        
+
         protected override void OnFixtureCreated(Fixture fixture)
         {
             base.OnFixtureCreated(fixture);
