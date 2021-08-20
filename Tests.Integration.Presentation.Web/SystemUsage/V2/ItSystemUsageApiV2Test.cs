@@ -705,22 +705,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
-            var initialRoles = new List<RoleAssignmentRequestDTO>
-            {
-                new()
-                {
-                    RoleUuid = role.Uuid,
-                    UserUuid = user1.Uuid
-                }
-            };
-            var modifyRoles = new List<RoleAssignmentRequestDTO>
-            {
-                new()
-                {
-                    RoleUuid = role.Uuid,
-                    UserUuid = user2.Uuid
-                }
-            };
+            var initialRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user1.Uuid } };
+            var modifyRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user2.Uuid } };
 
             //Act - Add role
             var addInitialRolesRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, initialRoles);
@@ -751,8 +737,18 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         public async Task Can_POST_With_GDPR()
         {
             //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+
+            var gdpr = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
+            gdpr.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
+            //gdpr.SensitivePersonDataUuids
+            //gdpr.RegisteredDataCategoryUuids
+            gdpr.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+
 
             //Act
+            var createdDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid, gdpr: gdpr));
+
 
             //Assert
         }
@@ -881,7 +877,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
             LocalKLEDeviationsRequestDTO kleDeviationsRequest = null,
             IEnumerable<ExternalReferenceDataDTO> referenceDataDtos = null,
-            IEnumerable<RoleAssignmentRequestDTO> roles = null)
+            IEnumerable<RoleAssignmentRequestDTO> roles = null,
+            GDPRWriteRequestDTO gdpr = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
@@ -891,7 +888,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 OrganizationUsage = organizationalUsageSection,
                 LocalKleDeviations = kleDeviationsRequest,
                 ExternalReferences = referenceDataDtos?.ToList(),
-                Roles = roles
+                Roles = roles?.ToList(),
+                GDPR = gdpr
             };
         }
 
