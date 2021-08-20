@@ -481,7 +481,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message}", removeResult.Error.FailureType);
+                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrFallback(string.Empty)}", removeResult.Error.FailureType);
             }
 
             foreach (var userRolePair in toAdd)
@@ -489,7 +489,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message}", assignmentResult.Error.FailureType);
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrFallback(string.Empty)}", assignmentResult.Error.FailureType);
             }
 
             return systemUsage;
