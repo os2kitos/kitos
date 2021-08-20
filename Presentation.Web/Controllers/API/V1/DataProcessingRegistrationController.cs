@@ -928,8 +928,8 @@ namespace Presentation.Web.Controllers.API.V1
                 MasterReference = masterReferenceId.HasValue && masterReferenceId == reference.Id,
                 ReferenceId = reference.ExternalReferenceId,
                 Url = reference.URL,
-                CreatedAt = reference.Created,
-                CreatedByUser = reference.ObjectOwner.MapToNamedEntityDTO()
+                LastChanged = reference.LastChanged,
+                LastChangedByUser = reference.LastChangedByUser.MapToNamedEntityDTO()
             };
         }
 
