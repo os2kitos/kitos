@@ -8,7 +8,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageArchivingParameters
     {
-        public Maybe<ChangedValue<Maybe<ArchiveDutyTypes>>> ArchiveDuty { get; set; } = Maybe<ChangedValue<Maybe<ArchiveDutyTypes>>>.None;
+        public Maybe<ChangedValue<ArchiveDutyTypes?>> ArchiveDuty { get; set; } = Maybe<ChangedValue<ArchiveDutyTypes?>>.None;
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveTypeUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveLocationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveTestLocationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;

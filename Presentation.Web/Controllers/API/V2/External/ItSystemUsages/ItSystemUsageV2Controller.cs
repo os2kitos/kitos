@@ -16,6 +16,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -496,7 +497,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = MapArchiveDuty(archiving.ArchiveDuty).AsChangedValue(),
+                ArchiveDuty = MapEnumChoice(archiving.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes),
                 ArchiveTypeUuid = (archiving.ArchiveTypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
@@ -507,6 +508,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 ArchiveDocumentBearing = (archiving.ArchiveDocumentBearing?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
                 ArchiveJournalPeriods = (archiving.ArchiveJournalPeriods.Any() ? Maybe<IEnumerable<SystemUsageJournalPeriod>>.Some(archiving.ArchiveJournalPeriods.Select(MapJournalPeriod)) : Maybe<IEnumerable<SystemUsageJournalPeriod>>.None ?? Maybe<IEnumerable<SystemUsageJournalPeriod>>.None).AsChangedValue()
             };
+        }
+
+        private static ChangedValue<TOut?> MapEnumChoice<TIn, TOut>(TIn? choice, Func<TIn, TOut> mapWith) where TIn : struct where TOut : struct
+        {
+            return choice.HasValue ? mapWith(choice.Value) : new ChangedValue<TOut?>(null);
         }
 
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)

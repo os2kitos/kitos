@@ -188,7 +188,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformArchivingUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageArchivingParameters archivingProperties)
         {
-            return WithOptionalUpdate(itSystemUsage, archivingProperties.ArchiveDuty, (usage, archiveDuty) => usage.UpdateArchiveDuty(archiveDuty))
+            return WithOptionalUpdate(itSystemUsage, archivingProperties.ArchiveDuty, (usage, archiveDuty) => usage.ArchiveDuty = archiveDuty)
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTypeUuid, UpdateArchiveType))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveLocationUuid, UpdateArchiveLocation))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTestLocationUuid, UpdateArchiveTestLocation))

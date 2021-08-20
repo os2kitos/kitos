@@ -707,18 +707,6 @@ namespace Core.DomainModel.ItSystemUsage
             };
         }
 
-        public void UpdateArchiveDuty(Maybe<ArchiveDutyTypes> archiveDuty)
-        {
-            if (archiveDuty.IsNone)
-            {
-                ArchiveDuty = null;
-            }
-            else
-            {
-                ArchiveDuty = archiveDuty.Value;
-            }
-        }
-
         public void ResetArchiveType()
         {
             ArchiveTypeId = null;

@@ -7,6 +7,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -1329,11 +1330,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.Value.Value.Value.Count()));
         }
 
-        private UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
+        private static UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ArchiveDutyTypes>.None.AsChangedValue(),
+                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(new ChangedValue<ArchiveDutyTypes?>(null)),
                 ArchiveTypeUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveTestLocationUuid = Maybe<Guid>.None.AsChangedValue(),
@@ -1350,7 +1351,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = A<ArchiveDutyTypes>().FromNullable().AsChangedValue(),
+                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(A<ArchiveDutyTypes>()),
                 ArchiveTypeUuid = archiveTypeUuid.AsChangedValue(),
                 ArchiveLocationUuid = archiveLocationUuid.AsChangedValue(),
                 ArchiveTestLocationUuid = archiveTestLocationUuid.AsChangedValue(),
