@@ -135,9 +135,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Same(error, createResult.Error);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Fact]
@@ -156,10 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(error.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Fact]
@@ -177,10 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(error.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Theory]
@@ -266,9 +258,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -292,9 +282,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -319,11 +307,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(operationError.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
-
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
         }
 
         [Fact]
@@ -350,9 +334,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -379,9 +361,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -407,9 +387,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -437,9 +415,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -463,9 +439,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -491,9 +465,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -627,9 +599,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -656,9 +626,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -686,9 +654,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -741,10 +707,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.Contains("Duplicates in KLE", createResult.Error.Message.GetValueOrFallback(string.Empty));
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicates in KLE", transactionMock);
+
         }
 
         [Fact]
@@ -766,10 +730,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("KLE cannot be both added and removed", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "KLE cannot be both added and removed", transactionMock);
         }
 
         [Fact]
@@ -789,10 +750,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot ADD KLE which is already present in the system context", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot ADD KLE which is already present in the system context", transactionMock);
+
         }
 
         [Fact]
@@ -813,10 +772,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot Remove KLE which is not present in the system context", transactionMock);
         }
 
         [Fact]
@@ -866,9 +822,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(result, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -894,9 +848,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(result, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -924,10 +876,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(operationError.FailureType, result.Error.FailureType);
-            Assert.EndsWith(operationError.Message.GetValueOrDefault(), result.Error.Message.GetValueOrDefault());
+            AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
         }
 
         [Fact]
@@ -995,9 +944,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(error, createResult.Error.FailureType);
+            AssertFailure(createResult, error, transactionMock);
         }
 
         [Fact]
@@ -1156,10 +1103,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Duplicate sensitivity levels are not allowed", createResult.Error.Message.GetValueOrDefault());
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicate sensitivity levels are not allowed", transactionMock);
         }
 
         [Fact]
@@ -1183,10 +1127,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Duplicates are not allowed in technical precautions", createResult.Error.Message.GetValueOrDefault());
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicates are not allowed in technical precautions", transactionMock);
         }
 
         [Fact]
@@ -1212,10 +1153,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(operationError.Message.GetValueOrDefault(), createResult.Error.Message.GetValueOrDefault());
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
         }
 
         [Fact]
@@ -1241,9 +1179,26 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             }));
 
             //Assert
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
+        }
+
+        private static void AssertFailureWithExpectedOperationError(Result<ItSystemUsage, OperationError> createResult, OperationError operationError,
+            Mock<IDatabaseTransaction> transactionMock)
+        {
+            AssertFailureWithErrorMessageContent(createResult, operationError.FailureType, operationError.Message.GetValueOrEmptyString(), transactionMock);
+        }
+
+        private static void AssertFailureWithErrorMessageContent(Result<ItSystemUsage, OperationError> createResult, OperationFailure expectedFailure, string expectedContent,
+            Mock<IDatabaseTransaction> transactionMock)
+        {
+            AssertFailure(createResult, expectedFailure, transactionMock);
+            Assert.Contains(expectedContent, createResult.Error.Message.GetValueOrDefault());
+        }
+
+        private static void AssertFailure(Result<ItSystemUsage, OperationError> createResult, OperationFailure expectedFailure, Mock<IDatabaseTransaction> transactionMock)
+        {
             Assert.True(createResult.Failed);
-            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(operationError.Message.GetValueOrDefault(), createResult.Error.Message.GetValueOrDefault());
+            Assert.Equal(expectedFailure, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transactionMock);
         }
 

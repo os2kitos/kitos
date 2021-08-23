@@ -198,9 +198,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.GetTechnicalPrecautions().Select(precaution => precaution.ToTechnicalPrecautionChoice());
         }
 
-        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel arg)
+        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel dataLevel)
         {
-            return arg?.SensitivityDataLevel.Transform(x => x.ToDataSensitivityLevelChoice());
+            return dataLevel?.SensitivityDataLevel.ToDataSensitivityLevelChoice();
         }
 
         private static HostingChoice? MapHosting(ItSystemUsage systemUsage)
@@ -219,7 +219,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         private static YesNoDontKnowChoice? MapYesNoExtended(DataOptions? input)
         {
-            return input?.Transform(option => option.ToYesNoDontKnowChoice());
+            return input?.ToYesNoDontKnowChoice();
         }
 
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)

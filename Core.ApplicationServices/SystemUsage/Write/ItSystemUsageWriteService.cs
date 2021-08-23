@@ -167,23 +167,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                    }))
 
                 //Registered data sensitivity
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) =>
-                   {
-                       var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
-                       var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
-                       var error = systemUsage.UpdateDataSensitivityLevels(newLevels);
-                       if (error.HasValue)
-                           return error;
-                       
-                       var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
-                       
-                       foreach (var removedSensitiveDataLevel in levelsRemoved)
-                       {
-                           _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
-                       }
-
-                       return Maybe<OperationError>.None;
-                   }))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
                 .Bind(usage => WithOptionalUpdate(usage, parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
                 .Bind(usage => WithOptionalUpdate(usage, parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
 
@@ -232,6 +216,24 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(usage => WithOptionalUpdate(usage, parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
         }
 
+        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
+        {
+            var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
+            var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
+            var error = systemUsage.UpdateDataSensitivityLevels(newLevels);
+            if (error.HasValue)
+                return error;
+
+            var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
+
+            foreach (var removedSensitiveDataLevel in levelsRemoved)
+            {
+                _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
         private static Maybe<OperationError> UpdateAppliedTechnicalPrecautions(ItSystemUsage systemUsage, Maybe<IEnumerable<TechnicalPrecaution>> newPrecautions)
         {
             return systemUsage.UpdateTechnicalPrecautions(newPrecautions.GetValueOrFallback(new List<TechnicalPrecaution>()));
@@ -274,13 +276,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
 
                     if (result.Failed)
-                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                     if (referenceProperties.MasterReference)
                     {
                         var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
                         if (masterReferenceResult.Failed)
-                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
                     }
                 }
             }
@@ -301,7 +303,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     additions.Add(result.Value.kle);
                 }
@@ -312,7 +314,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     removals.Add(result.Value.kle);
                 }
@@ -334,7 +336,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 {
                     var organizationUnitResult = _organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
                     if (organizationUnitResult.Failed)
-                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrFallback(string.Empty)}", organizationUnitResult.Error.FailureType);
+                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrEmptyString()}", organizationUnitResult.Error.FailureType);
                     nextResponsibleOrg = organizationUnitResult.Value;
                 }
                 var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
@@ -348,7 +350,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         {
                             var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
                             if (result.Failed)
-                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                             nextUsingOrganizationUnits.Add(result.Value);
                         }
                     }
@@ -424,7 +426,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var result = _projectService.GetProject(uuid);
 
                 if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                 itProjects.Add(result.Value);
             }
@@ -442,7 +444,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             var contractResult = _contractService.GetContract(contractId.Value);
             if (contractResult.Failed)
-                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrFallback(string.Empty)}", contractResult.Error.FailureType);
+                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrEmptyString()}", contractResult.Error.FailureType);
 
             return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }

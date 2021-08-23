@@ -15,12 +15,12 @@ using Xunit;
 
 namespace Tests.Unit.Core.DomainServices.SystemUsage
 {
-    public class TestTarget
+    public class TestTargetStub
     {
 
     }
 
-    public class TestOption : OptionEntity<TestTarget>
+    public class TestOptionStub : OptionEntity<TestTargetStub>
     {
 
     }
@@ -28,9 +28,9 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     public class AttachedOptionsAssignmentServiceTest : WithAutoFixture
     {
         private readonly OptionType _optionType;
-        private readonly AttachedOptionsAssignmentService<TestOption, TestTarget> _sut;
+        private readonly AttachedOptionsAssignmentService<TestOptionStub, TestTargetStub> _sut;
         private readonly Mock<IAttachedOptionRepository> _attachedOptionsRepositoryMock;
-        private readonly Mock<IOptionsService<TestTarget, TestOption>> _optionsServiceMock;
+        private readonly Mock<IOptionsService<TestTargetStub, TestOptionStub>> _optionsServiceMock;
         private readonly ItSystemUsage _systemUsage;
 
         public AttachedOptionsAssignmentServiceTest()
@@ -43,8 +43,8 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 Id = fixture.Create<int>()
             };
             _attachedOptionsRepositoryMock = new Mock<IAttachedOptionRepository>();
-            _optionsServiceMock = new Mock<IOptionsService<TestTarget, TestOption>>();
-            _sut = new AttachedOptionsAssignmentService<TestOption, TestTarget>(_optionType,
+            _optionsServiceMock = new Mock<IOptionsService<TestTargetStub, TestOptionStub>>();
+            _sut = new AttachedOptionsAssignmentService<TestOptionStub, TestTargetStub>(_optionType,
                 _attachedOptionsRepositoryMock.Object, _optionsServiceMock.Object);
         }
 
@@ -71,7 +71,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var optionUuids = Many<Guid>().Distinct().ToList();
             ExpectGetExistingAttachedOptionsReturns(Enumerable.Empty<AttachedOption>());
             _optionsServiceMock.Setup(x => x.GetOptionByUuid(_systemUsage.OrganizationId, It.IsAny<Guid>()))
-                .Returns(Maybe<(TestOption option, bool available)>.None);
+                .Returns(Maybe<(TestOptionStub option, bool available)>.None);
 
             //Act
             var result = _sut.UpdateAssignedOptions(_systemUsage, optionUuids);
@@ -89,7 +89,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             var optionUuids = Many<Guid>().Distinct().ToList();
             ExpectGetExistingAttachedOptionsReturns(Enumerable.Empty<AttachedOption>());
             _optionsServiceMock.Setup(x => x.GetOptionByUuid(_systemUsage.OrganizationId, It.IsAny<Guid>()))
-                .Returns((new TestOption(), false));
+                .Returns((new TestOptionStub(), false));
 
             //Act
             var result = _sut.UpdateAssignedOptions(_systemUsage, optionUuids);
@@ -104,7 +104,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         public void Can_UpdateAssignedOptions()
         {
             //Arrange
-            var options = Many<Guid>(10).Distinct().Select(uuid => new TestOption { Uuid = uuid, Id = A<int>() }).ToList();
+            var options = Many<Guid>(10).Distinct().Select(uuid => new TestOptionStub { Uuid = uuid, Id = A<int>() }).ToList();
             var optionUuids = options.Select(x => x.Uuid).ToList();
 
             var existingOptionWhichWillBeDeleted = A<int>();
