@@ -31,7 +31,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var systemUsageRoles = _sut.MapRoles(roles);
 
             //Assert
-            var userRolePairs = AssertPropertyContainsDataChange(systemUsageRoles.UserRolePairs).OrderBy(x=>x.RoleUuid).ToList();
+            var userRolePairs = AssertPropertyContainsDataChange(systemUsageRoles.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
             Assert.Equal(roles.Count, userRolePairs.Count);
             for (var i = 0; i < userRolePairs.Count; i++)
             {
@@ -109,14 +109,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert 
             var responsible = AssertPropertyContainsDataChange(output.ResponsibleOrganizationUnitUuid);
             var usingOrgUnits = AssertPropertyContainsDataChange(output.UsingOrganizationUnitUuids);
-            Assert.Equal(input.ResponsibleOrganizationUnitUuid,responsible);
-            Assert.Equal(input.UsingOrganizationUnitUuids,usingOrgUnits);
+            Assert.Equal(input.ResponsibleOrganizationUnitUuid, responsible);
+            Assert.Equal(input.UsingOrganizationUnitUuids, usingOrgUnits);
         }
 
         [Theory]
-        [InlineData(true,true)]
-        [InlineData(true,false)]
-        [InlineData(false,true)]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
         public void Map_OrganizationUsage_Resets_Property_If_Source_Value_Is_Not_Defined(bool responsibleIsNull, bool unitsAreNull)
         {
             //Arrange
@@ -138,11 +138,40 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertPropertyContainsDataChange(output.UsingOrganizationUnitUuids);
         }
 
+        [Fact]
+        public void Can_Map_General_Data_Properties()
+        {
+            //Arrange
+            var input = A<GeneralDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
+            Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
+            Assert.Equal(input.SystemVersion, AssertPropertyContainsDataChange(output.SystemVersion));
+            Assert.Equal(input.AssociatedProjectUuids, AssertPropertyContainsDataChange(output.AssociatedProjectUuids));
+            Assert.Equal(input.DataClassificationUuid, AssertPropertyContainsDataChange(output.DataClassificationUuid));
+            //TODO
+            //Assert.Equal(input.Validity, AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));
+         
+            //TODO
+            //Assert.Equal(input.NumberOfExpectedUsers, AssertPropertyContainsDataChange(output.));
+        }
+
         private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
         {
             Assert.True(sourceData.HasValue);
             Assert.True(sourceData.Value.Value.HasValue);
             return sourceData.Value.Value.Value;
+        }
+
+        private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<T>> sourceData)
+        {
+            Assert.True(sourceData.HasValue);
+            return sourceData.Value.Value;
         }
 
         private static void AssertPropertyContainsResetDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
@@ -161,11 +190,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         /*
          *
-        
+            UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData);
 
             UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO generalData);
-            
-            UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData);
 
             UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request);
         
@@ -174,7 +201,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Check that no reset is set
             SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request);
             
-            //Assert that sections are defined
+            //Assert that sections are defined even if absent from the input
             SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request);
          */
     }
