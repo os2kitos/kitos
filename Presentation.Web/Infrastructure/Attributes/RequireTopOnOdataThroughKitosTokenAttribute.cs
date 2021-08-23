@@ -19,11 +19,12 @@ namespace Presentation.Web.Infrastructure.Attributes
                 if (!actionContext.Request.RequestUri.AbsoluteUri.Contains("$top="))
                 {
                     logger.Warning("Request spørger om data gennem ODATA uden \"top\" argumentet til at begrænse udtrækket (paging fejl)");
-                    actionContext.Response = new HttpResponseMessage
-                    {
-                        StatusCode = HttpStatusCode.BadRequest,
-                        Content = new StringContent("Pagination required. Missing 'top' query parameter on ODATA request")
-                    };
+                    //TODO: Re-enable in https://os2web.atlassian.net/browse/KITOSUDV-2137
+                    //actionContext.Response = new HttpResponseMessage
+                    //{
+                    //    StatusCode = HttpStatusCode.BadRequest,
+                    //    Content = new StringContent("Pagination required. Missing 'top' query parameter on ODATA request")
+                    //};
                 }
             }
             base.OnActionExecuting(actionContext);

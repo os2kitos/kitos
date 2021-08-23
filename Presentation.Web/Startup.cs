@@ -45,7 +45,7 @@ namespace Presentation.Web
             app.Use<ApiRequestsLoggingMiddleware>();
             app.Use<DenyUsersWithoutApiAccessMiddleware>();
             app.Use<DenyModificationsThroughApiMiddleware>();
-            app.Use<DenyTooLargeQueriesMiddleware>();
+            //app.Use<DenyTooLargeQueriesMiddleware>(); //TODO: Re-Enable https://os2web.atlassian.net/browse/KITOSUDV-2137
         }
 
         private static void InitializeHangfire(IAppBuilder app)
