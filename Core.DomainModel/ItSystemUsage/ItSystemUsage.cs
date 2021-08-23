@@ -281,6 +281,18 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions? precautions { get; set; }
+
+        public IEnumerable<TechnicalPrecaution> GetTechnicalPrecautions()
+        {
+            if (precautionsOptionsAccessControl)
+                yield return TechnicalPrecaution.AccessControl;
+            if (precautionsOptionsEncryption)
+                yield return TechnicalPrecaution.Encryption;
+            if (precautionsOptionsLogning)
+                yield return TechnicalPrecaution.Logging;
+            if (precautionsOptionsPseudonomisering)
+                yield return TechnicalPrecaution.Pseudonymization;
+        }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
@@ -699,7 +711,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
         {
-            return new ItSystemRight()
+            return new ItSystemRight
             {
                 Role = role,
                 User = user,
@@ -810,6 +822,76 @@ namespace Core.DomainModel.ItSystemUsage
 
             ArchivePeriods.Add(newPeriod);
             return newPeriod;
+        }
+
+        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        {
+            if (sensitiveDataLevels == null)
+                throw new ArgumentNullException(nameof(sensitiveDataLevels));
+
+            var levels = sensitiveDataLevels.ToList();
+
+            if (levels.Distinct().Count() != levels.Count)
+                return new OperationError("Duplicate sensitivity levels are not allowed", OperationFailure.BadInput);
+
+            var levelMappings = levels.Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            }).ToList();
+
+            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
+        {
+            if (technicalPrecautions == null)
+                throw new ArgumentNullException(nameof(technicalPrecautions));
+
+            var enabledPrecautions = technicalPrecautions.ToList();
+
+            if (enabledPrecautions.Count != enabledPrecautions.Distinct().Count())
+                return new OperationError("Duplicates are not allowed in technical precautions", OperationFailure.BadInput);
+
+            var disabledPrecautions = Enum.GetValues(typeof(TechnicalPrecaution)).Cast<TechnicalPrecaution>().Except(enabledPrecautions).ToList();
+
+            var changeSet = enabledPrecautions
+                .Select(p =>
+                    new
+                    {
+                        Enabled = true,
+                        Precaution = p
+                    }).Concat(disabledPrecautions.Select(p => new
+                    {
+                        Enabled = false,
+                        Precaution = p
+
+                    }));
+
+            foreach (var change in changeSet)
+            {
+                switch (change.Precaution)
+                {
+                    case TechnicalPrecaution.Encryption:
+                        precautionsOptionsEncryption = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Pseudonymization:
+                        precautionsOptionsPseudonomisering = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.AccessControl:
+                        precautionsOptionsAccessControl = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Logging:
+                        precautionsOptionsLogning = change.Enabled;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Maybe<OperationError>.None;
         }
     }
 }

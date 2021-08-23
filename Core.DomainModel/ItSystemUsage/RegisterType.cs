@@ -1,6 +1,6 @@
-﻿namespace Core.DomainModel.ItSystem
+﻿namespace Core.DomainModel.ItSystemUsage
 {
-    public class RegisterType : OptionHasChecked<ItSystemUsage.ItSystemUsage>
+    public class RegisterType : OptionHasChecked<ItSystemUsage>
     {
         
     }

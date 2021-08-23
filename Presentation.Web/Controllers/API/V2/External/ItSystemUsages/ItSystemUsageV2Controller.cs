@@ -10,8 +10,9 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
-using Core.DomainModel;
+using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
@@ -234,7 +235,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters()
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
                     Roles = MapRoles(request)
                 })
@@ -332,12 +333,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGdpr([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GDPRWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGDPR([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] GDPRWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    GDPR = MapGDPR(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -462,8 +469,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 GeneralProperties = request.General.FromNullable().Select(MapFullCommonGeneralData),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
                 KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
-				ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
+                ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = request.Roles.FromNullable().Select(MapRoles),
+                GDPR = request.GDPR.FromNullable().Select(MapGDPR),
                 Archiving = request.Archiving.FromNullable().Select(MapArchiving)
             };
         }
@@ -476,11 +484,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <returns></returns>
         private static SystemUsageUpdateParameters CreateFullPUTParameters(UpdateItSystemUsageRequestDTO request)
         {
-            var generalDataInput = request.General ??new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ??  new OrganizationUsageWriteRequestDTO();
+            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
+            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
             var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var roles = request.Roles ??  new List<RoleAssignmentRequestDTO>();
-			var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
+            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
+            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
+            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
             var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
             return new SystemUsageUpdateParameters
             {
@@ -489,10 +498,40 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 KLE = kleInput.FromNullable().Select(MapKle),
                 ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
                 Roles = roles.FromNullable().Select(MapRoles),
+                GDPR = gdpr.FromNullable().Select(MapGDPR),
                 Archiving = archiving.FromNullable().Select(MapArchiving)
             };
         }
-
+        private static UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
+        {
+            return new UpdatedSystemUsageGDPRProperties
+            {
+                Purpose = request.Purpose.AsChangedValue(),
+                BusinessCritical = MapYesNoDontKnow(request.BusinessCritical),
+                HostedAt = MapEnumChoice(request.HostedAt, HostedAtMappingExtensions.ToHostedAt),
+                DirectoryDocumentation = MapLink(request.DirectoryDocumentation),
+                DataSensitivityLevels = MapEnumList(request.DataSensitivityLevels, SensitiveDataLevelMappingExtensions.ToSensitiveDataLevel),
+                SensitivePersonDataUuids = MapCrossReferences(request.SensitivePersonDataUuids),
+                RegisteredDataCategoryUuids = MapCrossReferences(request.RegisteredDataCategoryUuids),
+                TechnicalPrecautionsInPlace = MapYesNoDontKnow(request.TechnicalPrecautionsInPlace),
+                TechnicalPrecautionsApplied = MapEnumList(request.TechnicalPrecautionsApplied, TechnicalPrecautionMappingExtensions.ToTechnicalPrecaution),
+                TechnicalPrecautionsDocumentation = MapLink(request.TechnicalPrecautionsDocumentation),
+                UserSupervision = MapYesNoDontKnow(request.UserSupervision),
+                UserSupervisionDate = request.UserSupervisionDate.AsChangedValue(),
+                UserSupervisionDocumentation = MapLink(request.UserSupervisionDocumentation),
+                RiskAssessmentConducted = MapYesNoDontKnow(request.RiskAssessmentConducted),
+                RiskAssessmentConductedDate = request.RiskAssessmentConductedDate.AsChangedValue(),
+                RiskAssessmentResult = MapEnumChoice(request.RiskAssessmentResult, RiskLevelMappingExtensions.ToRiskLevel),
+                RiskAssessmentDocumentation = MapLink(request.RiskAssessmentDocumentation),
+                RiskAssessmentNotes = request.RiskAssessmentNotes.AsChangedValue(),
+                DPIAConducted = MapYesNoDontKnow(request.DPIAConducted),
+                DPIADate = request.DPIADate.AsChangedValue(),
+                DPIADocumentation = MapLink(request.DPIADocumentation),
+                RetentionPeriodDefined = MapYesNoDontKnow(request.RetentionPeriodDefined),
+                NextDataRetentionEvaluationDate = request.NextDataRetentionEvaluationDate.AsChangedValue(),
+                DataRetentionEvaluationFrequencyInMonths = request.DataRetentionEvaluationFrequencyInMonths.AsChangedValue()
+            };
+        }
         private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
         {
             return new UpdatedSystemUsageArchivingParameters()
@@ -510,11 +549,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             };
         }
 
-        private static ChangedValue<TOut?> MapEnumChoice<TIn, TOut>(TIn? choice, Func<TIn, TOut> mapWith) where TIn : struct where TOut : struct
-        {
-            return choice.HasValue ? mapWith(choice.Value) : new ChangedValue<TOut?>(null);
-        }
-
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
         {
             return new SystemUsageJournalPeriod()
@@ -524,6 +558,31 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 EndDate = journalPeriod.EndDate,
                 StartDate = journalPeriod.StartDate
             };
+        }
+
+        private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
+        {
+            return (list?.FromNullable().Select(dataSensitivityLevelChoices => dataSensitivityLevelChoices.Select(mapWith)) ?? Maybe<IEnumerable<TOut>>.None).AsChangedValue();
+        }
+
+        private static ChangedValue<TOut?> MapEnumChoice<TIn, TOut>(TIn? choice, Func<TIn, TOut> mapWith) where TIn : struct where TOut : struct
+        {
+            return choice.HasValue ? mapWith(choice.Value) : new ChangedValue<TOut?>(null);
+        }
+
+        private static ChangedValue<Maybe<IEnumerable<Guid>>> MapCrossReferences(IEnumerable<Guid> crossReferences)
+        {
+            return (crossReferences?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue();
+        }
+
+        private static ChangedValue<DataOptions?> MapYesNoDontKnow(YesNoDontKnowChoice? choice)
+        {
+            return MapEnumChoice(choice, DataOptionsMappingExtensions.ToDataOptions);
+        }
+
+        private static ChangedValue<Maybe<NamedLink>> MapLink(SimpleLinkDTO simpleLinkDto)
+        {
+            return (simpleLinkDto?.FromNullable().Select(linkDto => new NamedLink(linkDto.Name, linkDto.Url)) ?? Maybe<NamedLink>.None).AsChangedValue();
         }
 
         private static IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
@@ -539,7 +598,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
         private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
         {
-            return new UpdatedSystemUsageKLEDeviationParameters()
+            return new UpdatedSystemUsageKLEDeviationParameters
             {
                 AddedKLEUuids = kle.AddedKLEUuids.FromNullable().AsChangedValue(),
                 RemovedKLEUuids = kle.RemovedKLEUuids.FromNullable().AsChangedValue()

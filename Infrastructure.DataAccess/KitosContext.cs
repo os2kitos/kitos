@@ -282,6 +282,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsingSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new UserNotificationMap());
+            modelBuilder.Configurations.Add(new AttachedOptionMap());
         }
     }
 }
