@@ -291,14 +291,6 @@ namespace Presentation.Web.Controllers.API.V1
                         continue; // don't allow writing to these.
                     }
 
-                    if (destName == nameof(IHasUuid.Uuid))
-                    {
-                        if (item is IHasUuid hasUuid && jToken != null && jToken.Value<Guid>() != hasUuid.Uuid)
-                        {
-                            throw new NotSupportedException("Cannot change UUID");
-                        }
-                    }
-
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
 
@@ -344,6 +336,15 @@ namespace Presentation.Web.Controllers.API.V1
                     {
                         Guid guid;
                         Guid.TryParse(valuePair.Value.Value<string>(), out guid);
+
+                        if (destName == nameof(IHasUuid.Uuid))
+                        {
+                            if (item is IHasUuid hasUuid && guid != hasUuid.Uuid)
+                            {
+                                throw new NotSupportedException("Cannot change UUID");
+                            }
+                        }
+
                         propRef.SetValue(item, guid);
                     }
                     else
