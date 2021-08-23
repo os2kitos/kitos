@@ -17,6 +17,7 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
@@ -310,8 +311,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    Archiving = MapArchiving(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -464,7 +471,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
                 ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = request.Roles.FromNullable().Select(MapRoles),
-                GDPR = request.GDPR.FromNullable().Select(MapGDPR)
+                GDPR = request.GDPR.FromNullable().Select(MapGDPR),
+                Archiving = request.Archiving.FromNullable().Select(MapArchiving)
             };
         }
 
@@ -482,6 +490,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
             var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
             var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
+            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
@@ -489,7 +498,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 KLE = kleInput.FromNullable().Select(MapKle),
                 ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
                 Roles = roles.FromNullable().Select(MapRoles),
-                GDPR = gdpr.FromNullable().Select(MapGDPR)
+                GDPR = gdpr.FromNullable().Select(MapGDPR),
+                Archiving = archiving.FromNullable().Select(MapArchiving)
             };
         }
         private static UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
@@ -522,6 +532,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 DataRetentionEvaluationFrequencyInMonths = request.DataRetentionEvaluationFrequencyInMonths.AsChangedValue()
             };
         }
+        private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
+        {
+            return new UpdatedSystemUsageArchivingParameters()
+            {
+                ArchiveDuty = MapEnumChoice(archiving.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes),
+                ArchiveTypeUuid = (archiving.ArchiveTypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveSupplierOrganizationUuid = (archiving.ArchiveSupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveActive = archiving.ArchiveActive.AsChangedValue(),
+                ArchiveNotes = archiving.ArchiveNotes.AsChangedValue(),
+                ArchiveFrequencyInMonths = archiving.ArchiveFrequencyInMonths.AsChangedValue(),
+                ArchiveDocumentBearing = archiving.ArchiveDocumentBearing.AsChangedValue(),
+                ArchiveJournalPeriods = archiving.ArchiveJournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue()
+            };
+        }
+
+        private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
+        {
+            return new SystemUsageJournalPeriod()
+            {
+                Approved = journalPeriod.Approved,
+                ArchiveId = journalPeriod.ArchiveId,
+                EndDate = journalPeriod.EndDate,
+                StartDate = journalPeriod.StartDate
+            };
+        }
+
         private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
         {
             return (list?.FromNullable().Select(dataSensitivityLevelChoices => dataSensitivityLevelChoices.Select(mapWith)) ?? Maybe<IEnumerable<TOut>>.None).AsChangedValue();

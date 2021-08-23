@@ -839,6 +839,142 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return (token, user, organization, system);
         }
 
+        [Fact]
+        public async Task Can_POST_With_Archiving()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
+
+            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+
+            var request = CreatePostRequest(organization.Uuid, system.Uuid, archiving: inputs);
+
+            //Act
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert
+            var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersSet(inputs, dto.Archiving);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Archiving()
+        {
+            //Arrange
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+
+            var createRequest = CreatePostRequest(organization.Uuid, system.Uuid);
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, createRequest);
+
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
+
+            var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+
+            //Act - Add archiving data
+            var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, inputs);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
+            var addedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersSet(inputs, addedDTO.Archiving);
+
+            //Act - Update archiving data
+            var updatedArchiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 1)).First();
+            var updatedArchiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 1)).First();
+            var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
+            var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
+            
+            var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
+            var updatedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
+
+            //Act - Remove archiving data
+            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ ArchiveJournalPeriods = new List<JournalPeriodDTO>()});
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
+            var removedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersNotSet(removedDTO.Archiving);
+        }
+
+        private static void AssertArchivingParametersNotSet(ArchivingRegistrationsResponseDTO actual)
+        {
+            Assert.Null(actual.ArchiveDuty);
+            Assert.Null(actual.Type);
+            Assert.Null(actual.Location);
+            Assert.Null(actual.TestLocation);
+            Assert.Null(actual.Supplier);
+            Assert.Null(actual.Active);
+            Assert.Null(actual.FrequencyInMonths);
+            Assert.Null(actual.DocumentBearing);
+            Assert.Null(actual.Notes);
+
+            Assert.Empty(actual.JournalPeriods);
+        }
+
+        private static void AssertArchivingParametersSet(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
+        {
+            Assert.Equal(expected.ArchiveDuty, actual.ArchiveDuty);
+            Assert.Equal(expected.ArchiveTypeUuid, actual.Type.Uuid);
+            Assert.Equal(expected.ArchiveLocationUuid, actual.Location.Uuid);
+            Assert.Equal(expected.ArchiveTestLocationUuid, actual.TestLocation.Uuid);
+            Assert.Equal(expected.ArchiveSupplierOrganizationUuid, actual.Supplier.Uuid);
+            Assert.Equal(expected.ArchiveActive, actual.Active);
+            Assert.Equal(expected.ArchiveFrequencyInMonths, actual.FrequencyInMonths);
+            Assert.Equal(expected.ArchiveDocumentBearing, actual.DocumentBearing);
+            Assert.Equal(expected.ArchiveNotes, actual.Notes);
+
+            Assert.Equal(expected.ArchiveJournalPeriods.Count(), actual.JournalPeriods.Count());
+            var firstJournalPeriod = expected.ArchiveJournalPeriods.First();
+            var journalPeriodFromServer = Assert.Single(actual.JournalPeriods.Where(x => x.ArchiveId == firstJournalPeriod.ArchiveId));
+            Assert.Equal(firstJournalPeriod.Approved, journalPeriodFromServer.Approved);
+            Assert.Equal(firstJournalPeriod.ArchiveId, journalPeriodFromServer.ArchiveId);
+            Assert.Equal(firstJournalPeriod.StartDate, journalPeriodFromServer.StartDate);
+            Assert.Equal(firstJournalPeriod.EndDate, journalPeriodFromServer.EndDate);
+        }
+
+        private ArchivingWriteRequestDTO CreateArchivingWriteRequestDTO(Guid archiveTypeUuid, Guid archiveLocationUuid, Guid archiveTestLocationUuid, Guid organizationUuid)
+        {
+            return new ArchivingWriteRequestDTO()
+            {
+                ArchiveDuty = A<ArchiveDutyChoice>(),
+                ArchiveTypeUuid = archiveTypeUuid,
+                ArchiveLocationUuid = archiveLocationUuid,
+                ArchiveTestLocationUuid = archiveTestLocationUuid,
+                ArchiveSupplierOrganizationUuid = organizationUuid,
+                ArchiveActive = A<bool>(),
+                ArchiveFrequencyInMonths = A<int>(),
+                ArchiveDocumentBearing = A<bool>(),
+                ArchiveNotes = A<string>(),
+                ArchiveJournalPeriods = new Fixture()
+                    .Build<JournalPeriodDTO>()
+                    .Without(x => x.EndDate)
+                    .Without(x => x.StartDate)
+                    .Do(x =>
+                    {
+                        var startDate = A<DateTime>();
+                        x.StartDate = startDate;
+                        x.EndDate = startDate.AddDays(1);
+                    })
+                    .CreateMany()
+            };
+        }
+
         private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
         {
             var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
@@ -955,7 +1091,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             LocalKLEDeviationsRequestDTO kleDeviationsRequest = null,
             IEnumerable<ExternalReferenceDataDTO> referenceDataDtos = null,
             IEnumerable<RoleAssignmentRequestDTO> roles = null,
-            GDPRWriteRequestDTO gdpr = null)
+            GDPRWriteRequestDTO gdpr = null,
+            ArchivingWriteRequestDTO archiving = null)
         {
             return new CreateItSystemUsageRequestDTO
             {
@@ -966,7 +1103,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 LocalKleDeviations = kleDeviationsRequest,
                 ExternalReferences = referenceDataDtos?.ToList(),
                 Roles = roles?.ToList(),
-                GDPR = gdpr
+                GDPR = gdpr,
+                Archiving = archiving
             };
         }
 

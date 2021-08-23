@@ -11,5 +11,6 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public Maybe<IEnumerable<UpdatedExternalReferenceProperties>> ExternalReferences { get; set; } = Maybe<IEnumerable<UpdatedExternalReferenceProperties>>.None;
         public Maybe<UpdatedSystemUsageRoles> Roles { get; set; } = Maybe<UpdatedSystemUsageRoles>.None;
         public Maybe<UpdatedSystemUsageGDPRProperties> GDPR { get; set; } = Maybe<UpdatedSystemUsageGDPRProperties>.None;
+        public Maybe<UpdatedSystemUsageArchivingParameters> Archiving { get; set; } = Maybe<UpdatedSystemUsageArchivingParameters>.None;
     }
 }

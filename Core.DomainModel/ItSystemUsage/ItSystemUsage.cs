@@ -709,7 +709,6 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-
         public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
         {
             return new ItSystemRight
@@ -718,6 +717,111 @@ namespace Core.DomainModel.ItSystemUsage
                 User = user,
                 Object = this
             };
+        }
+
+        public void ResetArchiveType()
+        {
+            ArchiveType.Track();
+            ArchiveType = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveType(ArchiveType newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveType == null || ArchiveType.Id != newValue.Id)
+            {
+                ArchiveType = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveLocation()
+        {
+            ArchiveLocation.Track();
+            ArchiveLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveLocation(ArchiveLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveLocation == null || ArchiveLocation.Id != newValue.Id)
+            {
+                ArchiveLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveTestLocation()
+        {
+            ArchiveTestLocation.Track();
+            ArchiveTestLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveTestLocation(ArchiveTestLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveTestLocation == null || ArchiveTestLocation.Id != newValue.Id)
+            {
+                ArchiveTestLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveSupplierOrganization()
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            ArchiveSupplier = "";
+            SupplierId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            ArchiveSupplier = newValue.Name;
+
+            if (SupplierId != newValue.Id)
+            {
+                SupplierId = newValue.Id;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<ArchivePeriod>, OperationError> ResetArchivePeriods()
+        {
+            var periodsToRemove = ArchivePeriods.ToList();
+            ArchivePeriods.Clear();
+            return periodsToRemove;
+        }
+
+        public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            if(startDate.Date > endDate.Date)
+                return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
+
+            var newPeriod = new ArchivePeriod()
+            {
+                Approved = approved,
+                UniqueArchiveId = archiveId,
+                StartDate = startDate,
+                EndDate = endDate,
+                ItSystemUsage = this
+            };
+
+            ArchivePeriods.Add(newPeriod);
+            return newPeriod;
         }
 
         public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)

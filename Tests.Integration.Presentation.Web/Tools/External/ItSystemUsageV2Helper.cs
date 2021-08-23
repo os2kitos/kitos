@@ -113,9 +113,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles"), token, dto);
         }
+        
         public static async Task<HttpResponseMessage> SendPutGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/gdpr"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/archiving"), token, dto);
         }
     }
 }
