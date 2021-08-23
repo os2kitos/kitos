@@ -929,7 +929,7 @@ namespace Presentation.Web.Controllers.API.V1
                 ReferenceId = reference.ExternalReferenceId,
                 Url = reference.URL,
                 LastChanged = reference.LastChanged,
-                LastChangedByUser = reference.LastChangedByUser.MapToNamedEntityDTO()
+                LastChangedByUser = reference.LastChangedByUser?.MapToNamedEntityDTO()
             };
         }
 

@@ -89,7 +89,7 @@
                     },
                 }, {
                     field: "lastChanged",
-                    title: "ændret",
+                    title: "Ændret",
                     template: "#= kendo.toString(kendo.parseDate(lastChanged, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
                 }, {
                     field: "lastChangedByUser.fullName",

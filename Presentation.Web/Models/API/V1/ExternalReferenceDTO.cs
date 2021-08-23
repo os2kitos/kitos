@@ -15,6 +15,6 @@ namespace Presentation.Web.Models.API.V1
         public int? DataProcessingRegistration_Id;
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
-        public virtual UserDTO LastChangedByUser { get; set; }
+        public UserDTO LastChangedByUser { get; set; }
     }
 }
