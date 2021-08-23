@@ -188,53 +188,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private RiskLevelChoice? MapRiskAssessment(ItSystemUsage systemUsage)
+        private static RiskLevelChoice? MapRiskAssessment(ItSystemUsage systemUsage)
         {
-            return systemUsage.preriskAssessment switch
-            {
-                RiskLevel.LOW => RiskLevelChoice.Low,
-                RiskLevel.MIDDLE => RiskLevelChoice.Middle,
-                RiskLevel.HIGH => RiskLevelChoice.High,
-                RiskLevel.UNDECIDED => RiskLevelChoice.Undecided,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.preriskAssessment?.ToRiskLevelChoice();
         }
 
         private static IEnumerable<TechnicalPrecautionChoice> MapPrecautions(ItSystemUsage systemUsage)
         {
-            if (systemUsage.precautionsOptionsAccessControl)
-                yield return TechnicalPrecautionChoice.AccessControl;
-            if (systemUsage.precautionsOptionsEncryption)
-                yield return TechnicalPrecautionChoice.Encryption;
-            if (systemUsage.precautionsOptionsLogning)
-                yield return TechnicalPrecautionChoice.Logging;
-            if (systemUsage.precautionsOptionsPseudonomisering)
-                yield return TechnicalPrecautionChoice.Pseudonymization;
+            return systemUsage.GetTechnicalPrecautions().Select(precaution => precaution.ToTechnicalPrecautionChoice());
         }
 
-        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel arg)
+        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel dataLevel)
         {
-            return arg.SensitivityDataLevel switch
-            {
-                SensitiveDataLevel.NONE => DataSensitivityLevelChoice.None,
-                SensitiveDataLevel.PERSONALDATA => DataSensitivityLevelChoice.PersonData,
-                SensitiveDataLevel.SENSITIVEDATA => DataSensitivityLevelChoice.SensitiveData,
-                SensitiveDataLevel.LEGALDATA => DataSensitivityLevelChoice.LegalData,
-                _ => null
-            };
+            return dataLevel?.SensitivityDataLevel.ToDataSensitivityLevelChoice();
         }
 
         private static HostingChoice? MapHosting(ItSystemUsage systemUsage)
         {
-            return systemUsage.HostedAt switch
-            {
-                HostedAt.UNDECIDED => HostingChoice.Undecided,
-                HostedAt.ONPREMISE => HostingChoice.OnPremise,
-                HostedAt.EXTERNAL => HostingChoice.External,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.HostedAt?.ToHostingChoice();
         }
 
         private static SimpleLinkDTO MapSimpleLink(string name, string url)
@@ -246,17 +217,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static YesNoExtendedChoice? MapYesNoExtended(DataOptions? input)
+        private static YesNoDontKnowChoice? MapYesNoExtended(DataOptions? input)
         {
-            return input switch
-            {
-                DataOptions.NO => YesNoExtendedChoice.No,
-                DataOptions.YES => YesNoExtendedChoice.Yes,
-                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
-                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException(nameof(input), input, null)
-            };
+            return input?.ToYesNoDontKnowChoice();
         }
 
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)

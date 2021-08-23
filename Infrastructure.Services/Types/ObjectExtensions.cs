@@ -14,7 +14,6 @@ namespace Infrastructure.Services.Types
         {
             return string.IsNullOrEmpty(src) ? Maybe<string>.None : src;
         }
-
         public static string GetValueOrEmptyString(this Maybe<string> src)
         {
             return src.Match(val => val, () => string.Empty);

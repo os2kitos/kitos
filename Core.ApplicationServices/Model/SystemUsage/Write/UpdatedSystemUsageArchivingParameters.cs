@@ -13,10 +13,10 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveLocationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveTestLocationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
         public Maybe<ChangedValue<Maybe<Guid>>> ArchiveSupplierOrganizationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
-        public Maybe<ChangedValue<Maybe<bool>>> ArchiveActive { get; set; } = Maybe<ChangedValue<Maybe<bool>>>.None;
+        public Maybe<ChangedValue<bool?>> ArchiveActive { get; set; } = Maybe<ChangedValue<bool?>>.None;
         public Maybe<ChangedValue<string>> ArchiveNotes { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<Maybe<int>>> ArchiveFrequencyInMonths { get; set; } = Maybe<ChangedValue<Maybe<int>>>.None;
-        public Maybe<ChangedValue<Maybe<bool>>> ArchiveDocumentBearing { get; set; } = Maybe<ChangedValue<Maybe<bool>>>.None;
+        public Maybe<ChangedValue<int?>> ArchiveFrequencyInMonths { get; set; } = Maybe<ChangedValue<int?>>.None;
+        public Maybe<ChangedValue<bool?>> ArchiveDocumentBearing { get; set; } = Maybe<ChangedValue<bool?>>.None;
         public Maybe<ChangedValue<Maybe<IEnumerable<SystemUsageJournalPeriod>>>> ArchiveJournalPeriods = Maybe<ChangedValue<Maybe<IEnumerable<SystemUsageJournalPeriod>>>>.None;
     }
 }
