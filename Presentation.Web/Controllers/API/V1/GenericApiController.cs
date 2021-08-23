@@ -291,6 +291,14 @@ namespace Presentation.Web.Controllers.API.V1
                         continue; // don't allow writing to these.
                     }
 
+                    if (destName == nameof(IHasUuid.Uuid))
+                    {
+                        if (item is IHasUuid hasUuid && jToken != null && jToken.Value<Guid>() != hasUuid.Uuid)
+                        {
+                            throw new NotSupportedException("Cannot change UUID");
+                        }
+                    }
+
                     var propRef = itemType.GetProperty(destName);
                     var t = propRef.PropertyType;
 
@@ -396,6 +404,11 @@ namespace Presentation.Web.Controllers.API.V1
                 var result = PatchQuery(item, obj);
                 DomainEvents.Raise(new EntityUpdatedEvent<TModel>(result));
                 return Ok(Map(result));
+            }
+            catch (NotSupportedException e)
+            {
+                Logger.Error(e, "Error during patch of id {id} of type {type}", id, typeof(TModel));
+                return BadRequest();
             }
             catch (SecurityException e)
             {
