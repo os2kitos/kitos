@@ -249,6 +249,7 @@ namespace Presentation.Web.Ninject
         private void RegisterMappers(IKernel kernel)
         {
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
