@@ -747,6 +747,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             //Arrange
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
             var (user, token) = await CreateApiUser(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
@@ -767,6 +768,19 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
             var addedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
             AssertArchivingParametersSet(inputs, addedDTO.Archiving);
+
+            //Act - Update archiving data
+            var updatedArchiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 1)).First();
+            var updatedArchiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 1)).First();
+            var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
+            var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
+            
+            var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
+            var updatedDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
+            AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
             var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ ArchiveJournalPeriods = new List<JournalPeriodDTO>()});

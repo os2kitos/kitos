@@ -709,7 +709,8 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveType()
         {
-            ArchiveTypeId = null;
+            ArchiveType.Track();
+            ArchiveType = null;
         }
 
         public Maybe<OperationError> UpdateArchiveType(ArchiveType newValue)
@@ -727,7 +728,8 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveLocation()
         {
-            ArchiveLocationId = null;
+            ArchiveLocation.Track();
+            ArchiveLocation = null;
         }
 
         public Maybe<OperationError> UpdateArchiveLocation(ArchiveLocation newValue)
@@ -745,7 +747,8 @@ namespace Core.DomainModel.ItSystemUsage
 
         public void ResetArchiveTestLocation()
         {
-            ArchiveTestLocationId = null;
+            ArchiveTestLocation.Track();
+            ArchiveTestLocation = null;
         }
 
         public Maybe<OperationError> UpdateArchiveTestLocation(ArchiveTestLocation newValue)
@@ -784,23 +787,29 @@ namespace Core.DomainModel.ItSystemUsage
             return Maybe<OperationError>.None;
         }
 
-        public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveArchivePeriods()
+        public Result<IEnumerable<ArchivePeriod>, OperationError> ResetArchivePeriods()
         {
             var periodsToRemove = ArchivePeriods.ToList();
             ArchivePeriods.Clear();
             return periodsToRemove;
         }
 
-        public Maybe<OperationError> AddArchivePeriod(ArchivePeriod newPeriod)
+        public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
-            if (newPeriod == null)
-                throw new ArgumentNullException(nameof(newPeriod));
+            if(startDate.Date > endDate.Date)
+                return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
 
-            if(DateTime.Compare(newPeriod.StartDate, newPeriod.EndDate) > 0)
-                return new OperationError($"StartDate: {newPeriod.StartDate} cannot be before EndDate: {newPeriod.EndDate}", OperationFailure.BadInput);
+            var newPeriod = new ArchivePeriod()
+            {
+                Approved = approved,
+                UniqueArchiveId = archiveId,
+                StartDate = startDate,
+                EndDate = endDate,
+                ItSystemUsage = this
+            };
 
             ArchivePeriods.Add(newPeriod);
-            return Maybe<OperationError>.None;
+            return newPeriod;
         }
     }
 }

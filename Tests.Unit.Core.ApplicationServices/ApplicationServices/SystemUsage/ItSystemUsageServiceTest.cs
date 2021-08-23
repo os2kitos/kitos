@@ -546,9 +546,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(removeResult.Ok);
             Assert.Equal(archivePeriods.Count(), removeResult.Value.Count());
+            Assert.Empty(itSystemUsage.ArchivePeriods);
             for (var i = 0; i < archivePeriods.Count(); i++)
             {
                 AssertArchivePeriod(archivePeriods[i], removeResult.Value.ToList()[i]);
+                _archivePeriodRepositoryMock.Verify(x => x.DeleteWithReferencePreload(archivePeriods[i]), Times.Once);
             }
         }
 
@@ -666,7 +668,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void AddArchivePeriod_Returns_BadInput()
+        public void AddArchivePeriod_Returns_BadInput_If_StartDate_Later_Than_EndDate()
         {
             //Arrange
             var itSystem = CreateItSystem();

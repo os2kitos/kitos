@@ -250,73 +250,56 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId)
         {
-            Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(systemUsageId);
-
-            if (usageResult.IsNone)
-                return new OperationError(OperationFailure.NotFound);
-
-            var usage = usageResult.Value;
-            if (!_authorizationContext.AllowModify(usage))
-                return new OperationError(OperationFailure.Forbidden);
-
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-            var removedPeriods = usage
-                .RemoveArchivePeriods()
-                .Match<Result<IEnumerable<ArchivePeriod>, OperationError>>
-                (
-                    periodsToRemove =>
-                    {
-                        var removed = periodsToRemove.ToList();
-                        foreach (var removedPeriod in removed)
-                        {
-                            _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
-                        }
-                        _archivePeriodRepository.Save();
-                        return removed;
-                    },
-                    error => error);
-
-            if (removedPeriods.Failed)
+            return Modify(systemUsageId, usage =>
             {
-                transaction.Rollback();
-                return removedPeriods.Error;
-            }
+                var removedPeriods = usage
+                    .ResetArchivePeriods()
+                    .Match<Result<IEnumerable<ArchivePeriod>, OperationError>>
+                    (
+                        periodsToRemove =>
+                        {
+                            var removed = periodsToRemove.ToList();
+                            foreach (var removedPeriod in removed)
+                            {
+                                _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
+                            }
+                            _archivePeriodRepository.Save();
+                            return removed;
+                        },
+                        error => error);
 
-            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
-            transaction.Commit();
-            return removedPeriods;
+                return removedPeriods.Failed ? removedPeriods.Error : removedPeriods;
+            });
         }
 
         public Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved)
         {
-            Maybe<ItSystemUsage> usageResult = _usageRepository.GetByKey(systemUsageId);
+            return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
+        }
 
-            if (usageResult.IsNone)
+        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<ItSystemUsage, Result<TSuccess, OperationError>> mutation)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+            var usage = _usageRepository.GetByKey(id);
+
+            if (usage == null)
                 return new OperationError(OperationFailure.NotFound);
 
-            var usage = usageResult.Value;
             if (!_authorizationContext.AllowModify(usage))
                 return new OperationError(OperationFailure.Forbidden);
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-            var newPeriod = new ArchivePeriod()
+            var mutationResult = mutation(usage);
+
+            if (mutationResult.Ok)
             {
-                StartDate = startDate,
-                EndDate = endDate,
-                UniqueArchiveId = archiveId,
-                Approved = approved,
-                ItSystemUsageId = systemUsageId
-            };
-            var addFailed = usage.AddArchivePeriod(newPeriod);
-            if (addFailed.HasValue)
-            {
-                transaction.Rollback();
-                return new OperationError($"Failed to add ArchivePeriod. Original error message: {addFailed.Value.Message}", addFailed.Value.FailureType);
+                _usageRepository.Update(usage);
+                _usageRepository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+                transaction.Commit();
             }
-            _usageRepository.Save();
-            _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
-            transaction.Commit();
-            return newPeriod;
+
+            return mutationResult;
         }
     }
 }

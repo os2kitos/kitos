@@ -193,10 +193,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveLocationUuid, UpdateArchiveLocation))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTestLocationUuid, UpdateArchiveTestLocation))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveSupplierOrganizationUuid, UpdateArchiveSupplierOrganization))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveActive, (usage, archiveActive) => usage.ArchiveFromSystem = archiveActive.HasValue ? archiveActive.Value : null))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveActive, (usage, archiveActive) => usage.ArchiveFromSystem = archiveActive))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveNotes, (usage, archiveNotes) => usage.ArchiveNotes = archiveNotes))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveFrequencyInMonths, (usage, archiveFrequencyInMonths) => usage.ArchiveFreq = archiveFrequencyInMonths.HasValue ? archiveFrequencyInMonths.Value : null))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveDocumentBearing, (usage, archiveDocumentBearing) => usage.Registertype = archiveDocumentBearing.HasValue ? archiveDocumentBearing.Value : null))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveFrequencyInMonths, (usage, archiveFrequencyInMonths) => usage.ArchiveFreq = archiveFrequencyInMonths))
+                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveDocumentBearing, (usage, archiveDocumentBearing) => usage.Registertype = archiveDocumentBearing))
                 .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
         }
 
@@ -257,6 +257,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveTestLocation Uuid", OperationFailure.BadInput);
 
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ArchiveTestLocationId != null && systemUsage.ArchiveTestLocationId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
+
             if (!optionByUuid.Value.available)
                 return new OperationError("ArchiveTestLocation is not available in the organization.", OperationFailure.BadInput);
 
@@ -276,6 +280,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveLocation Uuid", OperationFailure.BadInput);
 
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ArchiveLocationId != null && systemUsage.ArchiveLocationId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
+
             if (!optionByUuid.Value.available)
                 return new OperationError("ArchiveLocation is not available in the organization.", OperationFailure.BadInput);
 
@@ -294,6 +302,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid ArchiveType Uuid", OperationFailure.BadInput);
+
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ArchiveTypeId != null && systemUsage.ArchiveTypeId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
 
             if (!optionByUuid.Value.available)
                 return new OperationError("ArchiveType is not available in the organization.", OperationFailure.BadInput);

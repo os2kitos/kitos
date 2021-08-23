@@ -502,11 +502,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = (archiving.ArchiveSupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveActive = (archiving.ArchiveActive?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
+                ArchiveActive = archiving.ArchiveActive.AsChangedValue(),
                 ArchiveNotes = archiving.ArchiveNotes.AsChangedValue(),
-                ArchiveFrequencyInMonths = (archiving.ArchiveFrequencyInMonths?.FromNullable() ?? Maybe<int>.None).AsChangedValue(),
-                ArchiveDocumentBearing = (archiving.ArchiveDocumentBearing?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
-                ArchiveJournalPeriods = (archiving.ArchiveJournalPeriods.Any() ? Maybe<IEnumerable<SystemUsageJournalPeriod>>.Some(archiving.ArchiveJournalPeriods.Select(MapJournalPeriod)) : Maybe<IEnumerable<SystemUsageJournalPeriod>>.None ?? Maybe<IEnumerable<SystemUsageJournalPeriod>>.None).AsChangedValue()
+                ArchiveFrequencyInMonths = archiving.ArchiveFrequencyInMonths.AsChangedValue(),
+                ArchiveDocumentBearing = archiving.ArchiveDocumentBearing.AsChangedValue(),
+                ArchiveJournalPeriods = archiving.ArchiveJournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue()
             };
         }
 
@@ -524,19 +524,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 EndDate = journalPeriod.EndDate,
                 StartDate = journalPeriod.StartDate
             };
-        }
-
-        private static Maybe<ArchiveDutyTypes> MapArchiveDuty(ArchiveDutyChoice? archiveDuty)
-        {
-            return archiveDuty.HasValue
-                ? archiveDuty.Value switch
-                {
-                    ArchiveDutyChoice.B => ArchiveDutyTypes.B,
-                    ArchiveDutyChoice.K => ArchiveDutyTypes.K,
-                    ArchiveDutyChoice.Undecided => ArchiveDutyTypes.Undecided,
-                    ArchiveDutyChoice.Unknown => ArchiveDutyTypes.Unknown
-                }
-                : Maybe<ArchiveDutyTypes>.None;
         }
 
         private static IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
