@@ -16,6 +16,53 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageWriteModelMapper : IItSystemUsageWriteModelMapper
     {
+        /// <summary>
+        /// Creates a update parameters for POST operation. Undefined sections will be ignored
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request)
+        {
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = request.General.FromNullable().Select(MapGeneralData),
+                OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
+                KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
+                ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
+                Roles = request.Roles.FromNullable().Select(MapRoles),
+                GDPR = request.GDPR.FromNullable().Select(MapGDPR),
+                Archiving = request.Archiving.FromNullable().Select(MapArchiving)
+            };
+        }
+
+        /// <summary>
+        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="b"></param>
+        /// <returns></returns>
+        public SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request)
+        {
+            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
+            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
+            var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
+            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
+            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
+            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
+            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralDataUpdate),
+                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
+                KLE = kleInput.FromNullable().Select(MapKle),
+                ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
+                Roles = roles.FromNullable().Select(MapRoles),
+                GDPR = gdpr.FromNullable().Select(MapGDPR),
+                Archiving = archiving.FromNullable().Select(MapArchiving)
+            };
+        }
+
         public UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
         {
             return new UpdatedSystemUsageGDPRProperties

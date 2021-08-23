@@ -8,6 +8,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public interface IItSystemUsageWriteModelMapper
     {
+        SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request);
+        SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request);
         UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request);
         UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving);
         IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references);

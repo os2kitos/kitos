@@ -37,8 +37,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
 
         public ItSystemUsageV2Controller(
-            IItSystemUsageService itSystemUsageService, 
-            IItSystemUsageResponseMapper responseMapper, 
+            IItSystemUsageService itSystemUsageService,
+            IItSystemUsageResponseMapper responseMapper,
             IItSystemUsageWriteService writeService,
             IItSystemUsageWriteModelMapper writeModelMapper)
         {
@@ -161,7 +161,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateFullPOSTParameters(request)))
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, _writeModelMapper.FromPOST(request)))
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
@@ -183,7 +183,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updateParameters = CreateFullPUTParameters(request);
+            var updateParameters = _writeModelMapper.FromPUT(request);
 
             return _writeService
                 .Update(systemUsageUuid, updateParameters)
@@ -454,53 +454,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a update parameters for POST operation. Undefined sections will be ignored
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private SystemUsageUpdateParameters CreateFullPOSTParameters(CreateItSystemUsageRequestDTO request)
-        {
-            return new SystemUsageUpdateParameters
-            {
-                GeneralProperties = request.General.FromNullable().Select(_writeModelMapper.MapGeneralData),
-                OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(_writeModelMapper.MapOrganizationalUsage),
-                KLE = request.LocalKleDeviations.FromNullable().Select(_writeModelMapper.MapKle),
-                ExternalReferences = request.ExternalReferences.FromNullable().Select(_writeModelMapper.MapReferences),
-                Roles = request.Roles.FromNullable().Select(_writeModelMapper.MapRoles),
-                GDPR = request.GDPR.FromNullable().Select(_writeModelMapper.MapGDPR),
-                Archiving = request.Archiving.FromNullable().Select(_writeModelMapper.MapArchiving)
-            };
-        }
-
-        /// <summary>
-        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private SystemUsageUpdateParameters CreateFullPUTParameters(UpdateItSystemUsageRequestDTO request)
-        {
-            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
-            var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
-            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
-            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
-            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
-            return new SystemUsageUpdateParameters
-            {
-                GeneralProperties = generalDataInput.FromNullable().Select(_writeModelMapper.MapGeneralDataUpdate),
-                OrganizationalUsage = orgUsageInput.FromNullable().Select(_writeModelMapper.MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(_writeModelMapper.MapKle),
-                ExternalReferences = externalReferenceDataDtos.FromNullable().Select(_writeModelMapper.MapReferences),
-                Roles = roles.FromNullable().Select(_writeModelMapper.MapRoles),
-                GDPR = gdpr.FromNullable().Select(_writeModelMapper.MapGDPR),
-                Archiving = archiving.FromNullable().Select(_writeModelMapper.MapArchiving)
-            };
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
