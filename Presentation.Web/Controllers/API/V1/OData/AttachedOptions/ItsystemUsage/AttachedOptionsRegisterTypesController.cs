@@ -2,6 +2,7 @@
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.LocalOptions;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SystemUsage;
 using Microsoft.AspNet.OData;

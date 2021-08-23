@@ -3,7 +3,7 @@
     public enum RiskLevelChoice
     {
         Low = 0,
-        Middle = 1,
+        Medium = 1,
         High = 2,
         Undecided = 3
     }

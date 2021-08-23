@@ -12,13 +12,17 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Options;
+using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
@@ -45,6 +49,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IDomainEvents _domainEvents;
         private readonly ILogger _logger;
         private readonly IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> _roleAssignmentService;
+        private readonly IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> _sensitivePersonDataAssignmentService;
+        private readonly IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> _registerTypeAssignmentService;
+        private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
 
         public ItSystemUsageWriteService(
             IItSystemUsageService systemUsageService,
@@ -58,6 +65,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IKLEApplicationService kleApplicationService,
             IReferenceService referenceService,
             IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage> roleAssignmentService,
+            IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem> sensitivePersonDataAssignmentService,
+            IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage> registerTypeAssignmentService,
+            IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger)
@@ -76,6 +86,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _domainEvents = domainEvents;
             _logger = logger;
             _roleAssignmentService = roleAssignmentService;
+            _sensitivePersonDataAssignmentService = sensitivePersonDataAssignmentService;
+            _registerTypeAssignmentService = registerTypeAssignmentService;
+            _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -137,7 +150,107 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
                     .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate));
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate))
+                    .Bind(usage => WithOptionalUpdate(usage, parameters.GDPR, PerformGDPRUpdates));
+        }
+
+        private Result<ItSystemUsage, OperationError> PerformGDPRUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGDPRProperties parameters)
+        {
+            //General GDPR registrations
+            return WithOptionalUpdate(itSystemUsage, parameters.Purpose, (usage, newPurpose) => usage.GeneralPurpose = newPurpose)
+                .Bind(usage => WithOptionalUpdate(usage, parameters.BusinessCritical, (systemUsage, businessCritical) => systemUsage.isBusinessCritical = businessCritical))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DirectoryDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.LinkToDirectoryUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.LinkToDirectoryUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Registered data sensitivity
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
+
+                //Technical precautions
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsApplied, UpdateAppliedTechnicalPrecautions))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsDocumentation,
+                    (systemUsage, newLink) =>
+                    {
+                        systemUsage.TechnicalSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                        systemUsage.TechnicalSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                    }))
+
+                //User supervision
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UserSupervision = supervision))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UserSupervisionDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.UserSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.UserSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Risk assessments
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.riskAssessment = conducted))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.riskAssesmentDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.preriskAssessment = result))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentDocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.RiskSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.RiskSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
+
+                //DPIA
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADate, (systemUsage, date) => systemUsage.DPIADateFor = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADocumentation, (systemUsage, newLink) =>
+                   {
+                       systemUsage.DPIASupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
+                       systemUsage.DPIASupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
+                   }))
+
+                //Data retention
+                .Bind(usage => WithOptionalUpdate(usage, parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.answeringDataDPIA = retentionPeriodDefined))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.DPIAdeleteDate = date))
+                .Bind(usage => WithOptionalUpdate(usage, parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
+        }
+
+        private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
+        {
+            var newLevels = levels.GetValueOrFallback(new List<SensitiveDataLevel>()).ToList();
+            var levelsBefore = systemUsage.SensitiveDataLevels.ToList();
+            var error = systemUsage.UpdateDataSensitivityLevels(newLevels);
+            if (error.HasValue)
+                return error;
+
+            var levelsRemoved = levelsBefore.Except(systemUsage.SensitiveDataLevels.ToList()).ToList();
+
+            foreach (var removedSensitiveDataLevel in levelsRemoved)
+            {
+                _sensitiveDataLevelRepository.Delete(removedSensitiveDataLevel);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private static Maybe<OperationError> UpdateAppliedTechnicalPrecautions(ItSystemUsage systemUsage, Maybe<IEnumerable<TechnicalPrecaution>> newPrecautions)
+        {
+            return systemUsage.UpdateTechnicalPrecautions(newPrecautions.GetValueOrFallback(new List<TechnicalPrecaution>()));
+        }
+
+        private Maybe<OperationError> UpdateRegisteredDataCategories(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> registerTypeUuids)
+        {
+            return _registerTypeAssignmentService
+                .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
+                .Match(_ => Maybe<OperationError>.None, error => error);
+        }
+
+        private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
+        {
+            return _sensitivePersonDataAssignmentService
+                .UpdateAssignedOptions(systemUsage, sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()))
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -149,7 +262,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (newReferences.Any())
             {
                 var masterReferencesCount = newReferences.Count(x => x.MasterReference);
-                
+
                 switch (masterReferencesCount)
                 {
                     case < 1:
@@ -163,13 +276,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
 
                     if (result.Failed)
-                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                     if (referenceProperties.MasterReference)
                     {
                         var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
                         if (masterReferenceResult.Failed)
-                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrFallback(string.Empty)}", masterReferenceResult.Error.FailureType);
+                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
                     }
                 }
             }
@@ -190,7 +303,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     additions.Add(result.Value.kle);
                 }
@@ -201,7 +314,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     var result = _kleApplicationService.GetKle(uuid);
                     if (result.Failed)
                     {
-                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                        return new OperationError($"Failed to load KLE with uuid:{uuid}:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                     }
                     removals.Add(result.Value.kle);
                 }
@@ -223,7 +336,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 {
                     var organizationUnitResult = _organizationService.GetOrganizationUnit(nextResponsibleOrgUuid.Value);
                     if (organizationUnitResult.Failed)
-                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrFallback(string.Empty)}", organizationUnitResult.Error.FailureType);
+                        return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrEmptyString()}", organizationUnitResult.Error.FailureType);
                     nextResponsibleOrg = organizationUnitResult.Value;
                 }
                 var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
@@ -237,7 +350,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         {
                             var result = _organizationService.GetOrganizationUnit(usingOrgUnitUuid);
                             if (result.Failed)
-                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                                return new OperationError($"Failed to using org unit with id {usingOrgUnitUuid}: {result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
                             nextUsingOrganizationUnits.Add(result.Value);
                         }
                     }
@@ -313,7 +426,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var result = _projectService.GetProject(uuid);
 
                 if (result.Failed)
-                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrFallback(string.Empty)}", result.Error.FailureType);
+                    return new OperationError($"Error loading project with id: {uuid}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
 
                 itProjects.Add(result.Value);
             }
@@ -331,7 +444,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             var contractResult = _contractService.GetContract(contractId.Value);
             if (contractResult.Failed)
-                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrFallback(string.Empty)}", contractResult.Error.FailureType);
+                return new OperationError($"Failure getting the contract:{contractResult.Error.Message.GetValueOrEmptyString()}", contractResult.Error.FailureType);
 
             return systemUsage.SetMainContract(contractResult.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
@@ -356,6 +469,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
             if (optionByUuid.IsNone)
                 return new OperationError("Invalid option id", OperationFailure.BadInput);
+
+            //Not a change from current state so do not apply availability constraint
+            if (systemUsage.ItSystemCategoriesId != null && systemUsage.ItSystemCategoriesId == optionByUuid.Value.option.Id)
+                return Maybe<OperationError>.None;
 
             if (!optionByUuid.Value.available)
                 return new OperationError("Option is not available in the organization.", OperationFailure.BadInput);
@@ -382,7 +499,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message}", removeResult.Error.FailureType);
+                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrFallback(string.Empty)}", removeResult.Error.FailureType);
             }
 
             foreach (var userRolePair in toAdd)
@@ -390,7 +507,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                 var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
 
                 if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message}", assignmentResult.Error.FailureType);
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrFallback(string.Empty)}", assignmentResult.Error.FailureType);
             }
 
             return systemUsage;

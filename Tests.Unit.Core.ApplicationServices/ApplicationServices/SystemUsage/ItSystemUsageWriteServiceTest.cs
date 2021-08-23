@@ -20,15 +20,19 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
+using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
+using Moq.Language.Flow;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -50,6 +54,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly ItSystemUsageWriteService _sut;
         private readonly Mock<IKLEApplicationService> _kleServiceMock;
         private readonly Mock<IReferenceService> _referenceServiceMock;
+        private readonly Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>> _sensitiveDataOptionsService;
+        private readonly Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>> _registerTypeOptionsService;
+        private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -65,10 +72,17 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _kleServiceMock = new Mock<IKLEApplicationService>();
             _referenceServiceMock = new Mock<IReferenceService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>>();
+            _sensitiveDataOptionsService = new Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>();
+            _registerTypeOptionsService = new Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>();
+            _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
-                _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object, Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
+                _kleServiceMock.Object, _referenceServiceMock.Object, _roleAssignmentService.Object,
+                _sensitiveDataOptionsService.Object,
+                _registerTypeOptionsService.Object,
+                _sensitiveDataLevelRepository.Object,
+                Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -121,9 +135,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Same(error, createResult.Error);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Fact]
@@ -142,10 +154,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(error.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Fact]
@@ -163,10 +172,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters()));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(error.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailureWithExpectedOperationError(createResult, error, transactionMock);
         }
 
         [Theory]
@@ -252,9 +258,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -278,9 +282,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -305,11 +307,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(operationError.FailureType, createResult.Error.FailureType);
-            Assert.EndsWith(operationError.Message.Value, createResult.Error.Message.Value);
-            AssertTransactionNotCommitted(transactionMock);
-
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
         }
 
         [Fact]
@@ -336,9 +334,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -365,9 +361,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -393,9 +387,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -423,9 +415,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -449,9 +439,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -477,9 +465,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -613,9 +599,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -642,9 +626,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -672,9 +654,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(createResult, OperationFailure.BadInput, transactionMock);
         }
 
         [Theory]
@@ -727,10 +707,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.Contains("Duplicates in KLE", createResult.Error.Message.GetValueOrFallback(string.Empty));
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicates in KLE", transactionMock);
+
         }
 
         [Fact]
@@ -752,10 +730,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("KLE cannot be both added and removed", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "KLE cannot be both added and removed", transactionMock);
         }
 
         [Fact]
@@ -775,10 +750,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot ADD KLE which is already present in the system context", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot ADD KLE which is already present in the system context", transactionMock);
+
         }
 
         [Fact]
@@ -799,10 +772,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            Assert.EndsWith("Cannot Remove KLE which is not present in the system context", createResult.Error.Message.GetValueOrDefault());
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Cannot Remove KLE which is not present in the system context", transactionMock);
         }
 
         [Fact]
@@ -852,9 +822,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(result, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -880,9 +848,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transactionMock);
+            AssertFailure(result, OperationFailure.BadInput, transactionMock);
         }
 
         [Fact]
@@ -910,10 +876,350 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(result.Failed);
+            AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
+        }
+
+        [Fact]
+        public void Can_Create_With_Roles()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+
+            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                CreateUserRolePair(roleUuid, userUuid)
+            });
+
+            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Can_Create_With_No_Roles()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var input = CreateSystemUsageUpdateParametersWithoutData();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_Role_Assignment_Fails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+
+            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                CreateUserRolePair(roleUuid, userUuid)
+            });
+            var error = A<OperationFailure>();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, new OperationError(error));
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
+
+            //Assert
+            AssertFailure(createResult, error, transactionMock);
+        }
+
+        [Fact]
+        public void Can_Update_Roles_To_Remove_Them()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var newRight = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var newUserRolePair = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            ExpectRoleAssignmentReturns(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid, newRight);
+
+            var rightToRemove1 = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var rightToKeep = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
+            var userRolePairToKeep = CreateUserRolePair(rightToKeep.Role.Uuid, rightToKeep.User.Uuid);
+            itSystemUsage.Rights.Add(rightToRemove1);
+            itSystemUsage.Rights.Add(rightToKeep);
+
+            var roleInput = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
+            {
+                newUserRolePair, userRolePairToKeep
+            });
+
+            ExpectRoleRemoveReturns(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid, rightToRemove1);
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+
+            //Act
+            var updateResult = _sut.Update(itSystemUsage.Uuid, roleInput);
+
+            //Assert
+            Assert.True(updateResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertRemoveRoleCalledOnce(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid);
+            AssertAssignRoleCalledOnce(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid);
+        }
+
+        [Fact]
+        public void Can_Create_With_GDPR()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            var sensitiveDataTypeUuids = Many<Guid>().Distinct().ToList();
+            var registerTypeUuids = Many<Guid>().Distinct().ToList();
+
+            ExpectUpdateSensitiveDataTypesReturns(itSystemUsage, sensitiveDataTypeUuids, sensitiveDataTypeUuids.Select(uuid => new SensitivePersonalDataType { Uuid = uuid, Id = A<int>() }).ToList());
+            ExpectUpdateRegisterTypesReturns(itSystemUsage, registerTypeUuids, registerTypeUuids.Select(uuid => new RegisterType { Uuid = uuid, Id = A<int>() }).ToList());
+
+            var purpose = A<string>();
+            var businessCritical = A<DataOptions?>();
+            var hostedAt = A<HostedAt?>();
+            var directoryDoc = A<NamedLink>();
+            var sensitiveDataLevels = Many<SensitiveDataLevel>().Distinct().ToList();
+            var technicalPrecautionsInPlace = A<DataOptions?>();
+            var technicalPrecautions = Many<TechnicalPrecaution>().Distinct().ToList();
+            var technicalPrecautionsDocumentation = A<NamedLink>();
+            var userSupervision = A<DataOptions?>();
+            var supervisionDate = A<DateTime?>();
+            var supervisionDoc = A<NamedLink>();
+            var riskAssessmentConducted = A<DataOptions?>();
+            var riskAssessmentDate = A<DateTime?>();
+            var riskAssessmentDoc = A<NamedLink>();
+            var riskAssessmentNotes = A<string>();
+            var riskAssessmentResult = A<RiskLevel?>();
+            var dpiaConducted = A<DataOptions?>();
+            var dpiaDate = A<DateTime?>();
+            var dpiaDoc = A<NamedLink>();
+            var retentionPeriod = A<DataOptions?>();
+            var nextEvaluationDate = A<DateTime?>();
+            var evaluationFrequency = A<int?>();
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                Purpose = purpose.AsChangedValue(),
+                BusinessCritical = businessCritical.AsChangedValue(),
+                HostedAt = hostedAt.AsChangedValue(),
+                DirectoryDocumentation = directoryDoc.FromNullable().AsChangedValue(),
+                DataSensitivityLevels = sensitiveDataLevels.FromNullable<IEnumerable<SensitiveDataLevel>>().AsChangedValue(),
+                SensitivePersonDataUuids = sensitiveDataTypeUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                RegisteredDataCategoryUuids = registerTypeUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+                TechnicalPrecautionsInPlace = technicalPrecautionsInPlace.AsChangedValue(),
+                TechnicalPrecautionsApplied = technicalPrecautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
+                TechnicalPrecautionsDocumentation = technicalPrecautionsDocumentation.FromNullable().AsChangedValue(),
+                UserSupervision = userSupervision.AsChangedValue(),
+                UserSupervisionDate = supervisionDate.AsChangedValue(),
+                UserSupervisionDocumentation = supervisionDoc.FromNullable().AsChangedValue(),
+                RiskAssessmentConducted = riskAssessmentConducted.AsChangedValue(),
+                RiskAssessmentConductedDate = riskAssessmentDate.AsChangedValue(),
+                RiskAssessmentDocumentation = riskAssessmentDoc.FromNullable().AsChangedValue(),
+                RiskAssessmentNotes = riskAssessmentNotes.AsChangedValue(),
+                RiskAssessmentResult = riskAssessmentResult.AsChangedValue(),
+                DPIAConducted = dpiaConducted.AsChangedValue(),
+                DPIADate = dpiaDate.AsChangedValue(),
+                DPIADocumentation = dpiaDoc.FromNullable().AsChangedValue(),
+                RetentionPeriodDefined = retentionPeriod.AsChangedValue(),
+                NextDataRetentionEvaluationDate = nextEvaluationDate.AsChangedValue(),
+                DataRetentionEvaluationFrequencyInMonths = evaluationFrequency.AsChangedValue()
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            Assert.True(createResult.Ok);
+            Assert.Same(itSystemUsage, createResult.Value);
+            AssertTransactionCommitted(transactionMock);
+            Assert.Equal(purpose, itSystemUsage.GeneralPurpose);
+            Assert.Equal(businessCritical, itSystemUsage.isBusinessCritical);
+            Assert.Equal(hostedAt, itSystemUsage.HostedAt);
+            AssertLink(directoryDoc, itSystemUsage.LinkToDirectoryUrlName, itSystemUsage.LinkToDirectoryUrl);
+            Assert.Equal(sensitiveDataLevels.OrderBy(x => x), itSystemUsage.SensitiveDataLevels.Select(x => x.SensitivityDataLevel).OrderBy(x => x));
+            _sensitiveDataOptionsService.Verify(x => x.UpdateAssignedOptions(itSystemUsage, sensitiveDataTypeUuids), Times.Once);
+            _registerTypeOptionsService.Verify(x => x.UpdateAssignedOptions(itSystemUsage, registerTypeUuids), Times.Once);
+            Assert.Equal(technicalPrecautionsInPlace, itSystemUsage.precautions);
+            Assert.Equal(technicalPrecautions.OrderBy(x => x), itSystemUsage.GetTechnicalPrecautions().OrderBy(x => x));
+            AssertLink(technicalPrecautionsDocumentation, itSystemUsage.TechnicalSupervisionDocumentationUrlName, itSystemUsage.TechnicalSupervisionDocumentationUrl);
+            Assert.Equal(userSupervision, itSystemUsage.UserSupervision);
+            Assert.Equal(supervisionDate, itSystemUsage.UserSupervisionDate);
+            AssertLink(supervisionDoc, itSystemUsage.UserSupervisionDocumentationUrlName, itSystemUsage.UserSupervisionDocumentationUrl);
+            Assert.Equal(riskAssessmentConducted, itSystemUsage.riskAssessment);
+            Assert.Equal(riskAssessmentDate, itSystemUsage.riskAssesmentDate);
+            AssertLink(riskAssessmentDoc, itSystemUsage.RiskSupervisionDocumentationUrlName, itSystemUsage.RiskSupervisionDocumentationUrl);
+            Assert.Equal(riskAssessmentNotes, itSystemUsage.noteRisks);
+            Assert.Equal(riskAssessmentResult, itSystemUsage.preriskAssessment);
+            Assert.Equal(dpiaConducted, itSystemUsage.DPIA);
+            Assert.Equal(dpiaDate, itSystemUsage.DPIADateFor);
+            AssertLink(dpiaDoc, itSystemUsage.DPIASupervisionDocumentationUrlName, itSystemUsage.DPIASupervisionDocumentationUrl);
+            Assert.Equal(retentionPeriod, itSystemUsage.answeringDataDPIA);
+            Assert.Equal(nextEvaluationDate, itSystemUsage.DPIAdeleteDate);
+            Assert.Equal(evaluationFrequency, itSystemUsage.numberDPIA);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_SensitiveDataLevelsAreNotUnique()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var sensitiveDataLevels = Many<SensitiveDataLevel>().Distinct().ToList();
+            sensitiveDataLevels.Add(sensitiveDataLevels.First()); //Add duplicate
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                DataSensitivityLevels = sensitiveDataLevels.FromNullable<IEnumerable<SensitiveDataLevel>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicate sensitivity levels are not allowed", transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_AppliedTechnicalPrecutionsAreNotUnique()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var precautions = Many<TechnicalPrecaution>().Distinct().ToList();
+            precautions.Add(precautions.First()); //Add duplicate
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                TechnicalPrecautionsApplied = precautions.FromNullable<IEnumerable<TechnicalPrecaution>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            AssertFailureWithErrorMessageContent(createResult, OperationFailure.BadInput, "Duplicates are not allowed in technical precautions", transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_RegisterTypeUpdatesFails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var ids = Many<Guid>().ToList();
+            var operationError = A<OperationError>();
+            ExpectUpdateRegisterTypesReturns(itSystemUsage, ids, operationError);
+
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                RegisteredDataCategoryUuids = ids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GDPR_If_SensitivePersonDataUpdateFails()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+
+            var ids = Many<Guid>().ToList();
+            var operationError = A<OperationError>();
+            ExpectUpdateSensitiveDataTypesReturns(itSystemUsage, ids, operationError);
+
+            var gdprInput = new UpdatedSystemUsageGDPRProperties
+            {
+                SensitivePersonDataUuids = ids.FromNullable<IEnumerable<Guid>>().AsChangedValue(),
+            };
+
+            //Act
+            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, new SystemUsageUpdateParameters
+            {
+                GDPR = gdprInput
+            }));
+
+            //Assert
+            AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
+        }
+
+        private static void AssertFailureWithExpectedOperationError(Result<ItSystemUsage, OperationError> createResult, OperationError operationError,
+            Mock<IDatabaseTransaction> transactionMock)
+        {
+            AssertFailureWithErrorMessageContent(createResult, operationError.FailureType, operationError.Message.GetValueOrEmptyString(), transactionMock);
+        }
+
+        private static void AssertFailureWithErrorMessageContent(Result<ItSystemUsage, OperationError> createResult, OperationFailure expectedFailure, string expectedContent,
+            Mock<IDatabaseTransaction> transactionMock)
+        {
+            AssertFailure(createResult, expectedFailure, transactionMock);
+            Assert.Contains(expectedContent, createResult.Error.Message.GetValueOrDefault());
+        }
+
+        private static void AssertFailure(Result<ItSystemUsage, OperationError> createResult, OperationFailure expectedFailure, Mock<IDatabaseTransaction> transactionMock)
+        {
+            Assert.True(createResult.Failed);
+            Assert.Equal(expectedFailure, createResult.Error.FailureType);
             AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(operationError.FailureType, result.Error.FailureType);
-            Assert.EndsWith(operationError.Message.GetValueOrDefault(), result.Error.Message.GetValueOrDefault());
+        }
+
+        private static void AssertLink(NamedLink expectedLink, string actualName, string actualUrl)
+        {
+            Assert.Equal(expectedLink.Name, actualName);
+            Assert.Equal(expectedLink.Url, actualUrl);
+        }
+
+        private void ExpectUpdateSensitiveDataTypesReturns(ItSystemUsage itSystemUsage,
+            IReadOnlyCollection<Guid> sensitiveDataTypeUuids,
+            Result<IEnumerable<SensitivePersonalDataType>, OperationError> result)
+        {
+            _sensitiveDataOptionsService.Setup(x => x.UpdateAssignedOptions(itSystemUsage, sensitiveDataTypeUuids)).Returns(result);
+        }
+
+        private void ExpectUpdateRegisterTypesReturns(ItSystemUsage itSystemUsage,
+            IReadOnlyCollection<Guid> optionUuids,
+            Result<IEnumerable<RegisterType>, OperationError> result)
+        {
+            _registerTypeOptionsService.Setup(x => x.UpdateAssignedOptions(itSystemUsage, optionUuids)).Returns(result);
         }
 
         private void ExpectAddExternalReferenceReturns(ItSystemUsage itSystemUsage, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
@@ -982,111 +1288,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
-        [Fact]
-        public void Can_Create_With_Roles()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var roleUuid = A<Guid>();
-            var userUuid = A<Guid>();
-
-            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                CreateUserRolePair(roleUuid, userUuid)
-            });
-
-            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            Assert.True(createResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-        }
-
-        [Fact]
-        public void Can_Create_With_No_Roles()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            var input = CreateSystemUsageUpdateParametersWithoutData();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            Assert.True(createResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_Roles_If_Role_Assignment_Fails()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var roleUuid = A<Guid>();
-            var userUuid = A<Guid>();
-
-            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                CreateUserRolePair(roleUuid, userUuid)
-            });
-            var error = A<OperationFailure>();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, new OperationError(error));
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            Assert.True(createResult.Failed);
-            AssertTransactionNotCommitted(transactionMock);
-            Assert.Equal(error, createResult.Error.FailureType);
-        }
-
-        [Fact]
-        public void Can_Update_Roles_To_Remove_Them()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            var newRight = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var newUserRolePair = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid, newRight);
-
-            var rightToRemove1 = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var rightToKeep = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var userRolePairToKeep = CreateUserRolePair(rightToKeep.Role.Uuid, rightToKeep.User.Uuid);
-            itSystemUsage.Rights.Add(rightToRemove1);
-            itSystemUsage.Rights.Add(rightToKeep);
-
-            var roleInput = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                newUserRolePair, userRolePairToKeep
-            });
-
-            ExpectRoleRemoveReturns(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid, rightToRemove1);
-            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
-
-            //Act
-            var updateResult = _sut.Update(itSystemUsage.Uuid, roleInput);
-
-            //Assert
-            Assert.True(updateResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-            AssertRemoveRoleCalledOnce(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid);
-            AssertAssignRoleCalledOnce(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid);
-        }
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
             return new SystemUsageUpdateParameters()
