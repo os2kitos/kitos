@@ -886,7 +886,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
-            }
+        }
 
         [Fact]
         public void Can_Create_With_Archiving()
@@ -970,7 +970,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var archiveTestLocationUuid = A<Guid>();
 
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
-            
+
             ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.None);
 
             var input = new SystemUsageUpdateParameters
@@ -1022,14 +1022,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveTypeUuid = A<Guid>();
             var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
             itSystemUsage.ArchiveTypeId = archiveType.Id;
             itSystemUsage.ArchiveType = archiveType;
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveTestLocationUuid = A<Guid>();
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
@@ -1134,7 +1134,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
             itSystemUsage.ArchiveLocationId = archiveLocation.Id;
@@ -1251,7 +1251,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            var archiveTestLocationUuid = A<Guid>(); 
+            var archiveTestLocationUuid = A<Guid>();
             var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
             itSystemUsage.ArchiveTestLocationId = archiveTestLocation.Id;
             itSystemUsage.ArchiveTestLocation = archiveTestLocation;
@@ -1911,15 +1911,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
-            return new SystemUsageUpdateParameters()
+            return new SystemUsageUpdateParameters
             {
                 Roles = new UpdatedSystemUsageRoles()
                 {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None
-                        .AsChangedValue()
-                        .FromNullable()
-                }
-                    .FromNullable()
+                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue()
+                }.FromNullable()
             };
         }
 

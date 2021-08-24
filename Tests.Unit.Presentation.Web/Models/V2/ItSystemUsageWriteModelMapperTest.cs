@@ -546,13 +546,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).upperBound);
         }
 
-        private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
-        {
-            Assert.True(sourceData.HasValue);
-            Assert.True(sourceData.Value.Value.HasValue);
-            return sourceData.Value.Value.Value;
-        }
-
         private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)
         {
             Assert.True(sourceData.HasChange);
@@ -564,12 +557,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             Assert.True(sourceData.HasChange);
             return sourceData.NewValue;
-        }
-
-        private static void AssertPropertyContainsResetDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
-        {
-            Assert.True(sourceData.HasValue);
-            Assert.True(sourceData.Value.Value.IsNone);
         }
 
         private static void AssertPropertyContainsResetDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)

@@ -111,6 +111,7 @@
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
+    <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
