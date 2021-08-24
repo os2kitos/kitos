@@ -518,8 +518,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             if (generalProperties.ValidFrom.IsUnchanged && generalProperties.ValidTo.IsUnchanged)
                 return usage; //Not changes provided
 
-            var newValidFrom = generalProperties.ValidFrom.MapDataTimeOptionalChangeWithFallback(usage.Concluded);
-            var newValidTo = generalProperties.ValidTo.MapDataTimeOptionalChangeWithFallback(usage.ExpirationDate);
+            var newValidFrom = generalProperties.ValidFrom.MapDateTimeOptionalChangeWithFallback(usage.Concluded);
+            var newValidTo = generalProperties.ValidTo.MapDateTimeOptionalChangeWithFallback(usage.ExpirationDate);
 
             return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
         }

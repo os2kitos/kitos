@@ -15,12 +15,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageWriteModelMapper : IItSystemUsageWriteModelMapper
     {
-        /// <summary>
-        /// Creates a update parameters for POST operation. Undefined sections will be ignored
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request)
         {
             return new SystemUsageUpdateParameters
@@ -35,12 +29,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        /// <summary>
-        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
         public SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request)
         {
             var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();

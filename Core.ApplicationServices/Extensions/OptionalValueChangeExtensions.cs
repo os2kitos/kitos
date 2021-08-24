@@ -7,7 +7,7 @@ namespace Core.ApplicationServices.Extensions
 {
     public static class OptionalValueChangeExtensions
     {
-        public static DateTime? MapDataTimeOptionalChangeWithFallback(this OptionalValueChange<Maybe<DateTime>> optionalChange, DateTime? fallback)
+        public static DateTime? MapDateTimeOptionalChangeWithFallback(this OptionalValueChange<Maybe<DateTime>> optionalChange, DateTime? fallback)
         {
             return optionalChange
                 .Match(changeTo =>
