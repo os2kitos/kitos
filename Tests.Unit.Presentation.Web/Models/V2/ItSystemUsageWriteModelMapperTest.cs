@@ -523,7 +523,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.False(output.GDPR.IsNone);
         }
 
-        private static void AssertLinkMapping(SimpleLinkDTO sourceData, Maybe<ChangedValue<Maybe<NamedLink>>> actual)
+        private static void AssertLinkMapping(SimpleLinkDTO sourceData, OptionalValueChange<Maybe<NamedLink>> actual)
         {
             Assert.Equal(sourceData.Name, AssertPropertyContainsDataChange(actual).Name);
             Assert.Equal(sourceData.Url, AssertPropertyContainsDataChange(actual).Url);
@@ -558,12 +558,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(sourceData.HasChange);
             Assert.True(sourceData.NewValue.HasValue);
             return sourceData.NewValue.Value;
-        }
-
-        private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<T>> sourceData)
-        {
-            Assert.True(sourceData.HasValue);
-            return sourceData.Value.Value;
         }
 
         private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<T> sourceData)
