@@ -1770,32 +1770,32 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
         {
-            Assert.Equal(expected.ArchiveDuty.Value.Value.Value, actual.ArchiveDuty);
-            Assert.Equal(expected.ArchiveTypeUuid.Value.Value.Value, actual.ArchiveType.Uuid);
-            Assert.Equal(expected.ArchiveLocationUuid.Value.Value.Value, actual.ArchiveLocation.Uuid);
-            Assert.Equal(expected.ArchiveTestLocationUuid.Value.Value.Value, actual.ArchiveTestLocation.Uuid);
+            Assert.Equal(expected.ArchiveDuty.NewValue, actual.ArchiveDuty);
+            Assert.Equal(expected.ArchiveTypeUuid.NewValue.Value, actual.ArchiveType.Uuid);
+            Assert.Equal(expected.ArchiveLocationUuid.NewValue.Value, actual.ArchiveLocation.Uuid);
+            Assert.Equal(expected.ArchiveTestLocationUuid.NewValue.Value, actual.ArchiveTestLocation.Uuid);
             Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
             Assert.Equal(expectedSupplierId, actual.SupplierId);
-            Assert.Equal(expected.ArchiveActive.Value.Value.Value, actual.ArchiveFromSystem);
-            Assert.Equal(expected.ArchiveDocumentBearing.Value.Value.Value, actual.Registertype);
-            Assert.Equal(expected.ArchiveFrequencyInMonths.Value.Value.Value, actual.ArchiveFreq);
-            Assert.Equal(expected.ArchiveNotes.Value.Value, actual.ArchiveNotes);
+            Assert.Equal(expected.ArchiveActive.NewValue, actual.ArchiveFromSystem);
+            Assert.Equal(expected.ArchiveDocumentBearing.NewValue, actual.Registertype);
+            Assert.Equal(expected.ArchiveFrequencyInMonths.NewValue, actual.ArchiveFreq);
+            Assert.Equal(expected.ArchiveNotes.NewValue, actual.ArchiveNotes);
             _itSystemUsageServiceMock.Verify(x => x.RemoveAllArchivePeriods(actual.Id), Times.Once);
-            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.Value.Value.Value.Count()));
+            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.NewValue.Value.Count()));
         }
 
         private static UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(new ChangedValue<ArchiveDutyTypes?>(null)),
+                ArchiveDuty = new ChangedValue<ArchiveDutyTypes?>(null),
                 ArchiveTypeUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveTestLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(null)),
+                ArchiveActive = new ChangedValue<bool?>(null),
+                ArchiveDocumentBearing = new ChangedValue<bool?>(null),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(null),
                 ArchiveNotes = "".AsChangedValue(),
                 ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriod>>.None.AsChangedValue()
             };
@@ -1805,14 +1805,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(A<ArchiveDutyTypes>()),
+                ArchiveDuty = A<ArchiveDutyTypes?>().AsChangedValue(),
                 ArchiveTypeUuid = archiveTypeUuid.AsChangedValue(),
                 ArchiveLocationUuid = archiveLocationUuid.AsChangedValue(),
                 ArchiveTestLocationUuid = archiveTestLocationUuid.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = archiveSupplierUuid.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(A<int>())),
+                ArchiveActive = A<bool?>().AsChangedValue(),
+                ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
                 ArchiveNotes = A<string>().AsChangedValue(),
                 ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
             };
