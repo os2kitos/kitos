@@ -4,22 +4,24 @@ using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Model.Shared
 {
-    //TODO: Use me
     /// <summary>
     /// Declares an optional change to a value
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public class OptionalValueChange<T>
     {
-        public static readonly OptionalValueChange<T> Empty = new(Maybe<ChangedValue<T>>.None);
+        public static readonly OptionalValueChange<T> None = new(Maybe<ChangedValue<T>>.None);
 
         private readonly Maybe<ChangedValue<T>> _state;
 
+        public bool IsUnchanged => !HasChange;
         public bool HasChange => _state.HasValue;
+
+        public T NewValue => _state.Value.Value;
 
         public static implicit operator OptionalValueChange<T>(ChangedValue<T> source)
         {
-            return source == null ? Empty : With(source.Value);
+            return source == null ? None : With(source.Value);
         }
 
         private OptionalValueChange(Maybe<ChangedValue<T>> state)
@@ -35,12 +37,12 @@ namespace Core.ApplicationServices.Model.Shared
                 .Transform(m => new OptionalValueChange<T>(m));
         }
 
-        public TOut Match<TOut>(Func<T, TOut> fromChange, Func<TOut> fromEmpty)
+        public TOut Match<TOut>(Func<T, TOut> fromChange, Func<TOut> fromNone)
         {
             if (fromChange == null) throw new ArgumentNullException(nameof(fromChange));
-            if (fromEmpty == null) throw new ArgumentNullException(nameof(fromEmpty));
+            if (fromNone == null) throw new ArgumentNullException(nameof(fromNone));
 
-            return _state.Match(change => fromChange(change.Value), fromEmpty);
+            return _state.Match(change => fromChange(change.Value), fromNone);
         }
     }
 }

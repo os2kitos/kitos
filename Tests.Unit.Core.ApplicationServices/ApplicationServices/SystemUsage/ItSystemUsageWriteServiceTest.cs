@@ -233,15 +233,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionCommitted(transactionMock);
             Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
             var generalProperties = input.GeneralProperties.Value;
-            Assert.Equal(generalProperties.LocalCallName.Value.Value, itSystemUsage.LocalCallName);
-            Assert.Equal(generalProperties.LocalSystemId.Value.Value, itSystemUsage.LocalSystemId);
-            Assert.Equal(generalProperties.SystemVersion.Value.Value, itSystemUsage.Version);
-            Assert.Equal(generalProperties.Notes.Value.Value, itSystemUsage.Note);
-            Assert.Equal(generalProperties.EnforceActive.Value.Value, itSystemUsage.Active);
-            Assert.Equal(generalProperties.DataClassificationUuid.Value.Value, itSystemUsage.ItSystemCategories.Uuid);
-            Assert.Equal(generalProperties.ValidFrom.Value.Value.Value.Date, itSystemUsage.Concluded);
-            Assert.Equal(generalProperties.ValidTo.Value.Value.Value.Date, itSystemUsage.ExpirationDate);
-            Assert.Equal(generalProperties.MainContractUuid.Value.Value, itSystemUsage.MainContract.ItContract.Uuid);
+            Assert.Equal(generalProperties.LocalCallName.NewValue, itSystemUsage.LocalCallName);
+            Assert.Equal(generalProperties.LocalSystemId.NewValue, itSystemUsage.LocalSystemId);
+            Assert.Equal(generalProperties.SystemVersion.NewValue, itSystemUsage.Version);
+            Assert.Equal(generalProperties.Notes.NewValue, itSystemUsage.Note);
+            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, itSystemUsage.Active);
+            Assert.Equal(generalProperties.DataClassificationUuid.NewValue.Value, itSystemUsage.ItSystemCategories.Uuid);
+            Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
+            Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
+            Assert.Equal(generalProperties.MainContractUuid.NewValue.Value, itSystemUsage.MainContract.ItContract.Uuid);
             Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
         }
 

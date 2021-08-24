@@ -150,7 +150,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertCommonGeneralDataWriteProperties(input, output);
-            Assert.True(output.MainContractUuid.IsNone, "The main contract should be untouched as it is not part of the initial write contract");
+            Assert.True(output.MainContractUuid.IsUnchanged, "The main contract should be untouched as it is not part of the initial write contract");
         }
 
         [Fact]
@@ -553,16 +553,35 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return sourceData.Value.Value.Value;
         }
 
+        private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)
+        {
+            Assert.True(sourceData.HasChange);
+            Assert.True(sourceData.NewValue.HasValue);
+            return sourceData.NewValue.Value;
+        }
+
         private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<T>> sourceData)
         {
             Assert.True(sourceData.HasValue);
             return sourceData.Value.Value;
         }
 
+        private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<T> sourceData)
+        {
+            Assert.True(sourceData.HasChange);
+            return sourceData.NewValue;
+        }
+
         private static void AssertPropertyContainsResetDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
         {
             Assert.True(sourceData.HasValue);
             Assert.True(sourceData.Value.Value.IsNone);
+        }
+
+        private static void AssertPropertyContainsResetDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)
+        {
+            Assert.True(sourceData.HasChange);
+            Assert.True(sourceData.NewValue.IsNone);
         }
 
         private static void AssertKLE(IEnumerable<Guid> expected, Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> actual)

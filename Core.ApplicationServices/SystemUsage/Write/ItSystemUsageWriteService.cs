@@ -72,8 +72,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger,
-            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService, 
-            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService, 
+            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
+            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService)
         {
             _systemUsageService = systemUsageService;
@@ -515,7 +515,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
-            if (generalProperties.ValidFrom.IsNone && generalProperties.ValidTo.IsNone)
+            if (generalProperties.ValidFrom.IsUnchanged && generalProperties.ValidTo.IsUnchanged)
                 return usage; //Not changes provided
 
             var newValidFrom = MapDataTimeOptionalChangeWithFallback(generalProperties.ValidFrom, usage.Concluded);
@@ -524,10 +524,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
         }
 
-        private static DateTime? MapDataTimeOptionalChangeWithFallback(Maybe<ChangedValue<Maybe<DateTime>>> optionalChange, DateTime? fallback)
+        private static DateTime? MapDataTimeOptionalChangeWithFallback(OptionalValueChange<Maybe<DateTime>> optionalChange, DateTime? fallback)
         {
             return optionalChange
-                .Select(x => x.Value)
                 .Match(changeTo =>
                         changeTo.Match
                         (
@@ -648,6 +647,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return systemUsage;
         }
 
+        //TODO: All of these extensions should go to an extension class!
+
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
             ItSystemUsage systemUsage,
             Maybe<ChangedValue<TValue>> optionalUpdate,
@@ -656,6 +657,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return optionalUpdate
                 .Select(changedValue => updateCommand(systemUsage, changedValue.Value))
                 .Match(updateResult => updateResult, () => systemUsage);
+        }
+
+        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
+            ItSystemUsage systemUsage,
+            OptionalValueChange<TValue> optionalUpdate,
+            Func<ItSystemUsage, TValue, Result<ItSystemUsage, OperationError>> updateCommand)
+        {
+            return optionalUpdate.Match(changedValue => updateCommand(systemUsage, changedValue), () => systemUsage);
         }
 
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
@@ -680,6 +689,19 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
             ItSystemUsage systemUsage,
+            OptionalValueChange<TValue> optionalUpdate,
+            Func<ItSystemUsage, TValue, Maybe<OperationError>> updateCommand)
+        {
+            return optionalUpdate
+                .Match
+                (
+                    fromChange: changedValue => updateCommand(systemUsage, changedValue).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage),
+                    fromNone: () => systemUsage
+                );
+        }
+
+        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
+            ItSystemUsage systemUsage,
             Maybe<ChangedValue<TValue>> optionalUpdate,
             Action<ItSystemUsage, TValue> updateCommand)
         {
@@ -690,6 +712,17 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     return systemUsage;
                 })
                 .Match(updateResult => updateResult, () => systemUsage);
+        }
+
+        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
+            ItSystemUsage systemUsage,
+            OptionalValueChange<TValue> optionalUpdate,
+            Action<ItSystemUsage, TValue> updateCommand)
+        {
+            if (optionalUpdate.HasChange)
+                updateCommand(systemUsage, optionalUpdate.NewValue);
+
+            return systemUsage;
         }
 
         private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)
