@@ -1711,6 +1711,27 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
         }
 
+        [Fact]
+        public void Can_Update_All_On_Empty_ItSystemUsage()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
+            var updateParameters = new SystemUsageUpdateParameters
+            {
+
+            };
+
+            //Act
+            var updateResult = _sut.Update(itSystemUsage.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updateResult.Ok);
+        }
+
         private static void AssertFailureWithExpectedOperationError(Result<ItSystemUsage, OperationError> createResult, OperationError operationError,
             Mock<IDatabaseTransaction> transactionMock)
         {
