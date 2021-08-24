@@ -62,6 +62,7 @@ describe("Data processing registration it-systems test", () => {
     }
 
     function verifyDprIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
+        console.log(`Expecting system ${systemName} contain reference to DPR:${dprName}`);
         return dpaHelper.clickSystem(systemName)
             .then(() => LocalItSystemNavigation.openGDPRPage())
             .then(() => expect(ItSystemUsageGdpr.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
