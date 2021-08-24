@@ -427,7 +427,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformKLEUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageKLEDeviationParameters changes)
         {
-            if (changes.AddedKLEUuids.HasValue || changes.RemovedKLEUuids.HasValue)
+            if (changes.AddedKLEUuids.HasChange || changes.RemovedKLEUuids.HasChange)
             {
                 var addedTaskRefs = MapOptionalChangeWithFallback(changes.AddedKLEUuids, systemUsage.TaskRefs.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
                 var removedTaskRefs = MapOptionalChangeWithFallback(changes.RemovedKLEUuids, systemUsage.TaskRefsOptOut.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
@@ -540,6 +540,15 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return optionalChange
                 .Select(x => x.Value)
+                .Match(changeTo =>
+                        changeTo, //Changed to null by client
+                    () => fallback // No change provided - use the fallback
+                );
+        }
+
+        private static T MapOptionalChangeWithFallback<T>(OptionalValueChange<T> optionalChange, T fallback)
+        {
+            return optionalChange
                 .Match(changeTo =>
                         changeTo, //Changed to null by client
                     () => fallback // No change provided - use the fallback

@@ -94,8 +94,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.MapKle(input);
 
             //Assert that null is translated into a reset value (change to "none")
-            Assert.Equal(addedNull, output.AddedKLEUuids.Value.Value.IsNone);
-            Assert.Equal(removedNull, output.RemovedKLEUuids.Value.Value.IsNone);
+            Assert.Equal(addedNull, output.AddedKLEUuids.NewValue.IsNone);
+            Assert.Equal(removedNull, output.RemovedKLEUuids.NewValue.IsNone);
         }
 
         [Fact]
@@ -578,11 +578,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(sourceData.NewValue.IsNone);
         }
 
-        private static void AssertKLE(IEnumerable<Guid> expected, Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> actual)
+        private static void AssertKLE(IEnumerable<Guid> expected, OptionalValueChange<Maybe<IEnumerable<Guid>>> actual)
         {
-            Assert.True(actual.HasValue);
-            Assert.True(actual.Value.Value.HasValue);
-            var mappedUuids = actual.Value.Value.Value;
+            Assert.True(actual.HasChange);
+            Assert.True(actual.NewValue.HasValue);
+            var mappedUuids = actual.NewValue.Value;
             Assert.Equal(expected, mappedUuids);
         }
     }
