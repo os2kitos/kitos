@@ -11,13 +11,13 @@ const cleanProtractor = function (callBack) {
     return del("tmp");
 }
 
-const launchHeadLess = function (done, files) {
+const launchHeadLess = function (done, files, config) {
     const params = process.argv;
     const args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
     src(files)
         .pipe(protractor.protractor({
-            configFile: "protractor.headless.conf.js",
+            configFile: config,
             args: [
                 "--params.login.email", args[0],
                 "--params.login.pwd", args[1],
@@ -36,17 +36,17 @@ const launchHeadLess = function (done, files) {
 
 const protractorHeadless = function (done) {
 
-    launchHeadLess(done, paths.e2eFiles);
+    launchHeadLess(done, paths.e2eFiles, "protractor.headless.conf.js");
 }
 
 const protractorHeadlessSequential = function (done) {
 
-    launchHeadLess(done, paths.e2eSequentialFiles);
+    launchHeadLess(done, paths.e2eSequentialFiles, "protractor.headless.conf.js");
 }
 
 const protractorHeadlessParallel = function (done) {
 
-    launchHeadLess(done, paths.e2eParallelFiles);
+    launchHeadLess(done, paths.e2eParallelFiles, "protractor.headless.parallel.conf.js");
 }
 
 
