@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
-using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
@@ -17,7 +17,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -34,12 +34,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IItSystemUsageResponseMapper _responseMapper;
         private readonly IItSystemUsageWriteService _writeService;
+        private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
 
-        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper, IItSystemUsageWriteService writeService)
+        public ItSystemUsageV2Controller(
+            IItSystemUsageService itSystemUsageService,
+            IItSystemUsageResponseMapper responseMapper,
+            IItSystemUsageWriteService writeService,
+            IItSystemUsageWriteModelMapper writeModelMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
             _writeService = writeService;
+            _writeModelMapper = writeModelMapper;
         }
 
         /// <summary>
@@ -155,7 +161,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _writeService
-                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, CreateFullUpdateParameters(request, false))) //Undefined sections are left out from the spec of additional data
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, _writeModelMapper.FromPOST(request)))
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(MapSystemCreatedResponse, FromOperationError);
         }
@@ -177,7 +183,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updateParameters = CreateFullUpdateParameters(request, true); //Enforce data reset in sections which are undefined in the input since this is PUT
+            var updateParameters = _writeModelMapper.FromPUT(request);
 
             return _writeService
                 .Update(systemUsageUuid, updateParameters)
@@ -205,7 +211,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
-                    GeneralProperties = MapFullUpdateGeneralData(request)
+                    GeneralProperties = _writeModelMapper.MapGeneralDataUpdate(request)
                 })
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
@@ -223,12 +229,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentResponseDTO> request)
+        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    Roles = _writeModelMapper.MapRoles(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -251,7 +263,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
-                    KLE = MapKle(request)
+                    KLE = _writeModelMapper.MapKle(request)
                 })
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
@@ -269,12 +281,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
+        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] IEnumerable<ExternalReferenceDataDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -293,8 +311,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    Archiving = _writeModelMapper.MapArchiving(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -309,12 +333,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGdpr([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GDPRWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGDPR([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] GDPRWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-            //TODO: Make wrapper methods yo provide a delta object with only the selected section
-            throw new System.NotImplementedException();
+
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    GDPR = _writeModelMapper.MapGDPR(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -337,7 +367,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             return _writeService
                 .Update(systemUsageUuid, new SystemUsageUpdateParameters
                 {
-                    OrganizationalUsage = MapOrganizationalUsage(request)
+                    OrganizationalUsage = _writeModelMapper.MapOrganizationalUsage(request)
                 })
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
@@ -424,96 +454,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             throw new System.NotImplementedException();
-        }
-
-        /// <summary>
-        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private static SystemUsageUpdateParameters CreateFullUpdateParameters(CreateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
-        {
-            //TODO: Merge this method with the other one - the general section is the issue and the one that diverges based on create vs update
-            var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataWriteRequestDTO() : null);
-            var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
-            var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
-            return new SystemUsageUpdateParameters
-            {
-                GeneralProperties = generalDataInput.FromNullable().Select(MapFullCommonGeneralData),
-                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(MapKle)
-            };
-        }
-
-        /// <summary>
-        /// Creates a complete update object where all values are defined and fallbacks to null are used for sections which are missing
-        /// </summary>
-        /// <param name="request"></param>
-        /// <param name="b"></param>
-        /// <returns></returns>
-        private static SystemUsageUpdateParameters CreateFullUpdateParameters(UpdateItSystemUsageRequestDTO request, bool enforceUndefinedSections)
-        {
-            var generalDataInput = request.General ?? (enforceUndefinedSections ? new GeneralDataUpdateRequestDTO() : null);
-            var orgUsageInput = request.OrganizationUsage ?? (enforceUndefinedSections ? new OrganizationUsageWriteRequestDTO() : null);
-            var kleInput = request.LocalKleDeviations ?? (enforceUndefinedSections ? new LocalKLEDeviationsRequestDTO() : null);
-            return new SystemUsageUpdateParameters
-            {
-                GeneralProperties = generalDataInput.FromNullable().Select(MapFullUpdateGeneralData),
-                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(MapKle)
-            };
-        }
-
-        private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
-        {
-            return new UpdatedSystemUsageKLEDeviationParameters()
-            {
-                AddedKLEUuids = kle.AddedKLEUuids.FromNullable().AsChangedValue(),
-                RemovedKLEUuids = kle.RemovedKLEUuids.FromNullable().AsChangedValue()
-            };
-        }
-
-        /// <summary>
-        /// Maps a complete update of the general data update request. Nulled sections are interpreted as intentionally reset
-        /// </summary>
-        /// <param name="generalData"></param>
-        /// <returns></returns>
-        private static UpdatedSystemUsageGeneralProperties MapFullUpdateGeneralData(GeneralDataUpdateRequestDTO generalData)
-        {
-            var generalProperties = MapFullCommonGeneralData(generalData);
-            generalProperties.MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue();
-            return generalProperties;
-        }
-
-        private static UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input)
-        {
-            return new UpdatedSystemUsageOrganizationalUseParameters
-            {
-                ResponsibleOrganizationUnitUuid = (input.ResponsibleOrganizationUnitUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                UsingOrganizationUnitUuids = (input.UsingOrganizationUnitUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
-            };
-        }
-
-        private static UpdatedSystemUsageGeneralProperties MapFullCommonGeneralData(GeneralDataWriteRequestDTO generalData)
-        {
-            return new UpdatedSystemUsageGeneralProperties
-            {
-                LocalCallName = generalData.LocalCallName.AsChangedValue(),
-                LocalSystemId = generalData.LocalSystemId.AsChangedValue(),
-                Notes = generalData.Notes.AsChangedValue(),
-                SystemVersion = generalData.SystemVersion.AsChangedValue(),
-                DataClassificationUuid = (generalData.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                NumberOfExpectedUsersInterval = generalData
-                    .NumberOfExpectedUsers?
-                    .FromNullable()
-                    .Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)).Match(interval => interval, () => Maybe<(int, int?)>.None)
-                    .AsChangedValue(),
-                EnforceActive = ((generalData.Validity?.EnforcedValid)?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
-                ValidFrom = (generalData.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
-                ValidTo = (generalData.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
-                AssociatedProjectUuids = (generalData.AssociatedProjectUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
-            };
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)

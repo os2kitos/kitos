@@ -96,11 +96,6 @@ namespace Core.DomainModel.GDPR
         public virtual ICollection<DataProcessingOversightOption> OversightOptions { get; set; }
         public string OversightOptionRemark { get; set; }
 
-        public IEnumerable<DataProcessingRegistrationRight> GetRights(int roleId)
-        {
-            return Rights.Where(x => x.RoleId == roleId);
-        }
-
         public Result<Organization.Organization, OperationError> AssignDataProcessor(Organization.Organization dataProcessor)
         {
             if (dataProcessor == null) throw new ArgumentNullException(nameof(dataProcessor));
@@ -247,53 +242,14 @@ namespace Core.DomainModel.GDPR
             return SystemUsages.FirstOrDefault(x => x.Id == usageId).FromNullable();
         }
 
-        public Result<DataProcessingRegistrationRight, OperationError> AssignRoleToUser(DataProcessingRegistrationRole role, User user)
+        public override DataProcessingRegistrationRight CreateNewRight(DataProcessingRegistrationRole role, User user)
         {
-            if (role == null) throw new ArgumentNullException(nameof(role));
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            if (HasRight(role, user))
-                return new OperationError("Existing right for same role found for the same user", OperationFailure.Conflict);
-
-            var newRight = new DataProcessingRegistrationRight
+            return new DataProcessingRegistrationRight()
             {
                 Role = role,
                 User = user,
                 Object = this
             };
-
-            Rights.Add(newRight);
-
-            return newRight;
-        }
-
-        private bool HasRight(DataProcessingRegistrationRole role, User user)
-        {
-            return GetRight(role, user).HasValue;
-        }
-
-        private Maybe<DataProcessingRegistrationRight> GetRight(DataProcessingRegistrationRole role, User user)
-        {
-            return GetRights(role.Id).FirstOrDefault(x => x.UserId == user.Id);
-        }
-
-        public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(DataProcessingRegistrationRole role, User user)
-        {
-            if (role == null) throw new ArgumentNullException(nameof(role));
-            if (user == null) throw new ArgumentNullException(nameof(user));
-
-            return GetRight(role, user)
-                .Match<Result<DataProcessingRegistrationRight, OperationError>>
-                (
-                    right =>
-                    {
-                        Rights.Remove(right);
-                        return right;
-                    },
-                    () => new OperationError($"Role with id {role.Id} is not assigned to user with id ${user.Id}",
-                        OperationFailure.BadInput)
-                );
-
         }
 
         public virtual ICollection<UserNotification> UserNotifications { get; set; }

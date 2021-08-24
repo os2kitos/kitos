@@ -66,7 +66,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var refName = $"REF:{name}";
             var refUserAssignedId = $"REF:{name}EXT_ID";
             var refUrl = $"https://www.test-rm{A<uint>()}.dk";
-            var refDisp = A<Display>();
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var isAgreementConcluded = A<YesNoIrrelevantOption>();
             var oversightInterval = A<YearMonthIntervalOption>();
@@ -131,7 +130,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registration.Id, oversightDate, oversightRemark);
 
             //References
-            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, refDisp, dto => dto.DataProcessingRegistration_Id = registration.Id);
+            await ReferencesHelper.CreateReferenceAsync(refName, refUserAssignedId, refUrl, dto => dto.DataProcessingRegistration_Id = registration.Id);
 
             //Systems
             var itSystemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);

@@ -71,7 +71,6 @@
     <Compile Include="GDPR\DataProcessingRegistrationOversightDateAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOversightOptionsAssignmentService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelUpdate.cs" />
-    <Compile Include="GDPR\DataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationBasisForTransferAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationDataProcessorAssignmentService.cs" />
@@ -80,7 +79,6 @@
     <Compile Include="GDPR\IDataProcessingRegistrationNamingService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationOversightDateAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationOversightOptionsAssignmentService.cs" />
-    <Compile Include="GDPR\IDataProcessingRegistrationRoleAssignmentsService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
@@ -122,6 +120,10 @@
     <Compile Include="Repositories\Notification\UserNotificationRepository.cs" />
     <Compile Include="Repositories\TaskRefs\ITaskRefRepository.cs" />
     <Compile Include="Repositories\TaskRefs\TaskRefRepository.cs" />
+    <Compile Include="Role\IRoleAssignmentService.cs" />
+    <Compile Include="Role\RoleAssignmentService.cs" />
+    <Compile Include="SystemUsage\AttachedOptionsAssignmentService.cs" />
+    <Compile Include="SystemUsage\IAttachedOptionsAssignmentService.cs" />
     <Compile Include="SystemUsage\ItSystemUsageOverviewReadModelUpdate.cs" />
     <Compile Include="IUserRepository.cs" />
     <Compile Include="GDPR\BuildDataProcessingRegistrationReadModelOnChangesHandler.cs" />

@@ -107,6 +107,17 @@ namespace Core.DomainModel.Organization
 
             return base.HasUserWriteAccess(user);
         }
+
+        public override OrganizationUnitRight CreateNewRight(OrganizationUnitRole role, User user)
+        {
+            return new OrganizationUnitRight()
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
+
         public Guid Uuid { get; set; }
     }
 }

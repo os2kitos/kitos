@@ -363,9 +363,17 @@
     <Compile Include="Controllers\API\V2\External\ItSystems\ItSystemV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRelationFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\DataOptionsMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\HostedAtMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\IItSystemUsageResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\IItSystemUsageWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ItSystemUsageResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\RiskLevelMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\SensitiveDataLevelMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ItSystemUsageWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\TechnicalPrecautionMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\KLE\KleOptionV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ArchiveDutyMappingExtenstions.cs" />
     <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />

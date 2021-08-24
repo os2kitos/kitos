@@ -111,6 +111,7 @@
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
+    <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
@@ -124,11 +125,19 @@
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
+    <Compile Include="Model\Shared\OptionalValueChange.cs" />
+    <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedExternalReferenceProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageArchivingParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageKLEDeviationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
+    <Compile Include="Model\SystemUsage\Write\UserRolePair.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />

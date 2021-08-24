@@ -32,6 +32,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IOrganizationalUserContext _userContext;
         private readonly IAttachedOptionRepository _attachedOptionRepository;
         private readonly IReferenceService _referenceService;
+        private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
 
         public ItSystemUsageService(
             IGenericRepository<ItSystemUsage> usageRepository,
@@ -42,7 +43,8 @@ namespace Core.ApplicationServices.SystemUsage
             IDomainEvents domainEvents,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
-            IAttachedOptionRepository attachedOptionRepository)
+            IAttachedOptionRepository attachedOptionRepository, 
+            IGenericRepository<ArchivePeriod> archivePeriodRepository)
         {
             _usageRepository = usageRepository;
             _authorizationContext = authorizationContext;
@@ -53,6 +55,7 @@ namespace Core.ApplicationServices.SystemUsage
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _userContext = userContext;
             _attachedOptionRepository = attachedOptionRepository;
+            _archivePeriodRepository = archivePeriodRepository;
         }
 
         public IQueryable<ItSystemUsage> Query(params IDomainQuery<ItSystemUsage>[] conditions)
@@ -243,6 +246,60 @@ namespace Core.ApplicationServices.SystemUsage
                         error.FailureType == OperationFailure.NotFound
                             ? new OperationError(OperationFailure.BadInput)
                             : error);
+        }
+
+        public Result<IEnumerable<ArchivePeriod>, OperationError> RemoveAllArchivePeriods(int systemUsageId)
+        {
+            return Modify(systemUsageId, usage =>
+            {
+                var removedPeriods = usage
+                    .ResetArchivePeriods()
+                    .Match<Result<IEnumerable<ArchivePeriod>, OperationError>>
+                    (
+                        periodsToRemove =>
+                        {
+                            var removed = periodsToRemove.ToList();
+                            foreach (var removedPeriod in removed)
+                            {
+                                _archivePeriodRepository.DeleteWithReferencePreload(removedPeriod);
+                            }
+                            _archivePeriodRepository.Save();
+                            return removed;
+                        },
+                        error => error);
+
+                return removedPeriods.Failed ? removedPeriods.Error : removedPeriods;
+            });
+        }
+
+        public Result<ArchivePeriod, OperationError> AddArchivePeriod(int systemUsageId, DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            return Modify(systemUsageId, usage => usage.AddArchivePeriod(startDate, endDate, archiveId, approved));
+        }
+
+        private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<ItSystemUsage, Result<TSuccess, OperationError>> mutation)
+        {
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+
+            var usage = _usageRepository.GetByKey(id);
+
+            if (usage == null)
+                return new OperationError(OperationFailure.NotFound);
+
+            if (!_authorizationContext.AllowModify(usage))
+                return new OperationError(OperationFailure.Forbidden);
+
+            var mutationResult = mutation(usage);
+
+            if (mutationResult.Ok)
+            {
+                _usageRepository.Update(usage);
+                _usageRepository.Save();
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
+                transaction.Commit();
+            }
+
+            return mutationResult;
         }
     }
 }

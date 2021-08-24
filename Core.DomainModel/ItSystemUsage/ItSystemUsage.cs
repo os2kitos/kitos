@@ -222,6 +222,12 @@ namespace Core.DomainModel.ItSystemUsage
             return new AddReferenceCommand(this).AddExternalReference(newReference);
         }
 
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
+        }
+
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
             Reference = newReference;
@@ -275,6 +281,18 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions? precautions { get; set; }
+
+        public IEnumerable<TechnicalPrecaution> GetTechnicalPrecautions()
+        {
+            if (precautionsOptionsAccessControl)
+                yield return TechnicalPrecaution.AccessControl;
+            if (precautionsOptionsEncryption)
+                yield return TechnicalPrecaution.Encryption;
+            if (precautionsOptionsLogning)
+                yield return TechnicalPrecaution.Logging;
+            if (precautionsOptionsPseudonomisering)
+                yield return TechnicalPrecaution.Pseudonymization;
+        }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
@@ -687,6 +705,191 @@ namespace Core.DomainModel.ItSystemUsage
 
             optIn.MirrorTo(TaskRefs, x => x.Uuid);
             optOut.MirrorTo(TaskRefsOptOut, x => x.Uuid);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
+        {
+            return new ItSystemRight
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
+
+        public void ResetArchiveType()
+        {
+            ArchiveType.Track();
+            ArchiveType = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveType(ArchiveType newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveType == null || ArchiveType.Id != newValue.Id)
+            {
+                ArchiveType = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveLocation()
+        {
+            ArchiveLocation.Track();
+            ArchiveLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveLocation(ArchiveLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveLocation == null || ArchiveLocation.Id != newValue.Id)
+            {
+                ArchiveLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveTestLocation()
+        {
+            ArchiveTestLocation.Track();
+            ArchiveTestLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveTestLocation(ArchiveTestLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveTestLocation == null || ArchiveTestLocation.Id != newValue.Id)
+            {
+                ArchiveTestLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveSupplierOrganization()
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            ArchiveSupplier = "";
+            SupplierId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            ArchiveSupplier = newValue.Name;
+
+            if (SupplierId != newValue.Id)
+            {
+                SupplierId = newValue.Id;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<ArchivePeriod>, OperationError> ResetArchivePeriods()
+        {
+            var periodsToRemove = ArchivePeriods.ToList();
+            ArchivePeriods.Clear();
+            return periodsToRemove;
+        }
+
+        public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            if(startDate.Date > endDate.Date)
+                return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
+
+            var newPeriod = new ArchivePeriod()
+            {
+                Approved = approved,
+                UniqueArchiveId = archiveId,
+                StartDate = startDate,
+                EndDate = endDate,
+                ItSystemUsage = this
+            };
+
+            ArchivePeriods.Add(newPeriod);
+            return newPeriod;
+        }
+
+        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        {
+            if (sensitiveDataLevels == null)
+                throw new ArgumentNullException(nameof(sensitiveDataLevels));
+
+            var levels = sensitiveDataLevels.ToList();
+
+            if (levels.Distinct().Count() != levels.Count)
+                return new OperationError("Duplicate sensitivity levels are not allowed", OperationFailure.BadInput);
+
+            var levelMappings = levels.Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            }).ToList();
+
+            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
+        {
+            if (technicalPrecautions == null)
+                throw new ArgumentNullException(nameof(technicalPrecautions));
+
+            var enabledPrecautions = technicalPrecautions.ToList();
+
+            if (enabledPrecautions.Count != enabledPrecautions.Distinct().Count())
+                return new OperationError("Duplicates are not allowed in technical precautions", OperationFailure.BadInput);
+
+            var disabledPrecautions = Enum.GetValues(typeof(TechnicalPrecaution)).Cast<TechnicalPrecaution>().Except(enabledPrecautions).ToList();
+
+            var changeSet = enabledPrecautions
+                .Select(p =>
+                    new
+                    {
+                        Enabled = true,
+                        Precaution = p
+                    }).Concat(disabledPrecautions.Select(p => new
+                    {
+                        Enabled = false,
+                        Precaution = p
+
+                    }));
+
+            foreach (var change in changeSet)
+            {
+                switch (change.Precaution)
+                {
+                    case TechnicalPrecaution.Encryption:
+                        precautionsOptionsEncryption = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Pseudonymization:
+                        precautionsOptionsPseudonomisering = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.AccessControl:
+                        precautionsOptionsAccessControl = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Logging:
+                        precautionsOptionsLogning = change.Enabled;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
 
             return Maybe<OperationError>.None;
         }

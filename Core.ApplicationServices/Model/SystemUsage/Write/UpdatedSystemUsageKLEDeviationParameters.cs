@@ -7,8 +7,8 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageKLEDeviationParameters
     {
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> AddedKLEUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> RemovedKLEUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> AddedKLEUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> RemovedKLEUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
 
     }
 }

@@ -17,6 +17,7 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using Moq;
@@ -31,11 +32,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDataProcessingRegistrationRepository> _repositoryMock;
         private readonly Mock<IDataProcessingRegistrationNamingService> _namingServiceMock;
-        private readonly Mock<IDataProcessingRegistrationRoleAssignmentsService> _roleAssignmentServiceMock;
+        private readonly Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>> _roleAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataResponsibleAssignmentService> _dataResponsibleAssignmentServiceMock;
         private readonly Mock<IReferenceRepository> _referenceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<IGenericRepository<DataProcessingRegistrationRight>> _rightsRepositoryMock;
         private readonly Mock<IDataProcessingRegistrationSystemAssignmentService> _systemAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationDataProcessorAssignmentService> _dpAssignmentService;
         private readonly Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService> _insecureThirdCountryAssignmentMock;
@@ -49,11 +49,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _repositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _namingServiceMock = new Mock<IDataProcessingRegistrationNamingService>();
-            _roleAssignmentServiceMock = new Mock<IDataProcessingRegistrationRoleAssignmentsService>();
+            _roleAssignmentServiceMock = new Mock<IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>>();
             _dataResponsibleAssignmentServiceMock = new Mock<IDataProcessingRegistrationDataResponsibleAssignmentService>();
             _referenceRepositoryMock = new Mock<IReferenceRepository>();
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _rightsRepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationRight>>();
             _systemAssignmentServiceMock = new Mock<IDataProcessingRegistrationSystemAssignmentService>();
             _dpAssignmentService = new Mock<IDataProcessingRegistrationDataProcessorAssignmentService>();
             _insecureThirdCountryAssignmentMock = new Mock<IDataProcessingRegistrationInsecureCountriesAssignmentService>();
@@ -75,7 +74,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightOptionAssignmentServiceMock.Object,
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
-                _rightsRepositoryMock.Object,
                 _userContextMock.Object);
         }
 
@@ -445,7 +443,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(serviceSucceeds, result.Ok);
             Assert.Same(serviceResult, result);
             VerifyExpectedDbSideEffect(serviceSucceeds, registration, transaction);
-            _rightsRepositoryMock.Verify(x => x.Delete(agreementRight), serviceSucceeds ? Times.Once() : Times.Never());
         }
 
         [Fact]

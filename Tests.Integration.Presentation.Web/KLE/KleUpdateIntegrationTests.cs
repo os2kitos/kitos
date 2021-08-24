@@ -117,12 +117,14 @@ namespace Tests.Integration.Presentation.Web.KLE
         }
 
         [Fact]
-        public async Task Put_Adds_Missing_TaskRefs()
+        public async Task Put_Removes_Obsoleted_TaskRefs_And_Patches_Uuids_And_Adds_Any_Missing()
         {
             //Arrange
             await PrepareForDetailedTest();
             var expectedTaskRefs = BuildTaskRefIntegritySet().ToList();
 
+            #region root
+            //Remove some
             MutateEntitySet<TaskRef>(repository =>
             {
                 var root = repository
@@ -131,7 +133,7 @@ namespace Tests.Integration.Presentation.Web.KLE
                     .First();
 
                 //Do a depth first removal to get around fk constraints
-                var toBeRemoved = FlattenTreeDepthFirst(root).ToList();
+                var toBeRemoved = FlattenTreeDepthFirst(root).Take(3).ToList();
 
                 // Remove task refs with ItSystem FKs
                 var taskRefsWithItSystem = toBeRemoved.Where(x => x.ItSystems.Any()).ToList();
@@ -142,21 +144,6 @@ namespace Tests.Integration.Presentation.Web.KLE
                 repository.Save();
             });
 
-            //Act
-            await PutKle();
-
-            //Assert - make sure the removed task refs were re-added
-            VerifyTaskRefIntegrity(expectedTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Removes_Obsoleted_TaskRefs()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-            var expectedTaskRefs = BuildTaskRefIntegritySet().ToList();
-
-            //Add some task refs which we expect to be removed
             MutateEntitySet<TaskRef>(repository =>
             {
                 var other = repository.AsQueryable().First();
@@ -166,22 +153,10 @@ namespace Tests.Integration.Presentation.Web.KLE
                 repository.Insert(CreateTaskRef(objectOwnerId, organizationUnitId));
                 repository.Save();
             });
+            #endregion root
 
-            //Act
-            await PutKle();
-
-            //Assert - make sure the removed task refs were re-added
-            VerifyTaskRefIntegrity(expectedTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Removes_Obsoleted_And_Removes_Usages_In_Organization()
-        {
-            //Arrange - make sure the latest KLE is imported, and then remove an entire root tree
-            await PrepareForDetailedTest();
-            var expectedTaskUsages = BuildTaskUsageIntegritySet().ToList();
-
-            //Add some task refs which we expect to be removed
+            #region organization
+            //Add some task in organization units refs which we expect to be removed
             MutateDatabase(db =>
             {
                 using (var taskUsages = new GenericRepository<TaskUsage>(db))
@@ -200,20 +175,9 @@ namespace Tests.Integration.Presentation.Web.KLE
                     taskUsages.Save();
                 }
             });
+            #endregion organization
 
-            //Act
-            await PutKle();
-
-            //Assert
-            VerifyTaskUsageIntegrity(expectedTaskUsages);
-        }
-
-        [Fact]
-        public async Task Put_Removes_Obsoleted_And_Removes_Usages_In_Projects()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-
+            #region projects
             var project = await ItProjectHelper.CreateProject(A<string>(), TestEnvironment.DefaultOrganizationId);
 
             //Add some task refs to a project and save the expected keys (keys not removed)
@@ -229,8 +193,8 @@ namespace Tests.Integration.Presentation.Web.KLE
                 }
             });
 
-            var expectedTaskRefs = GetProjectTaskRefKeys(project.Id);
-            Assert.Equal(2, expectedTaskRefs.Count);
+            var expectedProjectTaskRefs = GetProjectTaskRefKeys(project.Id);
+            Assert.Equal(2, expectedProjectTaskRefs.Count);
 
             //Add the task refs subject to removal
             MutateDatabase(db =>
@@ -252,22 +216,10 @@ namespace Tests.Integration.Presentation.Web.KLE
                     projects.Save();
                 }
             });
+            #endregion projects
 
-            //Act
-            await PutKle();
-
-            //Assert
-            var actualTaskRefs = GetProjectTaskRefKeys(project.Id);
-            VerifyTaskRefUsageKeys(expectedTaskRefs, actualTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Removes_Obsoleted_And_Removes_Usages_In_Systems()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-
-            var systemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            #region systems
+            var system1Dto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
             //Add some task refs to a system and save the expected keys (keys not removed)
             MutateDatabase(context =>
@@ -275,15 +227,15 @@ namespace Tests.Integration.Presentation.Web.KLE
                 using (var taskRefs = new GenericRepository<TaskRef>(context))
                 using (var systems = new GenericRepository<Core.DomainModel.ItSystem.ItSystem>(context))
                 {
-                    var itSystem = systems.GetByKey(systemDto.Id);
+                    var itSystem = systems.GetByKey(system1Dto.Id);
                     var toKeep = taskRefs.AsQueryable().Take(2).ToList();
                     toKeep.ForEach(itSystem.TaskRefs.Add);
                     systems.Save();
                 }
             });
 
-            var expectedTaskRefs = GetSystemTaskKeys(systemDto.Id);
-            Assert.Equal(2, expectedTaskRefs.Count);
+            var expectedSystemTaskRefs = GetSystemTaskKeys(system1Dto.Id);
+            Assert.Equal(2, expectedSystemTaskRefs.Count);
 
             //Add the task refs subject to removal
             MutateDatabase(db =>
@@ -299,28 +251,16 @@ namespace Tests.Integration.Presentation.Web.KLE
                     taskRefs.Save();
 
                     //Add usages which we expect to be removed
-                    var itSystem = systems.GetByKey(systemDto.Id);
+                    var itSystem = systems.GetByKey(system1Dto.Id);
                     itSystem.TaskRefs.Add(taskRef1);
                     itSystem.TaskRefs.Add(taskRef2);
                     systems.Save();
                 }
             });
+            #endregion systems
 
-            //Act
-            await PutKle();
-
-            //Assert
-            var actualTaskRefs = GetSystemTaskKeys(systemDto.Id);
-            VerifyTaskRefUsageKeys(expectedTaskRefs, actualTaskRefs);
-        }
-
-        [Fact]
-        public async Task Put_Removes_Obsoleted_And_Removes_Usages_And_Opt_Out_In_SystemUsages()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-
-            var systemDto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            #region system usages
+            var system2Dto = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
 
             //Add some task refs to a system, and an opt out in the system usage as well as additional task refs
             MutateDatabase(context =>
@@ -328,7 +268,7 @@ namespace Tests.Integration.Presentation.Web.KLE
                 using (var taskRefs = new GenericRepository<TaskRef>(context))
                 using (var systems = new GenericRepository<Core.DomainModel.ItSystem.ItSystem>(context))
                 {
-                    var itSystem = systems.GetByKey(systemDto.Id);
+                    var itSystem = systems.GetByKey(system2Dto.Id);
                     var toKeep = taskRefs.AsQueryable().OrderBy(x => x.Id).Take(2).ToList();
                     toKeep.ForEach(itSystem.TaskRefs.Add);
                     systems.Save();
@@ -336,7 +276,7 @@ namespace Tests.Integration.Presentation.Web.KLE
             });
 
             //Take system into use and add additional task refs as well as an opt out
-            var usage = await ItSystemHelper.TakeIntoUseAsync(systemDto.Id, TestEnvironment.DefaultOrganizationId);
+            var usage = await ItSystemHelper.TakeIntoUseAsync(system2Dto.Id, TestEnvironment.DefaultOrganizationId);
             MutateDatabase(context =>
             {
                 using (var taskRefs = new GenericRepository<TaskRef>(context))
@@ -372,7 +312,7 @@ namespace Tests.Integration.Presentation.Web.KLE
                     taskRefs.Save();
 
                     //Add inherited key which should be removed
-                    var system = systems.GetByKey(systemDto.Id);
+                    var system = systems.GetByKey(system1Dto.Id);
                     system.TaskRefs.Add(taskRef1);
                     systems.Save();
 
@@ -384,23 +324,9 @@ namespace Tests.Integration.Presentation.Web.KLE
                 }
             });
 
-            //Act
-            await PutKle();
+            #endregion system usages
 
-            //Assert
-            var (actualTaskRefKeys, actualInheritedKeys, actualOptOutKeys) = GetSystemUsageTasks(usage.Id);
-            VerifyTaskRefUsageKeys(expectedTaskRefKeys, actualTaskRefKeys);
-            VerifyTaskRefUsageKeys(expectedInheritedKeys, actualInheritedKeys);
-            VerifyTaskRefUsageKeys(expectedOptOutKeys, actualOptOutKeys);
-        }
-
-        [Fact]
-        public async Task Put_Renames_And_Patches_UUID_On_TaskRefs()
-        {
-            //Arrange
-            await PrepareForDetailedTest();
-            var expectedTaskRefs = BuildTaskRefIntegritySet().ToList();
-
+            #region uuid_name_patch
             MutateEntitySet<TaskRef>(repository =>
             {
                 var root = repository
@@ -414,16 +340,24 @@ namespace Tests.Integration.Presentation.Web.KLE
                 toBeRenamed.Where((_, index) => index == 0).ToList().ForEach(ClearUUID);
                 repository.Save();
             });
-
+            #endregion
 
             //Act
             await PutKle();
 
-            //Assert - make sure the task refs have the expected names
+            //Assert - make sure the removed task refs were re-added
             VerifyTaskRefIntegrity(expectedTaskRefs);
+            var actualTaskRefs = GetProjectTaskRefKeys(project.Id);
+            VerifyTaskRefUsageKeys(expectedProjectTaskRefs, actualTaskRefs);
+            var actualSystemTaskRefs = GetSystemTaskKeys(system1Dto.Id);
+            VerifyTaskRefUsageKeys(expectedSystemTaskRefs, actualSystemTaskRefs);
+            var (actualTaskRefKeys, actualInheritedKeys, actualOptOutKeys) = GetSystemUsageTasks(usage.Id);
+            VerifyTaskRefUsageKeys(expectedTaskRefKeys, actualTaskRefKeys);
+            VerifyTaskRefUsageKeys(expectedInheritedKeys, actualInheritedKeys);
+            VerifyTaskRefUsageKeys(expectedOptOutKeys, actualOptOutKeys);
         }
 
-        private void ClearUUID(TaskRef taskRef)
+        private static void ClearUUID(TaskRef taskRef)
         {
             taskRef.Uuid = Guid.Empty;
         }
@@ -583,9 +517,9 @@ namespace Tests.Integration.Presentation.Web.KLE
             {
                 return new TaskRef
                 {
-                    TaskKey = nextKey.ToString(), 
-                    ObjectOwnerId = objectOwnerId, 
-                    LastChangedByUserId = objectOwnerId, 
+                    TaskKey = nextKey.ToString(),
+                    ObjectOwnerId = objectOwnerId,
+                    LastChangedByUserId = objectOwnerId,
                     OwnedByOrganizationUnitId = organizationUnitId,
                     Uuid = Guid.NewGuid()
                 };

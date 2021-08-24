@@ -892,7 +892,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url)).Returns(createdReference);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(createdReference);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);
@@ -915,7 +915,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             var operationError = A<OperationError>();
-            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url)).Returns(operationError);
+            _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(operationError);
 
             //Act
             var result = _sut.UpdateMainUrlReference(systemId, urlReference);

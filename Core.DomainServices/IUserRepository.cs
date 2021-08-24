@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.Types;
@@ -15,5 +16,6 @@ namespace Core.DomainServices
         IQueryable<User> GetUsersWithCrossOrganizationPermissions();
         IQueryable<User> GetUsersWithRoleAssignment(OrganizationRole role);
         IQueryable<User> GetUsersInOrganization(int organizationId);
+        Maybe<User> GetByUuid(Guid uuid);
     }
 }
