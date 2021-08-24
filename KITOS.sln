@@ -51,6 +51,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "gulp", "gulp", "{8E3F47CB-D
 	ProjectSection(SolutionItems) = preProject
 		gulp\deploy.js = gulp\deploy.js
 		gulp\linting.js = gulp\linting.js
+		protractor.headless.parallel.conf.js = protractor.headless.parallel.conf.js
 		gulp\ui-test.js = gulp\ui-test.js
 	EndProjectSection
 EndProject

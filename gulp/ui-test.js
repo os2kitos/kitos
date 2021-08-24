@@ -1,22 +1,21 @@
 "use strict";
 
-var {src, series} = require("gulp");
+var { src, series } = require("gulp");
 var log = require("fancy-log");
 var protractor = require("gulp-protractor");
 var del = require("del");
 var paths = require("../paths.config.js");
 
 
-const cleanProtractor = function(callBack) {
+const cleanProtractor = function (callBack) {
     return del("tmp");
 }
 
-
-const protractorHeadless = function (done) {
+const launchHeadLess = function (done, files) {
     const params = process.argv;
     const args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
-    src(paths.e2eFiles) 
+    src(files)
         .pipe(protractor.protractor({
             configFile: "protractor.headless.conf.js",
             args: [
@@ -33,16 +32,31 @@ const protractorHeadless = function (done) {
         .on("end", function () {
             done();
         });
+};
+
+const protractorHeadless = function (done) {
+
+    launchHeadLess(done, paths.e2eFiles);
+}
+
+const protractorHeadlessSequential = function (done) {
+
+    launchHeadLess(done, paths.e2eSequentialFiles);
+}
+
+const protractorHeadlessParallel = function (done) {
+
+    launchHeadLess(done, paths.e2eParallelFiles);
 }
 
 
-const protractorLocal = function(done) {
+const protractorLocal = function (done) {
     const params = process.argv;
     const args = params.length === 6 ? [params[3], params[4], params[5]] : [];
 
     log.info(`e2e arguments: ${args}`);
-    
-    src(paths.e2eFiles) 
+
+    src(paths.e2eFiles)
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",
             args: [
@@ -70,7 +84,7 @@ const protractorSingle = function (done) {
     const singleSpec = args[3].split("=")[1];
     const singleSpecPath = `${paths.source}/Tests/${singleSpec}`;
     log.info(singleSpecPath);
-    src(singleSpecPath) 
+    src(singleSpecPath)
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",
             args: [
@@ -90,5 +104,7 @@ const protractorSingle = function (done) {
 }
 
 exports.runProtractorHeadless = series(cleanProtractor, protractorHeadless);
+exports.runProtractorHeadlessSequentialGroup = series(cleanProtractor, protractorHeadlessSequential);
+exports.runProtractorHeadlessParallelGroup = series(cleanProtractor, protractorHeadlessParallel);
 exports.runProtractorLocal = series(cleanProtractor, protractorLocal);
 exports.runProtractorSingle = series(cleanProtractor, protractorSingle);

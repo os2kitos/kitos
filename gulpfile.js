@@ -23,5 +23,7 @@ exports.clean = deploy.clean;
 exports.lint = linting.lint;
 
 exports.e2eHeadless = test.runProtractorHeadless;
+exports.e2eHeadlessSequentialGroup = test.runProtractorHeadlessSequentialGroup;
+exports.e2eHeadlessParallelGroup = test.runProtractorHeadlessParallelGroup;
 exports.e2eLocal = test.runProtractorLocal;
 exports.e2eSingle = test.runProtractorSingle;
