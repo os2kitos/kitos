@@ -435,6 +435,94 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPropertyContainsResetDataChange(output.ArchiveJournalPeriods);
         }
 
+        [Theory]
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public void FromPOST_Maps_All_Defined_Sections_And_Undefined_Are_Mapped_As_Unchanged(
+            bool generalNull,
+            bool rolesNull,
+            bool kleNull,
+            bool orgUsageNull,
+            bool referencesNull,
+            bool archivingNull,
+            bool gdprNull)
+        {
+            //Arrange
+            var input = new CreateItSystemUsageRequestDTO()
+            {
+                SystemUuid = A<Guid>(),
+                OrganizationUuid = A<Guid>(),
+                General = generalNull ? null : A<GeneralDataWriteRequestDTO>(),
+                Roles = rolesNull ? null : Many<RoleAssignmentRequestDTO>(),
+                LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
+                OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
+                ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataDTO>(),
+                Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
+                GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
+            };
+
+            //Act
+            var output = _sut.FromPOST(input);
+
+            //Assert that null on creation just turns off changes in affected, optional sections
+            Assert.Equal(generalNull, output.GeneralProperties.IsNone);
+            Assert.Equal(rolesNull, output.Roles.IsNone);
+            Assert.Equal(kleNull, output.KLE.IsNone);
+            Assert.Equal(orgUsageNull, output.OrganizationalUsage.IsNone);
+            Assert.Equal(referencesNull, output.ExternalReferences.IsNone);
+            Assert.Equal(archivingNull, output.Archiving.IsNone);
+            Assert.Equal(gdprNull, output.GDPR.IsNone);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public void FromPUT_Maps_All_Sections_Including_Null_Sections(
+           bool generalNull,
+           bool rolesNull,
+           bool kleNull,
+           bool orgUsageNull,
+           bool referencesNull,
+           bool archivingNull,
+           bool gdprNull)
+        {
+            //Arrange
+            var input = new UpdateItSystemUsageRequestDTO()
+            {
+                General = generalNull ? null : A<GeneralDataUpdateRequestDTO>(),
+                Roles = rolesNull ? null : Many<RoleAssignmentRequestDTO>(),
+                LocalKleDeviations = kleNull ? null : A<LocalKLEDeviationsRequestDTO>(),
+                OrganizationUsage = orgUsageNull ? null : A<OrganizationUsageWriteRequestDTO>(),
+                ExternalReferences = referencesNull ? null : Many<ExternalReferenceDataDTO>(),
+                Archiving = archivingNull ? null : A<ArchivingWriteRequestDTO>(),
+                GDPR = gdprNull ? null : A<GDPRWriteRequestDTO>(),
+            };
+
+            //Act
+            var output = _sut.FromPUT(input);
+
+            //Assert that all sections are mapped as changed - including undefined sections
+            Assert.False(output.GeneralProperties.IsNone);
+            Assert.False(output.Roles.IsNone);
+            Assert.False(output.KLE.IsNone);
+            Assert.False(output.OrganizationalUsage.IsNone);
+            Assert.False(output.ExternalReferences.IsNone);
+            Assert.False(output.Archiving.IsNone);
+            Assert.False(output.GDPR.IsNone);
+        }
+
         private static void AssertLinkMapping(SimpleLinkDTO sourceData, Maybe<ChangedValue<Maybe<NamedLink>>> actual)
         {
             Assert.Equal(sourceData.Name, AssertPropertyContainsDataChange(actual).Name);
@@ -484,14 +572,5 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var mappedUuids = actual.Value.Value.Value;
             Assert.Equal(expected, mappedUuids);
         }
-
-        /*
-         *
-            //Check that no reset is set
-            SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request);
-            
-            //Assert that sections are defined even if absent from the input
-            SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request);
-         */
     }
 }
