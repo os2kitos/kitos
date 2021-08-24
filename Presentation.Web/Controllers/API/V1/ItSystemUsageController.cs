@@ -440,9 +440,11 @@ namespace Presentation.Web.Controllers.API.V1
             if (result.Failed)
             {
                 if (result.Error.FailureType == OperationFailure.Forbidden)
+                {
                     // Is caught by Generic controller and converted to Forbidden HttpResponse
                     throw new SecurityException();
-                throw new InvalidOperationException(result.Error.FailureType.ToString("G"));
+                }
+                throw new InvalidOperationException(result.Error.ToString());
             }
         }
     }

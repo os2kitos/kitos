@@ -1729,7 +1729,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Can_Delete_SystemUsage_Returns_Not_Found_If_Not_Exists()
+        public void Cannot_Delete_SystemUsage_Returns_Not_Found_If_Not_Exists()
         {
             //Arrange
             var systemUsageUuid = A<Guid>();
@@ -1744,7 +1744,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Can_Delete_SystemUsage_Returns_Error_If_Delete_Fails()
+        public void Cannot_Delete_SystemUsage_Returns_Error_If_Delete_Fails()
         {
             //Arrange
             var systemUsageUuid = A<Guid>();
