@@ -66,6 +66,7 @@ describe("Data processing registration it-systems test", () => {
             .then(() => LocalItSystemNavigation.openGDPRPage())
             .then(() => expect(ItSystemUsageGdpr.getDataProcessingLink(dprName).isPresent()).toBeTruthy())
             .then(() => ItSystemUsageGdpr.getDataProcessingLink(dprName).click())
+            .then(() => browser.waitForAngular())
             .then(() => dpaHelper.goToItSystems());
     }
 });
