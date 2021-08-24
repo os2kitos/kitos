@@ -224,15 +224,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
-            return systemUsage.ArchiveDuty switch
-            {
-                ArchiveDutyTypes.Undecided => ArchiveDutyChoice.Undecided,
-                ArchiveDutyTypes.B => ArchiveDutyChoice.B,
-                ArchiveDutyTypes.K => ArchiveDutyChoice.K,
-                ArchiveDutyTypes.Unknown => ArchiveDutyChoice.Unknown,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation arg)

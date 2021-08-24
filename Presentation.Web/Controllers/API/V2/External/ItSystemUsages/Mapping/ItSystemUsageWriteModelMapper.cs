@@ -98,15 +98,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return new UpdatedSystemUsageArchivingParameters()
             {
                 ArchiveDuty = MapEnumChoice(archiving.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes),
-                ArchiveTypeUuid = (archiving.ArchiveTypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveLocationUuid = (archiving.ArchiveLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveTestLocationUuid = (archiving.ArchiveTestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveSupplierOrganizationUuid = (archiving.ArchiveSupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveActive = archiving.ArchiveActive.AsChangedValue(),
-                ArchiveNotes = archiving.ArchiveNotes.AsChangedValue(),
-                ArchiveFrequencyInMonths = archiving.ArchiveFrequencyInMonths.AsChangedValue(),
-                ArchiveDocumentBearing = archiving.ArchiveDocumentBearing.AsChangedValue(),
-                ArchiveJournalPeriods = archiving.ArchiveJournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue()
+                ArchiveTypeUuid = (archiving.TypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveLocationUuid = (archiving.LocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveTestLocationUuid = (archiving.TestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveSupplierOrganizationUuid = (archiving.SupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
+                ArchiveActive = archiving.Active.AsChangedValue(),
+                ArchiveNotes = archiving.Notes.AsChangedValue(),
+                ArchiveFrequencyInMonths = archiving.FrequencyInMonths.AsChangedValue(),
+                ArchiveDocumentBearing = archiving.DocumentBearing.AsChangedValue(),
+                ArchiveJournalPeriods = archiving.JournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue()
             };
         }
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)

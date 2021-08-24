@@ -5,6 +5,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -387,6 +388,27 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertPropertyContainsResetDataChange(output.DPIADocumentation);
+        }
+
+        [Fact]
+        public void Can_Map_Archiving()
+        {
+            //Arrange
+            var input = A<ArchivingWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapArchiving(input);
+
+            //Assert
+            Assert.Equal(input.ArchiveDuty, AssertPropertyContainsDataChange(output.ArchiveDuty)?.ToArchiveDutyChoice());
+            Assert.Equal(input.TypeUuid, AssertPropertyContainsDataChange(output.ArchiveTypeUuid));
+            Assert.Equal(input.LocationUuid, AssertPropertyContainsDataChange(output.ArchiveLocationUuid));
+            Assert.Equal(input.TestLocationUuid, AssertPropertyContainsDataChange(output.ArchiveTestLocationUuid));
+            Assert.Equal(input.SupplierOrganizationUuid, AssertPropertyContainsDataChange(output.ArchiveSupplierOrganizationUuid));
+            Assert.Equal(input.Active, AssertPropertyContainsDataChange(output.ArchiveActive));
+            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.ArchiveNotes));
+            Assert.Equal(input.FrequencyInMonths, AssertPropertyContainsDataChange(output.ArchiveFrequencyInMonths));
+            Assert.Equal(input.DocumentBearing, AssertPropertyContainsDataChange(output.ArchiveDocumentBearing));
         }
 
         private static void AssertLinkMapping(SimpleLinkDTO sourceData, Maybe<ChangedValue<Maybe<NamedLink>>> actual)
