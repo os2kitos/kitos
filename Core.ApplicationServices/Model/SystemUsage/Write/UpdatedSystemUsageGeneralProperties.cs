@@ -7,16 +7,16 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageGeneralProperties
     {
-        public Maybe<ChangedValue<string>> LocalSystemId { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<string>> LocalCallName { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<Maybe<Guid>>> DataClassificationUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
-        public Maybe<ChangedValue<string>> Notes { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<string>> SystemVersion { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<Maybe<(int lower, int? upperBound)>>> NumberOfExpectedUsersInterval { get; set; } = Maybe<ChangedValue<Maybe<(int lower, int? upperBound)>>>.None;
-        public Maybe<ChangedValue<Maybe<bool>>> EnforceActive { get; set; } = Maybe<ChangedValue<Maybe<bool>>>.None;
-        public Maybe<ChangedValue<Maybe<DateTime>>> ValidFrom { get; set; } = Maybe<ChangedValue<Maybe<DateTime>>>.None;
-        public Maybe<ChangedValue<Maybe<DateTime>>> ValidTo { get; set; } = Maybe<ChangedValue<Maybe<DateTime>>>.None;
-        public Maybe<ChangedValue<Maybe<Guid>>> MainContractUuid { get; set; } = Maybe<ChangedValue<Maybe<Guid>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> AssociatedProjectUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
+        public OptionalValueChange<string> LocalSystemId { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> LocalCallName { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<Maybe<Guid>> DataClassificationUuid { get; set; } = OptionalValueChange<Maybe<Guid>>.None;
+        public OptionalValueChange<string> Notes { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> SystemVersion { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<Maybe<(int lower, int? upperBound)>> NumberOfExpectedUsersInterval { get; set; } = OptionalValueChange<Maybe<(int lower, int? upperBound)>>.None;
+        public OptionalValueChange<Maybe<bool>> EnforceActive { get; set; } = OptionalValueChange<Maybe<bool>>.None;
+        public OptionalValueChange<Maybe<DateTime>> ValidFrom { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
+        public OptionalValueChange<Maybe<DateTime>> ValidTo { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
+        public OptionalValueChange<Maybe<Guid>> MainContractUuid { get; set; } = OptionalValueChange<Maybe<Guid>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> AssociatedProjectUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
     }
 }

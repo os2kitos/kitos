@@ -5,7 +5,7 @@ using Core.DomainModel;
 using Core.DomainModel.Result;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
-namespace Presentation.Web.Controllers.API.V2.Mapping
+namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public static class ArchiveDutyMappingExtensions
     {
