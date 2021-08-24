@@ -137,18 +137,18 @@ namespace Core.ApplicationServices.SystemUsage
                     itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
-        public Result<ItSystemUsage, OperationFailure> Delete(int id)
+        public Result<ItSystemUsage, OperationError> Delete(int id)
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
                 var itSystemUsage = GetById(id);
                 if (itSystemUsage == null)
                 {
-                    return OperationFailure.NotFound;
+                    return new OperationError($"Could not find it system usage with Id: {id}", OperationFailure.NotFound);
                 }
                 if (!_authorizationContext.AllowDelete(itSystemUsage))
                 {
-                    return OperationFailure.Forbidden;
+                    return new OperationError($"Not allowed to delete it system usage with Id: {id}", OperationFailure.Forbidden);
                 }
 
                 // delete it system usage
@@ -156,7 +156,7 @@ namespace Core.ApplicationServices.SystemUsage
                 if (deleteBySystemUsageId.Failed)
                 {
                     transaction.Rollback();
-                    return deleteBySystemUsageId.Error;
+                    return new OperationError($"Failed to delete it system usage with Id: {id}. Failed to delete references", deleteBySystemUsageId.Error);
                 }
 
                 _attachedOptionRepository.DeleteBySystemUsageId(id);

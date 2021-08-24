@@ -305,7 +305,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.NotFound, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -322,7 +322,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]

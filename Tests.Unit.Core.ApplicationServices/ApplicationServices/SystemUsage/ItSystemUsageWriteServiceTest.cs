@@ -1711,6 +1711,57 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertFailureWithExpectedOperationError(createResult, operationError, transactionMock);
         }
 
+        [Fact]
+        public void Can_Delete_SystemUsage()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var systemUsageId = A<int>();
+            var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(systemToBeDeleted);
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.IsNone);
+        }
+
+        [Fact]
+        public void Can_Delete_SystemUsage_Returns_Not_Found_If_Not_Exists()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(new OperationError(OperationFailure.NotFound));
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.HasValue);
+            Assert.Equal(OperationFailure.NotFound, deleteResult.Value.FailureType);
+        }
+
+        [Fact]
+        public void Can_Delete_SystemUsage_Returns_Error_If_Delete_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var systemUsageId = A<int>();
+            var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
+            var error = new OperationError(A<OperationFailure>());
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(error);
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.HasValue);
+            Assert.Equal(error.FailureType, deleteResult.Value.FailureType);
+        }
+
         private static void AssertFailureWithExpectedOperationError(Result<ItSystemUsage, OperationError> createResult, OperationError operationError,
             Mock<IDatabaseTransaction> transactionMock)
         {

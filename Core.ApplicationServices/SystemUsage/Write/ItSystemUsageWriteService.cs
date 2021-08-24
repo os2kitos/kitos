@@ -699,19 +699,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Maybe<OperationError> Delete(Guid itSystemUsageUuid)
         {
-            return _systemService.GetSystem(itSystemUsageUuid)
-                .Select(systemUsage => _systemService.Delete(systemUsage.Id))
-                .Match(systemDeleteResult =>
-                {
-                    return systemDeleteResult switch
-                    {
-                        SystemDeleteResult.Ok => Maybe<OperationError>.None,
-                        SystemDeleteResult.Forbidden => new OperationError(OperationFailure.Forbidden),
-                        SystemDeleteResult.NotFound => new OperationError(OperationFailure.NotFound),
-                        _ => new OperationError($"Failed to delete system usage:{systemDeleteResult:G}",
-                            OperationFailure.UnknownError)
-                    };
-                }, error => error);
+            return _systemUsageService.GetByUuid(itSystemUsageUuid)
+                .Bind(usage => _systemUsageService.Delete(usage.Id))
+                .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
     }
 }
