@@ -5,7 +5,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
-using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -17,8 +16,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class ItSystemUsageWriteModelMapperTest : WithAutoFixture
     {
         private readonly ItSystemUsageWriteModelMapper _sut;
-
-        //TODO: Opret y type: OptionalPropertyChange<T> => Value = Maybe<ChangeValue<T>> State, Match etc, PropertyChanged -> State.IsSome. Vil gørede der objekter mere læsbare
 
         public ItSystemUsageWriteModelMapperTest()
         {
@@ -409,6 +406,33 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.ArchiveNotes));
             Assert.Equal(input.FrequencyInMonths, AssertPropertyContainsDataChange(output.ArchiveFrequencyInMonths));
             Assert.Equal(input.DocumentBearing, AssertPropertyContainsDataChange(output.ArchiveDocumentBearing));
+
+            var inputPeriods = input.JournalPeriods.OrderBy(_ => _.ArchiveId).ToList();
+            var mappedPeriods = AssertPropertyContainsDataChange(output.ArchiveJournalPeriods).OrderBy(_ => _.ArchiveId).ToList();
+            Assert.Equal(inputPeriods.Count, mappedPeriods.Count);
+            for (var i = 0; i < inputPeriods.Count; i++)
+            {
+                var inputData = inputPeriods[i];
+                var outputData = mappedPeriods[i];
+                Assert.Equal(inputData.Approved, outputData.Approved);
+                Assert.Equal(inputData.ArchiveId, outputData.ArchiveId);
+                Assert.Equal(inputData.StartDate, outputData.StartDate);
+                Assert.Equal(inputData.EndDate, outputData.EndDate);
+            }
+        }
+
+        [Fact]
+        public void Map_Archiving_Resets_JournalPeriods_If_Null()
+        {
+            //Arrange
+            var input = A<ArchivingWriteRequestDTO>();
+            input.JournalPeriods = null;
+
+            //Act
+            var output = _sut.MapArchiving(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.ArchiveJournalPeriods);
         }
 
         private static void AssertLinkMapping(SimpleLinkDTO sourceData, Maybe<ChangedValue<Maybe<NamedLink>>> actual)
@@ -417,8 +441,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(sourceData.Url, AssertPropertyContainsDataChange(actual).Url);
         }
 
-        private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input,
-            UpdatedSystemUsageGeneralProperties output)
+        private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input, UpdatedSystemUsageGeneralProperties output)
         {
             Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
             Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
@@ -464,8 +487,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         /*
          *
-            UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving);
-
             //Check that no reset is set
             SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request);
             
