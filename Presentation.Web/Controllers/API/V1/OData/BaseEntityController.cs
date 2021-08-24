@@ -175,6 +175,14 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 }
             }
 
+            if (entity is IHasUuid hasUuid &&
+                delta.GetChangedPropertyNames().Contains(nameof(IHasUuid.Uuid)) &&
+                delta.TryGetPropertyValue(nameof(IHasUuid.Uuid), out var uuid) &&
+                ((Guid)uuid) != hasUuid.Uuid)
+            {
+                return BadRequest("UUID cannot be changed");
+            }
+
             // check model state
             if (!ModelState.IsValid)
             {
