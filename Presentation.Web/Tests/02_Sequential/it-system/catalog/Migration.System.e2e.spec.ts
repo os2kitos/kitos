@@ -1,5 +1,4 @@
 ﻿import Login = require("../../../Helpers/LoginHelper");
-import OrgHelper = require("../../../Helpers/OrgHelper")
 import SystemCatalogHelper = require("../../../Helpers/SystemCatalogHelper");
 import TestFixtureWrapper = require("../../../Utility/TestFixtureWrapper");
 import Constants = require("../../../Utility/Constants");
@@ -26,22 +25,6 @@ describe("Global Administrator is able to migrate from one system to another", (
 
     afterAll(() => {
         testFixture.disableLongRunningTest();
-    });
-
-    it("Local admin is not able to see the move button", () => {
-        loginHelper.loginAsLocalAdmin()
-            .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
-    });
-
-    it("Regular user is not able to see the move button", () => {
-        loginHelper.loginAsRegularUser()
-            .then(() => pageObject.getPage())
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => openMigrationOnSpecificSystem("DefaultTestItSystem"))
-            .then(() => expect(element(cssHelper.byDataElementType(constants.moveSystemButton)).isPresent()).toBe(false));
     });
 
     it("Global admin is able to get to the final migration window and execute a migration", () => {
