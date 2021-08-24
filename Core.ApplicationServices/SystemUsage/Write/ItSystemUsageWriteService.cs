@@ -564,7 +564,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private static Result<ItSystemUsage, OperationError> UpdateExpectedUsersInterval(ItSystemUsage systemUsage, Maybe<(int lower, int? upperBound)> newInterval)
         {
             if (newInterval.IsNone)
+            {
                 systemUsage.ResetUserCount();
+                return systemUsage;
+            }
 
             return systemUsage.SetExpectedUsersInterval(newInterval.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
