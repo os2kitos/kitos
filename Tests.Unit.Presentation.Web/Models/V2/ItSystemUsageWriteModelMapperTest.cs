@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -15,6 +16,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class ItSystemUsageWriteModelMapperTest : WithAutoFixture
     {
         private readonly ItSystemUsageWriteModelMapper _sut;
+
+        //TODO: Opret y type: OptionalPropertyChange<T> => Value = Maybe<ChangeValue<T>> State, Match etc, PropertyChanged -> State.IsSome. Vil gørede der objekter mere læsbare
 
         public ItSystemUsageWriteModelMapperTest()
         {
@@ -148,17 +151,99 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.MapGeneralData(input);
 
             //Assert
+            AssertCommonGeneralDataWriteProperties(input, output);
+            Assert.True(output.MainContractUuid.IsNone, "The main contract should be untouched as it is not part of the initial write contract");
+        }
+
+        [Fact]
+        public void Map_General_Data_Properties_Resets_Validity_If_SourceValue_Not_Defined()
+        {
+            //Arrange
+            var input = A<GeneralDataWriteRequestDTO>();
+            input.Validity = null;
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.EnforceActive);
+            AssertPropertyContainsResetDataChange(output.ValidFrom);
+            AssertPropertyContainsResetDataChange(output.ValidTo);
+        }
+
+        [Fact]
+        public void Map_General_Data_Properties_Resets_NumberOfExpectedUsers_If_SourceValue_Not_Defined()
+        {
+            //Arrange
+            var input = A<GeneralDataWriteRequestDTO>();
+            input.NumberOfExpectedUsers = null;
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.NumberOfExpectedUsersInterval);
+        }
+
+        [Fact]
+        public void Map_General_Data_Properties_Resets_AssociatedProjects_If_SourceValue_Not_Defined()
+        {
+            //Arrange
+            var input = A<GeneralDataWriteRequestDTO>();
+            input.AssociatedProjectUuids = null;
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.AssociatedProjectUuids);
+        }
+
+        [Fact]
+        public void Can_Map_General_Data_Update_Properties()
+        {
+            //Arrange
+            var input = A<GeneralDataUpdateRequestDTO>();
+
+            //Act
+            var output = _sut.MapGeneralDataUpdate(input);
+
+            //Assert
+            AssertCommonGeneralDataWriteProperties(input, output);
+            Assert.Equal(input.MainContractUuid, AssertPropertyContainsDataChange(output.MainContractUuid));
+        }
+
+        [Fact]
+        public void Map_General_Data_Update_Properties_Resets_Main_Contract_Id_If_Undefined()
+        {
+            //Arrange
+            var input = A<GeneralDataUpdateRequestDTO>();
+            input.MainContractUuid = null;
+
+            //Act
+            var output = _sut.MapGeneralDataUpdate(input);
+
+            //Assert
+            AssertCommonGeneralDataWriteProperties(input, output);
+            AssertPropertyContainsResetDataChange(output.MainContractUuid);
+        }
+
+        private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input,
+            UpdatedSystemUsageGeneralProperties output)
+        {
             Assert.Equal(input.LocalCallName, AssertPropertyContainsDataChange(output.LocalCallName));
             Assert.Equal(input.LocalSystemId, AssertPropertyContainsDataChange(output.LocalSystemId));
             Assert.Equal(input.SystemVersion, AssertPropertyContainsDataChange(output.SystemVersion));
             Assert.Equal(input.AssociatedProjectUuids, AssertPropertyContainsDataChange(output.AssociatedProjectUuids));
             Assert.Equal(input.DataClassificationUuid, AssertPropertyContainsDataChange(output.DataClassificationUuid));
-            //TODO
-            //Assert.Equal(input.Validity, AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Validity?.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceActive));
+            Assert.Equal(input.Validity?.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Validity?.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
             Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));
-         
-            //TODO
-            //Assert.Equal(input.NumberOfExpectedUsers, AssertPropertyContainsDataChange(output.));
+            Assert.Equal(input.NumberOfExpectedUsers.LowerBound,
+                AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).lower);
+            Assert.Equal(input.NumberOfExpectedUsers.UpperBound,
+                AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).upperBound);
         }
 
         private static T AssertPropertyContainsDataChange<T>(Maybe<ChangedValue<Maybe<T>>> sourceData)
@@ -190,10 +275,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         /*
          *
-            UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData);
-
-            UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO generalData);
-
             UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request);
         
             UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving);

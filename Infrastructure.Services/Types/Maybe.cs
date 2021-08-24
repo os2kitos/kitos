@@ -4,7 +4,7 @@ namespace Infrastructure.Services.Types
 {
     public sealed class Maybe<T>
     {
-        public static readonly Maybe<T> None = new Maybe<T>(false);
+        public static readonly Maybe<T> None = new(false);
 
         private readonly T _value;
 

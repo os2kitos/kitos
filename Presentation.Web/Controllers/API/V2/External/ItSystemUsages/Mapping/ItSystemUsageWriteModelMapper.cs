@@ -184,10 +184,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Notes = generalData.Notes.AsChangedValue(),
                 SystemVersion = generalData.SystemVersion.AsChangedValue(),
                 DataClassificationUuid = (generalData.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                NumberOfExpectedUsersInterval = generalData
+                NumberOfExpectedUsersInterval = (generalData
                     .NumberOfExpectedUsers?
                     .FromNullable()
-                    .Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)).Match(interval => interval, () => Maybe<(int, int?)>.None)
+                    .Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ?? Maybe<(int, int?)>.None)
                     .AsChangedValue(),
                 EnforceActive = ((generalData.Validity?.EnforcedValid)?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
                 ValidFrom = (generalData.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
