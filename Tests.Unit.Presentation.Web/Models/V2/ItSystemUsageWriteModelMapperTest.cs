@@ -228,6 +228,173 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPropertyContainsResetDataChange(output.MainContractUuid);
         }
 
+        [Fact]
+        public void Can_Map_GDPR_Data_Properties()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            Assert.Equal(input.Purpose, AssertPropertyContainsDataChange(output.Purpose));
+            Assert.Equal(input.BusinessCritical, AssertPropertyContainsDataChange(output.BusinessCritical)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.HostedAt, AssertPropertyContainsDataChange(output.HostedAt)?.ToHostingChoice());
+            AssertLinkMapping(input.DirectoryDocumentation, output.DirectoryDocumentation);
+            Assert.Equal(input.DataSensitivityLevels.ToList(), AssertPropertyContainsDataChange(output.DataSensitivityLevels).Select(x => x.ToDataSensitivityLevelChoice()));
+            Assert.Equal(input.SensitivePersonDataUuids.ToList(), AssertPropertyContainsDataChange(output.SensitivePersonDataUuids));
+            Assert.Equal(input.RegisteredDataCategoryUuids.ToList(), AssertPropertyContainsDataChange(output.RegisteredDataCategoryUuids));
+            Assert.Equal(input.TechnicalPrecautionsInPlace, AssertPropertyContainsDataChange(output.TechnicalPrecautionsInPlace)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.TechnicalPrecautionsApplied.ToList(), AssertPropertyContainsDataChange(output.TechnicalPrecautionsApplied).Select(x => x.ToTechnicalPrecautionChoice()));
+            AssertLinkMapping(input.TechnicalPrecautionsDocumentation, output.TechnicalPrecautionsDocumentation);
+            Assert.Equal(input.UserSupervision, AssertPropertyContainsDataChange(output.UserSupervision)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.UserSupervisionDate, AssertPropertyContainsDataChange(output.UserSupervisionDate));
+            AssertLinkMapping(input.UserSupervisionDocumentation, output.UserSupervisionDocumentation);
+            Assert.Equal(input.RiskAssessmentConducted, AssertPropertyContainsDataChange(output.RiskAssessmentConducted)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.RiskAssessmentNotes, AssertPropertyContainsDataChange(output.RiskAssessmentNotes));
+            Assert.Equal(input.RiskAssessmentConductedDate, AssertPropertyContainsDataChange(output.RiskAssessmentConductedDate));
+            AssertLinkMapping(input.RiskAssessmentDocumentation, output.RiskAssessmentDocumentation);
+            Assert.Equal(input.RiskAssessmentResult, AssertPropertyContainsDataChange(output.RiskAssessmentResult)?.ToRiskLevelChoice());
+            Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(output.DPIAConducted)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.DPIADate, AssertPropertyContainsDataChange(output.DPIADate));
+            Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(output.NextDataRetentionEvaluationDate));
+            Assert.Equal(input.DataRetentionEvaluationFrequencyInMonths, AssertPropertyContainsDataChange(output.DataRetentionEvaluationFrequencyInMonths));
+            AssertLinkMapping(input.DPIADocumentation, output.DPIADocumentation);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_Directory_Documentation_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.DirectoryDocumentation = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.DirectoryDocumentation);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_DataSensitivityLevels_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.DataSensitivityLevels = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.DataSensitivityLevels);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_SensitivePersonDataUuids_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.SensitivePersonDataUuids = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.SensitivePersonDataUuids);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_RegisteredDataCategoryUuids_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.RegisteredDataCategoryUuids = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.RegisteredDataCategoryUuids);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_TechnicalPrecautionsApplied_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.TechnicalPrecautionsApplied = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.TechnicalPrecautionsApplied);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_TechnicalPrecautionsDocumentation_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.TechnicalPrecautionsDocumentation = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.TechnicalPrecautionsDocumentation);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_UserSupervisionDocumentation_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.UserSupervisionDocumentation = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.UserSupervisionDocumentation);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_RiskAssessmentDocumentation_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.RiskAssessmentDocumentation = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.RiskAssessmentDocumentation);
+        }
+
+        [Fact]
+        public void Map_GDPR_Data_Properties_Maps_Reset_If_DPIADocumentation_Is_Null()
+        {
+            //Arrange
+            var input = A<GDPRWriteRequestDTO>();
+            input.DPIADocumentation = null;
+
+            //Act
+            var output = _sut.MapGDPR(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.DPIADocumentation);
+        }
+
+        private static void AssertLinkMapping(SimpleLinkDTO sourceData, Maybe<ChangedValue<Maybe<NamedLink>>> actual)
+        {
+            Assert.Equal(sourceData.Name, AssertPropertyContainsDataChange(actual).Name);
+            Assert.Equal(sourceData.Url, AssertPropertyContainsDataChange(actual).Url);
+        }
+
         private static void AssertCommonGeneralDataWriteProperties(GeneralDataWriteRequestDTO input,
             UpdatedSystemUsageGeneralProperties output)
         {
@@ -275,8 +442,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         /*
          *
-            UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request);
-        
             UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving);
 
             //Check that no reset is set
