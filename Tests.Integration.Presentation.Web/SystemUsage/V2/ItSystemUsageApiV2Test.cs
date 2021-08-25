@@ -904,7 +904,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ ArchiveJournalPeriods = new List<JournalPeriodDTO>()});
+            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ JournalPeriods = new List<JournalPeriodDTO>()});
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -981,17 +981,17 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static void AssertArchivingParametersSet(ArchivingWriteRequestDTO expected, ArchivingRegistrationsResponseDTO actual)
         {
             Assert.Equal(expected.ArchiveDuty, actual.ArchiveDuty);
-            Assert.Equal(expected.ArchiveTypeUuid, actual.Type.Uuid);
-            Assert.Equal(expected.ArchiveLocationUuid, actual.Location.Uuid);
-            Assert.Equal(expected.ArchiveTestLocationUuid, actual.TestLocation.Uuid);
-            Assert.Equal(expected.ArchiveSupplierOrganizationUuid, actual.Supplier.Uuid);
-            Assert.Equal(expected.ArchiveActive, actual.Active);
-            Assert.Equal(expected.ArchiveFrequencyInMonths, actual.FrequencyInMonths);
-            Assert.Equal(expected.ArchiveDocumentBearing, actual.DocumentBearing);
-            Assert.Equal(expected.ArchiveNotes, actual.Notes);
+            Assert.Equal(expected.TypeUuid, actual.Type.Uuid);
+            Assert.Equal(expected.LocationUuid, actual.Location.Uuid);
+            Assert.Equal(expected.TestLocationUuid, actual.TestLocation.Uuid);
+            Assert.Equal(expected.SupplierOrganizationUuid, actual.Supplier.Uuid);
+            Assert.Equal(expected.Active, actual.Active);
+            Assert.Equal(expected.FrequencyInMonths, actual.FrequencyInMonths);
+            Assert.Equal(expected.DocumentBearing, actual.DocumentBearing);
+            Assert.Equal(expected.Notes, actual.Notes);
 
-            Assert.Equal(expected.ArchiveJournalPeriods.Count(), actual.JournalPeriods.Count());
-            var firstJournalPeriod = expected.ArchiveJournalPeriods.First();
+            Assert.Equal(expected.JournalPeriods.Count(), actual.JournalPeriods.Count());
+            var firstJournalPeriod = expected.JournalPeriods.First();
             var journalPeriodFromServer = Assert.Single(actual.JournalPeriods.Where(x => x.ArchiveId == firstJournalPeriod.ArchiveId));
             Assert.Equal(firstJournalPeriod.Approved, journalPeriodFromServer.Approved);
             Assert.Equal(firstJournalPeriod.ArchiveId, journalPeriodFromServer.ArchiveId);
@@ -1004,15 +1004,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return new ArchivingWriteRequestDTO()
             {
                 ArchiveDuty = A<ArchiveDutyChoice>(),
-                ArchiveTypeUuid = archiveTypeUuid,
-                ArchiveLocationUuid = archiveLocationUuid,
-                ArchiveTestLocationUuid = archiveTestLocationUuid,
-                ArchiveSupplierOrganizationUuid = organizationUuid,
-                ArchiveActive = A<bool>(),
-                ArchiveFrequencyInMonths = A<int>(),
-                ArchiveDocumentBearing = A<bool>(),
-                ArchiveNotes = A<string>(),
-                ArchiveJournalPeriods = new Fixture()
+                TypeUuid = archiveTypeUuid,
+                LocationUuid = archiveLocationUuid,
+                TestLocationUuid = archiveTestLocationUuid,
+                SupplierOrganizationUuid = organizationUuid,
+                Active = A<bool>(),
+                FrequencyInMonths = A<int>(),
+                DocumentBearing = A<bool>(),
+                Notes = A<string>(),
+                JournalPeriods = new Fixture()
                     .Build<JournalPeriodDTO>()
                     .Without(x => x.EndDate)
                     .Without(x => x.StartDate)

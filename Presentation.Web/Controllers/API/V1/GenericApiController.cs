@@ -336,6 +336,15 @@ namespace Presentation.Web.Controllers.API.V1
                     {
                         Guid guid;
                         Guid.TryParse(valuePair.Value.Value<string>(), out guid);
+
+                        if (destName == nameof(IHasUuid.Uuid))
+                        {
+                            if (item is IHasUuid hasUuid && guid != hasUuid.Uuid)
+                            {
+                                throw new NotSupportedException("Cannot change UUID");
+                            }
+                        }
+
                         propRef.SetValue(item, guid);
                     }
                     else
@@ -396,6 +405,11 @@ namespace Presentation.Web.Controllers.API.V1
                 var result = PatchQuery(item, obj);
                 DomainEvents.Raise(new EntityUpdatedEvent<TModel>(result));
                 return Ok(Map(result));
+            }
+            catch (NotSupportedException e)
+            {
+                Logger.Error(e, "Error during patch of id {id} of type {type}", id, typeof(TModel));
+                return BadRequest();
             }
             catch (SecurityException e)
             {

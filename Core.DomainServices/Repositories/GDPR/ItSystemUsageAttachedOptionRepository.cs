@@ -6,12 +6,12 @@ using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.GDPR
 {
-    public class AttachedOptionRepository : IAttachedOptionRepository
+    public class ItSystemUsageAttachedOptionRepository : IItSystemUsageAttachedOptionRepository
     {
         private readonly IGenericRepository<AttachedOption> _attachedOptionRepository;
         private readonly Maybe<ActiveUserIdContext> _userContext;
 
-        public AttachedOptionRepository(IGenericRepository<AttachedOption> attachedOptionRepository, Maybe<ActiveUserIdContext> userContext)
+        public ItSystemUsageAttachedOptionRepository(IGenericRepository<AttachedOption> attachedOptionRepository, Maybe<ActiveUserIdContext> userContext)
         {
             _attachedOptionRepository = attachedOptionRepository;
             _userContext = userContext;
@@ -19,10 +19,10 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public IEnumerable<AttachedOption> GetBySystemUsageId(int systemUsageId)
         {
-            return GetAttachedOptions(systemUsageId).ToList();
+            return GetAttachedOptionsBySystemUsageId(systemUsageId).ToList();
         }
 
-        private IQueryable<AttachedOption> GetAttachedOptions(int systemUsageId)
+        private IQueryable<AttachedOption> GetAttachedOptionsBySystemUsageId(int systemUsageId)
         {
             return _attachedOptionRepository
                 .AsQueryable()
@@ -31,10 +31,10 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public IEnumerable<AttachedOption> GetBySystemUsageIdAndOptionType(int systemUsageId, OptionType type)
         {
-            return GetAttachedOptions(systemUsageId).Where(x => x.OptionType == type).ToList();
+            return GetAttachedOptionsBySystemUsageId(systemUsageId).Where(x => x.OptionType == type).ToList();
         }
 
-        public void DeleteBySystemUsageId(int systemUsageId)
+        public void DeleteAllBySystemUsageId(int systemUsageId)
         {
             var attachedOptions = GetBySystemUsageId(systemUsageId);
 

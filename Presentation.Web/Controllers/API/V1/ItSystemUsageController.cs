@@ -146,7 +146,7 @@ namespace Presentation.Web.Controllers.API.V1
                     return Forbidden();
                 }
 
-                var sysUsageResult = _itSystemUsageService.CreateNew(systemUsage.ItSystemId,systemUsage.OrganizationId);
+                var sysUsageResult = _itSystemUsageService.CreateNew(systemUsage.ItSystemId, systemUsage.OrganizationId);
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;

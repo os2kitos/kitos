@@ -233,15 +233,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionCommitted(transactionMock);
             Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
             var generalProperties = input.GeneralProperties.Value;
-            Assert.Equal(generalProperties.LocalCallName.Value.Value, itSystemUsage.LocalCallName);
-            Assert.Equal(generalProperties.LocalSystemId.Value.Value, itSystemUsage.LocalSystemId);
-            Assert.Equal(generalProperties.SystemVersion.Value.Value, itSystemUsage.Version);
-            Assert.Equal(generalProperties.Notes.Value.Value, itSystemUsage.Note);
-            Assert.Equal(generalProperties.EnforceActive.Value.Value, itSystemUsage.Active);
-            Assert.Equal(generalProperties.DataClassificationUuid.Value.Value, itSystemUsage.ItSystemCategories.Uuid);
-            Assert.Equal(generalProperties.ValidFrom.Value.Value.Value.Date, itSystemUsage.Concluded);
-            Assert.Equal(generalProperties.ValidTo.Value.Value.Value.Date, itSystemUsage.ExpirationDate);
-            Assert.Equal(generalProperties.MainContractUuid.Value.Value, itSystemUsage.MainContract.ItContract.Uuid);
+            Assert.Equal(generalProperties.LocalCallName.NewValue, itSystemUsage.LocalCallName);
+            Assert.Equal(generalProperties.LocalSystemId.NewValue, itSystemUsage.LocalSystemId);
+            Assert.Equal(generalProperties.SystemVersion.NewValue, itSystemUsage.Version);
+            Assert.Equal(generalProperties.Notes.NewValue, itSystemUsage.Note);
+            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, itSystemUsage.Active);
+            Assert.Equal(generalProperties.DataClassificationUuid.NewValue.Value, itSystemUsage.ItSystemCategories.Uuid);
+            Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
+            Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
+            Assert.Equal(generalProperties.MainContractUuid.NewValue.Value, itSystemUsage.MainContract.ItContract.Uuid);
             Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
         }
 
@@ -886,7 +886,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
-            }
+        }
 
         [Fact]
         public void Can_Create_With_Archiving()
@@ -970,7 +970,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var archiveTestLocationUuid = A<Guid>();
 
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
-            
+
             ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.None);
 
             var input = new SystemUsageUpdateParameters
@@ -1022,14 +1022,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveTypeUuid = A<Guid>();
             var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
             itSystemUsage.ArchiveTypeId = archiveType.Id;
             itSystemUsage.ArchiveType = archiveType;
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveTestLocationUuid = A<Guid>();
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
@@ -1134,7 +1134,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
             itSystemUsage.ArchiveLocationId = archiveLocation.Id;
@@ -1251,7 +1251,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            var archiveTestLocationUuid = A<Guid>(); 
+            var archiveTestLocationUuid = A<Guid>();
             var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
             itSystemUsage.ArchiveTestLocationId = archiveTestLocation.Id;
             itSystemUsage.ArchiveTestLocation = archiveTestLocation;
@@ -1821,32 +1821,32 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
         {
-            Assert.Equal(expected.ArchiveDuty.Value.Value.Value, actual.ArchiveDuty);
-            Assert.Equal(expected.ArchiveTypeUuid.Value.Value.Value, actual.ArchiveType.Uuid);
-            Assert.Equal(expected.ArchiveLocationUuid.Value.Value.Value, actual.ArchiveLocation.Uuid);
-            Assert.Equal(expected.ArchiveTestLocationUuid.Value.Value.Value, actual.ArchiveTestLocation.Uuid);
+            Assert.Equal(expected.ArchiveDuty.NewValue, actual.ArchiveDuty);
+            Assert.Equal(expected.ArchiveTypeUuid.NewValue.Value, actual.ArchiveType.Uuid);
+            Assert.Equal(expected.ArchiveLocationUuid.NewValue.Value, actual.ArchiveLocation.Uuid);
+            Assert.Equal(expected.ArchiveTestLocationUuid.NewValue.Value, actual.ArchiveTestLocation.Uuid);
             Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
             Assert.Equal(expectedSupplierId, actual.SupplierId);
-            Assert.Equal(expected.ArchiveActive.Value.Value.Value, actual.ArchiveFromSystem);
-            Assert.Equal(expected.ArchiveDocumentBearing.Value.Value.Value, actual.Registertype);
-            Assert.Equal(expected.ArchiveFrequencyInMonths.Value.Value.Value, actual.ArchiveFreq);
-            Assert.Equal(expected.ArchiveNotes.Value.Value, actual.ArchiveNotes);
+            Assert.Equal(expected.ArchiveActive.NewValue, actual.ArchiveFromSystem);
+            Assert.Equal(expected.ArchiveDocumentBearing.NewValue, actual.Registertype);
+            Assert.Equal(expected.ArchiveFrequencyInMonths.NewValue, actual.ArchiveFreq);
+            Assert.Equal(expected.ArchiveNotes.NewValue, actual.ArchiveNotes);
             _itSystemUsageServiceMock.Verify(x => x.RemoveAllArchivePeriods(actual.Id), Times.Once);
-            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.Value.Value.Value.Count()));
+            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.NewValue.Value.Count()));
         }
 
         private static UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(new ChangedValue<ArchiveDutyTypes?>(null)),
+                ArchiveDuty = new ChangedValue<ArchiveDutyTypes?>(null),
                 ArchiveTypeUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveTestLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(null)),
+                ArchiveActive = new ChangedValue<bool?>(null),
+                ArchiveDocumentBearing = new ChangedValue<bool?>(null),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(null),
                 ArchiveNotes = "".AsChangedValue(),
                 ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriod>>.None.AsChangedValue()
             };
@@ -1856,14 +1856,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(A<ArchiveDutyTypes>()),
+                ArchiveDuty = A<ArchiveDutyTypes?>().AsChangedValue(),
                 ArchiveTypeUuid = archiveTypeUuid.AsChangedValue(),
                 ArchiveLocationUuid = archiveLocationUuid.AsChangedValue(),
                 ArchiveTestLocationUuid = archiveTestLocationUuid.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = archiveSupplierUuid.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(A<int>())),
+                ArchiveActive = A<bool?>().AsChangedValue(),
+                ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
                 ArchiveNotes = A<string>().AsChangedValue(),
                 ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
             };
@@ -1962,15 +1962,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
-            return new SystemUsageUpdateParameters()
+            return new SystemUsageUpdateParameters
             {
                 Roles = new UpdatedSystemUsageRoles()
                 {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None
-                        .AsChangedValue()
-                        .FromNullable()
-                }
-                    .FromNullable()
+                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue()
+                }.FromNullable()
             };
         }
 

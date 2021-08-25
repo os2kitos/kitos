@@ -28,14 +28,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     {
         private readonly ItSystemUsageResponseMapper _sut;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
-        private readonly Mock<IAttachedOptionRepository> _attachedOptionsRepositoryMock;
+        private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionsRepositoryMock;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepositoryMock;
         private readonly Mock<IGenericRepository<RegisterType>> _registerTypeRepositoryMock;
 
         public ItSystemUsageResponseMapperTest()
         {
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
-            _attachedOptionsRepositoryMock = new Mock<IAttachedOptionRepository>();
+            _attachedOptionsRepositoryMock = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepositoryMock = new Mock<ISensitivePersonalDataTypeRepository>();
             _registerTypeRepositoryMock = new Mock<IGenericRepository<RegisterType>>();
             _sut = new ItSystemUsageResponseMapper(

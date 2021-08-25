@@ -4,8 +4,8 @@ using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
@@ -72,8 +72,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IDatabaseControl databaseControl,
             IDomainEvents domainEvents,
             ILogger logger,
-            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService, 
-            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService, 
+            IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
+            IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService)
         {
             _systemUsageService = systemUsageService;
@@ -153,36 +153,36 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformUpdates(ItSystemUsage systemUsage, SystemUsageUpdateParameters parameters)
         {
             //Optionally apply changes across the entire update specification
-            return WithOptionalUpdate(systemUsage, parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.Roles, PerformRoleAssignmentUpdates))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.KLE, PerformKLEUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.ExternalReferences, PerformReferencesUpdate))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.GDPR, PerformGDPRUpdates))
-                    .Bind(usage => WithOptionalUpdate(usage, parameters.Archiving, PerformArchivingUpdate));
+            return systemUsage.WithOptionalUpdate(parameters.GeneralProperties, PerformGeneralDataPropertiesUpdate)
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.Roles, PerformRoleAssignmentUpdates))
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.OrganizationalUsage, PerformOrganizationalUsageUpdate))
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.KLE, PerformKLEUpdate))
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.ExternalReferences, PerformReferencesUpdate))
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.GDPR, PerformGDPRUpdates))
+                    .Bind(usage => usage.WithOptionalUpdate(parameters.Archiving, PerformArchivingUpdate));
         }
 
         private Result<ItSystemUsage, OperationError> PerformGDPRUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageGDPRProperties parameters)
         {
             //General GDPR registrations
-            return WithOptionalUpdate(itSystemUsage, parameters.Purpose, (usage, newPurpose) => usage.GeneralPurpose = newPurpose)
-                .Bind(usage => WithOptionalUpdate(usage, parameters.BusinessCritical, (systemUsage, businessCritical) => systemUsage.isBusinessCritical = businessCritical))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DirectoryDocumentation, (systemUsage, newLink) =>
+            return itSystemUsage.WithOptionalUpdate(parameters.Purpose, (usage, newPurpose) => usage.GeneralPurpose = newPurpose)
+                .Bind(usage => usage.WithOptionalUpdate(parameters.BusinessCritical, (systemUsage, businessCritical) => systemUsage.isBusinessCritical = businessCritical))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.HostedAt, (systemUsage, hostedAt) => systemUsage.HostedAt = hostedAt))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DirectoryDocumentation, (systemUsage, newLink) =>
                    {
                        systemUsage.LinkToDirectoryUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
                        systemUsage.LinkToDirectoryUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
 
                 //Registered data sensitivity
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DataSensitivityLevels, (systemUsage, levels) => UpdateSensitivityLevels(levels, systemUsage)))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.SensitivePersonDataUuids, UpdateSensitivePersonDataIds))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RegisteredDataCategoryUuids, UpdateRegisteredDataCategories))
 
                 //Technical precautions
-                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsApplied, UpdateAppliedTechnicalPrecautions))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.TechnicalPrecautionsDocumentation,
+                .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsInPlace, (systemUsage, precautions) => systemUsage.precautions = precautions))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsApplied, UpdateAppliedTechnicalPrecautions))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.TechnicalPrecautionsDocumentation,
                     (systemUsage, newLink) =>
                     {
                         systemUsage.TechnicalSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
@@ -190,38 +190,38 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     }))
 
                 //User supervision
-                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UserSupervision = supervision))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UserSupervisionDate = date))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.UserSupervisionDocumentation, (systemUsage, newLink) =>
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervision, (systemUsage, supervision) => systemUsage.UserSupervision = supervision))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDate, (systemUsage, date) => systemUsage.UserSupervisionDate = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.UserSupervisionDocumentation, (systemUsage, newLink) =>
                    {
                        systemUsage.UserSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
                        systemUsage.UserSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
 
                 //Risk assessments
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.riskAssessment = conducted))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.riskAssesmentDate = date))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.preriskAssessment = result))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentDocumentation, (systemUsage, newLink) =>
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConducted, (systemUsage, conducted) => systemUsage.riskAssessment = conducted))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentConductedDate, (systemUsage, date) => systemUsage.riskAssesmentDate = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentResult, (systemUsage, result) => systemUsage.preriskAssessment = result))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentDocumentation, (systemUsage, newLink) =>
                    {
                        systemUsage.RiskSupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
                        systemUsage.RiskSupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RiskAssessmentNotes, (systemUsage, notes) => systemUsage.noteRisks = notes))
 
                 //DPIA
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADate, (systemUsage, date) => systemUsage.DPIADateFor = date))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DPIADocumentation, (systemUsage, newLink) =>
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIAConducted, (systemUsage, conducted) => systemUsage.DPIA = conducted))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADate, (systemUsage, date) => systemUsage.DPIADateFor = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DPIADocumentation, (systemUsage, newLink) =>
                    {
                        systemUsage.DPIASupervisionDocumentationUrlName = newLink.Select(x => x.Name).GetValueOrDefault();
                        systemUsage.DPIASupervisionDocumentationUrl = newLink.Select(x => x.Url).GetValueOrDefault();
                    }))
 
                 //Data retention
-                .Bind(usage => WithOptionalUpdate(usage, parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.answeringDataDPIA = retentionPeriodDefined))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.DPIAdeleteDate = date))
-                .Bind(usage => WithOptionalUpdate(usage, parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
+                .Bind(usage => usage.WithOptionalUpdate(parameters.RetentionPeriodDefined, (systemUsage, retentionPeriodDefined) => systemUsage.answeringDataDPIA = retentionPeriodDefined))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.NextDataRetentionEvaluationDate, (systemUsage, date) => systemUsage.DPIAdeleteDate = date))
+                .Bind(usage => usage.WithOptionalUpdate(parameters.DataRetentionEvaluationFrequencyInMonths, (systemUsage, frequencyInMonths) => systemUsage.numberDPIA = frequencyInMonths.GetValueOrDefault()));
         }
 
         private Maybe<OperationError> UpdateSensitivityLevels(Maybe<IEnumerable<SensitiveDataLevel>> levels, ItSystemUsage systemUsage)
@@ -300,16 +300,16 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformArchivingUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageArchivingParameters archivingProperties)
         {
-            return WithOptionalUpdate(itSystemUsage, archivingProperties.ArchiveDuty, (usage, archiveDuty) => usage.ArchiveDuty = archiveDuty)
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTypeUuid, UpdateArchiveType))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveLocationUuid, UpdateArchiveLocation))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveTestLocationUuid, UpdateArchiveTestLocation))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveSupplierOrganizationUuid, UpdateArchiveSupplierOrganization))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveActive, (usage, archiveActive) => usage.ArchiveFromSystem = archiveActive))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveNotes, (usage, archiveNotes) => usage.ArchiveNotes = archiveNotes))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveFrequencyInMonths, (usage, archiveFrequencyInMonths) => usage.ArchiveFreq = archiveFrequencyInMonths))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveDocumentBearing, (usage, archiveDocumentBearing) => usage.Registertype = archiveDocumentBearing))
-                .Bind(systemUsage => WithOptionalUpdate(systemUsage, archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
+            return itSystemUsage.WithOptionalUpdate(archivingProperties.ArchiveDuty, (usage, archiveDuty) => usage.ArchiveDuty = archiveDuty)
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveTypeUuid, UpdateArchiveType))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveLocationUuid, UpdateArchiveLocation))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveTestLocationUuid, UpdateArchiveTestLocation))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveSupplierOrganizationUuid, UpdateArchiveSupplierOrganization))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveActive, (usage, archiveActive) => usage.ArchiveFromSystem = archiveActive))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveNotes, (usage, archiveNotes) => usage.ArchiveNotes = archiveNotes))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveFrequencyInMonths, (usage, archiveFrequencyInMonths) => usage.ArchiveFreq = archiveFrequencyInMonths))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveDocumentBearing, (usage, archiveDocumentBearing) => usage.Registertype = archiveDocumentBearing))
+                .Bind(systemUsage => systemUsage.WithOptionalUpdate(archivingProperties.ArchiveJournalPeriods, UpdateArchiveJournalPeriods));
         }
 
         private Maybe<OperationError> UpdateArchiveJournalPeriods(ItSystemUsage systemUsage, Maybe<IEnumerable<SystemUsageJournalPeriod>> journalPeriods)
@@ -427,10 +427,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformKLEUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageKLEDeviationParameters changes)
         {
-            if (changes.AddedKLEUuids.HasValue || changes.RemovedKLEUuids.HasValue)
+            if (changes.AddedKLEUuids.HasChange || changes.RemovedKLEUuids.HasChange)
             {
-                var addedTaskRefs = MapOptionalChangeWithFallback(changes.AddedKLEUuids, systemUsage.TaskRefs.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
-                var removedTaskRefs = MapOptionalChangeWithFallback(changes.RemovedKLEUuids, systemUsage.TaskRefsOptOut.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
+                var addedTaskRefs = changes.AddedKLEUuids.MapOptionalChangeWithFallback(systemUsage.TaskRefs.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
+                var removedTaskRefs = changes.RemovedKLEUuids.MapOptionalChangeWithFallback(systemUsage.TaskRefsOptOut.Select(x => x.Uuid).ToList()).GetValueOrFallback(Enumerable.Empty<Guid>());
 
                 var additions = new List<TaskRef>();
                 foreach (var uuid in addedTaskRefs)
@@ -462,10 +462,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformOrganizationalUsageUpdate(ItSystemUsage systemUsage, UpdatedSystemUsageOrganizationalUseParameters updatedParameters)
         {
-            if (updatedParameters.ResponsibleOrganizationUnitUuid.HasValue ||
-                updatedParameters.UsingOrganizationUnitUuids.HasValue)
+            if (updatedParameters.ResponsibleOrganizationUnitUuid.HasChange ||
+                updatedParameters.UsingOrganizationUnitUuids.HasChange)
             {
-                var nextResponsibleOrgUuid = MapOptionalChangeWithFallback(updatedParameters.ResponsibleOrganizationUnitUuid, systemUsage.ResponsibleUsage.FromNullable().Select(x => x.OrganizationUnit.Uuid));
+                var nextResponsibleOrgUuid = updatedParameters.ResponsibleOrganizationUnitUuid.MapOptionalChangeWithFallback(systemUsage.ResponsibleUsage.FromNullable().Select(x => x.OrganizationUnit.Uuid));
                 var nextResponsibleOrg = Maybe<OrganizationUnit>.None;
                 if (nextResponsibleOrgUuid.HasValue)
                 {
@@ -474,7 +474,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                         return new OperationError($"Failed to fetch responsible org unit: {organizationUnitResult.Error.Message.GetValueOrEmptyString()}", organizationUnitResult.Error.FailureType);
                     nextResponsibleOrg = organizationUnitResult.Value;
                 }
-                var usingOrganizationUnits = MapOptionalChangeWithFallback(updatedParameters.UsingOrganizationUnitUuids, systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
+                var usingOrganizationUnits = updatedParameters.UsingOrganizationUnitUuids.MapOptionalChangeWithFallback(systemUsage.UsedBy.Select(x => x.OrganizationUnit.Uuid).ToList().FromNullable<IEnumerable<Guid>>());
                 var nextUsingOrganizationUnits = new List<OrganizationUnit>();
                 if (usingOrganizationUnits.HasValue)
                 {
@@ -501,50 +501,27 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformGeneralDataPropertiesUpdate(ItSystemUsage itSystemUsage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
-            return WithOptionalUpdate(itSystemUsage, generalProperties.LocalCallName, (systemUsage, localCallName) => systemUsage.UpdateLocalCallName(localCallName))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.LocalSystemId, (systemUsage, localSystemId) => systemUsage.UpdateLocalSystemId(localSystemId)))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.DataClassificationUuid, UpdateDataClassification))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
+            return itSystemUsage.WithOptionalUpdate(generalProperties.LocalCallName, (systemUsage, localCallName) => systemUsage.UpdateLocalCallName(localCallName))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.LocalSystemId, (systemUsage, localSystemId) => systemUsage.UpdateLocalSystemId(localSystemId)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.DataClassificationUuid, UpdateDataClassification))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.Notes, (systemUsage, notes) => systemUsage.Note = notes))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.SystemVersion, (systemUsage, version) => systemUsage.UpdateSystemVersion(version)))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.NumberOfExpectedUsersInterval, UpdateExpectedUsersInterval))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.EnforceActive, (systemUsage, enforceActive) => systemUsage.Active = enforceActive.GetValueOrFallback(false)))
                 .Bind(usage => UpdateValidityPeriod(usage, generalProperties))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.MainContractUuid, UpdateMainContract))
-                .Bind(usage => WithOptionalUpdate(usage, generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.MainContractUuid, UpdateMainContract))
+                .Bind(usage => usage.WithOptionalUpdate(generalProperties.AssociatedProjectUuids, UpdateProjectAssociations));
         }
 
         private static Result<ItSystemUsage, OperationError> UpdateValidityPeriod(ItSystemUsage usage, UpdatedSystemUsageGeneralProperties generalProperties)
         {
-            if (generalProperties.ValidFrom.IsNone && generalProperties.ValidTo.IsNone)
+            if (generalProperties.ValidFrom.IsUnchanged && generalProperties.ValidTo.IsUnchanged)
                 return usage; //Not changes provided
 
-            var newValidFrom = MapDataTimeOptionalChangeWithFallback(generalProperties.ValidFrom, usage.Concluded);
-            var newValidTo = MapDataTimeOptionalChangeWithFallback(generalProperties.ValidTo, usage.ExpirationDate);
+            var newValidFrom = generalProperties.ValidFrom.MapDateTimeOptionalChangeWithFallback(usage.Concluded);
+            var newValidTo = generalProperties.ValidTo.MapDateTimeOptionalChangeWithFallback(usage.ExpirationDate);
 
             return usage.UpdateSystemValidityPeriod(newValidFrom, newValidTo).Match<Result<ItSystemUsage, OperationError>>(error => error, () => usage);
-        }
-
-        private static DateTime? MapDataTimeOptionalChangeWithFallback(Maybe<ChangedValue<Maybe<DateTime>>> optionalChange, DateTime? fallback)
-        {
-            return optionalChange
-                .Select(x => x.Value)
-                .Match(changeTo =>
-                        changeTo.Match
-                        (
-                            newValue => newValue, //Client set new value
-                            () => (DateTime?)null), //Changed to null by client
-                    () => fallback // No change provided - use the fallback
-                );
-        }
-
-        private static T MapOptionalChangeWithFallback<T>(Maybe<ChangedValue<T>> optionalChange, T fallback)
-        {
-            return optionalChange
-                .Select(x => x.Value)
-                .Match(changeTo =>
-                        changeTo, //Changed to null by client
-                    () => fallback // No change provided - use the fallback
-                );
         }
 
         private Result<ItSystemUsage, OperationError> UpdateProjectAssociations(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> projectUuids)
@@ -587,7 +564,10 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private static Result<ItSystemUsage, OperationError> UpdateExpectedUsersInterval(ItSystemUsage systemUsage, Maybe<(int lower, int? upperBound)> newInterval)
         {
             if (newInterval.IsNone)
+            {
                 systemUsage.ResetUserCount();
+                return systemUsage;
+            }
 
             return systemUsage.SetExpectedUsersInterval(newInterval.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
@@ -617,7 +597,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> PerformRoleAssignmentUpdates(ItSystemUsage itSystemUsage, UpdatedSystemUsageRoles usageRoles)
         {
-            return WithOptionalUpdate(itSystemUsage, usageRoles.UserRolePairs, UpdateRoles);
+            return itSystemUsage.WithOptionalUpdate(usageRoles.UserRolePairs, UpdateRoles);
         }
 
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
@@ -646,50 +626,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
             }
 
             return systemUsage;
-        }
-
-        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
-            ItSystemUsage systemUsage,
-            Maybe<ChangedValue<TValue>> optionalUpdate,
-            Func<ItSystemUsage, TValue, Result<ItSystemUsage, OperationError>> updateCommand)
-        {
-            return optionalUpdate
-                .Select(changedValue => updateCommand(systemUsage, changedValue.Value))
-                .Match(updateResult => updateResult, () => systemUsage);
-        }
-
-        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
-            ItSystemUsage systemUsage,
-            Maybe<TValue> optionalUpdate,
-            Func<ItSystemUsage, TValue, Result<ItSystemUsage, OperationError>> updateCommand)
-        {
-            return optionalUpdate
-                .Select(changedValue => updateCommand(systemUsage, changedValue))
-                .Match(updateResult => updateResult, () => systemUsage);
-        }
-
-        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
-            ItSystemUsage systemUsage,
-            Maybe<ChangedValue<TValue>> optionalUpdate,
-            Func<ItSystemUsage, TValue, Maybe<OperationError>> updateCommand)
-        {
-            return optionalUpdate
-                .Select(changedValue => updateCommand(systemUsage, changedValue.Value).Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage))
-                .Match(updateResult => updateResult, () => systemUsage);
-        }
-
-        private static Result<ItSystemUsage, OperationError> WithOptionalUpdate<TValue>(
-            ItSystemUsage systemUsage,
-            Maybe<ChangedValue<TValue>> optionalUpdate,
-            Action<ItSystemUsage, TValue> updateCommand)
-        {
-            return optionalUpdate
-                .Select(changedValue =>
-                {
-                    updateCommand(systemUsage, changedValue.Value);
-                    return systemUsage;
-                })
-                .Match(updateResult => updateResult, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)

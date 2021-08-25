@@ -10,29 +10,29 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageGDPRProperties
     {
-        public Maybe<ChangedValue<string>> Purpose { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<DataOptions?>> BusinessCritical { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<HostedAt?>> HostedAt { get; set; } = Maybe<ChangedValue<HostedAt?>>.None;
-        public Maybe<ChangedValue<Maybe<NamedLink>>> DirectoryDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<SensitiveDataLevel>>>> DataSensitivityLevels { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<SensitiveDataLevel>>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> SensitivePersonDataUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>> RegisteredDataCategoryUuids { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<Guid>>>>.None;
-        public Maybe<ChangedValue<DataOptions?>> TechnicalPrecautionsInPlace { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<Maybe<IEnumerable<TechnicalPrecaution>>>> TechnicalPrecautionsApplied { get; set; } = Maybe<ChangedValue<Maybe<IEnumerable<TechnicalPrecaution>>>>.None;
-        public Maybe<ChangedValue<Maybe<NamedLink>>> TechnicalPrecautionsDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
-        public Maybe<ChangedValue<DataOptions?>> UserSupervision { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<DateTime?>> UserSupervisionDate { get; set; } = Maybe<ChangedValue<DateTime?>>.None;
-        public Maybe<ChangedValue<Maybe<NamedLink>>> UserSupervisionDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
-        public Maybe<ChangedValue<DataOptions?>> RiskAssessmentConducted { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<DateTime?>> RiskAssessmentConductedDate { get; set; } = Maybe<ChangedValue<DateTime?>>.None;
-        public Maybe<ChangedValue<RiskLevel?>> RiskAssessmentResult { get; set; } = Maybe<ChangedValue<RiskLevel?>>.None;
-        public Maybe<ChangedValue<Maybe<NamedLink>>> RiskAssessmentDocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
-        public Maybe<ChangedValue<string>> RiskAssessmentNotes { get; set; } = Maybe<ChangedValue<string>>.None;
-        public Maybe<ChangedValue<DataOptions?>> DPIAConducted { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<DateTime?>> DPIADate { get; set; } = Maybe<ChangedValue<DateTime?>>.None;
-        public Maybe<ChangedValue<Maybe<NamedLink>>> DPIADocumentation { get; set; } = Maybe<ChangedValue<Maybe<NamedLink>>>.None;
-        public Maybe<ChangedValue<DataOptions?>> RetentionPeriodDefined { get; set; } = Maybe<ChangedValue<DataOptions?>>.None;
-        public Maybe<ChangedValue<DateTime?>> NextDataRetentionEvaluationDate { get; set; } = Maybe<ChangedValue<DateTime?>>.None;
-        public Maybe<ChangedValue<int?>> DataRetentionEvaluationFrequencyInMonths { get; set; } = Maybe<ChangedValue<int?>>.None;
+        public OptionalValueChange<string> Purpose { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<DataOptions?> BusinessCritical { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<HostedAt?> HostedAt { get; set; } = OptionalValueChange<HostedAt?>.None;
+        public OptionalValueChange<Maybe<NamedLink>> DirectoryDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>> DataSensitivityLevels { get; set; } = OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> SensitivePersonDataUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> RegisteredDataCategoryUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<DataOptions?> TechnicalPrecautionsInPlace { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<Maybe<IEnumerable<TechnicalPrecaution>>> TechnicalPrecautionsApplied { get; set; } = OptionalValueChange<Maybe<IEnumerable<TechnicalPrecaution>>>.None;
+        public OptionalValueChange<Maybe<NamedLink>> TechnicalPrecautionsDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<DataOptions?> UserSupervision { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<DateTime?> UserSupervisionDate { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<Maybe<NamedLink>> UserSupervisionDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<DataOptions?> RiskAssessmentConducted { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<DateTime?> RiskAssessmentConductedDate { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<RiskLevel?> RiskAssessmentResult { get; set; } = OptionalValueChange<RiskLevel?>.None;
+        public OptionalValueChange<Maybe<NamedLink>> RiskAssessmentDocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<string> RiskAssessmentNotes { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<DataOptions?> DPIAConducted { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<DateTime?> DPIADate { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<Maybe<NamedLink>> DPIADocumentation { get; set; } = OptionalValueChange<Maybe<NamedLink>>.None;
+        public OptionalValueChange<DataOptions?> RetentionPeriodDefined { get; set; } = OptionalValueChange<DataOptions?>.None;
+        public OptionalValueChange<DateTime?> NextDataRetentionEvaluationDate { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<int?> DataRetentionEvaluationFrequencyInMonths { get; set; } = OptionalValueChange<int?>.None;
     }
 }
