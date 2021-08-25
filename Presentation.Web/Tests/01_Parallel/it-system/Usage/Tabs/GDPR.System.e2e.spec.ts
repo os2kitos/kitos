@@ -25,8 +25,6 @@ describe("Global admin is able to", () => {
     var numberValue = new Date().getDay().toString();
 
     var purposeText = `purpose${new Date().getTime()}`;
-    var dataResponsibleText = `dataResponsible${new Date().getTime()}`;
-    var noteUsageText = `noteUsage${new Date().getTime()}`;
     var noteRiskText = `noteRiskText${new Date().getTime()}`;
     var urlNameText = `urlName${new Date().getTime()}`;
 
