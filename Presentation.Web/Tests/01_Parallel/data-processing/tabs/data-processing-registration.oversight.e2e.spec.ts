@@ -48,6 +48,7 @@ describe("Data processing registration oversight detail tests", () => {
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => pageObject.getOversightPage())
                 .then(() => pageObject.getOversightIntervalRemark().sendKeys(intervalRemark))
+                .then(() => browser.waitForAngular())
                 .then(() => dpaHelper.changeOversightInterval(dropdownInterval))
                 .then(() => verifyOversightInterval(dropdownInterval))
                 .then(() => verifyOversightIntervalRemark(intervalRemark))
@@ -58,11 +59,13 @@ describe("Data processing registration oversight detail tests", () => {
                 .then(() => verifyOversightOptionContent([], [oversightOptionName]))
                 // Oversight option remark
                 .then(() => pageObject.getOversightOptionRemark().sendKeys(oversightOptionRemark))
+                .then(() => browser.waitForAngular())
                 .then(() => verifyOversightOptionRemark(intervalRemark))
                 // Oversight is completed
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))
                 .then(() => pageObject.getOversightCompletedRemark().sendKeys(completedRemark))
+                .then(() => browser.waitForAngular())
                 .then(() => verifyOversightCompletedRemark(completedRemark))
                 .then(() => verifyOversightCompleted(dropdownCompleted))
                 .then(() => expectOversightCompletedLatestDateVisibility(true))
@@ -76,32 +79,32 @@ describe("Data processing registration oversight detail tests", () => {
 
     function verifyOversightCompleted(selectedValue: string) {
         console.log(`Expecting oversight completed to be set to: ${selectedValue}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(Select2Helper.getData("s2id_oversightCompleted_config").getText()).toEqual(selectedValue));
     }
 
     function verifyOversightInterval(selectedValue: string) {
         console.log(`Expecting oversight completed to be set to: ${selectedValue}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(Select2Helper.getData("s2id_oversightInterval_config").getText()).toEqual(selectedValue));
 
     }
 
     function verifyOversightIntervalRemark(expectedValue: string) {
         console.log(`Expecting oversight interval remark to be set to: ${expectedValue}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(pageObject.getOversightIntervalRemark().getAttribute("value")).toEqual(expectedValue));
     }
 
     function expectOversightCompletedLatestDateVisibility(visible: boolean) {
         console.log(`Expecting visiblity of oversight completed date to be set to: ${visible}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(pageObject.getAssignOversightDateButton().isPresent()).toBe(visible));
     }
 
     function verifyOversightOptionRemark(expectedValue: string) {
         console.log(`Expecting oversight option remark to be set to: ${expectedValue}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(pageObject.getOversightOptionRemark().getAttribute("value")).toEqual(expectedValue));
 
     }
@@ -119,14 +122,15 @@ describe("Data processing registration oversight detail tests", () => {
 
     function verifyOversightCompletedRemark(expectedValue: string) {
         console.log(`Expecting OversightCompletedRemark value: ${expectedValue}`);
-        activateBlur()
+        return activateBlur()
             .then(() => expect(pageObject.getOversightCompletedRemark().getAttribute("value")).toEqual(expectedValue));
 
     }
 
     function activateBlur() {
         console.log(`Making sure blur is triggered`);
-        return pageObject.getDpaMainNameHeader().click();
+        return pageObject.getDpaMainNameHeader().click()
+            .then(() => browser.waitForAngular());
     }
 
     function verifyOversightDateAndRemarkRemoved() {

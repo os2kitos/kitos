@@ -39,10 +39,10 @@ describe("Data Processing registration reference test ",
                 .then(() => refHelper.createReference(referenceName, validUrl, referenceId))
                 .then(() => expect(refHelper.getReferenceId(referenceName).getText()).toEqual(referenceId))
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).getAttribute("href")).toEqual(validUrl))
-            // changing to invalid URL
+                // changing to invalid URL
                 .then(() => editReferenceUrl(referenceName, invalidUrl))
                 .then(() => expect(refHelper.getUrlFromReference(referenceName).isPresent()).toBeFalsy())
-            // deleting reference
+                // deleting reference
                 .then(() => deleteReferenceFromDpa(referenceName))
                 .then(() => expect(refHelper.getReferenceId(referenceName).isPresent()).toBeFalse());
         });
@@ -50,16 +50,18 @@ describe("Data Processing registration reference test ",
         function editReferenceUrl(reference: string, url: string) {
 
             console.log(`Editing ${reference} url value to ${url}`);
-            refHelper.getEditButtonFromReference(reference).click()
+            return refHelper.getEditButtonFromReference(reference).click()
+                .then(() => browser.waitForAngular())
                 .then(() => refHelper.getReferenceUrlField().clear())
                 .then(() => refHelper.getReferenceUrlField().sendKeys(url))
+                .then(() => browser.waitForAngular())
                 .then(() => refHelper.getReferenceSaveEditButton().click());
         }
 
         function deleteReferenceFromDpa(reference: string) {
 
             console.log(`Deleting ${reference}`);
-            browser.wait(ec.elementToBeClickable(refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference)))
+            return browser.wait(ec.elementToBeClickable(refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference)))
                 .then(() => refHelper.getDeleteButtonFromReferenceWithInvalidUrl(reference).click())
                 .then(() => browser.switchTo().alert().accept());
         }

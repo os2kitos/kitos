@@ -62,6 +62,7 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => dpaHelper.changeAgreementConcludedAt(today))
                 .then(() => verifyAgreementConcludedAt(today))
                 .then(() => pageObject.getAgreementConcludedRemark().sendKeys(agreementConcludedRemark))
+                .then(() => browser.waitForAngular())
                 .then(() => verifyAgreementConcludedRemark(agreementConcludedRemark))
                 //Changing data responsible
                 .then(() => dpaHelper.assignDataResponsible(dataResponsibleOptionName))
@@ -133,8 +134,11 @@ describe("Data processing registration main detail tests", () => {
     function renameNameAndVerify(name: string) {
         console.log(`Renaming registration to ${name}`);
         return pageObject.getDpaMainNameInput().click()
+            .then(() => browser.waitForAngular())
             .then(() => pageObject.getDpaMainNameInput().clear())
+            .then(() => browser.waitForAngular())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(name))
+            .then(() => browser.waitForAngular())
             .then(() => pageObject.getDpaMainNameInput().sendKeys(protractor.Key.TAB))
             .then(() => {
                 console.log(`Expecting registration to be called ${name}`);
@@ -156,9 +160,11 @@ describe("Data processing registration main detail tests", () => {
     }
 
     function verifyAgreementConcludedAt(selectedDate: string) {
-        setFocusOnNameToActivateBlur();
-        console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
-        expect(pageObject.getAgreementConcludedAtDateField().getAttribute("value")).toEqual(selectedDate);
+        return setFocusOnNameToActivateBlur()
+            .then(() => {
+                console.log(`Expecting IsAgreementConcluded to be set to: ${selectedDate}`);
+                expect(pageObject.getAgreementConcludedAtDateField().getAttribute("value")).toEqual(selectedDate);
+            });
     }
 
     function verifyDataReponsible(selectedDataResponsible: string) {
@@ -167,19 +173,21 @@ describe("Data processing registration main detail tests", () => {
     }
 
     function verifyDataReponsibleRemark(dataResponsibleRemark: string) {
-        setFocusOnNameToActivateBlur();
-        console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
-        expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
+        return  setFocusOnNameToActivateBlur().then(() => {
+            console.log(`Expecting DataReponsibleRemark to be set to: ${dataResponsibleRemark}`);
+            expect(pageObject.getDataResponsibleRemark().getAttribute("value")).toEqual(dataResponsibleRemark);
+        });
     }
 
     function verifyAgreementConcludedRemark(agreementConcludedRemark: string) {
-        setFocusOnNameToActivateBlur();
-        console.log(`Expecting DataReponsibleRemark to be set to: ${agreementConcludedRemark}`);
-        expect(pageObject.getAgreementConcludedRemark().getAttribute("value")).toEqual(agreementConcludedRemark);
+        return setFocusOnNameToActivateBlur().then(() => {
+            console.log(`Expecting DataReponsibleRemark to be set to: ${agreementConcludedRemark}`);
+            expect(pageObject.getAgreementConcludedRemark().getAttribute("value")).toEqual(agreementConcludedRemark);
+        });
     }
 
     function setFocusOnNameToActivateBlur() {
-        return pageObject.getDpaMainNameInput().click();
+        return pageObject.getDpaMainNameInput().click().then(() => browser.waitForAngular());
     }
 
 });
