@@ -12,6 +12,7 @@ using System.Net;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -35,6 +36,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
         }
 
+        protected override IQueryable<ItSystemRight> GetAllQuery()
+        {
+            var all = base.GetAllQuery();
+            if (UserContext.IsGlobalAdmin())
+                return all;
+            var orgIds = UserContext.OrganizationIds.ToList();
+            return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
+        }
+
         // GET /Users(1)/ItProjectRights
         [EnableQuery]
         [ODataRoute("Users({userId})/ItSystemRights")]
@@ -42,17 +52,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
+            var result = GetAllQuery().Where(x => x.UserId == userId);
 
-            result = FilterByAccessControl(result);
-
-            return Ok(result.AsQueryable());
-        }
-
-        private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
-        {
-            result = result.Where(AllowRead).ToList();
-            return result;
+            return Ok(result);
         }
 
         protected override void RaiseCreatedDomainEvent(ItSystemRight entity)

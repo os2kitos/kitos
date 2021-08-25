@@ -37,14 +37,18 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository
-                .AsQueryable()
-                .Where(x => x.UserId == userId)
-                .AsEnumerable()
-                .Where(AllowRead)
-                .AsQueryable();
+            var result = GetAllQuery().Where(x => x.UserId == userId);
 
             return Ok(result);
+        }
+
+        protected override IQueryable<ItProjectRight> GetAllQuery()
+        {
+            var all = base.GetAllQuery();
+            if (UserContext.IsGlobalAdmin())
+                return all;
+            var orgIds = UserContext.OrganizationIds.ToList();
+            return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
         }
 
         protected override void RaiseCreatedDomainEvent(ItProjectRight entity)
