@@ -437,11 +437,14 @@ namespace Presentation.Web.Controllers.API.V1
         protected override void DeleteQuery(ItSystemUsage entity)
         {
             var result = _itSystemUsageService.Delete(entity.Id);
-            if (result.Ok == false)
+            if (result.Failed)
             {
-                if (result.Error == OperationFailure.Forbidden)
+                if (result.Error.FailureType == OperationFailure.Forbidden)
+                {
+                    // Is caught by Generic controller and converted to Forbidden HttpResponse
                     throw new SecurityException();
-                throw new InvalidOperationException(result.Error.ToString("G"));
+                }
+                throw new InvalidOperationException(result.Error.ToString());
             }
         }
     }
