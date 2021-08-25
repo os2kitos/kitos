@@ -69,7 +69,8 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getSensitiveDataLevelCheckBox().click()
             .then(() => ItSystemUsageGDPRPage.getRegularDataLevelCheckBox().click())
             .then(() => ItSystemUsageGDPRPage.getLegalDataLevelCheckBox().click())
-            .then(() => ItSystemUsageGDPRPage.getSensitiveDataOption1Checkbox().click());
+            .then(() => ItSystemUsageGDPRPage.getSensitiveDataOption1Checkbox().click())
+            .then(() => browser.waitForAngular());
 
     }
 
@@ -77,7 +78,8 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getPrecautionsEncryptionCheckbox().click()
             .then(() => ItSystemUsageGDPRPage.getPrecautionsPseudonomiseringCheckbox().click())
             .then(() => ItSystemUsageGDPRPage.getPrecautionsAccessControlCheckbox().click())
-            .then(() => ItSystemUsageGDPRPage.getPrecautionsLogningCheckbox().click());
+            .then(() => ItSystemUsageGDPRPage.getPrecautionsLogningCheckbox().click())
+            .then(() => browser.waitForAngular());
     }
 
     function fillOutDropDown() {
@@ -89,7 +91,8 @@ describe("Global admin is able to", () => {
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprPrecautionsSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(dropdownYes, consts.gdprsUserSupervisionSelect2Id))
             .then(() => Select2Helper.selectWithNoSearch(hostedValue, consts.hostedAtSelect2Id))
-            .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment));
+            .then(() => Select2Helper.selectWithNoSearch(preRiskAssessmentMiddle, consts.gdprPreRiskAssessment))
+            .then(() => browser.waitForAngular());
     }
 
     function fillOutDateFields() {
@@ -97,7 +100,8 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getRiskAssesmentDateField().sendKeys(dateValue)
             .then(() => ItSystemUsageGDPRPage.getDPIADateField().sendKeys(dateValue))
             .then(() => ItSystemUsageGDPRPage.getLatestRiskAssesmentDateField().sendKeys(dateValue))
-            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue));
+            .then(() => ItSystemUsageGDPRPage.getDPIADeleteDateField().sendKeys(dateValue))
+            .then(() => browser.waitForAngular());
 
     }
 
@@ -106,21 +110,28 @@ describe("Global admin is able to", () => {
         return ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(protractor.Key.BACK_SPACE)
             .then(() => ItSystemUsageGDPRPage.getGDPRNumberDPIAField().sendKeys(numberValue))
             .then(() => ItSystemUsageGDPRPage.getGDPRSystemPurposeTextField().sendKeys(purposeText))
-            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText));
+            .then(() => ItSystemUsageGDPRPage.getGDPRNoteRiskTextField().sendKeys(noteRiskText))
+            .then(() => browser.waitForAngular());
     }
 
     function fillOutLinkFields() {
         console.log("Entering Urls into the link fields");
         return ItSystemUsageGDPRPage.getDPIALinkButton().click()
+            .then(() => browser.waitForAngular())
             .then(() => fillOutModalLinkWindow())
             .then(() => ItSystemUsageGDPRPage.getNoteLinkButton().click())
+            .then(() => browser.waitForAngular())
             .then(() => fillOutModalLinkWindow())
             .then(() => ItSystemUsageGDPRPage.getPrecautionLinkButton().click())
+            .then(() => browser.waitForAngular())
             .then(() => fillOutModalLinkWindow())
             .then(() => ItSystemUsageGDPRPage.getRiskLinkButton().click())
+            .then(() => browser.waitForAngular())
             .then(() => fillOutModalLinkWindow())
             .then(() => ItSystemUsageGDPRPage.getSuperVisionLinkButton().click())
-            .then(() => fillOutModalLinkWindow());
+            .then(() => browser.waitForAngular())
+            .then(() => fillOutModalLinkWindow())
+            .then(() => browser.waitForAngular());
     }
 
     function fillOutModalLinkWindow() {
@@ -128,7 +139,8 @@ describe("Global admin is able to", () => {
             .then(() => ItSystemUsageGDPRPage.getModalNameField().sendKeys(urlNameText))
             .then(() => ItSystemUsageGDPRPage.getModalUrlField().clear())
             .then(() => ItSystemUsageGDPRPage.getModalUrlField().sendKeys(testUrl))
-            .then(() => ItSystemUsageGDPRPage.getModalSaveButton().click());
+            .then(() => ItSystemUsageGDPRPage.getModalSaveButton().click())
+            .then(() => browser.waitForAngular());
     }
 
     function verifyCheckBoxes() {
