@@ -11,6 +11,8 @@ using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
+using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -30,7 +32,17 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemRight, ItSystemUsage>(sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItSystemRight, ItSystemUsage>(
+                sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
+        }
+
+        protected override IQueryable<ItSystemRight> GetAllQuery()
+        {
+            var all = base.GetAllQuery();
+            if (UserContext.IsGlobalAdmin())
+                return all;
+            var orgIds = UserContext.OrganizationIds.ToList();
+            return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
         }
 
         // GET /Users(1)/ItProjectRights
@@ -40,17 +52,34 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository.AsQueryable().Where(x => x.UserId == userId).ToList();
+            var result = GetAllQuery().Where(x => x.UserId == userId);
 
-            result = FilterByAccessControl(result);
-
-            return Ok(result.AsQueryable());
+            return Ok(result);
         }
 
-        private List<ItSystemRight> FilterByAccessControl(List<ItSystemRight> result)
+        protected override void RaiseCreatedDomainEvent(ItSystemRight entity)
         {
-            result = result.Where(AllowRead).ToList();
-            return result;
+            base.RaiseCreatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(ItSystemRight entity)
+        {
+            base.RaiseDeletedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(ItSystemRight entity)
+        {
+            base.RaiseUpdatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        private void RaiseRootUpdated(ItSystemRight entity)
+        {
+            var root = entity.Object ?? _systemUsageService.GetById(entity.ObjectId);
+            if (root != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
         }
     }
 }
