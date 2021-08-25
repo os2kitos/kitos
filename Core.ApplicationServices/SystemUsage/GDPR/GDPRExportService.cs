@@ -16,18 +16,18 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
     {
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
 
         public GDPRExportService(
             IItSystemUsageRepository systemUsageRepository,
             IAuthorizationContext authorizationContext,
-            IAttachedOptionRepository attachedOptionRepository,
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository)
         {
             _systemUsageRepository = systemUsageRepository;
             _authorizationContext = authorizationContext;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
         }
 
@@ -41,7 +41,7 @@ namespace Core.ApplicationServices.SystemUsage.GDPR
 
             var gdpExportReports = systemUsages
                 .AsEnumerable()
-                .Select(systemUsage => Map(systemUsage, _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id), sensitivePersonalDataTypes))
+                .Select(systemUsage => Map(systemUsage, _itSystemUsageAttachedOptionRepository.GetBySystemUsageId(systemUsage.Id), sensitivePersonalDataTypes))
                 .ToList();
 
             return Result<IEnumerable<GDPRExportReport>, OperationError>.Success(gdpExportReports);

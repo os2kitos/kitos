@@ -164,11 +164,11 @@
     <Compile Include="Repositories\Advice\AdviceRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\IPendingReadModelUpdateRepository.cs" />
     <Compile Include="Repositories\BackgroundJobs\PendingReadModelUpdateRepository.cs" />
-    <Compile Include="Repositories\GDPR\AttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\ItSystemUsageAttachedOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationOptionRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationReadModelRepository.cs" />
     <Compile Include="Repositories\GDPR\DataProcessingRegistrationRepository.cs" />
-    <Compile Include="Repositories\GDPR\IAttachedOptionRepository.cs" />
+    <Compile Include="Repositories\GDPR\IItSystemUsageAttachedOptionRepository.cs" />
     <Compile Include="Repositories\Contract\IItContractRepository.cs" />
     <Compile Include="Repositories\Contract\ItContractRepository.cs" />
     <Compile Include="Repositories\GDPR\IDataProcessingRegistrationOptionRepository.cs" />

@@ -14,14 +14,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         static ArchiveDutyMappingExtensions()
         {
-            ApiToDataMap = new Dictionary<ArchiveDutyChoice, ArchiveDutyTypes>()
+            ApiToDataMap = new Dictionary<ArchiveDutyChoice, ArchiveDutyTypes>
             {
                 { ArchiveDutyChoice.B, ArchiveDutyTypes.B },
                 { ArchiveDutyChoice.K, ArchiveDutyTypes.K },
                 { ArchiveDutyChoice.Undecided, ArchiveDutyTypes.Undecided },
                 { ArchiveDutyChoice.Unknown, ArchiveDutyTypes.Unknown }
             }.AsReadOnly();
-            DataToApiMap = ApiToDataMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key).AsReadOnly();
+            
+            DataToApiMap = ApiToDataMap
+                .ToDictionary(kvp => kvp.Value, kvp => kvp.Key)
+                .AsReadOnly();
         }
 
         public static ArchiveDutyTypes ToArchiveDutyTypes(this ArchiveDutyChoice value)

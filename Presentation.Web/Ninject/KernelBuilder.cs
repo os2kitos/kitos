@@ -378,12 +378,12 @@ namespace Presentation.Web.Ninject
             //Attached options services
             kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>
                 new AttachedOptionsAssignmentService<RegisterType, ItSystemUsage>(OptionType.REGISTERTYPEDATA,
-                    ctx.Kernel.GetRequiredService<IAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IItSystemUsageAttachedOptionRepository>(),
                     ctx.Kernel.GetRequiredService<IOptionsService<ItSystemUsage, RegisterType>>()));
 
             kernel.Bind<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>().ToMethod(ctx =>
                 new AttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>(OptionType.SENSITIVEPERSONALDATA,
-                    ctx.Kernel.GetRequiredService<IAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IItSystemUsageAttachedOptionRepository>(),
                     ctx.Kernel.GetRequiredService<IOptionsService<ItSystem, SensitivePersonalDataType>>()));
         }
 
@@ -440,7 +440,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationUnitRepository>().To<OrganizationUnitRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
-            kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageAttachedOptionRepository>().To<ItSystemUsageAttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
             kernel.Bind<IAdviceRepository>().To<AdviceRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationRepository>().To<DataProcessingRegistrationRepository>().InCommandScope(Mode);

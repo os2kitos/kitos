@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IOrganizationalUserContext _userContext;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
 
@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.SystemUsage
             IDomainEvents domainEvents,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
-            IAttachedOptionRepository attachedOptionRepository, 
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository, 
             IGenericRepository<ArchivePeriod> archivePeriodRepository)
         {
             _usageRepository = usageRepository;
@@ -54,7 +54,7 @@ namespace Core.ApplicationServices.SystemUsage
             _referenceService = referenceService;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _userContext = userContext;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
         }
 
@@ -159,7 +159,7 @@ namespace Core.ApplicationServices.SystemUsage
                     return deleteBySystemUsageId.Error;
                 }
 
-                _attachedOptionRepository.DeleteBySystemUsageId(id);
+                _itSystemUsageAttachedOptionRepository.DeleteAllBySystemUsageId(id);
 
                 _domainEvents.Raise(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
                 _usageRepository.DeleteByKeyWithReferencePreload(id);

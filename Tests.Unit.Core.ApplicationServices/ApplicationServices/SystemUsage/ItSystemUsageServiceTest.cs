@@ -56,7 +56,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _domainEvents.Object,
                 _sensitiveDataLevelRepository.Object,
                 _userContextMock.Object,
-                new Mock<IAttachedOptionRepository>().Object,
+                new Mock<IItSystemUsageAttachedOptionRepository>().Object,
                 _archivePeriodRepositoryMock.Object);
         }
 
