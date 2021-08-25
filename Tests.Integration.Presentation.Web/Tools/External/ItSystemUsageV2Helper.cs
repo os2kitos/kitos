@@ -123,5 +123,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/archiving"), token, dto);
         }
+
+        public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token);
+        }
     }
 }

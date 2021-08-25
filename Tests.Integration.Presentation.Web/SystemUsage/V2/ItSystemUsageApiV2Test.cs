@@ -912,6 +912,57 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersNotSet(removedDTO.Archiving);
         }
 
+        [Fact]
+        public async Task Can_Delete_ItSystemUsage()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync(); 
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, usageDTO.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
+            var notGetResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            Assert.Equal(HttpStatusCode.NotFound, notGetResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Delete_ItSystemUsage_Fails_If_System_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_Delete_ItSystemUsage_Fails_If_Not_Allowed_To_Delete()
+        {
+            //Arrange
+            var (token1, user1, organization1, system1) = await CreatePrerequisitesAsync();
+            var (token2, user2, organization2, system2) = await CreatePrerequisitesAsync();
+
+            var usageDTO = await ItSystemUsageV2Helper.PostAsync(token1, CreatePostRequest(organization1.Uuid, system1.Uuid));
+            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token2, usageDTO.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
+            var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            Assert.Equal(HttpStatusCode.OK, getStillExistsResult.StatusCode);
+        }
+
         private static void AssertArchivingParametersNotSet(ArchivingRegistrationsResponseDTO actual)
         {
             Assert.Null(actual.ArchiveDuty);
