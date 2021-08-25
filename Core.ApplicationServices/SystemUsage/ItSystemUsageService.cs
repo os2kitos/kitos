@@ -113,6 +113,11 @@ namespace Core.ApplicationServices.SystemUsage
                 return new OperationError("User does not have access to the target system", OperationFailure.Forbidden);
             }
 
+            if (itSystem.Disabled)
+            {
+                return new OperationError("Cannot take disabled it-system into use", OperationFailure.BadState);
+            }
+
             //Cannot create system usage in an org where the logical it system is unavailable to the users.
             if (!AllowUsageInTargetOrganization(newSystemUsage, itSystem))
             {

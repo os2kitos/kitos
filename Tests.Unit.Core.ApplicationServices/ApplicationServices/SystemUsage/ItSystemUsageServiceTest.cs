@@ -17,6 +17,7 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.System;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -74,7 +75,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var result = _sut.Query();
 
             //Assert
-            Assert.Equal(new[]{itSystemUsage1,itSystemUsage2,itSystemUsage3},result.ToList());
+            Assert.Equal(new[] { itSystemUsage1, itSystemUsage2, itSystemUsage3 }, result.ToList());
         }
 
         [Theory]
@@ -89,7 +90,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var itSystemUsage3 = CreateSystemUsage(A<int>(), CreateItSystem());
             ExpectUsageRepositoryAsQueryable(itSystemUsage1, itSystemUsage2, itSystemUsage3);
             ExpectGetCrossOrganizationReadAccessReturns(accessLevel);
-            _userContextMock.Setup(x=>x.OrganizationIds).Returns(new []{itSystemUsage1.OrganizationId, itSystemUsage3.OrganizationId});
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new[] { itSystemUsage1.OrganizationId, itSystemUsage3.OrganizationId });
 
             //Act
             var result = _sut.Query();
@@ -113,7 +114,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             subQuery2.Setup(x => x.Apply(It.IsAny<IQueryable<ItSystemUsage>>())).Returns<IQueryable<ItSystemUsage>>(input => input.Skip(1));
 
             //Act
-            var result = _sut.Query(subQuery1.Object,subQuery2.Object);
+            var result = _sut.Query(subQuery1.Object, subQuery2.Object);
 
             //Assert
             Assert.Equal(new[] { itSystemUsage3 }, result.ToList());
@@ -235,6 +236,26 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.False(result.Ok);
             Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Add_Returns_BadState_If_System_Is_Disabled()
+        {
+            //Arrange
+            var itSystemUsage = new ItSystemUsage { ItSystemId = A<int>(), OrganizationId = A<int>() };
+            var itSystem = new ItSystem() { Disabled = true }; //set system as disabled
+            SetupRepositoryQueryWith(Enumerable.Empty<ItSystemUsage>());
+            _authorizationContext.Setup(x => x.AllowCreate<ItSystemUsage>(itSystemUsage.OrganizationId, itSystemUsage)).Returns(true);
+            _systemRepository.Setup(x => x.GetSystem(itSystemUsage.ItSystemId)).Returns(itSystem);
+            _authorizationContext.Setup(x => x.AllowReads(itSystem)).Returns(true);
+
+            //Act
+            var result = _sut.Add(itSystemUsage);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.BadState, result.Error.FailureType);
+            Assert.Equal("Cannot take disabled it-system into use", result.Error.Message.GetValueOrEmptyString());
         }
 
         [Fact]
@@ -395,7 +416,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Same(itSystemUsage, result);
         }
 
-       
+
 
         [Theory]
         [InlineData(SensitiveDataLevel.NONE)]
@@ -719,7 +740,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(failure, operationError.FailureType);
         }
 
-      
+
         private void ExpectGetCrossOrganizationReadAccessReturns(CrossOrganizationDataReadAccessLevel accessLevel)
         {
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(accessLevel);
