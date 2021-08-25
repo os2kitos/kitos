@@ -11,6 +11,7 @@ using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
+using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -30,7 +31,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
-            return new ChildEntityCrudAuthorization<ItSystemRight, ItSystemUsage>(sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
+            return new ChildEntityCrudAuthorization<ItSystemRight, ItSystemUsage>(
+                sr => _systemUsageService.GetById(sr.ObjectId), base.GetCrudAuthorization());
         }
 
         // GET /Users(1)/ItProjectRights
@@ -51,6 +53,31 @@ namespace Presentation.Web.Controllers.API.V1.OData
         {
             result = result.Where(AllowRead).ToList();
             return result;
+        }
+
+        protected override void RaiseCreatedDomainEvent(ItSystemRight entity)
+        {
+            base.RaiseCreatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(ItSystemRight entity)
+        {
+            base.RaiseDeletedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(ItSystemRight entity)
+        {
+            base.RaiseUpdatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        private void RaiseRootUpdated(ItSystemRight entity)
+        {
+            var root = entity.Object ?? _systemUsageService.GetById(entity.ObjectId);
+            if (root != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(root));
         }
     }
 }

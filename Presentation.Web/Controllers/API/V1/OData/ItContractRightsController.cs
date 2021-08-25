@@ -11,6 +11,7 @@ using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
+using Infrastructure.Services.DomainEvents;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -45,6 +46,31 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .AsQueryable();
 
             return Ok(result);
+        }
+
+        protected override void RaiseCreatedDomainEvent(ItContractRight entity)
+        {
+            base.RaiseCreatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(ItContractRight entity)
+        {
+            base.RaiseDeletedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(ItContractRight entity)
+        {
+            base.RaiseUpdatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        private void RaiseRootUpdated(ItContractRight entity)
+        {
+            var root = entity.Object ?? _itContractRepository.GetById(entity.ObjectId);
+            if (root != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(root));
         }
     }
 }
