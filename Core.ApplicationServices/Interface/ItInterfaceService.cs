@@ -157,7 +157,7 @@ namespace Core.ApplicationServices.Interface
                 {
                     if (!AllowCreationWithAccessLevel(organizationId, accessModifier, newItInterface))
                     {
-                        return new OperationError("Cannot create interface with the provided access level", OperationFailure.BadInput);
+                        return new OperationError("Cannot create interface with the provided access level", OperationFailure.Forbidden);
                     }
                 }
                 else
