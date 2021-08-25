@@ -56,7 +56,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _domainEvents.Object,
                 _sensitiveDataLevelRepository.Object,
                 _userContextMock.Object,
-                new Mock<IAttachedOptionRepository>().Object,
+                new Mock<IItSystemUsageAttachedOptionRepository>().Object,
                 _archivePeriodRepositoryMock.Object);
         }
 
@@ -305,7 +305,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.NotFound, result.Error);
+            Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
 
         [Fact]
@@ -322,7 +322,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.False(result.Ok);
-            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
         }
 
         [Fact]

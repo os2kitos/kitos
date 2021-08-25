@@ -233,15 +233,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertTransactionCommitted(transactionMock);
             Assert.Equal(expectedNumberOfUsers, itSystemUsage.UserCount);
             var generalProperties = input.GeneralProperties.Value;
-            Assert.Equal(generalProperties.LocalCallName.Value.Value, itSystemUsage.LocalCallName);
-            Assert.Equal(generalProperties.LocalSystemId.Value.Value, itSystemUsage.LocalSystemId);
-            Assert.Equal(generalProperties.SystemVersion.Value.Value, itSystemUsage.Version);
-            Assert.Equal(generalProperties.Notes.Value.Value, itSystemUsage.Note);
-            Assert.Equal(generalProperties.EnforceActive.Value.Value, itSystemUsage.Active);
-            Assert.Equal(generalProperties.DataClassificationUuid.Value.Value, itSystemUsage.ItSystemCategories.Uuid);
-            Assert.Equal(generalProperties.ValidFrom.Value.Value.Value.Date, itSystemUsage.Concluded);
-            Assert.Equal(generalProperties.ValidTo.Value.Value.Value.Date, itSystemUsage.ExpirationDate);
-            Assert.Equal(generalProperties.MainContractUuid.Value.Value, itSystemUsage.MainContract.ItContract.Uuid);
+            Assert.Equal(generalProperties.LocalCallName.NewValue, itSystemUsage.LocalCallName);
+            Assert.Equal(generalProperties.LocalSystemId.NewValue, itSystemUsage.LocalSystemId);
+            Assert.Equal(generalProperties.SystemVersion.NewValue, itSystemUsage.Version);
+            Assert.Equal(generalProperties.Notes.NewValue, itSystemUsage.Note);
+            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, itSystemUsage.Active);
+            Assert.Equal(generalProperties.DataClassificationUuid.NewValue.Value, itSystemUsage.ItSystemCategories.Uuid);
+            Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, itSystemUsage.Concluded);
+            Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, itSystemUsage.ExpirationDate);
+            Assert.Equal(generalProperties.MainContractUuid.NewValue.Value, itSystemUsage.MainContract.ItContract.Uuid);
             Assert.Equal(projectUuids.OrderBy(x => x).ToList(), itSystemUsage.ItProjects.OrderBy(x => x.Uuid).Select(x => x.Uuid).ToList());
         }
 
@@ -886,7 +886,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
-            }
+        }
 
         [Fact]
         public void Can_Create_With_Archiving()
@@ -970,7 +970,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var archiveTestLocationUuid = A<Guid>();
 
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
-            
+
             ExpectGetArchiveTypeReturns(organization.Id, archiveTypeUuid, Maybe<(ArchiveType, bool)>.None);
 
             var input = new SystemUsageUpdateParameters
@@ -1022,14 +1022,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveTypeUuid = A<Guid>();
             var archiveType = new ArchiveType() { Id = A<int>(), Uuid = archiveTypeUuid };
             itSystemUsage.ArchiveTypeId = archiveType.Id;
             itSystemUsage.ArchiveType = archiveType;
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveTestLocationUuid = A<Guid>();
             var archivingParameters = CreateSystemUsageArchivingParameters(archiveTypeUuid, archiveLocationUuid, archiveTestLocationUuid, organizationUuid);
@@ -1134,7 +1134,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            
+
             var archiveLocationUuid = A<Guid>();
             var archiveLocation = new ArchiveLocation() { Id = A<int>(), Uuid = archiveLocationUuid };
             itSystemUsage.ArchiveLocationId = archiveLocation.Id;
@@ -1251,7 +1251,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            var archiveTestLocationUuid = A<Guid>(); 
+            var archiveTestLocationUuid = A<Guid>();
             var archiveTestLocation = new ArchiveTestLocation() { Id = A<int>(), Uuid = archiveTestLocationUuid };
             itSystemUsage.ArchiveTestLocationId = archiveTestLocation.Id;
             itSystemUsage.ArchiveTestLocation = archiveTestLocation;
@@ -1712,24 +1712,264 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
+        public void Can_Delete_SystemUsage()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var systemUsageId = A<int>();
+            var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(systemToBeDeleted);
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.IsNone);
+        }
+
+        [Fact]
+        public void Cannot_Delete_SystemUsage_Returns_Not_Found_If_Not_Exists()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(new OperationError(OperationFailure.NotFound));
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.HasValue);
+            Assert.Equal(OperationFailure.NotFound, deleteResult.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Delete_SystemUsage_Returns_Error_If_Delete_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var systemUsageId = A<int>();
+            var systemToBeDeleted = new ItSystemUsage() { Id = systemUsageId };
+            var error = new OperationError(A<OperationFailure>());
+            _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUsageUuid)).Returns(systemToBeDeleted);
+            _itSystemUsageServiceMock.Setup(x => x.Delete(systemUsageId)).Returns(error);
+
+            //Act
+            var deleteResult = _sut.Delete(systemUsageUuid);
+
+            //Assert
+            Assert.True(deleteResult.HasValue);
+            Assert.Equal(error.FailureType, deleteResult.Value.FailureType);
+        }
+
+        [Fact]
         public void Can_Update_All_On_Empty_ItSystemUsage()
         {
             //Arrange
-            var itSystemUsage = new ItSystemUsage
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var updateParameters = new SystemUsageUpdateParameters
-            {
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            };
+            var updateParameters = CreateSystemUsageUpdateParametersWithSimpleParametersAdded();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
 
             //Act
             var updateResult = _sut.Update(itSystemUsage.Uuid, updateParameters);
 
             //Assert
             Assert.True(updateResult.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertSystemUsageUpdateParametersWithSimpleParametersAdded(updateParameters, updateResult.Value);
+        }
+
+        [Fact]
+        public void Can_Update_All_On_Filled_Out_ItSystemUsage()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var updateParameters1 = CreateSystemUsageUpdateParametersWithSimpleParametersAdded();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var update1Result = _sut.Update(itSystemUsage.Uuid, updateParameters1);
+            Assert.True(update1Result.Ok);
+
+            var updateParameters2 = CreateSystemUsageUpdateParametersWithSimpleParametersAdded();
+
+            //Act
+            var update2Result = _sut.Update(itSystemUsage.Uuid, updateParameters2);
+
+            //Assert
+            Assert.True(update2Result.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertSystemUsageUpdateParametersWithSimpleParametersAdded(updateParameters2, update2Result.Value);
+        }
+
+        [Fact]
+        public void Can_Update_All_To_Empty_On_Filled_Out_ItSystemUsage()
+        {
+            //Arrange
+            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
+
+            var update1Parameters = CreateSystemUsageUpdateParametersWithSimpleParametersAdded();
+
+            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
+            ExpectAllowModifyReturns(itSystemUsage, true);
+
+            var update1Result = _sut.Update(itSystemUsage.Uuid, update1Parameters);
+            Assert.True(update1Result.Ok);
+
+            var update2Parameters = CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded();
+
+            //Act
+            var update2Result = _sut.Update(itSystemUsage.Uuid, update2Parameters);
+
+            //Assert
+            Assert.True(update2Result.Ok);
+            AssertTransactionCommitted(transactionMock);
+            AssertSystemUsageUpdateParametersWithSimpleParametersAdded(update2Parameters, update2Result.Value);
+        }
+
+        private void AssertSystemUsageUpdateParametersWithSimpleParametersAdded(SystemUsageUpdateParameters expected, ItSystemUsage actual)
+        {
+            //General Properties
+            var generalProperties = expected.GeneralProperties.Value;
+            Assert.Equal(generalProperties.LocalCallName.NewValue, actual.LocalCallName);
+            Assert.Equal(generalProperties.LocalSystemId.NewValue, actual.LocalSystemId);
+            Assert.Equal(generalProperties.SystemVersion.NewValue, actual.Version);
+            Assert.Equal(generalProperties.Notes.NewValue, actual.Note);
+            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, actual.Active);
+            Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
+            Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
+
+            //Archiving
+            var archiving = expected.Archiving.Value;
+            Assert.Equal(archiving.ArchiveDuty.NewValue, actual.ArchiveDuty);
+            Assert.Equal(archiving.ArchiveActive.NewValue, actual.ArchiveFromSystem);
+            Assert.Equal(archiving.ArchiveDocumentBearing.NewValue, actual.Registertype);
+            Assert.Equal(archiving.ArchiveFrequencyInMonths.NewValue, actual.ArchiveFreq);
+            Assert.Equal(archiving.ArchiveNotes.NewValue, actual.ArchiveNotes);
+
+            //GDPR
+            var gdpr = expected.GDPR.Value;
+            Assert.Equal(gdpr.Purpose.NewValue, actual.GeneralPurpose);
+            Assert.Equal(gdpr.BusinessCritical.NewValue, actual.isBusinessCritical);
+            Assert.Equal(gdpr.HostedAt.NewValue, actual.HostedAt);
+            AssertLink(gdpr.DirectoryDocumentation.NewValue.Value, actual.LinkToDirectoryUrlName, actual.LinkToDirectoryUrl);
+            Assert.Equal(gdpr.TechnicalPrecautionsInPlace.NewValue, actual.precautions);
+            AssertLink(gdpr.TechnicalPrecautionsDocumentation.NewValue.Value, actual.TechnicalSupervisionDocumentationUrlName, actual.TechnicalSupervisionDocumentationUrl);
+            Assert.Equal(gdpr.UserSupervision.NewValue, actual.UserSupervision);
+            Assert.Equal(gdpr.UserSupervisionDate.NewValue, actual.UserSupervisionDate);
+            AssertLink(gdpr.UserSupervisionDocumentation.NewValue.Value, actual.UserSupervisionDocumentationUrlName, actual.UserSupervisionDocumentationUrl);
+            Assert.Equal(gdpr.RiskAssessmentConducted.NewValue, actual.riskAssessment);
+            Assert.Equal(gdpr.RiskAssessmentConductedDate.NewValue, actual.riskAssesmentDate);
+            AssertLink(gdpr.RiskAssessmentDocumentation.NewValue.Value, actual.RiskSupervisionDocumentationUrlName, actual.RiskSupervisionDocumentationUrl);
+            Assert.Equal(gdpr.RiskAssessmentNotes.NewValue, actual.noteRisks);
+            Assert.Equal(gdpr.RiskAssessmentResult.NewValue, actual.preriskAssessment);
+            Assert.Equal(gdpr.DPIAConducted.NewValue, actual.DPIA);
+            Assert.Equal(gdpr.DPIADate.NewValue, actual.DPIADateFor);
+            AssertLink(gdpr.DPIADocumentation.NewValue.Value, actual.DPIASupervisionDocumentationUrlName, actual.DPIASupervisionDocumentationUrl);
+            Assert.Equal(gdpr.RetentionPeriodDefined.NewValue, actual.answeringDataDPIA);
+            Assert.Equal(gdpr.NextDataRetentionEvaluationDate.NewValue, actual.DPIAdeleteDate);
+            Assert.Equal(gdpr.DataRetentionEvaluationFrequencyInMonths.NewValue, actual.numberDPIA);
+        }
+
+        private SystemUsageUpdateParameters CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded()
+        {
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
+                {
+                    LocalCallName = A<string>().AsChangedValue(),
+                    LocalSystemId = A<string>().AsChangedValue(),
+                    SystemVersion = A<string>().AsChangedValue(),
+                    Notes = A<string>().AsChangedValue(),
+                    EnforceActive = Maybe<bool>.Some(A<bool>()).AsChangedValue(),
+                    ValidFrom = Maybe<DateTime>.Some(DateTime.Now).AsChangedValue(),
+                    ValidTo = Maybe<DateTime>.Some(DateTime.Now.AddDays(Math.Abs(A<short>()))).AsChangedValue()
+                },
+                Archiving = new UpdatedSystemUsageArchivingParameters
+                {
+                    ArchiveDuty = A<ArchiveDutyTypes?>().AsChangedValue(),
+                    ArchiveActive = A<bool?>().AsChangedValue(),
+                    ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
+                    ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
+                    ArchiveNotes = A<string>().AsChangedValue()
+                },
+                GDPR = new UpdatedSystemUsageGDPRProperties
+                {
+                    Purpose = A<string>().AsChangedValue(),
+                    BusinessCritical = A<DataOptions?>().AsChangedValue(),
+                    HostedAt = A<HostedAt?>().AsChangedValue(),
+                    DirectoryDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
+                    TechnicalPrecautionsInPlace = A<DataOptions?>().AsChangedValue(),
+                    TechnicalPrecautionsDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
+                    UserSupervision = A<DataOptions?>().AsChangedValue(),
+                    UserSupervisionDate = A<DateTime?>().AsChangedValue(),
+                    UserSupervisionDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
+                    RiskAssessmentConducted = A<DataOptions?>().AsChangedValue(),
+                    RiskAssessmentConductedDate = A<DateTime?>().AsChangedValue(),
+                    RiskAssessmentDocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
+                    RiskAssessmentNotes = A<string>().AsChangedValue(),
+                    RiskAssessmentResult = A<RiskLevel?>().AsChangedValue(),
+                    DPIAConducted = A<DataOptions?>().AsChangedValue(),
+                    DPIADate = A<DateTime?>().AsChangedValue(),
+                    DPIADocumentation = A<NamedLink>().FromNullable().AsChangedValue(),
+                    RetentionPeriodDefined = A<DataOptions?>().AsChangedValue(),
+                    NextDataRetentionEvaluationDate = A<DateTime?>().AsChangedValue(),
+                    DataRetentionEvaluationFrequencyInMonths = A<int?>().AsChangedValue()
+                }
+            };
+        }
+
+        private SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithSimpleParametersAdded()
+        {
+            return new SystemUsageUpdateParameters
+            {
+                GeneralProperties = new UpdatedSystemUsageGeneralProperties
+                {
+                    LocalCallName = "".AsChangedValue(),
+                    LocalSystemId = "".AsChangedValue(),
+                    SystemVersion = "".AsChangedValue(),
+                    Notes = "".AsChangedValue(),
+                    EnforceActive = new ChangedValue<Maybe<bool>>(Maybe<bool>.None),
+                    ValidFrom = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None),
+                    ValidTo = new ChangedValue<Maybe<DateTime>>(Maybe<DateTime>.None)
+                },
+                Archiving = new UpdatedSystemUsageArchivingParameters
+                {
+                    ArchiveDuty = new ChangedValue<ArchiveDutyTypes?>(null),
+                    ArchiveActive = new ChangedValue<bool?>(null),
+                    ArchiveDocumentBearing = new ChangedValue<bool?>(null),
+                    ArchiveFrequencyInMonths = new ChangedValue<int?>(null),
+                    ArchiveNotes = "".AsChangedValue()
+                },
+                GDPR = new UpdatedSystemUsageGDPRProperties
+                {
+                    Purpose = "".AsChangedValue(),
+                    BusinessCritical = new ChangedValue<DataOptions?>(null),
+                    HostedAt = new ChangedValue<HostedAt?>(null),
+                    DirectoryDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
+                    TechnicalPrecautionsInPlace = new ChangedValue<DataOptions?>(null),
+                    TechnicalPrecautionsDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
+                    UserSupervision = new ChangedValue<DataOptions?>(null),
+                    UserSupervisionDate = new ChangedValue<DateTime?>(null),
+                    UserSupervisionDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
+                    RiskAssessmentConducted = new ChangedValue<DataOptions?>(null),
+                    RiskAssessmentConductedDate = new ChangedValue<DateTime?>(null),
+                    RiskAssessmentDocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
+                    RiskAssessmentNotes = "".AsChangedValue(),
+                    RiskAssessmentResult = new ChangedValue<RiskLevel?>(null),
+                    DPIAConducted = new ChangedValue<DataOptions?>(null),
+                    DPIADate = new ChangedValue<DateTime?>(null),
+                    DPIADocumentation = new ChangedValue<Maybe<NamedLink>>(Maybe<NamedLink>.None),
+                    RetentionPeriodDefined = new ChangedValue<DataOptions?>(null),
+                    NextDataRetentionEvaluationDate = new ChangedValue<DateTime?>(null),
+                    DataRetentionEvaluationFrequencyInMonths = new ChangedValue<int?>(null)
+                }
+            };
         }
 
         private static void AssertFailureWithExpectedOperationError(Result<ItSystemUsage, OperationError> createResult, OperationError operationError,
@@ -1791,32 +2031,32 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private void AssertArchivingParameters(UpdatedSystemUsageArchivingParameters expected, string expectedSupplierName, int expectedSupplierId, ItSystemUsage actual)
         {
-            Assert.Equal(expected.ArchiveDuty.Value.Value.Value, actual.ArchiveDuty);
-            Assert.Equal(expected.ArchiveTypeUuid.Value.Value.Value, actual.ArchiveType.Uuid);
-            Assert.Equal(expected.ArchiveLocationUuid.Value.Value.Value, actual.ArchiveLocation.Uuid);
-            Assert.Equal(expected.ArchiveTestLocationUuid.Value.Value.Value, actual.ArchiveTestLocation.Uuid);
+            Assert.Equal(expected.ArchiveDuty.NewValue, actual.ArchiveDuty);
+            Assert.Equal(expected.ArchiveTypeUuid.NewValue.Value, actual.ArchiveType.Uuid);
+            Assert.Equal(expected.ArchiveLocationUuid.NewValue.Value, actual.ArchiveLocation.Uuid);
+            Assert.Equal(expected.ArchiveTestLocationUuid.NewValue.Value, actual.ArchiveTestLocation.Uuid);
             Assert.Equal(expectedSupplierName, actual.ArchiveSupplier);
             Assert.Equal(expectedSupplierId, actual.SupplierId);
-            Assert.Equal(expected.ArchiveActive.Value.Value.Value, actual.ArchiveFromSystem);
-            Assert.Equal(expected.ArchiveDocumentBearing.Value.Value.Value, actual.Registertype);
-            Assert.Equal(expected.ArchiveFrequencyInMonths.Value.Value.Value, actual.ArchiveFreq);
-            Assert.Equal(expected.ArchiveNotes.Value.Value, actual.ArchiveNotes);
+            Assert.Equal(expected.ArchiveActive.NewValue, actual.ArchiveFromSystem);
+            Assert.Equal(expected.ArchiveDocumentBearing.NewValue, actual.Registertype);
+            Assert.Equal(expected.ArchiveFrequencyInMonths.NewValue, actual.ArchiveFreq);
+            Assert.Equal(expected.ArchiveNotes.NewValue, actual.ArchiveNotes);
             _itSystemUsageServiceMock.Verify(x => x.RemoveAllArchivePeriods(actual.Id), Times.Once);
-            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.Value.Value.Value.Count()));
+            _itSystemUsageServiceMock.Verify(x => x.AddArchivePeriod(actual.Id, It.IsAny<DateTime>(), It.IsAny<DateTime>(), It.IsAny<string>(), It.IsAny<bool>()), Times.Exactly(expected.ArchiveJournalPeriods.NewValue.Value.Count()));
         }
 
         private static UpdatedSystemUsageArchivingParameters CreateEmptySystemUsageArchivingParameters()
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(new ChangedValue<ArchiveDutyTypes?>(null)),
+                ArchiveDuty = new ChangedValue<ArchiveDutyTypes?>(null),
                 ArchiveTypeUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveTestLocationUuid = Maybe<Guid>.None.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = Maybe<Guid>.None.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(new ChangedValue<bool?>(null)),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(null)),
+                ArchiveActive = new ChangedValue<bool?>(null),
+                ArchiveDocumentBearing = new ChangedValue<bool?>(null),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(null),
                 ArchiveNotes = "".AsChangedValue(),
                 ArchiveJournalPeriods = Maybe<IEnumerable<SystemUsageJournalPeriod>>.None.AsChangedValue()
             };
@@ -1826,14 +2066,14 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = Maybe<ChangedValue<ArchiveDutyTypes?>>.Some(A<ArchiveDutyTypes>()),
+                ArchiveDuty = A<ArchiveDutyTypes?>().AsChangedValue(),
                 ArchiveTypeUuid = archiveTypeUuid.AsChangedValue(),
                 ArchiveLocationUuid = archiveLocationUuid.AsChangedValue(),
                 ArchiveTestLocationUuid = archiveTestLocationUuid.AsChangedValue(),
                 ArchiveSupplierOrganizationUuid = archiveSupplierUuid.AsChangedValue(),
-                ArchiveActive = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveDocumentBearing = Maybe<ChangedValue<bool?>>.Some(A<bool>()),
-                ArchiveFrequencyInMonths = Maybe<ChangedValue<int?>>.Some(new ChangedValue<int?>(A<int>())),
+                ArchiveActive = A<bool?>().AsChangedValue(),
+                ArchiveDocumentBearing = A<bool?>().AsChangedValue(),
+                ArchiveFrequencyInMonths = new ChangedValue<int?>(A<int>()),
                 ArchiveNotes = A<string>().AsChangedValue(),
                 ArchiveJournalPeriods = Many<SystemUsageJournalPeriod>().ToList().FromNullable<IEnumerable<SystemUsageJournalPeriod>>().AsChangedValue()
             };
@@ -1932,15 +2172,12 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
         private static SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithoutData()
         {
-            return new SystemUsageUpdateParameters()
+            return new SystemUsageUpdateParameters
             {
                 Roles = new UpdatedSystemUsageRoles()
                 {
-                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None
-                        .AsChangedValue()
-                        .FromNullable()
-                }
-                    .FromNullable()
+                    UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue()
+                }.FromNullable()
             };
         }
 

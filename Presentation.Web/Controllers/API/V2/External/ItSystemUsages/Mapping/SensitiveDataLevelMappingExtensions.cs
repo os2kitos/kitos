@@ -9,31 +9,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public static class SensitiveDataLevelMappingExtensions
     {
-        private static readonly IReadOnlyDictionary<DataSensitivityLevelChoice, SensitiveDataLevel> apiToDataMap;
-        private static readonly IReadOnlyDictionary<SensitiveDataLevel, DataSensitivityLevelChoice> dataToApiMap;
+        private static readonly IReadOnlyDictionary<DataSensitivityLevelChoice, SensitiveDataLevel> ApiToDataMap;
+        private static readonly IReadOnlyDictionary<SensitiveDataLevel, DataSensitivityLevelChoice> DataToApiMap;
 
         static SensitiveDataLevelMappingExtensions()
         {
-            apiToDataMap = new Dictionary<DataSensitivityLevelChoice, SensitiveDataLevel>
+            ApiToDataMap = new Dictionary<DataSensitivityLevelChoice, SensitiveDataLevel>
             {
-                { DataSensitivityLevelChoice.LegalData ,SensitiveDataLevel.LEGALDATA},
-                { DataSensitivityLevelChoice.PersonData ,SensitiveDataLevel.PERSONALDATA},
-                { DataSensitivityLevelChoice.SensitiveData ,SensitiveDataLevel.SENSITIVEDATA},
-                { DataSensitivityLevelChoice.None,SensitiveDataLevel.NONE},
+                { DataSensitivityLevelChoice.LegalData, SensitiveDataLevel.LEGALDATA },
+                { DataSensitivityLevelChoice.PersonData, SensitiveDataLevel.PERSONALDATA },
+                { DataSensitivityLevelChoice.SensitiveData, SensitiveDataLevel.SENSITIVEDATA },
+                { DataSensitivityLevelChoice.None, SensitiveDataLevel.NONE }
             }.AsReadOnly();
-            dataToApiMap = apiToDataMap.ToDictionary(kvp => kvp.Value, kvp => kvp.Key).AsReadOnly();
+            
+            DataToApiMap = ApiToDataMap
+                .ToDictionary(kvp => kvp.Value, kvp => kvp.Key)
+                .AsReadOnly();
         }
 
         public static SensitiveDataLevel ToSensitiveDataLevel(this DataSensitivityLevelChoice value)
         {
-            return apiToDataMap.TryGetValue(value, out var result)
+            return ApiToDataMap.TryGetValue(value, out var result)
                 ? result
                 : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
         }
 
         public static DataSensitivityLevelChoice ToDataSensitivityLevelChoice(this SensitiveDataLevel value)
         {
-            return dataToApiMap.TryGetValue(value, out var result)
+            return DataToApiMap.TryGetValue(value, out var result)
                 ? result
                 : throw new ArgumentException($@"Unmapped domain value:{value:G}", nameof(value));
         }

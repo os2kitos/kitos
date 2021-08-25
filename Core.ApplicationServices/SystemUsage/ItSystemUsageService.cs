@@ -30,7 +30,7 @@ namespace Core.ApplicationServices.SystemUsage
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<ItSystemUsageSensitiveDataLevel> _sensitiveDataLevelRepository;
         private readonly IOrganizationalUserContext _userContext;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly IReferenceService _referenceService;
         private readonly IGenericRepository<ArchivePeriod> _archivePeriodRepository;
 
@@ -43,7 +43,7 @@ namespace Core.ApplicationServices.SystemUsage
             IDomainEvents domainEvents,
             IGenericRepository<ItSystemUsageSensitiveDataLevel> sensitiveDataLevelRepository,
             IOrganizationalUserContext userContext,
-            IAttachedOptionRepository attachedOptionRepository, 
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository, 
             IGenericRepository<ArchivePeriod> archivePeriodRepository)
         {
             _usageRepository = usageRepository;
@@ -54,7 +54,7 @@ namespace Core.ApplicationServices.SystemUsage
             _referenceService = referenceService;
             _sensitiveDataLevelRepository = sensitiveDataLevelRepository;
             _userContext = userContext;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _archivePeriodRepository = archivePeriodRepository;
         }
 
@@ -137,18 +137,18 @@ namespace Core.ApplicationServices.SystemUsage
                     itSystem.AccessModifier == AccessModifier.Public;           //It system is public and it is OK to place usages outside the owning organization
         }
 
-        public Result<ItSystemUsage, OperationFailure> Delete(int id)
+        public Result<ItSystemUsage, OperationError> Delete(int id)
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
                 var itSystemUsage = GetById(id);
                 if (itSystemUsage == null)
                 {
-                    return OperationFailure.NotFound;
+                    return new OperationError($"Could not find it system usage with Id: {id}", OperationFailure.NotFound);
                 }
                 if (!_authorizationContext.AllowDelete(itSystemUsage))
                 {
-                    return OperationFailure.Forbidden;
+                    return new OperationError($"Not allowed to delete it system usage with Id: {id}", OperationFailure.Forbidden);
                 }
 
                 // delete it system usage
@@ -156,10 +156,10 @@ namespace Core.ApplicationServices.SystemUsage
                 if (deleteBySystemUsageId.Failed)
                 {
                     transaction.Rollback();
-                    return deleteBySystemUsageId.Error;
+                    return new OperationError($"Failed to delete it system usage with Id: {id}. Failed to delete references", deleteBySystemUsageId.Error);
                 }
 
-                _attachedOptionRepository.DeleteBySystemUsageId(id);
+                _itSystemUsageAttachedOptionRepository.DeleteAllBySystemUsageId(id);
 
                 _domainEvents.Raise(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
                 _usageRepository.DeleteByKeyWithReferencePreload(id);

@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Model.SystemUsage.Write
 {
     public class UpdatedSystemUsageRoles
     {
-        public Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>> UserRolePairs = Maybe<ChangedValue<Maybe<IEnumerable<UserRolePair>>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<UserRolePair>>> UserRolePairs = OptionalValueChange<Maybe<IEnumerable<UserRolePair>>>.None;
     }
 }

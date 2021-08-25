@@ -12,13 +12,13 @@ namespace Core.DomainServices.SystemUsage
     public class AttachedOptionsAssignmentService<TOption, TTarget> : IAttachedOptionsAssignmentService<TOption, TTarget> where TOption : OptionEntity<TTarget>
     {
         private readonly OptionType _optionType;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly IOptionsService<TTarget, TOption> _optionsService;
 
-        public AttachedOptionsAssignmentService(OptionType optionType, IAttachedOptionRepository attachedOptionRepository, IOptionsService<TTarget, TOption> optionsService)
+        public AttachedOptionsAssignmentService(OptionType optionType, IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository, IOptionsService<TTarget, TOption> optionsService)
         {
             _optionType = optionType;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _optionsService = optionsService;
         }
 
@@ -32,7 +32,7 @@ namespace Core.DomainServices.SystemUsage
             if (ids.Count != ids.Distinct().Count())
                 return new OperationError($"Duplicates {_optionType:G} are not allowed", OperationFailure.BadInput);
 
-            var existingIds = _attachedOptionRepository
+            var existingIds = _itSystemUsageAttachedOptionRepository
                 .GetBySystemUsageIdAndOptionType(systemUsage.Id, _optionType)
                 .Select(x => x.OptionId)
                 .ToHashSet();
@@ -58,10 +58,10 @@ namespace Core.DomainServices.SystemUsage
             var typesToAdd = types.Select(x => x.Id).Except(existingIds).ToList();
 
             foreach (var id in typesToRemove)
-                _attachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, _optionType);
+                _itSystemUsageAttachedOptionRepository.DeleteAttachedOption(systemUsage.Id, id, _optionType);
 
             foreach (var id in typesToAdd)
-                _attachedOptionRepository.AddAttachedOption(systemUsage.Id, id, _optionType);
+                _itSystemUsageAttachedOptionRepository.AddAttachedOption(systemUsage.Id, id, _optionType);
 
             return types;
         }

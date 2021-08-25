@@ -21,18 +21,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
     public class ItSystemUsageResponseMapper : IItSystemUsageResponseMapper
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
         private readonly IGenericRepository<RegisterType> _registerTypesRepository;
 
         public ItSystemUsageResponseMapper(
             IOrganizationRepository organizationRepository,
-            IAttachedOptionRepository attachedOptionRepository,
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
             IGenericRepository<RegisterType> registerTypesRepository)
         {
             _organizationRepository = organizationRepository;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
             _registerTypesRepository = registerTypesRepository;
         }
@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
             var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
-            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
+            var attachedOptions = _itSystemUsageAttachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
 
             return new GDPRRegistrationsResponseDTO
             {
@@ -224,15 +224,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
-            return systemUsage.ArchiveDuty switch
-            {
-                ArchiveDutyTypes.Undecided => ArchiveDutyChoice.Undecided,
-                ArchiveDutyTypes.B => ArchiveDutyChoice.B,
-                ArchiveDutyTypes.K => ArchiveDutyChoice.K,
-                ArchiveDutyTypes.Unknown => ArchiveDutyChoice.Unknown,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation arg)

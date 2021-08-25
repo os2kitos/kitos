@@ -89,6 +89,21 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl("api/v2/it-system-usages"), dto, token);
         }
 
+        public static async Task<ItSystemUsageResponseDTO> PutAsync(string token, Guid uuid, UpdateItSystemUsageRequestDTO dto)
+        {
+            using var response = await SendPutAsync(token, uuid, dto);
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<ItSystemUsageResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPutAsync(string token, Guid uuid, UpdateItSystemUsageRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto);
+        }
+
         public static async Task<HttpResponseMessage> SendPutGeneral(string token, Guid uuid, GeneralDataUpdateRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/general"), token, dto);
@@ -122,6 +137,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/archiving"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token);
         }
     }
 }

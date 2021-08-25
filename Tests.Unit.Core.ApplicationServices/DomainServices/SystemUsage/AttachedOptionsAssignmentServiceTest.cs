@@ -29,7 +29,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
     {
         private readonly OptionType _optionType;
         private readonly AttachedOptionsAssignmentService<TestOptionStub, TestTargetStub> _sut;
-        private readonly Mock<IAttachedOptionRepository> _attachedOptionsRepositoryMock;
+        private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionsRepositoryMock;
         private readonly Mock<IOptionsService<TestTargetStub, TestOptionStub>> _optionsServiceMock;
         private readonly ItSystemUsage _systemUsage;
 
@@ -42,14 +42,14 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
                 OrganizationId = fixture.Create<int>(),
                 Id = fixture.Create<int>()
             };
-            _attachedOptionsRepositoryMock = new Mock<IAttachedOptionRepository>();
+            _attachedOptionsRepositoryMock = new Mock<IItSystemUsageAttachedOptionRepository>();
             _optionsServiceMock = new Mock<IOptionsService<TestTargetStub, TestOptionStub>>();
             _sut = new AttachedOptionsAssignmentService<TestOptionStub, TestTargetStub>(_optionType,
                 _attachedOptionsRepositoryMock.Object, _optionsServiceMock.Object);
         }
 
         [Fact]
-        public void UpdateAssignedOptions_Fails_If_OptionIds_Contains_Duplicates()
+        public void Cannot_UpdateAssignedOptions_If_OptionIds_Contains_Duplicates()
         {
             //Arrange
             var optionUuids = Many<Guid>().Distinct().ToList();
@@ -65,7 +65,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void UpdateAssignedOptions_Fails_If_GetOptionFromServiceFails()
+        public void Cannot_UpdateAssignedOptions_If_GetOptionFromServiceFails()
         {
             //Arrange
             var optionUuids = Many<Guid>().Distinct().ToList();
@@ -83,7 +83,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
         }
 
         [Fact]
-        public void UpdateAssignedOptions_Fails_If_Option_Is_Not_Available()
+        public void Cannot_UpdateAssignedOptions_If_Option_Is_Not_Available()
         {
             //Arrange
             var optionUuids = Many<Guid>().Distinct().ToList();

@@ -16,35 +16,35 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
-        public Guid? ArchiveTypeUuid { get; set; }
+        public Guid? TypeUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for archive receiving the data
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
-        public Guid? ArchiveLocationUuid { get; set; }
+        public Guid? LocationUuid { get; set; }
         /// <summary>
         /// Identifies the physical location for the archiving test
         /// Constraint: If an update changes this field, the option identified must be currently available in the organization context
         /// </summary>
         [NonEmptyGuid]
-        public Guid? ArchiveTestLocationUuid { get; set; }
+        public Guid? TestLocationUuid { get; set; }
         [NonEmptyGuid]
-        public Guid? ArchiveSupplierOrganizationUuid { get; set; }
+        public Guid? SupplierOrganizationUuid { get; set; }
         /// <summary>
         /// Determines if any archiving has occurred from this system
         /// </summary>
-        public bool? ArchiveActive { get; set; }
+        public bool? Active { get; set; }
         /// <summary>
         /// Archiving notes
         /// </summary>
-        public string ArchiveNotes { get; set; }
+        public string Notes { get; set; }
         /// <summary>
         /// Determines the frequency of the archiving activity
         /// </summary>
-        public int? ArchiveFrequencyInMonths { get; set; }
+        public int? FrequencyInMonths { get; set; }
 
-        public bool? ArchiveDocumentBearing { get; set; }
-        public IEnumerable<JournalPeriodDTO> ArchiveJournalPeriods { get; set; }
+        public bool? DocumentBearing { get; set; }
+        public IEnumerable<JournalPeriodDTO> JournalPeriods { get; set; }
     }
 }
