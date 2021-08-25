@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Request.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Request.SystemUsage
 {
     public abstract class BaseItSystemUsageWriteRequestDTO
     {
-        public GeneralDataWriteRequestDTO General { get; set; }
         /// <summary>
         /// A collection of IT-System usage role option assignments
         /// Constraint: Duplicates are not allowed
@@ -33,7 +30,8 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// <summary>
         /// User defined external references.
         /// The external reference marked as "master reference" will be shown in overviews and on the system front page in KITOS
-        /// Constraint: Only one reference can be marked as "master"
+        /// Constraint:
+        ///     - If the list is not empty one (and only one) must be marked as the master reference.
         /// </summary>
         public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
     }

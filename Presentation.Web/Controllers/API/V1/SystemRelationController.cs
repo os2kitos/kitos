@@ -6,12 +6,11 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V1.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Swashbuckle.Swagger.Annotations;
@@ -26,11 +25,11 @@ namespace Presentation.Web.Controllers.API.V1
     [RoutePrefix("api/v1/systemrelations")]
     public class SystemRelationController : BaseApiController
     {
-        private readonly IItSystemUsageService _usageService;
+        private readonly IItsystemUsageRelationsService _itsystemUsageRelationsService;
 
-        public SystemRelationController(IItSystemUsageService usageService)
+        public SystemRelationController(IItsystemUsageRelationsService itsystemUsageRelationsService)
         {
-            _usageService = usageService;
+            _itsystemUsageRelationsService = itsystemUsageRelationsService;
         }
 
         /// <summary>
@@ -45,7 +44,7 @@ namespace Presentation.Web.Controllers.API.V1
             if (relation == null)
                 return BadRequest("Missing relation data");
 
-            var result = _usageService.AddRelation(
+            var result = _itsystemUsageRelationsService.AddRelation(
                 relation.FromUsageId,
                 relation.ToUsageId,
                 relation.InterfaceId,
@@ -76,7 +75,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsFromSystem(int systemUsageId)
         {
-            return _usageService.GetRelationsFrom(systemUsageId)
+            return _itsystemUsageRelationsService.GetRelationsFrom(systemUsageId)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -94,7 +93,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsToSystem(int systemUsageId)
         {
-            return _usageService.GetRelationsTo(systemUsageId)
+            return _itsystemUsageRelationsService.GetRelationsTo(systemUsageId)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -112,7 +111,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsAssociatedWithContract(int contractId)
         {
-            return _usageService.GetRelationsAssociatedWithContract(contractId)
+            return _itsystemUsageRelationsService.GetRelationsAssociatedWithContract(contractId)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -135,7 +134,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO[]>))]
         public HttpResponseMessage GetRelationsDefinedInOrganization(int organizationId, int pageNumber, int pageSize)
         {
-            return _usageService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
+            return _itsystemUsageRelationsService.GetRelationsDefinedInOrganization(organizationId, pageNumber, pageSize)
                 .Match
                 (
                     onSuccess: value => Ok(MapRelations(value)),
@@ -154,7 +153,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<SystemRelationDTO>))]
         public HttpResponseMessage GetRelationFromSystem(int systemUsageId, int relationId)
         {
-            return _usageService.GetRelationFrom(systemUsageId, relationId)
+            return _itsystemUsageRelationsService.GetRelationFrom(systemUsageId, relationId)
                 .Match
                 (
                     onSuccess: relation => Ok(MapRelation(relation)),
@@ -173,7 +172,7 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("options/{fromSystemUsageId}/systems-which-can-be-related-to")]
         public HttpResponseMessage GetSystemUsagesWhichCanBeRelatedTo(int fromSystemUsageId, string nameContent, int amount)
         {
-            return _usageService.GetSystemUsagesWhichCanBeRelatedTo(fromSystemUsageId, nameContent.FromString(), amount)
+            return _itsystemUsageRelationsService.GetSystemUsagesWhichCanBeRelatedTo(fromSystemUsageId, nameContent.FromString(), amount)
                 .Match
                 (
                     onSuccess: systemUsages => Ok
@@ -197,7 +196,7 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("options/{fromSystemUsageId}/in-relation-to/{toSystemUsageId}")]
         public HttpResponseMessage GetAvailableOptions(int fromSystemUsageId, int toSystemUsageId)
         {
-            return _usageService.GetAvailableOptions(fromSystemUsageId, toSystemUsageId)
+            return _itsystemUsageRelationsService.GetAvailableOptions(fromSystemUsageId, toSystemUsageId)
                 .Match
                 (
                     onSuccess: options => Ok(MapOptions(options)),
@@ -215,7 +214,7 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("from/{fromSystemUsageId}/{relationId}")]
         public HttpResponseMessage DeleteRelationFromSystem(int fromSystemUsageId, int relationId)
         {
-            return _usageService.RemoveRelation(fromSystemUsageId, relationId)
+            return _itsystemUsageRelationsService.RemoveRelation(fromSystemUsageId, relationId)
                 .Match
                 (
                     onSuccess: _ => NoContent(),
@@ -242,7 +241,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return BadRequest("FromUsage AND ToUsage MUST be defined");
             }
 
-            var result = _usageService.ModifyRelation
+            var result = _itsystemUsageRelationsService.ModifyRelation
             (
                 relation.FromUsage.Id,
                 relation.Id,

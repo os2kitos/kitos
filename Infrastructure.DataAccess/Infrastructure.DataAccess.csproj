@@ -62,6 +62,7 @@
     <Compile Include="GenericRepository.cs" />
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
+    <Compile Include="Mapping\AttachedOptionMap.cs" />
     <Compile Include="Mapping\BrokenExternalReferencesReportMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationMap.cs" />
     <Compile Include="Mapping\DataProcessingRegistrationOversightDateMap.cs" />
@@ -797,6 +798,14 @@
     <Compile Include="Migrations\202108120847546_Changed_Kendo_Configuration.designer.cs">
       <DependentUpon>202108120847546_Changed_Kendo_Configuration.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202108181140210_ExternalReference_Remove_DisplayColumn.cs" />
+    <Compile Include="Migrations\202108181140210_ExternalReference_Remove_DisplayColumn.designer.cs">
+      <DependentUpon>202108181140210_ExternalReference_Remove_DisplayColumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202108191238336_AttachedOption_Indexes.cs" />
+    <Compile Include="Migrations\202108191238336_AttachedOption_Indexes.designer.cs">
+      <DependentUpon>202108191238336_AttachedOption_Indexes.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1307,6 +1316,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202108120847546_Changed_Kendo_Configuration.resx">
       <DependentUpon>202108120847546_Changed_Kendo_Configuration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108181140210_ExternalReference_Remove_DisplayColumn.resx">
+      <DependentUpon>202108181140210_ExternalReference_Remove_DisplayColumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202108191238336_AttachedOption_Indexes.resx">
+      <DependentUpon>202108191238336_AttachedOption_Indexes.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

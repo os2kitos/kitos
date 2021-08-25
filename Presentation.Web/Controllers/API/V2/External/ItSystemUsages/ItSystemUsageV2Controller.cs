@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
+using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
@@ -13,7 +17,7 @@ using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
@@ -29,11 +33,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
     {
         private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IItSystemUsageResponseMapper _responseMapper;
+        private readonly IItSystemUsageWriteService _writeService;
+        private readonly IItSystemUsageWriteModelMapper _writeModelMapper;
 
-        public ItSystemUsageV2Controller(IItSystemUsageService itSystemUsageService, IItSystemUsageResponseMapper responseMapper)
+        public ItSystemUsageV2Controller(
+            IItSystemUsageService itSystemUsageService,
+            IItSystemUsageResponseMapper responseMapper,
+            IItSystemUsageWriteService writeService,
+            IItSystemUsageWriteModelMapper writeModelMapper)
         {
             _itSystemUsageService = itSystemUsageService;
             _responseMapper = responseMapper;
+            _writeService = writeService;
+            _writeModelMapper = writeModelMapper;
         }
 
         /// <summary>
@@ -126,7 +138,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Delete(systemUsageUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         /// <summary>
@@ -146,7 +160,10 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Create(new SystemUsageCreationParameters(request.SystemUuid, request.OrganizationUuid, _writeModelMapper.FromPOST(request)))
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(MapSystemCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -166,7 +183,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            var updateParameters = _writeModelMapper.FromPUT(request);
+
+            return _writeService
+                .Update(systemUsageUuid, updateParameters)
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -181,12 +203,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGeneralProperties([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GeneralDataWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGeneralProperties([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GeneralDataUpdateRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    GeneralProperties = _writeModelMapper.MapGeneralDataUpdate(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -201,12 +229,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentResponseDTO> request)
+        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    Roles = _writeModelMapper.MapRoles(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -226,7 +260,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    KLE = _writeModelMapper.MapKle(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -241,12 +281,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
+        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] IEnumerable<ExternalReferenceDataDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -266,7 +312,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    Archiving = _writeModelMapper.MapArchiving(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -281,12 +333,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageArchiving([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GDPRWriteRequestDTO request)
+        public IHttpActionResult PutSystemUsageGDPR([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] GDPRWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    GDPR = _writeModelMapper.MapGDPR(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -306,7 +364,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .Update(systemUsageUuid, new SystemUsageUpdateParameters
+                {
+                    OrganizationalUsage = _writeModelMapper.MapOrganizationalUsage(request)
+                })
+                .Select(_responseMapper.MapSystemUsageDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -390,6 +454,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             throw new System.NotImplementedException();
+        }
+
+        private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

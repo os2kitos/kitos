@@ -21,18 +21,18 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
     public class ItSystemUsageResponseMapper : IItSystemUsageResponseMapper
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IAttachedOptionRepository _attachedOptionRepository;
+        private readonly IItSystemUsageAttachedOptionRepository _itSystemUsageAttachedOptionRepository;
         private readonly ISensitivePersonalDataTypeRepository _sensitivePersonalDataTypeRepository;
         private readonly IGenericRepository<RegisterType> _registerTypesRepository;
 
         public ItSystemUsageResponseMapper(
             IOrganizationRepository organizationRepository,
-            IAttachedOptionRepository attachedOptionRepository,
+            IItSystemUsageAttachedOptionRepository itSystemUsageAttachedOptionRepository,
             ISensitivePersonalDataTypeRepository sensitivePersonalDataTypeRepository,
             IGenericRepository<RegisterType> registerTypesRepository)
         {
             _organizationRepository = organizationRepository;
-            _attachedOptionRepository = attachedOptionRepository;
+            _itSystemUsageAttachedOptionRepository = itSystemUsageAttachedOptionRepository;
             _sensitivePersonalDataTypeRepository = sensitivePersonalDataTypeRepository;
             _registerTypesRepository = registerTypesRepository;
         }
@@ -44,9 +44,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 Uuid = systemUsage.Uuid,
                 SystemContext = systemUsage.ItSystem.MapIdentityNamePairDTO(),
                 OrganizationContext = systemUsage.Organization.MapShallowOrganizationResponseDTO(),
-                CreatedBy = systemUsage.ObjectOwner.MapIdentityNamePairDTO(),
+                CreatedBy = systemUsage.ObjectOwner?.MapIdentityNamePairDTO(),
                 LastModified = systemUsage.LastChanged,
-                LastModifiedBy = systemUsage.LastChangedByUser.MapIdentityNamePairDTO(),
+                LastModifiedBy = systemUsage.LastChangedByUser?.MapIdentityNamePairDTO(),
                 General = MapGeneral(systemUsage),
                 Roles = MapRoles(systemUsage),
                 LocalKLEDeviations = MapKle(systemUsage),
@@ -62,7 +62,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             var personDataTypesMap = new Lazy<IDictionary<int, SensitivePersonalDataType>>(() => _sensitivePersonalDataTypeRepository.GetSensitivePersonalDataTypes().ToDictionary(type => type.Id));
             var registerTypesMap = new Lazy<IDictionary<int, RegisterType>>(() => _registerTypesRepository.Get().ToDictionary(type => type.Id));
-            var attachedOptions = _attachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
+            var attachedOptions = _itSystemUsageAttachedOptionRepository.GetBySystemUsageId(systemUsage.Id).ToList();
 
             return new GDPRRegistrationsResponseDTO
             {
@@ -188,53 +188,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private RiskLevelChoice? MapRiskAssessment(ItSystemUsage systemUsage)
+        private static RiskLevelChoice? MapRiskAssessment(ItSystemUsage systemUsage)
         {
-            return systemUsage.preriskAssessment switch
-            {
-                RiskLevel.LOW => RiskLevelChoice.Low,
-                RiskLevel.MIDDLE => RiskLevelChoice.Middle,
-                RiskLevel.HIGH => RiskLevelChoice.High,
-                RiskLevel.UNDECIDED => RiskLevelChoice.Undecided,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.preriskAssessment?.ToRiskLevelChoice();
         }
 
-        private IEnumerable<TechnicalPrecautionChoice> MapPrecautions(ItSystemUsage systemUsage)
+        private static IEnumerable<TechnicalPrecautionChoice> MapPrecautions(ItSystemUsage systemUsage)
         {
-            if (systemUsage.precautionsOptionsAccessControl)
-                yield return TechnicalPrecautionChoice.AccessControl;
-            if (systemUsage.precautionsOptionsEncryption)
-                yield return TechnicalPrecautionChoice.Encryption;
-            if (systemUsage.precautionsOptionsLogning)
-                yield return TechnicalPrecautionChoice.Logging;
-            if (systemUsage.precautionsOptionsPseudonomisering)
-                yield return TechnicalPrecautionChoice.Pseudonymization;
+            return systemUsage.GetTechnicalPrecautions().Select(precaution => precaution.ToTechnicalPrecautionChoice());
         }
 
-        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel arg)
+        private static DataSensitivityLevelChoice? MapDataSensitivity(ItSystemUsageSensitiveDataLevel dataLevel)
         {
-            return arg.SensitivityDataLevel switch
-            {
-                SensitiveDataLevel.NONE => DataSensitivityLevelChoice.None,
-                SensitiveDataLevel.PERSONALDATA => DataSensitivityLevelChoice.PersonData,
-                SensitiveDataLevel.SENSITIVEDATA => DataSensitivityLevelChoice.SensitiveData,
-                SensitiveDataLevel.LEGALDATA => DataSensitivityLevelChoice.LegalData,
-                _ => null
-            };
+            return dataLevel?.SensitivityDataLevel.ToDataSensitivityLevelChoice();
         }
 
         private static HostingChoice? MapHosting(ItSystemUsage systemUsage)
         {
-            return systemUsage.HostedAt switch
-            {
-                HostedAt.UNDECIDED => HostingChoice.Undecided,
-                HostedAt.ONPREMISE => HostingChoice.OnPremise,
-                HostedAt.EXTERNAL => HostingChoice.External,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.HostedAt?.ToHostingChoice();
         }
 
         private static SimpleLinkDTO MapSimpleLink(string name, string url)
@@ -246,30 +217,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static YesNoExtendedChoice? MapYesNoExtended(DataOptions? input)
+        private static YesNoDontKnowChoice? MapYesNoExtended(DataOptions? input)
         {
-            return input switch
-            {
-                DataOptions.NO => YesNoExtendedChoice.No,
-                DataOptions.YES => YesNoExtendedChoice.Yes,
-                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
-                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException(nameof(input), input, null)
-            };
+            return input?.ToYesNoDontKnowChoice();
         }
 
         private static ArchiveDutyChoice? MapArchiveDuty(ItSystemUsage systemUsage)
         {
-            return systemUsage.ArchiveDuty switch
-            {
-                ArchiveDutyTypes.Undecided => ArchiveDutyChoice.Undecided,
-                ArchiveDutyTypes.B => ArchiveDutyChoice.B,
-                ArchiveDutyTypes.K => ArchiveDutyChoice.K,
-                ArchiveDutyTypes.Unknown => ArchiveDutyChoice.Unknown,
-                null => null,
-                _ => throw new ArgumentOutOfRangeException()
-            };
+            return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
         }
 
         public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation arg)

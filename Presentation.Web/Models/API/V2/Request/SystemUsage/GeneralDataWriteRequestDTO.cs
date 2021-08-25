@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Core.DomainModel.ItSystemUsage;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
@@ -12,13 +13,13 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// System Id assigned locally within the organization
         /// Max length: 200
         /// </summary>
-        [MaxLength(200)]
+        [MaxLength(ItSystemUsage.LongProperyMaxLength)]
         public string LocalSystemId { get; set; }
         /// <summary>
         /// Call name used locally within the organization
         /// Max length: 100
         /// </summary>
-        [MaxLength(100)]
+        [MaxLength(ItSystemUsage.DefaultMaxLength)]
         public string LocalCallName { get; set; }
         /// <summary>
         /// Optional classification of the registered data
@@ -34,7 +35,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Locally registered system version
         /// Max length: 100
         /// </summary>
-        [MaxLength(100)]
+        [MaxLength(ItSystemUsage.DefaultMaxLength)]
         public string SystemVersion { get; set; }
         /// <summary>
         /// Interval which defines the number of expected users this system has within the organization
@@ -46,12 +47,6 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// Validity of the system usage
         /// </summary>
         public ValidityWriteRequestDTO Validity { get; set; }
-        /// <summary>
-        /// Defines the master contract for this system (many contracts can point to a system usage but only one can be the master contract)
-        /// Constraint: The contract provided MUST point to this system usage for it to be selected as "main contract".
-        /// </summary>
-        [NonEmptyGuid]
-        public Guid? MainContractUuid { get; set; }
         /// <summary>
         /// IT-Projects associated with this system usage
         /// Constraint: Duplicates are not allowed

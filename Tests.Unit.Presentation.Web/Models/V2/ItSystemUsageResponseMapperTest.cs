@@ -28,14 +28,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     {
         private readonly ItSystemUsageResponseMapper _sut;
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
-        private readonly Mock<IAttachedOptionRepository> _attachedOptionsRepositoryMock;
+        private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionsRepositoryMock;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepositoryMock;
         private readonly Mock<IGenericRepository<RegisterType>> _registerTypeRepositoryMock;
 
         public ItSystemUsageResponseMapperTest()
         {
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
-            _attachedOptionsRepositoryMock = new Mock<IAttachedOptionRepository>();
+            _attachedOptionsRepositoryMock = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepositoryMock = new Mock<ISensitivePersonalDataTypeRepository>();
             _registerTypeRepositoryMock = new Mock<IGenericRepository<RegisterType>>();
             _sut = new ItSystemUsageResponseMapper(
@@ -301,7 +301,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             RiskLevelChoice? expected = sourceValue switch
             {
                 RiskLevel.LOW => RiskLevelChoice.Low,
-                RiskLevel.MIDDLE => RiskLevelChoice.Middle,
+                RiskLevel.MIDDLE => RiskLevelChoice.Medium,
                 RiskLevel.HIGH => RiskLevelChoice.High,
                 RiskLevel.UNDECIDED => RiskLevelChoice.Undecided,
                 null => null,
@@ -548,14 +548,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, (generalNumberOfExpectedUsers.LowerBound, generalNumberOfExpectedUsers.UpperBound));
         }
 
-        private static void AssertYesNoExtended(YesNoExtendedChoice? actual, DataOptions? expectedFromSource)
+        private static void AssertYesNoExtended(YesNoDontKnowChoice? actual, DataOptions? expectedFromSource)
         {
-            YesNoExtendedChoice? expected = expectedFromSource switch
+            YesNoDontKnowChoice? expected = expectedFromSource switch
             {
-                DataOptions.NO => YesNoExtendedChoice.No,
-                DataOptions.YES => YesNoExtendedChoice.Yes,
-                DataOptions.DONTKNOW => YesNoExtendedChoice.DontKnow,
-                DataOptions.UNDECIDED => YesNoExtendedChoice.Undecided,
+                DataOptions.NO => YesNoDontKnowChoice.No,
+                DataOptions.YES => YesNoDontKnowChoice.Yes,
+                DataOptions.DONTKNOW => YesNoDontKnowChoice.DontKnow,
+                DataOptions.UNDECIDED => YesNoDontKnowChoice.Undecided,
                 null => null,
                 _ => throw new ArgumentOutOfRangeException(nameof(expectedFromSource), expectedFromSource, null)
             };

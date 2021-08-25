@@ -36,7 +36,11 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            item.ItSystemUsage.MainContract = item;
+            var error = item.ItSystemUsage.SetMainContract(item.ItContract);
+            
+            if (error.HasValue)
+                return FromOperationError(error.Value);
+
             _domainEvent.Raise(new EntityUpdatedEvent<ItSystemUsage>(item.ItSystemUsage));
             _repository.Save();
             return Ok();
@@ -54,9 +58,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            // WARNING: force loading so setting it to null will be tracked
-            var forceLoad = usage.MainContract;
-            usage.MainContract = null;
+            usage.ResetMainContract();
 
             _domainEvent.Raise(new EntityUpdatedEvent<ItSystemUsage>(usage));
             _usageRepository.Save();

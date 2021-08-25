@@ -27,7 +27,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly GDPRExportService _sut;
         private readonly Mock<IItSystemUsageRepository> _usageRepository;
         private readonly Mock<IAuthorizationContext> _authorizationContext;
-        private readonly Mock<IAttachedOptionRepository> _attachedOptionRepository;
+        private readonly Mock<IItSystemUsageAttachedOptionRepository> _attachedOptionRepository;
         private readonly Mock<ISensitivePersonalDataTypeRepository> _sensitivePersonalDataTypeRepository;
 
         private const string datahandlerContractTypeName = "Databehandleraftale";
@@ -37,7 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             _usageRepository = new Mock<IItSystemUsageRepository>();
             _authorizationContext = new Mock<IAuthorizationContext>();
-            _attachedOptionRepository = new Mock<IAttachedOptionRepository>();
+            _attachedOptionRepository = new Mock<IItSystemUsageAttachedOptionRepository>();
             _sensitivePersonalDataTypeRepository = new Mock<ISensitivePersonalDataTypeRepository>();
             _sut = new GDPRExportService(_usageRepository.Object,
                 _authorizationContext.Object,

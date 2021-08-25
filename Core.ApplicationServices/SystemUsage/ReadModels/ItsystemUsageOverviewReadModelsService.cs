@@ -6,7 +6,7 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SystemUsage;
 
-namespace Core.ApplicationServices.SystemUsage
+namespace Core.ApplicationServices.SystemUsage.ReadModels
 {
     public class ItsystemUsageOverviewReadModelsService : IItsystemUsageOverviewReadModelsService
     {

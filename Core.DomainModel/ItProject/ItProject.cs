@@ -217,5 +217,15 @@ namespace Core.DomainModel.ItProject
         public virtual ICollection<ItProjectStatusUpdate> ItProjectStatusUpdates { get; set; }
 
         #endregion
+
+        public override ItProjectRight CreateNewRight(ItProjectRole role, User user)
+        {
+            return new ItProjectRight()
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
     }
 }

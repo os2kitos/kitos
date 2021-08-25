@@ -33,7 +33,7 @@ namespace Core.ApplicationServices.KLE
 
         public Result<KLEStatus, OperationFailure> GetKLEStatus()
         {
-            if (!HasAccess())
+            if (!AllowUpdate())
             {
                 return OperationFailure.Forbidden;
             }
@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.KLE
 
         public Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary()
         {
-            if (!HasAccess())
+            if (!AllowUpdate())
             {
                 return OperationFailure.Forbidden;
             }
@@ -51,7 +51,7 @@ namespace Core.ApplicationServices.KLE
 
         public Result<KLEUpdateStatus, OperationFailure> UpdateKLE(int organizationId)
         {
-            if (!HasAccess())
+            if (!AllowUpdate())
             {
                 return OperationFailure.Forbidden;
             }
@@ -90,7 +90,7 @@ namespace Core.ApplicationServices.KLE
                     );
         }
 
-        private bool HasAccess()
+        private bool AllowUpdate()
         {
             return _organizationalUserContext.IsGlobalAdmin();
         }
