@@ -9,6 +9,7 @@ using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.DomainServices.Repositories.Project;
+using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData
@@ -36,14 +37,43 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [RequireTopOnOdataThroughKitosToken]
         public IHttpActionResult GetByUser(int userId)
         {
-            var result = Repository
-                .AsQueryable()
-                .Where(x => x.UserId == userId)
-                .AsEnumerable()
-                .Where(AllowRead)
-                .AsQueryable();
+            var result = GetAllQuery().Where(x => x.UserId == userId);
 
             return Ok(result);
+        }
+
+        protected override IQueryable<ItProjectRight> GetAllQuery()
+        {
+            var all = base.GetAllQuery();
+            if (UserContext.IsGlobalAdmin())
+                return all;
+            var orgIds = UserContext.OrganizationIds.ToList();
+            return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
+        }
+
+        protected override void RaiseCreatedDomainEvent(ItProjectRight entity)
+        {
+            base.RaiseCreatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(ItProjectRight entity)
+        {
+            base.RaiseDeletedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(ItProjectRight entity)
+        {
+            base.RaiseUpdatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        private void RaiseRootUpdated(ItProjectRight entity)
+        {
+            var root = entity.Object ?? _itProjectRepository.GetById(entity.ObjectId);
+            if (root != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(root));
         }
     }
 }

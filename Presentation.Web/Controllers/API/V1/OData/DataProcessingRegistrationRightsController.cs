@@ -2,16 +2,15 @@
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
-using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
-using Core.DomainServices.Repositories.Project;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Repositories.GDPR;
+using Infrastructure.Services.DomainEvents;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -47,6 +46,40 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .AsQueryable();
 
             return Ok(result);
+        }
+
+        protected override IQueryable<DataProcessingRegistrationRight> GetAllQuery()
+        {
+            var all = base.GetAllQuery();
+            if (UserContext.IsGlobalAdmin())
+                return all;
+            var orgIds = UserContext.OrganizationIds.ToList();
+            return all.Where(x => orgIds.Contains(x.Object.OrganizationId));
+        }
+
+        protected override void RaiseCreatedDomainEvent(DataProcessingRegistrationRight entity)
+        {
+            base.RaiseCreatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseDeletedDomainEvent(DataProcessingRegistrationRight entity)
+        {
+            base.RaiseDeletedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        protected override void RaiseUpdatedDomainEvent(DataProcessingRegistrationRight entity)
+        {
+            base.RaiseUpdatedDomainEvent(entity);
+            RaiseRootUpdated(entity);
+        }
+
+        private void RaiseRootUpdated(DataProcessingRegistrationRight entity)
+        {
+            var root = entity.Object ?? _dataProcessingRegistrationRepository.GetById(entity.ObjectId).GetValueOrDefault();
+            if (root != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(root));
         }
     }
 }

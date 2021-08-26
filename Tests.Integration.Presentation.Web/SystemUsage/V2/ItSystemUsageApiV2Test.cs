@@ -307,6 +307,20 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Cannot_POST_If_ItSystem_Is_Disabled()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, true).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
+
+            //Act
+            using var response = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_POST_With_Full_General_Data_Section()
         {
             //Arrange
@@ -841,7 +855,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updatedArchiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 1)).First();
             var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
             var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
-            
+
             var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
 
             //Assert
@@ -850,7 +864,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO(){ JournalPeriods = new List<JournalPeriodDTO>()});
+            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -862,7 +876,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         public async Task Can_Delete_ItSystemUsage()
         {
             //Arrange
-            var (token, user, organization, system) = await CreatePrerequisitesAsync(); 
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
             var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
