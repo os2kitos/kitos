@@ -799,60 +799,6 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertGDPR(gdprVersion3, gdprResponse);
         }
 
-        private async Task<GDPRWriteRequestDTO> CreateGDPRInputAsync(Organization organization)
-        {
-            var registerTypes =
-                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes,
-                    organization.Uuid, 10, 0);
-            var sensitiveTypes =
-                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes,
-                    organization.Uuid, 10, 0);
-
-            var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
-            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
-            gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
-            gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
-            return gdprInput;
-        }
-
-        private static void AssertGDPR(GDPRWriteRequestDTO gdprInput, GDPRRegistrationsResponseDTO gdprResponse)
-        {
-            Assert.Equal(gdprInput.Purpose, gdprResponse.Purpose);
-            Assert.Equal(gdprInput.BusinessCritical, gdprResponse.BusinessCritical);
-            Assert.Equal(gdprInput.HostedAt, gdprResponse.HostedAt);
-            (gdprInput.DirectoryDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DirectoryDocumentation);
-            Assert.Equal((gdprInput.DataSensitivityLevels ?? new List<DataSensitivityLevelChoice>()).OrderBy(x => x), gdprResponse.DataSensitivityLevels.OrderBy(x => x));
-            Assert.Equal((gdprInput.SensitivePersonDataUuids ?? new List<Guid>()).OrderBy(x => x), gdprResponse.SensitivePersonData.Select(x => x.Uuid).OrderBy(x => x));
-            Assert.Equal((gdprInput.RegisteredDataCategoryUuids ?? new List<Guid>()).OrderBy(x => x), gdprResponse.RegisteredDataCategories.Select(x => x.Uuid).OrderBy(x => x));
-            Assert.Equal(gdprInput.TechnicalPrecautionsInPlace, gdprResponse.TechnicalPrecautionsInPlace);
-            Assert.Equal((gdprInput.TechnicalPrecautionsApplied ?? new List<TechnicalPrecautionChoice>()).OrderBy(x => x), gdprResponse.TechnicalPrecautionsApplied.OrderBy(x => x));
-            (gdprInput.TechnicalPrecautionsDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.TechnicalPrecautionsDocumentation);
-            Assert.Equal(gdprInput.UserSupervision, gdprResponse.UserSupervision);
-            Assert.Equal(gdprInput.UserSupervisionDate, gdprResponse.UserSupervisionDate);
-            (gdprInput.UserSupervisionDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.UserSupervisionDocumentation);
-            Assert.Equal(gdprInput.RiskAssessmentConducted, gdprResponse.RiskAssessmentConducted);
-            Assert.Equal(gdprInput.RiskAssessmentConductedDate, gdprResponse.RiskAssessmentConductedDate);
-            Assert.Equal(gdprInput.RiskAssessmentResult, gdprResponse.RiskAssessmentResult);
-            (gdprInput.RiskAssessmentDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.RiskAssessmentDocumentation);
-            Assert.Equal(gdprInput.RiskAssessmentNotes, gdprResponse.RiskAssessmentNotes);
-            Assert.Equal(gdprInput.DPIAConducted, gdprResponse.DPIAConducted);
-            Assert.Equal(gdprInput.DPIADate, gdprResponse.DPIADate);
-            (gdprInput.DPIADocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DPIADocumentation);
-            Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
-            Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
-            Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
-        }
-
-        private async Task<(string token, User user, Organization organization, ItSystemDTO system)> CreatePrerequisitesAsync()
-        {
-            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var (user, token) = await CreateApiUser(organization);
-            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
-            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
-            return (token, user, organization, system);
-        }
-
         [Fact]
         public async Task Can_POST_With_Archiving()
         {
@@ -975,6 +921,326 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
             var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getStillExistsResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_All_Data()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var (generalData, orgUnit, organizationUsageData, addedTaskRefs, removedTaskRefs, kleDeviations, externalReferences, roles, gdpr, archiving) = await CreateFullDataRequestDTO(organization, system);
+
+            var request = CreatePostRequest(organization.Uuid, system.Uuid,
+                    generalSection: generalData,
+                    organizationalUsageSection: organizationUsageData,
+                    kleDeviationsRequest: kleDeviations,
+                    referenceDataDtos: externalReferences,
+                    roles: roles,
+                    gdpr: gdpr,
+                    archiving: archiving);
+
+            //Act
+            var createdUsage = await ItSystemUsageV2Helper.PostAsync(token, request);
+
+            //Assert
+            AssertGeneralData(request.General, createdUsage.General);
+            
+            await AssertOrganizationalUsage(token, createdUsage.Uuid, new OrgUnitDTO[] { orgUnit }, orgUnit);
+
+            AssertKLEDeviation(true, addedTaskRefs, createdUsage.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(true, removedTaskRefs, createdUsage.LocalKLEDeviations.RemovedKLE);
+
+            AssertExternalReferenceResults(request.ExternalReferences.ToList(), createdUsage);
+
+            AssertRoles(request.Roles, createdUsage.Roles);
+
+            AssertGDPR(request.GDPR, createdUsage.GDPR);
+
+            AssertArchivingParametersSet(request.Archiving, createdUsage.Archiving);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_All_Data()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            var (generalData1, orgUnit1, organizationUsageData1, addedTaskRefs1, removedTaskRefs1, kleDeviations1, externalReferences1, roles1, gdpr1, archiving1) = await CreateFullDataRequestDTO(organization, system);
+            var updateRequest1 = CreatePutRequest(
+                    generalSection: generalData1,
+                    organizationalUsageSection: organizationUsageData1,
+                    kleDeviationsRequest: kleDeviations1,
+                    referenceDataDtos: externalReferences1,
+                    roles: roles1,
+                    gdpr: gdpr1,
+                    archiving: archiving1);
+
+            //Act - PUT on empty system usage
+            var updatedUsage1 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest1);
+
+            //Assert - PUT on empty system usage
+            AssertGeneralData(updateRequest1.General, updatedUsage1.General);
+
+            await AssertOrganizationalUsage(token, updatedUsage1.Uuid, new OrgUnitDTO[] { orgUnit1 }, orgUnit1);
+
+            AssertKLEDeviation(true, addedTaskRefs1, updatedUsage1.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(true, removedTaskRefs1, updatedUsage1.LocalKLEDeviations.RemovedKLE);
+
+            AssertExternalReferenceResults(updateRequest1.ExternalReferences.ToList(), updatedUsage1);
+
+            AssertRoles(updateRequest1.Roles, updatedUsage1.Roles);
+
+            AssertGDPR(updateRequest1.GDPR, updatedUsage1.GDPR);
+
+            AssertArchivingParametersSet(updateRequest1.Archiving, updatedUsage1.Archiving);
+
+            //Act - PUT on filled system usage
+            var (generalData2, orgUnit2, organizationUsageData2, addedTaskRefs2, removedTaskRefs2, kleDeviations2, externalReferences2, roles2, gdpr2, archiving2) = await CreateFullDataRequestDTO(organization, system);
+            var updateRequest2 = CreatePutRequest(
+                    generalSection: generalData2,
+                    organizationalUsageSection: organizationUsageData2,
+                    kleDeviationsRequest: kleDeviations2,
+                    referenceDataDtos: externalReferences2,
+                    roles: roles2,
+                    gdpr: gdpr2,
+                    archiving: archiving2);
+
+            var updatedUsage2 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest2);
+
+            //Assert - PUT on filled system usage
+            AssertGeneralData(updateRequest2.General, updatedUsage2.General);
+
+            await AssertOrganizationalUsage(token, updatedUsage2.Uuid, new OrgUnitDTO[] { orgUnit2 }, orgUnit2);
+
+            AssertKLEDeviation(true, addedTaskRefs2, updatedUsage2.LocalKLEDeviations.AddedKLE);
+            AssertKLEDeviation(true, removedTaskRefs2, updatedUsage2.LocalKLEDeviations.RemovedKLE);
+
+            AssertExternalReferenceResults(updateRequest2.ExternalReferences.ToList(), updatedUsage2);
+
+            AssertRoles(updateRequest2.Roles, updatedUsage2.Roles);
+
+            AssertGDPR(updateRequest2.GDPR, updatedUsage2.GDPR);
+
+            AssertArchivingParametersSet(updateRequest2.Archiving, updatedUsage2.Archiving);
+
+            //Act - PUT empty on filled system usage
+            var updateRequest3 = CreatePutRequest(
+                    generalSection: new GeneralDataWriteRequestDTO(),
+                    organizationalUsageSection: new OrganizationUsageWriteRequestDTO(),
+                    kleDeviationsRequest: new LocalKLEDeviationsRequestDTO(),
+                    referenceDataDtos: new List<ExternalReferenceDataDTO>(),
+                    roles: new List<RoleAssignmentRequestDTO>(),
+                    gdpr: new GDPRWriteRequestDTO(),
+                    archiving: new ArchivingWriteRequestDTO());
+
+            var updatedUsage3 = await ItSystemUsageV2Helper.PutAsync(token, newUsage.Uuid, updateRequest3);
+
+            //Assert - PUT empty on filled system usage
+            AssertGeneralData(updateRequest3.General, updatedUsage3.General, false);
+
+            await AssertOrganizationalUsage(token, updatedUsage3.Uuid, new OrgUnitDTO[] { }, null);
+
+            Assert.Empty(updatedUsage3.LocalKLEDeviations.AddedKLE);
+            Assert.Empty(updatedUsage3.LocalKLEDeviations.RemovedKLE);
+
+            Assert.Empty(updatedUsage3.ExternalReferences);
+
+            Assert.Empty(updatedUsage3.Roles);
+
+            AssertGDPR(updateRequest3.GDPR, updatedUsage3.GDPR);
+
+            AssertArchivingParametersNotSet(updatedUsage3.Archiving);
+        }
+
+        private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(Organization organization, ItSystemDTO system)
+        {
+            var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
+            var dataClassification = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageDataClassification, organization.Uuid, 1, 0)).First();
+            var generalData = CreateGeneralDataWriteRequestDTO(dataClassification.Uuid, new Guid[] { project1.Uuid, project2.Uuid });
+
+            var unit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var organizationUsageData = CreateOrganizationUsageWriteRequestDTO(new Guid[] { unit1.Uuid }, unit1.Uuid);
+
+            var addedTaskRefs = Many<Guid>(2).ToArray();
+            var taskRefsOnSystem = Many<Guid>(3).ToArray();
+            var removedTaskRefs = taskRefsOnSystem.Take(2).ToArray();
+            AddTaskRefsInDatabase(addedTaskRefs.Concat(taskRefsOnSystem));
+            var dbIdsOfSystemTaskRefs = DatabaseAccess.MapFromEntitySet<TaskRef, int[]>(all => all.AsQueryable().Where(s => taskRefsOnSystem.Contains(s.Uuid)).Select(x => x.Id).ToArray());
+            foreach (var taskRefId in dbIdsOfSystemTaskRefs)
+            {
+                using var addTaskRefResponse = await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRefId, organization.Id);
+                Assert.Equal(HttpStatusCode.OK, addTaskRefResponse.StatusCode);
+            }
+            var kleDeviations = CreateLocalKLEDeviationsRequestDTO(addedTaskRefs, removedTaskRefs);
+            
+
+            var externalReferences = CreateExternalReferenceDataDTOs();
+
+            var userToGainRole = await CreateUser(organization);
+            var role = DatabaseAccess.MapFromEntitySet<ItSystemRole, ItSystemRole>(x => x.AsQueryable().First());
+            var roles = CreateRoleAssignmentRequestDTOs(role.Uuid, userToGainRole.Uuid);
+
+            var gdpr = await CreateGDPRInputAsync(organization);
+
+            var archiveType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTypes, organization.Uuid, 1, 0)).First();
+            var archiveLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveLocations, organization.Uuid, 1, 0)).First();
+            var archiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 0)).First();
+            var archiving = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
+
+            return (generalData, unit1, organizationUsageData, addedTaskRefs, removedTaskRefs, kleDeviations, externalReferences, roles, gdpr, archiving);
+        }
+
+
+        private void AssertGeneralData(GeneralDataWriteRequestDTO expected, GeneralDataResponseDTO actual, bool hasData = true)
+        {
+            Assert.Equal(expected.LocalCallName, actual.LocalCallName);
+            Assert.Equal(expected.LocalSystemId, actual.LocalSystemId);
+            Assert.Equal(expected.SystemVersion, actual.SystemVersion);
+            Assert.Equal(expected.Notes, actual.Notes);
+            if (hasData)
+            {
+                Assert.Equal(expected.NumberOfExpectedUsers.LowerBound, actual.NumberOfExpectedUsers.LowerBound);
+                Assert.Equal(expected.NumberOfExpectedUsers.UpperBound, actual.NumberOfExpectedUsers.UpperBound);
+                Assert.Equal(expected.Validity.EnforcedValid, actual.Validity.EnforcedValid);
+                Assert.Equal(expected.Validity.ValidFrom.GetValueOrDefault().Date, actual.Validity.ValidFrom.GetValueOrDefault().Date);
+                Assert.Equal(expected.Validity.ValidTo.GetValueOrDefault().Date, actual.Validity.ValidTo.GetValueOrDefault().Date);
+                Assert.Equal(expected.DataClassificationUuid, actual.DataClassification.Uuid);
+                Assert.Equal(expected.AssociatedProjectUuids.OrderBy(x => x), actual.AssociatedProjects.Select(x => x.Uuid).OrderBy(x => x));
+            }
+            else
+            {
+                // 0 and 9 are the default values being reset to
+                Assert.Equal(0, actual.NumberOfExpectedUsers.LowerBound);
+                Assert.Equal(9, actual.NumberOfExpectedUsers.UpperBound);
+
+                Assert.False(actual.Validity.EnforcedValid);
+                Assert.Null(actual.Validity.ValidFrom);
+                Assert.Null(actual.Validity.ValidTo);
+
+                Assert.Null(actual.DataClassification);
+                Assert.Empty(actual.AssociatedProjects);
+            }
+        }
+
+        private void AssertRoles(IEnumerable<RoleAssignmentRequestDTO> expected, IEnumerable<RoleAssignmentResponseDTO> actual)
+        {
+            Assert.Equal(expected.Count(), actual.Count());
+            foreach (var expectedRight in expected)
+            {
+                Assert.Single(actual.Where(x => x.User.Uuid == expectedRight.UserUuid && x.Role.Uuid == expectedRight.RoleUuid));
+            }
+        }
+
+        private IEnumerable<RoleAssignmentRequestDTO> CreateRoleAssignmentRequestDTOs(Guid roleUuid, Guid userUuid)
+        {
+            return new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = roleUuid,
+                    UserUuid = userUuid
+                }
+            };
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> CreateExternalReferenceDataDTOs()
+        {
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            return Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+        }
+
+        private LocalKLEDeviationsRequestDTO CreateLocalKLEDeviationsRequestDTO(Guid[] addedUuids, Guid[] removedUuids)
+        {
+            return new LocalKLEDeviationsRequestDTO
+            {
+                AddedKLEUuids = addedUuids,
+                RemovedKLEUuids = removedUuids
+            };
+        }
+
+        private OrganizationUsageWriteRequestDTO CreateOrganizationUsageWriteRequestDTO(Guid[] orgUnitsUuids, Guid ResponsibleUuid)
+        {
+            return new OrganizationUsageWriteRequestDTO()
+            {
+                UsingOrganizationUnitUuids = orgUnitsUuids,
+                ResponsibleOrganizationUnitUuid = ResponsibleUuid
+            };
+        }
+
+        private GeneralDataWriteRequestDTO CreateGeneralDataWriteRequestDTO(Guid dataClassificationUuid, Guid[] projectUuids)
+        {
+            return new GeneralDataWriteRequestDTO
+            {
+                LocalCallName = A<string>(),
+                LocalSystemId = A<string>(),
+                SystemVersion = A<string>(),
+                Notes = A<string>(),
+                AssociatedProjectUuids = projectUuids,
+                DataClassificationUuid = dataClassificationUuid,
+                NumberOfExpectedUsers = new ExpectedUsersIntervalDTO { LowerBound = 10, UpperBound = 50 },
+                Validity = new ValidityWriteRequestDTO
+                {
+                    EnforcedValid = A<bool>(),
+                    ValidFrom = DateTime.UtcNow.Date,
+                    ValidTo = DateTime.UtcNow.Date.AddDays(Math.Abs(A<short>()))
+                },
+            };
+        }
+
+        private async Task<GDPRWriteRequestDTO> CreateGDPRInputAsync(Organization organization)
+        {
+            var registerTypes =
+                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes,
+                    organization.Uuid, 10, 0);
+            var sensitiveTypes =
+                await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes,
+                    organization.Uuid, 10, 0);
+
+            var gdprInput = A<GDPRWriteRequestDTO>(); //Start with random values and then correct the ones where values matter
+            gdprInput.DataSensitivityLevels = Many<DataSensitivityLevelChoice>().Distinct().ToList(); //Must be unique
+            gdprInput.SensitivePersonDataUuids = sensitiveTypes.Take(2).Select(x => x.Uuid).ToList();
+            gdprInput.RegisteredDataCategoryUuids = registerTypes.Take(2).Select(x => x.Uuid).ToList();
+            gdprInput.TechnicalPrecautionsApplied = Many<TechnicalPrecautionChoice>().Distinct().ToList(); //must be unique
+            return gdprInput;
+        }
+
+        private static void AssertGDPR(GDPRWriteRequestDTO gdprInput, GDPRRegistrationsResponseDTO gdprResponse)
+        {
+            Assert.Equal(gdprInput.Purpose, gdprResponse.Purpose);
+            Assert.Equal(gdprInput.BusinessCritical, gdprResponse.BusinessCritical);
+            Assert.Equal(gdprInput.HostedAt, gdprResponse.HostedAt);
+            (gdprInput.DirectoryDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DirectoryDocumentation);
+            Assert.Equal((gdprInput.DataSensitivityLevels ?? new List<DataSensitivityLevelChoice>()).OrderBy(x => x), gdprResponse.DataSensitivityLevels.OrderBy(x => x));
+            Assert.Equal((gdprInput.SensitivePersonDataUuids ?? new List<Guid>()).OrderBy(x => x), gdprResponse.SensitivePersonData.Select(x => x.Uuid).OrderBy(x => x));
+            Assert.Equal((gdprInput.RegisteredDataCategoryUuids ?? new List<Guid>()).OrderBy(x => x), gdprResponse.RegisteredDataCategories.Select(x => x.Uuid).OrderBy(x => x));
+            Assert.Equal(gdprInput.TechnicalPrecautionsInPlace, gdprResponse.TechnicalPrecautionsInPlace);
+            Assert.Equal((gdprInput.TechnicalPrecautionsApplied ?? new List<TechnicalPrecautionChoice>()).OrderBy(x => x), gdprResponse.TechnicalPrecautionsApplied.OrderBy(x => x));
+            (gdprInput.TechnicalPrecautionsDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.TechnicalPrecautionsDocumentation);
+            Assert.Equal(gdprInput.UserSupervision, gdprResponse.UserSupervision);
+            Assert.Equal(gdprInput.UserSupervisionDate, gdprResponse.UserSupervisionDate);
+            (gdprInput.UserSupervisionDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.UserSupervisionDocumentation);
+            Assert.Equal(gdprInput.RiskAssessmentConducted, gdprResponse.RiskAssessmentConducted);
+            Assert.Equal(gdprInput.RiskAssessmentConductedDate, gdprResponse.RiskAssessmentConductedDate);
+            Assert.Equal(gdprInput.RiskAssessmentResult, gdprResponse.RiskAssessmentResult);
+            (gdprInput.RiskAssessmentDocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.RiskAssessmentDocumentation);
+            Assert.Equal(gdprInput.RiskAssessmentNotes, gdprResponse.RiskAssessmentNotes);
+            Assert.Equal(gdprInput.DPIAConducted, gdprResponse.DPIAConducted);
+            Assert.Equal(gdprInput.DPIADate, gdprResponse.DPIADate);
+            (gdprInput.DPIADocumentation ?? new SimpleLinkDTO()).ToExpectedObject().ShouldMatch(gdprResponse.DPIADocumentation);
+            Assert.Equal(gdprInput.RetentionPeriodDefined, gdprResponse.RetentionPeriodDefined);
+            Assert.Equal(gdprInput.NextDataRetentionEvaluationDate, gdprResponse.NextDataRetentionEvaluationDate);
+            Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
+        }
+
+        private async Task<(string token, User user, Organization organization, ItSystemDTO system)> CreatePrerequisitesAsync()
+        {
+            var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            var system = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            return (token, user, organization, system);
         }
 
         private static void AssertArchivingParametersNotSet(ArchivingRegistrationsResponseDTO actual)
@@ -1164,6 +1430,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 OrganizationUuid = organizationId,
                 SystemUuid = systemId,
                 General = generalSection,
+                OrganizationUsage = organizationalUsageSection,
+                LocalKleDeviations = kleDeviationsRequest,
+                ExternalReferences = referenceDataDtos?.ToList(),
+                Roles = roles?.ToList(),
+                GDPR = gdpr,
+                Archiving = archiving
+            };
+        }
+
+        private static UpdateItSystemUsageRequestDTO CreatePutRequest(
+            GeneralDataWriteRequestDTO generalSection = null,
+            OrganizationUsageWriteRequestDTO organizationalUsageSection = null,
+            LocalKLEDeviationsRequestDTO kleDeviationsRequest = null,
+            IEnumerable<ExternalReferenceDataDTO> referenceDataDtos = null,
+            IEnumerable<RoleAssignmentRequestDTO> roles = null,
+            GDPRWriteRequestDTO gdpr = null,
+            ArchivingWriteRequestDTO archiving = null)
+        {
+            var generalUpdateRequest = new GeneralDataUpdateRequestDTO()
+            {
+                AssociatedProjectUuids = generalSection.AssociatedProjectUuids,
+                DataClassificationUuid = generalSection.DataClassificationUuid,
+                LocalCallName = generalSection.LocalCallName,
+                LocalSystemId = generalSection.LocalSystemId,
+                Notes = generalSection.Notes,
+                NumberOfExpectedUsers = generalSection.NumberOfExpectedUsers,
+                SystemVersion = generalSection.SystemVersion,
+                Validity = generalSection.Validity
+            };
+            return new UpdateItSystemUsageRequestDTO
+            {
+                General = generalUpdateRequest,
                 OrganizationUsage = organizationalUsageSection,
                 LocalKleDeviations = kleDeviationsRequest,
                 ExternalReferences = referenceDataDtos?.ToList(),
