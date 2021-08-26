@@ -185,6 +185,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
         public SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData)
         {
+            if (relationData == null)
+                throw new ArgumentNullException(nameof(relationData));
+
             return new SystemRelationParameters
             (
                 relationData.ToSystemUsageUuid,
