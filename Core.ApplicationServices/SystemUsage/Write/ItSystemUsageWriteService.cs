@@ -648,6 +648,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return _systemUsageService
                 .GetByUuid(itSystemUsageUuid)
+                .Bind(WithWriteAccess)
                 .Bind<(ItSystemUsage usage, SystemRelation relation)>(usage =>
                 {
                     var usageRelation = usage.GetUsageRelation(itSystemUsageRelationUuid);
