@@ -39,14 +39,17 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItInterfaceDTO> CreateInterface(ItInterfaceDTO input)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var createdResponse = await SendCreateInterface(input);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateInterface(ItInterfaceDTO input, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/itinterface");
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, input))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
-            }
+            return await HttpApi.PostWithCookieAsync(url, cookie, input);
         }
 
         public static async Task CreateInterfaces(params ItInterfaceDTO[] interfaces)

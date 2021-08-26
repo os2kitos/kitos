@@ -2,6 +2,7 @@
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -30,7 +31,7 @@ namespace Core.ApplicationServices.Interface
         private readonly IAuthorizationContext _authorizationContext;
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
-        private readonly IInterfaceRepository _interfaceRepository; 
+        private readonly IInterfaceRepository _interfaceRepository;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOperationClock _operationClock;
 
@@ -41,7 +42,7 @@ namespace Core.ApplicationServices.Interface
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             IInterfaceRepository interfaceRepository,
-            IOrganizationalUserContext userContext, 
+            IOrganizationalUserContext userContext,
             IOperationClock operationClock)
         {
             _dataRowRepository = dataRowRepository;
@@ -89,7 +90,7 @@ namespace Core.ApplicationServices.Interface
                 transaction.Commit();
                 return itInterface;
             }
-        }        
+        }
 
         public IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions)
         {
@@ -145,13 +146,28 @@ namespace Core.ApplicationServices.Interface
                 var newItInterface = new ItInterface
                 {
                     OrganizationId = organizationId,
-                    AccessModifier = accessModifier ?? AccessModifier.Public,
                     Uuid = rightsHolderProvidedUuid ?? Guid.NewGuid(),
                     ItInterfaceId = interfaceId,
                     ObjectOwnerId = _userContext.UserId,
                     Name = name,
                     Created = _operationClock.Now
                 };
+
+                if (accessModifier != null)
+                {
+                    if (!AllowCreationWithAccessLevel(organizationId, accessModifier.Value, newItInterface))
+                    {
+                        return new OperationError("Cannot create interface with the provided access level", OperationFailure.Forbidden);
+                    }
+                }
+                else
+                {
+                    accessModifier = AllowCreationWithAccessLevel(organizationId, AccessModifier.Public, newItInterface)
+                        ? AccessModifier.Public
+                        : AccessModifier.Local;
+                }
+
+                newItInterface.AccessModifier = accessModifier.Value;
 
                 _interfaceRepository.Add(newItInterface);
                 _domainEvents.Raise(new EntityCreatedEvent<ItInterface>(newItInterface));
@@ -161,11 +177,17 @@ namespace Core.ApplicationServices.Interface
             return new OperationError(OperationFailure.Forbidden);
         }
 
+        private bool AllowCreationWithAccessLevel(int organizationId, AccessModifier accessModifier, ItInterface newItInterface)
+        {
+            return _authorizationContext.HasPermission(new CreateEntityWithVisibilityPermission(accessModifier, newItInterface, organizationId));
+        }
+
         public Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string itInterfaceId)
         {
-            return Mutate(id, 
-                itInterface => itInterface.ItInterfaceId != itInterfaceId || itInterface.Name != name, 
-                updateWithResult: itInterface => {
+            return Mutate(id,
+                itInterface => itInterface.ItInterfaceId != itInterfaceId || itInterface.Name != name,
+                updateWithResult: itInterface =>
+                {
                     var nameError = CheckForUniqueNaming(name, itInterfaceId, itInterface.OrganizationId);
                     if (nameError.HasValue)
                         return nameError.Value;
@@ -194,8 +216,9 @@ namespace Core.ApplicationServices.Interface
         public Result<ItInterface, OperationError> UpdateExposingSystem(int id, int? newSystemId)
         {
             return Mutate(id,
-                itInterface => itInterface.ExhibitedBy?.ItSystemId != newSystemId, 
-                updateWithResult: itInterface => {
+                itInterface => itInterface.ExhibitedBy?.ItSystemId != newSystemId,
+                updateWithResult: itInterface =>
+                {
 
                     Maybe<ItSystem> oldSystem = itInterface.ExhibitedBy?.ItSystem;
                     var newSystem = Maybe<ItSystem>.None;
@@ -228,8 +251,8 @@ namespace Core.ApplicationServices.Interface
 
         public Result<ItInterface, OperationError> Deactivate(int id)
         {
-            return Mutate(id, 
-                itInterface => itInterface.Disabled == false, 
+            return Mutate(id,
+                itInterface => itInterface.Disabled == false,
                 itInterface =>
             {
                 itInterface.Deactivate();
@@ -253,7 +276,7 @@ namespace Core.ApplicationServices.Interface
             if (!ValidateName(name))
                 return new OperationError("Name was not valid", OperationFailure.BadInput);
 
-            if(!ValidateItInterfaceId(itInterfaceId))
+            if (!ValidateItInterfaceId(itInterfaceId))
                 return new OperationError("ItInterfaceId was not valid", OperationFailure.BadInput);
 
             if (_interfaceRepository

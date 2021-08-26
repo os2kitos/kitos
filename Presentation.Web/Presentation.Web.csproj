@@ -1198,7 +1198,6 @@
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
     <TypeScriptCompile Include="app\shared\searchBox\searchBox.directive.ts" />
-    <TypeScriptCompile Include="app\shared\selectAccessModifier\selectAccessModifier.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectStatus2\selectStatus2.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectUser\selectUser.directive.ts" />
     <TypeScriptCompile Include="app\shared\showErrors.directive.ts" />
@@ -1289,7 +1288,6 @@
     <Content Include="app\shared\paginationButtons\paginationButtons.view.html" />
     <Content Include="app\shared\searchBox\searchBox.view.html" />
     <Content Include="app\shared\selectStatus2\selectStatus2.view.html" />
-    <Content Include="app\shared\selectAccessModifier\selectAccessModifier.view.html" />
     <Content Include="app\shared\selectUser\selectUser.view.html" />
     <Content Include="app\shared\showStatus\showStatus.view.html" />
     <Content Include="app\components\global-admin\global-admin-global-admins.view.html" />
