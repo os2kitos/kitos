@@ -227,17 +227,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return systemUsage.ArchiveDuty?.ToArchiveDutyChoice();
         }
 
-        public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation arg)
+        public SystemRelationResponseDTO MapSystemRelationDTO(SystemRelation systemRelation)
         {
             return new()
             {
-                Uuid = arg.Uuid,
-                Description = arg.Description,
-                UrlReference = arg.Reference,
-                AssociatedContract = arg.AssociatedContract?.MapIdentityNamePairDTO(),
-                RelationFrequency = arg.UsageFrequency?.MapIdentityNamePairDTO(),
-                UsingInterface = arg.RelationInterface?.MapIdentityNamePairDTO(),
-                ToSystemUsage = arg.ToSystemUsage?.MapIdentityNamePairDTO()
+                Uuid = systemRelation.Uuid,
+                Description = systemRelation.Description,
+                UrlReference = systemRelation.Reference,
+                AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO(),
+                RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO(),
+                UsingInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
+                ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO()
             };
         }
 

@@ -9,6 +9,7 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
@@ -411,7 +412,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _itSystemUsageService
+                .GetByUuid(systemRelationUuid)
+                .Bind(usage =>
+                    usage.GetUsageRelation(systemRelationUuid)
+                        .Match<Result<SystemRelation, OperationError>>
+                        (
+                        systemRelation => systemRelation,
+                        () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
+                    )
+                .Select(_responseMapper.MapSystemRelationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
