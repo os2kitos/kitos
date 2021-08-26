@@ -128,5 +128,55 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token);
         }
+
+        public static async Task<SystemRelationResponseDTO> PostRelationAsync(string token, Guid systemUsageUuid, SystemRelationWriteRequestDTO dto)
+        {
+            using var response = await SendPostRelationAsync(token, systemUsageUuid, dto);
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<SystemRelationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPostRelationAsync(string token, Guid systemUsageUuid, SystemRelationWriteRequestDTO dto)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations"), dto, token);
+        }
+
+        public static async Task<SystemRelationResponseDTO> PutRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid, SystemRelationWriteRequestDTO dto)
+        {
+            using var response = await SendPutRelationAsync(token, systemUsageUuid, systemRelationUuid, dto);
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<SystemRelationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPutRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid, SystemRelationWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token, dto);
+        }
+
+        public static async Task<SystemRelationResponseDTO> GetRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid)
+        {
+            using var response = await SendGetRelationAsync(token, systemUsageUuid, systemRelationUuid);
+            if (!response.IsSuccessStatusCode)
+                Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<SystemRelationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetRelationAsync(string token, Guid systemUsageUuid, Guid systemRelationUuid)
+        {
+            return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{systemUsageUuid}/system-relations/{systemRelationUuid}"), token);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteRelationAsync(string token, Guid uuid, Guid systemRelationUuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/system-relations/{systemRelationUuid}"), token);
+        }
     }
 }
