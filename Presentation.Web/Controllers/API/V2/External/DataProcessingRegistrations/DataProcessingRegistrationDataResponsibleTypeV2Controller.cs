@@ -12,7 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
-    [RoutePrefix("api/v2/data-processing-registrations-data-responsible-types")]
+    [RoutePrefix("api/v2/data-processing-registration-data-responsible-types")]
     public class DataProcessingRegistrationDataResponsibleTypeV2Controller : BaseRegularOptionTypeV2Controller<DataProcessingRegistration, DataProcessingDataResponsibleOption>
     {
         public DataProcessingRegistrationDataResponsibleTypeV2Controller(IOptionsApplicationService<DataProcessingRegistration, DataProcessingDataResponsibleOption> optionService)

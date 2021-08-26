@@ -12,7 +12,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
-    [RoutePrefix("api/v2/data-processing-registrations-country-types")]
+    [RoutePrefix("api/v2/data-processing-registration-country-types")]
     public class DataProcessingRegistrationCountryTypeV2Controller : BaseRegularOptionTypeV2Controller<DataProcessingRegistration, DataProcessingCountryOption>
     {
         public DataProcessingRegistrationCountryTypeV2Controller(IOptionsApplicationService<DataProcessingRegistration, DataProcessingCountryOption> optionService)

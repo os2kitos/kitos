@@ -11,7 +11,7 @@ using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
-    [RoutePrefix("api/v2/data-processing-registrations-role-types")]
+    [RoutePrefix("api/v2/data-processing-registration-role-types")]
     public class DataProcessingRegistrationRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<DataProcessingRegistrationRight, DataProcessingRegistrationRole>
     {
         public DataProcessingRegistrationRoleTypeV2Controller(IOptionsApplicationService<DataProcessingRegistrationRight, DataProcessingRegistrationRole> optionApplicationService)
