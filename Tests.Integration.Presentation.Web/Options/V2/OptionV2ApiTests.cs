@@ -126,6 +126,8 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.SensitivePersonalDataTypes, OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.RegisterTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.ContractTypes, OptionV2ApiHelper.ResourceName.ItContractContractTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingDataResponsibleOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingBasisForTransferOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer };
         }
     }
 }

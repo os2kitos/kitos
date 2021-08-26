@@ -23,6 +23,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
             public const string ItSystemUsageRoles = "it-system-usage-role-types";
             public const string ItContractContractTypes = "it-contract-contract-types";
+            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
+            public const string DataProcessingRegistrationBasisForTransfer = "data-processing-registrations-basis-for-transfer-types";
+            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
+            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
+            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
