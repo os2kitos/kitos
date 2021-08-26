@@ -1829,10 +1829,10 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(update2Result.Ok);
             AssertTransactionCommitted(transactionMock);
-            AssertSystemUsageUpdateParametersWithSimpleParametersAdded(update2Parameters, update2Result.Value);
+            AssertSystemUsageUpdateParametersWithSimpleParametersAdded(update2Parameters, update2Result.Value, true);
         }
 
-        private void AssertSystemUsageUpdateParametersWithSimpleParametersAdded(SystemUsageUpdateParameters expected, ItSystemUsage actual)
+        private void AssertSystemUsageUpdateParametersWithSimpleParametersAdded(SystemUsageUpdateParameters expected, ItSystemUsage actual, bool shouldBeEmpty = false)
         {
             //General Properties
             var generalProperties = expected.GeneralProperties.Value;
@@ -1840,9 +1840,17 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(generalProperties.LocalSystemId.NewValue, actual.LocalSystemId);
             Assert.Equal(generalProperties.SystemVersion.NewValue, actual.Version);
             Assert.Equal(generalProperties.Notes.NewValue, actual.Note);
-            Assert.Equal(generalProperties.EnforceActive.NewValue.Value, actual.Active);
-            Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
-            Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
+            if (shouldBeEmpty)
+            {
+                Assert.Null(actual.Concluded);
+                Assert.Null(actual.ExpirationDate);
+            }
+            else
+            {
+                Assert.Equal(generalProperties.EnforceActive.NewValue.Value, actual.Active);
+                Assert.Equal(generalProperties.ValidFrom.NewValue.Value.Date, actual.Concluded);
+                Assert.Equal(generalProperties.ValidTo.NewValue.Value.Date, actual.ExpirationDate);
+            }
 
             //Archiving
             var archiving = expected.Archiving.Value;
@@ -1857,26 +1865,45 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             Assert.Equal(gdpr.Purpose.NewValue, actual.GeneralPurpose);
             Assert.Equal(gdpr.BusinessCritical.NewValue, actual.isBusinessCritical);
             Assert.Equal(gdpr.HostedAt.NewValue, actual.HostedAt);
-            AssertLink(gdpr.DirectoryDocumentation.NewValue.Value, actual.LinkToDirectoryUrlName, actual.LinkToDirectoryUrl);
             Assert.Equal(gdpr.TechnicalPrecautionsInPlace.NewValue, actual.precautions);
-            AssertLink(gdpr.TechnicalPrecautionsDocumentation.NewValue.Value, actual.TechnicalSupervisionDocumentationUrlName, actual.TechnicalSupervisionDocumentationUrl);
             Assert.Equal(gdpr.UserSupervision.NewValue, actual.UserSupervision);
             Assert.Equal(gdpr.UserSupervisionDate.NewValue, actual.UserSupervisionDate);
-            AssertLink(gdpr.UserSupervisionDocumentation.NewValue.Value, actual.UserSupervisionDocumentationUrlName, actual.UserSupervisionDocumentationUrl);
             Assert.Equal(gdpr.RiskAssessmentConducted.NewValue, actual.riskAssessment);
             Assert.Equal(gdpr.RiskAssessmentConductedDate.NewValue, actual.riskAssesmentDate);
-            AssertLink(gdpr.RiskAssessmentDocumentation.NewValue.Value, actual.RiskSupervisionDocumentationUrlName, actual.RiskSupervisionDocumentationUrl);
             Assert.Equal(gdpr.RiskAssessmentNotes.NewValue, actual.noteRisks);
             Assert.Equal(gdpr.RiskAssessmentResult.NewValue, actual.preriskAssessment);
             Assert.Equal(gdpr.DPIAConducted.NewValue, actual.DPIA);
             Assert.Equal(gdpr.DPIADate.NewValue, actual.DPIADateFor);
-            AssertLink(gdpr.DPIADocumentation.NewValue.Value, actual.DPIASupervisionDocumentationUrlName, actual.DPIASupervisionDocumentationUrl);
             Assert.Equal(gdpr.RetentionPeriodDefined.NewValue, actual.answeringDataDPIA);
             Assert.Equal(gdpr.NextDataRetentionEvaluationDate.NewValue, actual.DPIAdeleteDate);
-            Assert.Equal(gdpr.DataRetentionEvaluationFrequencyInMonths.NewValue, actual.numberDPIA);
+
+            if (shouldBeEmpty)
+            {
+                Assert.Equal(0, actual.numberDPIA);
+                Assert.Null(actual.LinkToDirectoryUrlName);
+                Assert.Null(actual.LinkToDirectoryUrl);
+                Assert.Null(actual.TechnicalSupervisionDocumentationUrlName);
+                Assert.Null(actual.TechnicalSupervisionDocumentationUrl);
+                Assert.Null(actual.UserSupervisionDocumentationUrlName);
+                Assert.Null(actual.UserSupervisionDocumentationUrl);
+                Assert.Null(actual.RiskSupervisionDocumentationUrlName);
+                Assert.Null(actual.RiskSupervisionDocumentationUrl);
+                Assert.Null(actual.DPIASupervisionDocumentationUrlName);
+                Assert.Null(actual.DPIASupervisionDocumentationUrl);
+            }
+            else
+            {
+                Assert.Equal(gdpr.DataRetentionEvaluationFrequencyInMonths.NewValue, actual.numberDPIA);
+                AssertLink(gdpr.DirectoryDocumentation.NewValue.Value, actual.LinkToDirectoryUrlName, actual.LinkToDirectoryUrl);
+                AssertLink(gdpr.TechnicalPrecautionsDocumentation.NewValue.Value, actual.TechnicalSupervisionDocumentationUrlName, actual.TechnicalSupervisionDocumentationUrl);
+                AssertLink(gdpr.UserSupervisionDocumentation.NewValue.Value, actual.UserSupervisionDocumentationUrlName, actual.UserSupervisionDocumentationUrl);
+                AssertLink(gdpr.RiskAssessmentDocumentation.NewValue.Value, actual.RiskSupervisionDocumentationUrlName, actual.RiskSupervisionDocumentationUrl);
+                AssertLink(gdpr.DPIADocumentation.NewValue.Value, actual.DPIASupervisionDocumentationUrlName, actual.DPIASupervisionDocumentationUrl);
+            }
+
         }
 
-        private SystemUsageUpdateParameters CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded()
+        private SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithSimpleParametersAdded()
         {
             return new SystemUsageUpdateParameters
             {
@@ -1924,7 +1951,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
-        private SystemUsageUpdateParameters CreateSystemUsageUpdateParametersWithSimpleParametersAdded()
+        private SystemUsageUpdateParameters CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded()
         {
             return new SystemUsageUpdateParameters
             {
