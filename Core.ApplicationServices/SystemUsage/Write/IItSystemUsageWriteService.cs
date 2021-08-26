@@ -13,6 +13,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
 
+        Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters);
+        Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters);
         Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
     }
 }
