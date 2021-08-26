@@ -236,7 +236,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 UrlReference = systemRelation.Reference,
                 AssociatedContract = systemRelation.AssociatedContract?.MapIdentityNamePairDTO(),
                 RelationFrequency = systemRelation.UsageFrequency?.MapIdentityNamePairDTO(),
-                UsingInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
+                RelationInterface = systemRelation.RelationInterface?.MapIdentityNamePairDTO(),
                 ToSystemUsage = systemRelation.ToSystemUsage?.MapIdentityNamePairDTO()
             };
         }

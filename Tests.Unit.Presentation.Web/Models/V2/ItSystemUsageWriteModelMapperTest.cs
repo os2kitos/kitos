@@ -536,7 +536,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.ToSystemUsageUuid,output.ToSystemUsageUuid);
             Assert.Equal(input.AssociatedContractUuid,output.AssociatedContractUuid);
             Assert.Equal(input.RelationFrequencyUuid,output.RelationFrequencyUuid);
-            Assert.Equal(input.UsingInterfaceUuid,output.UsingInterfaceUuid);
+            Assert.Equal(input.RelationInterfaceUuid,output.UsingInterfaceUuid);
             Assert.Equal(input.Description,output.Description);
             Assert.Equal(input.UrlReference,output.UrlReference);
         }

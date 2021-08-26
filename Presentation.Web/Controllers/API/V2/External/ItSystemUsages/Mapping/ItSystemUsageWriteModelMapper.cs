@@ -191,7 +191,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return new SystemRelationParameters
             (
                 relationData.ToSystemUsageUuid,
-                relationData.UsingInterfaceUuid,
+                relationData.RelationInterfaceUuid,
                 relationData.AssociatedContractUuid,
                 relationData.RelationFrequencyUuid,
                 relationData.Description,

@@ -1069,7 +1069,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid,
-                UsingInterfaceUuid = interfaceUuid,
+                RelationInterfaceUuid = interfaceUuid,
                 AssociatedContractUuid = contract.Uuid,
                 RelationFrequencyUuid = relationFrequency.Uuid,
                 Description = A<string>(),
@@ -1127,7 +1127,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid,
-                UsingInterfaceUuid = interfaceUuid,
+                RelationInterfaceUuid = interfaceUuid,
                 AssociatedContractUuid = contract.Uuid,
                 RelationFrequencyUuid = relationFrequency.Uuid,
                 Description = A<string>(),
@@ -1181,7 +1181,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid,
-                UsingInterfaceUuid = interfaceUuid,
+                RelationInterfaceUuid = interfaceUuid,
                 AssociatedContractUuid = contract.Uuid,
                 RelationFrequencyUuid = relationFrequency.Uuid,
                 Description = A<string>(),
@@ -1259,7 +1259,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = badToUsage ? A<Guid>() : usage2.Uuid,
-                UsingInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid,
+                RelationInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid,
                 AssociatedContractUuid = badContract ? A<Guid>() : contract.Uuid,
                 RelationFrequencyUuid = badFrequency ? A<Guid>() : relationFrequency.Uuid,
             };
@@ -1295,7 +1295,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updateInput3 = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage3.Uuid,
-                UsingInterfaceUuid = interfaceUuid3,
+                RelationInterfaceUuid = interfaceUuid3,
                 AssociatedContractUuid = contract3.Uuid,
                 RelationFrequencyUuid = relationFrequency3.Uuid,
                 Description = A<string>(),
@@ -1319,7 +1319,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updateInput4 = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage4.Uuid,
-                UsingInterfaceUuid = interfaceUuid4,
+                RelationInterfaceUuid = interfaceUuid4,
                 AssociatedContractUuid = contract4.Uuid,
                 RelationFrequencyUuid = relationFrequency4.Uuid,
                 Description = A<string>(),
@@ -1344,7 +1344,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert - Update to empty
             Assert.Equal(usage5.Uuid, updatedRelation5.ToSystemUsage.Uuid);
-            Assert.Null(updatedRelation5.UsingInterface);
+            Assert.Null(updatedRelation5.RelationInterface);
             Assert.Null(updatedRelation5.AssociatedContract);
             Assert.Null(updatedRelation5.RelationFrequency);
             Assert.Null(updatedRelation5.Description);
@@ -1463,7 +1463,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updateInput = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = badToUsage ? A<Guid>() : usage3.Uuid,
-                UsingInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid3,
+                RelationInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid3,
                 AssociatedContractUuid = badContract ? A<Guid>() : contract3.Uuid,
                 RelationFrequencyUuid = badFrequency ? A<Guid>() : relationFrequency3.Uuid,
                 Description = A<string>(),
@@ -1515,7 +1515,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid,
-                UsingInterfaceUuid = interfaceUuid,
+                RelationInterfaceUuid = interfaceUuid,
                 AssociatedContractUuid = contract.Uuid,
                 RelationFrequencyUuid = relationFrequency.Uuid,
                 Description = A<string>(),
@@ -1600,8 +1600,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, SystemRelationResponseDTO actual)
         {
             Assert.Equal(expected.ToSystemUsageUuid, actual.ToSystemUsage.Uuid);
-            Assert.Equal(expected.UsingInterfaceUuid, actual.UsingInterface.Uuid);
-            Assert.Equal(expectedInterfaceName, actual.UsingInterface.Name);
+            Assert.Equal(expected.RelationInterfaceUuid, actual.RelationInterface.Uuid);
+            Assert.Equal(expectedInterfaceName, actual.RelationInterface.Name);
             Assert.Equal(expected.AssociatedContractUuid, actual.AssociatedContract.Uuid);
             Assert.Equal(expectedContractName, actual.AssociatedContract.Name);
             Assert.Equal(expected.RelationFrequencyUuid, actual.RelationFrequency.Uuid);
