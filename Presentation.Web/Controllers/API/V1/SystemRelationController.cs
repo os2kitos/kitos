@@ -218,7 +218,7 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match
                 (
                     onSuccess: _ => NoContent(),
-                    onFailure: FromOperationFailure
+                    onFailure: FromOperationError
                 );
         }
 

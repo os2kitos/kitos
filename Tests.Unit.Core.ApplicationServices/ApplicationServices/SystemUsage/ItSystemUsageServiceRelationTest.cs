@@ -525,7 +525,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             //Assert
             Assert.False(relation.Ok);
-            Assert.Equal(OperationFailure.NotFound, relation.Error);
+            Assert.Equal(OperationFailure.NotFound, relation.Error.FailureType);
         }
 
         [Fact]
