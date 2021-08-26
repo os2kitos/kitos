@@ -1085,6 +1085,66 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Cannot_GET_SystemUsageRelation_If_Relation_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system) = await CreatePrerequisitesAsync();
+            var usage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+
+            //Act
+            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, usage.Uuid, A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, getResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_SystemUsageRelation_If_SystemUsage_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+
+            //Act
+            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, A<Guid>(), A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, getResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_SystemUsageRelation_If_Not_Allowed()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var (interfaceUuid, interfaceName) = await CreateExhibitingInterface(organization.Id, system2.Id);
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var relationFrequency = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies, organization.Uuid, 1, 0)).First();
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid,
+                UsingInterfaceUuid = interfaceUuid,
+                AssociatedContractUuid = contract.Uuid,
+                RelationFrequencyUuid = relationFrequency.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
+
+            var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
+
+            //Act
+            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, getResult.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_POST_SystemUsageRelation_With_Just_SystemUsages()
         {
             //Arrange
@@ -1133,6 +1193,82 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             AssertRelation(input, interfaceName, contract.Name, relationFrequency.Name, createdRelation);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_SystemUsageRelation_If_From_Usage_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid
+            };
+
+            //Act
+            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, A<Guid>(), input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, createdResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_SystemUsageRelation_If_Not_Allowed()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+            
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid
+            };
+
+            var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
+
+            //Act
+            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(tokenForOtherUser, usage1.Uuid, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, createdResponse.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        public async Task Cannot_POST_SystemUsageRelation_If_DTO_Contains_Bad_Input(bool badToUsage, bool badInterface, bool badContract, bool badFrequency)
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var (interfaceUuid, interfaceName) = await CreateExhibitingInterface(organization.Id, system2.Id);
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var relationFrequency = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies, organization.Uuid, 1, 0)).First();
+
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = badToUsage ? A<Guid>() : usage2.Uuid,
+                UsingInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid,
+                AssociatedContractUuid = badContract ? A<Guid>() : contract.Uuid,
+                RelationFrequencyUuid = badFrequency ? A<Guid>() : relationFrequency.Uuid,
+            };
+
+            //Act
+            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, usage1.Uuid, input);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, createdResponse.StatusCode);
         }
 
         [Fact]
@@ -1216,6 +1352,132 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Cannot_PUT_SystemUsageRelation_If_From_Usage_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            // Create relation
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, new SystemRelationWriteRequestDTO {ToSystemUsageUuid = usage2.Uuid});
+            Assert.Equal(usage2.Uuid, createdRelation.ToSystemUsage.Uuid);
+
+
+            var system3 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage3 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system3.Uuid));
+            var updateInput = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage3.Uuid
+            };
+
+            //Act
+            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, A<Guid>(), createdRelation.Uuid, updateInput);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.NotFound, updatedResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_SystemUsageRelation_If_Relation_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+
+            // Starting from 3 as we have 3 systems
+            var system3 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage3 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system3.Uuid));
+
+            var updateInput = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage3.Uuid
+            };
+
+            //Act
+            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, A<Guid>(), updateInput);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.BadRequest, updatedResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_PUT_SystemUsageRelation_If_Not_Allowed()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+            
+            var createInput = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid
+            };
+
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, createInput);
+
+            var system3 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage3 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system3.Uuid));
+
+            var updateInput = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage3.Uuid
+            };
+
+            var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
+
+            //Act
+            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid, updateInput);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, updatedResponse.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        public async Task Cannot_PUT_SystemUsageRelation_If_DTO_Contains_Bad_Input(bool badToUsage, bool badInterface, bool badContract, bool badFrequency)
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            // Create relation
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, new SystemRelationWriteRequestDTO { ToSystemUsageUuid = usage2.Uuid });
+            Assert.Equal(usage2.Uuid, createdRelation.ToSystemUsage.Uuid);
+
+            // Starting from 3 as we have 3 systems
+            var system3 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage3 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system3.Uuid));
+
+            var (interfaceUuid3, interfaceName3) = await CreateExhibitingInterface(organization.Id, system3.Id);
+            var contract3 = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var relationFrequency3 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRelationFrequencies, organization.Uuid, 1, 0)).First();
+
+            var updateInput = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = badToUsage ? A<Guid>() : usage3.Uuid,
+                UsingInterfaceUuid = badInterface ? A<Guid>() : interfaceUuid3,
+                AssociatedContractUuid = badContract ? A<Guid>() : contract3.Uuid,
+                RelationFrequencyUuid = badFrequency ? A<Guid>() : relationFrequency3.Uuid,
+                Description = A<string>(),
+                UrlReference = A<string>()
+            };
+
+            //Act
+            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, createdRelation.Uuid, updateInput);
+
+            //Assert 
+            Assert.Equal(HttpStatusCode.BadRequest, updatedResponse.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_DELETE_SystemUsageRelation_With_Just_SystemUsages()
         {
             //Arrange
@@ -1266,6 +1528,73 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_SystemUsageRelation_If_From_Usage_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid
+            };
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, A<Guid>(), createdRelation.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_SystemUsageRelation_If_Relation_Not_Exists()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_SystemUsageRelation_If_Not_Allowed()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
+            var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
+            var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
+
+            var input = new SystemRelationWriteRequestDTO
+            {
+                ToSystemUsageUuid = usage2.Uuid
+            };
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
+
+            var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
+
+            //Act
+            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
+        }
+
+        private async Task<string> CreateUserInNewOrgAndGetToken()
+        {
+            var otherOrganization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var (_, token) = await CreateApiUser(otherOrganization);
+            return token;
         }
 
         private static void AssertRelation(SystemRelationWriteRequestDTO expected, string expectedInterfaceName, string expectedContractName, string expectedFrequencyName, SystemRelationResponseDTO actual)
