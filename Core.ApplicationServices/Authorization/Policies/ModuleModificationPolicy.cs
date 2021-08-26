@@ -106,17 +106,15 @@ namespace Core.ApplicationServices.Authorization.Policies
 
             if (typeof(IHasRightsHolder).IsAssignableFrom(target))
             {
-                return IsRightsHolder(organizationId);
-            }
+                if (IsRightsHolder(organizationId))
+                    return true;
 
-            if (MatchType<ItSystem>(target))
-            {
-                return false; //Only global admin
-            }
+                if (MatchType<ItInterface>(target))
+                {
+                    return IsSystemModuleAdmin(organizationId) || IsLocalAdmin(organizationId);
+                }
 
-            if (MatchType<ItInterface>(target))
-            {
-                return false; //Only global admin
+                return false;
             }
 
             if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)
