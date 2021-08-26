@@ -155,7 +155,7 @@ namespace Core.ApplicationServices.Interface
 
                 if (accessModifier != null)
                 {
-                    if (!AllowCreationWithAccessLevel(organizationId, accessModifier, newItInterface))
+                    if (!AllowCreationWithAccessLevel(organizationId, accessModifier.Value, newItInterface))
                     {
                         return new OperationError("Cannot create interface with the provided access level", OperationFailure.Forbidden);
                     }
@@ -177,9 +177,9 @@ namespace Core.ApplicationServices.Interface
             return new OperationError(OperationFailure.Forbidden);
         }
 
-        private bool AllowCreationWithAccessLevel(int organizationId, AccessModifier? accessModifier, ItInterface newItInterface)
+        private bool AllowCreationWithAccessLevel(int organizationId, AccessModifier accessModifier, ItInterface newItInterface)
         {
-            return _authorizationContext.HasPermission(new CreateEntityWithVisibilityPermission(accessModifier.Value, newItInterface, organizationId));
+            return _authorizationContext.HasPermission(new CreateEntityWithVisibilityPermission(accessModifier, newItInterface, organizationId));
         }
 
         public Result<ItInterface, OperationError> UpdateNameAndInterfaceId(int id, string name, string itInterfaceId)
