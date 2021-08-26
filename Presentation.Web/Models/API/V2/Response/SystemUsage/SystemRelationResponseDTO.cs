@@ -17,7 +17,7 @@ namespace Presentation.Web.Models.API.V2.Response.SystemUsage
         /// <summary>
         /// The relation uses the interface
         /// </summary>
-        public IdentityNamePairResponseDTO UsingInterface { get; set; }
+        public IdentityNamePairResponseDTO RelationInterface { get; set; }
         /// <summary>
         /// The contract association of the system relation
         /// </summary>

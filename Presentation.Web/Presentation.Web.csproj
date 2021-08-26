@@ -1632,6 +1632,10 @@
       <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
+      <Project>{c01c5f9e-6904-4b4c-94b1-12d7c83f8070}</Project>
+      <Name>Infrastructure.Ninject</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
       <Project>{5ae358f5-4f11-47fe-94be-1588f357dcdc}</Project>
       <Name>Infrastructure.OpenXML</Name>

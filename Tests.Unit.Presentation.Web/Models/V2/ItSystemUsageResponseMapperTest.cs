@@ -438,7 +438,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertIdentity(expected.ToSystemUsage, actual.ToSystemUsage);
             AssertOptionalIdentity(expected.AssociatedContract, actual.AssociatedContract);
             AssertOptionalIdentity(expected.UsageFrequency, actual.RelationFrequency);
-            AssertOptionalIdentity(expected.RelationInterface, actual.UsingInterface);
+            AssertOptionalIdentity(expected.RelationInterface, actual.RelationInterface);
         }
 
         private static void AssertOptionalIdentity<T>(T optionalExpectedIdentity, IdentityNamePairResponseDTO actualIdentity) where T : IHasUuid, IHasName

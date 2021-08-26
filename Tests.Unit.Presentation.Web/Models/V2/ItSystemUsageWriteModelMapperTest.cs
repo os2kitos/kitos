@@ -523,6 +523,24 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.False(output.GDPR.IsNone);
         }
 
+        [Fact]
+        public void Can_Map_SystemRelationParameters()
+        {
+            //Arrange
+            var input = A<SystemRelationWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapRelation(input);
+
+            //Assert
+            Assert.Equal(input.ToSystemUsageUuid,output.ToSystemUsageUuid);
+            Assert.Equal(input.AssociatedContractUuid,output.AssociatedContractUuid);
+            Assert.Equal(input.RelationFrequencyUuid,output.RelationFrequencyUuid);
+            Assert.Equal(input.RelationInterfaceUuid,output.UsingInterfaceUuid);
+            Assert.Equal(input.Description,output.Description);
+            Assert.Equal(input.UrlReference,output.UrlReference);
+        }
+
         private static void AssertLinkMapping(SimpleLinkDTO sourceData, OptionalValueChange<Maybe<NamedLink>> actual)
         {
             Assert.Equal(sourceData.Name, AssertPropertyContainsDataChange(actual).Name);

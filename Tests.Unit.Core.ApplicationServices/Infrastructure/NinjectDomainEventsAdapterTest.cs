@@ -1,16 +1,17 @@
-﻿using Infrastructure.Services.DomainEvents;
+﻿using Infrastructure.Ninject.DomainServices;
+using Infrastructure.Services.DomainEvents;
 using Ninject;
 using Xunit;
 
 namespace Tests.Unit.Core.Infrastructure
 {
-    public class DomainEventsTest
+    public class NinjectDomainEventsAdapterTest
     {
         private const int ExpectedDomainEventId = 1;
 
         private readonly StandardKernel _kernel;
 
-        public DomainEventsTest()
+        public NinjectDomainEventsAdapterTest()
         {
             _kernel = new StandardKernel();
         }
@@ -22,7 +23,7 @@ namespace Tests.Unit.Core.Infrastructure
             var resultHolder = new ResultHolder();
             _kernel.Bind<IResultHolder>().ToConstant(resultHolder);
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().To<MyHandler>().InThreadScope();
-            var sut = new DomainEvents(_kernel);
+            var sut = new NinjectDomainEventsAdapter(_kernel);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });
@@ -40,7 +41,7 @@ namespace Tests.Unit.Core.Infrastructure
             var secondHandlerResult = new ResultHolder();
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(firstHandlerResult)).InThreadScope();
             _kernel.Bind<IDomainEventHandler<MyDomainEvent>>().ToConstant(new MyHandler(secondHandlerResult)).InThreadScope();
-            var sut = new DomainEvents(_kernel);
+            var sut = new NinjectDomainEventsAdapter(_kernel);
 
             // Act
             sut.Raise(new MyDomainEvent { Id = ExpectedDomainEventId });

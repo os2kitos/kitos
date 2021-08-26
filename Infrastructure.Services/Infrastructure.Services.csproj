@@ -33,9 +33,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
-    </Reference>
     <Reference Include="Polly, Version=7.0.0.0, Culture=neutral, PublicKeyToken=c8a3ffc3f8f825cc, processorArchitecture=MSIL">
       <HintPath>..\packages\Polly.7.2.1\lib\net472\Polly.dll</HintPath>
     </Reference>
@@ -67,7 +64,6 @@
     <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
     <Compile Include="Delegates\Factory.cs" />
-    <Compile Include="DomainEvents\DomainEvents.cs" />
     <Compile Include="DomainEvents\EntityCreatedEvent.cs" />
     <Compile Include="DomainEvents\EntityDeletedEvent.cs" />
     <Compile Include="DomainEvents\EntityLifeCycleEvent.cs" />

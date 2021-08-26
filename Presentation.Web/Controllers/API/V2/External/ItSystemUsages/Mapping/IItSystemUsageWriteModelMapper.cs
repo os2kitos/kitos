@@ -18,5 +18,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input);
         UpdatedSystemUsageRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles);
         UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData);
+        SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData);
     }
 }

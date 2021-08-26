@@ -10,7 +10,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
     {
         Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters);
         Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters);
-
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
+        Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters);
+        Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters);
+        Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
     }
 }

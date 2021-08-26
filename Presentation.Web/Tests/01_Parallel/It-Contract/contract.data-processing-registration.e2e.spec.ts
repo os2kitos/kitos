@@ -65,6 +65,7 @@ describe("Data processing registration it-systems test", () => {
             .then(() => dpaHelper.goToItContracts())
             .then(() => expect(DataProcessingRegistrationEditContractPageObject.getContractLink(contractName).isPresent()).toBeTruthy())
             .then(() => dpaHelper.clickContract(contractName))
+            .then(() => browser.waitForAngular())
             .then(() => contractHelper.goToDpr());
     }
 });
