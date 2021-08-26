@@ -272,7 +272,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
-            kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
+            kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
