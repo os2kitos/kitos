@@ -698,7 +698,6 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return _systemUsageService
                 .GetByUuid(itSystemUsageUuid)
-                .Bind(WithWriteAccess)
                 .Bind<(int usageId, int relationId)>(usage =>
                 {
                     var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
