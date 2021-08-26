@@ -3,28 +3,28 @@ using System.Collections.Generic;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
-using Core.DomainModel.ItSystem;
+using Core.DomainModel.GDPR;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 
-namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
+namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
-    [RoutePrefix("api/v2/it-system-usage-role-types")]
-    public class ItSystemUsageRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<ItSystemRight, ItSystemRole>
+    [RoutePrefix("api/v2/data-processing-registrations-role-types")]
+    public class DataProcessingRegistrationRoleTypeV2Controller : BaseRoleOptionTypeV2Controller<DataProcessingRegistrationRight, DataProcessingRegistrationRole>
     {
-        public ItSystemUsageRoleTypeV2Controller(IOptionsApplicationService<ItSystemRight, ItSystemRole> optionApplicationService)
+        public DataProcessingRegistrationRoleTypeV2Controller(IOptionsApplicationService<DataProcessingRegistrationRight, DataProcessingRegistrationRole> optionApplicationService)
             : base(optionApplicationService)
         {
             
         }
 
         /// <summary>
-        /// Returns IT-System usage role types which are available for new registrations within the organization
+        /// Returns Data Processing Registration role types which are available for new registrations within the organization
         /// </summary>
-        /// <param name="organizationUuid">organization context for the IT-System usage role availability</param>
-        /// <returns>A list of available IT-System usage role types</returns>
+        /// <param name="organizationUuid">organization context for the Data Processing Registration role availability</param>
+        /// <returns>A list of available Data Processing Registration role option types</returns>
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RoleOptionResponseDTO>))]
@@ -38,21 +38,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Returns requested IT-System usage role type
+        /// Returns requested Data Processing Registration role type
         /// </summary>
-        /// <param name="systemUsageRoleTypeUuid">role type identifier</param>
+        /// <param name="dataProcessingRegistrationRoleTypeUuid">role type identifier</param>
         /// <param name="organizationUuid">organization context for the role type availability</param>
-        /// <returns>A detailed description of the role type and it's availability</returns>
+        /// <returns>A detailed description of the Data Processing Registration role type and it's availability</returns>
         [HttpGet]
-        [Route("{systemUsageRoleTypeUuid}")]
+        [Route("{dataProcessingRegistrationRoleTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RoleOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid systemUsageRoleTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid dataProcessingRegistrationRoleTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
-            return GetSingle(systemUsageRoleTypeUuid, organizationUuid);
+            return GetSingle(dataProcessingRegistrationRoleTypeUuid, organizationUuid);
         }
     }
 }

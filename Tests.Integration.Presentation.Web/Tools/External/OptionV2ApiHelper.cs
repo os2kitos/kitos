@@ -25,9 +25,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItContractContractTypes = "it-contract-contract-types";
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
             public const string DataProcessingRegistrationBasisForTransfer = "data-processing-registrations-basis-for-transfer-types";
-            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
-            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
-            public const string DataProcessingRegistrationDataResponsible = "data-processing-registrations-data-responsible-types";
+            public const string DataProcessingRegistrationCountry = "data-processing-registrations-country-types";
+            public const string DataProcessingRegistrationOversight = "data-processing-registrations-oversight-types";
+            public const string DataProcessingRegistrationRoles = "data-processing-registrations-role-types";
         }
 
         public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetOptionsAsync(string resource, Guid orgUuid, int pageSize, int pageNumber)
