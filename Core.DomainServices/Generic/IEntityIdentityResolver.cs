@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.DomainModel;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Generic
@@ -8,8 +9,7 @@ namespace Core.DomainServices.Generic
     /// </summary>
     public interface IEntityIdentityResolver
     {
-        //TODO: Generics to lazy resolve the repository using dbset?
-        Maybe<Guid> ResolveUuid(int dbId);
-        Maybe<int> ResolveDbId(Guid uuid);
+        Maybe<Guid> ResolveUuid<T>(int dbId) where T : class, IHasUuid, IHasId;
+        Maybe<int> ResolveDbId<T>(Guid uuid) where T : class, IHasUuid, IHasId;
     }
 }

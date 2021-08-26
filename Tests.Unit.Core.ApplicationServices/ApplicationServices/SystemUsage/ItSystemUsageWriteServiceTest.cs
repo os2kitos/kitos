@@ -27,6 +27,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
@@ -93,7 +94,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(),
                 _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
                 _archiveTestLocationOptionsServiceMock.Object,
-                Mock.Of<IItsystemUsageRelationsService>());
+                Mock.Of<IItsystemUsageRelationsService>(),
+                Mock.Of<IEntityIdentityResolver>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

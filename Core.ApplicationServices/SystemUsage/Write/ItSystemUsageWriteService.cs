@@ -6,7 +6,6 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -21,6 +20,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
@@ -44,6 +44,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOptionsService<ItSystemUsage, ArchiveLocation> _archiveLocationOptionsService;
         private readonly IOptionsService<ItSystemUsage, ArchiveTestLocation> _archiveTestLocationOptionsService;
         private readonly IItsystemUsageRelationsService _systemUsageRelationsService;
+        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
@@ -77,7 +78,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
             IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
-            IItsystemUsageRelationsService systemUsageRelationsService)
+            IItsystemUsageRelationsService systemUsageRelationsService,
+            IEntityIdentityResolver identityResolver)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -100,6 +102,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _archiveLocationOptionsService = archiveLocationOptionsService;
             _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
             _systemUsageRelationsService = systemUsageRelationsService;
+            _identityResolver = identityResolver;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -649,15 +652,15 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return _systemUsageService
                 .GetByUuid(itSystemUsageUuid)
                 .Bind(WithWriteAccess)
-                .Bind<(ItSystemUsage usage, SystemRelation relation)>(usage =>
+                .Bind<(int usageId, int relationId)>(usage =>
                 {
-                    var usageRelation = usage.GetUsageRelation(itSystemUsageRelationUuid);
+                    var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
                     if (usageRelation.IsNone)
                         return new OperationError(
-                            $"Relation with id:{itSystemUsageRelationUuid} does not exist on system usage with id:{itSystemUsageUuid}", OperationFailure.BadInput);
-                    return (usage, usageRelation.Value);
+                            $"Relation with id:{itSystemUsageRelationUuid} does not exist", OperationFailure.BadInput);
+                    return (usage.Id, usageRelation.Value);
                 })
-                .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usage.Id, usageAndRelation.relation.Id))
+                .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
                 .Match(_ => Maybe<OperationError>.None, error => error);
         }
     }

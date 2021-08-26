@@ -433,11 +433,6 @@ namespace Core.DomainModel.ItSystemUsage
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
         }
 
-        public Maybe<SystemRelation> GetUsageRelation(Guid itSystemUsageRelationUuid)
-        {
-            return UsageRelations.FirstOrDefault(r => r.Uuid == itSystemUsageRelationUuid);
-        }
-
         private Result<SystemRelation, OperationError> UpdateRelation(
             SystemRelation relation,
             ItSystemUsage toSystemUsage,
