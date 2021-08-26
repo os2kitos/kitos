@@ -1092,7 +1092,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var usage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
-            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, usage.Uuid, A<Guid>());
+            using var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, usage.Uuid, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, getResult.StatusCode);
@@ -1105,7 +1105,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token, user, organization, system1) = await CreatePrerequisitesAsync();
 
             //Act
-            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, A<Guid>(), A<Guid>());
+            using var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(token, A<Guid>(), A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, getResult.StatusCode);
@@ -1138,7 +1138,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
 
             //Act
-            var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
+            using var getResult = await ItSystemUsageV2Helper.SendGetRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, getResult.StatusCode);
@@ -1209,7 +1209,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
 
             //Act
-            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, A<Guid>(), input);
+            using var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, A<Guid>(), input);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, createdResponse.StatusCode);
@@ -1232,7 +1232,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
 
             //Act
-            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(tokenForOtherUser, usage1.Uuid, input);
+            using var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(tokenForOtherUser, usage1.Uuid, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdResponse.StatusCode);
@@ -1265,7 +1265,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
 
             //Act
-            var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, usage1.Uuid, input);
+            using var createdResponse = await ItSystemUsageV2Helper.SendPostRelationAsync(token, usage1.Uuid, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdResponse.StatusCode);
@@ -1373,7 +1373,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
 
             //Act
-            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, A<Guid>(), createdRelation.Uuid, updateInput);
+            using var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, A<Guid>(), createdRelation.Uuid, updateInput);
 
             //Assert 
             Assert.Equal(HttpStatusCode.NotFound, updatedResponse.StatusCode);
@@ -1396,7 +1396,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
 
             //Act
-            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, A<Guid>(), updateInput);
+            using var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, A<Guid>(), updateInput);
 
             //Assert 
             Assert.Equal(HttpStatusCode.BadRequest, updatedResponse.StatusCode);
@@ -1429,7 +1429,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
 
             //Act
-            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid, updateInput);
+            using var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid, updateInput);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, updatedResponse.StatusCode);
@@ -1471,7 +1471,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
 
             //Act
-            var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, createdRelation.Uuid, updateInput);
+            using var updatedResponse = await ItSystemUsageV2Helper.SendPutRelationAsync(token, usage1.Uuid, createdRelation.Uuid, updateInput);
 
             //Assert 
             Assert.Equal(HttpStatusCode.BadRequest, updatedResponse.StatusCode);
@@ -1493,7 +1493,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, createdRelation.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, createdRelation.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
@@ -1524,7 +1524,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, createdRelation.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, createdRelation.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
@@ -1546,7 +1546,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, input);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, A<Guid>(), createdRelation.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, A<Guid>(), createdRelation.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
@@ -1560,7 +1560,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, A<Guid>());
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(token, usage1.Uuid, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, deleteResult.StatusCode);
@@ -1584,7 +1584,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var tokenForOtherUser = await CreateUserInNewOrgAndGetToken();
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteRelationAsync(tokenForOtherUser, usage1.Uuid, createdRelation.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
