@@ -121,6 +121,7 @@
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
     <Compile Include="Model\Shared\OptionalValueChange.cs" />
     <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
     <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
