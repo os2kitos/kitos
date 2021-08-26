@@ -61,17 +61,13 @@ namespace Core.ApplicationServices.Authorization
                 return OrganizationDataReadAccessLevel.All;
             }
 
-            switch (GetCrossOrganizationReadAccess())
+            return GetCrossOrganizationReadAccess() switch
             {
-                case CrossOrganizationDataReadAccessLevel.Public:
-                    return OrganizationDataReadAccessLevel.Public;
-                case CrossOrganizationDataReadAccessLevel.All:
-                    return OrganizationDataReadAccessLevel.All;
-                case CrossOrganizationDataReadAccessLevel.RightsHolder:
-                    return OrganizationDataReadAccessLevel.RightsHolder;
-                default:
-                    return OrganizationDataReadAccessLevel.None;
-            }
+                CrossOrganizationDataReadAccessLevel.Public => OrganizationDataReadAccessLevel.Public,
+                CrossOrganizationDataReadAccessLevel.All => OrganizationDataReadAccessLevel.All,
+                CrossOrganizationDataReadAccessLevel.RightsHolder => OrganizationDataReadAccessLevel.RightsHolder,
+                _ => OrganizationDataReadAccessLevel.None
+            };
         }
 
         private bool HasRightsHolderAccessIn(int organizationId)
@@ -100,21 +96,19 @@ namespace Core.ApplicationServices.Authorization
             var entityType = _typeResolver.Resolve(entity.GetType());
 
             var readAccessLevel = GetReadAccessLevel(entityType);
-            switch (readAccessLevel)
+            return readAccessLevel switch
             {
-                case EntityReadAccessLevel.None:
-                    return false;
-                case EntityReadAccessLevel.OrganizationAndRightsHolderAccess:
-                    return HasRoleInSameOrganizationAs(entity) || IsRightsHolderFor(entity);
-                case EntityReadAccessLevel.OrganizationOnly:
-                    return HasRoleInSameOrganizationAs(entity);
-                case EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations:
-                    return HasRoleInSameOrganizationAs(entity) || EntityIsShared(entity);
-                case EntityReadAccessLevel.All:
-                    return true;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level");
-            }
+                EntityReadAccessLevel.None => false,
+                EntityReadAccessLevel.OrganizationAndRightsHolderAccess =>
+                    HasRoleInSameOrganizationAs(entity) ||
+                    IsRightsHolderFor(entity),
+                EntityReadAccessLevel.OrganizationOnly => HasRoleInSameOrganizationAs(entity),
+                EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations =>
+                    HasRoleInSameOrganizationAs(entity) ||
+                    EntityIsShared(entity),
+                EntityReadAccessLevel.All => true,
+                _ => throw new ArgumentOutOfRangeException(nameof(readAccessLevel), "unsupported read access level")
+            };
         }
 
         private bool IsRightsHolderFor(IEntity entity)
@@ -156,16 +150,14 @@ namespace Core.ApplicationServices.Authorization
             {
                 var crossOrganizationDataReadAccessLevel = GetCrossOrganizationReadAccess();
 
-                switch (crossOrganizationDataReadAccessLevel)
+                return crossOrganizationDataReadAccessLevel switch
                 {
-                    case CrossOrganizationDataReadAccessLevel.RightsHolder:
-                        return EntityReadAccessLevel.OrganizationAndRightsHolderAccess;
-                    case CrossOrganizationDataReadAccessLevel.All:
-                    case CrossOrganizationDataReadAccessLevel.Public:
-                        return EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations;
-                    default:
-                        return EntityReadAccessLevel.OrganizationOnly;
-                }
+                    CrossOrganizationDataReadAccessLevel.RightsHolder => EntityReadAccessLevel.OrganizationAndRightsHolderAccess,
+                    CrossOrganizationDataReadAccessLevel.All => EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations,
+                    CrossOrganizationDataReadAccessLevel.Public => EntityReadAccessLevel.OrganizationAndPublicFromOtherOrganizations,
+                    CrossOrganizationDataReadAccessLevel.None => EntityReadAccessLevel.OrganizationOnly,
+                    _ => EntityReadAccessLevel.OrganizationOnly
+                };
             }
 
             return EntityReadAccessLevel.None;
@@ -242,24 +234,19 @@ namespace Core.ApplicationServices.Authorization
             var result = false;
             if (AllowModify(entity))
             {
-                switch (entity)
+                result = entity switch
                 {
-                    case ItInterface itInterface:
+                    ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
-                        result = IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId);
-                        break;
-                    case ItSystem system:
+                        IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
+                    ItSystem system =>
                         //Even rightsholders are not allowed to delete systems
-                        result = IsGlobalAdmin() || IsLocalAdmin(system.OrganizationId);
-                        break;
-                    case OrganizationRight right:
+                        IsGlobalAdmin() || IsLocalAdmin(system.OrganizationId),
+                    OrganizationRight right =>
                         // Only global admin can set other users as global admins
-                        result = AllowAdministerOrganizationRight(right);
-                        break;
-                    default:
-                        result = true;
-                        break;
-                }
+                        AllowAdministerOrganizationRight(right),
+                    _ => true
+                };
             }
 
             return result;
@@ -379,17 +366,18 @@ namespace Core.ApplicationServices.Authorization
             {
                 var ownedByOrganization = (IOwnedByOrganization)target;
 
-                switch (target)
+                return target switch
                 {
-                    case IReportModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsReportModuleAdmin(ownedByOrganization.OrganizationId);
-                    case IContractModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId) || IsContractModuleAdmin(ownedByOrganization.OrganizationId);
-                    case IOrganizationModule _:
-                        return IsGlobalAdmin() || IsLocalAdmin(ownedByOrganization.OrganizationId);
-                }
-
-                return IsGlobalAdmin();
+                    IReportModule _ => IsGlobalAdmin() || 
+                                       IsLocalAdmin(ownedByOrganization.OrganizationId) ||
+                                       IsReportModuleAdmin(ownedByOrganization.OrganizationId),
+                    IContractModule _ => IsGlobalAdmin() || 
+                                         IsLocalAdmin(ownedByOrganization.OrganizationId) ||
+                                         IsContractModuleAdmin(ownedByOrganization.OrganizationId),
+                    IOrganizationModule _ => IsGlobalAdmin() || 
+                                             IsLocalAdmin(ownedByOrganization.OrganizationId),
+                    _ => IsGlobalAdmin()
+                };
             }
 
             //No-one can control access modifiers that are not there
@@ -439,17 +427,16 @@ namespace Core.ApplicationServices.Authorization
 
         bool IPermissionVisitor.Visit(DefineOrganizationTypePermission permission)
         {
-            switch (permission.TargetOrganizationType)
+            return permission.TargetOrganizationType switch
             {
-                case OrganizationTypeKeys.Kommune:
-                case OrganizationTypeKeys.AndenOffentligMyndighed:
-                    return IsGlobalAdmin();
-                case OrganizationTypeKeys.Interessefællesskab:
-                case OrganizationTypeKeys.Virksomhed:
-                    return IsGlobalAdmin() || IsLocalAdmin(permission.ParentOrganizationId);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType), permission.TargetOrganizationType, "Unmapped organization type");
-            }
+                OrganizationTypeKeys.Kommune => IsGlobalAdmin(),
+                OrganizationTypeKeys.AndenOffentligMyndighed => IsGlobalAdmin(),
+                OrganizationTypeKeys.Interessefællesskab => IsGlobalAdmin() ||
+                                                            IsLocalAdmin(permission.ParentOrganizationId),
+                OrganizationTypeKeys.Virksomhed => IsGlobalAdmin() || IsLocalAdmin(permission.ParentOrganizationId),
+                _ => throw new ArgumentOutOfRangeException(nameof(permission.TargetOrganizationType),
+                    permission.TargetOrganizationType, "Unmapped organization type")
+            };
         }
 
         public bool Visit(CreateEntityWithVisibilityPermission permission)
@@ -470,14 +457,12 @@ namespace Core.ApplicationServices.Authorization
 
         public bool Visit(AdministerGlobalPermission permission)
         {
-            switch (permission.Permission)
+            return permission.Permission switch
             {
-                case GlobalPermission.GlobalAdmin:
-                case GlobalPermission.StakeHolderAccess:
-                    return IsGlobalAdmin();
-                default:
-                    return false;
-            }
+                GlobalPermission.GlobalAdmin => IsGlobalAdmin(),
+                GlobalPermission.StakeHolderAccess => IsGlobalAdmin(),
+                _ => false
+            };
         }
 
         #endregion PERMISSIONS

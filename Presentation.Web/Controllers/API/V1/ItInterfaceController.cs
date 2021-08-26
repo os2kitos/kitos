@@ -3,7 +3,9 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -44,8 +46,8 @@ namespace Presentation.Web.Controllers.API.V1
         }
 
         [NonAction]
-        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto) => throw  new NotSupportedException();
-        
+        public override HttpResponseMessage Post(int organizationId, ItInterfaceDTO dto) => throw new NotSupportedException();
+
         public HttpResponseMessage Post(ItInterfaceDTO dto)
         {
             try
@@ -85,6 +87,14 @@ namespace Presentation.Web.Controllers.API.V1
                 uuidToken.ToObject<Guid>() != itInterface.Uuid)
             {
                 return BadRequest("Cannot change uuid");
+            }
+
+            if (obj.TryGetValue(nameof(ItInterface.AccessModifier), StringComparison.OrdinalIgnoreCase, out var newAccessModifuer) &&
+                Enum.TryParse<AccessModifier>(newAccessModifuer.Value<string>(), out var newModifier) &&
+                newModifier != itInterface.AccessModifier)
+            {
+                if (!AuthorizationContext.HasPermission(new VisibilityControlPermission(itInterface)))
+                    return Forbidden("Not allowed to change visibility of entity");
             }
 
             return base.Patch(id, organizationId, obj);
