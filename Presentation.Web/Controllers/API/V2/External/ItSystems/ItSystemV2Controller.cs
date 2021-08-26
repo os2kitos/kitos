@@ -232,7 +232,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             var parameters = new RightsHolderSystemUpdateParameters(request.Name, request.ParentUuid, request.FormerName,
                 request.Description, request.UrlReference, request.BusinessTypeUuid,
-                request.KLENumbers ?? new string[0], request.KLEUuids ?? new Guid[0]);
+                request.KLENumbers ?? Array.Empty<string>(), request.KLEUuids ?? Array.Empty<Guid>());
 
             return _rightsHolderSystemService
                 .Update(uuid, parameters)

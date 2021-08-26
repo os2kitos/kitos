@@ -12,6 +12,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -42,6 +43,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOptionsService<ItSystemUsage, ArchiveType> _archiveTypeOptionsService;
         private readonly IOptionsService<ItSystemUsage, ArchiveLocation> _archiveLocationOptionsService;
         private readonly IOptionsService<ItSystemUsage, ArchiveTestLocation> _archiveTestLocationOptionsService;
+        private readonly IItsystemUsageRelationsService _systemUsageRelationsService;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
@@ -74,7 +76,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             ILogger logger,
             IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
-            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService)
+            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
+            IItsystemUsageRelationsService systemUsageRelationsService)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -96,6 +99,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _archiveTypeOptionsService = archiveTypeOptionsService;
             _archiveLocationOptionsService = archiveLocationOptionsService;
             _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
+            _systemUsageRelationsService = systemUsageRelationsService;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -638,6 +642,22 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return _systemUsageService.GetByUuid(itSystemUsageUuid)
                 .Bind(usage => _systemUsageService.Delete(usage.Id))
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
+        }
+
+        public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
+        {
+            return _systemUsageService
+                .GetByUuid(itSystemUsageUuid)
+                .Bind<(ItSystemUsage usage, SystemRelation relation)>(usage =>
+                {
+                    var usageRelation = usage.GetUsageRelation(itSystemUsageRelationUuid);
+                    if (usageRelation.IsNone)
+                        return new OperationError(
+                            $"Relation with id:{itSystemUsageRelationUuid} does not exist on system usage with id:{itSystemUsageUuid}", OperationFailure.BadInput);
+                    return (usage, usageRelation.Value);
+                })
+                .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usage.Id, usageAndRelation.relation.Id))
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
     }
 }

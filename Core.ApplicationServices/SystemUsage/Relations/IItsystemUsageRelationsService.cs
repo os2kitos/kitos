@@ -38,7 +38,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
         /// <param name="fromSystemUsageId">Id of the "source" it system usage</param>
         /// <param name="relationId">Relation Id</param>
         /// <returns></returns>
-        Result<SystemRelation, OperationFailure> RemoveRelation(int fromSystemUsageId, int relationId);
+        Result<SystemRelation, OperationError> RemoveRelation(int fromSystemUsageId, int relationId);
         /// <summary>
         /// Gets a system relation
         /// </summary>

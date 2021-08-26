@@ -12,5 +12,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         Result<ItSystemUsage, OperationError> Update(Guid systemUsageUuid, SystemUsageUpdateParameters parameters);
 
         Maybe<OperationError> Delete(Guid itSystemUsageUuid);
+
+        Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid);
     }
 }
