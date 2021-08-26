@@ -84,8 +84,8 @@ describe("For Local Administrator", () => {
         checkSystemUsageAccessibility(true, true);
     });
 
-    it("Create IT interface is disabled", () => {
-        checkInterfaceAccessibility(false, true);
+    it("Create IT interface is enabled", () => {
+        checkInterfaceAccessibility(true, true);
     });
 
     it("Create IT project is enabled", () => {

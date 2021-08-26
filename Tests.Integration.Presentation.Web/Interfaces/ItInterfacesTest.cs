@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
@@ -29,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             using var httpResponse = await HttpApi.GetWithCookieAsync(url, cookie);
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK,httpResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, httpResponse.StatusCode);
             var response = await httpResponse.ReadOdataListResponseBodyAsAsync<ItInterface>();
             Assert.NotNull(response);
             var filteredResult = response.Where(x => x.Name.StartsWith(interFacePrefixName)).ToList();
@@ -100,6 +102,40 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
+        [Theory, Description("Global admin can create with any access, system/local admin with local access only and the rest are not allowed")]
+        [InlineData(OrganizationRole.ContractModuleAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.ContractModuleAdmin, AccessModifier.Local, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.ProjectModuleAdmin, AccessModifier.Local, false)]
+        [InlineData(OrganizationRole.User, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.User, AccessModifier.Local, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.OrganizationModuleAdmin, AccessModifier.Local, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.ReportModuleAdmin, AccessModifier.Local, false)]
+        [InlineData(OrganizationRole.LocalAdmin, AccessModifier.Local, true)]
+        [InlineData(OrganizationRole.LocalAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, AccessModifier.Local, true)]
+        [InlineData(OrganizationRole.SystemModuleAdmin, AccessModifier.Public, false)]
+        [InlineData(OrganizationRole.GlobalAdmin, AccessModifier.Local, true)]
+        [InlineData(OrganizationRole.GlobalAdmin, AccessModifier.Public, true)]
+        public async Task Interface_Creation_Allowed(OrganizationRole role, AccessModifier accessModifier, bool expectSuccess)
+        {
+            //Arrange
+            var email = $"{A<Guid>():N}@kitos.dk";
+            var login = role == OrganizationRole.GlobalAdmin
+                ? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin)
+                : (await HttpApi.CreateUserAndLogin(email, role)).Transform(x => x.loginCookie);
+
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+
+            //Act - perform the action with the actual role
+            using var result = await InterfaceHelper.SendCreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, accessModifier),login);
+
+            //Assert
+            Assert.Equal(expectSuccess ? HttpStatusCode.Created : HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
         [Fact]
         public async Task BelongsTo_Is_Same_As_Exhibit_System()
         {
@@ -115,7 +151,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces
             var interfaceResult = await InterfaceHelper.GetInterfaceById(interfaceDto.Id);
             var systemResult = await ItSystemHelper.GetSystemAsync(system.Id);
             Assert.Equal(systemResult.BelongsToName, interfaceResult.BelongsToName);
-                
+
         }
 
         [Theory]
