@@ -677,7 +677,21 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
         {
-            throw new NotImplementedException();
+            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+                .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
+                .Bind(usageAndIds => ResolveRequiredId<SystemRelation>(relationUuid).Select(relationId => (usageAndIds.usage, relationId, usageAndIds.ids)))
+                .Bind(usageAndIds =>
+                    _systemUsageRelationsService.ModifyRelation(
+                        usageAndIds.usage.Id,
+                        usageAndIds.relationId,
+                        usageAndIds.ids.systemUsageId,
+                        parameters.Description,
+                        parameters.UrlReference,
+                        usageAndIds.ids.interfaceId.Match<int?>(id => id, () => null),
+                        usageAndIds.ids.contractId.Match<int?>(id => id, () => null),
+                        usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null)
+                    )
+                );
         }
 
         public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
