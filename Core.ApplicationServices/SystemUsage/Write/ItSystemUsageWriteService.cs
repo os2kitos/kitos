@@ -672,7 +672,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return ResolveOptionalId<ItContract>(parameters.AssociatedContractUuid)
                 .Bind(id => ResolveOptionalId<ItInterface>(parameters.UsingInterfaceUuid).Select(interfaceId => (contractId: id, interfaceId)))
                 .Bind(ids => ResolveOptionalId<RelationFrequencyType>(parameters.RelationFrequencyUuid).Select(id => (ids.contractId, ids.interfaceId, frequencyId: id)))
-                .Bind(ids => ResolveRequiredId<ItSystemUsage>(parameters.ToSystemUsageUuid).Select(id => (ids.contractId, ids.interfaceId, ids.contractId, systemUsageId: id)));
+                .Bind(ids => ResolveRequiredId<ItSystemUsage>(parameters.ToSystemUsageUuid).Select(id => (ids.contractId, ids.interfaceId, ids.frequencyId, systemUsageId: id)));
         }
 
         public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
