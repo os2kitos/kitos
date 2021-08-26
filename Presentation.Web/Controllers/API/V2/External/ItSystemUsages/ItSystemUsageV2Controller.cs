@@ -417,7 +417,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
                 return BadRequest(ModelState);
 
             return _itSystemUsageService
-                .GetByUuid(systemRelationUuid)
+                .GetByUuid(systemUsageUuid)
                 .Bind(usage =>
                     usage.GetUsageRelation(systemRelationUuid)
                         .Match<Result<SystemRelation, OperationError>>
@@ -450,7 +450,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             var systemRelationParameters = _writeModelMapper.MapRelation(request);
 
             return _writeService
-                .UpdateSystemRelation(systemUsageUuid, systemUsageUuid, systemRelationParameters)
+                .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
                 .Select(_responseMapper.MapSystemRelationDTO)
                 .Match(Ok, FromOperationError);
         }

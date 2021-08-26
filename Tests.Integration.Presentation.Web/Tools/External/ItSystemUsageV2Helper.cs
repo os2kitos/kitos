@@ -165,7 +165,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (!response.IsSuccessStatusCode)
                 Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<SystemRelationResponseDTO>();
         }
 
@@ -180,7 +180,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (!response.IsSuccessStatusCode)
                 Debug.WriteLine(response.StatusCode + ":" + await response.Content.ReadAsStringAsync());
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<SystemRelationResponseDTO>();
         }
 
