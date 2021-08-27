@@ -5,7 +5,7 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Request.DataProcessing
 {
-    public class OversightWriteRequestDTO
+    public class DataProcessingRegistrationOversightWriteRequestDTO
     {
         /// <summary>
         /// Applied oversight options.

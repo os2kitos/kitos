@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
-namespace Presentation.Web.Models.API.V2.Request.DataProcessing
+namespace Presentation.Web.Models.API.V2.Response.DataProcessing
 {
-    public class GeneralDataWriteRequestDTO
+    public class DataProcessingRegistrationGeneralDataResponseDTO
     {
         /// <summary>
         /// Optional data responsible selection
-        /// Constraints:
-        ///     - If changed from existing value, the option must currently be available in the organization
         /// </summary>
-        [NonEmptyGuid]
-        public Guid? DataResponsibleUuid { get; set; }
+        public IdentityNamePairResponseDTO DataResponsible { get; set; }
         /// <summary>
         /// Additional remark related to the data responsible
         /// </summary>
@@ -28,45 +26,31 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         public string IsAgreementConcludedRemark { get; set; }
         /// <summary>
         /// Describes the date when the data processing agreement was concluded
-        /// Constraints:
-        ///     - IsAgreementConcluded equals 'yes'
         /// </summary>
         public DateTime? AgreementConcludedAt { get; set; }
         /// <summary>
         /// Optional basis for transfer selection
-        /// Constraints:
-        ///     - If changed from existing value, the option must currently be available in the organization
         /// </summary>
-        [NonEmptyGuid]
-        public Guid? BasisForTransferUuid { get; set; }
+        public IdentityNamePairResponseDTO BasisForTransfer { get; set; }
         /// <summary>
         /// Determines if the data processing includes transfer to insecure third countries
         /// </summary>
         public YesNoUndecidedChoice? TransferToInsecureThirdCountries { get; set; }
         /// <summary>
         /// Which insecure third countries are subject to data transfer as part of the data processing
-        /// Constraints:
-        ///     - TransferToInsecureThirdCountries equals 'yes'
-        ///     - Duplicates are not allowed
-        ///     - If changed from existing value, the options must currently be available in the organization
         /// </summary>
-        public IEnumerable<Guid> InsecureCountriesSubjectToDataTransferUuids { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> InsecureCountriesSubjectToDataTransfer { get; set; }
         /// <summary>
         /// UUID's of the organization entities selected as data processors
-        /// Constraints:
-        ///     - No duplicates
         /// </summary>
-        public IEnumerable<Guid> DataProcessorUuids { get; set; }
+        public IEnumerable<ShallowOrganizationResponseDTO> DataProcessors { get; set; }
         /// <summary>
         /// Determines if the data processing involves sub data processors
         /// </summary>
         public YesNoUndecidedChoice? HasSubDataProcesors { get; set; }
         /// <summary>
         /// UUID's of the organization entities selected as sub data processors
-        /// Constraints:
-        ///     - HasSubDataProcesors equals 'yes'
-        ///     - No duplicates
         /// </summary>
-        public IEnumerable<Guid> SubDataProcessorUuids { get; set; }
+        public IEnumerable<ShallowOrganizationResponseDTO> SubDataProcessors { get; set; }
     }
 }

@@ -177,7 +177,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] GeneralDataWriteRequestDTO request)
+        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationGeneralDataWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -223,7 +223,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] OversightWriteRequestDTO request)
+        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationOversightWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

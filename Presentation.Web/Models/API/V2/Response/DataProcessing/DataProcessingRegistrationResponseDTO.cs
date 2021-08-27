@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -16,15 +16,15 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         public DateTime LastModified { get; set; }
         public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
-        public GeneralDataResponseDTO General { get; set; }
+        public DataProcessingRegistrationGeneralDataResponseDTO General { get; set; }
         /// <summary>
         /// Associated it-system-usage entities
         public IEnumerable<IdentityNamePairResponseDTO> SystemUuids { get; set; }
-        public OversightResponseDTO Oversight { get; set; }
+        public DataProcessingRegistrationOversightResponseDTO Oversight { get; set; }
         /// <summary>
         /// Data processing role assignments
         /// </summary>
-        public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
+        public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
         /// <summary>
         /// External reference definitions
         /// </summary>

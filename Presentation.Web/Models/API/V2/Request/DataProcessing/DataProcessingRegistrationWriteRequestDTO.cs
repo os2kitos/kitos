@@ -18,7 +18,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         [Required(AllowEmptyStrings = false)]
         [MaxLength(DataProcessingRegistrationConstraints.MaxNameLength)]
         public string Name { get; set; }
-        public GeneralDataWriteRequestDTO General { get; set; }
+        public DataProcessingRegistrationGeneralDataWriteRequestDTO General { get; set; }
         /// <summary>
         /// UUIDs of associated it-system-usage entities
         /// Constraints:
@@ -26,7 +26,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - System usages must be belong to the same organization as this data processing registration
         /// </summary>
         public IEnumerable<Guid> SystemUuids { get; set; }
-        public OversightWriteRequestDTO Oversight { get; set; }
+        public DataProcessingRegistrationOversightWriteRequestDTO Oversight { get; set; }
         /// <summary>
         /// Data processing role assignments
         /// Constraints:
