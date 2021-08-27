@@ -383,6 +383,8 @@
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\GeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\GeneralDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\OversightResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\DataProcessing\OversightDateDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\OversightWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
