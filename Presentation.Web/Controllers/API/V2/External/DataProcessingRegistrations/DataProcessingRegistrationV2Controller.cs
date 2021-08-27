@@ -39,6 +39,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">System UUID filter</param>
         /// <param name="systemUsageUuid">SystemUsage UUID filter</param>
+        /// <param name="dataProcessorUuid">UUID of a data processor in the registration</param>
+        /// <param name="subDataProcessorUuid">UUID of a sub data processor in the registration</param>
+        /// <param name="agreementConcluded">Filter based on whether or not an agreement has been concluded</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -50,6 +53,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
+            [NonEmptyGuid] Guid? dataProcessorUuid = null,
+            [NonEmptyGuid] Guid? subDataProcessorUuid = null,
+            [NonEmptyGuid] bool? agreementConcluded = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
