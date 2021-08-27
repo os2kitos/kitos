@@ -2,6 +2,7 @@
 using System.Data;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -53,10 +54,14 @@ namespace Core.ApplicationServices.GDPR.Write
                 return new OperationError($"Unable to resolve Organization with uuid{organizationUuid}", OperationFailure.BadInput);
             }
             if (parameters.Name.IsUnchanged)
-                return new OperationError($"Name must be provided", OperationFailure.BadInput);
+                return new OperationError("Name must be provided", OperationFailure.BadInput);
+
             var name = parameters.Name.NewValue;
 
-            var creationResult = _dataProcessingRegistrationApplicationService.Create(orgId.Value, name)
+            parameters.Name = OptionalValueChange<string>.None; //Remove from change set. It is set during creation
+
+            var creationResult = _dataProcessingRegistrationApplicationService
+                .Create(orgId.Value, name)
                 .Bind(createdSystemUsage => Update(() => createdSystemUsage, parameters));
 
             if (creationResult.Ok)
@@ -70,6 +75,9 @@ namespace Core.ApplicationServices.GDPR.Write
 
         public Result<DataProcessingRegistration, OperationError> Update(Guid dataProcessingRegistrationUuid, DataProcessingRegistrationModificationParameters parameters)
         {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
             return Update(() => _dataProcessingRegistrationApplicationService.GetByUuid(dataProcessingRegistrationUuid), parameters);
         }
 
