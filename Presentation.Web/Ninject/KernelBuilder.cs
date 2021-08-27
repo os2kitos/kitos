@@ -97,8 +97,10 @@ using Core.ApplicationServices.Rights;
 using Core.ApplicationServices.SystemUsage.ReadModels;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
+using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -219,6 +221,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -269,7 +272,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
-            kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
+            kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);

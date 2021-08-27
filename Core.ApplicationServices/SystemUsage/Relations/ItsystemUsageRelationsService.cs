@@ -239,7 +239,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                     );
         }
 
-        public Result<SystemRelation, OperationFailure> RemoveRelation(int fromSystemUsageId, int relationId)
+        public Result<SystemRelation, OperationError> RemoveRelation(int fromSystemUsageId, int relationId)
         {
             using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
             {
@@ -248,13 +248,13 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                 return
                     LoadFromSystemUsage(operationContext)
                         .Bind(WithAuthorizedModificationAccess)
-                        .Match
+                        .Match<Result<SystemRelation, OperationError>>
                         (
                             onSuccess: context => context
                                 .Entities
                                 .FromSystemUsage
                                 .RemoveUsageRelation(relationId)
-                                .Match<Result<SystemRelation, OperationFailure>>
+                                .Match<Result<SystemRelation, OperationError>>
                                 (
                                     onSuccess: removedRelation =>
                                     {
@@ -271,9 +271,9 @@ namespace Core.ApplicationServices.SystemUsage.Relations
                                     onFailure: error =>
                                     {
                                         _logger.Error("Attempt to remove relation from {systemUsageId} with Id {relationId} failed with {error}", fromSystemUsageId, relationId, error);
-                                        return error;
+                                        return new OperationError(error);
                                     }),
-                            onFailure: error => error.FailureType
+                            onFailure: error => error
                         );
             }
         }

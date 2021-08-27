@@ -6,12 +6,14 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
+using Core.ApplicationServices.SystemUsage.Relations;
+using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -20,6 +22,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
@@ -42,6 +45,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private readonly IOptionsService<ItSystemUsage, ArchiveType> _archiveTypeOptionsService;
         private readonly IOptionsService<ItSystemUsage, ArchiveLocation> _archiveLocationOptionsService;
         private readonly IOptionsService<ItSystemUsage, ArchiveTestLocation> _archiveTestLocationOptionsService;
+        private readonly IItsystemUsageRelationsService _systemUsageRelationsService;
+        private readonly IEntityIdentityResolver _identityResolver;
         private readonly IItContractService _contractService;
         private readonly IItProjectService _projectService;
         private readonly IKLEApplicationService _kleApplicationService;
@@ -74,7 +79,9 @@ namespace Core.ApplicationServices.SystemUsage.Write
             ILogger logger,
             IOptionsService<ItSystemUsage, ArchiveType> archiveTypeOptionsService,
             IOptionsService<ItSystemUsage, ArchiveLocation> archiveLocationOptionsService,
-            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService)
+            IOptionsService<ItSystemUsage, ArchiveTestLocation> archiveTestLocationOptionsService,
+            IItsystemUsageRelationsService systemUsageRelationsService,
+            IEntityIdentityResolver identityResolver)
         {
             _systemUsageService = systemUsageService;
             _transactionManager = transactionManager;
@@ -96,6 +103,8 @@ namespace Core.ApplicationServices.SystemUsage.Write
             _archiveTypeOptionsService = archiveTypeOptionsService;
             _archiveLocationOptionsService = archiveLocationOptionsService;
             _archiveTestLocationOptionsService = archiveTestLocationOptionsService;
+            _systemUsageRelationsService = systemUsageRelationsService;
+            _identityResolver = identityResolver;
         }
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
@@ -638,6 +647,89 @@ namespace Core.ApplicationServices.SystemUsage.Write
             return _systemUsageService.GetByUuid(itSystemUsageUuid)
                 .Bind(usage => _systemUsageService.Delete(usage.Id))
                 .Match(_ => Maybe<OperationError>.None, error => new OperationError($"Failed to delete it system usage with Uuid: {itSystemUsageUuid}, Error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
+        }
+
+        public Result<SystemRelation, OperationError> CreateSystemRelation(Guid fromSystemUsageUuid, SystemRelationParameters parameters)
+        {
+            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+                .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
+                .Bind(usageAndIds =>
+                    _systemUsageRelationsService.AddRelation
+                        (
+                            usageAndIds.usage.Id,
+                            usageAndIds.ids.systemUsageId,
+                            usageAndIds.ids.interfaceId.Match<int?>(id => id, () => null),
+                            parameters.Description,
+                            parameters.UrlReference,
+                            usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null),
+                            usageAndIds.ids.contractId.Match<int?>(id => id, () => null)
+                        )
+                );
+        }
+
+        private Result<(Maybe<int> contractId, Maybe<int> interfaceId, Maybe<int> frequencyId, int systemUsageId), OperationError> ResolveRelationParameterIdentities(SystemRelationParameters parameters)
+        {
+            return ResolveOptionalId<ItContract>(parameters.AssociatedContractUuid)
+                .Bind(id => ResolveOptionalId<ItInterface>(parameters.UsingInterfaceUuid).Select(interfaceId => (contractId: id, interfaceId)))
+                .Bind(ids => ResolveOptionalId<RelationFrequencyType>(parameters.RelationFrequencyUuid).Select(id => (ids.contractId, ids.interfaceId, frequencyId: id)))
+                .Bind(ids => ResolveRequiredId<ItSystemUsage>(parameters.ToSystemUsageUuid).Select(id => (ids.contractId, ids.interfaceId, ids.frequencyId, systemUsageId: id)));
+        }
+
+        public Result<SystemRelation, OperationError> UpdateSystemRelation(Guid fromSystemUsageUuid, Guid relationUuid, SystemRelationParameters parameters)
+        {
+            return _systemUsageService.GetByUuid(fromSystemUsageUuid)
+                .Bind(usage => ResolveRelationParameterIdentities(parameters).Select(ids => (usage, ids)))
+                .Bind(usageAndIds => ResolveRequiredId<SystemRelation>(relationUuid).Select(relationId => (usageAndIds.usage, relationId, usageAndIds.ids)))
+                .Bind(usageAndIds =>
+                    _systemUsageRelationsService.ModifyRelation(
+                        usageAndIds.usage.Id,
+                        usageAndIds.relationId,
+                        usageAndIds.ids.systemUsageId,
+                        parameters.Description,
+                        parameters.UrlReference,
+                        usageAndIds.ids.interfaceId.Match<int?>(id => id, () => null),
+                        usageAndIds.ids.contractId.Match<int?>(id => id, () => null),
+                        usageAndIds.ids.frequencyId.Match<int?>(id => id, () => null)
+                    )
+                );
+        }
+
+        public Maybe<OperationError> DeleteSystemRelation(Guid itSystemUsageUuid, Guid itSystemUsageRelationUuid)
+        {
+            return _systemUsageService
+                .GetByUuid(itSystemUsageUuid)
+                .Bind<(int usageId, int relationId)>(usage =>
+                {
+                    var usageRelation = _identityResolver.ResolveDbId<SystemRelation>(itSystemUsageRelationUuid);
+                    if (usageRelation.IsNone)
+                        return new OperationError(
+                            $"Relation with id:{itSystemUsageRelationUuid} does not exist", OperationFailure.BadInput);
+                    return (usage.Id, usageRelation.Value);
+                })
+                .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
+                .Match(_ => Maybe<OperationError>.None, error => error);
+        }
+
+        private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId
+        {
+            return ResolveOptionalId<T>(requiredId)
+                .Bind(result => result.Match<Result<int, OperationError>>(optionalId => optionalId, () => new OperationError(OperationFailure.BadInput)));
+        }
+
+        private Result<Maybe<int>, OperationError> ResolveOptionalId<T>(Guid? optionalId) where T : class, IHasUuid, IHasId
+        {
+            if (optionalId.HasValue)
+            {
+                var id = _identityResolver.ResolveDbId<T>(optionalId.Value);
+
+                return id.Match<Result<Maybe<int>, OperationError>>
+                (
+                    dbId => Maybe<int>.Some(dbId),
+                    () => new OperationError($"Invalid {typeof(T).Name} Id", OperationFailure.BadInput)
+                );
+            }
+
+            return Maybe<int>.None;
         }
     }
 }

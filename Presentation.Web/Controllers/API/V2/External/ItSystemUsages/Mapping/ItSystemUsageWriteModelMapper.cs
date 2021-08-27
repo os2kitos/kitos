@@ -183,6 +183,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
+        public SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData)
+        {
+            if (relationData == null)
+                throw new ArgumentNullException(nameof(relationData));
+
+            return new SystemRelationParameters
+            (
+                relationData.ToSystemUsageUuid,
+                relationData.RelationInterfaceUuid,
+                relationData.AssociatedContractUuid,
+                relationData.RelationFrequencyUuid,
+                relationData.Description,
+                relationData.UrlReference
+                );
+        }
+
         private static ChangedValue<Maybe<IEnumerable<TOut>>> MapEnumList<TIn, TOut>(IEnumerable<TIn> list, Func<TIn, TOut> mapWith)
         {
             return (list?.FromNullable().Select(dataSensitivityLevelChoices => dataSensitivityLevelChoices.Select(mapWith)) ?? Maybe<IEnumerable<TOut>>.None).AsChangedValue();

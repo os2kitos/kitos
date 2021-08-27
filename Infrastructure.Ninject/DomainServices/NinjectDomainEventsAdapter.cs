@@ -1,6 +1,7 @@
-﻿using Ninject;
+﻿using Infrastructure.Services.DomainEvents;
+using Ninject;
 
-namespace Infrastructure.Services.DomainEvents
+namespace Infrastructure.Ninject.DomainServices
 {
     /// <summary>
     /// DomainEvents
@@ -8,11 +9,11 @@ namespace Infrastructure.Services.DomainEvents
     /// <seealso cref="https://devblogs.microsoft.com/cesardelatorre/domain-events-vs-integration-events-in-domain-driven-design-and-microservices-architectures"/>
     /// <remarks>We have chosen to use a simpler in-memory version of the Domain Events implementation, since we do not have a service bus or u-service architecture</remarks>
     /// </summary>
-    public class DomainEvents : IDomainEvents
+    public class NinjectDomainEventsAdapter : IDomainEvents
     {
         private readonly IKernel _kernel;
 
-        public DomainEvents(IKernel kernel)
+        public NinjectDomainEventsAdapter(IKernel kernel)
         {
             _kernel = kernel;
         }

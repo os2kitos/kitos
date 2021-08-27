@@ -1,10 +1,8 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Advice;
+﻿using Core.DomainModel.Advice;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Ninject;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,99 +13,85 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Ninject.Extensions.Logging;
 using Infrastructure.Services.Types;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainModel.Notification;
 using Core.DomainServices.Advice;
+using Serilog;
 
 namespace Core.ApplicationServices
 {
     public class AdviceService : IAdviceService
     {
-        #region Properties
+        private readonly IMailClient _mailClient;
+        private readonly IGenericRepository<Advice> _adviceRepository;
+        private readonly IGenericRepository<AdviceSent> _adviceSentRepository;
+        private readonly IGenericRepository<ItContractRight> _itContractRights;
+        private readonly IGenericRepository<ItProjectRight> _itProjectRights;
+        private readonly IGenericRepository<ItSystemRight> _itSystemRights;
+        private readonly IGenericRepository<DataProcessingRegistrationRight> _dataProcessingRegistrationRights;
+        private readonly ILogger _logger;
+        private readonly ITransactionManager _transactionManager;
+        private readonly IOrganizationalUserContext _organizationalUserContext;
+        private readonly IHangfireApi _hangfireApi;
+        private readonly IOperationClock _operationClock;
+        private readonly IUserNotificationService _userNotificationService;
+        private readonly IAdviceRootResolution _adviceRootResolution;
 
-        [Inject]
-        public IMailClient MailClient { get; set; }
-
-        [Inject]
-        public IGenericRepository<User> UserRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<DomainModel.Advice.Advice> AdviceRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<AdviceSent> AdviceSentRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItContractRight> ItContractRights { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItProjectRight> ItprojectRights { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItSystemRight> ItSystemRights { get; set; }
-
-        [Inject]
-        public IGenericRepository<DataProcessingRegistrationRight> DataProcessingRegistrationRights { get; set; }
-
-        [Inject]
-        public ILogger Logger { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItContract> ItContractRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItInterface> ItInterfaceRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItProject> ItProjectRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<ItSystemUsage> ItSystemUsageRepository { get; set; }
-
-        [Inject]
-        public IGenericRepository<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
-
-        [Inject]
-        public ITransactionManager TransactionManager { get; set; }
-
-        [Inject]
-        public IOrganizationalUserContext OrganizationalUserContext { get; set; }
-
-        [Inject] public IHangfireApi HangfireApi { get; set; }
-
-        [Inject] public IOperationClock OperationClock { get; set; }
-
-        [Inject] public IUserNotificationService UserNotificationService { get; set; }
-
-        [Inject] public IAdviceRootResolution AdviceRootResolution { get; set; }
-
-        #endregion
+        public AdviceService(
+            IMailClient mailClient, 
+            IGenericRepository<Advice> adviceRepository, 
+            IGenericRepository<AdviceSent> adviceSentRepository, 
+            IGenericRepository<ItContractRight> itContractRights, 
+            IGenericRepository<ItProjectRight> itProjectRights, 
+            IGenericRepository<ItSystemRight> itSystemRights, 
+            IGenericRepository<DataProcessingRegistrationRight> dataProcessingRegistrationRights, 
+            ILogger logger, 
+            ITransactionManager transactionManager, 
+            IOrganizationalUserContext organizationalUserContext, 
+            IHangfireApi hangfireApi, 
+            IOperationClock operationClock, 
+            IUserNotificationService userNotificationService, 
+            IAdviceRootResolution adviceRootResolution)
+        {
+            _mailClient = mailClient;
+            _adviceRepository = adviceRepository;
+            _adviceSentRepository = adviceSentRepository;
+            _itContractRights = itContractRights;
+            _itProjectRights = itProjectRights;
+            _itSystemRights = itSystemRights;
+            _dataProcessingRegistrationRights = dataProcessingRegistrationRights;
+            _logger = logger;
+            _transactionManager = transactionManager;
+            _organizationalUserContext = organizationalUserContext;
+            _hangfireApi = hangfireApi;
+            _operationClock = operationClock;
+            _userNotificationService = userNotificationService;
+            _adviceRootResolution = adviceRootResolution;
+        }
 
         public void CreateAdvice(Advice advice)
         {
             ScheduleAdvice(advice);
-            AdviceRepository.Update(advice);
-            AdviceRepository.Save();
+            _adviceRepository.Update(advice);
+            _adviceRepository.Save();
         }
 
         public IQueryable<Advice> GetAdvicesForOrg(int orgKey)
         {
-            var result = AdviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
+            var result = _adviceRepository.SQL($"SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItContract c on c.Id = a.RelationId Where c.OrganizationId = {orgKey} and a.Type = 0 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItProject p on p.Id = a.RelationId Where p.OrganizationId = {orgKey} and a.Type = 2 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItSystemUsage u on u.Id = a.RelationId Where u.OrganizationId = {orgKey} and a.Type = 1 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join ItInterface i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 3 Union SELECT a.* FROM[kitos].[dbo].[Advice] a Join DataProcessingRegistrations i on i.Id = a.RelationId Where i.OrganizationId = {orgKey} and a.Type = 4");
             return result.AsQueryable();
         }
 
         public IQueryable<Advice> GetAdvicesAccessibleToCurrentUser()
         {
-            return OrganizationalUserContext.IsGlobalAdmin()
-                ? AdviceRepository.AsQueryable()
-                : OrganizationalUserContext
+            return _organizationalUserContext.IsGlobalAdmin()
+                ? _adviceRepository.AsQueryable()
+                : _organizationalUserContext
                     .OrganizationIds
                     .Select(GetAdvicesForOrg)
                     .Aggregate<IQueryable<Advice>, IQueryable<Advice>>
@@ -119,19 +103,19 @@ namespace Core.ApplicationServices
 
         public bool SendAdvice(int id)
         {
-            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             try
             {
-                var advice = AdviceRepository.AsQueryable().ById(id);
+                var advice = _adviceRepository.AsQueryable().ById(id);
                 if (advice != null)
                 {
                     if (advice.AdviceType == AdviceType.Immediate || IsAdviceInScope(advice))
                     {
                         if (DispatchEmails(advice))
                         {
-                            AdviceRepository.Update(advice);
+                            _adviceRepository.Update(advice);
 
-                            AdviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = OperationClock.Now });
+                            _adviceSentRepository.Insert(new AdviceSent { AdviceId = id, AdviceSentDate = _operationClock.Now });
                         }
                     }
 
@@ -145,15 +129,15 @@ namespace Core.ApplicationServices
                         DeleteJobFromHangfire(advice);
                     }
 
-                    AdviceRepository.Save();
-                    AdviceSentRepository.Save();
+                    _adviceRepository.Save();
+                    _adviceSentRepository.Save();
                     transaction.Commit();
                 }
                 return true;
             }
             catch (Exception e)
             {
-                Logger?.Error(e, "General error sending emails in advice service");
+                _logger?.Error(e, "General error sending emails in advice service");
                 transaction.Rollback();
                 throw;
             }
@@ -161,12 +145,12 @@ namespace Core.ApplicationServices
 
         private bool IsAdviceExpired(Advice advice)
         {
-            return advice.StopDate != null && advice.StopDate.Value.Date < OperationClock.Now.Date;
+            return advice.StopDate != null && advice.StopDate.Value.Date < _operationClock.Now.Date;
         }
 
         private bool IsAdviceInScope(Advice advice)
         {
-            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= OperationClock.Now.Date && !IsAdviceExpired(advice);
+            return advice.AlarmDate != null && advice.AlarmDate.Value.Date <= _operationClock.Now.Date && !IsAdviceExpired(advice);
         }
 
         private bool DispatchEmails(Advice advice)
@@ -210,8 +194,8 @@ namespace Core.ApplicationServices
 
             if (message.To.Any() || message.CC.Any())
             {
-                MailClient.Send(message);
-                advice.SentDate = OperationClock.Now;
+                _mailClient.Send(message);
+                advice.SentDate = _operationClock.Now;
                 return true;
             }
             else
@@ -219,18 +203,18 @@ namespace Core.ApplicationServices
                 var organizationIdOfRelatedEntityId = GetRelatedEntityOrganizationId(advice);
                 if(organizationIdOfRelatedEntityId.IsNone)
                 {
-                    Logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
+                    _logger?.Error($"Advis doesn't have valid/correct related entity (RelationId and Type mismatch). Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}");
                 }
                 else
                 {
                     if (advice.HasInvalidState())
                     {
-                        Logger?.Error($"Advis is missing critical function information. Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}, Advice ownerId: {advice.ObjectOwnerId}");
+                        _logger?.Error($"Advis is missing critical function information. Advice Id: {advice.Id}, Advice RelationId: {advice.RelationId}, Advice RelatedEntityType: {advice.Type}, Advice ownerId: {advice.ObjectOwnerId}");
                     }
                     else
                     {
                         var nameForNotification = advice.Name ?? "Ikke navngivet";
-                        UserNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
+                        _userNotificationService.AddUserNotification(organizationIdOfRelatedEntityId.Value, advice.ObjectOwnerId.Value, nameForNotification, "Advis kunne ikke sendes da der ikke blev fundet nogen gyldig modtager. Dette kan skyldes at der ikke er nogen bruger tilknyttet den/de valgte rolle(r).", advice.RelationId.Value, advice.Type.Value, NotificationType.Advice);
                     }
                 }
                 return false;
@@ -251,7 +235,7 @@ namespace Core.ApplicationServices
             {
                 case RelatedEntityType.itContract:
 
-                    var itContractRoles = ItContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                    var itContractRoles = _itContractRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in itContractRoles)
                     {
@@ -260,7 +244,7 @@ namespace Core.ApplicationServices
 
                     break;
                 case RelatedEntityType.itProject:
-                    var projectRoles = ItprojectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                    var projectRoles = _itProjectRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in projectRoles)
                     {
@@ -270,7 +254,7 @@ namespace Core.ApplicationServices
                     break;
                 case RelatedEntityType.itSystemUsage:
 
-                    var systemRoles = ItSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
+                    var systemRoles = _itSystemRights.AsQueryable().Where(I => I.ObjectId == advice.RelationId
                                                                               && I.Role.Name == r.Name);
                     foreach (var t in systemRoles)
                     {
@@ -280,7 +264,7 @@ namespace Core.ApplicationServices
                     break;
                 case RelatedEntityType.dataProcessingRegistration:
 
-                    var dpaRoles = DataProcessingRegistrationRights.AsQueryable().Where(I =>
+                    var dpaRoles = _dataProcessingRegistrationRights.AsQueryable().Where(I =>
                         I.ObjectId == advice.RelationId
                         && I.Role.Name == r.Name);
                     foreach (var t in dpaRoles)
@@ -295,19 +279,19 @@ namespace Core.ApplicationServices
         public void Delete(Advice advice)
         {
             RemoveAdviceAndItsRelatedEntities(advice);
-            AdviceRepository.Save();
+            _adviceRepository.Save();
         }
 
         private void RemoveAdviceAndItsRelatedEntities(Advice advice)
         {
             DeleteJobFromHangfire(advice);
-            AdviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
+            _adviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
         }
 
         private void DeleteJobFromHangfire(Advice advice)
         {
             //Remove pending shcedules if any
-            var allScheduledJobs = HangfireApi
+            var allScheduledJobs = _hangfireApi
                 .GetScheduledJobs(0, int.MaxValue)
                 .ToList();
 
@@ -322,7 +306,7 @@ namespace Core.ApplicationServices
                 var adviceIdAsString = j.Value.Job.Args[0].ToString();
                 if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
                 {
-                    HangfireApi.DeleteScheduledJob(j.Key);
+                    _hangfireApi.DeleteScheduledJob(j.Key);
                     break;
                 }
             }
@@ -337,27 +321,27 @@ namespace Core.ApplicationServices
                 var adviceIdAsString = j.Value.Job.Args[0].ToString();
                 if (int.TryParse(adviceIdAsString, out var adviceId) && adviceId == advice.Id)
                 {
-                    HangfireApi.DeleteScheduledJob(j.Key);
+                    _hangfireApi.DeleteScheduledJob(j.Key);
                     break;
                 }
             }
 
             //Remove the job by main job id + any partitions (max 12 - one pr. month)
-            HangfireApi.RemoveRecurringJobIfExists(advice.JobId);
+            _hangfireApi.RemoveRecurringJobIfExists(advice.JobId);
             for (var i = 0; i < 12; i++)
             {
-                HangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
+                _hangfireApi.RemoveRecurringJobIfExists(CreatePartitionJobId(advice.JobId, i));
             }
         }
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
         {
-            using var transaction = TransactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             foreach (var advice in toBeDeleted)
             {
                 RemoveAdviceAndItsRelatedEntities(advice);
             }
-            AdviceRepository.Save();
+            _adviceRepository.Save();
             transaction.Commit();
         }
 
@@ -365,8 +349,8 @@ namespace Core.ApplicationServices
         {
             DeleteJobFromHangfire(advice);
             advice.IsActive = false;
-            AdviceRepository.Update(advice);
-            AdviceRepository.Save();
+            _adviceRepository.Update(advice);
+            _adviceRepository.Save();
         }
 
         /// <summary>
@@ -375,7 +359,7 @@ namespace Core.ApplicationServices
         /// <param name="adviceId"></param>
         public void DeactivateById(int adviceId)
         {
-            var advice = AdviceRepository.AsQueryable().ById(adviceId);
+            var advice = _adviceRepository.AsQueryable().ById(adviceId);
             if (advice != null)
             {
                 Deactivate(advice);
@@ -386,7 +370,7 @@ namespace Core.ApplicationServices
         {
             if (advice.AdviceType == AdviceType.Immediate)
             {
-                HangfireApi.Schedule(() => SendAdvice(advice.Id));
+                _hangfireApi.Schedule(() => SendAdvice(advice.Id));
             }
             else if (advice.AdviceType == AdviceType.Repeat)
             {
@@ -396,8 +380,8 @@ namespace Core.ApplicationServices
                     throw new ArgumentException(nameof(alarmDate) + " must be defined");
 
                 //Only postpone the trigger creation if the alarm date has not been passed yet
-                var runAt = OperationClock.Now.Date >= alarmDate.Value.Date ? default(DateTimeOffset?) : new DateTimeOffset(alarmDate.Value.Date);
-                HangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id), runAt);
+                var runAt = _operationClock.Now.Date >= alarmDate.Value.Date ? default(DateTimeOffset?) : new DateTimeOffset(alarmDate.Value.Date);
+                _hangfireApi.Schedule(() => CreateOrUpdateJob(advice.Id), runAt);
             }
         }
 
@@ -418,7 +402,7 @@ namespace Core.ApplicationServices
         /// <param name="adviceId"></param>
         public void CreateOrUpdateJob(int adviceId)
         {
-            var advice = AdviceRepository.GetByKey(adviceId);
+            var advice = _adviceRepository.GetByKey(adviceId);
             if (advice == null || advice.Scheduling == null || advice.AlarmDate == null)
             {
                 throw new ArgumentException(nameof(adviceId) + " does not point to a valid id or points to an advice without alarm date or scheduling");
@@ -433,17 +417,17 @@ namespace Core.ApplicationServices
             {
                 var prefix = advice.JobId;
                 var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
-                HangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
+                _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
 
             if (advice.StopDate.HasValue)
             {
                 //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
-                HangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
+                _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
             }
 
             //If time has passed the trigger time, Hangfire will not fire until the next trigger data so we must force it.
-            if (adviceAlarmDate.Date.Equals(OperationClock.Now.Date))
+            if (adviceAlarmDate.Date.Equals(_operationClock.Now.Date))
             {
                 switch (adviceScheduling)
                 {
@@ -459,7 +443,7 @@ namespace Core.ApplicationServices
                         if (mustScheduleAdviceToday)
                         {
                             //Send the first advice now
-                            HangfireApi.Schedule(() => SendAdvice(adviceId));
+                            _hangfireApi.Schedule(() => SendAdvice(adviceId));
                         }
                         break;
                     //Intentional fallthrough - no corrections here
@@ -473,7 +457,7 @@ namespace Core.ApplicationServices
 
         private bool WillTriggerInvokeToday()
         {
-            var utcNow = OperationClock.Now.ToUniversalTime();
+            var utcNow = _operationClock.Now.ToUniversalTime();
             return 
                 utcNow.Hour < CronPatternDefaults.TriggerHourUTC || 
                 (utcNow.Minute < CronPatternDefaults.TriggerMinute && utcNow.Hour == CronPatternDefaults.TriggerHourUTC);
@@ -486,12 +470,12 @@ namespace Core.ApplicationServices
 
         public Maybe<Advice> GetAdviceById(int id)
         {
-            return AdviceRepository.GetByKey(id);
+            return _adviceRepository.GetByKey(id);
         }
 
         private Maybe<int> GetRelatedEntityOrganizationId(Advice advice)
         {
-            return AdviceRootResolution.Resolve(advice).Select(x => x.OrganizationId);
+            return _adviceRootResolution.Resolve(advice).Select(x => x.OrganizationId);
         }
     }
 }

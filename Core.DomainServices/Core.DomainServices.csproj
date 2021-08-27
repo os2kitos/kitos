@@ -80,6 +80,7 @@
     <Compile Include="GDPR\IDataProcessingRegistrationOversightDateAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationOversightOptionsAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
+    <Compile Include="Generic\IEntityIdentityResolver.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
