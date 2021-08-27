@@ -380,6 +380,8 @@
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataUpdateRequestDTO.cs" />
@@ -388,6 +390,7 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\OrganizationUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\SystemRelationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GeneralDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasEntityCreator.cs" />

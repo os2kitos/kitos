@@ -7,14 +7,14 @@ using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Web;
 using System.Web.Http;
+using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
@@ -32,15 +32,15 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         }
 
         /// <summary>
-        /// Returns all Data-Processing-Registrations in the requested organization available to the user
+        /// Returns all Data-Processing-Registrations available to the user
         /// </summary>
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">System UUID filter</param>
         /// <param name="systemUsageUuid">SystemUsage UUID filter</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
+        [Route]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<DataProcessingRegistrationResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             var conditions = new List<IDomainQuery<DataProcessingRegistration>>();
 
-            if(organizationUuid.HasValue)
+            if (organizationUuid.HasValue)
                 conditions.Add(new QueryByOrganizationUuid<DataProcessingRegistration>(organizationUuid.Value));
 
             if (systemUuid.HasValue)
@@ -76,25 +76,182 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <summary>
         /// Returns a specific Data-Processing-Registration
         /// </summary>
-        /// <param name="dataProcessingRegistraionUuid">UUID of Data-Processing-Registration entity</param>
+        /// <param name="uuid">UUID of Data-Processing-Registration entity</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("{dataProcessingRegistraionUuid}")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult GetItSystemUsage([NonEmptyGuid] Guid dataProcessingRegistraionUuid)
+        public IHttpActionResult GetDataProcessingRegistration([NonEmptyGuid] Guid uuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             return _dataProcessingRegistrationService
-                .GetByUuid(dataProcessingRegistraionUuid)
+                .GetByUuid(uuid)
                 .Select(x => x.MapIdentityNamePairDTO())
                 .Match(Ok, FromOperationError);
         }
 
+        /// <summary>
+        /// Create a new data processing registration
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route]
+        [SwaggerResponse(HttpStatusCode.Created, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PostDataProcessingRegistration([FromBody] CreateDataProcessingRegistrationRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Removes an existing data processing registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.NoContent)]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult DeleteDataProcessingRegistration([NonEmptyGuid] Guid uuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of the "General data" section of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}/general")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of the "Systems" section of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}/systems")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of the "Oversight" section of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}/oversight")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of the "Roles" section of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}/roles")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistrationRolesData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Perform a full update of the "External references" section of an existing data processing registration.
+        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("{uuid}/external-references")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PutDataProcessingRegistrationExternalReferencesData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        {
+            throw new NotImplementedException();
+        }
+        //TODO: Add shallow contracts
+        //TODO: Fill in shallow contracts
+        //TODO: Document contracts
     }
 }
