@@ -3,7 +3,7 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import Login = require("../../Helpers/LoginHelper");
 import WaitTimers = require("../../Utility/waitTimers");
 
-describe("Only Global Admins can create user with special permissions",
+describe("Only Global Admins can create user with special permissions, Parallel",
     () => {
         var testFixture = new TestFixtureWrapper();
         var pageObject = new HomePage();
