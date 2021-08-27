@@ -14,7 +14,9 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
@@ -111,6 +113,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult PostDataProcessingRegistration([FromBody] CreateDataProcessingRegistrationRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -129,8 +134,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request)
+        public IHttpActionResult PutDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationWriteRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -148,6 +156,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult DeleteDataProcessingRegistration([NonEmptyGuid] Guid uuid)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -166,8 +177,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] GeneralDataWriteRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -186,8 +200,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUuids)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -206,8 +223,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] OversightWriteRequestDTO request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -226,8 +246,11 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationRolesData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        public IHttpActionResult PutDataProcessingRegistrationRolesData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
 
@@ -246,12 +269,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationExternalReferencesData([NonEmptyGuid] Guid uuid, [FromBody] CreateDataProcessingRegistrationRequestDTO request) //TODO: Contract
+        public IHttpActionResult PutDataProcessingRegistrationExternalReferencesData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             throw new NotImplementedException();
         }
-        //TODO: Add shallow contracts
-        //TODO: Fill in shallow contracts
-        //TODO: Document contracts
     }
 }
