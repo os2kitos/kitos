@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
@@ -92,8 +93,8 @@ namespace Core.ApplicationServices.GDPR.Write
         private Result<DataProcessingRegistration, OperationError> PerformUpdates(DataProcessingRegistration dpr, DataProcessingRegistrationModificationParameters parameters)
         {
             //Optionally apply changes across the entire update specification
-            //TODO:
-            return dpr;
+            return dpr
+                .WithOptionalUpdate(parameters.Name, (registration, changedName) => _dataProcessingRegistrationApplicationService.UpdateName(registration.Id, changedName));
         }
 
         public Maybe<OperationError> Delete(Guid dataProcessingRegistrationUuid)
