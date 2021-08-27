@@ -82,7 +82,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .OrderBy(dpr => dpr.Id)
                 .Page(paginationQuery)
                 .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(ToDTO)
                 .Transform(Ok);
         }
 
@@ -105,7 +105,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _dataProcessingRegistrationService
                 .GetByUuid(uuid)
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
 
