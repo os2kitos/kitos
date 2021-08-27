@@ -385,6 +385,13 @@
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationGeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationGeneralDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationOversightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\DataProcessing\OversightDateDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationOversightWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GDPRWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\GeneralDataUpdateRequestDTO.cs" />
@@ -393,6 +400,7 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\OrganizationUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\SystemRelationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GeneralDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasEntityCreator.cs" />
@@ -415,6 +423,9 @@
     <Compile Include="Models\API\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Roles\RoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GDPRRegistrationsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\OversightIntervalChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoIrrelevantChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoUndecidedChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\JournalPeriodDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
@@ -433,7 +444,7 @@
     <Compile Include="Models\API\V2\Types\SystemUsage\HostingChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\RiskLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\TechnicalPrecautionChoice.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\YesNoChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoDontKnowChoice.cs" />
     <Compile Include="Models\API\V1\Users\UserWithApiAccessDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithOrganizationDTO.cs" />
