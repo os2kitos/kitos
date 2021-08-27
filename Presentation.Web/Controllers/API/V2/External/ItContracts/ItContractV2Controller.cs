@@ -35,6 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">Associated system UUID filter</param>
         /// <param name="systemUsageUuid">Associated system usage UUID filter</param>
+        /// <param name="dataProcessingRegistrationUuid">Associated data processing registration UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
         /// <returns></returns>
         [HttpGet]
