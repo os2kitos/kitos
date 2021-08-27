@@ -11,15 +11,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItContractV2Helper
     {
-        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
+        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
         {
-            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, nameContent, page, pageSize);
+            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, nameContent, page, pageSize);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItContractResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
+        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -31,6 +31,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if(systemUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
+
+            if (systemUsageUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("systemUsageUuid", systemUsageUuid.Value.ToString("D")));
+
+            if (dataProcessingRegistrationUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("dataProcessingRegistrationUuid", dataProcessingRegistrationUuid.Value.ToString("D")));
 
             if (nameContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameContent", nameContent));
