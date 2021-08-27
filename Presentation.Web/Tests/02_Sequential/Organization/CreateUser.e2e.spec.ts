@@ -4,7 +4,7 @@ import Login = require("../../Helpers/LoginHelper");
 import WaitTimers = require("../../Utility/waitTimers");
 import createUserHelper = require("../../Helpers/CreateUserHelper");
 
-describe("Only Global Admins can create user with special permissions",
+describe("Only Global Admins can create user with special permissions, Sequential",
     () => {
         var testFixture = new TestFixtureWrapper();
         var userHelper = new createUserHelper();
@@ -20,8 +20,10 @@ describe("Only Global Admins can create user with special permissions",
         function executeSpecialPermissionUseCase(mutate: () => webdriver.promise.Promise<void>, validate: () => webdriver.promise.Promise<boolean>) {
             return loginHelper.loginAsGlobalAdmin()
                 .then(() => pageObject.getPage())
+                .then(() => browser.waitForAngular())
                 .then(() => browser.wait(ec.presenceOf(pageObject.createUserButton), waitUpTo.twentySeconds))
                 .then(() => mutate())
+                .then(() => browser.waitForAngular())
                 .then(() => browser.wait(ec.presenceOf(pageObject.kendoToolbarWrapper.columnHeaders().userEmail), waitUpTo.twentySeconds))
                 .then(() => validate());
         }

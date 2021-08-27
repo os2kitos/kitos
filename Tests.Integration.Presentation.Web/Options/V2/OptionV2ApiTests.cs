@@ -113,6 +113,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
         public static IEnumerable<object[]> GetRoleResources()
         {
             yield return new[] { EntityOptionHelper.ResourceNames.SystemRoles, OptionV2ApiHelper.ResourceName.ItSystemUsageRoles };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingRegistrationRoles, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationRoles };
         }
 
         public static IEnumerable<object[]> GetRegularResources()
@@ -126,6 +127,10 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.SensitivePersonalDataTypes, OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.RegisterTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.ContractTypes, OptionV2ApiHelper.ResourceName.ItContractContractTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingDataResponsibleOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingBasisForTransferOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingCountryOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry };
+            yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingOversightOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight };
         }
     }
 }
