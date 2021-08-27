@@ -178,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organizationUuid: Guid.Empty, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organizationUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -192,7 +192,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUuid: Guid.Empty, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -206,7 +206,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUsageUuid: Guid.Empty, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUsageUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -220,7 +220,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, dataProcessingRegistrationUuid: Guid.Empty, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, dataProcessingRegistrationUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -235,7 +235,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organization.Uuid, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organization.Uuid, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
