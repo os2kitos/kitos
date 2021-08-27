@@ -221,7 +221,7 @@
     <Compile Include="DomainServices\SystemUsage\AttachedOptionsAssignmentServiceTest.cs" />
     <Compile Include="DomainServices\SystemUsage\BuildItSystemUsageOverviewReadModelOnChangesHandlerTest.cs" />
     <Compile Include="DomainServices\SystemUsage\ItSystemUsageOverviewReadModelUpdateTest.cs" />
-    <Compile Include="Infrastructure\DomainEventsTest.cs" />
+    <Compile Include="Infrastructure\NinjectDomainEventsAdapterTest.cs" />
     <Compile Include="Infrastructure\EndpointValidationServiceTest.cs" />
     <Compile Include="Infrastructure\EnumerableExtensionsTest.cs" />
     <Compile Include="Model\EventHandlers\ContractDeletedHandlerTest.cs" />
@@ -265,6 +265,10 @@
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
       <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
+      <Project>{c01c5f9e-6904-4b4c-94b1-12d7c83f8070}</Project>
+      <Name>Infrastructure.Ninject</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>

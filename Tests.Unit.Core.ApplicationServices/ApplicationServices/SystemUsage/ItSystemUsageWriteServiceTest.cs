@@ -14,6 +14,7 @@ using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -26,6 +27,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
@@ -61,6 +63,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private readonly Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>> _sensitiveDataOptionsService;
         private readonly Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>> _registerTypeOptionsService;
         private readonly Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>> _sensitiveDataLevelRepository;
+        private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
+        private readonly Mock<IItsystemUsageRelationsService> _systemUsageRelationServiceMock;
 
         public ItSystemUsageWriteServiceTest()
         {
@@ -82,6 +86,8 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _sensitiveDataOptionsService = new Mock<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>();
             _registerTypeOptionsService = new Mock<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>();
             _sensitiveDataLevelRepository = new Mock<IGenericRepository<ItSystemUsageSensitiveDataLevel>>();
+            _identityResolverMock = new Mock<IEntityIdentityResolver>();
+            _systemUsageRelationServiceMock = new Mock<IItsystemUsageRelationsService>();
             _sut = new ItSystemUsageWriteService(_itSystemUsageServiceMock.Object, _transactionManagerMock.Object,
                 _itSystemServiceMock.Object, _organizationServiceMock.Object, _authorizationContextMock.Object,
                 _systemCategoriesOptionsServiceMock.Object, _contractServiceMock.Object, _projectServiceMock.Object,
@@ -91,7 +97,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
                 _sensitiveDataLevelRepository.Object,
                 Mock.Of<IDatabaseControl>(), _domainEventsMock.Object, Mock.Of<ILogger>(),
                 _archiveTypeOptionsServiceMock.Object, _archiveLocationOptionsServiceMock.Object,
-                _archiveTestLocationOptionsServiceMock.Object);
+                _archiveTestLocationOptionsServiceMock.Object,
+                _systemUsageRelationServiceMock.Object,
+                _identityResolverMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -1832,7 +1840,446 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             AssertSystemUsageUpdateParametersWithSimpleParametersAdded(update2Parameters, update2Result.Value, true);
         }
 
-        private void AssertSystemUsageUpdateParametersWithSimpleParametersAdded(SystemUsageUpdateParameters expected, ItSystemUsage actual, bool shouldBeEmpty = false)
+        [Fact]
+        public void Can_Delete_SystemRelation()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsageRelationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var relationDbId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(itSystemUsageRelationUuid, relationDbId);
+            ExpectRemoveRelationReturns(itSystemUsage.Id, relationDbId, new SystemRelation(itSystemUsage));
+
+            //Act
+            var error = _sut.DeleteSystemRelation(systemUsageUuid, itSystemUsageRelationUuid);
+
+            //Assert
+            Assert.True(error.IsNone);
+        }
+
+        [Fact]
+        public void Cannot_Delete_SystemRelation_If_Removal_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsageRelationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var relationDbId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(itSystemUsageRelationUuid, relationDbId);
+            ExpectRemoveRelationReturns(itSystemUsage.Id, relationDbId, operationError);
+
+            //Act
+            var error = _sut.DeleteSystemRelation(systemUsageUuid, itSystemUsageRelationUuid);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Same(operationError, error.Value);
+        }
+
+        [Fact]
+        public void Cannot_Delete_SystemRelation_If_Relation_Id_Resolution_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsageRelationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(itSystemUsageRelationUuid, Maybe<int>.None);
+
+            //Act
+            var error = _sut.DeleteSystemRelation(systemUsageUuid, itSystemUsageRelationUuid);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Delete_SystemRelation_If_SystemUsageRetrieval_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsageRelationUuid = A<Guid>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, operationError);
+
+            //Act
+            var error = _sut.DeleteSystemRelation(systemUsageUuid, itSystemUsageRelationUuid);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Same(operationError, error.Value);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Create_SystemRelation(bool interfaceIdDefined, bool frequencyTypeDefined, bool contractDefined)
+        {
+            //Arrange - make sure uuids are defined for all
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), interfaceIdDefined ? A<Guid>() : null, contractDefined ? A<Guid>() : null, frequencyTypeDefined ? A<Guid>() : null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            var interfaceId = interfaceIdDefined ? A<int>() : (int?)null;
+            var frequencyTypeId = frequencyTypeDefined ? A<int>() : (int?)null;
+            var contractId = contractDefined ? A<int>() : (int?)null;
+            var newRelation = new SystemRelation(itSystemUsage);
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItInterface>(systemRelationParameters.UsingInterfaceUuid, interfaceId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<RelationFrequencyType>(systemRelationParameters.RelationFrequencyUuid, frequencyTypeId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(systemRelationParameters.AssociatedContractUuid, contractId);
+            ExpectAddSystemRelationReturns(itSystemUsage, toSystemUsageId, interfaceId, frequencyTypeId, contractId, systemRelationParameters.Description, systemRelationParameters.UrlReference, newRelation);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(newRelation, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_AddRelation_Fails()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => null));
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = A<SystemRelationParameters>();
+            var toSystemUsageId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectAddSystemRelationReturns(itSystemUsage, toSystemUsageId, null, null, null, systemRelationParameters.Description, systemRelationParameters.UrlReference, operationError);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_Resolve_InterfaceId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), A<Guid>(), null, null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItInterface>(systemRelationParameters.UsingInterfaceUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_Resolve_ContractId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), null, A<Guid>(), null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(systemRelationParameters.AssociatedContractUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_Resolve_FrequencyTypeId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), null, null, A<Guid>(), A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<RelationFrequencyType>(systemRelationParameters.RelationFrequencyUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_Resolve_ToSystemUsageId_Fails()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => null));
+            var systemUsageUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = A<SystemRelationParameters>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Create_SystemRelation_If_GetSystemUsage_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var systemRelationParameters = A<SystemRelationParameters>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, operationError);
+
+            //Act
+            var result = _sut.CreateSystemRelation(systemUsageUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public void Can_Update_SystemRelation(bool interfaceIdDefined, bool frequencyTypeDefined, bool contractDefined)
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), interfaceIdDefined ? A<Guid>() : null, contractDefined ? A<Guid>() : null, frequencyTypeDefined ? A<Guid>() : null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            var interfaceId = interfaceIdDefined ? A<int>() : (int?)null;
+            var frequencyTypeId = frequencyTypeDefined ? A<int>() : (int?)null;
+            var contractId = contractDefined ? A<int>() : (int?)null;
+            var relationId = A<int>();
+            var newRelation = new SystemRelation(itSystemUsage);
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, relationId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItInterface>(systemRelationParameters.UsingInterfaceUuid, interfaceId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<RelationFrequencyType>(systemRelationParameters.RelationFrequencyUuid, frequencyTypeId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(systemRelationParameters.AssociatedContractUuid, contractId);
+            ExpectModifyRelationReturns(itSystemUsage, relationId, toSystemUsageId, interfaceId, frequencyTypeId, contractId, systemRelationParameters.Description, systemRelationParameters.UrlReference, newRelation);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(newRelation, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_Update_Fails()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => null));
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = A<SystemRelationParameters>();
+            var toSystemUsageId = A<int>();
+            var relationId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, relationId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectModifyRelationReturns(itSystemUsage, relationId, toSystemUsageId, null, null, null, systemRelationParameters.Description, systemRelationParameters.UrlReference, operationError);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_Resolve_SystemRelationId_Fails()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => null));
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage() { Id = A<int>() };
+            var systemRelationParameters = A<SystemRelationParameters>();
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_Resolve_InterfaceId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), A<Guid>(), null, null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, A<int>());
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItInterface>(systemRelationParameters.UsingInterfaceUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_Resolve_ContractId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), null, A<Guid>(), null, A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, A<int>());
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItContract>(systemRelationParameters.AssociatedContractUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_Resolve_FrequencyTypeId_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Id = A<int>() };
+            var systemRelationParameters = new SystemRelationParameters(A<Guid>(), null, null, A<Guid>(), A<string>(), A<string>());
+            var toSystemUsageId = A<int>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, toSystemUsageId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<SystemRelation>(relationUuid, A<int>());
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<RelationFrequencyType>(systemRelationParameters.RelationFrequencyUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_ToSystemUsageId_Resolution_Fails()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => null));
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var itSystemUsage = new ItSystemUsage { Id = A<int>() };
+            var systemRelationParameters = A<SystemRelationParameters>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, itSystemUsage);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(systemRelationParameters.ToSystemUsageUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_Update_SystemRelation_If_SystemUsage_Resolution_Fails()
+        {
+            //Arrange
+            var systemUsageUuid = A<Guid>();
+            var relationUuid = A<Guid>();
+            var systemRelationParameters = A<SystemRelationParameters>();
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(systemUsageUuid, operationError);
+
+            //Act
+            var result = _sut.UpdateSystemRelation(systemUsageUuid, relationUuid, systemRelationParameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Same(operationError, result.Error);
+        }
+
+        private void ExpectAddSystemRelationReturns(ItSystemUsage itSystemUsage, int toSystemUsageId, int? interfaceId, int? frequencyTypeId, int? contractId, string description, string urlReference, Result<SystemRelation, OperationError> result)
+        {
+            _systemUsageRelationServiceMock.Setup(x => x.AddRelation(itSystemUsage.Id, toSystemUsageId, interfaceId,
+                description, urlReference, frequencyTypeId,
+                contractId)).Returns(result);
+        }
+
+        private void ExpectModifyRelationReturns(ItSystemUsage itSystemUsage, int relationId, int toSystemUsageId, int? interfaceId, int? frequencyTypeId, int? contractId, string description, string urlReference, Result<SystemRelation, OperationError> result)
+        {
+            _systemUsageRelationServiceMock.Setup(x => x.ModifyRelation(itSystemUsage.Id, relationId, toSystemUsageId, description, urlReference, interfaceId, contractId, frequencyTypeId)).Returns(result);
+        }
+
+
+        private void ExpectRemoveRelationReturns(int systemUsageId, int relationDbId, Result<SystemRelation, OperationError> result)
+        {
+            _systemUsageRelationServiceMock.Setup(x => x.RemoveRelation(systemUsageId, relationDbId))
+                .Returns(result);
+        }
+
+        private void ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<T>(Guid? uuid, Maybe<int> dbId) where T : class, IHasUuid, IHasId
+        {
+            if (uuid.HasValue)
+                _identityResolverMock.Setup(x => x.ResolveDbId<T>(uuid.Value)).Returns(dbId);
+        }
+
+        private static void AssertSystemUsageUpdateParametersWithSimpleParametersAdded(SystemUsageUpdateParameters expected, ItSystemUsage actual, bool shouldBeEmpty = false)
         {
             //General Properties
             var generalProperties = expected.GeneralProperties.Value;
@@ -1951,7 +2398,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
-        private SystemUsageUpdateParameters CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded()
+        private static SystemUsageUpdateParameters CreateEmptySystemUsageUpdateParametersWithSimpleParametersAdded()
         {
             return new SystemUsageUpdateParameters
             {
@@ -2252,18 +2699,9 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _roleAssignmentService.Verify(x => x.AssignRole(itSystemUsage, roleUuid, userUuid), Times.Once);
         }
 
-        private void AssertAssignRoleNeverCalled()
-        {
-            _roleAssignmentService.Verify(x => x.AssignRole(It.IsAny<ItSystemUsage>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
-        }
-
         private void AssertRemoveRoleCalledOnce(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
         {
             _roleAssignmentService.Verify(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid), Times.Once);
-        }
-        private void AssertRemoveRoleNeverCalled()
-        {
-            _roleAssignmentService.Verify(x => x.RemoveRole(It.IsAny<ItSystemUsage>(), It.IsAny<Guid>(), It.IsAny<Guid>()), Times.Never);
         }
 
         private void ExpectRoleAssignmentReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
@@ -2369,7 +2807,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _itSystemUsageServiceMock.Setup(x => x.CreateNew(itSystem.Id, organization.Id)).Returns(result);
         }
 
-        private void ExpectGetSystemUsageReturns(Guid systemUuid, ItSystemUsage result)
+        private void ExpectGetSystemUsageReturns(Guid systemUuid, Result<ItSystemUsage, OperationError> result)
         {
             _itSystemUsageServiceMock.Setup(x => x.GetByUuid(systemUuid)).Returns(result);
         }

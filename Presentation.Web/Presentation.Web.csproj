@@ -349,7 +349,12 @@
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseOptionTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationOversightTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationCountryTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationBasisForTransferTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationDataResponsibleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
@@ -1642,6 +1647,10 @@
     <ProjectReference Include="..\Infrastructure.DataAccess\Infrastructure.DataAccess.csproj">
       <Project>{6cd15363-5401-43c5-9479-02fddfa881dc}</Project>
       <Name>Infrastructure.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.Ninject\Infrastructure.Ninject.csproj">
+      <Project>{c01c5f9e-6904-4b4c-94b1-12d7c83f8070}</Project>
+      <Name>Infrastructure.Ninject</Name>
     </ProjectReference>
     <ProjectReference Include="..\Infrastructure.OpenXML\Infrastructure.OpenXML.csproj">
       <Project>{5ae358f5-4f11-47fe-94be-1588f357dcdc}</Project>

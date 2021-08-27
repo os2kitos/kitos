@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Xunit;
 
@@ -22,6 +21,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string SensitivePersonalDataTypes = "SensitivePersonalDataTypes";
             public const string SystemRoles = "ItSystemRoles";
             public const string ContractTypes = "ItContractTypes";
+            public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
+            public const string DataProcessingBasisForTransferOptions = "DataProcessingBasisForTransferOptions";
+            public const string DataProcessingCountryOptions = "DataProcessingCountryOptions";
+            public const string DataProcessingOversightOptions = "DataProcessingOversightOptions";
+            public const string DataProcessingRegistrationRoles = "DataProcessingRegistrationRoles";
         }
 
         public static async Task<OptionDTO> CreateOptionTypeAsync(string resource, string optionName, int organizationId, Cookie optionalLogin = null)

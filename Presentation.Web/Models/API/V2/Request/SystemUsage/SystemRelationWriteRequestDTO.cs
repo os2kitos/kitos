@@ -17,7 +17,7 @@ namespace Presentation.Web.Models.API.V2.Request.SystemUsage
         /// The interface must be exposed by the system identified by ToSystemUsageUuid
         /// </summary>
         [NonEmptyGuid]
-        public Guid? UsingInterfaceUuid { get; set; }
+        public Guid? RelationInterfaceUuid { get; set; }
         /// <summary>
         /// The contract association of the system relation
         /// The contract must be defined in the same organization as the it-system usages.

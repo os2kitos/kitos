@@ -9,6 +9,7 @@ using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
 using Infrastructure.Services.Types;
@@ -385,12 +386,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PostSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [FromBody] SystemRelationWriteRequestDTO request)
+        public IHttpActionResult PostSystemUsageRelation([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] SystemRelationWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            var systemRelationParameters = _writeModelMapper.MapRelation(request);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .CreateSystemRelation(systemUsageUuid, systemRelationParameters)
+                .Select(_responseMapper.MapSystemRelationDTO)
+                .Match(relationDTO => Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{systemUsageUuid}/system-relations/{relationDTO.Uuid}", relationDTO), FromOperationError);
         }
 
         /// <summary>
@@ -411,7 +416,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _itSystemUsageService
+                .GetByUuid(systemUsageUuid)
+                .Bind(usage =>
+                    usage.GetUsageRelation(systemRelationUuid)
+                        .Match<Result<SystemRelation, OperationError>>
+                        (
+                        systemRelation => systemRelation,
+                        () => new OperationError("Relation not found on system usage", OperationFailure.NotFound))
+                    )
+                .Select(_responseMapper.MapSystemRelationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -432,7 +447,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            var systemRelationParameters = _writeModelMapper.MapRelation(request);
+
+            return _writeService
+                .UpdateSystemRelation(systemUsageUuid, systemRelationUuid, systemRelationParameters)
+                .Select(_responseMapper.MapSystemRelationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -453,7 +473,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new System.NotImplementedException();
+            return _writeService
+                .DeleteSystemRelation(systemUsageUuid, systemRelationUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         private CreatedNegotiatedContentResult<ItSystemUsageResponseDTO> MapSystemCreatedResponse(ItSystemUsageResponseDTO dto)
