@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using AutoFixture;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
@@ -43,6 +44,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
                 _databaseControlMock.Object);
+        }
+        protected override void OnFixtureCreated(Fixture fixture)
+        {
+            base.OnFixtureCreated(fixture);
+            var outerFixture = new Fixture();
+
+            //Ensure operation errors are always auto-created WITH both failure and message
+            fixture.Register(() => new OperationError(outerFixture.Create<string>(), outerFixture.Create<OperationFailure>()));
         }
 
         [Fact]
@@ -137,7 +146,117 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             AssertFailureWithKnownErrorDetails(result, "Unable to resolve Organization with uuid", OperationFailure.BadInput, transaction);
         }
 
-        //TODO: Update scenarios!!
+        [Fact]
+        public void Can_Update_Name()
+        {
+            //Arrange
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue()
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Id = A<int>()
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+            ExpectUpdateNameReturns(dataProcessingRegistration.Id, parameters.Name.NewValue, dataProcessingRegistration);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(dataProcessingRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Update_Name_Does_Not_Change_Anything_If_No_NameChange_Is_Defined()
+        {
+            //Arrange
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = OptionalValueChange<string>.None
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Id = A<int>()
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(dataProcessingRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+            _dprServiceMock.Verify(x => x.UpdateName(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void Cannot_Update_Name_If_NameUpdate_Fails()
+        {
+            //Arrange
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue()
+            };
+            var dataProcessingRegistration = new DataProcessingRegistration
+            {
+                Id = A<int>()
+            };
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+            var operationError = A<OperationError>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, dataProcessingRegistration);
+            ExpectUpdateNameReturns(dataProcessingRegistration.Id, parameters.Name.NewValue, operationError);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Update_Name_If_Dpr_Resolution_Fails()
+        {
+            //Arrange
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue()
+            };
+          
+            var transaction = ExpectTransaction();
+            var dprUuid = A<Guid>();
+            var operationError = A<OperationError>();
+
+            ExpectGetDataProcessingRegistrationReturns(dprUuid, operationError);
+
+            //Act
+            var result = _sut.Update(dprUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.UpdateName(dprId, nameNewValue)).Returns(result);
+        }
+
+        private void ExpectGetDataProcessingRegistrationReturns(Guid dprUuid, Result<DataProcessingRegistration, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.GetByUuid(dprUuid)).Returns(result);
+        }
 
         private void AssertFailureWithKnownError(Result<DataProcessingRegistration, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
         {
