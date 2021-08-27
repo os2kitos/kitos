@@ -13,6 +13,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
+using Core.ApplicationServices.GDPR.Write;
+using Core.ApplicationServices.Model.GDPR.Write;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
@@ -27,10 +30,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
     public class DataProcessingRegistrationV2Controller : ExternalBaseController
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
+        private readonly IDataProcessingRegistrationWriteService _writeService;
 
-        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService)
+        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, IDataProcessingRegistrationWriteService writeService)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .OrderBy(dpr => dpr.Id)
                 .Page(paginationQuery)
                 .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(ToDTO)
                 .Transform(Ok);
         }
 
@@ -100,7 +105,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _dataProcessingRegistrationService
                 .GetByUuid(uuid)
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(ToDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -122,7 +127,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Create(request.OrganizationUuid, ToWriteModel(request))
+                .Select(ToDTO)
+                .Match(MapCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -145,7 +153,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, ToWriteModel(request))
+                .Select(ToDTO)
+                .Match(MapCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -165,7 +176,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Delete(uuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         /// <summary>
@@ -280,6 +293,22 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
+            throw new NotImplementedException();
+        }
+
+        private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
+        }
+        private DataProcessingRegistrationResponseDTO ToDTO(DataProcessingRegistration arg)
+        {
+            //TODO: To response mapper
+            throw new NotImplementedException();
+        }
+
+        private DataProcessingRegistrationModificationParameters ToWriteModel(DataProcessingRegistrationWriteRequestDTO request)
+        {
+            //TODO: To write model mapper
             throw new NotImplementedException();
         }
     }
