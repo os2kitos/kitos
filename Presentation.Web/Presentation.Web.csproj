@@ -415,6 +415,8 @@
     <Compile Include="Models\API\V2\Response\Organization\ShallowOrganizationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Generic\Roles\RoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GDPRRegistrationsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoIrrelevantChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoUndecidedChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\JournalPeriodDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
@@ -433,7 +435,7 @@
     <Compile Include="Models\API\V2\Types\SystemUsage\HostingChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\RiskLevelChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\TechnicalPrecautionChoice.cs" />
-    <Compile Include="Models\API\V2\Types\Shared\YesNoChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\YesNoDontKnowChoice.cs" />
     <Compile Include="Models\API\V1\Users\UserWithApiAccessDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithCrossOrganizationalRightsDTO.cs" />
     <Compile Include="Models\API\V1\Users\UserWithOrganizationDTO.cs" />
