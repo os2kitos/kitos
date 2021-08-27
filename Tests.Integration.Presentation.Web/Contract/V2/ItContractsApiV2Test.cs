@@ -85,7 +85,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, null, null, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(2, contracts.Count());
@@ -106,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, null, newContract1.Name, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, nameContent: newContract1.Name, page: 0, pageSize: 100);
 
             //Assert
             var contract = Assert.Single(contracts);
@@ -126,7 +126,45 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             await ItContractHelper.AddItSystemUsage(newContract1.Id, systemUsage.Id, organization.Id);
 
             //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, system.Uuid, null, 0, 100);
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, systemUuid: system.Uuid, page: 0, pageSize: 100);
+            //Assert
+            var contract = Assert.Single(contracts);
+            AssertContractResponseDTO(newContract1, contract);
+        }
+
+        [Fact]
+        public async Task GET_Contracts_Returns_Ok_With_SystemUsage_Filtering()
+        {
+            //Arrange
+            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
+            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
+            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
+
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
+            await ItContractHelper.AddItSystemUsage(newContract1.Id, systemUsage.Id, organization.Id);
+
+            //Act
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, systemUsageUuid: systemUsage.Uuid, nameContent: null, page: 0, pageSize: 100);
+
+            //Assert
+            var contract = Assert.Single(contracts);
+            AssertContractResponseDTO(newContract1, contract);
+        }
+
+        [Fact]
+        public async Task GET_Contracts_Returns_Ok_With_DataProcessingRegistration_Filtering()
+        {
+            //Arrange
+            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
+            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
+            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
+
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, CreateName());
+            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(newContract1.Id, dpr.Id);
+
+            //Act
+            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, dataProcessingRegistrationUuid: dpr.Uuid, nameContent: null, page: 0, pageSize: 100);
 
             //Assert
             var contract = Assert.Single(contracts);
@@ -140,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, Guid.Empty, null, null, 0, 100);
+            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organizationUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -154,7 +192,35 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, Guid.Empty, null, 0, 100);
+            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUuid: Guid.Empty, page: 0, pageSize: 100);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GET_Contracts_Returns_BadRequest_For_Empty_SystemUsage_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUsageUuid: Guid.Empty, page: 0, pageSize: 100);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GET_Contracts_Returns_BadRequest_For_Empty_DataProcessingRegistration_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, dataProcessingRegistrationUuid: Guid.Empty, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -169,7 +235,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
 
             //Act
-            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organization.Uuid, null, null, 0, 100);
+            var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organization.Uuid, page: 0, pageSize: 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

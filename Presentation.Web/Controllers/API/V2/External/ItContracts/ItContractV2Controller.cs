@@ -4,7 +4,6 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Contract;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Swashbuckle.Swagger.Annotations;
 using System;
@@ -48,6 +47,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid organizationUuid,
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
+            [NonEmptyGuid] Guid? dataProcessingRegistrationUuid = null,
             string nameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
@@ -61,6 +61,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             if (systemUsageUuid.HasValue)
                 refinements.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
+
+            if (dataProcessingRegistrationUuid.HasValue)
+                refinements.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
 
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
