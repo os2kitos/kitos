@@ -16,6 +16,7 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
@@ -31,11 +32,16 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
         private readonly IDataProcessingRegistrationWriteService _writeService;
+        private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
 
-        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, IDataProcessingRegistrationWriteService writeService)
+        public DataProcessingRegistrationV2Controller(
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationService, 
+            IDataProcessingRegistrationWriteService writeService,
+            IDataProcessingRegistrationResponseMapper responseMapper)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
             _writeService = writeService;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -82,7 +88,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .OrderBy(dpr => dpr.Id)
                 .Page(paginationQuery)
                 .ToList()
-                .Select(ToDTO)
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Transform(Ok);
         }
 
@@ -105,7 +111,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _dataProcessingRegistrationService
                 .GetByUuid(uuid)
-                .Select(ToDTO)
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -129,7 +135,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _writeService
                 .Create(request.OrganizationUuid, ToWriteModel(request))
-                .Select(ToDTO)
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(MapCreatedResponse, FromOperationError);
         }
 
@@ -155,7 +161,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _writeService
                 .Update(uuid, ToWriteModel(request))
-                .Select(ToDTO)
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(MapCreatedResponse, FromOperationError);
         }
 
@@ -299,11 +305,6 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)
         {
             return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
-        }
-        private DataProcessingRegistrationResponseDTO ToDTO(DataProcessingRegistration arg)
-        {
-            //TODO: To response mapper
-            throw new NotImplementedException();
         }
 
         private DataProcessingRegistrationModificationParameters ToWriteModel(DataProcessingRegistrationWriteRequestDTO request)
