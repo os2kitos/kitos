@@ -5,7 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainServices.Extensions;
+using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -259,6 +261,47 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_GeneralData()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var subDataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var subDataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dataResponsible = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var basisForTransfer = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                DataResponsibleUuid = dataResponsible.Uuid, //TODO: Parameterize
+                DataResponsibleRemark = A<string>(),
+                IsAgreementConcluded = A<YesNoIrrelevantChoice>(),
+                IsAgreementConcludedRemark = A<string>(),
+                AgreementConcludedAt = A<DateTime>(),
+                BasisForTransferUuid = basisForTransfer.Uuid, //TODO: Parameterize
+                TransferToInsecureThirdCountries = YesNoUndecidedChoice.Yes, //TODO :Parametrize this
+                InsecureCountriesSubjectToDataTransferUuids = country.Uuid.WrapAsEnumerable().ToList(), //TODO: Parameterize
+                HasSubDataProcesors = YesNoUndecidedChoice.Yes, //TODO: PArameterize
+                DataProcessorUuids = new[] { dataProcessor1.Uuid, dataProcessor2.Uuid }, //TODO: Parameterize
+                SubDataProcessorUuids = new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } //TODO: Parameterize
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = input
+            };
+
+            //Act
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Assert
+            //TODO: Assert the content
         }
 
         private string CreateEmail()
