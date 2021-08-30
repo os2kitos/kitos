@@ -204,6 +204,7 @@
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="Controllers\CronStringHelperTests.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUsageUuidTest.cs" />
+    <Compile Include="DomainServices\Contract\QueryByDataProcessingRegistrationUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QQueryByAgreementConcludedTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySubDataProcessorUuidTest.cs" />
