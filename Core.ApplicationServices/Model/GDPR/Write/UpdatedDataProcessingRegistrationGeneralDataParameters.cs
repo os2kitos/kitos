@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.Shared;
+using Infrastructure.Services.Types;
+
+namespace Core.ApplicationServices.Model.GDPR.Write
+{
+    public class UpdatedDataProcessingRegistrationGeneralDataParameters
+    {
+        public OptionalValueChange<Guid?> DataResponsibleUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<string> DataResponsibleRemark { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<YesNoIrrelevantOption?> IsAgreementConcluded { get; set; } = OptionalValueChange<YesNoIrrelevantOption?>.None;
+        public OptionalValueChange<string> IsAgreementConcludedRemark { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<DateTime?> AgreementConcludedAt { get; set; } = OptionalValueChange<DateTime?>.None;
+        public OptionalValueChange<Guid?> BasisForTransferUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<YesNoUndecidedOption?> TransferToInsecureThirdCountries { get; set; } = OptionalValueChange<YesNoUndecidedOption?>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> InsecureCountriesSubjectToDataTransferUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> DataProcessorUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+        public OptionalValueChange<YesNoUndecidedOption?> HasSubDataProcesors { get; set; } = OptionalValueChange<YesNoUndecidedOption?>.None;
+        public OptionalValueChange<Maybe<IEnumerable<Guid>>> SubDataProcessorUuids { get; set; } = OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+    }
+}

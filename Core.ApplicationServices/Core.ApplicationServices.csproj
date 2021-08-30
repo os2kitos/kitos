@@ -119,6 +119,7 @@
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
+    <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
     <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
