@@ -251,7 +251,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var name2 = CreateName();
             var createRequest1 = new CreateDataProcessingRegistrationRequestDTO { Name = name1, OrganizationUuid = organization.Uuid };
             var createRequest2 = new CreateDataProcessingRegistrationRequestDTO { Name = name2, OrganizationUuid = organization.Uuid };
-            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest1);
+            await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest1);
             var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest2);
 
             //Act - try to change name of dpr2 to that of dpr1
