@@ -1,25 +1,26 @@
-﻿using Presentation.Web.Models.API.V2.Response.Generic.Identity;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class DataProcessingRegistrationV2Helper
     {
-        public static async Task<IEnumerable<IdentityNamePairResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, YesNoIrrelevantChoice? agreementConcluded = null)
         {
-            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid);
+            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
+            return await response.ReadResponseBodyAsAsync<IEnumerable<DataProcessingRegistrationResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null)
+        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, YesNoIrrelevantChoice? agreementConcluded = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -36,17 +37,26 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (systemUsageUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUsageUuid", systemUsageUuid.Value.ToString("D")));
 
+            if (dataProcessorUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("dataProcessorUuid", dataProcessorUuid.Value.ToString("D")));
+
+            if (subDataProcessorUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("subDataProcessorUuid", subDataProcessorUuid.Value.ToString("D")));
+
+            if (agreementConcluded.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("agreementConcluded", agreementConcluded.Value.ToString()));
+
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations?{query}"), token);
         }
 
-        public static async Task<IdentityNamePairResponseDTO> GetDPRAsync(string token, Guid uuid)
+        public static async Task<DataProcessingRegistrationResponseDTO> GetDPRAsync(string token, Guid uuid)
         {
             using var response = await SendGetDPRAsync(token, uuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetDPRAsync(string token, Guid uuid)

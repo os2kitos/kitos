@@ -90,6 +90,9 @@
     <Compile Include="Organizations\OrgUnitService.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\Contract\QueryBySystemUuid.cs" />
+    <Compile Include="Queries\DPR\QueryByAgreementConcluded.cs" />
+    <Compile Include="Queries\DPR\QueryBySubDataProcessorUuid.cs" />
+    <Compile Include="Queries\DPR\QueryByDataProcessorUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUsageUuid.cs" />
     <Compile Include="Queries\DPR\QueryBySystemUuid.cs" />
     <Compile Include="Queries\ItSystem\QueryByBusinessType.cs" />

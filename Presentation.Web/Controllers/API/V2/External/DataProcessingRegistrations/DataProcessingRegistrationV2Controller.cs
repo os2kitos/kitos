@@ -66,7 +66,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? systemUsageUuid = null,
             [NonEmptyGuid] Guid? dataProcessorUuid = null,
             [NonEmptyGuid] Guid? subDataProcessorUuid = null,
-            [NonEmptyGuid] bool? agreementConcluded = null,
+            YesNoIrrelevantChoice? agreementConcluded = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -82,6 +82,15 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             if (systemUsageUuid.HasValue)
                 conditions.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
+
+            if (dataProcessorUuid.HasValue)
+                conditions.Add(new QueryByDataProcessorUuid(dataProcessorUuid.Value));
+
+            if (subDataProcessorUuid.HasValue)
+                conditions.Add(new QueryBySubDataProcessorUuid(subDataProcessorUuid.Value));
+
+            if (agreementConcluded.HasValue)
+                conditions.Add(new QueryByAgreementConcluded(agreementConcluded.Value.ToDataOptions()));
 
             return _dataProcessingRegistrationService
                 .Query(conditions.ToArray())
