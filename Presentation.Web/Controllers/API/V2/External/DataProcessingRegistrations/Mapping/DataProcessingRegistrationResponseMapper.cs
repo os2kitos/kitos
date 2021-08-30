@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 LastModified = dataProcessingRegistration.LastChanged,
                 LastModifiedBy = dataProcessingRegistration.LastChangedByUser?.MapIdentityNamePairDTO(),
                 General = MapGeneral(dataProcessingRegistration),
-                SystemUuids = MapSystemUuids(dataProcessingRegistration),
+                SystemUsageUuids = MapSystemUuids(dataProcessingRegistration),
                 Oversight = MapOversight(dataProcessingRegistration),
                 Roles = MapRoles(dataProcessingRegistration),
                 ExternalReferences = MapExternalReferences(dataProcessingRegistration)

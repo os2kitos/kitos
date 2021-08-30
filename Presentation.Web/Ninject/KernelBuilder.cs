@@ -102,6 +102,7 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
 using Infrastructure.Ninject.DomainServices;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -253,8 +254,12 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
+
+            //Data processing
+            kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
