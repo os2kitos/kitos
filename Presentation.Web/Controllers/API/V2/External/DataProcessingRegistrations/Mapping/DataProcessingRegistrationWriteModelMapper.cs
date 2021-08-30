@@ -1,5 +1,8 @@
-﻿using Core.ApplicationServices.Extensions;
+﻿using System.Linq;
+using System.Web.WebPages;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Elasticsearch.Net;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 
@@ -41,6 +44,27 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 DataProcessorUuids = dto.DataProcessorUuids.FromNullable().AsChangedValue(),
                 HasSubDataProcesors = (dto.HasSubDataProcesors?.ToYesNoUndecidedOption()).AsChangedValue(),
                 SubDataProcessorUuids = dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
+            };
+        }
+
+        public UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
+        {
+            return new UpdatedDataProcessingRegistrationOversightDataParameters
+            {
+                OversightOptionUuids = dto.OversightOptionUuids.FromNullable().AsChangedValue(),
+                OversightOptionsRemark = dto.OversightOptionsRemark.AsChangedValue(),
+                //OversightInterval = dto.OversightInterval?.To,
+                OversightIntervalRemark = dto.OversightIntervalRemark.AsChangedValue(),
+                IsOversightCompleted = (dto.IsOversightCompleted?.ToYesNoUndecidedOption()).AsChangedValue(),
+                OversightCompletedRemark = dto.OversightCompletedRemark.AsChangedValue(),
+                OversightDates = dto.OversightDates
+                    .FromNullable()
+                    .Select(x => x
+                        .Select(y => new UpdatedDataProcessingRegistrationOversightDate()
+                            {
+                                CompletedAt = y.CompletedAt,
+                                Remark = y.Remark
+                            })).AsChangedValue()
             };
         }
     }
