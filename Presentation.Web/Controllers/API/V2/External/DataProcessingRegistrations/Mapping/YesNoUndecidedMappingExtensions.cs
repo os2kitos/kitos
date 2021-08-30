@@ -16,9 +16,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             ApiToDataMap = new Dictionary<YesNoUndecidedChoice, YesNoUndecidedOption>
             {
-                { YesNoUndecidedChoice.Yes ,YesNoUndecidedOption.Yes},
-                { YesNoUndecidedChoice.No ,YesNoUndecidedOption.No},
-                { YesNoUndecidedChoice.Undecided ,YesNoUndecidedOption.Undecided}
+                { YesNoUndecidedChoice.Yes, YesNoUndecidedOption.Yes },
+                { YesNoUndecidedChoice.No, YesNoUndecidedOption.No },
+                { YesNoUndecidedChoice.Undecided, YesNoUndecidedOption.Undecided }
             }.AsReadOnly();
 
             DataToApiMap = ApiToDataMap

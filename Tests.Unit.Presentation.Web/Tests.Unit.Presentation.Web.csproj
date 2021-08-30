@@ -204,8 +204,12 @@
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="Controllers\CronStringHelperTests.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUsageUuidTest.cs" />
+    <Compile Include="DomainServices\Contract\QueryByDataProcessingRegistrationUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QQueryByAgreementConcludedTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryBySubDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUsageUuidTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryByDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUuidTest.cs" />
     <Compile Include="DomainServices\Interface\QueryByExposingSystemTest.cs" />
     <Compile Include="DomainServices\IntersectionQueryTest.cs" />
@@ -248,6 +252,7 @@
     <Compile Include="Controllers\ItSystemControllerTest.cs" />
     <Compile Include="Infrastructure\NonEmptyGuidAttributeTest.cs" />
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
+    <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="OData\EconomyStreamsController.cs" />

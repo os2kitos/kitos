@@ -19,7 +19,7 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         public DataProcessingRegistrationGeneralDataResponseDTO General { get; set; }
         /// <summary>
         /// Associated it-system-usage entities
-        public IEnumerable<IdentityNamePairResponseDTO> SystemUuids { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> SystemUsages { get; set; }
         public DataProcessingRegistrationOversightResponseDTO Oversight { get; set; }
         /// <summary>
         /// Data processing role assignments
