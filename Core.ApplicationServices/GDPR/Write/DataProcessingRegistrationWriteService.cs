@@ -14,7 +14,6 @@ using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
-using Infrastructure.Soap.STSAdresse;
 using Serilog;
 
 namespace Core.ApplicationServices.GDPR.Write
@@ -168,12 +167,36 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Maybe<OperationError> UpdateBasisForTransfer(DataProcessingRegistration dpr, Guid? basisForTransferUuid)
         {
-            throw new NotImplementedException();
+            if (!basisForTransferUuid.HasValue)
+                return _applicationService
+                    .ClearBasisForTransfer(dpr.Id)
+                    .Match(_ => Maybe<OperationError>.None, error => error);
+
+            var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingBasisForTransferOption>(basisForTransferUuid.Value);
+
+            if (dbId.IsNone)
+                return new OperationError($"Basis for transfer option with uuid {basisForTransferUuid.Value} could not be found", OperationFailure.BadInput);
+
+            return _applicationService
+                .AssignBasisForTransfer(dpr.Id, dbId.Value)
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         private Maybe<OperationError> UpdateDataResponsible(DataProcessingRegistration dpr, Guid? dataResponsibleUuid)
         {
-            throw new NotImplementedException();
+            if (!dataResponsibleUuid.HasValue)
+                return _applicationService
+                    .ClearDataResponsible(dpr.Id)
+                    .Match(_ => Maybe<OperationError>.None, error => error);
+
+            var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingDataResponsibleOption>(dataResponsibleUuid.Value);
+
+            if (dbId.IsNone)
+                return new OperationError($"Data responsible option with uuid {dataResponsibleUuid.Value} could not be found", OperationFailure.BadInput);
+
+            return _applicationService
+                .AssignDataResponsible(dpr.Id, dbId.Value)
+                .Match(_ => Maybe<OperationError>.None, error => error);
         }
 
         public Maybe<OperationError> Delete(Guid dataProcessingRegistrationUuid)
