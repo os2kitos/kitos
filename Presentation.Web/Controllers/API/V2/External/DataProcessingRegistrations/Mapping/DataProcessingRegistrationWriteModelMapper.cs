@@ -26,9 +26,22 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
+        public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
         {
-            throw new System.NotImplementedException();
+            return new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = dto.DataResponsibleUuid.AsChangedValue(),
+                DataResponsibleRemark = dto.DataResponsibleRemark.AsChangedValue(),
+                IsAgreementConcluded = (dto.IsAgreementConcluded?.ToYesNoIrrelevantOption()).AsChangedValue(),
+                IsAgreementConcludedRemark = dto.IsAgreementConcludedRemark.AsChangedValue(),
+                AgreementConcludedAt = dto.AgreementConcludedAt.AsChangedValue(),
+                BasisForTransferUuid = dto.BasisForTransferUuid.AsChangedValue(),
+                TransferToInsecureThirdCountries = (dto.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption()).AsChangedValue(),
+                InsecureCountriesSubjectToDataTransferUuids = dto.InsecureCountriesSubjectToDataTransferUuids.FromNullable().AsChangedValue(),
+                DataProcessorUuids = dto.DataProcessorUuids.FromNullable().AsChangedValue(),
+                HasSubDataProcesors = (dto.HasSubDataProcesors?.ToYesNoUndecidedOption()).AsChangedValue(),
+                SubDataProcessorUuids = dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
+            };
         }
     }
 }
