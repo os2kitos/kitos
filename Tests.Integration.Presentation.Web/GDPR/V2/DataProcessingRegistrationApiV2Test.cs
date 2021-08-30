@@ -263,31 +263,37 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_POST_With_GeneralData()
+        [Theory]
+        [InlineData(true, true, true, true, true)]
+        [InlineData(true, true, true, true, false)]
+        [InlineData(true, true, true, false, true)]
+        [InlineData(true, true, false, true, true)]
+        [InlineData(true, false, true, true, true)]
+        [InlineData(false, true, true, true, true)]
+        public async Task Can_POST_With_GeneralData(bool withDataProcessors, bool withSubDataProcessors, bool withResponsible, bool withBasisForTransfer, bool withInsecureCountries)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var dataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var dataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var subDataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var subDataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var dataResponsible = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
-            var basisForTransfer = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
-            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor1 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor2 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataResponsible = withResponsible ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            var basisForTransfer = withBasisForTransfer ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            var country = withInsecureCountries ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
             var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
             {
-                DataResponsibleUuid = dataResponsible.Uuid, //TODO: Parameterize
+                DataResponsibleUuid = dataResponsible?.Uuid,
                 DataResponsibleRemark = A<string>(),
                 IsAgreementConcluded = A<YesNoIrrelevantChoice>(),
                 IsAgreementConcludedRemark = A<string>(),
                 AgreementConcludedAt = A<DateTime>(),
-                BasisForTransferUuid = basisForTransfer.Uuid, //TODO: Parameterize
-                TransferToInsecureThirdCountries = YesNoUndecidedChoice.Yes, //TODO :Parametrize this
-                InsecureCountriesSubjectToDataTransferUuids = country.Uuid.WrapAsEnumerable().ToList(), //TODO: Parameterize
-                HasSubDataProcesors = YesNoUndecidedChoice.Yes, //TODO: PArameterize
-                DataProcessorUuids = new[] { dataProcessor1.Uuid, dataProcessor2.Uuid }, //TODO: Parameterize
-                SubDataProcessorUuids = new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } //TODO: Parameterize
+                BasisForTransferUuid = basisForTransfer?.Uuid,
+                TransferToInsecureThirdCountries = withInsecureCountries ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                InsecureCountriesSubjectToDataTransferUuids = country?.Uuid.WrapAsEnumerable().ToList(),
+                HasSubDataProcesors = withSubDataProcessors ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                DataProcessorUuids = withDataProcessors ? new[] { dataProcessor1.Uuid, dataProcessor2.Uuid } : null,
+                SubDataProcessorUuids = withSubDataProcessors ? new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } : null
             };
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -302,6 +308,63 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Assert
             //TODO: Assert the content
+        }
+
+        [Theory]
+        [InlineData(YesNoUndecidedChoice.No)]
+        [InlineData(YesNoUndecidedChoice.Undecided)]
+        [InlineData(null)]
+        public async Task Cannot_POST_With_GeneralData_And_InsecureThirdCountries_When_TransferToInsecureCountries_Is_Anyhing_But_Yes(YesNoUndecidedChoice? transferToInsecureThirdCountries)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                TransferToInsecureThirdCountries = transferToInsecureThirdCountries,
+                InsecureCountriesSubjectToDataTransferUuids = new[] { country.Uuid }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = input
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(YesNoUndecidedChoice.No)]
+        [InlineData(YesNoUndecidedChoice.Undecided)]
+        [InlineData(null)]
+        public async Task Cannot_POST_With_GeneralData_And_SubDataProcessor_When_HasSubDataProcessors_Set_To_Anything_But_Yes(YesNoUndecidedChoice? hasSubDataProcessors)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                HasSubDataProcesors = hasSubDataProcessors,
+                SubDataProcessorUuids = new[] { organization.Uuid }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = input
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private string CreateEmail()

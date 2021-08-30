@@ -170,10 +170,13 @@ namespace Core.ApplicationServices.GDPR.Write
             if (!basisForTransferUuid.HasValue)
                 return _applicationService
                     .ClearBasisForTransfer(dpr.Id)
-                    .Match(_ => Maybe<OperationError>.None, error => error);
+                    .Match(
+                        _ => Maybe<OperationError>.None,
+                        error => error.FailureType == OperationFailure.BadState ? Maybe<OperationError>.None : error
+                    );
 
             var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingBasisForTransferOption>(basisForTransferUuid.Value);
-
+            
             if (dbId.IsNone)
                 return new OperationError($"Basis for transfer option with uuid {basisForTransferUuid.Value} could not be found", OperationFailure.BadInput);
 
@@ -187,7 +190,10 @@ namespace Core.ApplicationServices.GDPR.Write
             if (!dataResponsibleUuid.HasValue)
                 return _applicationService
                     .ClearDataResponsible(dpr.Id)
-                    .Match(_ => Maybe<OperationError>.None, error => error);
+                    .Match(
+                        _ => Maybe<OperationError>.None,
+                        error => error.FailureType == OperationFailure.BadState ? Maybe<OperationError>.None : error
+                    );
 
             var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingDataResponsibleOption>(dataResponsibleUuid.Value);
 
