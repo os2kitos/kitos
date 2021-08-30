@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
@@ -127,17 +129,41 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
-            throw new NotImplementedException();
+            return UpdateMultiAssignment
+            (
+                "sub data processor",
+                dpr,
+                organizationUuids,
+                registration => registration.SubDataProcessors,
+                (registration, id) => _applicationService.AssignSubDataProcessor(registration.Id, id),
+                (registration, id) => _applicationService.RemoveSubDataProcessor(registration.Id, id)
+                );
         }
 
         private Maybe<OperationError> UpdateDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
-            throw new NotImplementedException();
+            return UpdateMultiAssignment
+            (
+                "data processor",
+                dpr,
+                organizationUuids,
+                registration => registration.DataProcessors,
+                (registration, id) => _applicationService.AssignDataProcessor(registration.Id, id),
+                (registration, id) => _applicationService.RemoveDataProcessor(registration.Id, id)
+            );
         }
 
         private Maybe<OperationError> UpdateInsecureCountriesSubjectToDataTransfer(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> countryOptionUuids)
         {
-            throw new NotImplementedException();
+            return UpdateMultiAssignment
+            (
+                "insecure third country",
+                dpr,
+                countryOptionUuids,
+                registration => registration.InsecureCountriesSubjectToDataTransfer,
+                (registration, id) => _applicationService.AssignInsecureThirdCountry(registration.Id, id),
+                (registration, id) => _applicationService.RemoveInsecureThirdCountry(registration.Id, id)
+            );
         }
 
         private Maybe<OperationError> UpdateBasisForTransfer(DataProcessingRegistration dpr, Guid? basisForTransferUuid)
@@ -160,6 +186,49 @@ namespace Core.ApplicationServices.GDPR.Write
             return _applicationService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, error => error);
+        }
+
+        private Maybe<OperationError> UpdateMultiAssignment<TAssignment>(
+           string subject,
+           DataProcessingRegistration dpr,
+           Maybe<IEnumerable<Guid>> assignedItemUuid,
+           Func<DataProcessingRegistration, IEnumerable<TAssignment>> getExistingState,
+           Func<DataProcessingRegistration, int, Result<TAssignment, OperationError>> assign,
+           Func<DataProcessingRegistration, int, Result<TAssignment, OperationError>> unAssign)
+           where TAssignment : class, IHasId, IHasUuid
+        {
+            var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
+            var existingAssignemnts = getExistingState(dpr).ToDictionary(x => x.Uuid);
+            var existingUuids = existingAssignemnts.Values.Select(x => x.Uuid).ToList();
+
+            var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
+            foreach (var (delta, uuid) in changes)
+            {
+                switch (delta)
+                {
+                    case EnumerableExtensions.EnumerableDelta.Added:
+                        var dbId = _entityIdentityResolver.ResolveDbId<TAssignment>(uuid);
+
+                        if (dbId.IsNone)
+                            return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
+                        var addResult = assign(dpr, dbId.Value);
+
+                        if (addResult.Failed)
+                            return addResult.Error;
+
+                        break;
+                    case EnumerableExtensions.EnumerableDelta.Removed:
+                        var removeResult = unAssign(dpr, existingAssignemnts[uuid].Id);
+                        if (removeResult.Failed)
+                            return removeResult.Error;
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Maybe<OperationError>.None;
         }
     }
 }
