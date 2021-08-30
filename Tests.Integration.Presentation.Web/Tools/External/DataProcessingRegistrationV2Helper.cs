@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -27,7 +29,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 new("pageSize", pageSize.ToString("D")),
             };
 
-            if(organizationUuid.HasValue)
+            if (organizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if (systemUuid.HasValue)
@@ -52,6 +54,30 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendGetDPRAsync(string token, Guid uuid)
         {
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid:D}"), token);
+        }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PostAsync(string token, CreateDataProcessingRegistrationRequestDTO payload)
+        {
+            using var response = await SendPostAsync(token, payload);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPostAsync(string token, CreateDataProcessingRegistrationRequestDTO payload)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations"), payload, token);
+        }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PutAsync(string token, Guid uuid, DataProcessingRegistrationWriteRequestDTO payload)
+        {
+            using var response = await SendPutAsync(token, uuid, payload);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPutAsync(string token, Guid uuid, DataProcessingRegistrationWriteRequestDTO payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, payload);
         }
     }
 }
