@@ -6,16 +6,19 @@ namespace Core.DomainServices.Queries.DPR
 {
     public class QueryByAgreementConcluded : IDomainQuery<DataProcessingRegistration>
     {
-        private readonly YesNoIrrelevantOption _isAgreementConcluded;
+        private readonly bool _isAgreementConcluded;
 
-        public QueryByAgreementConcluded(YesNoIrrelevantOption isAgreementConcluded)
+        public QueryByAgreementConcluded(bool isAgreementConcluded)
         {
             _isAgreementConcluded = isAgreementConcluded;
         }
 
         public IQueryable<DataProcessingRegistration> Apply(IQueryable<DataProcessingRegistration> source)
         {
-            return source.Where(dataProcessingRegistration => dataProcessingRegistration.IsAgreementConcluded == _isAgreementConcluded);
+            return source.Where(dataProcessingRegistration => 
+                _isAgreementConcluded 
+                    ? dataProcessingRegistration.IsAgreementConcluded == YesNoIrrelevantOption.YES
+                    : (dataProcessingRegistration.IsAgreementConcluded == null || dataProcessingRegistration.IsAgreementConcluded != YesNoIrrelevantOption.YES));
         }
     }
 }

@@ -62,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Null(dto.Name);
             Assert.Null(dto.OrganizationContext);
             Assert.Empty(dto.ExternalReferences);
-            Assert.Empty(dto.SystemUsageUuids);
+            Assert.Empty(dto.SystemUsages);
             Assert.Empty(dto.Roles);
 
             var general = dto.General;
@@ -141,11 +141,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             if (withSystemUsages)
             {
-                AssertSystemUsages(dpr, dto.SystemUsageUuids.ToList());
+                AssertSystemUsages(dpr, dto.SystemUsages.ToList());
             }
             else
             {
-                Assert.Empty(dto.SystemUsageUuids);
+                Assert.Empty(dto.SystemUsages);
             }
         }
 

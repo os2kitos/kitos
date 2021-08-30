@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 LastModified = dataProcessingRegistration.LastChanged,
                 LastModifiedBy = dataProcessingRegistration.LastChangedByUser?.MapIdentityNamePairDTO(),
                 General = MapGeneral(dataProcessingRegistration),
-                SystemUsageUuids = MapSystemUuids(dataProcessingRegistration),
+                SystemUsages = MapSystemUsages(dataProcessingRegistration),
                 Oversight = MapOversight(dataProcessingRegistration),
                 Roles = MapRoles(dataProcessingRegistration),
                 ExternalReferences = MapExternalReferences(dataProcessingRegistration)
@@ -36,13 +36,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             return new DataProcessingRegistrationOversightResponseDTO
             {
-                OversightOptions = dataProcessingRegistration.OversightOptions?.Select(x => x.MapIdentityNamePairDTO()),
+                OversightOptions = dataProcessingRegistration.OversightOptions?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 OversightOptionsRemark = dataProcessingRegistration.OversightOptionRemark,
                 OversightInterval = MapOversightInterval(dataProcessingRegistration.OversightInterval),
                 OversightIntervalRemark = dataProcessingRegistration.OversightIntervalRemark,
                 IsOversightCompleted = MapYesNoUndecided(dataProcessingRegistration.IsOversightCompleted),
                 OversightCompletedRemark = dataProcessingRegistration.OversightCompletedRemark,
-                OversightDates = MapOversightDates(dataProcessingRegistration.OversightDates)
+                OversightDates = MapOversightDates(dataProcessingRegistration.OversightDates).ToList()
             };
         }
 
@@ -51,9 +51,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return oversightInterval?.ToYesNoDontKnowChoice();
         }
 
-        private static YesNoUndecidedChoice? MapYesNoUndecided(YesNoUndecidedOption? isOversightCompleted)
+        private static YesNoUndecidedChoice? MapYesNoUndecided(YesNoUndecidedOption? yesNoUndecidedOption)
         {
-            return isOversightCompleted?.ToYesNoDontKnowChoice();
+            return yesNoUndecidedOption?.ToYesNoDontKnowChoice();
         }
 
         private IEnumerable<OversightDateDTO> MapOversightDates(ICollection<DataProcessingRegistrationOversightDate> oversightDates)
@@ -70,7 +70,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        private static IEnumerable<IdentityNamePairResponseDTO> MapSystemUuids(DataProcessingRegistration dataProcessingRegistration)
+        private static IEnumerable<IdentityNamePairResponseDTO> MapSystemUsages(DataProcessingRegistration dataProcessingRegistration)
         {
             return dataProcessingRegistration.SystemUsages.Select(x => x.MapIdentityNamePairDTO());
         }
@@ -86,10 +86,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 AgreementConcludedAt = dataProcessingRegistration.AgreementConcludedAt,
                 TransferToInsecureThirdCountries = MapYesNoUndecided(dataProcessingRegistration.TransferToInsecureThirdCountries),
                 BasisForTransfer = dataProcessingRegistration.BasisForTransfer?.MapIdentityNamePairDTO(),
-                InsecureCountriesSubjectToDataTransfer = dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer?.Select(x => x.MapIdentityNamePairDTO()),
-                DataProcessors = dataProcessingRegistration.DataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()),
+                InsecureCountriesSubjectToDataTransfer = dataProcessingRegistration.InsecureCountriesSubjectToDataTransfer?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
+                DataProcessors = dataProcessingRegistration.DataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList(),
                 HasSubDataProcessors = MapYesNoUndecided(dataProcessingRegistration.HasSubDataProcessors),
-                SubDataProcessors = dataProcessingRegistration.SubDataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO())
+                SubDataProcessors = dataProcessingRegistration.SubDataProcessors?.Select(x => x.MapShallowOrganizationResponseDTO()).ToList()
             };
         }
 

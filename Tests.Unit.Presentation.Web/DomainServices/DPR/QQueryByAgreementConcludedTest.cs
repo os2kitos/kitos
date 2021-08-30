@@ -9,33 +9,51 @@ namespace Tests.Unit.Presentation.Web.DomainServices.DPR
 {
     public class QQueryByAgreementConcludedTest : WithAutoFixture
     {
-        [Fact]
-        public void Apply_Returns_Items_With_Id_Match()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Apply_Returns_Items_With_Id_Match(bool isAgreementConcluded)
         {
             //Arrange
-            var correctOption = A<YesNoIrrelevantOption>();
-            var incorrectOption = A<YesNoIrrelevantOption>();
-            while (correctOption == incorrectOption)
+            const YesNoIrrelevantOption yesOption = YesNoIrrelevantOption.YES;
+            var notYesOption = A<YesNoIrrelevantOption>();
+            while (yesOption == notYesOption)
             {
-                incorrectOption = A<YesNoIrrelevantOption>();
+                notYesOption = A<YesNoIrrelevantOption>();
             }
-            var matched = new DataProcessingRegistration() { 
-                IsAgreementConcluded = correctOption
+            var yesMatch = new DataProcessingRegistration() { 
+                IsAgreementConcluded = yesOption,
+                Id = A<int>()
             };
-            var excluded1 = new DataProcessingRegistration() {
-                IsAgreementConcluded = incorrectOption
+            var otherMatch = new DataProcessingRegistration() {
+                IsAgreementConcluded = notYesOption,
+                Id = A<int>()
             };
-            var excluded2 = new DataProcessingRegistration();
+            var emptyMatch = new DataProcessingRegistration()
+            {
+                Id = A<int>()
+            };
 
-            var input = new[] { matched, excluded1, excluded2 }.AsQueryable();
-            var sut = new QueryByAgreementConcluded(correctOption);
+            var input = new[] { yesMatch, otherMatch, emptyMatch }.AsQueryable();
+            var sut = new QueryByAgreementConcluded(isAgreementConcluded);
 
             //Act
             var result = sut.Apply(input);
 
             //Assert
-            var entity = Assert.Single(result);
-            Assert.Same(matched, entity);
+            if (isAgreementConcluded)
+            {
+                var entity = Assert.Single(result);
+                Assert.Same(yesMatch, entity);
+            }
+            else
+            {
+                Assert.Equal(2, result.Count());
+                var other = Assert.Single(result.Where(x => x.Id == otherMatch.Id));
+                Assert.Same(otherMatch, other);
+                var empty = Assert.Single(result.Where(x => x.Id == emptyMatch.Id));
+                Assert.Same(emptyMatch, empty);
+            }
         }
     }
 }

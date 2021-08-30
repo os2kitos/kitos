@@ -5,6 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AutoFixture;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Core.DomainModel.Shared;
@@ -212,25 +213,43 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Theory]
-        [InlineData(YesNoIrrelevantOption.YES, YesNoIrrelevantChoice.Yes)]
-        [InlineData(YesNoIrrelevantOption.NO, YesNoIrrelevantChoice.No)]
-        [InlineData(YesNoIrrelevantOption.IRRELEVANT, YesNoIrrelevantChoice.Irrelevant)]
-        [InlineData(YesNoIrrelevantOption.UNDECIDED, YesNoIrrelevantChoice.Undecided)]
-        public async Task Can_GET_All_DPRs_With_AgreementConcludedFiltering(YesNoIrrelevantOption optionValue, YesNoIrrelevantChoice choiceValue)
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_GET_All_DPRs_With_AgreementConcludedFiltering(bool isAgreementConcluded)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
             var dpr1 = await CreateDPRAsync(organization.Id);
             var dpr2 = await CreateDPRAsync(organization.Id);
-            using var assignResult = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, optionValue);
-            Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
+            var dpr3 = await CreateDPRAsync(organization.Id);
+            
+            using var assignResult1 = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, YesNoIrrelevantOption.YES);
+            Assert.Equal(HttpStatusCode.OK, assignResult1.StatusCode);
+
+            Configure(f => f.Create<Generator<YesNoIrrelevantOption>>().First(x => x != YesNoIrrelevantOption.YES));
+
+            using var assignResult2 = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, A<YesNoIrrelevantOption>());
+            Assert.Equal(HttpStatusCode.OK, assignResult2.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, agreementConcluded: choiceValue);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, agreementConcluded: isAgreementConcluded);
 
             //Assert
-            var retrievedDPR = Assert.Single(dprs);
-            AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
+            if (isAgreementConcluded)
+            {
+                var retrievedDPR = Assert.Single(dprs);
+                AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
+            }
+            else
+            {
+                Assert.Equal(2, dprs.Count());
+                var second = Assert.Single(dprs.Where(x => x.Uuid == dpr2.Uuid));
+                AssertExpectedShallowDPR(dpr2, organization, second);
+
+                var third = Assert.Single(dprs.Where(x => x.Uuid == dpr3.Uuid));
+                AssertExpectedShallowDPR(dpr3, organization, third);
+            }
+            
         }
 
         [Fact]
