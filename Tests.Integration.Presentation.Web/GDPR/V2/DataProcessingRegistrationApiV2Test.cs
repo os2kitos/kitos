@@ -1,12 +1,15 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -158,9 +161,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Assert
             Assert.Equal(name, dto.Name);
             Assert.NotEqual(Guid.Empty, dto.Uuid);
-            Assert.Equal(organization.Name, dto.OrganizationContext.Name);
-            Assert.Equal(organization.Cvr, dto.OrganizationContext.Cvr);
-            Assert.Equal(organization.Uuid, dto.OrganizationContext.Uuid);
+            AssertOrganizationReference(organization, dto.OrganizationContext);
         }
 
         [Fact]
@@ -305,9 +306,21 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
 
             //Assert
-            //TODO: Assert the content
+            AssertOrganizationReference(organization, freshDTO.OrganizationContext);
+            AssertCrossReference(dataResponsible, freshDTO.General.DataResponsible);
+            Assert.Equal(input.DataResponsibleRemark, freshDTO.General.DataResponsibleRemark);
+            Assert.Equal(input.IsAgreementConcluded, freshDTO.General.IsAgreementConcluded);
+            Assert.Equal(input.IsAgreementConcludedRemark, freshDTO.General.IsAgreementConcludedRemark);
+            Assert.Equal(input.AgreementConcludedAt, freshDTO.General.AgreementConcludedAt);
+            AssertCrossReference(basisForTransfer, freshDTO.General.BasisForTransfer);
+            Assert.Equal(input.TransferToInsecureThirdCountries, freshDTO.General.TransferToInsecureThirdCountries);
+            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, freshDTO.General.InsecureCountriesSubjectToDataTransfer);
+            AssertMultiAssignment(input.DataProcessorUuids, freshDTO.General.DataProcessors);
+            Assert.Equal(input.HasSubDataProcesors, freshDTO.General.HasSubDataProcesors);
+            AssertMultiAssignment(input.SubDataProcessorUuids, freshDTO.General.SubDataProcessors);
         }
 
         [Theory]
@@ -397,6 +410,25 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         private string CreateName()
         {
             return $"{nameof(DataProcessingRegistrationApiV2Test)}{A<string>()}";
+        }
+        private static void AssertOrganizationReference(Organization expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
+        {
+            Assert.Equal(expected.Name, organizationReferenceDTO.Name);
+            Assert.Equal(expected.Cvr, organizationReferenceDTO.Cvr);
+            Assert.Equal(expected.Uuid, organizationReferenceDTO.Uuid);
+        }
+        private static void AssertCrossReference(IdentityNamePairResponseDTO expected, IdentityNamePairResponseDTO actual)
+        {
+            Assert.Equal(expected?.Uuid, actual?.Uuid);
+            Assert.Equal(expected?.Name, actual?.Name);
+        }
+
+        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        {
+            var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
+            var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
+            Assert.Equal(expectedUuids.Count, actualUuids.Count);
+            Assert.Equal(expectedUuids, actualUuids);
         }
     }
 }

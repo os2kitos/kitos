@@ -43,12 +43,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations?{query}"), token);
         }
 
-        public static async Task<IdentityNamePairResponseDTO> GetDPRAsync(string token, Guid uuid)
+        public static async Task<DataProcessingRegistrationResponseDTO> GetDPRAsync(string token, Guid uuid)
         {
             using var response = await SendGetDPRAsync(token, uuid);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-            return await response.ReadResponseBodyAsAsync<IdentityNamePairResponseDTO>();
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetDPRAsync(string token, Guid uuid)
