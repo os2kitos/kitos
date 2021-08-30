@@ -64,15 +64,18 @@ class DataProcessingRegistrationHelper {
     }
 
     public static goToItSystems() {
-        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.it-systems");
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.it-systems")
+            .then(() => browser.waitForAngular());
     }
 
     public static goToRoles() {
-        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles");
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.roles")
+            .then(() => browser.waitForAngular());
     }
 
     public static goToItContracts() {
-        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.contracts");
+        return DataProcessingRegistrationHelper.navigation.goToSubMenuElement("data-processing.edit-registration.contracts")
+            .then(() => browser.waitForAngular());
     }
 
     public static assignRole(role: string, user: string) {
