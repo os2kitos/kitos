@@ -182,6 +182,46 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
+        public async Task Cannot_POST_If_Organization_Does_Not_Exist()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var name = CreateName();
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = name,
+                OrganizationUuid = A<Guid>()
+            };
+
+            //Act
+            using var failingRequest = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, failingRequest.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_If_User_Is_Not_Member_Of_Organization()
+        {
+            //Arrange
+            var (token, _, _) = await CreatePrerequisitesAsync();
+            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
+
+            var name = CreateName();
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = name,
+                OrganizationUuid = defaultOrgUuid
+            };
+
+            //Act
+            using var failingRequest = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, failingRequest.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_PUT_With_Name_Change()
         {
             //Arrange
@@ -201,6 +241,26 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Assert
             Assert.Equal(name2, changedDTO.Name);
         }
+
+        [Fact]
+        public async Task Cannot_PUT_Duplicated_Name()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var name1 = CreateName();
+            var name2 = CreateName();
+            var createRequest1 = new CreateDataProcessingRegistrationRequestDTO { Name = name1, OrganizationUuid = organization.Uuid };
+            var createRequest2 = new CreateDataProcessingRegistrationRequestDTO { Name = name2, OrganizationUuid = organization.Uuid };
+            await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest1);
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest2);
+
+            //Act - try to change name of dpr2 to that of dpr1
+            using var response = await DataProcessingRegistrationV2Helper.SendPutAsync(token, dpr2.Uuid, new DataProcessingRegistrationWriteRequestDTO() { Name = name1 });
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+        }
+
         private string CreateEmail()
         {
             return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
