@@ -14,6 +14,7 @@ using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.GDPR.Write;
+using Core.ApplicationServices.Model.GDPR.Write;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -206,7 +207,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    General = _writeModelMapper.MapGeneral(request)
+                })
+                .Select(ToDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
