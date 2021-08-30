@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -10,7 +11,7 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// Applied oversight options.
         /// </summary>
-        public IEnumerable<Guid> OversightOptions { get; set; }
+        public IEnumerable<IdentityNamePairResponseDTO> OversightOptions { get; set; }
         /// <summary>
         /// Remark related to the selected oversight options
         /// </summary>

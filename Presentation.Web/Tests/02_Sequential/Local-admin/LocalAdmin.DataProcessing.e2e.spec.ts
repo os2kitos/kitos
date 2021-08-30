@@ -15,13 +15,13 @@ describe("Local admin is able to toggle DataProcessing", () => {
     var naviHelper = new NavigationBarHelper();
     var systemName = createItSystemName(1);
 
-    beforeAll(() => {
+    beforeAll(async () => {
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsGlobalAdmin();
-        SystemCatalogHelper.createSystem(systemName);
-        SystemCatalogHelper.createLocalSystem(systemName);
-        loginHelper.logout();
-        loginHelper.loginAsLocalAdmin();
+        return loginHelper.loginAsGlobalAdmin()
+            .then(() => SystemCatalogHelper.createSystem(systemName))
+            .then(() => SystemCatalogHelper.createLocalSystem(systemName))
+            .then(() => loginHelper.logout())
+            .then(() => loginHelper.loginAsLocalAdmin());
     });
 
     afterAll(() => {
