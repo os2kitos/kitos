@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             {
                 Name = dto.Name.AsChangedValue(),
                 General = dto.General.FromNullable().Select(MapGeneral),
-                SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
+                SystemUsageUuids = dto.SystemUsageUuids.FromNullable()
             };
         }
 
