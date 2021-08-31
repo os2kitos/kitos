@@ -1,5 +1,9 @@
-﻿using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.GDPR.Write;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -76,6 +80,66 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertPropertyContainsResetDataChange(output.SubDataProcessorUuids);
+        }
+
+        [Fact]
+        public void MapOversight_Returns_UpdatedDataProcessingRegistrationOversightDataParameters()
+        {
+            //Arrange
+            var input = A<DataProcessingRegistrationOversightWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapOversight(input);
+
+            //Assert
+            Assert.Equal(input.OversightOptionUuids, AssertPropertyContainsDataChange(output.OversightOptionUuids));
+            Assert.Equal(input.OversightOptionsRemark, AssertPropertyContainsDataChange(output.OversightOptionsRemark));
+            Assert.Equal(input.OversightInterval?.ToIntervalOption(), AssertPropertyContainsDataChange(output.OversightInterval));
+            Assert.Equal(input.OversightIntervalRemark, AssertPropertyContainsDataChange(output.OversightIntervalRemark));
+            Assert.Equal(input.IsOversightCompleted?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.IsOversightCompleted));
+            Assert.Equal(input.OversightCompletedRemark, AssertPropertyContainsDataChange(output.OversightCompletedRemark));
+            AssertOversightDates(input.OversightDates, AssertPropertyContainsDataChange(output.OversightDates));
+        }
+
+        [Fact]
+        public void MapOversight_Resets_OversightOptions_If_Input_Is_Null()
+        {
+            //Arrange
+            var input = A<DataProcessingRegistrationOversightWriteRequestDTO>();
+            input.OversightOptionUuids = null;
+
+            //Act
+            var output = _sut.MapOversight(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.OversightOptionUuids);
+        }
+
+        [Fact]
+        public void MapOversight_Resets_OversightDates_If_Input_Is_Null()
+        {
+            //Arrange
+            var input = A<DataProcessingRegistrationOversightWriteRequestDTO>();
+            input.OversightDates = null;
+
+            //Act
+            var output = _sut.MapOversight(input);
+
+            //Assert
+            AssertPropertyContainsResetDataChange(output.OversightDates);
+        }
+
+        private void AssertOversightDates(IEnumerable<OversightDateDTO> expected, IEnumerable<UpdatedDataProcessingRegistrationOversightDate> actual)
+        {
+            var orderedExpected = expected.OrderBy(x => x.CompletedAt).ToList();
+            var orderedActual = actual.OrderBy(x => x.CompletedAt).ToList();
+
+            Assert.Equal(orderedExpected.Count, orderedActual.Count);
+            for (var i = 0; i < orderedExpected.Count; i++)
+            {
+                Assert.Equal(orderedExpected[i].CompletedAt, orderedActual[i].CompletedAt);
+                Assert.Equal(orderedExpected[i].Remark, orderedActual[i].Remark);
+            }
         }
     }
 }

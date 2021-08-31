@@ -1012,13 +1012,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
-            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null)
+            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
+            UpdatedDataProcessingRegistrationOversightDataParameters oversightData = null)
         {
             var organizationUuid = A<Guid>();
             var parameters = new DataProcessingRegistrationModificationParameters
             {
                 Name = A<string>().AsChangedValue(),
-                General = generalData.FromNullable()
+                General = generalData.FromNullable(),
+                Oversight = oversightData.FromNullable()
             };
             var createdRegistration = new DataProcessingRegistration
             {
@@ -1036,49 +1038,508 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         //TODO: Update edge cases
 
         [Fact]
-        public void Can_Create_With_Oversight()
+        public void Can_Create_With_Oversight_OversightOptions()
         {
             //Arrange
-            var oversightOption = new DataProcessingOversightOption()
+            var inputUuids = Many<Guid>().ToList();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
             {
-                Uuid = A<Guid>(),
-                Id = A<int>(),
-                Name = A<string>()
+                OversightOptionUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
             };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
 
-            var parameters = new DataProcessingRegistrationModificationParameters
-            {
-                Name = A<string>().AsChangedValue(),
-                Oversight = new UpdatedDataProcessingRegistrationOversightDataParameters()
-                {
-                    OversightOptionUuids = new []{ oversightOption.Uuid }.ToEnumerable().FromNullable().AsChangedValue()
-                }
-            };
+            //Make sure we have som existing countries and add one which is shared with the new state. That one, we don't expect to be removed
+            var existingOversightOptionsAssigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
+            var optionMap = inputUuids
+                .Concat(existingOversightOptionsAssigmentIds)
+                .Distinct()
+                .ToDictionary(uuid => uuid, uuid => new DataProcessingOversightOption() { Uuid = uuid, Id = A<int>() });
 
-            var createdRegistration = new DataProcessingRegistration()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var orgDbId = A<int>();
+            createdRegistration.OversightOptions = existingOversightOptionsAssigmentIds.Select(uuid => optionMap[uuid]).ToList();
+            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingOversightOption>(uuid, optionMap[uuid].Id));
 
-            var organizationUuid = A<Guid>();
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingOversightOption>(oversightOption.Uuid, oversightOption.Id);
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
-            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
+            var expectedRemovals = existingOversightOptionsAssigmentIds.Except(inputUuids).ToList();
+            var expectedAdditions = inputUuids.Except(existingOversightOptionsAssigmentIds).ToList();
+            foreach (var expectedRemoval in expectedRemovals)
+                _dprServiceMock.Setup(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
 
-            var transaction = ExpectTransaction();
-            _dprServiceMock.Setup(x => x.AssignOversightOption(createdRegistration.Id, oversightOption.Id)).Returns(oversightOption);
-
+            foreach (var expectedAddition in expectedAdditions)
+                _dprServiceMock.Setup(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id)).Returns(optionMap[expectedAddition]);
+            
             //Act
-            var createdResult = _sut.Create(organizationUuid, parameters);
+            var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createdResult.Ok);
-            var createdOversightOption = Assert.Single(createdResult.Value.OversightOptions);
-            Assert.Equal(oversightOption.Uuid, createdOversightOption.Uuid);
-            Assert.Equal(oversightOption.Name, createdOversightOption.Name);
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
+
+            foreach (var expectedRemoval in expectedRemovals)
+            {
+                _dprServiceMock.Verify(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Never);
+            }
+
+            foreach (var expectedAddition in expectedAdditions)
+            {
+                _dprServiceMock.Verify(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Never);
+            }
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OversightData_OversightOptionsRemark(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightOptionsRemark = (inputIsNull ? null : A<string>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateOversightOptionRemark(createdRegistration.Id, oversightData.OversightOptionsRemark.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_OversightData_OversightOptionsRemark_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightOptionsRemark = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateOversightOptionRemark(createdRegistration.Id, oversightData.OversightOptionsRemark.NewValue)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightOptionsRemark_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightOptionsRemark = OptionalValueChange<string>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateOversightOptionRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OversightData_OversightInterval(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightInterval = (inputIsNull ? (YearMonthIntervalOption?)null : A<YearMonthIntervalOption>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateOversightInterval(createdRegistration.Id, oversightData.OversightInterval.NewValue.GetValueOrDefault(YearMonthIntervalOption.Undecided))).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_OversightData_OversightInterval_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightInterval = A<YearMonthIntervalOption?>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateOversightInterval(createdRegistration.Id, oversightData.OversightInterval.NewValue.GetValueOrDefault(YearMonthIntervalOption.Undecided))).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightInterval_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightInterval = OptionalValueChange<YearMonthIntervalOption?>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateOversightInterval(It.IsAny<int>(), It.IsAny<YearMonthIntervalOption>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OversightData_OversightIntervalRemark(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightIntervalRemark = (inputIsNull ? null : A<string>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateOversightIntervalRemark(createdRegistration.Id, oversightData.OversightIntervalRemark.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_OversightData_OversightIntervalRemark_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightIntervalRemark = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateOversightIntervalRemark(createdRegistration.Id, oversightData.OversightIntervalRemark.NewValue)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightIntervalRemark_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightIntervalRemark = OptionalValueChange<string>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateOversightIntervalRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OversightData_IsOversightCompleted(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                IsOversightCompleted = (inputIsNull ? (YesNoUndecidedOption?)null : A<YesNoUndecidedOption>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateIsOversightCompleted(createdRegistration.Id, oversightData.IsOversightCompleted.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_OversightData_IsOversightCompleted_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                IsOversightCompleted = A<YesNoUndecidedOption?>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateIsOversightCompleted(createdRegistration.Id, oversightData.IsOversightCompleted.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_IsOversightCompleted_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                IsOversightCompleted = OptionalValueChange<YesNoUndecidedOption?>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateIsOversightCompleted(It.IsAny<int>(), It.IsAny<YesNoUndecidedOption>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_OversightData_OversightCompletedRemark(bool inputIsNull)
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightCompletedRemark = (inputIsNull ? null : A<string>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            _dprServiceMock.Setup(x => x.UpdateOversightCompletedRemark(createdRegistration.Id, oversightData.OversightCompletedRemark.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_OversightData_OversightCompletedRemark_If_Update_Fails()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightCompletedRemark = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateOversightCompletedRemark(createdRegistration.Id, oversightData.OversightCompletedRemark.NewValue)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightCompletedRemark_Set_To_NoChanges()
+        {
+            //Arrange
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightCompletedRemark = OptionalValueChange<string>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateOversightCompletedRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightDates()
+        {
+            //Arrange
+            var dates = Many<UpdatedDataProcessingRegistrationOversightDate>().ToList();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightDates = dates.FromNullable<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var oversightDatesMap =
+                dates
+                    .ToDictionary(
+                        x => x,
+                        x => new DataProcessingRegistrationOversightDate { Id = A<int>(), OversightDate = x.CompletedAt, OversightRemark = x.Remark});
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Setup(x => x.AssignOversightDate(createdRegistration.Id, oversightDate.CompletedAt, oversightDate.Remark)).Returns(oversightDatesMap[oversightDate]);
+            }
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, oversightDate.CompletedAt, oversightDate.Remark), Times.Once);
+            }
+            
+            _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightDates_Removes_Existing_If_None()
+        {
+            //Arrange
+            var dates = Many<UpdatedDataProcessingRegistrationOversightDate>().ToList();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightDates = Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>.None.AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var oversightDatesMap =
+                dates
+                    .ToDictionary(
+                        x => x,
+                        x => new DataProcessingRegistrationOversightDate { Id = A<int>(), OversightDate = x.CompletedAt, OversightRemark = x.Remark });
+
+            createdRegistration.OversightDates = dates.Select(x => oversightDatesMap[x]).ToList();
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Setup(x => x.RemoveOversightDate(createdRegistration.Id, oversightDatesMap[oversightDate].Id)).Returns(oversightDatesMap[oversightDate]);
+            }
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, oversightDatesMap[oversightDate].Id), Times.Once);
+            }
+
+            _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightDates_Updates_Existing_If_Any()
+        {
+            //Arrange
+            var dates = Many<UpdatedDataProcessingRegistrationOversightDate>().ToList();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightDates = dates.FromNullable<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            var oversightDatesMap =
+                dates
+                    .ToDictionary(
+                        x => x,
+                        x => new DataProcessingRegistrationOversightDate { Id = A<int>(), OversightDate = x.CompletedAt, OversightRemark = x.Remark });
+
+            createdRegistration.OversightDates = dates.Select(x => oversightDatesMap[x]).ToList();
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Setup(x => x.RemoveOversightDate(createdRegistration.Id, oversightDatesMap[oversightDate].Id)).Returns(oversightDatesMap[oversightDate]);
+            }
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Setup(x => x.AssignOversightDate(createdRegistration.Id, oversightDate.CompletedAt, oversightDate.Remark)).Returns(oversightDatesMap[oversightDate]);
+            }
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, oversightDatesMap[oversightDate].Id), Times.Once);
+            }
+
+            foreach (var oversightDate in dates)
+            {
+                _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, oversightDate.CompletedAt, oversightDate.Remark), Times.Once);
+            }
+        }
+
+        [Fact]
+        public void Can_Create_With_OversightData_OversightDates_Set_To_NoChanges()
+        {
+            //Arrange
+            var dates = Many<UpdatedDataProcessingRegistrationOversightDate>().ToList();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightDates = OptionalValueChange<Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>>>.None
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+            
+            _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, It.IsAny<int>()), Times.Never);
+            _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
+        
         }
 
         private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)

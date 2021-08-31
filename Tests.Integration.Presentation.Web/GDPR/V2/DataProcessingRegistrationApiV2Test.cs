@@ -552,7 +552,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 OversightOptionsRemark = A<string>(),
                 OversightInterval = A<OversightIntervalChoice>(),
                 OversightIntervalRemark = A<string>(),
-                IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 OversightCompletedRemark = A<string>(),
                 OversightDates = new []{ oversightDate1, oversightDate2 }
             };
