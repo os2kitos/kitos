@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.GDPR;
 using Xunit;
@@ -19,6 +17,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<DataProcessingRegistrationDTO> CreateAsync(int organizationId, string name, Cookie optionalLogin = null)
         {
             using var createdResponse = await SendCreateRequestAsync(organizationId, name, optionalLogin);
+            if (!createdResponse.IsSuccessStatusCode)
+                throw new Exception($"DPR creation failed with {createdResponse.StatusCode} and message:{await createdResponse.Content.ReadAsStringAsync()}");
+
             Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
             var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingRegistrationDTO>();
 
