@@ -16,6 +16,7 @@ using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
 using Serilog;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -58,21 +59,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Can_Create_With_Name_Only()
         {
             //Arrange
-            var organizationUuid = A<Guid>();
-            var parameters = new DataProcessingRegistrationModificationParameters
-            {
-                Name = A<string>().AsChangedValue()
-            };
-            var createdRegistration = new DataProcessingRegistration()
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var transaction = ExpectTransaction();
-            var orgDbId = A<int>();
-
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
-            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites();
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -234,7 +221,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             {
                 Name = A<string>().AsChangedValue()
             };
-          
+
             var transaction = ExpectTransaction();
             var dprUuid = A<Guid>();
             var operationError = A<OperationError>();
@@ -247,6 +234,142 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             AssertFailureWithKnownError(result, operationError, transaction);
         }
+
+        [Fact]
+        public void Can_Create_With_GeneralData_DataResponsible()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = new Guid?(A<Guid>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var responsibleId = A<int>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingDataResponsibleOption>(generalData.DataResponsibleUuid.NewValue, responsibleId);
+            _dprServiceMock.Setup(x => x.AssignDataResponsible(createdRegistration.Id, responsibleId)).Returns(new DataProcessingDataResponsibleOption());
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_GeneralData_With_Null_DataResponsible()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = ((Guid?)null).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var responsibleId = A<int>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingDataResponsibleOption>(generalData.DataResponsibleUuid.NewValue, responsibleId);
+            _dprServiceMock.Setup(x => x.ClearDataResponsible(createdRegistration.Id)).Returns(new DataProcessingDataResponsibleOption());
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_GeneralData_With_Null_DataResponsible_If_DprService_Responds_With_BadState()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = ((Guid?)null).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var responsibleId = A<int>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingDataResponsibleOption>(generalData.DataResponsibleUuid.NewValue, responsibleId);
+            _dprServiceMock.Setup(x => x.ClearDataResponsible(createdRegistration.Id)).Returns(new OperationError(OperationFailure.BadState));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_With_Null_DataResponsible_If_DprService_Fails_With_AnythingBut_BadState()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = ((Guid?)null).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+            var responsibleId = A<int>();
+            var clearError = new OperationError(EnumRange.AllExcept(OperationFailure.BadState).RandomItem());
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingDataResponsibleOption>(generalData.DataResponsibleUuid.NewValue, responsibleId);
+            _dprServiceMock.Setup(x => x.ClearDataResponsible(createdRegistration.Id)).Returns(clearError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, clearError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_DataResponsible_If_DataResponsible_Id_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataResponsibleUuid = new Guid?(A<Guid>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingDataResponsibleOption>(generalData.DataResponsibleUuid.NewValue, Maybe<int>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Data responsible option with uuid", OperationFailure.BadInput, transaction);
+        }
+
+        private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
+            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null)
+        {
+            var organizationUuid = A<Guid>();
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue(),
+                General = generalData.FromNullable()
+            };
+            var createdRegistration = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
+            var transaction = ExpectTransaction();
+            var orgDbId = A<int>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
+            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
+            return (organizationUuid, parameters, createdRegistration, transaction);
+        }
+
+        //TODO: Create edge case
+        //TODO: Update success scenarios
+        //TODO: Update edge cases
 
         private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)
         {

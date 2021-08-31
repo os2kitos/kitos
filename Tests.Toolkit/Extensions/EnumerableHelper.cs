@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
 
-namespace Tests.Integration.Presentation.Web.Tools
+namespace Tests.Toolkit.Extensions
 {
     public static class EnumerableHelper
     {

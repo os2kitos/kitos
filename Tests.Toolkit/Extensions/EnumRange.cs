@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tests.Integration.Presentation.Web.Tools
+namespace Tests.Toolkit.Extensions
 {
     public static class EnumRange
     {
