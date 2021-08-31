@@ -231,8 +231,8 @@ namespace Core.ApplicationServices.GDPR.Write
             {
                 return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
             }
-            var existingAssignemnts = getExistingState(dpr).ToDictionary(x => x.Uuid);
-            var existingUuids = existingAssignemnts.Values.Select(x => x.Uuid).ToList();
+            var existingAssignments = getExistingState(dpr).ToDictionary(x => x.Uuid);
+            var existingUuids = existingAssignments.Values.Select(x => x.Uuid).ToList();
 
             var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
             foreach (var (delta, uuid) in changes)
@@ -251,7 +251,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeResult = unAssign(dpr, existingAssignemnts[uuid].Id);
+                        var removeResult = unAssign(dpr, existingAssignments[uuid].Id);
                         if (removeResult.Failed)
                             return removeResult.Error;
 

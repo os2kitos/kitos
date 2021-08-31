@@ -16,10 +16,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             ApiToDataMap = new Dictionary<YesNoIrrelevantChoice, YesNoIrrelevantOption>
             {
-                { YesNoIrrelevantChoice.Yes ,YesNoIrrelevantOption.YES},
-                { YesNoIrrelevantChoice.No ,YesNoIrrelevantOption.NO},
-                { YesNoIrrelevantChoice.Irrelevant,YesNoIrrelevantOption.IRRELEVANT},
-                { YesNoIrrelevantChoice.Undecided,YesNoIrrelevantOption.UNDECIDED}
+                { YesNoIrrelevantChoice.Yes, YesNoIrrelevantOption.YES },
+                { YesNoIrrelevantChoice.No, YesNoIrrelevantOption.NO },
+                { YesNoIrrelevantChoice.Irrelevant, YesNoIrrelevantOption.IRRELEVANT },
+                { YesNoIrrelevantChoice.Undecided, YesNoIrrelevantOption.UNDECIDED }
             }.AsReadOnly();
 
             DataToApiMap = ApiToDataMap
