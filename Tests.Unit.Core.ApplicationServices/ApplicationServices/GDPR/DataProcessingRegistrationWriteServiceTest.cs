@@ -1035,8 +1035,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             return (organizationUuid, parameters, createdRegistration, transaction);
         }
 
-        //TODO: Update edge cases
-
         [Fact]
         public void Can_Create_With_Oversight_OversightOptions()
         {
