@@ -275,7 +275,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 {
                     Oversight = _writeModelMapper.MapOversight(request)
                 })
-                .Select(ToDTO)
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(Ok, FromOperationError);
         }
 

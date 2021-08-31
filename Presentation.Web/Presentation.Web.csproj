@@ -355,13 +355,13 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationDataResponsibleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\DataProcessingRegistrationRoleTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\OversightIntervalMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoIrrelevantMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationResponseMapper.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationResponseMapper.cs" />
-    <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\OversightIntervalMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />

@@ -1,8 +1,6 @@
 ﻿using System.Linq;
-using System.Web.WebPages;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
-using Elasticsearch.Net;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 
@@ -53,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             {
                 OversightOptionUuids = dto.OversightOptionUuids.FromNullable().AsChangedValue(),
                 OversightOptionsRemark = dto.OversightOptionsRemark.AsChangedValue(),
-                //OversightInterval = dto.OversightInterval?.To,
+                OversightInterval = (dto.OversightInterval?.ToIntervalOption()).AsChangedValue(),
                 OversightIntervalRemark = dto.OversightIntervalRemark.AsChangedValue(),
                 IsOversightCompleted = (dto.IsOversightCompleted?.ToYesNoUndecidedOption()).AsChangedValue(),
                 OversightCompletedRemark = dto.OversightCompletedRemark.AsChangedValue(),

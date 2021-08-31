@@ -28,14 +28,14 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .AsReadOnly();
         }
 
-        public static YearMonthIntervalOption ToDataOptions(this OversightIntervalChoice value)
+        public static YearMonthIntervalOption ToIntervalOption(this OversightIntervalChoice value)
         {
             return ApiToDataMap.TryGetValue(value, out var result)
                 ? result
                 : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
         }
 
-        public static OversightIntervalChoice ToYesNoDontKnowChoice(this YearMonthIntervalOption value)
+        public static OversightIntervalChoice ToIntervalChoice(this YearMonthIntervalOption value)
         {
             return DataToApiMap.TryGetValue(value, out var result)
                 ? result
