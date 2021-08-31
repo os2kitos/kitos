@@ -107,7 +107,59 @@ namespace Core.ApplicationServices.GDPR.Write
             //Optionally apply changes across the entire update specification
             return dpr
                 .WithOptionalUpdate(parameters.Name, (registration, changedName) => _applicationService.UpdateName(registration.Id, changedName))
-                .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData));
+                .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData))
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData));
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateOversightData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationOversightDataParameters parameters)
+        {
+            return dpr
+                .WithOptionalUpdate(parameters.OversightOptionUuids, UpdateOversightOptions)
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightOptionsRemark, (registration, remark) => _applicationService.UpdateOversightOptionRemark(registration.Id, remark)))
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightInterval, (registration, interval) => _applicationService.UpdateOversightInterval(registration.Id, interval ?? YearMonthIntervalOption.Undecided)))
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightIntervalRemark, (registration, remark) => _applicationService.UpdateOversightIntervalRemark(registration.Id, remark)))
+                .Bind(r => r.WithOptionalUpdate(parameters.IsOversightCompleted, (registration, completed) => _applicationService.UpdateIsOversightCompleted(registration.Id, completed ?? YesNoUndecidedOption.Undecided)))
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightCompletedRemark, (registration, remark) => _applicationService.UpdateOversightCompletedRemark(registration.Id, remark)))
+                .Bind(r => r.WithOptionalUpdate(parameters.OversightDates, UpdateOversightDates));
+        }
+
+        private Maybe<OperationError> UpdateOversightDates(DataProcessingRegistration dpr, Maybe<IEnumerable<UpdatedDataProcessingRegistrationOversightDate>> oversightDates)
+        {
+            // As this is "dumb" data (i.e. we don't know if two with equal data is supposed to be the same or two different registrations) we first remove all before assigning new values.
+            var oldDates = dpr.OversightDates.ToList();
+            foreach (var oldDate in oldDates)
+            {
+                var removeResult = _applicationService.RemoveOversightDate(dpr.Id, oldDate.Id);
+
+                if (removeResult.Failed)
+                    return new OperationError($"Failed to remove old oversight date with Id: {oldDate.Id}. Error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+            }
+
+            if (oversightDates.IsNone)
+                return Maybe<OperationError>.None;
+
+            foreach (var newDate in oversightDates.Value)
+            {
+                var assignResult = _applicationService.AssignOversightDate(dpr.Id, newDate.CompletedAt, newDate.Remark);
+
+                if (assignResult.Failed)
+                    return new OperationError($"Failed to assign new oversight date with Date: {newDate.CompletedAt} and Remark: {newDate.Remark}. Error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateOversightOptions(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> oversightOptionUuids)
+        {
+            return UpdateMultiAssignment
+            (
+                "oversight options",
+                dpr,
+                oversightOptionUuids,
+                registration => registration.OversightOptions,
+                (registration, id) => _applicationService.AssignOversightOption(registration.Id, id),
+                (registration, id) => _applicationService.RemoveOversightOption(registration.Id, id)
+            );
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateGeneralData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationGeneralDataParameters parameters)

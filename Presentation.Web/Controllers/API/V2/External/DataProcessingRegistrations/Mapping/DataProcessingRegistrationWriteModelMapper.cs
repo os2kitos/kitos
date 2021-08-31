@@ -23,7 +23,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return new DataProcessingRegistrationModificationParameters
             {
                 Name = dto.Name.AsChangedValue(),
-                General = dto.General.FromNullable().Select(MapGeneral)
+                General = dto.General.FromNullable().Select(MapGeneral),
+                Oversight = dto.Oversight.FromNullable().Select(MapOversight)
             };
         }
 

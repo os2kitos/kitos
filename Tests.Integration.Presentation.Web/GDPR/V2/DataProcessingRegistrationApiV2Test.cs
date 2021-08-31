@@ -3,7 +3,6 @@ using Core.DomainModel.Organization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -15,6 +14,7 @@ using Presentation.Web.Models.API.V2.Response.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1.GDPR;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -504,6 +504,196 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(false, false)]
+        public async Task Can_POST_With_OversightData(bool withOversightOptions, bool withOversightDates)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var oversightDate1 = CreateOversightDate();
+            var oversightDate2 = CreateOversightDate();
+            var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            
+            var input = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = withOversightOptions? new[]{ oversightOption.Uuid } : null,
+                OversightOptionsRemark = A<string>(),
+                OversightInterval = A<OversightIntervalChoice>(),
+                OversightIntervalRemark = A<string>(),
+                IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                OversightCompletedRemark = A<string>(),
+                OversightDates = new []{ oversightDate1, oversightDate2 }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Oversight = input
+            };
+
+            //Act
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+
+            //Assert
+            AssertOversight(input, freshDTO.Oversight);
+        }
+
+        [Theory]
+        [InlineData(YesNoUndecidedChoice.No)]
+        [InlineData(YesNoUndecidedChoice.Undecided)]
+        [InlineData(null)]
+        public async Task Cannot_POST_With_OversightData_And_OversightDates_When_IsOversightCompleted_Is_Anyhing_But_Yes(YesNoUndecidedChoice? isOversightCompleted)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var oversightDate1 = CreateOversightDate();
+            var oversightDate2 = CreateOversightDate();
+
+            var input = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                IsOversightCompleted = isOversightCompleted,
+                OversightDates = new[] { oversightDate1, oversightDate2 }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Oversight = input
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_OversightData()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var createRequest = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            };
+            // Create new DPR
+            var newDPR = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest);
+
+            var oversightDate1 = CreateOversightDate();
+            var oversightDate2 = CreateOversightDate();
+            var oversightOption1 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 0)).OrderBy(x => A<int>()).First();
+
+            var input1 = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = new[] { oversightOption1.Uuid },
+                OversightOptionsRemark = A<string>(),
+                OversightInterval = A<OversightIntervalChoice>(),
+                OversightIntervalRemark = A<string>(),
+                IsOversightCompleted = YesNoUndecidedChoice.Yes,
+                OversightCompletedRemark = A<string>(),
+                OversightDates = new[] { oversightDate1, oversightDate2 }
+            };
+
+            //Act - Update empty DPR
+            var updatedDPR1 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input1);
+
+            //Assert - Update empty DPR
+            AssertOversight(input1, updatedDPR1.Oversight);
+
+            //Act - Update filled DPR
+            var oversightDate3 = CreateOversightDate();
+            var oversightDate4 = CreateOversightDate();
+            var oversightOption2 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 1)).OrderBy(x => A<int>()).First();
+
+            var input2 = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = new[] { oversightOption2.Uuid },
+                OversightOptionsRemark = A<string>(),
+                OversightInterval = A<OversightIntervalChoice>(),
+                OversightIntervalRemark = A<string>(),
+                IsOversightCompleted = YesNoUndecidedChoice.Yes,
+                OversightCompletedRemark = A<string>(),
+                OversightDates = new[] { oversightDate3, oversightDate4 }
+            };
+
+            var updatedDPR2 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input2);
+
+            //Assert - Update filled DPR
+            AssertOversight(input2, updatedDPR2.Oversight);
+
+            //Act - Empty filled DPR
+
+            var input3 = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = null,
+                OversightOptionsRemark = "",
+                OversightInterval = null,
+                OversightIntervalRemark = "",
+                IsOversightCompleted = null,
+                OversightCompletedRemark = "",
+                OversightDates = null
+            };
+
+            var updatedDPR3 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input3);
+
+            //Assert - Update filled DPR
+            AssertEmptiedOversight(updatedDPR3.Oversight);
+        }
+
+        private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
+        {
+            Assert.Empty(actual.OversightOptions);
+            Assert.Equal("", actual.OversightOptionsRemark);
+            Assert.Equal(OversightIntervalChoice.Undecided, actual.OversightInterval);
+            Assert.Equal("", actual.OversightIntervalRemark);
+            Assert.Equal(YesNoUndecidedChoice.Undecided, actual.IsOversightCompleted);
+            Assert.Equal("", actual.OversightCompletedRemark);
+            Assert.Empty(actual.OversightDates);
+        }
+
+        private void AssertOversight(DataProcessingRegistrationOversightWriteRequestDTO expected, DataProcessingRegistrationOversightResponseDTO actual)
+        {
+            AssertMultiAssignment(expected.OversightOptionUuids, actual.OversightOptions);
+            Assert.Equal(expected.OversightOptionsRemark, actual.OversightOptionsRemark);
+            Assert.Equal(expected.OversightInterval, actual.OversightInterval);
+            Assert.Equal(expected.OversightIntervalRemark, actual.OversightIntervalRemark);
+            Assert.Equal(expected.IsOversightCompleted, actual.IsOversightCompleted);
+            Assert.Equal(expected.OversightCompletedRemark, actual.OversightCompletedRemark);
+            AssertOversightDates(expected.OversightDates, actual.OversightDates);
+        }
+
+        private static void AssertOversightDates(IEnumerable<OversightDateDTO> expected, IEnumerable<OversightDateDTO> actual)
+        {
+            var expectedOversightDates = (expected ?? Array.Empty<OversightDateDTO>()).OrderBy(x => x.CompletedAt).ToList();
+            var actualOversightDates = actual.OrderBy(x => x.CompletedAt).ToList();
+            Assert.Equal(expectedOversightDates.Count, actualOversightDates.Count);
+            for (var i = 0; i < expectedOversightDates.Count; i++)
+            {
+                Assert.Equal(expectedOversightDates[i].CompletedAt, actualOversightDates[i].CompletedAt);
+                Assert.Equal(expectedOversightDates[i].Remark, actualOversightDates[i].Remark);
+            }
+            
+        }
+
+        private OversightDateDTO CreateOversightDate()
+        {
+            return new OversightDateDTO()
+            {
+                CompletedAt = A<DateTime>(),
+                Remark = A<string>()
+            };
         }
 
         private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
