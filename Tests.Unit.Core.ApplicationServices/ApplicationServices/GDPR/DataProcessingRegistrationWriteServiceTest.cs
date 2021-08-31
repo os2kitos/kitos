@@ -425,7 +425,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.UpdateDataResponsibleRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
         }
 
-        //TODO: From here
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -485,6 +484,129 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             _dprServiceMock.Verify(x => x.UpdateIsAgreementConcluded(It.IsAny<int>(), It.IsAny<YesNoIrrelevantOption>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_IsAgreementConcludedRemark(bool inputIsNull)
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcludedRemark = (inputIsNull ? null : A<string>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            _dprServiceMock.Setup(x => x.UpdateAgreementConcludedRemark(createdRegistration.Id, generalData.IsAgreementConcludedRemark.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_IsAgreementConcludedRemark_If_Update_Fails()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcludedRemark = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateAgreementConcludedRemark(createdRegistration.Id, generalData.IsAgreementConcludedRemark.NewValue)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Create_With_GeneralData_IsAgreementConcludedRemark_Set_To_NoChanges()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcludedRemark = OptionalValueChange<string>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateAgreementConcludedRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        //TODO: from here
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_AgreementConcludedAt(bool inputIsNull)
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                AgreementConcludedAt = (inputIsNull ? (DateTime?)null : A<DateTime>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            _dprServiceMock.Setup(x => x.UpdateAgreementConcludedAt(createdRegistration.Id, generalData.AgreementConcludedAt.NewValue)).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_AgreementConcludedAt_If_Update_Fails()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                AgreementConcludedAt = ((DateTime?)A<DateTime>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateAgreementConcludedAt(createdRegistration.Id, generalData.AgreementConcludedAt.NewValue)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Create_With_GeneralData_AgreementConcludedAt_Set_To_NoChanges()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                AgreementConcludedAt = OptionalValueChange<DateTime?>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateAgreementConcludedAt(It.IsAny<int>(), It.IsAny<DateTime?>()), Times.Never);
         }
 
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
