@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using AutoFixture;
 using Core.ApplicationServices.Extensions;
@@ -10,11 +11,13 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
+using Ninject.Infrastructure.Language;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -246,6 +249,52 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_Oversight()
+        {
+            //Arrange
+            var oversightOption = new DataProcessingOversightOption()
+            {
+                Uuid = A<Guid>(),
+                Id = A<int>(),
+                Name = A<string>()
+            };
+
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue(),
+                Oversight = new UpdatedDataProcessingRegistrationOversightDataParameters()
+                {
+                    OversightOptionUuids = new []{ oversightOption.Uuid }.ToEnumerable().FromNullable().AsChangedValue()
+                }
+            };
+
+            var createdRegistration = new DataProcessingRegistration()
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
+            var orgDbId = A<int>();
+
+            var organizationUuid = A<Guid>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingOversightOption>(oversightOption.Uuid, oversightOption.Id);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
+            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
+
+            var transaction = ExpectTransaction();
+            _dprServiceMock.Setup(x => x.AssignOversightOption(createdRegistration.Id, oversightOption.Id)).Returns(oversightOption);
+
+            //Act
+            var createdResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createdResult.Ok);
+            var createdOversightOption = Assert.Single(createdResult.Value.OversightOptions);
+            Assert.Equal(oversightOption.Uuid, createdOversightOption.Uuid);
+            Assert.Equal(oversightOption.Name, createdOversightOption.Name);
+            AssertTransactionCommitted(transaction);
         }
 
         private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)
