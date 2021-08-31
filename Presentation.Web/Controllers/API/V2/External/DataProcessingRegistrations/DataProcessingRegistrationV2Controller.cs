@@ -228,26 +228,32 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         }
 
         /// <summary>
-        /// Perform a full update of the "Systems" section of an existing data processing registration.
+        /// Perform a full update of the "SystemUsages" section of an existing data processing registration.
         /// Absent/nulled fields will result in a data reset in the targeted registration.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("{uuid}/systems")]
+        [Route("{uuid}/system-usages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUuids)
+        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUsageUuids)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    SystemUsageUuids = systemUsageUuids.FromNullable()
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
