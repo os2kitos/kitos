@@ -18,7 +18,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             using var createdResponse = await SendCreateRequestAsync(organizationId, name, optionalLogin);
             if (!createdResponse.IsSuccessStatusCode)
-                throw new Exception($"DPR creation failed with {createdResponse.StatusCode} and message:{await createdResponse.Content.ReadAsStringAsync()}");
+                throw new Exception($"ERROR creating DPR:{name} in org with id:{organizationId}. Error code: {createdResponse.StatusCode} Message:{await createdResponse.Content.ReadAsStringAsync()}");
 
             Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
             var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<DataProcessingRegistrationDTO>();

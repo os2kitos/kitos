@@ -414,7 +414,7 @@ namespace Core.ApplicationServices.GDPR
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
             var result = _repository.GetById(id);
 
