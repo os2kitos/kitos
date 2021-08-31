@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.GDPR.Write
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
             var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
 
@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> Update(Func<Result<DataProcessingRegistration, OperationError>> getDpr, DataProcessingRegistrationModificationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
             var result = getDpr()
                 .Bind(systemUsage => PerformUpdates(systemUsage, parameters));

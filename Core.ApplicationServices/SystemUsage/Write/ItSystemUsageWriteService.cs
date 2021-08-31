@@ -109,7 +109,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             var systemResult = _systemService.GetSystem(parameters.SystemUuid);
             if (systemResult.Failed)
             {
