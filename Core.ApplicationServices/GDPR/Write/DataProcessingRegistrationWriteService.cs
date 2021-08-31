@@ -5,6 +5,7 @@ using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
@@ -108,8 +109,42 @@ namespace Core.ApplicationServices.GDPR.Write
             return dpr
                 .WithOptionalUpdate(parameters.Name, (registration, changedName) => _applicationService.UpdateName(registration.Id, changedName))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData))
-                .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData));
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData))
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Roles, UpdateRolesData));
         }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateRolesData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationRoles usageRoles)
+        {
+            return dpr.WithOptionalUpdate(usageRoles.UserRolePairs, UpdateRoles);
+        }
+
+        //private Result<DataProcessingRegistration, OperationError> UpdateRoles(DataProcessingRegistration dpr, Maybe<IEnumerable<UserRolePair>> userRolePairs)
+        //{
+        //    // Compare lists to find which needs to be remove and which need to be added
+        //    var rightsKeys = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+        //    var userRoleKeys = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+
+        //    var toRemove = rightsKeys.Except(userRoleKeys);
+        //    var toAdd = userRoleKeys.Except(rightsKeys);
+
+        //    foreach (var userRolePair in toRemove)
+        //    {
+        //        var removeResult = _applicationService.RemoveRole(dpr.Id, userRolePair.RoleUuid, userRolePair.UserUuid);
+
+        //        if (removeResult.Failed)
+        //            return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+        //    }
+
+        //    foreach (var userRolePair in toAdd)
+        //    {
+        //        var assignmentResult = _applicationService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
+
+        //        if (assignmentResult.Failed)
+        //            return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+        //    }
+
+        //    return systemUsage;
+        //}
 
         private Result<DataProcessingRegistration, OperationError> UpdateOversightData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationOversightDataParameters parameters)
         {

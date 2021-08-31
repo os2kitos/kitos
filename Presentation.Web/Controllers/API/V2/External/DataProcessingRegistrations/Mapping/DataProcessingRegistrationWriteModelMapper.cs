@@ -1,8 +1,11 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Core.ApplicationServices.Model.Shared.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
@@ -24,7 +27,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             {
                 Name = dto.Name.AsChangedValue(),
                 General = dto.General.FromNullable().Select(MapGeneral),
-                Oversight = dto.Oversight.FromNullable().Select(MapOversight)
+                Oversight = dto.Oversight.FromNullable().Select(MapOversight),
+                Roles = dto.Roles.FromNullable().Select(MapRoles)
             };
         }
 
@@ -64,6 +68,22 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                                 CompletedAt = y.CompletedAt,
                                 Remark = y.Remark
                             })).AsChangedValue()
+            };
+        }
+
+        public UpdatedDataProcessingRegistrationRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
+        {
+            var roleAssignmentResponseDtos = roles.ToList();
+
+            return new UpdatedDataProcessingRegistrationRoles
+            {
+                UserRolePairs = (roleAssignmentResponseDtos.Any() ?
+                    Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
+                    {
+                        RoleUuid = x.RoleUuid,
+                        UserUuid = x.UserUuid
+                    })) :
+                    Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue()
             };
         }
     }
