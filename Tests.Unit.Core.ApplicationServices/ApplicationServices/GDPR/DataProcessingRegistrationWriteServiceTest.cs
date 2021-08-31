@@ -910,6 +910,106 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             }
         }
 
+        [Fact]
+        public void Can_CreateWith_GeneralData_DataProcessor()
+        {
+            //Arrange
+            var inputUuids = Many<Guid>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
+            var assigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
+            var entityMap = inputUuids
+                .Concat(assigmentIds)
+                .Distinct()
+                .ToDictionary(uuid => uuid, uuid => new Organization() { Uuid = uuid, Id = A<int>() });
+
+            createdRegistration.DataProcessors = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
+            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(uuid, entityMap[uuid].Id));
+
+            var expectedRemovals = assigmentIds.Except(inputUuids).ToList();
+            var expectedAdditions = inputUuids.Except(assigmentIds).ToList();
+            foreach (var expectedRemoval in expectedRemovals)
+                _dprServiceMock.Setup(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
+
+            foreach (var expectedAddition in expectedAdditions)
+                _dprServiceMock.Setup(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var expectedRemoval in expectedRemovals)
+            {
+                _dprServiceMock.Verify(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
+            }
+
+            foreach (var expectedAddition in expectedAdditions)
+            {
+                _dprServiceMock.Verify(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
+            }
+        }
+
+        [Fact]
+        public void Can_CreateWith_GeneralData_SubDataProcessor()
+        {
+            //Arrange
+            var inputUuids = Many<Guid>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
+            var assigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
+            var entityMap = inputUuids
+                .Concat(assigmentIds)
+                .Distinct()
+                .ToDictionary(uuid => uuid, uuid => new Organization { Uuid = uuid, Id = A<int>() });
+
+            createdRegistration.SubDataProcessors = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
+            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(uuid, entityMap[uuid].Id));
+
+            var expectedRemovals = assigmentIds.Except(inputUuids).ToList();
+            var expectedAdditions = inputUuids.Except(assigmentIds).ToList();
+            foreach (var expectedRemoval in expectedRemovals)
+                _dprServiceMock.Setup(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
+
+            foreach (var expectedAddition in expectedAdditions)
+                _dprServiceMock.Setup(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var expectedRemoval in expectedRemovals)
+            {
+                _dprServiceMock.Verify(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
+            }
+
+            foreach (var expectedAddition in expectedAdditions)
+            {
+                _dprServiceMock.Verify(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
+            }
+        }
+
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null)
         {
