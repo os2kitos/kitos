@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using AutoFixture;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
@@ -797,20 +799,19 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.UpdateTransferToInsecureThirdCountries(It.IsAny<int>(), It.IsAny<YesNoUndecidedOption>()), Times.Never);
         }
 
-        //TODO: From here
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Can_Create_With_GeneralData_HasSubDataProcesors(bool inputIsNull)
+        public void Can_Create_With_GeneralData_HasSubDataProcessors(bool inputIsNull)
         {
             //Arrange
             var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                HasSubDataProcesors = (inputIsNull ? (YesNoUndecidedOption?)null : A<YesNoUndecidedOption>()).AsChangedValue()
+                HasSubDataProcessors = (inputIsNull ? (YesNoUndecidedOption?)null : A<YesNoUndecidedOption>()).AsChangedValue()
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            _dprServiceMock.Setup(x => x.SetSubDataProcessorsState(createdRegistration.Id, generalData.HasSubDataProcesors.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(createdRegistration);
+            _dprServiceMock.Setup(x => x.SetSubDataProcessorsState(createdRegistration.Id, generalData.HasSubDataProcessors.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(createdRegistration);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -822,17 +823,17 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Cannot_Create_With_GeneralData_HasSubDataProcesors_If_Update_Fails()
+        public void Cannot_Create_With_GeneralData_HasSubDataProcessors_If_Update_Fails()
         {
             //Arrange
             var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                HasSubDataProcesors = A<YesNoUndecidedOption?>().AsChangedValue()
+                HasSubDataProcessors = A<YesNoUndecidedOption?>().AsChangedValue()
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
             var operationError = A<OperationError>();
-            _dprServiceMock.Setup(x => x.SetSubDataProcessorsState(createdRegistration.Id, generalData.HasSubDataProcesors.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(operationError);
+            _dprServiceMock.Setup(x => x.SetSubDataProcessorsState(createdRegistration.Id, generalData.HasSubDataProcessors.NewValue.GetValueOrDefault(YesNoUndecidedOption.Undecided))).Returns(operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -842,12 +843,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
-        public void Create_With_GeneralData_HasSubDataProcesors_Set_To_NoChanges()
+        public void Create_With_GeneralData_HasSubDataProcessors_Set_To_NoChanges()
         {
             //Arrange
             var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
-                HasSubDataProcesors = OptionalValueChange<YesNoUndecidedOption?>.None
+                HasSubDataProcessors = OptionalValueChange<YesNoUndecidedOption?>.None
             };
             var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
@@ -857,6 +858,56 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             _dprServiceMock.Verify(x => x.SetSubDataProcessorsState(It.IsAny<int>(), It.IsAny<YesNoUndecidedOption>()), Times.Never);
+        }
+
+        [Fact]
+        public void Can_CreateWith_GeneralData_InsecureCountriesSubjectToDataTransfer()
+        {
+            //Arrange
+            var inputUuids = Many<Guid>().ToList();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                InsecureCountriesSubjectToDataTransferUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Make sure we have som existing countries and add one which is shared with the new state. That one, we don't expect to be removed
+            var existingCountryAssigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
+            var optionMap = inputUuids
+                .Concat(existingCountryAssigmentIds)
+                .Distinct()
+                .ToDictionary(uuid => uuid, uuid => new DataProcessingCountryOption { Uuid = uuid, Id = A<int>() });
+
+            createdRegistration.InsecureCountriesSubjectToDataTransfer = existingCountryAssigmentIds.Select(uuid => optionMap[uuid]).ToList();
+            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(uuid, optionMap[uuid].Id));
+
+            var expectedRemovals = existingCountryAssigmentIds.Except(inputUuids).ToList();
+            var expectedAdditions = inputUuids.Except(existingCountryAssigmentIds).ToList();
+            foreach (var expectedRemoval in expectedRemovals) 
+                _dprServiceMock.Setup(x=>x.RemoveInsecureThirdCountry(createdRegistration.Id,optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
+            
+            foreach (var expectedAddition in expectedAdditions)
+                _dprServiceMock.Setup(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id)).Returns(optionMap[expectedAddition]);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var expectedRemoval in expectedRemovals)
+            {
+                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Never);
+            }
+
+            foreach (var expectedAddition in expectedAdditions)
+            {
+                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id),Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id),Times.Never);
+            }
         }
 
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(

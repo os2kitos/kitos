@@ -32,7 +32,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption(),AssertPropertyContainsDataChange(output.TransferToInsecureThirdCountries));
             Assert.Equal(input.InsecureCountriesSubjectToDataTransferUuids,AssertPropertyContainsDataChange(output.InsecureCountriesSubjectToDataTransferUuids));
             Assert.Equal(input.DataProcessorUuids,AssertPropertyContainsDataChange(output.DataProcessorUuids));
-            Assert.Equal(input.HasSubDataProcesors?.ToYesNoUndecidedOption(),AssertPropertyContainsDataChange(output.HasSubDataProcesors));
+            Assert.Equal(input.HasSubDataProcessors?.ToYesNoUndecidedOption(),AssertPropertyContainsDataChange(output.HasSubDataProcessors));
             Assert.Equal(input.SubDataProcessorUuids,AssertPropertyContainsDataChange(output.SubDataProcessorUuids));
         }
 

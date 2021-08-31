@@ -462,7 +462,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var (token, user, organization) = await CreatePrerequisitesAsync();
             var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
             {
-                HasSubDataProcesors = hasSubDataProcessors,
+                HasSubDataProcessors = hasSubDataProcessors,
                 SubDataProcessorUuids = new[] { organization.Uuid }
             };
 
@@ -526,7 +526,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             
             //null input uses the undecided fallback
             inputDto.IsAgreementConcluded = YesNoIrrelevantChoice.Undecided;
-            inputDto.HasSubDataProcesors = YesNoUndecidedChoice.Undecided;
+            inputDto.HasSubDataProcessors = YesNoUndecidedChoice.Undecided;
             inputDto.TransferToInsecureThirdCountries = YesNoUndecidedChoice.Undecided;
             AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
         }
@@ -571,7 +571,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                     ? YesNoUndecidedChoice.Yes
                     : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 InsecureCountriesSubjectToDataTransferUuids = country?.Uuid.WrapAsEnumerable().ToList(),
-                HasSubDataProcesors = withSubDataProcessors
+                HasSubDataProcessors = withSubDataProcessors
                     ? YesNoUndecidedChoice.Yes
                     : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 DataProcessorUuids = dataProcessorUuids,
@@ -597,7 +597,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(input.TransferToInsecureThirdCountries, actual.General.TransferToInsecureThirdCountries);
             AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, actual.General.InsecureCountriesSubjectToDataTransfer);
             AssertMultiAssignment(input.DataProcessorUuids, actual.General.DataProcessors);
-            Assert.Equal(input.HasSubDataProcesors, actual.General.HasSubDataProcessors);
+            Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
             AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
         }
 
