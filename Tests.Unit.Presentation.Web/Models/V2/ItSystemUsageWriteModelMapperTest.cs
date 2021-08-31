@@ -8,12 +8,11 @@ using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
-using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
-    public class ItSystemUsageWriteModelMapperTest : WithAutoFixture
+    public class ItSystemUsageWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly ItSystemUsageWriteModelMapper _sut;
 
@@ -562,25 +561,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).lower);
             Assert.Equal(input.NumberOfExpectedUsers.UpperBound,
                 AssertPropertyContainsDataChange(output.NumberOfExpectedUsersInterval).upperBound);
-        }
-
-        private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)
-        {
-            Assert.True(sourceData.HasChange);
-            Assert.True(sourceData.NewValue.HasValue);
-            return sourceData.NewValue.Value;
-        }
-
-        private static T AssertPropertyContainsDataChange<T>(OptionalValueChange<T> sourceData)
-        {
-            Assert.True(sourceData.HasChange);
-            return sourceData.NewValue;
-        }
-
-        private static void AssertPropertyContainsResetDataChange<T>(OptionalValueChange<Maybe<T>> sourceData)
-        {
-            Assert.True(sourceData.HasChange);
-            Assert.True(sourceData.NewValue.IsNone);
         }
 
         private static void AssertKLE(IEnumerable<Guid> expected, OptionalValueChange<Maybe<IEnumerable<Guid>>> actual)
