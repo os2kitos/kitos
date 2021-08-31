@@ -10,6 +10,7 @@ using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
@@ -883,9 +884,9 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             var expectedRemovals = existingCountryAssigmentIds.Except(inputUuids).ToList();
             var expectedAdditions = inputUuids.Except(existingCountryAssigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals) 
-                _dprServiceMock.Setup(x=>x.RemoveInsecureThirdCountry(createdRegistration.Id,optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
-            
+            foreach (var expectedRemoval in expectedRemovals)
+                _dprServiceMock.Setup(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
+
             foreach (var expectedAddition in expectedAdditions)
                 _dprServiceMock.Setup(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id)).Returns(optionMap[expectedAddition]);
 
@@ -905,8 +906,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             foreach (var expectedAddition in expectedAdditions)
             {
-                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id),Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id),Times.Never);
+                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Never);
             }
         }
 
@@ -1010,14 +1011,62 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             }
         }
 
+        [Fact]
+        public void Can_CreateWith_SystemUsages()
+        {
+            //Arrange
+            var systemUsageUuids = Many<Guid>().ToList();
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsageUuids);
+
+            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
+            var assigmentIds = Many<Guid>().Append(systemUsageUuids.RandomItem()).ToList();
+            var entityMap = systemUsageUuids
+                .Concat(assigmentIds)
+                .Distinct()
+                .ToDictionary(uuid => uuid, uuid => new ItSystemUsage { Uuid = uuid, Id = A<int>() });
+
+            createdRegistration.SystemUsages = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
+            systemUsageUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(uuid, entityMap[uuid].Id));
+
+            var expectedRemovals = assigmentIds.Except(systemUsageUuids).ToList();
+            var expectedAdditions = systemUsageUuids.Except(assigmentIds).ToList();
+            foreach (var expectedRemoval in expectedRemovals)
+                _dprServiceMock.Setup(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
+
+            foreach (var expectedAddition in expectedAdditions)
+                _dprServiceMock.Setup(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+
+            foreach (var expectedRemoval in expectedRemovals)
+            {
+                _dprServiceMock.Verify(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
+            }
+
+            foreach (var expectedAddition in expectedAdditions)
+            {
+                _dprServiceMock.Verify(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
+                _dprServiceMock.Verify(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
+            }
+        }
+
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
-            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null)
+            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
+            IEnumerable<Guid> systemUsageUuids = null)
         {
             var organizationUuid = A<Guid>();
             var parameters = new DataProcessingRegistrationModificationParameters
             {
                 Name = A<string>().AsChangedValue(),
-                General = generalData.FromNullable()
+                General = generalData.FromNullable(),
+                SystemUsageUuids = systemUsageUuids.FromNullable()
             };
             var createdRegistration = new DataProcessingRegistration
             {
