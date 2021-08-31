@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.GDPR.Write
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
             var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
 
@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> Update(Func<Result<DataProcessingRegistration, OperationError>> getDpr, DataProcessingRegistrationModificationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
 
             var result = getDpr()
                 .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
@@ -174,7 +174,7 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.TransferToInsecureThirdCountries, (registration, newValue) => _applicationService.UpdateTransferToInsecureThirdCountries(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
                 .Bind(r => r.WithOptionalUpdate(parameters.InsecureCountriesSubjectToDataTransferUuids, UpdateInsecureCountriesSubjectToDataTransfer))
                 .Bind(r => r.WithOptionalUpdate(parameters.DataProcessorUuids, UpdateDataProcessors))
-                .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcesors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
+                .Bind(r => r.WithOptionalUpdate(parameters.HasSubDataProcessors, (registration, newValue) => _applicationService.SetSubDataProcessorsState(registration.Id, newValue ?? YesNoUndecidedOption.Undecided)))
                 .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessorUuids, UpdateSubDataProcessors));
         }
 
@@ -279,6 +279,10 @@ namespace Core.ApplicationServices.GDPR.Write
            where TAssignment : class, IHasId, IHasUuid
         {
             var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
+            if (newUuids.Distinct().Count() != newUuids.Count)
+            {
+                return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
+            }
             var existingAssignemnts = getExistingState(dpr).ToDictionary(x => x.Uuid);
             var existingUuids = existingAssignemnts.Values.Select(x => x.Uuid).ToList();
 

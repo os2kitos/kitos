@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 TransferToInsecureThirdCountries = (dto.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption()).AsChangedValue(),
                 InsecureCountriesSubjectToDataTransferUuids = dto.InsecureCountriesSubjectToDataTransferUuids.FromNullable().AsChangedValue(),
                 DataProcessorUuids = dto.DataProcessorUuids.FromNullable().AsChangedValue(),
-                HasSubDataProcesors = (dto.HasSubDataProcesors?.ToYesNoUndecidedOption()).AsChangedValue(),
+                HasSubDataProcessors = (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue(),
                 SubDataProcessorUuids = dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
             };
         }
