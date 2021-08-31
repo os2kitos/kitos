@@ -19,7 +19,7 @@ namespace Infrastructure.Services.Types
         /// <typeparam name="TIdentity"></typeparam>
         /// <param name="currentCollectionState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
         /// <param name="nextCollectionState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
-        /// <param name="withIdentity"></param>
+        /// <param name="withIdentity">A function which provides an identity for an item of type <typeparam name="T"></typeparam></param>
         /// <returns></returns>
         public static IEnumerable<(EnumerableDelta delta, T item)> ComputeDelta<T, TIdentity>(this IEnumerable<T> currentCollectionState, IEnumerable<T> nextCollectionState, Func<T, TIdentity> withIdentity)
         {
@@ -78,7 +78,7 @@ namespace Infrastructure.Services.Types
         /// <typeparam name="TIdentity">This is used to extract the identity of the source type iow. the value derived from the instance which can be used to distinguish it from other instances of the same type.</typeparam>
         /// <param name="newState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
         /// <param name="existingState">A collection o UNIQUE entities of <typeparam name="T"></typeparam></param>
-        /// <param name="withIdentity"></param>
+        /// <param name="withIdentity">A function which provides an identity for an item of type <typeparam name="T"></typeparam></param>
         public static void MirrorTo<T, TIdentity>(this IEnumerable<T> newState, ICollection<T> existingState, Func<T, TIdentity> withIdentity)
         {
             existingState

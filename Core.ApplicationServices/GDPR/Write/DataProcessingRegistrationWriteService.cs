@@ -227,6 +227,10 @@ namespace Core.ApplicationServices.GDPR.Write
            where TAssignment : class, IHasId, IHasUuid
         {
             var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
+            if (newUuids.Distinct().Count() != newUuids.Count)
+            {
+                return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
+            }
             var existingAssignemnts = getExistingState(dpr).ToDictionary(x => x.Uuid);
             var existingUuids = existingAssignemnts.Values.Select(x => x.Uuid).ToList();
 
