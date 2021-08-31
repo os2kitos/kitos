@@ -13,6 +13,7 @@ using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1.GDPR;
+using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -523,13 +524,42 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
-            
+
             //null input uses the undecided fallback
             inputDto.IsAgreementConcluded = YesNoIrrelevantChoice.Undecided;
             inputDto.HasSubDataProcessors = YesNoUndecidedChoice.Undecided;
             inputDto.TransferToInsecureThirdCountries = YesNoUndecidedChoice.Undecided;
             AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
         }
+
+        [Fact]
+        public async Task Can_POST_With_SystemUsages()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                SystemUsageUuids = new[] { system1Usage.Uuid, system2Usage.Uuid }
+            };
+
+            //Act
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Assert
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+            AssertMultiAssignment(request.SystemUsageUuids, freshDTO.SystemUsages);
+        }
+
+        //TODO: Error cases
+        //TODO: Update scenarios
 
         private async Task<(IdentityNamePairResponseDTO dataResponsible, IdentityNamePairResponseDTO basisForTransfer, DataProcessingRegistrationGeneralDataWriteRequestDTO inputDTO)> CreateGeneralDataInput(
            bool withDataProcessors,
