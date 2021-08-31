@@ -61,7 +61,7 @@ namespace Core.ApplicationServices.RightsHolders
             if (creationParameters == null)
                 throw new ArgumentNullException(nameof(creationParameters));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             try
             {
                 var organizationId = _organizationRepository.GetByUuid(rightsHolderUuid).Select(x => x.Id);
@@ -97,7 +97,7 @@ namespace Core.ApplicationServices.RightsHolders
 
         public Result<ItSystem, OperationError> Update(Guid systemUuid, RightsHolderSystemUpdateParameters updateParameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
             try
             {
                 var result = _systemService

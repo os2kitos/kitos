@@ -27,14 +27,14 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 .AsReadOnly();
         }
 
-        public static YesNoIrrelevantOption ToDataOptions(this YesNoIrrelevantChoice value)
+        public static YesNoIrrelevantOption ToYesNoIrrelevantOption(this YesNoIrrelevantChoice value)
         {
             return ApiToDataMap.TryGetValue(value, out var result)
                 ? result
                 : throw new ArgumentException($@"Unmapped choice:{value:G}", nameof(value));
         }
 
-        public static YesNoIrrelevantChoice ToYesNoDontKnowChoice(this YesNoIrrelevantOption value)
+        public static YesNoIrrelevantChoice ToYesNoIrrelevantChoice(this YesNoIrrelevantOption value)
         {
             return DataToApiMap.TryGetValue(value, out var result)
                 ? result

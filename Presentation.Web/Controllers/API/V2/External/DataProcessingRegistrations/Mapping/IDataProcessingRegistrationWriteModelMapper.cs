@@ -7,5 +7,6 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
     {
         DataProcessingRegistrationModificationParameters FromPOST(DataProcessingRegistrationWriteRequestDTO dto);
         DataProcessingRegistrationModificationParameters FromPUT(DataProcessingRegistrationWriteRequestDTO dto);
+        UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto);
     }
 }

@@ -53,7 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private static YesNoUndecidedChoice? MapYesNoUndecided(YesNoUndecidedOption? yesNoUndecidedOption)
         {
-            return yesNoUndecidedOption?.ToYesNoDontKnowChoice();
+            return yesNoUndecidedOption?.ToYesNoUndecidedChoice();
         }
 
         private IEnumerable<OversightDateDTO> MapOversightDates(ICollection<DataProcessingRegistrationOversightDate> oversightDates)
@@ -95,7 +95,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private static YesNoIrrelevantChoice? MapYesNoIrrelevant(YesNoIrrelevantOption? isAgreementConcluded)
         {
-            return isAgreementConcluded?.ToYesNoDontKnowChoice();
+            return isAgreementConcluded?.ToYesNoIrrelevantChoice();
         }
 
         private static IEnumerable<ExternalReferenceDataDTO> MapExternalReferences(DataProcessingRegistration dataProcessingRegistration)

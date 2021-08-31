@@ -20,7 +20,7 @@ namespace Infrastructure.DataAccess.Services
             {
                 return new WithinAmbienTransaction();
             }
-            return new DatabaseTransaction(_context.Database.BeginTransaction());
+            return new DatabaseTransaction(_context.Database.BeginTransaction(isolationLevel));
         }
 
         public void Dispose()
