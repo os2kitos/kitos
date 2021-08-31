@@ -3,7 +3,6 @@ using Core.DomainModel.Organization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
@@ -203,7 +202,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var subDataProcessor = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
             var dpr1 = await CreateDPRAsync(organization.Id);
             var dpr2 = await CreateDPRAsync(organization.Id);
-            using var setStateResult = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dpr1.Id,YesNoUndecidedOption.Yes);
+            using var setStateResult = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dpr1.Id, YesNoUndecidedOption.Yes);
             Assert.Equal(HttpStatusCode.OK, setStateResult.StatusCode);
             using var assignResult = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dpr1.Id, subDataProcessor.Id);
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
@@ -226,7 +225,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr1 = await CreateDPRAsync(organization.Id);
             var dpr2 = await CreateDPRAsync(organization.Id);
             var dpr3 = await CreateDPRAsync(organization.Id);
-            
+
             using var assignResult1 = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, YesNoIrrelevantOption.YES);
             Assert.Equal(HttpStatusCode.OK, assignResult1.StatusCode);
 
@@ -253,7 +252,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 var third = Assert.Single(dprs.Where(x => x.Uuid == dpr3.Uuid));
                 AssertExpectedShallowDPR(dpr3, organization, third);
             }
-            
+
         }
 
         [Fact]
@@ -397,37 +396,22 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         [InlineData(true, true, false, true, true)]
         [InlineData(true, false, true, true, true)]
         [InlineData(false, true, true, true, true)]
-        public async Task Can_POST_With_GeneralData(bool withDataProcessors, bool withSubDataProcessors, bool withResponsible, bool withBasisForTransfer, bool withInsecureCountries)
+        public async Task Can_POST_With_GeneralData(
+            bool withDataProcessors,
+            bool withSubDataProcessors,
+            bool withResponsible,
+            bool withBasisForTransfer,
+            bool withInsecureCountries)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
-            var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
-            var subDataProcessor1 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
-            var subDataProcessor2 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
-            var dataResponsible = withResponsible ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
-            var basisForTransfer = withBasisForTransfer ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
-            var country = withInsecureCountries ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
-            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
-            {
-                DataResponsibleUuid = dataResponsible?.Uuid,
-                DataResponsibleRemark = A<string>(),
-                IsAgreementConcluded = A<YesNoIrrelevantChoice>(),
-                IsAgreementConcludedRemark = A<string>(),
-                AgreementConcludedAt = A<DateTime>(),
-                BasisForTransferUuid = basisForTransfer?.Uuid,
-                TransferToInsecureThirdCountries = withInsecureCountries ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
-                InsecureCountriesSubjectToDataTransferUuids = country?.Uuid.WrapAsEnumerable().ToList(),
-                HasSubDataProcesors = withSubDataProcessors ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
-                DataProcessorUuids = withDataProcessors ? new[] { dataProcessor1.Uuid, dataProcessor2.Uuid } : null,
-                SubDataProcessorUuids = withSubDataProcessors ? new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } : null
-            };
+            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(withDataProcessors, withSubDataProcessors, withResponsible, withBasisForTransfer, withInsecureCountries, organization);
 
             var request = new CreateDataProcessingRegistrationRequestDTO
             {
                 Name = CreateName(),
                 OrganizationUuid = organization.Uuid,
-                General = input
+                General = inputDto
             };
 
             //Act
@@ -435,18 +419,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
 
             //Assert
-            AssertOrganizationReference(organization, freshDTO.OrganizationContext);
-            AssertCrossReference(dataResponsible, freshDTO.General.DataResponsible);
-            Assert.Equal(input.DataResponsibleRemark, freshDTO.General.DataResponsibleRemark);
-            Assert.Equal(input.IsAgreementConcluded, freshDTO.General.IsAgreementConcluded);
-            Assert.Equal(input.IsAgreementConcludedRemark, freshDTO.General.IsAgreementConcludedRemark);
-            Assert.Equal(input.AgreementConcludedAt, freshDTO.General.AgreementConcludedAt);
-            AssertCrossReference(basisForTransfer, freshDTO.General.BasisForTransfer);
-            Assert.Equal(input.TransferToInsecureThirdCountries, freshDTO.General.TransferToInsecureThirdCountries);
-            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, freshDTO.General.InsecureCountriesSubjectToDataTransfer);
-            AssertMultiAssignment(input.DataProcessorUuids, freshDTO.General.DataProcessors);
-            Assert.Equal(input.HasSubDataProcesors, freshDTO.General.HasSubDataProcessors);
-            AssertMultiAssignment(input.SubDataProcessorUuids, freshDTO.General.SubDataProcessors);
+            AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
         }
 
         [Theory]
@@ -457,7 +430,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).RandomItem();
             var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
             {
                 TransferToInsecureThirdCountries = transferToInsecureThirdCountries,
@@ -505,6 +478,128 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
+
+        [Fact]
+        public async Task Can_Put_General_Data()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = new DataProcessingRegistrationGeneralDataWriteRequestDTO()
+            };
+            var createdDpr = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Act - change all properties
+            var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
+            AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
+
+            //Act - change all properties
+            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, false, true, false, true, organization);
+            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
+            AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
+
+            //Act - change all properties
+            (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(false, true, false, true, false, organization);
+            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
+            AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
+
+            //Act - reset all properties by providing an empty input
+            (dataResponsible, basisForTransfer, inputDto) = (null, null, new DataProcessingRegistrationGeneralDataWriteRequestDTO());
+            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
+            
+            //null input uses the undecided fallback
+            inputDto.IsAgreementConcluded = YesNoIrrelevantChoice.Undecided;
+            inputDto.HasSubDataProcesors = YesNoUndecidedChoice.Undecided;
+            inputDto.TransferToInsecureThirdCountries = YesNoUndecidedChoice.Undecided;
+            AssertGeneralData(organization, dataResponsible, inputDto, basisForTransfer, freshDTO);
+        }
+
+        private async Task<(IdentityNamePairResponseDTO dataResponsible, IdentityNamePairResponseDTO basisForTransfer, DataProcessingRegistrationGeneralDataWriteRequestDTO inputDTO)> CreateGeneralDataInput(
+           bool withDataProcessors,
+           bool withSubDataProcessors,
+           bool withResponsible,
+           bool withBasisForTransfer,
+           bool withInsecureCountries,
+           Organization organization)
+        {
+            var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor1 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor2 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataResponsible = withResponsible
+                ? (await OptionV2ApiHelper.GetOptionsAsync(
+                    OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0))
+                .RandomItem()
+                : default;
+            var basisForTransfer = withBasisForTransfer
+                ? (await OptionV2ApiHelper.GetOptionsAsync(
+                    OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0))
+                .RandomItem()
+                : default;
+            var country = withInsecureCountries
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry,
+                    organization.Uuid, 10, 0)).RandomItem()
+                : default;
+            var dataProcessorUuids = withDataProcessors ? new[] { dataProcessor1.Uuid, dataProcessor2.Uuid } : null;
+            var subDataProcessorUuids = withSubDataProcessors ? new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } : null;
+            var inputDTO = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                DataResponsibleUuid = dataResponsible?.Uuid,
+                DataResponsibleRemark = A<string>(),
+                IsAgreementConcluded = A<YesNoIrrelevantChoice>(),
+                IsAgreementConcludedRemark = A<string>(),
+                AgreementConcludedAt = A<DateTime>(),
+                BasisForTransferUuid = basisForTransfer?.Uuid,
+                TransferToInsecureThirdCountries = withInsecureCountries
+                    ? YesNoUndecidedChoice.Yes
+                    : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
+                InsecureCountriesSubjectToDataTransferUuids = country?.Uuid.WrapAsEnumerable().ToList(),
+                HasSubDataProcesors = withSubDataProcessors
+                    ? YesNoUndecidedChoice.Yes
+                    : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
+                DataProcessorUuids = dataProcessorUuids,
+                SubDataProcessorUuids = subDataProcessorUuids
+            };
+            return (dataResponsible, basisForTransfer, inputDTO);
+        }
+
+        private void AssertGeneralData(
+            Organization organization,
+            IdentityNamePairResponseDTO inputDataResponsible,
+            DataProcessingRegistrationGeneralDataWriteRequestDTO input,
+            IdentityNamePairResponseDTO inputBasisForTransfer,
+            DataProcessingRegistrationResponseDTO actual)
+        {
+            AssertOrganizationReference(organization, actual.OrganizationContext);
+            AssertCrossReference(inputDataResponsible, actual.General.DataResponsible);
+            Assert.Equal(input.DataResponsibleRemark, actual.General.DataResponsibleRemark);
+            Assert.Equal(input.IsAgreementConcluded, actual.General.IsAgreementConcluded);
+            Assert.Equal(input.IsAgreementConcludedRemark, actual.General.IsAgreementConcludedRemark);
+            Assert.Equal(input.AgreementConcludedAt, actual.General.AgreementConcludedAt);
+            AssertCrossReference(inputBasisForTransfer, actual.General.BasisForTransfer);
+            Assert.Equal(input.TransferToInsecureThirdCountries, actual.General.TransferToInsecureThirdCountries);
+            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, actual.General.InsecureCountriesSubjectToDataTransfer);
+            AssertMultiAssignment(input.DataProcessorUuids, actual.General.DataProcessors);
+            Assert.Equal(input.HasSubDataProcesors, actual.General.HasSubDataProcessors);
+            AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
+        }
+
 
         private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
         {

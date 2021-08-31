@@ -113,6 +113,8 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\EnumerableHelper.cs" />
+    <Compile Include="Tools\EnumRange.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
     <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />
     <Compile Include="Contract\V2\ItContractsApiV2Test.cs" />
