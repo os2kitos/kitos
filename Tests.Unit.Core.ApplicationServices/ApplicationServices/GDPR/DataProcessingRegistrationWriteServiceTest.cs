@@ -10,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
@@ -422,6 +423,68 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             _dprServiceMock.Verify(x => x.UpdateDataResponsibleRemark(It.IsAny<int>(), It.IsAny<string>()), Times.Never);
+        }
+
+        //TODO: From here
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_IsAgreementConcluded(bool inputIsNull)
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcluded = (inputIsNull ? (YesNoIrrelevantOption?)null : A<YesNoIrrelevantOption>()).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            _dprServiceMock.Setup(x => x.UpdateIsAgreementConcluded(createdRegistration.Id, generalData.IsAgreementConcluded.NewValue.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED))).Returns(createdRegistration);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(createdRegistration, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_GeneralData_IsAgreementConcluded_If_Update_Fails()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcluded = A<YesNoIrrelevantOption?>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            var operationError = A<OperationError>();
+            _dprServiceMock.Setup(x => x.UpdateIsAgreementConcluded(createdRegistration.Id, generalData.IsAgreementConcluded.NewValue.GetValueOrDefault(YesNoIrrelevantOption.UNDECIDED))).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Create_With_GeneralData_IsAgreementConcluded_Set_To_NoChanges()
+        {
+            //Arrange
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                IsAgreementConcluded = OptionalValueChange<YesNoIrrelevantOption?>.None
+            };
+            var (organizationUuid, parameters, _, _) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dprServiceMock.Verify(x => x.UpdateIsAgreementConcluded(It.IsAny<int>(), It.IsAny<YesNoIrrelevantOption>()), Times.Never);
         }
 
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
