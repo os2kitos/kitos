@@ -1,12 +1,20 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.Organization;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using AutoFixture;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Organization;
+using Core.DomainModel.Shared;
+using Presentation.Web.Models.API.V1.GDPR;
+using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -18,22 +26,21 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
     public class DataProcessingRegistrationApiV2Test : WithAutoFixture
     {
         [Fact]
-        public async Task GET_DPR_Returns_Ok()
+        public async Task Can_GET_Specific_DPR()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newDPR = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newDPR = await CreateDPRAsync(organization.Id);
 
             //Act
-            var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(regularUserToken.Token, newDPR.Uuid);
+            var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newDPR.Uuid);
 
             //Assert
-            Assert.Equal(newDPR.Uuid, dto.Uuid);
-            Assert.Equal(newDPR.Name, dto.Name);
+            AssertExpectedShallowDPR(newDPR, organization, dto);
         }
 
         [Fact]
-        public async Task GET_DPR_Returns_NotFound()
+        public async Task Cannot_Get_DPR_If_Unknown()
         {
             //Arrange
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
@@ -46,98 +53,220 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task GET_DPR_Returns_BadRequest_For_Empty_Uuid()
+        public async Task Cannot_Get_DPR_If_NotAllowedTo()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var newDPR = await CreateDPRAsync(organization2.Id);
 
             //Act
-            using var response = await DataProcessingRegistrationV2Helper.SendGetDPRAsync(regularUserToken.Token, Guid.Empty);
+            using var response = await DataProcessingRegistrationV2Helper.SendGetDPRAsync(token, newDPR.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Get_DPR_If_Empty_Uuid_In_Request()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendGetDPRAsync(token, Guid.Empty);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
-        public async Task GET_DPRs_Returns_Ok()
+        public async Task Can_GET_All_DPRs()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(regularUserToken.Token, 0, 100);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100);
 
             //Assert
-            Assert.NotEmpty(dprs);
+            Assert.Equal(2, dprs.Count());
+            AssertExpectedShallowDPRs(dpr1, organization, dprs);
+            AssertExpectedShallowDPRs(dpr2, organization, dprs);
         }
 
         [Fact]
-        public async Task GET_DPRs_Returns_Ok_With_OrganizationFiltering()
+        public async Task Can_GET_All_DPRs_With_Paging()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var newOrg = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var newDPR = await DataProcessingRegistrationHelper.CreateAsync(newOrg.Id, CreateName());
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            var dpr3 = await CreateDPRAsync(organization.Id);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(regularUserToken.Token, 0, 100, organizationUuid: newOrg.Uuid);
+            var page1Dprs = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 2)).ToList();
+            var page2Dprs = (await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 1, 2)).ToList();
 
             //Assert
-            var dpr = Assert.Single(dprs);
-            Assert.Equal(newDPR.Uuid, dpr.Uuid);
+            Assert.Equal(2, page1Dprs.Count());
+            AssertExpectedShallowDPRs(dpr1, organization, page1Dprs);
+            AssertExpectedShallowDPRs(dpr2, organization, page1Dprs);
+
+            var page2Dpr = Assert.Single(page2Dprs);
+            AssertExpectedShallowDPR(dpr3, organization, page2Dpr);
         }
 
         [Fact]
-        public async Task GET_DPRs_Returns_Ok_With_SystemFiltering()
+        public async Task Can_GET_All_DPRs_With_OrganizationFiltering()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var newOrg = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), newOrg.Id, AccessModifier.Local);
-            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, newOrg.Id);
-            var newDPR = await DataProcessingRegistrationHelper.CreateAsync(newOrg.Id, CreateName());
-            using var assignResult = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(newDPR.Id, newSystemUsage.Id);
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization1.Id);
+            var organization2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dpr2 = await CreateDPRAsync(organization2.Id);
+
+            //Act
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100);
+
+            //Assert
+            var retrievedDPR = Assert.Single(dprs);
+            AssertExpectedShallowDPR(dpr1, organization1, retrievedDPR);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_DPRs_With_SystemFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
+            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            using var assignResult = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dpr1.Id, newSystemUsage.Id);
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(regularUserToken.Token, 0, 100, systemUuid: newSystem.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, systemUuid: newSystem.Uuid);
 
             //Assert
-            var dpr = Assert.Single(dprs);
-            Assert.Equal(newDPR.Uuid, dpr.Uuid);
+            var retrievedDPR = Assert.Single(dprs);
+            AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
         }
 
         [Fact]
-        public async Task GET_DPRs_Returns_Ok_With_SystemUsageFiltering()
+        public async Task Can_GET_All_DPRs_With_SystemUsageFiltering()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
-            var newOrg = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), newOrg.Id, AccessModifier.Local);
-            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, newOrg.Id);
-            var newDPR = await DataProcessingRegistrationHelper.CreateAsync(newOrg.Id, CreateName());
-            using var assignResult = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(newDPR.Id, newSystemUsage.Id);
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
+            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            using var assignResult = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dpr1.Id, newSystemUsage.Id);
             Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(regularUserToken.Token, 0, 100, systemUsageUuid: newSystemUsage.Uuid);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, systemUsageUuid: newSystemUsage.Uuid);
 
             //Assert
-            var dpr = Assert.Single(dprs);
-            Assert.Equal(newDPR.Uuid, dpr.Uuid);
+            var retrievedDPR = Assert.Single(dprs);
+            AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
         }
 
         [Fact]
-        public async Task GET_DPRs_Returns_BadRequest_For_Empty_Uuid()
+        public async Task Can_GET_All_DPRs_With_DataProcessorFiltering()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dataProcessor = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            using var assignResult = await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(dpr1.Id, dataProcessor.Id);
+            Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
 
             //Act
-            var response = await DataProcessingRegistrationV2Helper.SendGetDPRsAsync(regularUserToken.Token, 0, 100, systemUsageUuid: Guid.Empty);
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, dataProcessorUuid: dataProcessor.Uuid);
 
             //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            var retrievedDPR = Assert.Single(dprs);
+            AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_DPRs_With_SubDataProcessorFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var subDataProcessor = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            using var setStateResult = await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dpr1.Id,YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, setStateResult.StatusCode);
+            using var assignResult = await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dpr1.Id, subDataProcessor.Id);
+            Assert.Equal(HttpStatusCode.OK, assignResult.StatusCode);
+
+            //Act
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, subDataProcessorUuid: subDataProcessor.Uuid);
+
+            //Assert
+            var retrievedDPR = Assert.Single(dprs);
+            AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_GET_All_DPRs_With_AgreementConcludedFiltering(bool isAgreementConcluded)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            var dpr3 = await CreateDPRAsync(organization.Id);
+            
+            using var assignResult1 = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, YesNoIrrelevantOption.YES);
+            Assert.Equal(HttpStatusCode.OK, assignResult1.StatusCode);
+
+            Configure(f => f.Create<Generator<YesNoIrrelevantOption>>().First(x => x != YesNoIrrelevantOption.YES));
+
+            using var assignResult2 = await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dpr1.Id, A<YesNoIrrelevantOption>());
+            Assert.Equal(HttpStatusCode.OK, assignResult2.StatusCode);
+
+            //Act
+            var dprs = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, 0, 100, agreementConcluded: isAgreementConcluded);
+
+            //Assert
+            if (isAgreementConcluded)
+            {
+                var retrievedDPR = Assert.Single(dprs);
+                AssertExpectedShallowDPR(dpr1, organization, retrievedDPR);
+            }
+            else
+            {
+                Assert.Equal(2, dprs.Count());
+                var second = Assert.Single(dprs.Where(x => x.Uuid == dpr2.Uuid));
+                AssertExpectedShallowDPR(dpr2, organization, second);
+
+                var third = Assert.Single(dprs.Where(x => x.Uuid == dpr3.Uuid));
+                AssertExpectedShallowDPR(dpr3, organization, third);
+            }
+            
+        }
+
+        [Fact]
+        public async Task Cannot_Get_All_Dprs_If_Empty_Guid_Used_For_Filtering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var getResult = await DataProcessingRegistrationV2Helper.SendGetDPRsAsync(token, 0, 100, organizationUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, getResult.StatusCode);
         }
 
         [Fact]
@@ -158,9 +287,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Assert
             Assert.Equal(name, dto.Name);
             Assert.NotEqual(Guid.Empty, dto.Uuid);
-            Assert.Equal(organization.Name, dto.OrganizationContext.Name);
-            Assert.Equal(organization.Cvr, dto.OrganizationContext.Cvr);
-            Assert.Equal(organization.Uuid, dto.OrganizationContext.Uuid);
+            AssertOrganizationReference(organization, dto.OrganizationContext);
         }
 
         [Fact]
@@ -263,31 +390,37 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
 
-        [Fact]
-        public async Task Can_POST_With_GeneralData()
+        [Theory]
+        [InlineData(true, true, true, true, true)]
+        [InlineData(true, true, true, true, false)]
+        [InlineData(true, true, true, false, true)]
+        [InlineData(true, true, false, true, true)]
+        [InlineData(true, false, true, true, true)]
+        [InlineData(false, true, true, true, true)]
+        public async Task Can_POST_With_GeneralData(bool withDataProcessors, bool withSubDataProcessors, bool withResponsible, bool withBasisForTransfer, bool withInsecureCountries)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var dataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var dataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var subDataProcessor1 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var subDataProcessor2 = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var dataResponsible = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
-            var basisForTransfer = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
-            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor1 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var subDataProcessor2 = withSubDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
+            var dataResponsible = withResponsible ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            var basisForTransfer = withBasisForTransfer ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            var country = withInsecureCountries ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
             var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
             {
-                DataResponsibleUuid = dataResponsible.Uuid, //TODO: Parameterize
+                DataResponsibleUuid = dataResponsible?.Uuid,
                 DataResponsibleRemark = A<string>(),
                 IsAgreementConcluded = A<YesNoIrrelevantChoice>(),
                 IsAgreementConcludedRemark = A<string>(),
                 AgreementConcludedAt = A<DateTime>(),
-                BasisForTransferUuid = basisForTransfer.Uuid, //TODO: Parameterize
-                TransferToInsecureThirdCountries = YesNoUndecidedChoice.Yes, //TODO :Parametrize this
-                InsecureCountriesSubjectToDataTransferUuids = country.Uuid.WrapAsEnumerable().ToList(), //TODO: Parameterize
-                HasSubDataProcesors = YesNoUndecidedChoice.Yes, //TODO: PArameterize
-                DataProcessorUuids = new[] { dataProcessor1.Uuid, dataProcessor2.Uuid }, //TODO: Parameterize
-                SubDataProcessorUuids = new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } //TODO: Parameterize
+                BasisForTransferUuid = basisForTransfer?.Uuid,
+                TransferToInsecureThirdCountries = withInsecureCountries ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                InsecureCountriesSubjectToDataTransferUuids = country?.Uuid.WrapAsEnumerable().ToList(),
+                HasSubDataProcesors = withSubDataProcessors ? YesNoUndecidedChoice.Yes : YesNoUndecidedChoice.No,
+                DataProcessorUuids = withDataProcessors ? new[] { dataProcessor1.Uuid, dataProcessor2.Uuid } : null,
+                SubDataProcessorUuids = withSubDataProcessors ? new[] { subDataProcessor1.Uuid, subDataProcessor2.Uuid } : null
             };
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -299,24 +432,107 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
 
             //Assert
-            //TODO: Assert the content
+            AssertOrganizationReference(organization, freshDTO.OrganizationContext);
+            AssertCrossReference(dataResponsible, freshDTO.General.DataResponsible);
+            Assert.Equal(input.DataResponsibleRemark, freshDTO.General.DataResponsibleRemark);
+            Assert.Equal(input.IsAgreementConcluded, freshDTO.General.IsAgreementConcluded);
+            Assert.Equal(input.IsAgreementConcludedRemark, freshDTO.General.IsAgreementConcludedRemark);
+            Assert.Equal(input.AgreementConcludedAt, freshDTO.General.AgreementConcludedAt);
+            AssertCrossReference(basisForTransfer, freshDTO.General.BasisForTransfer);
+            Assert.Equal(input.TransferToInsecureThirdCountries, freshDTO.General.TransferToInsecureThirdCountries);
+            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, freshDTO.General.InsecureCountriesSubjectToDataTransfer);
+            AssertMultiAssignment(input.DataProcessorUuids, freshDTO.General.DataProcessors);
+            Assert.Equal(input.HasSubDataProcesors, freshDTO.General.HasSubDataProcessors);
+            AssertMultiAssignment(input.SubDataProcessorUuids, freshDTO.General.SubDataProcessors);
         }
 
-        private string CreateEmail()
+        [Theory]
+        [InlineData(YesNoUndecidedChoice.No)]
+        [InlineData(YesNoUndecidedChoice.Undecided)]
+        [InlineData(null)]
+        public async Task Cannot_POST_With_GeneralData_And_InsecureThirdCountries_When_TransferToInsecureCountries_Is_Anyhing_But_Yes(YesNoUndecidedChoice? transferToInsecureThirdCountries)
         {
-            return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var country = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First();
+            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                TransferToInsecureThirdCountries = transferToInsecureThirdCountries,
+                InsecureCountriesSubjectToDataTransferUuids = new[] { country.Uuid }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = input
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(YesNoUndecidedChoice.No)]
+        [InlineData(YesNoUndecidedChoice.Undecided)]
+        [InlineData(null)]
+        public async Task Cannot_POST_With_GeneralData_And_SubDataProcessor_When_HasSubDataProcessors_Set_To_Anything_But_Yes(YesNoUndecidedChoice? hasSubDataProcessors)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var input = new DataProcessingRegistrationGeneralDataWriteRequestDTO
+            {
+                HasSubDataProcesors = hasSubDataProcessors,
+                SubDataProcessorUuids = new[] { organization.Uuid }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                General = input
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
+        {
+            var dto = Assert.Single(dtos, dpr => dpr.Uuid == expectedContent.Uuid);
+            AssertExpectedShallowDPR(expectedContent, expectedOrganization, dto);
+        }
+
+        private static void AssertExpectedShallowDPR(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, DataProcessingRegistrationResponseDTO dto)
+        {
+            Assert.Equal(expectedContent.Uuid, dto.Uuid);
+            Assert.Equal(expectedContent.Name, dto.Name);
+            Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
+            Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
+            Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
+        }
+        private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId)
+        {
+            return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
         }
 
         private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
-            var (user, token) = await CreateApiUser(organization);
+            var (user, token) = await CreateApiUserAsync(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             return (token, user, organization);
         }
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUserAsync(Organization organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
@@ -334,6 +550,31 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         private string CreateName()
         {
             return $"{nameof(DataProcessingRegistrationApiV2Test)}{A<string>()}";
+        }
+
+        private static void AssertOrganizationReference(Organization expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
+        {
+            Assert.Equal(expected.Name, organizationReferenceDTO.Name);
+            Assert.Equal(expected.Cvr, organizationReferenceDTO.Cvr);
+            Assert.Equal(expected.Uuid, organizationReferenceDTO.Uuid);
+        }
+        private static void AssertCrossReference(IdentityNamePairResponseDTO expected, IdentityNamePairResponseDTO actual)
+        {
+            Assert.Equal(expected?.Uuid, actual?.Uuid);
+            Assert.Equal(expected?.Name, actual?.Name);
+        }
+
+        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        {
+            var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
+            var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
+            Assert.Equal(expectedUuids.Count, actualUuids.Count);
+            Assert.Equal(expectedUuids, actualUuids);
+        }
+
+        private string CreateEmail()
+        {
+            return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
         }
     }
 }

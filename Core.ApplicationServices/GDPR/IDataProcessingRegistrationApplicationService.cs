@@ -44,8 +44,10 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId);
+        /// <returns>Error if clear operation fails or BadState of no basis for transfer is assigned</returns>
         Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
         Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId);
+        /// <returns>Error if clear operation fails or BadState of no data responsible is assigned</returns>
         Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
         Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int oversightOptionId);
