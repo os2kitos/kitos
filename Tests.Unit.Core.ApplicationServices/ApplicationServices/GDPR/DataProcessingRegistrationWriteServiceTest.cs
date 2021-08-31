@@ -1032,8 +1032,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             return (organizationUuid, parameters, createdRegistration, transaction);
         }
 
-        //TODO: Update edge cases
-
         private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)
         {
             _dprServiceMock.Setup(x => x.UpdateName(dprId, nameNewValue)).Returns(result);
