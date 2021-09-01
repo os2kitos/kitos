@@ -558,7 +558,80 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(request.SystemUsageUuids, freshDTO.SystemUsages);
         }
 
-        //TODO: Error cases
+        [Fact]
+        public async Task Cannot_POST_With_SystemUsages_From_Other_Organizations()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var (token2, _, otherOrganization) = await CreatePrerequisitesAsync();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system.Uuid });
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token2, new CreateItSystemUsageRequestDTO { OrganizationUuid = otherOrganization.Uuid, SystemUuid = system.Uuid });
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                SystemUsageUuids = new[] { system1Usage.Uuid, system2Usage.Uuid }
+            };
+
+            //Act
+            using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest,response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Update_Systems()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+            var system3Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system3.Uuid });
+
+            var request = new CreateDataProcessingRegistrationRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid};
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            var assignment1 = new[] { system1Usage.Uuid };
+            var assignment2 = new[] { system1Usage.Uuid, system2Usage.Uuid };
+            var assignment3 = new[] { system3Usage.Uuid, system2Usage.Uuid };
+            var assignment4 = Array.Empty<Guid>();
+
+            //Act
+            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment1, freshDTO.SystemUsages);
+
+            //Act
+            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment2, freshDTO.SystemUsages);
+
+            //Act
+            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment3, freshDTO.SystemUsages);
+
+            //Act
+            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment4, freshDTO.SystemUsages);
+        }
+
         //TODO: Update scenarios
 
         private async Task<(IdentityNamePairResponseDTO dataResponsible, IdentityNamePairResponseDTO basisForTransfer, DataProcessingRegistrationGeneralDataWriteRequestDTO inputDTO)> CreateGeneralDataInput(
