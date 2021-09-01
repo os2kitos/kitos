@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Xunit;
 
@@ -103,6 +104,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight"), token, payload);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutRolesAsync(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/roles"), token, payload);
         }
     }
 }
