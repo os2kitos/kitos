@@ -220,6 +220,9 @@ namespace Core.DomainModel.GDPR
             if (GetAssignedSystemUsage(systemUsage.Id).HasValue)
                 return new OperationError("System usage is already assigned", OperationFailure.Conflict);
 
+            if(OrganizationId != systemUsage.OrganizationId)
+                return new OperationError("System usage must be in the same organization as this data processing registration",OperationFailure.BadInput);
+
             SystemUsages.Add(systemUsage);
 
             return systemUsage;
@@ -311,7 +314,8 @@ namespace Core.DomainModel.GDPR
             IsOversightCompleted = completed;
             if (IsOversightCompleted != YesNoUndecidedOption.Yes)
             {
-                var oversightDatesToBeRemoved = OversightDates;
+                var oversightDatesToBeRemoved = OversightDates.ToList();
+                OversightDates.Clear();
                 return Maybe<IEnumerable<DataProcessingRegistrationOversightDate>>.Some(oversightDatesToBeRemoved);
             }
             return Maybe<IEnumerable<DataProcessingRegistrationOversightDate>>.None;
@@ -321,6 +325,8 @@ namespace Core.DomainModel.GDPR
 
         public Result<DataProcessingRegistrationOversightDate, OperationError> AssignOversightDate(DateTime oversightDate, string oversightRemark)
         {
+            if (IsOversightCompleted != YesNoUndecidedOption.Yes)
+                return new OperationError("Cannot assign oversight dates if 'IsOversightCompleted' is not set to 'Yes'", OperationFailure.BadState);
             if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
             if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
 

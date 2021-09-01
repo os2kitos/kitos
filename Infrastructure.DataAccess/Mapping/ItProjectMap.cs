@@ -10,8 +10,19 @@ namespace Infrastructure.DataAccess.Mapping
 
             this.Property(x => x.Name)
                 .HasMaxLength(ItProjectConstraints.MaxNameLength)
-                .IsRequired()
-                .HasIndexAnnotation("Project_Index_Name", 0);
+                .IsRequired();
+
+            HasIndex(x => new { x.OrganizationId, x.Name })
+                .IsUnique(true)
+                .HasName("UX_NameUniqueToOrg");
+
+            HasIndex(x => x.OrganizationId)
+                .IsUnique(false)
+                .HasName("IX_OrganizationId");
+
+            HasIndex(x => x.Name)
+                .IsUnique(false)
+                .HasName("IX_Name");
 
             // Table & Column Mappings
             ToTable("ItProject");

@@ -142,7 +142,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() } } };
             _itProjectRepo.Setup(x => x.GetByKey(id)).Returns(itProject);
             _authorizationContext.Setup(x => x.AllowDelete(itProject)).Returns(true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(databaseTransaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(databaseTransaction.Object);
             _referenceService.Setup(x => x.DeleteByProjectId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act

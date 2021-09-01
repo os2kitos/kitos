@@ -2826,7 +2826,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var trasactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(trasactionMock.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
             return trasactionMock;
         }
     }

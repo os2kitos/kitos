@@ -110,7 +110,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
             var systemResult = _systemService.GetSystem(parameters.SystemUuid);
             if (systemResult.Failed)
             {
@@ -144,7 +144,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         }
         private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var result = getItSystemUsage()
                     .Bind(WithWriteAccess)

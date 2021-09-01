@@ -205,7 +205,7 @@ namespace Core.ApplicationServices.System
                 return SystemDeleteResult.HasInterfaceExhibits;
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             try
             {
@@ -233,7 +233,7 @@ namespace Core.ApplicationServices.System
         {
             if (_authorizationContext.AllowCreate<ItSystem>(organizationId))
             {
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var nameError = ValidateNewSystemName(organizationId, name);
 
@@ -492,7 +492,7 @@ namespace Core.ApplicationServices.System
             if (updateWith == null && updateWithResult == null)
                 throw new ArgumentException("No mutations provided");
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var itSystem = _itSystemRepository.GetSystem(systemId);
             if (itSystem == null)

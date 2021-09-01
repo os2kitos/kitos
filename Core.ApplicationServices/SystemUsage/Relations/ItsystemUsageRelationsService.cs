@@ -241,7 +241,7 @@ namespace Core.ApplicationServices.SystemUsage.Relations
 
         public Result<SystemRelation, OperationError> RemoveRelation(int fromSystemUsageId, int relationId)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin())
             {
                 var operationContext = new SystemRelationOperationContext(new SystemRelationOperationParameters { FromSystemUsageId = fromSystemUsageId }, new SystemRelationOperationEntities());
 

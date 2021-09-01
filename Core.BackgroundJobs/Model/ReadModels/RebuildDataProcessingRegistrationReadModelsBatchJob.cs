@@ -53,7 +53,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     if (token.IsCancellationRequested)
                         break;
 
-                    using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                    using var transaction = _transactionManager.Begin();
                     _logger.Debug("Rebuilding read model for {category}:{sourceId}", pendingReadModelUpdate.Category, pendingReadModelUpdate.SourceId);
                     var source = _sourceRepository.GetById(pendingReadModelUpdate.SourceId);
                     var readModelResult = _readModelRepository.GetBySourceId(pendingReadModelUpdate.SourceId);

@@ -23,7 +23,6 @@ using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -494,7 +493,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<int>();
             var uuid = withUuid ? A<Guid>() : (Guid?)null;
             var name = A<string>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectAllowCreateReturns(organizationId, true);
             ExpectGetSystemsReturns(null, Enumerable.Empty<ItSystem>());
             if (withUuid)
@@ -523,7 +522,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var organizationId = A<int>();
             var name = A<string>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectAllowCreateReturns(organizationId, true);
             ExpectGetSystemsReturns(null,
                 new[]
@@ -546,7 +545,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<int>();
             var name = A<string>();
             var uuid = A<Guid>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectAllowCreateReturns(organizationId, true);
             ExpectGetSystemsReturns(null, new List<ItSystem>());
             ExpectGetSystemReturns(uuid, new ItSystem());
@@ -566,7 +565,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var newValue = A<string>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
 
@@ -619,7 +618,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var newValue = A<string>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
 
@@ -673,7 +672,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var parentSystemId = A<int>();
             var itSystem = new ItSystem();
             var parentSystem = new ItSystem { Id = parentSystemId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemReturns(parentSystemId, parentSystem);
@@ -696,7 +695,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var parentSystemId = A<int>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemReturns(parentSystemId, null);
@@ -716,7 +715,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var parentSystemId = A<int>();
             var itSystem = new ItSystem();
             var parentSystem = new ItSystem { Id = parentSystemId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemReturns(parentSystemId, parentSystem);
@@ -736,7 +735,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var parentSystemId = A<int>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
 
@@ -753,7 +752,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var parentSystemId = A<int>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
             //Act
@@ -772,7 +771,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var rightsHolderId = A<Guid>();
             var itSystem = new ItSystem();
             var rightsHolder = new Organization() { Id = A<int>() };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
@@ -795,7 +794,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var rightsHolderId = A<Guid>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetOrganizationReturns(rightsHolderId, Maybe<Organization>.None);
@@ -815,7 +814,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var rightsHolderId = A<Guid>();
             var itSystem = new ItSystem();
             var rightsHolder = new Organization();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetOrganizationReturns(rightsHolderId, rightsHolder);
@@ -835,7 +834,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var rightsHolderId = A<Guid>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
 
@@ -852,7 +851,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var rightsHolderId = A<Guid>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
             //Act
@@ -869,7 +868,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var urlReference = A<string>();
             var itSystem = new ItSystem { Reference = new ExternalReference { URL = A<string>() } };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
 
@@ -889,7 +888,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var urlReference = A<string>();
             var createdReference = new ExternalReference { URL = A<string>() };
             var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             _referenceService.Setup(x => x.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference)).Returns(createdReference);
@@ -911,7 +910,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var urlReference = A<string>();
             var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             var operationError = A<OperationError>();
@@ -931,7 +930,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var urlReference = A<string>();
             var itSystem = new ItSystem { Id = systemId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
 
@@ -948,7 +947,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var urlReference = A<string>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
             //Act
@@ -967,7 +966,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<int>();
             var itSystem = new ItSystem { OrganizationId = organizationId };
             var businessType = new BusinessType { Id = A<int>() };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (businessType, true));
@@ -991,7 +990,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<int>();
             var itSystem = new ItSystem { OrganizationId = organizationId };
             var businessType = new BusinessType { Id = A<int>() };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (businessType, false));
@@ -1011,7 +1010,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var businessTypeId = A<Guid>();
             var organizationId = A<int>();
             var itSystem = new ItSystem { OrganizationId = organizationId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, Maybe<(BusinessType, bool)>.None);
@@ -1031,7 +1030,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var businessTypeId = A<Guid>();
             var organizationId = A<int>();
             var itSystem = new ItSystem { OrganizationId = organizationId };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
             ExpectGetBusinessTypeOptionReturns(organizationId, businessTypeId, (new BusinessType(), true));
@@ -1049,7 +1048,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var businessTypeId = A<Guid>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
             //Act
@@ -1068,7 +1067,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var taskRefId1 = A<int>();
             var taskRefId2 = A<int>();
             var taskRefIds = new[] { taskRefId1, taskRefId2 };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetTaskRefReturnsSome(taskRefId1);
@@ -1093,7 +1092,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var taskRefId1 = A<int>();
             var taskRefId2 = A<int>();
             var taskRefIds = new[] { taskRefId1, taskRefId2 };
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetTaskRefReturnsSome(taskRefId1);
@@ -1112,7 +1111,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
 
@@ -1129,7 +1128,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             var itSystem = new ItSystem();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, null);
 
             //Act
@@ -1149,7 +1148,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization2Id = A<int>();
             var itSystem = CreateSystem(organization1Id);
             var otherSystem = CreateSystem(organization2Id, name: newName); //Different org, same name as the new name
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemsReturns(new List<ItSystem> { itSystem, otherSystem });
@@ -1173,7 +1172,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization1Id = A<int>();
             var itSystem = CreateSystem(organization1Id);
             var otherSystem = CreateSystem(organization1Id, name: newName);
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemsReturns(new List<ItSystem> { itSystem, otherSystem });
@@ -1205,7 +1204,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var organization1Id = A<int>();
             var itSystem = CreateSystem(organization1Id);
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
 
@@ -1226,7 +1225,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var organization1Id = A<int>();
             var itSystem = CreateSystem(organization1Id);
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, false);
 
@@ -1242,7 +1241,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var systemId = A<int>();
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId,null);
 
             //Act
@@ -1258,7 +1257,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var systemId = A<int>();
             var organization1Id = A<int>();
             var itSystem = CreateSystem(organization1Id);
-            ExpectTransactionToBeSet(IsolationLevel.ReadCommitted);
+            ExpectTransactionToBeSet();
             ExpectGetSystemReturns(systemId, itSystem);
             ExpectAllowModifyReturns(itSystem, true);
             ExpectGetSystemsReturns(new List<ItSystem>());
@@ -1377,9 +1376,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceService.Setup(x => x.DeleteBySystemId(id)).Returns(result);
         }
 
-        private void ExpectTransactionToBeSet(IsolationLevel isolationLevel = IsolationLevel.Serializable)
+        private void ExpectTransactionToBeSet()
         {
-            _transactionManager.Setup(x => x.Begin(isolationLevel)).Returns(_dbTransaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(_dbTransaction.Object);
         }
 
         private static void AddUsage(ItSystem system, ItSystemUsage usage)
