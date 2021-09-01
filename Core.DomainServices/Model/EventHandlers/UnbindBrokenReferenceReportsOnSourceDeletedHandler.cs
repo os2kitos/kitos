@@ -28,7 +28,7 @@ namespace Core.DomainServices.Model.EventHandlers
 
         public void Handle(EntityDeletedEvent<ExternalReference> domainEvent)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             foreach (var report in domainEvent.Entity.BrokenLinkReports.ToList())
             {
                 _externalReferenceBrokenLinks.Delete(report);
@@ -38,7 +38,7 @@ namespace Core.DomainServices.Model.EventHandlers
 
         public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             foreach (var report in domainEvent.Entity.BrokenLinkReports.ToList())
             {
                 _interfaceBrokenLinks.Delete(report);

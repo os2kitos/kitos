@@ -556,7 +556,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             systemRelation.Id = relationId;
             var itSystemUsage = new ItSystemUsage { UsageRelations = new List<SystemRelation> { CreateRelation(), systemRelation } };
             var transaction = new Mock<IDatabaseTransaction>();
-            _mockTransactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _mockTransactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             ExpectGetUsageByKeyReturns(id, itSystemUsage);
             ExpectAllowModifyReturns(itSystemUsage, true);
 

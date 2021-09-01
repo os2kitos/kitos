@@ -56,7 +56,7 @@ namespace Core.ApplicationServices.Interface
         }
         public Result<ItInterface, OperationFailure> Delete(int id)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using (var transaction = _transactionManager.Begin())
             {
                 var getItInterfaceResult = _interfaceRepository.GetInterface(id);
 
@@ -131,7 +131,7 @@ namespace Core.ApplicationServices.Interface
         {
             if (_authorizationContext.AllowCreate<ItInterface>(organizationId))
             {
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var nameError = CheckForUniqueNaming(name, interfaceId, organizationId);
 
@@ -296,7 +296,7 @@ namespace Core.ApplicationServices.Interface
             if (updateWith == null && updateWithResult == null)
                 throw new ArgumentException("No mutations provided");
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var getItInterfaceResult = _interfaceRepository.GetInterface(interfaceId);
             if (getItInterfaceResult.IsNone)

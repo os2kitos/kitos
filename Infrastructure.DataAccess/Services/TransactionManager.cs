@@ -13,14 +13,14 @@ namespace Infrastructure.DataAccess.Services
             _context = context;
         }
 
-        public IDatabaseTransaction Begin(IsolationLevel isolationLevel)
+        public IDatabaseTransaction Begin()
         {
             var currentTransaction = _context.Database.CurrentTransaction;
             if (currentTransaction != null)
             {
                 return new WithinAmbienTransaction();
             }
-            return new DatabaseTransaction(_context.Database.BeginTransaction(isolationLevel));
+            return new DatabaseTransaction(_context.Database.BeginTransaction());
         }
 
         public void Dispose()

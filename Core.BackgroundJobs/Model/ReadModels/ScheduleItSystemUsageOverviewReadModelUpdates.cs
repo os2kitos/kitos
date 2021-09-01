@@ -67,7 +67,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 
                 var systemIds = _itSystemUsageRepository.GetBySystemId(update.SourceId).Select(x => x.Id).ToList();
                 var parentSystemIds = _itSystemUsageRepository.GetByParentSystemId(update.SourceId).Select(x => x.Id).ToList();
@@ -92,7 +92,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId).ToList();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
@@ -108,7 +108,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _readModelRepository.GetByOrganizationUnitId(update.SourceId).Select(x => x.SourceEntityId).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
@@ -123,7 +123,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var ids = _readModelRepository.GetByDependentOrganizationId(update.SourceId).Select(x => x.SourceEntityId).ToList();
 
@@ -140,7 +140,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _readModelRepository.GetByBusinessTypeId(update.SourceId).Select(x => x.SourceEntityId).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
@@ -155,7 +155,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var systemIds = _itSystemRepository.GetByTaskRefId(update.SourceId).Select(x => x.Id).ToList();
 
@@ -174,7 +174,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var ids = _readModelRepository.GetByContractId(update.SourceId).Select(x => x.SourceEntityId).ToList();
 
@@ -191,7 +191,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var ids = _readModelRepository.GetByProjectId(update.SourceId).Select(x => x.SourceEntityId).ToList();
 
@@ -208,7 +208,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var existingReadModelUsageIds = _readModelRepository.GetByDataProcessingRegistrationId(update.SourceId).Select(x => x.SourceEntityId);
                 var currentUsageIds = _itSystemUsageRepository.GetByDataProcessingAgreement(update.SourceId).Select(x => x.Id);
@@ -228,7 +228,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 var ids = _readModelRepository.GetByItInterfaceId(update.SourceId).Select(x => x.SourceEntityId);
 

@@ -159,7 +159,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext.Setup(x => x.HasPermission(It.IsAny<DefineOrganizationTypePermission>()))
                 .Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _organizationRepository.Setup(x => x.Insert(newOrg)).Returns(newOrg);
 
             //Act
@@ -194,7 +194,7 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowCreateReturns<Organization>(true);
             _authorizationContext.Setup(x => x.HasPermission(It.IsAny<DefineOrganizationTypePermission>())).Returns(true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _organizationRepository.Setup(x => x.Insert(newOrg)).Returns(newOrg);
 
             //Act

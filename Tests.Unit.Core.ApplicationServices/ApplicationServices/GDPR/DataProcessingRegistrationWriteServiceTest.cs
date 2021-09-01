@@ -1124,7 +1124,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var trasactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(trasactionMock.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
             return trasactionMock;
         }
 

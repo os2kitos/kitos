@@ -890,7 +890,7 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         private Mock<IDatabaseTransaction> ExpectTransactionBegins()
         {
             var transactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transactionMock.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transactionMock.Object);
             return transactionMock;
         }
 
