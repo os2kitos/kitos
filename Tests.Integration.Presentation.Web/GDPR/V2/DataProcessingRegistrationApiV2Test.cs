@@ -580,7 +580,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             using var response = await DataProcessingRegistrationV2Helper.SendPostAsync(token, request);
 
             //Assert
-            Assert.Equal(HttpStatusCode.BadRequest,response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
@@ -596,7 +596,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
             var system3Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system3.Uuid });
 
-            var request = new CreateDataProcessingRegistrationRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid};
+            var request = new CreateDataProcessingRegistrationRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid };
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
             var assignment1 = new[] { system1Usage.Uuid };
@@ -633,6 +633,62 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(assignment4, freshDTO.SystemUsages);
         }
 
+        [Fact]
+        public async Task Can_DELETE()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var name = CreateName();
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = name,
+                OrganizationUuid = organization.Uuid
+            };
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Act
+            using var deleteResponse = await DataProcessingRegistrationV2Helper.SendDeleteAsync(token, dto.Uuid);
+            using var getAfterDeleteResponse = await DataProcessingRegistrationV2Helper.SendGetDPRAsync(token, dto.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, deleteResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getAfterDeleteResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_If_Not_AllowedTo()
+        {
+            //Arrange
+            var (tokenOrg1, _, organization1) = await CreatePrerequisitesAsync();
+            var (tokenOrg2, _, organization2) = await CreatePrerequisitesAsync();
+            var name = CreateName();
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = name,
+                OrganizationUuid = organization1.Uuid
+            };
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(tokenOrg1, request);
+
+            //Act
+            using var deleteResponse = await DataProcessingRegistrationV2Helper.SendDeleteAsync(tokenOrg2, dto.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_Unknown()
+        {
+            //Arrange
+            var (token, _, _) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var deleteResponse = await DataProcessingRegistrationV2Helper.SendDeleteAsync(token, A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
+        }
+
         [Theory]
         [InlineData(true, true)]
         [InlineData(false, true)]
@@ -646,16 +702,16 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightDate1 = CreateOversightDate();
             var oversightDate2 = CreateOversightDate();
             var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem() : default;
-            
+
             var input = new DataProcessingRegistrationOversightWriteRequestDTO()
             {
-                OversightOptionUuids = withOversightOptions? new[]{ oversightOption.Uuid } : null,
+                OversightOptionUuids = withOversightOptions ? new[] { oversightOption.Uuid } : null,
                 OversightOptionsRemark = A<string>(),
                 OversightInterval = A<OversightIntervalChoice>(),
                 OversightIntervalRemark = A<string>(),
                 IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 OversightCompletedRemark = A<string>(),
-                OversightDates = withOversightDates ? new []{ oversightDate1, oversightDate2 } : new List<OversightDateDTO>()
+                OversightDates = withOversightDates ? new[] { oversightDate1, oversightDate2 } : new List<OversightDateDTO>()
             };
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -769,7 +825,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertEmptiedOversight(updatedDPR3.Oversight);
         }
 
-        private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
+        private static void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
         {
             Assert.Empty(actual.OversightOptions);
             Assert.Null(actual.OversightOptionsRemark);
@@ -801,7 +857,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 Assert.Equal(expectedOversightDates[i].CompletedAt, actualOversightDates[i].CompletedAt);
                 Assert.Equal(expectedOversightDates[i].Remark, actualOversightDates[i].Remark);
             }
-            
+
         }
 
         private OversightDateDTO CreateOversightDate()
@@ -882,7 +938,6 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
             AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
         }
-
 
         private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
         {
