@@ -21,8 +21,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         {
             dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
             dto.SystemUsageUuids ??= Array.Empty<Guid>();
-
             dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
+            dto.Roles ??= Array.Empty<RoleAssignmentRequestDTO>();
             return Map(dto);
         }
         private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)

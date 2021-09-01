@@ -6,6 +6,7 @@ using Infrastructure.Services.Types;
 using System.Linq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Xunit;
 
@@ -133,30 +134,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
         }
 
-        private static void AssertGeneralData(DataProcessingRegistrationGeneralDataWriteRequestDTO input, UpdatedDataProcessingRegistrationGeneralDataParameters output)
-        {
-            Assert.Equal(input.DataResponsibleUuid, AssertPropertyContainsDataChange(output.DataResponsibleUuid));
-            Assert.Equal(input.DataResponsibleRemark, AssertPropertyContainsDataChange(output.DataResponsibleRemark));
-            Assert.Equal(input.IsAgreementConcluded?.ToYesNoIrrelevantOption(), AssertPropertyContainsDataChange(output.IsAgreementConcluded));
-            Assert.Equal(input.IsAgreementConcludedRemark, AssertPropertyContainsDataChange(output.IsAgreementConcludedRemark));
-            Assert.Equal(input.AgreementConcludedAt, AssertPropertyContainsDataChange(output.AgreementConcludedAt));
-            Assert.Equal(input.BasisForTransferUuid, AssertPropertyContainsDataChange(output.BasisForTransferUuid));
-            Assert.Equal(input.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.TransferToInsecureThirdCountries));
-            AssertNullableCollection(input, input.InsecureCountriesSubjectToDataTransferUuids, output.InsecureCountriesSubjectToDataTransferUuids);
-            AssertNullableCollection(input, input.DataProcessorUuids, output.DataProcessorUuids);
-            Assert.Equal(input.HasSubDataProcessors?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.HasSubDataProcessors));
-            AssertNullableCollection(input, input.SubDataProcessorUuids, output.SubDataProcessorUuids);
-        }
-
-        private static void AssertNullableCollection(DataProcessingRegistrationGeneralDataWriteRequestDTO input, IEnumerable<Guid> fromCollection, OptionalValueChange<Maybe<IEnumerable<Guid>>> actualCollection)
-        {
-            if (fromCollection == null)
-                AssertPropertyContainsResetDataChange(actualCollection);
-            else
-                Assert.Equal(fromCollection,
-                    AssertPropertyContainsDataChange(actualCollection));
-        }
-
         [Fact]
         public void MapOversight_Returns_UpdatedDataProcessingRegistrationOversightDataParameters()
         {
@@ -202,6 +179,51 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertPropertyContainsResetDataChange(output.OversightDates);
+        }
+
+        [Fact]
+        public void MapRoles_Returns_UpdatedDataProcessingRegistrationRoles()
+        {
+            //Arrange
+            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+
+            //Act
+            var dprRoles = _sut.MapRoles(roles);
+
+            //Assert
+            var userRolePairs = AssertPropertyContainsDataChange(dprRoles.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
+            Assert.Equal(roles.Count, userRolePairs.Count);
+            for (var i = 0; i < userRolePairs.Count; i++)
+            {
+                var expected = roles[i];
+                var actual = userRolePairs[i];
+                Assert.Equal(expected.RoleUuid, actual.RoleUuid);
+                Assert.Equal(expected.UserUuid, actual.UserUuid);
+            }
+        }
+
+        private static void AssertGeneralData(DataProcessingRegistrationGeneralDataWriteRequestDTO input, UpdatedDataProcessingRegistrationGeneralDataParameters output)
+        {
+            Assert.Equal(input.DataResponsibleUuid, AssertPropertyContainsDataChange(output.DataResponsibleUuid));
+            Assert.Equal(input.DataResponsibleRemark, AssertPropertyContainsDataChange(output.DataResponsibleRemark));
+            Assert.Equal(input.IsAgreementConcluded?.ToYesNoIrrelevantOption(), AssertPropertyContainsDataChange(output.IsAgreementConcluded));
+            Assert.Equal(input.IsAgreementConcludedRemark, AssertPropertyContainsDataChange(output.IsAgreementConcludedRemark));
+            Assert.Equal(input.AgreementConcludedAt, AssertPropertyContainsDataChange(output.AgreementConcludedAt));
+            Assert.Equal(input.BasisForTransferUuid, AssertPropertyContainsDataChange(output.BasisForTransferUuid));
+            Assert.Equal(input.TransferToInsecureThirdCountries?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.TransferToInsecureThirdCountries));
+            AssertNullableCollection(input, input.InsecureCountriesSubjectToDataTransferUuids, output.InsecureCountriesSubjectToDataTransferUuids);
+            AssertNullableCollection(input, input.DataProcessorUuids, output.DataProcessorUuids);
+            Assert.Equal(input.HasSubDataProcessors?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.HasSubDataProcessors));
+            AssertNullableCollection(input, input.SubDataProcessorUuids, output.SubDataProcessorUuids);
+        }
+
+        private static void AssertNullableCollection(DataProcessingRegistrationGeneralDataWriteRequestDTO input, IEnumerable<Guid> fromCollection, OptionalValueChange<Maybe<IEnumerable<Guid>>> actualCollection)
+        {
+            if (fromCollection == null)
+                AssertPropertyContainsResetDataChange(actualCollection);
+            else
+                Assert.Equal(fromCollection,
+                    AssertPropertyContainsDataChange(actualCollection));
         }
 
         private void AssertOversightDates(IEnumerable<OversightDateDTO> expected, IEnumerable<UpdatedDataProcessingRegistrationOversightDate> actual)
