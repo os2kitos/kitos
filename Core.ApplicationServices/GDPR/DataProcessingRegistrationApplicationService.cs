@@ -362,11 +362,6 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark)
         {
-            if (remark == null)
-            {
-                return new OperationError(OperationFailure.BadInput);
-            }
-
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.OversightIntervalRemark = remark;
@@ -460,7 +455,7 @@ namespace Core.ApplicationServices.GDPR
                 var oversightDates = registration.SetOversightCompleted(isOversightCompleted);
                 if (oversightDates.HasValue)
                 {
-                    oversightDates.Value.ToList().ForEach(x => _oversightDateAssignmentService.Remove(registration, x.Id));
+                    oversightDates.Value.ToList().ForEach(x => _oversightDateAssignmentService.Remove(x));
                 }
                 return registration;
             });
@@ -483,11 +478,6 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)
         {
-            if (remark == null)
-            {
-                return new OperationError(OperationFailure.BadInput);
-            }
-
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.OversightCompletedRemark = remark;

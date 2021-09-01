@@ -28,9 +28,14 @@ namespace Core.DomainServices.GDPR
             var removedRegistration = registration.RemoveOversightDate(oversightId);
             if (removedRegistration.Ok)
             {
-                _repository.Delete(removedRegistration.Value);
+                Remove(removedRegistration.Value);
             }
             return removedRegistration;
+        }
+
+        public void Remove(DataProcessingRegistrationOversightDate oversight)
+        {
+            _repository.Delete(oversight);
         }
     }
 }

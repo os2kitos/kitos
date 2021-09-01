@@ -16,6 +16,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         public DataProcessingRegistrationModificationParameters FromPUT(DataProcessingRegistrationWriteRequestDTO dto)
         {
             dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
+            dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
             return Map(dto);
         }
         private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)

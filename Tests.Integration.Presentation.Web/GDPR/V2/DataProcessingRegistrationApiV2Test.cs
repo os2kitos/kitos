@@ -544,7 +544,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var oversightDate1 = CreateOversightDate();
             var oversightDate2 = CreateOversightDate();
-            var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).OrderBy(x => A<int>()).First() : default;
+            var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem() : default;
             
             var input = new DataProcessingRegistrationOversightWriteRequestDTO()
             {
@@ -554,7 +554,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 OversightIntervalRemark = A<string>(),
                 IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 OversightCompletedRemark = A<string>(),
-                OversightDates = new []{ oversightDate1, oversightDate2 }
+                OversightDates = withOversightDates ? new []{ oversightDate1, oversightDate2 } : new List<OversightDateDTO>()
             };
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -659,33 +659,23 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Assert - Update filled DPR
             AssertOversight(input2, updatedDPR2.Oversight);
 
-            //Act - Empty filled DPR
-
-            var input3 = new DataProcessingRegistrationOversightWriteRequestDTO()
-            {
-                OversightOptionUuids = null,
-                OversightOptionsRemark = "",
-                OversightInterval = null,
-                OversightIntervalRemark = "",
-                IsOversightCompleted = null,
-                OversightCompletedRemark = "",
-                OversightDates = null
-            };
+            //Act - Reset filled DPR
+            var input3 = new DataProcessingRegistrationOversightWriteRequestDTO();
 
             var updatedDPR3 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input3);
 
-            //Assert - Update filled DPR
+            //Assert - Reset filled DPR
             AssertEmptiedOversight(updatedDPR3.Oversight);
         }
 
         private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
         {
             Assert.Empty(actual.OversightOptions);
-            Assert.Equal("", actual.OversightOptionsRemark);
+            Assert.Null(actual.OversightOptionsRemark);
             Assert.Equal(OversightIntervalChoice.Undecided, actual.OversightInterval);
-            Assert.Equal("", actual.OversightIntervalRemark);
+            Assert.Null(actual.OversightIntervalRemark);
             Assert.Equal(YesNoUndecidedChoice.Undecided, actual.IsOversightCompleted);
-            Assert.Equal("", actual.OversightCompletedRemark);
+            Assert.Null(actual.OversightCompletedRemark);
             Assert.Empty(actual.OversightDates);
         }
 
