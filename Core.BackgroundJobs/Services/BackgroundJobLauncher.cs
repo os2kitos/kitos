@@ -97,7 +97,7 @@ namespace Core.BackgroundJobs.Services
 
         private void LogJobStarted(string jobId)
         {
-            _logger.Information("'{jobName}' STARTING", jobId);
+            _logger.Verbose("'{jobName}' STARTING", jobId);
         }
 
         private void LogJobResult(string jobId, Result<string, OperationError> result)
@@ -119,7 +119,7 @@ namespace Core.BackgroundJobs.Services
 
         private void LogJobSucceeded(string jobId, Result<string, OperationError> result)
         {
-            _logger.Information("'{jobName}' SUCCEEDED with '{message}'", jobId, result.Value);
+            _logger.Verbose("'{jobName}' SUCCEEDED with '{message}'", jobId, result.Value);
         }
     }
 }
