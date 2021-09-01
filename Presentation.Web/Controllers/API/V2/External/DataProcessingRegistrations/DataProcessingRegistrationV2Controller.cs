@@ -276,7 +276,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    Oversight = _writeModelMapper.MapOversight(request)
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

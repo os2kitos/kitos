@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Infrastructure.Services.Types;
@@ -18,6 +19,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
             dto.SystemUsageUuids ??= Array.Empty<Guid>();
 
+            dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
             return Map(dto);
         }
         private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)
@@ -26,7 +28,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             {
                 Name = dto.Name.AsChangedValue(),
                 General = dto.General.FromNullable().Select(MapGeneral),
-                SystemUsageUuids = dto.SystemUsageUuids.FromNullable()
+                SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
+                Oversight = dto.Oversight.FromNullable().Select(MapOversight)
             };
         }
 
@@ -45,6 +48,27 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 DataProcessorUuids = dto.DataProcessorUuids.FromNullable().AsChangedValue(),
                 HasSubDataProcessors = (dto.HasSubDataProcessors?.ToYesNoUndecidedOption()).AsChangedValue(),
                 SubDataProcessorUuids = dto.SubDataProcessorUuids.FromNullable().AsChangedValue()
+            };
+        }
+
+        public UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
+        {
+            return new UpdatedDataProcessingRegistrationOversightDataParameters
+            {
+                OversightOptionUuids = dto.OversightOptionUuids.FromNullable().AsChangedValue(),
+                OversightOptionsRemark = dto.OversightOptionsRemark.AsChangedValue(),
+                OversightInterval = (dto.OversightInterval?.ToIntervalOption()).AsChangedValue(),
+                OversightIntervalRemark = dto.OversightIntervalRemark.AsChangedValue(),
+                IsOversightCompleted = (dto.IsOversightCompleted?.ToYesNoUndecidedOption()).AsChangedValue(),
+                OversightCompletedRemark = dto.OversightCompletedRemark.AsChangedValue(),
+                OversightDates = dto.OversightDates
+                    .FromNullable()
+                    .Select(x => x
+                        .Select(y => new UpdatedDataProcessingRegistrationOversightDate()
+                            {
+                                CompletedAt = y.CompletedAt,
+                                Remark = y.Remark
+                            })).AsChangedValue()
             };
         }
     }
