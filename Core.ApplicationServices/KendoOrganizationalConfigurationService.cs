@@ -43,7 +43,7 @@ namespace Core.ApplicationServices
         public Result<KendoOrganizationalConfiguration, OperationError> CreateOrUpdate(int organizationId,
             OverviewType overviewType, IEnumerable<KendoColumnConfiguration> columns)
         {
-            var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            var transaction = _transactionManager.Begin();
             var currentConfig = _kendoOrganizationRepository.Get(organizationId, overviewType);
 
             if (currentConfig.HasValue)

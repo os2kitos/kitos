@@ -4,6 +4,6 @@ namespace Infrastructure.Services.DataAccess
 {
     public interface ITransactionManager
     {
-        IDatabaseTransaction Begin(IsolationLevel isolationLevel);
+        IDatabaseTransaction Begin();
     }
 }

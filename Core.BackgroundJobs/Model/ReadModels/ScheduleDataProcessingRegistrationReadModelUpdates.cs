@@ -62,7 +62,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _dataProcessingRegistrationRepository.GetByOversightOptionId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
@@ -77,7 +77,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _dataProcessingRegistrationRepository.GetByDataResponsibleId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
@@ -92,7 +92,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
@@ -107,7 +107,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
 
                 //Org id is not stored in read model so search the source model
                 var ids = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId).Select(x => x.Id);
@@ -124,7 +124,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 //System id is not stored in read model so search the source model
                 var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
@@ -140,7 +140,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 //Contract id is not stored in read model so search the source model
                 var dataProcessingRegistrationIds = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id);
 
@@ -157,7 +157,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }

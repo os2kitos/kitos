@@ -111,7 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetContractReturns(contractId, itContract);
             ExpectAllowDeleteReturns(itContract, true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
 
             //Act
@@ -176,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(contract, true);
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.AssignDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.AssignDataProcessingRegistration(id, dataProcessingRegistrationId);
@@ -211,7 +211,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(contract, true);
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.RemoveDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.RemoveDataProcessingRegistration(id, dataProcessingRegistrationId);

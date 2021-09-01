@@ -48,7 +48,7 @@ namespace Core.ApplicationServices.GDPR.Write
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
 
@@ -87,7 +87,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> Update(Func<Result<DataProcessingRegistration, OperationError>> getDpr, DataProcessingRegistrationModificationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             var result = getDpr()
                 .Bind(systemUsage => PerformUpdates(systemUsage, parameters));
@@ -108,6 +108,7 @@ namespace Core.ApplicationServices.GDPR.Write
             return dpr
                 .WithOptionalUpdate(parameters.Name, (registration, changedName) => _applicationService.UpdateName(registration.Id, changedName))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData))
+                .Bind(registration => registration.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData));
         }
 
@@ -178,6 +179,19 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(r => r.WithOptionalUpdate(parameters.SubDataProcessorUuids, UpdateSubDataProcessors));
         }
 
+        private Result<DataProcessingRegistration, OperationError> UpdateSystemAssignments(DataProcessingRegistration dpr, IEnumerable<Guid> systemUsageUuids)
+        {
+            return UpdateMultiAssignment
+            (
+                "system usage",
+                dpr,
+                systemUsageUuids.FromNullable(),
+                registration => registration.SystemUsages,
+                (registration, id) => _applicationService.AssignSystem(registration.Id, id),
+                (registration, id) => _applicationService.RemoveSystem(registration.Id, id)
+            ).Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
+        }
+
         private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
             return UpdateMultiAssignment
@@ -228,7 +242,7 @@ namespace Core.ApplicationServices.GDPR.Write
                     );
 
             var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingBasisForTransferOption>(basisForTransferUuid.Value);
-            
+
             if (dbId.IsNone)
                 return new OperationError($"Basis for transfer option with uuid {basisForTransferUuid.Value} could not be found", OperationFailure.BadInput);
 
@@ -261,7 +275,7 @@ namespace Core.ApplicationServices.GDPR.Write
         {
             var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(dataProcessingRegistrationUuid);
 
-            if (dbId == null)
+            if (dbId.IsNone)
                 return new OperationError(OperationFailure.NotFound);
 
             return _applicationService

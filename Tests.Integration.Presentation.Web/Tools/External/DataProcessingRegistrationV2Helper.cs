@@ -93,6 +93,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/general"), token, payload);
         }
 
+        public static async Task<HttpResponseMessage> SendPutSystemsAsync(string token, Guid uuid, IEnumerable<Guid> payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/system-usages"), token, payload?.ToList());
+        }
+
         public static async Task<DataProcessingRegistrationResponseDTO> PutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
         {
             using var response = await SendPutOversightAsync(token, uuid, payload);

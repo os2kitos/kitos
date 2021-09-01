@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Infrastructure.Services.Types;
@@ -16,6 +17,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         public DataProcessingRegistrationModificationParameters FromPUT(DataProcessingRegistrationWriteRequestDTO dto)
         {
             dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
+            dto.SystemUsageUuids ??= Array.Empty<Guid>();
+
             dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
             return Map(dto);
         }
@@ -25,6 +28,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             {
                 Name = dto.Name.AsChangedValue(),
                 General = dto.General.FromNullable().Select(MapGeneral),
+                SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(MapOversight)
             };
         }

@@ -276,7 +276,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             var renamedTaskRef = SetupTaskRef(2, "KLE-Emne", "00.03.00", "International virksomhed og EU");
             _stubTaskRefRepository.Insert(removedTaskRef);
             _stubTaskRefRepository.Insert(renamedTaskRef);
-            _mockTransactionManager.Setup(t => t.Begin(It.IsAny<IsolationLevel>())).Returns(new Mock<IDatabaseTransaction>().Object);
+            _mockTransactionManager.Setup(t => t.Begin()).Returns(new Mock<IDatabaseTransaction>().Object);
             return (_mockKleDataBridge, _mockTransactionManager, _mockLogger, _stubTaskRefRepository, removedTaskRef, renamedTaskRef);
         }
 

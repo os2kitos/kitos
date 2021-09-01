@@ -806,6 +806,10 @@
     <Compile Include="Migrations\202108191238336_AttachedOption_Indexes.designer.cs">
       <DependentUpon>202108191238336_AttachedOption_Indexes.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109010730183_LocallyUniqueName_On_Org_Specific_Roots.cs" />
+    <Compile Include="Migrations\202109010730183_LocallyUniqueName_On_Org_Specific_Roots.designer.cs">
+      <DependentUpon>202109010730183_LocallyUniqueName_On_Org_Specific_Roots.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1322,6 +1326,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202108191238336_AttachedOption_Indexes.resx">
       <DependentUpon>202108191238336_AttachedOption_Indexes.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109010730183_LocallyUniqueName_On_Org_Specific_Roots.resx">
+      <DependentUpon>202109010730183_LocallyUniqueName_On_Org_Specific_Roots.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

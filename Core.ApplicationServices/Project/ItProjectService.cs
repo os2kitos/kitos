@@ -75,7 +75,7 @@ namespace Core.ApplicationServices.Project
 
         public Result<ItProject, OperationFailure> DeleteProject(int id)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin())
             {
                 var project = _projectRepository.GetByKey(id);
                 if (project == null)

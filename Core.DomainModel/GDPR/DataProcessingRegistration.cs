@@ -220,6 +220,9 @@ namespace Core.DomainModel.GDPR
             if (GetAssignedSystemUsage(systemUsage.Id).HasValue)
                 return new OperationError("System usage is already assigned", OperationFailure.Conflict);
 
+            if(OrganizationId != systemUsage.OrganizationId)
+                return new OperationError("System usage must be in the same organization as this data processing registration",OperationFailure.BadInput);
+
             SystemUsages.Add(systemUsage);
 
             return systemUsage;

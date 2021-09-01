@@ -103,7 +103,7 @@ namespace Core.ApplicationServices
 
         public bool SendAdvice(int id)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             try
             {
                 var advice = _adviceRepository.AsQueryable().ById(id);
@@ -336,7 +336,7 @@ namespace Core.ApplicationServices
 
         public void BulkDeleteAdvice(IEnumerable<Advice> toBeDeleted)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             foreach (var advice in toBeDeleted)
             {
                 RemoveAdviceAndItsRelatedEntities(advice);

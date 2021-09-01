@@ -78,7 +78,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingRegistration>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
             var error = _namingService.ValidateSuggestedNewRegistrationName(organizationId, name);
 
             if (error.HasValue)
@@ -106,7 +106,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> Delete(int id)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             var result = _repository.GetById(id);
 
@@ -409,7 +409,7 @@ namespace Core.ApplicationServices.GDPR
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             var result = _repository.GetById(id);
 

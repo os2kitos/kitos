@@ -144,7 +144,7 @@ namespace Core.ApplicationServices.SystemUsage
 
         public Result<ItSystemUsage, OperationError> Delete(int id)
         {
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin())
             {
                 var itSystemUsage = GetById(id);
                 if (itSystemUsage == null)
@@ -284,7 +284,7 @@ namespace Core.ApplicationServices.SystemUsage
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<ItSystemUsage, Result<TSuccess, OperationError>> mutation)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var usage = _usageRepository.GetByKey(id);
 

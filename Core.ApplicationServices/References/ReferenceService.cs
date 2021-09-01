@@ -165,7 +165,7 @@ namespace Core.ApplicationServices.References
                 return OperationFailure.Forbidden;
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var systemExternalReferences = root.ExternalReferences.ToList();
 
             if (systemExternalReferences.Count == 0)

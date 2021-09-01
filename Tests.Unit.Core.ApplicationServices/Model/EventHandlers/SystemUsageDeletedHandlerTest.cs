@@ -40,7 +40,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             deletedSystemUsage.UsedByRelations.Add(relation1);
             deletedSystemUsage.UsedByRelations.Add(relation2);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             _sut.Handle(new EntityDeletedEvent<ItSystemUsage>(deletedSystemUsage));
