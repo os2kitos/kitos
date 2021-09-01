@@ -8,10 +8,12 @@ using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
@@ -31,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly DataProcessingRegistrationWriteService _sut;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
@@ -39,12 +42,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
+            _referenceServiceMock = new Mock<IReferenceService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _sut = new DataProcessingRegistrationWriteService(
                 _dprServiceMock.Object,
                 _identityResolverMock.Object,
+                _referenceServiceMock.Object, 
                 Mock.Of<ILogger>(),
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
@@ -1820,7 +1825,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Can_Update_Roles_To_Remove_Them()
         {
             //Arrange
-
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites();
 
             var newRight = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
@@ -1867,6 +1871,121 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, rightToKeep.RoleId, rightToKeep.UserId), Times.Never);
         }
 
+        [Fact]
+        public void Can_Create_With_ExternalReferences()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+            
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+            Assert.Equal(expectedMaster.Title, result.Value.Reference.Title);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_But_No_Master()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_And_Multiple_Masters()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            //Set two masters
+            foreach (var master in externalReferences.Take(2))
+                master.MasterReference = true;
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_If_Add_Reference_Fails()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            expectedMaster.MasterReference = true;
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            foreach (var externalReference in externalReferences)
+                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
+
+            var operationError = A<OperationError>();
+
+            ExpectAddExternalReferenceReturns(createdRegistration, expectedMaster, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(operationError.FailureType, result.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        private void ExpectAddExternalReferenceReturns(DataProcessingRegistration dpr, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
+        {
+            if (value.Ok)
+                dpr.AddExternalReference(value.Value);
+            _referenceServiceMock
+                .Setup(x => x.AddReference(dpr.Id, ReferenceRootType.DataProcessingRegistration, externalReference.Title, externalReference.DocumentId, externalReference.Url))
+                .Returns(value);
+        }
+
+        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
+        {
+            return new ExternalReference
+            {
+                Id = A<int>(),
+                Title = externalReference.Title,
+                ExternalReferenceId = externalReference.DocumentId,
+                URL = externalReference.Url
+            };
+        }
+
         private void ExpectRoleAssignmentReturns(DataProcessingRegistration dpr, int roleId, int userId, Result<DataProcessingRegistrationRight, OperationError> result)
         {
             _dprServiceMock.Setup(x => x.AssignRole(dpr.Id, roleId, userId)).Returns(result);
@@ -1889,7 +2008,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
             IEnumerable<Guid> systemUsageUuids = null,
             UpdatedDataProcessingRegistrationOversightDataParameters oversightData = null,
-            UpdatedDataProcessingRegistrationRoles roles = null)
+            UpdatedDataProcessingRegistrationRoles roles = null,
+            IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null)
         {
             var organizationUuid = A<Guid>();
             var parameters = new DataProcessingRegistrationModificationParameters
@@ -1898,7 +2018,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 General = generalData.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Oversight = oversightData.FromNullable(),
-                Roles = roles.FromNullable()
+                Roles = roles.FromNullable(),
+                ExternalReferences = externalReferences.FromNullable()
             };
             var createdRegistration = new DataProcessingRegistration
             {

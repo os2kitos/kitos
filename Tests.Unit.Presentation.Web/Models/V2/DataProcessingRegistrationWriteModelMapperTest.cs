@@ -8,6 +8,7 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -199,6 +200,28 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 var actual = userRolePairs[i];
                 Assert.Equal(expected.RoleUuid, actual.RoleUuid);
                 Assert.Equal(expected.UserUuid, actual.UserUuid);
+            }
+        }
+
+        [Fact]
+        public void Can_Map_ExternalReferences()
+        {
+            //Arrange
+            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+
+            //Act
+            var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
+
+            //Assert
+            Assert.Equal(mappedReferences.Count, mappedReferences.Count);
+            for (var i = 0; i < mappedReferences.Count; i++)
+            {
+                var expected = references[i];
+                var actual = mappedReferences[i];
+                Assert.Equal(expected.Url, actual.Url);
+                Assert.Equal(expected.Title, actual.Title);
+                Assert.Equal(expected.DocumentId, actual.DocumentId);
+                Assert.Equal(expected.MasterReference, actual.MasterReference);
             }
         }
 

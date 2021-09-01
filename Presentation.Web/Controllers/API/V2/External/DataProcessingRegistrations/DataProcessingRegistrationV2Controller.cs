@@ -334,7 +334,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)

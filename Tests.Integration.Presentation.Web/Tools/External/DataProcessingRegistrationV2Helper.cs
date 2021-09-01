@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -119,6 +120,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutRolesAsync(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> payload)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/roles"), token, payload);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/external-references"), token, payload?.ToList() ?? new List<ExternalReferenceDataDTO>());
         }
     }
 }

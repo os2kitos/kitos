@@ -7,6 +7,7 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
@@ -23,6 +24,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             dto.SystemUsageUuids ??= Array.Empty<Guid>();
             dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
             dto.Roles ??= Array.Empty<RoleAssignmentRequestDTO>();
+            dto.ExternalReferences ??= Array.Empty<ExternalReferenceDataDTO>();
             return Map(dto);
         }
         private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)
@@ -33,8 +35,20 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 General = dto.General.FromNullable().Select(MapGeneral),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(MapOversight),
-                Roles = dto.Roles.FromNullable().Select(MapRoles)
+                Roles = dto.Roles.FromNullable().Select(MapRoles),
+                ExternalReferences = dto.ExternalReferences.FromNullable().Select(MapReferences)
             };
+        }
+
+        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            return references.Select(x => new UpdatedExternalReferenceProperties
+            {
+                Title = x.Title,
+                DocumentId = x.DocumentId,
+                Url = x.Url,
+                MasterReference = x.MasterReference
+            });
         }
 
         public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
