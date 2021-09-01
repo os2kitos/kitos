@@ -232,7 +232,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// Absent/nulled fields will result in a data reset in the targeted registration.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
+        /// <param name="systemUsageUuids"></param>
         /// <returns></returns>
         [HttpPut]
         [Route("{uuid}/system-usages")]
