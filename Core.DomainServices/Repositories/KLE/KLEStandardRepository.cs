@@ -155,7 +155,7 @@ namespace Core.DomainServices.Repositories.KLE
             var kleXmlData = _kleDataBridge.GetAllActiveKleNumbers();
             var changes = GetKLEChangeSummary(kleXmlData);
             _logger.Debug($"Changes: {changes.Count}");
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using (var transaction = _transactionManager.Begin())
             {
                 // Changes first run
                 UpdateRemovedTaskRefs(changes);

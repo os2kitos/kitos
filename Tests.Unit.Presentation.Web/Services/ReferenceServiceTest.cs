@@ -470,7 +470,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void ExpectTransactionToBeSet()
         {
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(_dbTransaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(_dbTransaction.Object);
         }
 
         private ItSystem CreateSystem()

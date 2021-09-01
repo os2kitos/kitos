@@ -60,7 +60,7 @@ namespace Core.DomainServices.Notifications
                 throw new ArgumentNullException(nameof(name));
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             if (!RelatedEntityExists(relatedEntityId, relatedEntityType))
             {
                 transaction.Rollback();
@@ -95,7 +95,7 @@ namespace Core.DomainServices.Notifications
 
         public Maybe<OperationError> Delete(int id)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var deleted = _userNotificationRepository.DeleteById(id);
             transaction.Commit();
             return deleted;
@@ -135,7 +135,7 @@ namespace Core.DomainServices.Notifications
 
         public void BulkDeleteUserNotification(IEnumerable<UserNotification> toBeDeleted)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             foreach (var userNotification in toBeDeleted)
             {
                 var deleteResult = _userNotificationRepository.DeleteById(userNotification.Id);

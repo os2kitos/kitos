@@ -38,7 +38,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 if (token.IsCancellationRequested)
                     break;
 
-                using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+                using var transaction = _transactionManager.Begin();
                 var idsInQueue = new HashSet<int>();
 
                 var updates = _pendingReadModelUpdateRepository

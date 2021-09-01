@@ -34,7 +34,7 @@ namespace Core.DomainServices.Model.EventHandlers
             if (domainEvent == null)
                 throw new ArgumentNullException(nameof(domainEvent));
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin())
             {
                 var affectedInterface = domainEvent.AffectedInterface;
 
@@ -80,7 +80,7 @@ namespace Core.DomainServices.Model.EventHandlers
             if (domainEvent == null)
                 throw new ArgumentNullException(nameof(domainEvent));
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var affectedInterface = domainEvent.Entity;
 
             _logger.Debug(

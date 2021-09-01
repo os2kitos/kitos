@@ -35,7 +35,7 @@ namespace Core.DomainServices.Model.EventHandlers
             if (domainEvent.ChangeType != LifeCycleEventType.Deleted)
                 return;
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var deletedSystemUsage = domainEvent.Entity;
 
             _logger.Debug("System usage with id {id} deleted. All relations TO from other usages will be removed",

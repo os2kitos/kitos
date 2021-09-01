@@ -296,7 +296,7 @@ namespace Tests.Unit.Core.ApplicationServices.Kendo
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             return transaction;
         }
     }

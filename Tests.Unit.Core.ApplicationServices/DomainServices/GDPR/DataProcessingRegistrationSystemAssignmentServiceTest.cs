@@ -67,6 +67,25 @@ namespace Tests.Unit.Core.DomainServices.GDPR
         }
 
         [Fact]
+        public void Cannot_AssignSystem_If_Organization_Id_Is_Different_From_Dpr_Org()
+        {
+            //Arrange
+            var orgId1 = A<int>();
+            var orgId2 = orgId1 + 1;
+            var systemUsageId = A<int>();
+            var registration = new DataProcessingRegistration { OrganizationId = orgId1 };
+            var itSystemUsage = new ItSystemUsage { OrganizationId = orgId2 };
+            _systemRepository.Setup(x => x.GetSystemUsage(systemUsageId)).Returns(itSystemUsage);
+
+            //Act
+            var result = _sut.AssignSystem(registration, systemUsageId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+        [Fact]
         public void Cannot_AssignSystem_If_System_Is_Not_Found()
         {
             //Arrange

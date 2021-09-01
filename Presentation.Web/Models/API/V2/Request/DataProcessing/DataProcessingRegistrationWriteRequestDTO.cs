@@ -25,7 +25,7 @@ namespace Presentation.Web.Models.API.V2.Request.DataProcessing
         ///     - No duplicates
         ///     - System usages must be belong to the same organization as this data processing registration
         /// </summary>
-        public IEnumerable<Guid> SystemUuids { get; set; }
+        public IEnumerable<Guid> SystemUsageUuids { get; set; }
         public DataProcessingRegistrationOversightWriteRequestDTO Oversight { get; set; }
         /// <summary>
         /// Data processing role assignments

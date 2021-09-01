@@ -81,7 +81,7 @@ namespace Core.ApplicationServices.Contract
             {
                 return OperationFailure.Forbidden;
             }
-            using (var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted))
+            using (var transaction = _transactionManager.Begin())
             {
                 try
                 {
@@ -183,7 +183,7 @@ namespace Core.ApplicationServices.Contract
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<ItContract, Result<TSuccess, OperationError>> mutation)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var contract = _repository.GetById(id);
 

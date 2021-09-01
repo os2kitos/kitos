@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Extensions;
+﻿using System;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -15,6 +16,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         public DataProcessingRegistrationModificationParameters FromPUT(DataProcessingRegistrationWriteRequestDTO dto)
         {
             dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
+            dto.SystemUsageUuids ??= Array.Empty<Guid>();
+
             return Map(dto);
         }
         private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)
@@ -22,7 +25,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return new DataProcessingRegistrationModificationParameters
             {
                 Name = dto.Name.AsChangedValue(),
-                General = dto.General.FromNullable().Select(MapGeneral)
+                General = dto.General.FromNullable().Select(MapGeneral),
+                SystemUsageUuids = dto.SystemUsageUuids.FromNullable()
             };
         }
 
