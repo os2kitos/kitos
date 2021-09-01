@@ -10,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;

@@ -112,6 +112,11 @@ namespace Core.DomainServices.Repositories.GDPR
                 .Where(x => x.OversightOptions.Any(option => option.Id == oversightOptionId));
         }
 
+        public IQueryable<DataProcessingRegistration> AsQueryable()
+        {
+            return _repository.AsQueryable();
+        }
+
         private void Notify(DataProcessingRegistration dataProcessingRegistration, LifeCycleEventType changeType)
         {
             switch (changeType)

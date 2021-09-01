@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Qa.References;
 using Infrastructure.Services.Types;
@@ -103,6 +104,14 @@ namespace Core.DomainModel.ItSystem
         public void Deactivate()
         {
             Disabled = true;
+        }
+
+        public IEnumerable<string> UsedByOrganizationNames
+        {
+            get
+            {
+                return AssociatedSystemRelations.GroupBy(x => (x.FromSystemUsage.Organization.Id, x.FromSystemUsage.Organization.Name)).Distinct().Select(x => x.Key.Name).OrderBy(x => x).ToList();
+            }
         }
     }
 }

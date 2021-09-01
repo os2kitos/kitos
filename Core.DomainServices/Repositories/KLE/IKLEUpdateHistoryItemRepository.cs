@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.KLE;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.KLE
 {
@@ -8,6 +9,6 @@ namespace Core.DomainServices.Repositories.KLE
     {
         IEnumerable<KLEUpdateHistoryItem> Get();
         KLEUpdateHistoryItem Insert(DateTime version);
-        DateTime GetLastUpdated();
+        Maybe<DateTime> GetLastUpdated();
     }
 }

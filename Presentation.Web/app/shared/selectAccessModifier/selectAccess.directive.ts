@@ -2,10 +2,10 @@
     'use strict';
 
     app.controller("selectAccessController", ["$scope", "select2LoadingService", function ($scope, select2LoadingService) {
-        var secondOptionText = $scope.isGlobalAdmin ? "Offentlig" : "Offentlig (kun systemadministrator)";
+        var secondOptionText = $scope.isGlobalAdmin === true || $scope.isGlobalAdmin === 'true' ? "Offentlig" : "Offentlig (kun systemadministrator)";
         var options = [
             { id: "0", text: "Lokal" },
-            { id: "1", text: secondOptionText },
+            { id: "1", text: secondOptionText, disabled: $scope.isGlobalAdmin !== 'true' && $scope.isGlobalAdmin !== true }
         ];
 
         $scope.select2Config = select2LoadingService.select2LocalDataNoSearch(() => options, true);

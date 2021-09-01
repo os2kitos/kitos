@@ -67,6 +67,5 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         public void DeleteByKey(params object[] key) { }
         public void Update(TaskRef entity) { }
         public void Save() { }
-        public void Patch(TaskRef item) { }
     }
 }

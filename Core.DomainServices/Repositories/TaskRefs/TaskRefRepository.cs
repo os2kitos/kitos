@@ -2,6 +2,7 @@
 using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainServices.Repositories.TaskRefs
@@ -13,6 +14,11 @@ namespace Core.DomainServices.Repositories.TaskRefs
         public TaskRefRepository(IGenericRepository<TaskRef> repository)
         {
             _repository = repository;
+        }
+
+        public IQueryable<TaskRef> Query(params IDomainQuery<TaskRef>[] conditions)
+        {
+            return _repository.AsQueryable().Transform(new IntersectionQuery<TaskRef>(conditions).Apply);
         }
 
         public Maybe<TaskRef> GetTaskRef(int id)

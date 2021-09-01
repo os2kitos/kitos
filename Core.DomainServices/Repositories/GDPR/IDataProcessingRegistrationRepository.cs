@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using Core.DomainModel.GDPR;
 using Infrastructure.Services.Types;
 
@@ -19,5 +18,6 @@ namespace Core.DomainServices.Repositories.GDPR
         IQueryable<DataProcessingRegistration> GetByDataResponsibleId(int dataResponsibleId);
         IQueryable<DataProcessingRegistration> GetByOversightOptionId(int oversightOptionId);
         IQueryable<DataProcessingRegistration> GetByContractId(int sourceId);
+        IQueryable<DataProcessingRegistration> AsQueryable();
     }
 }

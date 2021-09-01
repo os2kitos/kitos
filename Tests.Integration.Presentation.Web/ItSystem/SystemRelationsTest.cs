@@ -8,13 +8,16 @@ using Core.DomainModel.ItSystem;
 using ExpectedObjects;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models;
-using Presentation.Web.Models.SystemRelations;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class SystemRelationsTest : WithAutoFixture
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");

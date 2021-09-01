@@ -10,15 +10,19 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Infrastructure.Services.Types;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Request.System;
+using Presentation.Web.Models.API.V2.Response;
+using Presentation.Web.Models.API.V2.Response.System;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem.V2
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class ItSystemsApiV2Test : WithAutoFixture
     {
         [Fact]
@@ -74,7 +78,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, CreateName(), organizationId);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {
@@ -84,7 +88,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
                 itSystem.PreviousName = A<string>();
                 itSystem.Description = A<string>();
-                itSystem.Disabled = A<bool>();
                 itSystem.ArchiveDuty = A<ArchiveDutyRecommendationTypes>();
                 itSystem.ArchiveDutyComment = A<string>();
                 itSystem.ParentId = parentSystem.dbId;
@@ -109,6 +112,11 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             });
             await ItSystemHelper.TakeIntoUseAsync(system.dbId, organizationId);
             await ItSystemHelper.TakeIntoUseAsync(system.dbId, rightsHolderOrganization.Id);
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(systems =>
+            {
+                var itSystem = systems.AsQueryable().ByUuid(system.uuid);
+                itSystem.Disabled = A<bool>(); //Cannot before setting into use because if it becomes false, the taking into use will fail
+            });
 
             //Act
             var systemDTO = await ItSystemV2Helper.GetSingleAsync(token, system.uuid);
@@ -230,8 +238,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var businessType2 = A<string>();
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-            var correctBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType1, organizationId);
-            var incorrectBusinessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessType2, organizationId);
+            var correctBusinessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType1, organizationId);
+            var incorrectBusinessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType2, organizationId);
             var correctBusinessTypeId = DatabaseAccess.GetEntityUuid<BusinessType>(correctBusinessType.Id);
 
             var unexpectedWrongBusinessType = await CreateSystemAsync(organizationId, AccessModifier.Public);
@@ -394,7 +402,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var organizationId = TestEnvironment.DefaultOrganizationId;
             var system = await CreateSystemAsync(organizationId, AccessModifier.Public);
             var parentSystem = await CreateSystemAsync(organizationId, AccessModifier.Public);
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(CreateName(), organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, CreateName(), organizationId);
             var exposedInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), organizationId, AccessModifier.Public));
             DatabaseAccess.MutateDatabase(db =>
             {
@@ -889,7 +897,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
 
-            var reason = new DeactivationReasonRequestDTO() {DeactivationReason = string.Empty};
+            var reason = new DeactivationReasonRequestDTO() { DeactivationReason = string.Empty };
 
             //Act
             using var result = await ItSystemV2Helper.SendDeleteRightsHolderSystemAsync(token, createdSystem.Uuid, reason);
@@ -939,7 +947,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
             var createSystemRequest1 = await PrepareCreateRightsHolderSystemRequestAsync(false, false, false, false, false, true, rightsHolder);
             var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest1);
-            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository=>repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
+            DatabaseAccess.MutateEntitySet<Core.DomainModel.ItSystem.ItSystem>(repository => repository.AsQueryable().ByUuid(createdSystem.Uuid).Deactivate());
 
             var reason = A<DeactivationReasonRequestDTO>();
 
@@ -948,6 +956,19 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
+        {
+            //Arrange
+            var (token, _) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+
+            //Act
+            using var result = await ItSystemV2Helper.SendGetManyAsync(token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         private static void AssertBaseSystemDTO(Core.DomainModel.ItSystem.ItSystem dbSystem, BaseItSystemResponseDTO systemDTO)
@@ -966,8 +987,8 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(dbSystem.Created, systemDTO.Created);
             Assert.Equal(dbSystem.ObjectOwner.Uuid, systemDTO.CreatedBy.Uuid);
             Assert.Equal(dbSystem.ObjectOwner.GetFullName(), systemDTO.CreatedBy.Name);
-            Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDutyResponse.Id.ToString("G"));
-            Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDutyResponse.Comment);
+            Assert.Equal(dbSystem.ArchiveDuty?.ToString("G"), systemDTO.RecommendedArchiveDuty.Id.ToString("G"));
+            Assert.Equal(dbSystem.ArchiveDutyComment, systemDTO.RecommendedArchiveDuty.Comment);
             Assert.Equal(dbSystem.Parent.Uuid, systemDTO.ParentSystem.Uuid);
             Assert.Equal(dbSystem.Parent.Name, systemDTO.ParentSystem.Name);
             Assert.Equal(dbSystem.BelongsTo.Uuid, systemDTO.RightsHolder.Uuid);

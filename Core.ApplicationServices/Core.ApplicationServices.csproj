@@ -49,12 +49,6 @@
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Ninject, Version=3.3.4.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.3.3.4\lib\net45\Ninject.dll</HintPath>
-    </Reference>
-    <Reference Include="Ninject.Extensions.Logging, Version=3.3.0.0, Culture=neutral, PublicKeyToken=c7192dc5380945e7, processorArchitecture=MSIL">
-      <HintPath>..\packages\Ninject.Extensions.Logging.3.3.0\lib\net45\Ninject.Extensions.Logging.dll</HintPath>
-    </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
@@ -73,7 +67,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdviceService.cs" />
-    <Compile Include="ApplicationServiceModule.cs" />
     <Compile Include="Authentication\AuthenticationContext.cs" />
     <Compile Include="Authentication\AuthenticationMethod.cs" />
     <Compile Include="Authentication\AuthenticationScope.cs" />
@@ -109,8 +102,10 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Extensions\ChangedValueExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
+    <Compile Include="Extensions\OptionalValueChangeExtensions.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationOptionsApplicationService.cs" />
@@ -120,8 +115,24 @@
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
+    <Compile Include="IUserService.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotification.cs" />
     <Compile Include="Model\Notification\GlobalAdminNotificationMessage.cs" />
+    <Compile Include="Model\RightsHolder\UserRoleAssociationDTO.cs" />
+    <Compile Include="Model\Shared\OptionalValueChange.cs" />
+    <Compile Include="Model\SystemUsage\Write\NamedLink.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemRelationParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageCreationParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageJournalPeriod.cs" />
+    <Compile Include="Model\SystemUsage\Write\SystemUsageUpdateParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedExternalReferenceProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGDPRProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageArchivingParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageGeneralProperties.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageKLEDeviationParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageOrganizationalUseParameters.cs" />
+    <Compile Include="Model\SystemUsage\Write\UpdatedSystemUsageRoles.cs" />
+    <Compile Include="Model\SystemUsage\Write\UserRolePair.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />
@@ -143,6 +154,8 @@
     <Compile Include="Model\Interface\RightsHolderItInterfaceCreationParameters.cs" />
     <Compile Include="RightsHolders\ItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\RightsHolderSystemService.cs" />
+    <Compile Include="Rights\IUserRightsService.cs" />
+    <Compile Include="Rights\UserRightsService.cs" />
     <Compile Include="ScheduledJobs\HangfireApi.cs" />
     <Compile Include="ScheduledJobs\IHangfireApi.cs" />
     <Compile Include="IKendoOrganizationalConfigurationService.cs" />
@@ -194,9 +207,11 @@
     <Compile Include="SSO\StsAdgangsStyringConstants.cs" />
     <Compile Include="SystemUsage\GDPR\GDPRExportService.cs" />
     <Compile Include="SystemUsage\GDPR\IGDPRExportService.cs" />
-    <Compile Include="SystemUsage\IItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\ReadModels\IItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\Relations\IItsystemUsageRelationsService.cs" />
     <Compile Include="SystemUsage\IItSystemUsageService.cs" />
-    <Compile Include="SystemUsage\ItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\ReadModels\ItsystemUsageOverviewReadModelsService.cs" />
+    <Compile Include="SystemUsage\Relations\ItsystemUsageRelationsService.cs" />
     <Compile Include="SystemUsage\Migration\IItSystemUsageMigrationService.cs" />
     <Compile Include="SystemUsage\Migration\ItSystemUsageMigrationService.cs" />
     <Compile Include="Model\SystemUsage\Migration\ItSystemUsageMigration.cs" />
@@ -208,6 +223,8 @@
     <Compile Include="Contract\ItContractService.cs" />
     <Compile Include="Project\ItProjectService.cs" />
     <Compile Include="Interface\ItInterfaceService.cs" />
+    <Compile Include="SystemUsage\Write\IItSystemUsageWriteService.cs" />
+    <Compile Include="SystemUsage\Write\ItSystemUsageWriteService.cs" />
     <Compile Include="System\IItSystemService.cs" />
     <Compile Include="References\IReferenceService.cs" />
     <Compile Include="System\ItSystemService.cs" />
@@ -216,7 +233,6 @@
     <Compile Include="ExcelImportError.cs" />
     <Compile Include="ExcelService.cs" />
     <Compile Include="Organizations\OrganizationService.cs" />
-    <Compile Include="OrgUnitService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SingleThreadedMailClient.cs" />
     <Compile Include="References\ReferenceService.cs" />

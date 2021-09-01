@@ -10,7 +10,7 @@ class KendoLoaderHelper {
 
     waitForKendoGridData(columnName: protractor.ElementFinder) {
         console.log("Waiting for kendo grid to load");
-        return browser.wait(this.kendoLoadingMaskOff, this.waitUpTo.twentySeconds)
+        return browser.wait(this.kendoLoadingMaskOff, this.waitUpTo.fourtySeconds)
             .then(() => this.waitForKendoGrid(columnName));
     }
 

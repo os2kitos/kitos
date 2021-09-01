@@ -327,7 +327,7 @@ namespace Core.ApplicationServices.System
                     return system;
                 }
 
-                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference, Display.Url);
+                var addReferenceResult = _referenceService.AddReference(systemId, ReferenceRootType.System, "Reference", string.Empty, urlReference);
                 if (addReferenceResult.Failed)
                 {
                     return addReferenceResult.Error;

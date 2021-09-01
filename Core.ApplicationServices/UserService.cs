@@ -9,8 +9,14 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Security.Cryptography;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DomainEvents;
+using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices
 {
@@ -21,6 +27,8 @@ namespace Core.ApplicationServices
         private readonly string _mailSuffix;
         private readonly string _defaultUserPassword;
         private readonly bool _useDefaultUserPassword;
+        private readonly IUserRepository _repository;
+        private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -29,7 +37,8 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
-        private static readonly RNGCryptoServiceProvider rngCsp = new RNGCryptoServiceProvider();
+        private static readonly RNGCryptoServiceProvider rngCsp = new();
+        private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
         public UserService(TimeSpan ttl,
             string baseUrl,
@@ -42,7 +51,9 @@ namespace Core.ApplicationServices
             IMailClient mailClient,
             ICryptoService cryptoService,
             IAuthorizationContext authorizationContext,
-            IDomainEvents domainEvents)
+            IDomainEvents domainEvents,
+            IUserRepository repository,
+            IOrganizationService organizationService)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -56,6 +67,8 @@ namespace Core.ApplicationServices
             _cryptoService = cryptoService;
             _authorizationContext = authorizationContext;
             _domainEvents = domainEvents;
+            _repository = repository;
+            _organizationService = organizationService;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -110,7 +123,7 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                          "<p><a href='"+ KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
                           "<p>Bemærk at denne mail ikke kan besvares.</p>";
 
             IssuePasswordReset(user, subject, content);
@@ -135,7 +148,7 @@ namespace Core.ApplicationServices
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='https://os2.eu/sites/default/files/documents/generelt_-_login_i_kitos_som_ny_bruger.pdf'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                              "<p><a href='"+ KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
                               "<p>Bemærk at denne mail ikke kan besvares.</p>";
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
@@ -218,6 +231,53 @@ namespace Core.ApplicationServices
         public void Dispose()
         {
             _crypt?.Dispose();
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersWithCrossOrganizationPermissions()
+        {
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithCrossOrganizationPermissions());
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role)
+        {
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return Result<IQueryable<User>, OperationError>.Success(_repository.GetUsersWithRoleAssignment(role));
+        }
+
+        public Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries)
+        {
+            return _organizationService
+                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Bind(organization =>
+                {
+                    var query = new IntersectionQuery<User>(queries);
+
+                    return _repository
+                        .GetUsersInOrganization(organization.Id)
+                        .Transform(query.Apply)
+                        .Transform(Result<IQueryable<User>, OperationError>.Success);
+                });
+        }
+
+        public Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid)
+        {
+            return GetUsersInOrganization(organizationUuid)
+                .Select(x => x.ByUuid(userUuid).FromNullable())
+                .Bind(user =>
+                    user.Match<Result<User, OperationError>>
+                    (
+                        foundUser => foundUser,
+                        () => new OperationError("User is not member of the organization", OperationFailure.NotFound)
+                    )
+                );
         }
     }
 }

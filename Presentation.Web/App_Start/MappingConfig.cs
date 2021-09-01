@@ -7,12 +7,12 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models.ItSystemUsage;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Advice = Core.DomainModel.Advice.Advice;
 using ContactPerson = Core.DomainModel.ContactPerson;
 using DataRow = Core.DomainModel.ItSystem.DataRow;
@@ -198,12 +198,6 @@ namespace Presentation.Web
                   .ReverseMap()
                   .IgnoreDestinationEntityFields();
 
-            CreateMap<User, UserOverviewDTO>()
-                .ForMember(dest => dest.DefaultOrganizationUnitId,
-                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnitId : null))
-                  .ForMember(dest => dest.DefaultOrganizationUnitName,
-                      opt => opt.MapFrom(src => src.OrganizationRights.FirstOrDefault() != null ? src.OrganizationRights.First().DefaultOrgUnit.Name : null));
-
             CreateMap<Organization, OrganizationDTO>()
                 .ForMember(dest => dest.Root, opt => opt.MapFrom(src => src.GetRoot()))
                 .ReverseMap()
@@ -247,98 +241,6 @@ namespace Presentation.Web
                 .ForMember(dto => dto.ObjectName, opt => opt.MapFrom(src => src.Object.ItSystem.Name));
             CreateMap<RightInputDTO, ItSystemRight>();
 
-            CreateMap<ItSystemRight, ReportItSystemRightOutputDTO>()
-               .ForMember(dto => dto.roleId, opt => opt.MapFrom(src => src.Role.Id))
-               .ForMember(dto => dto.roleName, opt => opt.MapFrom(src => src.Role.Name))
-               .ForMember(dto => dto.roleisSuggestion, opt => opt.MapFrom(src => src.Role.IsSuggestion))
-               .ForMember(dto => dto.roleHasreadAccess, opt => opt.MapFrom(src => src.Role.HasReadAccess))
-               .ForMember(dto => dto.roleHasWriteAccess, opt => opt.MapFrom(src => src.Role.HasWriteAccess))
-               .ForMember(dto => dto.roleHasreadAccess, opt => opt.MapFrom(src => src.Role.HasReadAccess))
-               .ForMember(dto => dto.roleObjectOwnerId, opt => opt.MapFrom(src => src.Role.ObjectOwnerId))
-               .ForMember(dto => dto.roleLastChanged, opt => opt.MapFrom(src => src.Role.LastChanged))
-               .ForMember(dto => dto.roleLastChangedByUserId, opt => opt.MapFrom(src => src.Role.LastChangedByUserId))
-               .ForMember(dto => dto.roleDescription, opt => opt.MapFrom(src => src.Role.Description))
-               .ForMember(dto => dto.roleIsObligatory, opt => opt.MapFrom(src => src.Role.IsObligatory))
-               .ForMember(dto => dto.roleIsEnabled, opt => opt.MapFrom(src => src.Role.IsEnabled))
-               .ForMember(dto => dto.roleIsLocallyAvailable, opt => opt.MapFrom(src => src.Role.IsLocallyAvailable))
-               .ForMember(dto => dto.rolePriority, opt => opt.MapFrom(src => src.Role.Priority))
-               .ForMember(dto => dto.itSystemRightId, opt => opt.MapFrom(src => src.Id))
-               .ForMember(dto => dto.itSystemRightUserId, opt => opt.MapFrom(src => src.UserId))
-               .ForMember(dto => dto.itSystemRightRoleId, opt => opt.MapFrom(src => src.RoleId))
-               .ForMember(dto => dto.itSystemRightObjectId, opt => opt.MapFrom(src => src.ObjectId))
-               .ForMember(dto => dto.itSystemRightObjectOwnerId, opt => opt.MapFrom(src => src.ObjectOwnerId))
-               .ForMember(dto => dto.itSystemRightLastChanged, opt => opt.MapFrom(src => src.LastChanged))
-               .ForMember(dto => dto.itSystemRightLastChangedByUserId, opt => opt.MapFrom(src => src.LastChangedByUserId))
-               .ForMember(dto => dto.userId, opt => opt.MapFrom(src => src.UserId))
-               .ForMember(dto => dto.userName, opt => opt.MapFrom(src => src.User.Name))
-               .ForMember(dto => dto.userLastName, opt => opt.MapFrom(src => src.User.LastName))
-               .ForMember(dto => dto.userPhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-               .ForMember(dto => dto.userEmail, opt => opt.MapFrom(src => src.User.Email))
-               .ForMember(dto => dto.userPassword, opt => opt.MapFrom(src => src.User.Password))
-               .ForMember(dto => dto.userSalt, opt => opt.MapFrom(src => src.User.Salt))
-               .ForMember(dto => dto.userIsGlobalAdmin, opt => opt.MapFrom(src => src.User.IsGlobalAdmin))
-               .ForMember(dto => dto.userLastAdvisDate, opt => opt.MapFrom(src => src.User.LastAdvisDate))
-               .ForMember(dto => dto.userObjectOwnerId, opt => opt.MapFrom(src => src.User.ObjectOwnerId))
-               .ForMember(dto => dto.userLastChanged, opt => opt.MapFrom(src => src.User.LastChanged))
-               .ForMember(dto => dto.userLastChangedByUserId, opt => opt.MapFrom(src => src.User.LastChangedByUserId))
-               .ForMember(dto => dto.userLockedOutDate, opt => opt.MapFrom(src => src.User.LockedOutDate))
-               .ForMember(dto => dto.userFailedAttempts, opt => opt.MapFrom(src => src.User.FailedAttempts))
-               .ForMember(dto => dto.userDefaultUserStartPreference, opt => opt.MapFrom(src => src.User.DefaultUserStartPreference))
-               .ForMember(dto => dto.ItSystemUsageId, opt => opt.MapFrom(src => src.Object.Id))
-               .ForMember(dto => dto.ItSystemUsageIsStatusActive, opt => opt.MapFrom(src => src.Object.IsStatusActive))
-               .ForMember(dto => dto.ItSystemUsageNote, opt => opt.MapFrom(src => src.Object.Note))
-               .ForMember(dto => dto.ItSystemUsageLocalSystemId, opt => opt.MapFrom(src => src.Object.LocalSystemId))
-               .ForMember(dto => dto.ItSystemUsageVersion, opt => opt.MapFrom(src => src.Object.Version))
-               .ForMember(dto => dto.ItSystemUsageEsdhRef, opt => opt.MapFrom(src => src.Object.EsdhRef))
-               .ForMember(dto => dto.ItSystemUsageCmdbRef, opt => opt.MapFrom(src => src.Object.CmdbRef))
-               .ForMember(dto => dto.ItSystemUsageDirectoryOrUrlRef, opt => opt.MapFrom(src => src.Object.DirectoryOrUrlRef))
-               .ForMember(dto => dto.ItSystemUsageLocalCallName, opt => opt.MapFrom(src => src.Object.LocalCallName))
-               .ForMember(dto => dto.ItSystemUsageOrganizationId, opt => opt.MapFrom(src => src.Object.OrganizationId))
-               .ForMember(dto => dto.ItSystemUsageItSystemId, opt => opt.MapFrom(src => src.Object.ItSystemId))
-               .ForMember(dto => dto.ItSystemUsageArchiveTypeId, opt => opt.MapFrom(src => src.Object.ArchiveTypeId))
-               .ForMember(dto => dto.ItSystemUsageSensitiveDataTypeId, opt => opt.MapFrom(src => src.Object.SensitiveDataTypeId))
-               .ForMember(dto => dto.ItSystemUsageOverviewId, opt => opt.MapFrom(src => src.Object.OverviewId))
-               .ForMember(dto => dto.ItSystemUsageObjectOwnerId, opt => opt.MapFrom(src => src.Object.ObjectOwnerId))
-               .ForMember(dto => dto.ItSystemUsageLastChanged, opt => opt.MapFrom(src => src.Object.LastChanged))
-               .ForMember(dto => dto.ItSystemUsageLastChangedByUserId, opt => opt.MapFrom(src => src.Object.LastChangedByUserId))
-               .ForMember(dto => dto.ItSystemUsageReferenceId, opt => opt.MapFrom(src => src.Object.ReferenceId))
-               .ForMember(dto => dto.ItSystemUsageActive, opt => opt.MapFrom(src => src.Object.Active))
-               .ForMember(dto => dto.ItSystemUsageConcluded, opt => opt.MapFrom(src => src.Object.Concluded))
-               .ForMember(dto => dto.ItSystemUsageExpirationDate, opt => opt.MapFrom(src => src.Object.ExpirationDate))
-               .ForMember(dto => dto.ItSystemUsageTerminated, opt => opt.MapFrom(src => src.Object.Terminated))
-               .ForMember(dto => dto.ItSystemUsageTerminationDeadlineInSystem_Id, opt => opt.MapFrom(src => src.Object.TerminationDeadlineInSystem.Id))
-               .ForMember(dto => dto.ItSystemUsageArchiveDuty, opt => opt.MapFrom(src => src.Object.ArchiveDuty))
-               .ForMember(dto => dto.ItSystemUsageReportedToDPA, opt => opt.MapFrom(src => src.Object.ReportedToDPA))
-               .ForMember(dto => dto.ItSystemUsageDocketNo, opt => opt.MapFrom(src => src.Object.DocketNo))
-               .ForMember(dto => dto.ItSystemUsageArchivedDate, opt => opt.MapFrom(src => src.Object.ArchivedDate))
-               .ForMember(dto => dto.ItSystemUsageArchiveNotes, opt => opt.MapFrom(src => src.Object.ArchiveNotes))
-               .ForMember(dto => dto.ItSystemUsageArchiveLocationId, opt => opt.MapFrom(src => src.Object.ArchiveLocationId))
-               .ForMember(dto => dto.OrganizationId, opt => opt.MapFrom(src => src.Object.Organization.Id))
-               .ForMember(dto => dto.OrganizationName, opt => opt.MapFrom(src => src.Object.Organization.Name))
-               .ForMember(dto => dto.OrganizationCvr, opt => opt.MapFrom(src => src.Object.Organization.Cvr))
-               .ForMember(dto => dto.OrganizationAccessModifier, opt => opt.MapFrom(src => src.Object.Organization.AccessModifier))
-               .ForMember(dto => dto.OrganizationUuid, opt => opt.MapFrom(src => src.Object.Organization.Uuid))
-               .ForMember(dto => dto.OrganizationObjectOwnerId, opt => opt.MapFrom(src => src.Object.Organization.ObjectOwnerId))
-               .ForMember(dto => dto.OrganizationLastChanged, opt => opt.MapFrom(src => src.Object.Organization.LastChanged))
-               .ForMember(dto => dto.OrganizationLastChangedByUserId, opt => opt.MapFrom(src => src.Object.Organization.LastChangedByUserId))
-               .ForMember(dto => dto.OrganizationTypeId, opt => opt.MapFrom(src => src.Object.Organization.TypeId))
-               .ForMember(dto => dto.ItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.Id))
-               .ForMember(dto => dto.ItSystemItSystemId, opt => opt.MapFrom(src => src.Object.ItSystem.ItSystemId))
-               .ForMember(dto => dto.ItSystemParentId, opt => opt.MapFrom(src => src.Object.ItSystem.ParentId))
-               .ForMember(dto => dto.ItSystemBusinessTypeId, opt => opt.MapFrom(src => src.Object.ItSystem.BusinessTypeId))
-               .ForMember(dto => dto.ItSystemName, opt => opt.MapFrom(src => src.Object.ItSystem.Name))
-               .ForMember(dto => dto.ItSystemUuid, opt => opt.MapFrom(src => src.Object.ItSystem.Uuid))
-               .ForMember(dto => dto.ItSystemDescription, opt => opt.MapFrom(src => src.Object.ItSystem.Description))
-               .ForMember(dto => dto.ItSystemAccessModifier, opt => opt.MapFrom(src => src.Object.ItSystem.AccessModifier))
-               .ForMember(dto => dto.ItSystemOrganizationId, opt => opt.MapFrom(src => src.Object.ItSystem.OrganizationId))
-               .ForMember(dto => dto.ItSystemBelongsToId, opt => opt.MapFrom(src => src.Object.ItSystem.BelongsToId))
-               .ForMember(dto => dto.ItSystemObjectOwnerId, opt => opt.MapFrom(src => src.Object.ItSystem.ObjectOwnerId))
-               .ForMember(dto => dto.ItSystemLastChanged, opt => opt.MapFrom(src => src.Object.ItSystem.LastChanged))
-               .ForMember(dto => dto.ItSystemLastChangedByUserId, opt => opt.MapFrom(src => src.Object.ItSystem.LastChangedByUserId))
-               .ForMember(dto => dto.ItSystemDisabled, opt => opt.MapFrom(src => src.Object.ItSystem.Disabled))
-               .ForMember(dto => dto.ItSystemReferenceId, opt => opt.MapFrom(src => src.Object.ItSystem.ReferenceId))
-               .ForMember(dto => dto.ItSystemPreviousName, opt => opt.MapFrom(src => src.Object.ItSystem.PreviousName));
-
             CreateMap<ItProjectRight, RightOutputDTO>();
             CreateMap<RightInputDTO, ItProjectRight>();
 
@@ -380,7 +282,6 @@ namespace Presentation.Web
                 .ForMember(dest => dest.MainContractIsActive, opt => opt.MapFrom(src => src.MainContract.ItContract.IsActive))
                 .ForMember(dest => dest.InterfaceExhibitCount, opt => opt.MapFrom(src => src.ItSystem.ItInterfaceExhibits.Count))
                 .ReverseMap()
-                .ForMember(dest => dest.OrgUnits, opt => opt.Ignore())
                 .ForMember(dest => dest.TaskRefs, opt => opt.Ignore())
                 .ForMember(dest => dest.ItProjects, opt => opt.Ignore())
                 .ForMember(dest => dest.Contracts, opt => opt.Ignore())
@@ -440,14 +341,7 @@ namespace Presentation.Web
                 .ReverseMap();
 
             //Output only - this mapping should not be reversed
-            CreateMap<ItProject, ItProjectCatalogDTO>();
-
-            //Output only - this mapping should not be reversed
             CreateMap<ItProject, ItProjectSimpleDTO>();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItProject, ItProjectOverviewDTO>()
-                .ForMember(dest => dest.ResponsibleOrgUnitName, opt => opt.MapFrom(src => src.ResponsibleUsage.OrganizationUnit.Name));
 
             CreateMap<Handover, HandoverDTO>()
                   .ReverseMap()
@@ -465,12 +359,6 @@ namespace Presentation.Web
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore())
                   .IgnoreDestinationEntityFields();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItContract, ItContractOverviewDTO>();
-
-            //Output only - this mapping should not be reversed
-            CreateMap<ItContract, ItContractPlanDTO>();
 
             //Output only - this mapping should not be reversed
             CreateMap<ItContract, ItContractSystemDTO>()

@@ -8,7 +8,8 @@ using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models;
-using Presentation.Web.Models.GDPR;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.GDPR;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools

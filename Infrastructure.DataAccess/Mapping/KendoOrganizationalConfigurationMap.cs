@@ -1,5 +1,6 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel;
+using Core.DomainModel.KendoConfig;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -9,13 +10,18 @@ namespace Infrastructure.DataAccess.Mapping
         {
             
             Property(x => x.OverviewType)
-                .IsRequired();
+                .IsRequired()
+                .HasIndexAnnotation("KendoOrganizationalConfiguration_OverviewType", 0);
 
-            Property(x => x.Configuration)
+            Property(x => x.Version)
                 .IsRequired();
 
             Property(x => x.OrganizationId)
                 .IsRequired();
+
+            HasMany(x => x.VisibleColumns)
+                .WithRequired(x => x.KendoOrganizationalConfiguration)
+                .HasForeignKey(x => x.KendoOrganizationalConfigurationId);
         }
     }
 }

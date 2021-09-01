@@ -2,7 +2,6 @@
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
@@ -19,7 +18,8 @@ using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Options;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Role;
 
 namespace Core.ApplicationServices.GDPR
 {
@@ -28,7 +28,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDataProcessingRegistrationRepository _repository;
         private readonly IDataProcessingRegistrationNamingService _namingService;
-        private readonly IDataProcessingRegistrationRoleAssignmentsService _roleAssignmentsService;
+        private readonly IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> _roleAssignmentsService;
         private readonly IDataProcessingRegistrationDataResponsibleAssignmentService _dataResponsibleAssigmentService;
         private readonly IReferenceRepository _referenceRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _systemAssignmentService;
@@ -38,14 +38,14 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationOversightOptionsAssignmentService _oversightOptionAssignmentService;
         private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
-        private readonly IGenericRepository<DataProcessingRegistrationRight> _rightRepository;
+        private readonly IOrganizationalUserContext _userContext;
 
 
         public DataProcessingRegistrationApplicationService(
             IAuthorizationContext authorizationContext,
             IDataProcessingRegistrationRepository repository,
             IDataProcessingRegistrationNamingService namingService,
-            IDataProcessingRegistrationRoleAssignmentsService roleAssignmentsService,
+            IRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration> roleAssignmentsService,
             IReferenceRepository referenceRepository,
             IDataProcessingRegistrationDataResponsibleAssignmentService dataResponsibleAssigmentService,
             IDataProcessingRegistrationSystemAssignmentService systemAssignmentService,
@@ -55,7 +55,7 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
-            IGenericRepository<DataProcessingRegistrationRight> rightRepository)
+            IOrganizationalUserContext userContext)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -70,7 +70,7 @@ namespace Core.ApplicationServices.GDPR
             _oversightOptionAssignmentService = oversightOptionAssignmentService;
             _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
-            _rightRepository = rightRepository;
+            _userContext = userContext;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -87,7 +87,8 @@ namespace Core.ApplicationServices.GDPR
             var registration = new DataProcessingRegistration
             {
                 OrganizationId = organizationId,
-                Name = name
+                Name = name,
+                Uuid = Guid.NewGuid()
             };
 
             var dataProcessingRegistration = _repository.Add(registration);
@@ -202,17 +203,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistrationRight, OperationError> RemoveRole(int id, int roleId, int userId)
         {
-            return Modify(id, registration =>
-            {
-                var removeResult = _roleAssignmentsService.RemoveRole(registration, roleId, userId);
-
-                if (removeResult.Ok)
-                {
-                    _rightRepository.Delete(removeResult.Value);
-                }
-
-                return removeResult;
-            });
+            return Modify(id, registration => _roleAssignmentsService.RemoveRole(registration, roleId, userId));
         }
 
         public Result<IEnumerable<ItSystemUsage>, OperationError> GetSystemsWhichCanBeAssigned(int id, string nameQuery, int pageSize)
@@ -502,6 +493,36 @@ namespace Core.ApplicationServices.GDPR
                 registration.OversightCompletedRemark = remark;
                 return registration;
             });
+        }
+
+        public IQueryable<DataProcessingRegistration> Query(params IDomainQuery<DataProcessingRegistration>[] conditions)
+        {
+            var baseQuery = _repository.AsQueryable();
+            var subQueries = new List<IDomainQuery<DataProcessingRegistration>>();
+
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+                subQueries.Add(new QueryByOrganizationIds<DataProcessingRegistration>(_userContext.OrganizationIds));
+
+            subQueries.AddRange(conditions);
+
+            var result = subQueries.Any()
+                ? new IntersectionQuery<DataProcessingRegistration>(subQueries).Apply(baseQuery)
+                : baseQuery;
+
+            return result;
+        }
+
+        public Result<DataProcessingRegistration, OperationError> GetByUuid(Guid uuid)
+        {
+            return _repository
+                .AsQueryable()
+                .ByUuid(uuid)
+                .FromNullable()
+                .Match<Result<DataProcessingRegistration, OperationError>>
+                (
+                    dpr => _authorizationContext.AllowReads(dpr) ? dpr : new OperationError(OperationFailure.Forbidden),
+                    () => new OperationError(OperationFailure.NotFound)
+                );
         }
     }
 }

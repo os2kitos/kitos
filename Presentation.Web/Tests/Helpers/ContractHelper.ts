@@ -24,7 +24,9 @@ class ContractHelper {
             .then(() => this.contractPage.getCreateContractButton().click())
             .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
             .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
+            .then(() => browser.waitForAngular())
             .then(() => this.contractPage.getSaveContractButton().click())
+            .then(() => browser.waitForAngular())
             .then(() => console.log("Contract created"));
     }
 
@@ -72,7 +74,8 @@ class ContractHelper {
         console.log("Removing dpr with name: " + name);
         return this.contractDprPage.getRemoveDprButton(name)
             .click()
-            .then(() => browser.switchTo().alert().accept());
+            .then(() => browser.switchTo().alert().accept())
+            .then(() => browser.waitForAngular());
     }
 
     static clickDpr(dprName: string) { return element(by.linkText(dprName)).click() };

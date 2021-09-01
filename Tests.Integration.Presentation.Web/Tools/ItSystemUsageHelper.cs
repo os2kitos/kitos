@@ -13,7 +13,8 @@ using Core.DomainModel.Organization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Presentation.Web.Models;
-using Presentation.Web.Models.ItSystemUsage;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsage;
 using Tests.Integration.Presentation.Web.ItSystem;
 using Xunit;
 
@@ -154,7 +155,14 @@ namespace Tests.Integration.Presentation.Web.Tools
                     userId = userId
                 });
         }
-        
+
+        public static async Task<HttpResponseMessage> SendOdataDeleteRightRequestAsync(int rightId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"odata/ItSystemRights({rightId})"), cookie);
+        }
+
         public static async Task<HttpResponseMessage> SendSetResponsibleOrganizationUnitRequestAsync(int systemUsageId, int orgUnitId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);

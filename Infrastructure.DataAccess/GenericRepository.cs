@@ -149,21 +149,6 @@ namespace Infrastructure.DataAccess
             _context.Entry(entity).State = EntityState.Modified;
         }
 
-        public void Patch(T entity)
-        {
-            _context.Configuration.ValidateOnSaveEnabled = false;
-            _dbSet.Attach(entity);
-            var entry = _context.Entry(entity);
-            foreach (var propertyInfo in typeof(T).GetProperties())
-            {
-                if (propertyInfo.Name == "Id")
-                    continue; // skip primary key
-
-                if (propertyInfo.GetValue(entity) != null)
-                    entry.Property(propertyInfo.Name).IsModified = true;
-            }
-        }
-
         public IEnumerable<T> SQL(string sql)
         {
             return _dbSet.SqlQuery(sql);

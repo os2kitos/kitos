@@ -29,14 +29,6 @@ module Kitos.Utility.KendoGrid {
         schemaMutation: (map: any) => void;
     }
 
-    export interface IKendoGridExcelOnlyColumn<TDataSource> {
-        id: string;
-        title: string;
-        width: number;
-        template: (dataItem: TDataSource) => string;
-        dependOnColumnId: string | null;
-    }
-
     export interface IKendoParameter {
         textValue: string;
         remoteValue: any;
@@ -51,11 +43,11 @@ module Kitos.Utility.KendoGrid {
 
     export interface IKendoGridExcelOnlyColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
-        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
-        build(): IKendoGridExcelOnlyColumn<TDataSource>;
+        build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
     export interface IKendoGridColumnBuilder<TDataSource> {
@@ -81,7 +73,7 @@ module Kitos.Utility.KendoGrid {
         private standardWidth: number = 150;
         private title: string = null;
         private id: string = null;
-        private dependOnColumnId: string = null;
+        private dataSourceName: string = null;
         private excelOutput: (source: TDataSource) => string = null;
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
@@ -93,6 +85,12 @@ module Kitos.Utility.KendoGrid {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
             if (id == null) throw "id must be defined";
             this.id = id;
+            return this;
+        }
+
+        withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (name == null) throw "name must be defined";
+            this.dataSourceName = name;
             return this;
         }
 
@@ -108,30 +106,31 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
-        dependOnColumnWithId(columnId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
-            if (columnId == null) throw "columnId must be defined";
-            this.dependOnColumnId = columnId;
-            return this;
-        }
-
         private checkRequiredField(name: string, value: any) {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
             }
         }
 
-        build(): IKendoGridExcelOnlyColumn<TDataSource> {
+        build(): IExtendedKendoGridColumn<TDataSource> {
             this.checkRequiredField("title", this.title);
             this.checkRequiredField("id", this.id);
+            this.checkRequiredField("dataSourceName", this.dataSourceName);
             this.checkRequiredField("excelOutput", this.excelOutput);
 
             return {
+                field: this.dataSourceName,
                 title: this.title,
+                attributes: [],
                 width: this.standardWidth,
-                id: this.id,
-                template: (dataItem => this.excelOutput(dataItem)),
-                dependOnColumnId: this.dependOnColumnId
-            } as IKendoGridExcelOnlyColumn<TDataSource>;
+                persistId: `${this.id}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")this.id,
+                excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
+                filterable: false,
+                sortable: false,
+                hidden: true, // Always invisible
+                menu: false, //Never selectable in menu or visible in anything but excel sheets
+                schemaMutation: () => {}
+            } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
 
@@ -465,8 +464,7 @@ module Kitos.Utility.KendoGrid {
         private user: Services.IUser = null;
         private urlFactory: UrlFactory = null;
         private customToolbarEntries: IKendoToolbarEntry[] = [];
-        private columns: ColumnConstruction<TDataSource>[] = [];
-        private excelOnlyColumns: ExcelOnlyColumnConstruction<TDataSource>[] = [];
+        private columnFactories: (()=>IExtendedKendoGridColumn<TDataSource>)[] = [];
         private responseParser: ResponseParser<TDataSource> = response => response;
         private parameterMapper: ParameterMapper = (data, type) => null;
         private overviewType: Models.Generic.OverviewType = null;
@@ -504,13 +502,21 @@ module Kitos.Utility.KendoGrid {
 
         withColumn(build: ColumnConstruction<TDataSource>): IKendoGridLauncher<TDataSource> {
             if (!build) throw "build must be defined";
-            this.columns.push(build);
+            this.columnFactories.push(() => {
+                const builder = new KendoGridColumnBuilder<TDataSource>();
+                build(builder);
+                return builder.build();
+            });
             return this;
         }
 
         withExcelOnlyColumn(build: (builder: IKendoGridExcelOnlyColumnBuilder<TDataSource>) => void): IKendoGridLauncher<TDataSource> {
             if (!build) throw "build must be defined";
-            this.excelOnlyColumns.push(build);
+            this.columnFactories.push(() => {
+                const builder = new KendoGridExcelOnlyColumnBuilder<TDataSource>();
+                build(builder);
+                return builder.build();
+            });
             return this;
         }
 
@@ -616,12 +622,39 @@ module Kitos.Utility.KendoGrid {
             return this.gridState.doesGridProfileExist();
         }
 
+        saveGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil gemme nuværende kolonneopsætning af felter som standard til ${this.user.currentOrganizationName}`)) {
+                this.gridState.saveGridOrganizationalConfiguration(this.gridBinding.mainGrid, this.overviewType);
+            }
+        }
+
+        clearGridForOrganization() {
+            if (confirm(`Er du sikker på at du vil slette standard kolonneopsætning af felter til ${this.user.currentOrganizationName}`)) {
+                this.gridState.deleteGridOrganizationalConfiguration(this.overviewType);
+            }
+        }
+
+        showGridForOrganizationButtons() {
+            if (this.overviewType !== null) {
+                return this.user.isLocalAdmin;
+            }
+            return false;
+        }
+
+        canDeleteGridForOrganization() {
+            return this.gridState.canDeleteGridOrganizationalConfiguration();
+        }
+
+        doesGridDivergeFromDefault() {
+            return this.gridState.doesGridDivergeFromOrganizationalConfiguration(this.overviewType, this.gridBinding.mainGrid);
+        }
+
         // clears grid filters by removing the localStorageItem and reloading the page
         clearOptions() {
             this.gridState.removeProfile();
             this.gridState.removeLocal();
             this.gridState.removeSession();
-            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
+            this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge gendannet til standardopsætning ");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
         }
@@ -631,22 +664,7 @@ module Kitos.Utility.KendoGrid {
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-            var additionalColumns = [];
-            this._.forEach(this.excelOnlyColumns,
-                build => {
-                    const builder = new KendoGridExcelOnlyColumnBuilder<TDataSource>();
-                    build(builder);
-                    const column = builder.build();
-                    additionalColumns.push({
-                        title: column.title,
-                        persistId: column.id,
-                        width: column.width,
-                        template: (dataItem: any) => column.template(dataItem),
-                        dependOnColumnPersistId: column.dependOnColumnId
-                    });
-                });
-
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, additionalColumns);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
         }
 
         private checkRequiredField(name: string, value: any) {
@@ -693,16 +711,22 @@ module Kitos.Utility.KendoGrid {
                     saveGridProfile: () => this.saveGridProfile(),
                     loadGridProfile: () => this.loadGridProfile(),
                     clearGridProfile: () => this.clearGridProfile(),
-                    doesGridProfileExist: () => this.doesGridProfileExist()
+                    doesGridProfileExist: () => this.doesGridProfileExist(),
+                    saveGridForOrganization: () => this.saveGridForOrganization(),
+                    clearGridForOrganization: () => this.clearGridForOrganization(),
+                    showGridForOrganizationButtons: () => this.showGridForOrganizationButtons(),
+                    canDeleteGridForOrganization: () => this.canDeleteGridForOrganization(),
+                    doesGridDivergeFromDefault: () => this.doesGridDivergeFromDefault(),
+                    gridDivergenceText: () => this.doesGridDivergeFromDefault() ? "OBS: Opsætning af overblik afviger fra kommunens standardoverblik. Tryk på 'Gendan kolonneopsætning' for at benytte den gældende opsætning" : ""
                 }
             };
 
             var toolbar = [
                 {
                     name: "clearFilter",
-                    text: "Nulstil",
+                    text: "Gendan kolonneopsætning",
                     template:
-                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text #</button>"
+                        "<button data-element-type='resetFilterButton' type='button' class='k-button k-button-icontext' title='{{kendoVm.standardToolbar.gridDivergenceText()}}' data-ng-click='kendoVm.standardToolbar.clearOptions()'>#: text # <i class='fa fa-exclamation-circle warning-icon-right-of-text' ng-if='kendoVm.standardToolbar.doesGridDivergeFromDefault()'></i></button>"
                 },
                 {
                     name: "saveFilter",
@@ -721,6 +745,16 @@ module Kitos.Utility.KendoGrid {
                     text: "Slet filter",
                     template:
                         "<button data-element-type='removeFilterButton' type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='kendoVm.standardToolbar.clearGridProfile()' data-ng-disabled='!kendoVm.standardToolbar.doesGridProfileExist()'>#: text #</button>"
+                },
+                {
+                    name: "filterOrg",
+                    text: "Gem kolonneopsætning for organisation",
+                    template: "<button data-element-type='filterOrgButton' type='button' class='k-button k-button-icontext' title='Gem kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.saveGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
+                },
+                {
+                    name: "removeFilterOrg",
+                    text: "Slet kolonneopsætning for organisation",
+                    template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
 
@@ -767,6 +801,7 @@ module Kitos.Utility.KendoGrid {
                                         var selectedId = e.sender.value();
                                         const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
                                         entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                                        this.saveGridOptions();
                                     }
                                 }
                             }
@@ -780,11 +815,9 @@ module Kitos.Utility.KendoGrid {
             //Build the columns
             var columns = [];
             var schemaFields = {};
-            this._.forEach(this.columns,
-                build => {
-                    const builder = new KendoGridColumnBuilder<TDataSource>();
-                    build(builder);
-                    const gridColumn = builder.build();
+            this._.forEach(this.columnFactories,
+                factory => {
+                    const gridColumn = factory();
                     gridColumn.schemaMutation(schemaFields);
                     columns.push(gridColumn);
                 });

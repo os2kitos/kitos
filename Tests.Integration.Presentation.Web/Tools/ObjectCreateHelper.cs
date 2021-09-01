@@ -1,6 +1,7 @@
 ﻿using Presentation.Web.Models;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using AutoFixture;
+using Presentation.Web.Models.API.V1;
 
 namespace Tests.Integration.Presentation.Web.Tools
 {

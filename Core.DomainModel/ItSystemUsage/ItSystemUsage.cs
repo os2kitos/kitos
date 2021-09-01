@@ -10,41 +10,45 @@ using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Infrastructure.Services.Types;
+using Core.DomainModel.Notification;
+using System;
+using Core.DomainModel.ItSystem.DataTypes;
+using Infrastructure.Services.Extensions;
 
 namespace Core.DomainModel.ItSystemUsage
 {
-    using Core.DomainModel.Notification;
-    using ItSystem.DataTypes;
-    using System;
-    using System.ComponentModel.DataAnnotations.Schema;
-
-    using ItSystem = Core.DomainModel.ItSystem.ItSystem;
-
     /// <summary>
     /// Represents an organisation's usage of an it system.
     /// </summary>
-    public class ItSystemUsage : HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>, ISystemModule, IOwnedByOrganization, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithAdvices, IEntityWithUserNotification
+    public class ItSystemUsage :
+        HasRightsEntity<ItSystemUsage, ItSystemRight, ItSystemRole>,
+        ISystemModule,
+        IEntityWithExternalReferences,
+        IHasAttachedOptions,
+        IEntityWithAdvices,
+        IEntityWithUserNotification,
+        IHasUuid
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
         public const int LinkNameMaxLength = 150;
-        
+
 
         public ItSystemUsage()
         {
-            this.Contracts = new List<ItContractItSystemUsage>();
-            this.ArchivePeriods = new List<ArchivePeriod>();
-            this.OrgUnits = new List<OrganizationUnit>();
-            this.TaskRefs = new List<TaskRef>();
-            this.AccessTypes = new List<AccessType>();
-            this.TaskRefsOptOut = new List<TaskRef>();
-            this.UsedBy = new List<ItSystemUsageOrgUnitUsage>();
-            this.ItProjects = new List<ItProject.ItProject>();
+            Contracts = new List<ItContractItSystemUsage>();
+            ArchivePeriods = new List<ArchivePeriod>();
+            TaskRefs = new List<TaskRef>();
+            AccessTypes = new List<AccessType>();
+            TaskRefsOptOut = new List<TaskRef>();
+            UsedBy = new List<ItSystemUsageOrgUnitUsage>();
+            ItProjects = new List<ItProject.ItProject>();
             ExternalReferences = new List<ExternalReference>();
             UsageRelations = new List<SystemRelation>();
             UsedByRelations = new List<SystemRelation>();
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
             UserNotifications = new List<UserNotification>();
+            Uuid = Guid.NewGuid();
         }
 
         public bool IsActive
@@ -62,19 +66,6 @@ namespace Core.DomainModel.ItSystemUsage
                         endDate = ExpirationDate.Value.Date.AddDays(1).AddTicks(-1);
                     }
 
-                    if (this.Terminated.HasValue)
-                    {
-                        var terminationDate = this.Terminated;
-                        if (this.TerminationDeadlineInSystem != null)
-                        {
-                            int deadline;
-                            int.TryParse(this.TerminationDeadlineInSystem.Name, out deadline);
-                            terminationDate = this.Terminated.Value.AddMonths(deadline);
-                        }
-                        // indgået-dato <= dags dato <= opsagt-dato + opsigelsesfrist
-                        return today >= startDate.Date && today <= terminationDate.Value.Date.AddDays(1).AddTicks(-1);
-                    }
-
                     // indgået-dato <= dags dato <= udløbs-dato
                     return today >= startDate.Date && today <= endDate;
                 }
@@ -83,7 +74,7 @@ namespace Core.DomainModel.ItSystemUsage
         }
 
         /// <summary>
-        ///     Gets or sets Active.
+        ///     Gets or sets Active. (Enforces Active state. For more info: <see cref="IsActive"/>)
         /// </summary>
         /// <value>
         ///   Active.
@@ -106,32 +97,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// </value>
         public DateTime? ExpirationDate { get; set; }
 
-        /// <summary>
-        ///     Date the system ends. (opsagt)
-        /// </summary>
-        /// <value>
-        ///     The termination date.
-        /// </value>
-        public DateTime? Terminated { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the termination deadline option. (opsigelsesfrist)
-        /// </summary>
-        /// <remarks>
-        ///     Added months to the <see cref="Terminated" /> contract termination date before the contract expires.
-        ///     It's a string but should be treated as an int.
-        /// </remarks>
-        /// <value>
-        ///     The termination deadline.
-        /// </value>
-        public virtual TerminationDeadlineTypesInSystem TerminationDeadlineInSystem { get; set; }
-        /// <summary>
-        /// Gets or sets a value indicating whether this instance's status is active.
-        /// </summary>
-        /// <value>
-        /// <c>true</c> if this instance's status is active; otherwise, <c>false</c>.
-        /// </value>
-        public bool IsStatusActive { get; set; }
         /// <summary>
         /// Gets or sets the note.
         /// </summary>
@@ -156,27 +121,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The version.
         /// </value>
         public string Version { get; set; }
-        /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern ESDH system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to ESDH system.
-        /// </value>
-        public string EsdhRef { get; set; }
-        /// <summary>
-        /// Gets or sets a reference to relevant documents in an extern CMDB system.
-        /// </summary>
-        /// <value>
-        /// Extern reference  to CMDB system.
-        /// </value>
-        public string CmdbRef { get; set; }
-        /// <summary>
-        /// Gets or sets a path or url to relevant documents.
-        /// </summary>
-        /// <value>
-        /// Path or url relevant documents.
-        /// </value>
-        public string DirectoryOrUrlRef { get; set; }
         /// <summary>
         /// Gets or sets the local call system.
         /// </summary>
@@ -208,25 +152,13 @@ namespace Core.DomainModel.ItSystemUsage
         /// <value>
         /// It system.
         /// </value>
-        public virtual ItSystem ItSystem { get; set; }
+        public virtual ItSystem.ItSystem ItSystem { get; set; }
 
         public int? ArchiveTypeId { get; set; }
         public virtual ArchiveType ArchiveType { get; set; }
 
         public int? SensitiveDataTypeId { get; set; }
         public virtual SensitiveDataType SensitiveDataType { get; set; }
-
-        public int? OverviewId { get; set; }
-        /// <summary>
-        /// Gets or sets the it system usage that is set to be displayed on the it system overview page.
-        /// </summary>
-        /// <remarks>
-        /// It's the it system name that is actually displayed.
-        /// </remarks>
-        /// <value>
-        /// The overview it system.
-        /// </value>
-        public virtual ItSystemUsage Overview { get; set; }
 
         /// <summary>
         /// Gets or sets the main it contract for this instance.
@@ -244,13 +176,6 @@ namespace Core.DomainModel.ItSystemUsage
         /// The contracts.
         /// </value>
         public virtual ICollection<ItContractItSystemUsage> Contracts { get; set; }
-        /// <summary>
-        /// Gets or sets the organization units associated with this instance.
-        /// </summary>
-        /// <value>
-        /// The organization units.
-        /// </value>
-        public virtual ICollection<OrganizationUnit> OrgUnits { get; set; }
         /// <summary>
         /// Gets or sets the organization units that are using this instance.
         /// </summary>
@@ -297,6 +222,12 @@ namespace Core.DomainModel.ItSystemUsage
             return new AddReferenceCommand(this).AddExternalReference(newReference);
         }
 
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
+        }
+
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
             Reference = newReference;
@@ -308,13 +239,6 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
-
-        public bool? ReportedToDPA { get; set; }
-
-        public string DocketNo { get; set; }
-
-        [Column(TypeName = "date")]
-        public DateTime? ArchivedDate { get; set; }
 
         public string ArchiveNotes { get; set; }
 
@@ -343,13 +267,7 @@ namespace Core.DomainModel.ItSystemUsage
 
         public virtual ItSystemCategories ItSystemCategories { get; set; }
 
-
-
-
         public UserCount UserCount { get; set; }
-
-        public string systemCategories { get; set; }
-
 
         #region GDPR
         public string GeneralPurpose { get; set; }
@@ -363,6 +281,18 @@ namespace Core.DomainModel.ItSystemUsage
         public virtual ICollection<ItSystemUsageSensitiveDataLevel> SensitiveDataLevels { get; set; }
 
         public DataOptions? precautions { get; set; }
+
+        public IEnumerable<TechnicalPrecaution> GetTechnicalPrecautions()
+        {
+            if (precautionsOptionsAccessControl)
+                yield return TechnicalPrecaution.AccessControl;
+            if (precautionsOptionsEncryption)
+                yield return TechnicalPrecaution.Encryption;
+            if (precautionsOptionsLogning)
+                yield return TechnicalPrecaution.Logging;
+            if (precautionsOptionsPseudonomisering)
+                yield return TechnicalPrecaution.Pseudonymization;
+        }
         public bool precautionsOptionsEncryption { get; set; }
         public bool precautionsOptionsPseudonomisering { get; set; }
         public bool precautionsOptionsAccessControl { get; set; }
@@ -502,6 +432,10 @@ namespace Core.DomainModel.ItSystemUsage
         {
             return UsageRelations.FirstOrDefault(r => r.Id == relationId);
         }
+        public Maybe<SystemRelation> GetUsageRelation(Guid systemRelationUuid)
+        {
+            return UsageRelations.SingleOrDefault(x => x.Uuid == systemRelationUuid);
+        }
 
         private Result<SystemRelation, OperationError> UpdateRelation(
             SystemRelation relation,
@@ -557,6 +491,411 @@ namespace Core.DomainModel.ItSystemUsage
         private bool SensitiveDataLevelExists(SensitiveDataLevel sensitiveDataLevel)
         {
             return SensitiveDataLevels.Any(x => x.SensitivityDataLevel == sensitiveDataLevel);
+        }
+
+        public Guid Uuid { get; set; }
+
+        public Maybe<OperationError> UpdateLocalCallName(string localCallName)
+        {
+            if (LocalCallName != localCallName)
+            {
+                if (localCallName is { Length: > DefaultMaxLength })
+                    return new OperationError($"{nameof(localCallName)} is too large", OperationFailure.BadInput);
+                LocalCallName = localCallName;
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateLocalSystemId(string localSystemId)
+        {
+            if (LocalSystemId != localSystemId)
+            {
+                if (localSystemId is { Length: > LongProperyMaxLength })
+                    return new OperationError($"{nameof(localSystemId)} is too large", OperationFailure.BadInput);
+                LocalSystemId = localSystemId;
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSystemCategories()
+        {
+            ItSystemCategoriesId = null;
+        }
+
+        public Maybe<OperationError> UpdateSystemCategories(ItSystemCategories newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ItSystemCategories == null || ItSystemCategories.Id != newValue.Id)
+            {
+                ItSystemCategories = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateSystemVersion(string version)
+        {
+            if (Version != version)
+            {
+                if (version is { Length: > DefaultMaxLength })
+                    return new OperationError($"{nameof(version)} is too large", OperationFailure.BadInput);
+                Version = version;
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetUserCount()
+        {
+            UserCount = UserCount.BELOWTEN;
+        }
+
+        public Maybe<OperationError> SetExpectedUsersInterval((int lower, int? upperBound) newIntervalValue)
+        {
+            switch (newIntervalValue)
+            {
+                case (0, 9):
+                    UserCount = UserCount.BELOWTEN;
+                    break;
+                case (10, 50):
+                    UserCount = UserCount.TENTOFIFTY;
+                    break;
+                case (50, 100):
+                    UserCount = UserCount.FIFTYTOHUNDRED;
+                    break;
+                case (100, null):
+                case (100, int.MaxValue):
+                    UserCount = UserCount.HUNDREDPLUS;
+                    break;
+                default:
+                    return new OperationError("Invalid user count. Please refer to input documentation", OperationFailure.BadInput);
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetMainContract()
+        {
+            MainContract?.Track();
+            MainContract = null;
+        }
+
+        public Maybe<OperationError> SetMainContract(ItContract.ItContract contract)
+        {
+            if (contract == null)
+                throw new ArgumentNullException(nameof(contract));
+
+            if (MainContract == null || contract.Id != MainContract.ItContractId)
+            {
+                if (contract.OrganizationId != OrganizationId)
+                    return new OperationError("Contract must belong to same organization as this usage", OperationFailure.BadInput);
+
+                var contractAssociation = Contracts.FirstOrDefault(c => c.ItContractId == contract.Id);
+
+                if (contractAssociation == null)
+                    return new OperationError("The provided contract is not associated with this system usage", OperationFailure.BadInput);
+
+                ResetMainContract();
+                MainContract = contractAssociation;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetProjectAssociations()
+        {
+            ItProjects.Clear();
+        }
+
+        public Maybe<OperationError> SetProjectAssociations(IEnumerable<ItProject.ItProject> projects)
+        {
+            var itProjects = projects.ToList();
+
+            if (itProjects.Select(x => x.Uuid).Distinct().Count() != itProjects.Count)
+                return new OperationError("projects must not contain duplicates", OperationFailure.BadInput);
+
+            if (itProjects.Any(project => project.OrganizationId != OrganizationId))
+                return new OperationError("All projects must belong to same organization as this system usage", OperationFailure.BadInput);
+
+            itProjects.MirrorTo(ItProjects, p => p.Uuid);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateSystemValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
+        {
+            var validFromDate = newValidFrom?.Date;
+            var validToDate = newValidTo?.Date;
+
+            if (validFromDate.HasValue && validToDate.HasValue && validFromDate.Value.Date > validToDate.Value.Date)
+            {
+                return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
+            }
+
+            Concluded = validFromDate;
+
+            ExpirationDate = validToDate;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetOrganizationalUsage()
+        {
+            UsedBy.Clear();
+            ResponsibleUsage.Track();
+            ResponsibleUsage = null;
+        }
+
+        public Maybe<OperationError> UpdateOrganizationalUsage(IEnumerable<OrganizationUnit> usingOrganizationUnits, Maybe<OrganizationUnit> responsibleOrgUnit)
+        {
+            var organizationUnits = usingOrganizationUnits?.ToList();
+            if (organizationUnits == null)
+                throw new ArgumentNullException(nameof(organizationUnits));
+
+            if (organizationUnits.Any(x => x.OrganizationId != OrganizationId))
+                return new OperationError("Using Organization units must belong to the same organization as the system usage", OperationFailure.BadInput);
+
+            if (organizationUnits.Select(x => x.Uuid).Distinct().Count() != organizationUnits.Count)
+                return new OperationError("No duplicates allowed in using org units", OperationFailure.BadInput);
+
+            if (responsibleOrgUnit.HasValue && (organizationUnits.Any(unit => unit.Uuid == responsibleOrgUnit.Value.Uuid) == false))
+                return new OperationError("Responsible org unit must be one of the using organizations", OperationFailure.BadInput);
+
+            var newOrgUnitUsages = organizationUnits.Select(organizationUnit => new ItSystemUsageOrgUnitUsage
+            {
+                ItSystemUsage = this,
+                OrganizationUnit = organizationUnit
+            }).ToList();
+
+            newOrgUnitUsages.MirrorTo(UsedBy, usedBy => usedBy.OrganizationUnit.Uuid);
+
+            ResponsibleUsage = responsibleOrgUnit
+                .Select(orgUnit => UsedBy.Single(x => x.OrganizationUnit.Uuid == orgUnit.Uuid))
+                .GetValueOrDefault();
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateKLEDeviations(IEnumerable<TaskRef> additions, IEnumerable<TaskRef> removals)
+        {
+            if (additions == null)
+                throw new ArgumentNullException(nameof(additions));
+
+            if (removals == null)
+                throw new ArgumentNullException(nameof(removals));
+
+            var optIn = additions.ToList();
+            var optOut = removals.ToList();
+
+            var optInIds = optIn.Select(x => x.Uuid).Distinct().ToList();
+            var optOutIds = optOut.Select(x => x.Uuid).Distinct().ToList();
+
+            if (optInIds.Count != optIn.Count)
+                return new OperationError("Duplicates in KLE Additions are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Count != optOut.Count)
+                return new OperationError("Duplicates in KLE Removals are not allowed", OperationFailure.BadInput);
+
+            if (optOutIds.Intersect(optInIds).Any())
+                return new OperationError("KLE cannot be both added and removed", OperationFailure.BadInput);
+
+            var systemTaskRefIds = ItSystem.TaskRefs.Select(x => x.Uuid).ToHashSet();
+
+            if (optInIds.Any(systemTaskRefIds.Contains))
+                return new OperationError("Cannot ADD KLE which is already present in the system context", OperationFailure.BadInput);
+
+            if (optOutIds.Any(id => systemTaskRefIds.Contains(id) == false))
+                return new OperationError("Cannot Remove KLE which is not present in the system context", OperationFailure.BadInput);
+
+            optIn.MirrorTo(TaskRefs, x => x.Uuid);
+            optOut.MirrorTo(TaskRefsOptOut, x => x.Uuid);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public override ItSystemRight CreateNewRight(ItSystemRole role, User user)
+        {
+            return new ItSystemRight
+            {
+                Role = role,
+                User = user,
+                Object = this
+            };
+        }
+
+        public void ResetArchiveType()
+        {
+            ArchiveType.Track();
+            ArchiveType = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveType(ArchiveType newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveType == null || ArchiveType.Id != newValue.Id)
+            {
+                ArchiveType = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveLocation()
+        {
+            ArchiveLocation.Track();
+            ArchiveLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveLocation(ArchiveLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveLocation == null || ArchiveLocation.Id != newValue.Id)
+            {
+                ArchiveLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveTestLocation()
+        {
+            ArchiveTestLocation.Track();
+            ArchiveTestLocation = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveTestLocation(ArchiveTestLocation newValue)
+        {
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            if (ArchiveTestLocation == null || ArchiveTestLocation.Id != newValue.Id)
+            {
+                ArchiveTestLocation = newValue;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetArchiveSupplierOrganization()
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            ArchiveSupplier = "";
+            SupplierId = null;
+        }
+
+        public Maybe<OperationError> UpdateArchiveSupplierOrganization(Organization.Organization newValue)
+        {
+            //TODO: Revisit this once https://os2web.atlassian.net/browse/KITOSUDV-2118 is resolved
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+
+            ArchiveSupplier = newValue.Name;
+
+            if (SupplierId != newValue.Id)
+            {
+                SupplierId = newValue.Id;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<ArchivePeriod>, OperationError> ResetArchivePeriods()
+        {
+            var periodsToRemove = ArchivePeriods.ToList();
+            ArchivePeriods.Clear();
+            return periodsToRemove;
+        }
+
+        public Result<ArchivePeriod, OperationError> AddArchivePeriod(DateTime startDate, DateTime endDate, string archiveId, bool approved)
+        {
+            if(startDate.Date > endDate.Date)
+                return new OperationError($"StartDate: {startDate.Date} cannot be before EndDate: {endDate.Date}", OperationFailure.BadInput);
+
+            var newPeriod = new ArchivePeriod()
+            {
+                Approved = approved,
+                UniqueArchiveId = archiveId,
+                StartDate = startDate,
+                EndDate = endDate,
+                ItSystemUsage = this
+            };
+
+            ArchivePeriods.Add(newPeriod);
+            return newPeriod;
+        }
+
+        public Maybe<OperationError> UpdateDataSensitivityLevels(IEnumerable<SensitiveDataLevel> sensitiveDataLevels)
+        {
+            if (sensitiveDataLevels == null)
+                throw new ArgumentNullException(nameof(sensitiveDataLevels));
+
+            var levels = sensitiveDataLevels.ToList();
+
+            if (levels.Distinct().Count() != levels.Count)
+                return new OperationError("Duplicate sensitivity levels are not allowed", OperationFailure.BadInput);
+
+            var levelMappings = levels.Select(sensitiveDataLevel => new ItSystemUsageSensitiveDataLevel()
+            {
+                ItSystemUsage = this,
+                SensitivityDataLevel = sensitiveDataLevel
+            }).ToList();
+
+            levelMappings.MirrorTo(SensitiveDataLevels, x => x.SensitivityDataLevel);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateTechnicalPrecautions(IEnumerable<TechnicalPrecaution> technicalPrecautions)
+        {
+            if (technicalPrecautions == null)
+                throw new ArgumentNullException(nameof(technicalPrecautions));
+
+            var enabledPrecautions = technicalPrecautions.ToList();
+
+            if (enabledPrecautions.Count != enabledPrecautions.Distinct().Count())
+                return new OperationError("Duplicates are not allowed in technical precautions", OperationFailure.BadInput);
+
+            var disabledPrecautions = Enum.GetValues(typeof(TechnicalPrecaution)).Cast<TechnicalPrecaution>().Except(enabledPrecautions).ToList();
+
+            var changeSet = enabledPrecautions
+                .Select(p =>
+                    new
+                    {
+                        Enabled = true,
+                        Precaution = p
+                    }).Concat(disabledPrecautions.Select(p => new
+                    {
+                        Enabled = false,
+                        Precaution = p
+
+                    }));
+
+            foreach (var change in changeSet)
+            {
+                switch (change.Precaution)
+                {
+                    case TechnicalPrecaution.Encryption:
+                        precautionsOptionsEncryption = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Pseudonymization:
+                        precautionsOptionsPseudonomisering = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.AccessControl:
+                        precautionsOptionsAccessControl = change.Enabled;
+                        break;
+                    case TechnicalPrecaution.Logging:
+                        precautionsOptionsLogning = change.Enabled;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return Maybe<OperationError>.None;
         }
     }
 }

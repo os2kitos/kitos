@@ -93,6 +93,15 @@ using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Notifications;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainServices.Repositories.TaskRefs;
+using Core.ApplicationServices.Rights;
+using Core.ApplicationServices.SystemUsage.ReadModels;
+using Core.ApplicationServices.SystemUsage.Relations;
+using Core.ApplicationServices.SystemUsage.Write;
+using Core.DomainServices.Generic;
+using Core.DomainServices.Organizations;
+using Core.DomainServices.Role;
+using Infrastructure.Ninject.DomainServices;
+using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -178,6 +187,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItSystemService>().To<ItSystemService>().InCommandScope(Mode);
             kernel.Bind<IItProjectService>().To<ItProjectService>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageService>().To<ItSystemUsageService>().InCommandScope(Mode);
+            kernel.Bind<IItsystemUsageRelationsService>().To<ItsystemUsageRelationsService>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
@@ -193,7 +204,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationOptionsApplicationService>().To<DataProcessingRegistrationOptionsApplicationService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationNamingService>().To<DataProcessingRegistrationNamingService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationSystemAssignmentService>().To<DataProcessingRegistrationSystemAssignmentService>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingRegistrationRoleAssignmentsService>().To<DataProcessingRegistrationRoleAssignmentsService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationReadModelService>().To<DataProcessingRegistrationReadModelService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationDataProcessorAssignmentService>().To<DataProcessingRegistrationDataProcessorAssignmentService>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationInsecureCountriesAssignmentService>().To<DataProcessingRegistrationInsecureCountriesAssignmentService>().InCommandScope(Mode);
@@ -211,6 +221,11 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserNotificationService>().To<UserNotificationService>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
+            kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
+
+            //Role assignment services
+            RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
+            RegisterRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(kernel);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -227,9 +242,17 @@ namespace Presentation.Web.Ninject
             RegisterOptions(kernel);
             RegisterBackgroundJobs(kernel);
             RegisterSSO(kernel);
+            RegisterMappers(kernel);
 
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
+            kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
+        }
+
+        private void RegisterMappers(IKernel kernel)
+        {
+            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -249,7 +272,7 @@ namespace Presentation.Web.Ninject
 
         private void RegisterDomainEventsEngine(IKernel kernel)
         {
-            kernel.Bind<IDomainEvents>().To<DomainEvents>().InCommandScope(Mode);
+            kernel.Bind<IDomainEvents>().To<NinjectDomainEventsAdapter>().InCommandScope(Mode);
             RegisterDomainEvent<ExposingSystemChanged, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, RelationSpecificInterfaceEventsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, UnbindBrokenReferenceReportsOnSourceDeletedHandler>(kernel);
@@ -321,35 +344,72 @@ namespace Presentation.Web.Ninject
 
         private void RegisterOptions(IKernel kernel)
         {
-            //DomainService bindings
-            kernel.Bind<IOptionsService<SystemRelation, RelationFrequencyType>>()
-                .To<OptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>>().InCommandScope(Mode);
+            //Data processing registrations
+            RegisterOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole>>()
-                .To<OptionsService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, LocalDataProcessingRegistrationRole>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingCountryOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingCountryOption, LocalDataProcessingCountryOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingBasisForTransferOption, LocalDataProcessingBasisForTransferOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingDataResponsibleOption, LocalDataProcessingDataResponsibleOption>>().InCommandScope(Mode);
+            RegisterOptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>(kernel);
 
-            kernel.Bind<IOptionsService<DataProcessingRegistration, DataProcessingOversightOption>>()
-                .To<OptionsService<DataProcessingRegistration, DataProcessingOversightOption, LocalDataProcessingOversightOption>>().InCommandScope(Mode);
+            //IT-System
+            RegisterOptionsService<ItSystem, BusinessType, LocalBusinessType>(kernel);
 
-            kernel.Bind<IOptionsService<ItSystem, BusinessType>>()
-               .To<OptionsService<ItSystem, BusinessType, LocalBusinessType>>().InCommandScope(Mode);
+            RegisterOptionsService<ItSystem, SensitivePersonalDataType, LocalSensitivePersonalDataType>(kernel);
 
-            kernel.Bind<IOptionsService<ItSystemRight, ItSystemRole>>()
-                .To<OptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>>().InCommandScope(Mode);
+            //IT-System usages
+            RegisterOptionsService<ItSystemRight, ItSystemRole, LocalItSystemRole>(kernel);
 
+            RegisterOptionsService<SystemRelation, RelationFrequencyType, LocalRelationFrequencyType>(kernel);
 
-            // ApplicationService bindings
-            kernel.Bind<IOptionsApplicationService<ItSystem, BusinessType>>()
-               .To<OptionsApplicationService<ItSystem, BusinessType>>().InCommandScope(Mode);
+            RegisterOptionsService<ItSystemUsage, ItSystemCategories, LocalItSystemCategories>(kernel);
+
+            RegisterOptionsService<ItSystemUsage, ArchiveType, LocalArchiveType>(kernel);
+
+            RegisterOptionsService<ItSystemUsage, ArchiveLocation, LocalArchiveLocation>(kernel);
+
+            RegisterOptionsService<ItSystemUsage, ArchiveTestLocation, LocalArchiveTestLocation>(kernel);
+
+            RegisterOptionsService<ItSystemUsage, RegisterType, LocalRegisterType>(kernel);
+
+            //IT-Contract
+            RegisterOptionsService<ItContract, ItContractType, LocalItContractType>(kernel);
+
+            //Attached options services
+            kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>
+                new AttachedOptionsAssignmentService<RegisterType, ItSystemUsage>(OptionType.REGISTERTYPEDATA,
+                    ctx.Kernel.GetRequiredService<IItSystemUsageAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IOptionsService<ItSystemUsage, RegisterType>>()));
+
+            kernel.Bind<IAttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>>().ToMethod(ctx =>
+                new AttachedOptionsAssignmentService<SensitivePersonalDataType, ItSystem>(OptionType.SENSITIVEPERSONALDATA,
+                    ctx.Kernel.GetRequiredService<IItSystemUsageAttachedOptionRepository>(),
+                    ctx.Kernel.GetRequiredService<IOptionsService<ItSystem, SensitivePersonalDataType>>()));
+        }
+
+        private void RegisterOptionsService<TParent, TOption, TLocalOption>(IKernel kernel)
+            where TOption : OptionEntity<TParent>
+            where TLocalOption : LocalOptionEntity<TOption>
+        {
+            //Domain service
+            kernel.Bind<IOptionsService<TParent, TOption>>()
+                .To<OptionsService<TParent, TOption, TLocalOption>>().InCommandScope(Mode);
+
+            //Application service
+            kernel.Bind<IOptionsApplicationService<TParent, TOption>>()
+                .To<OptionsApplicationService<TParent, TOption>>().InCommandScope(Mode);
+        }
+
+        private void RegisterRoleAssignmentService<TRight, TRole, TModel>(IKernel kernel)
+            where TRight : Entity, IRight<TModel, TRight, TRole>
+            where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
+            where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
+        {
+            kernel.Bind<IRoleAssignmentService<TRight, TRole, TModel>>()
+                .To<RoleAssignmentService<TRight, TRole, TModel>>().InCommandScope(Mode);
         }
 
         private void RegisterKLE(IKernel kernel)
@@ -383,7 +443,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOrganizationUnitRepository>().To<OrganizationUnitRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
-            kernel.Bind<IAttachedOptionRepository>().To<AttachedOptionRepository>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageAttachedOptionRepository>().To<ItSystemUsageAttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);
             kernel.Bind<IAdviceRepository>().To<AdviceRepository>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationRepository>().To<DataProcessingRegistrationRepository>().InCommandScope(Mode);

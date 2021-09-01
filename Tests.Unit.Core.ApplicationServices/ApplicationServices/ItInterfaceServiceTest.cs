@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -549,6 +550,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository.Setup(x => x.GetInterface(uuid)).Returns(Maybe<ItInterface>.None);
             _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
             _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
+            _authorizationContext.Setup(x=>x.HasPermission(It.IsAny<CreateEntityWithVisibilityPermission>())).Returns(true);
 
             //Act
             var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, withSpecifiedUuid ? uuid : null, withAccessModifier ? accessModifier : null);

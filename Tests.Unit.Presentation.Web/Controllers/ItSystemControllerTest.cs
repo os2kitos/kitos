@@ -13,9 +13,10 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Time;
 using Moq;
-using Presentation.Web.Controllers.API;
+using Presentation.Web.Controllers.API.V1;
 using Presentation.Web.Models;
-using Presentation.Web.Models.ItSystem;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystem;
 using Tests.Unit.Presentation.Web.Helpers;
 using Xunit;
 

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using System.Threading.Tasks;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools

@@ -8,15 +8,17 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
-using Presentation.Web.Models.ItSystemUsageMigration;
-using Presentation.Web.Models.SystemRelations;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.ItSystemUsageMigration;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.ItSystem
 {
-    [CollectionDefinition("Migration tests", DisableParallelization = true)]
+    [Collection(nameof(SequentialTestGroup))]
     public class ItSystemUsageMigrationTests : WithAutoFixture, IAsyncLifetime
     {
         private static readonly string NameSessionPart = new Guid().ToString("N");

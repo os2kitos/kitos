@@ -7,6 +7,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Infrastructure.Services.Types;
@@ -88,6 +89,8 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsLocalAdmin;
             if (target.GetType().IsImplementationOfGenericType(typeof(LocalOptionEntity<>)))
                 yield return IsLocalAdmin;
+            if (target is KendoOrganizationalConfiguration)
+                yield return IsLocalAdmin;
         }
 
         /// <summary>
@@ -103,17 +106,15 @@ namespace Core.ApplicationServices.Authorization.Policies
 
             if (typeof(IHasRightsHolder).IsAssignableFrom(target))
             {
-                return IsRightsHolder(organizationId);
-            }
+                if (IsRightsHolder(organizationId))
+                    return true;
 
-            if (MatchType<ItSystem>(target))
-            {
-                return false; //Only global admin
-            }
+                if (MatchType<ItInterface>(target))
+                {
+                    return IsSystemModuleAdmin(organizationId) || IsLocalAdmin(organizationId);
+                }
 
-            if (MatchType<ItInterface>(target))
-            {
-                return false; //Only global admin
+                return false;
             }
 
             if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)

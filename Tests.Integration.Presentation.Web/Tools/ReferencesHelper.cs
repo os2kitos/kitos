@@ -2,9 +2,8 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -15,7 +14,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             string title,
             string externalReferenceId,
             string referenceUrl,
-            Display display,
             Action<ExternalReferenceDTO> setTargetId,
             Cookie optionalLogin = null)
         {
@@ -27,8 +25,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Title = title,
                 ExternalReferenceId = externalReferenceId,
-                URL = referenceUrl,
-                Display = display
+                URL = referenceUrl
             };
             setTargetId(body);
 

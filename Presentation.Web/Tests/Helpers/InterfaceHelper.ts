@@ -9,18 +9,15 @@ class InterfaceHelper {
 
     public static writeDataToTextInput(data: string, ele: string) {
         console.log(`Writing ${data} To ${ele}`);
-        return element(this.cssHelper.byDataElementType(ele)).clear().then(() => {
-            return element(this.cssHelper.byDataElementType(ele)).sendKeys(data);
-        });
+        return element(this.cssHelper.byDataElementType(ele)).clear()
+            .then(() => element(this.cssHelper.byDataElementType(ele)).sendKeys(data));
     }
 
     public static writeDataToTable(data: string, dataType: string) {
         console.log(`Writing ${data} ${dataType} to table`);
-        return element(this.cssHelper.byDataElementType(this.const.interfaceNewRowButton)).click().then(() => {
-            return this.writeDataToTextInput(data, this.const.interfaceDataInput);
-        }).then(() => {
-            return this.selectDataFromNoSearchSelect2Field(dataType, this.const.interfaceSelectTableDataType);
-        });
+        return element(this.cssHelper.byDataElementType(this.const.interfaceNewRowButton)).click()
+            .then(() => this.writeDataToTextInput(data, this.const.interfaceDataInput)
+                .then(() => this.selectDataFromNoSearchSelect2Field(dataType, this.const.interfaceSelectTableDataType)));
     }
 
     public static verifyDataFromTextInput(data: string, ele: string) {

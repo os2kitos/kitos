@@ -61,8 +61,7 @@ namespace Core.ApplicationServices.References
             ReferenceRootType rootType,
             string title,
             string externalReferenceId,
-            string url,
-            Display display)
+            string url)
         {
             return _referenceRepository
                 .GetRootEntity(rootId, rootType)
@@ -81,7 +80,6 @@ namespace Core.ApplicationServices.References
                                 Title = title,
                                 ExternalReferenceId = externalReferenceId,
                                 URL = url,
-                                Display = display,
                                 Created = _operationClock.Now,
                             })
                             .Match<Result<ExternalReference, OperationError>>
@@ -167,7 +165,7 @@ namespace Core.ApplicationServices.References
                 return OperationFailure.Forbidden;
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
             var systemExternalReferences = root.ExternalReferences.ToList();
 
             if (systemExternalReferences.Count == 0)

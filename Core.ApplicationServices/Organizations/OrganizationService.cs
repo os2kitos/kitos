@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
@@ -8,8 +7,13 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.Organization;
+using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.DataAccess;
+using Infrastructure.Services.Types;
 using Serilog;
 
 namespace Core.ApplicationServices.Organizations
@@ -17,6 +21,8 @@ namespace Core.ApplicationServices.Organizations
     public class OrganizationService : IOrganizationService
     {
         private readonly IGenericRepository<Organization> _orgRepository;
+        private readonly IOrganizationRepository _repository;
+        private readonly IOrgUnitService _orgUnitService;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -33,7 +39,9 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationalUserContext userContext,
             ILogger logger,
             IOrganizationRoleService organizationRoleService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager,
+            IOrganizationRepository repository,
+            IOrgUnitService orgUnitService)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -43,18 +51,8 @@ namespace Core.ApplicationServices.Organizations
             _logger = logger;
             _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
-        }
-
-        /// <summary>
-        /// lists the organizations the user is a member of
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns>a list of organizations that the user is a member of</returns>
-        public IEnumerable<Organization> GetOrganizations(User user)
-        {
-            if (user.IsGlobalAdmin) return _orgRepository.Get();
-            return _orgRepository
-                .Get(o => o.Rights.Any(r => r.OrganizationId == o.Id && r.UserId == user.Id));
+            _repository = repository;
+            _orgUnitService = orgUnitService;
         }
 
         //returns the default org unit for that user inside that organization
@@ -180,6 +178,71 @@ namespace Core.ApplicationServices.Organizations
                 transaction.Commit();
                 return newOrg;
             }
+        }
+
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null)
+        {
+            return _repository.GetByUuid(organizationUuid).Match<Result<Organization, OperationError>>(organization =>
+                {
+                    var hasAccess = withMinimumAccessLevel.HasValue
+                        ? _authorizationContext.GetOrganizationReadAccessLevel(organization.Id) >= withMinimumAccessLevel.Value
+                        : _authorizationContext.AllowReads(organization);
+
+                    if (!hasAccess)
+                    {
+                        return new OperationError(OperationFailure.Forbidden);
+                    }
+                    return organization;
+                },
+                () => new OperationError(OperationFailure.NotFound)
+            );
+        }
+
+        public Result<IQueryable<Organization>, OperationError> GetAllOrganizations()
+        {
+            if (_authorizationContext.GetCrossOrganizationReadAccess() != CrossOrganizationDataReadAccessLevel.All)
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+            return Result<IQueryable<Organization>, OperationError>.Success(_repository.GetAll());
+        }
+
+        public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions)
+        {
+            var crossOrganizationReadAccess = _authorizationContext.GetCrossOrganizationReadAccess();
+
+            var domainQueries = conditions.ToList();
+            if (crossOrganizationReadAccess < CrossOrganizationDataReadAccessLevel.All)
+            {
+                //Restrict organization access
+                domainQueries =
+                    new QueryOrganizationByIdsOrSharedAccess(_userContext.OrganizationIds, crossOrganizationReadAccess == CrossOrganizationDataReadAccessLevel.Public)
+                        .WrapAsEnumerable()
+                        .Concat(domainQueries)
+                        .ToList();
+            }
+
+            var query = new IntersectionQuery<Organization>(domainQueries);
+            return _repository.GetAll().Transform(query.Apply);
+        }
+
+        public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria)
+        {
+            return GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
+                .Select(_orgUnitService.GetOrganizationUnits)
+                .Select(new IntersectionQuery<OrganizationUnit>(criteria).Apply);
+        }
+
+        public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid)
+        {
+            return
+                _orgUnitService
+                    .GetOrganizationUnit(organizationUnitUuid)
+                    .Match<Result<OrganizationUnit, OperationError>>(
+                        unit => _authorizationContext.AllowReads(unit)
+                            ? unit
+                            : new OperationError(OperationFailure.Forbidden),
+                        () => new OperationError(OperationFailure.NotFound));
         }
     }
 }

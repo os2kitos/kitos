@@ -109,8 +109,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Advice\AdviceTest.cs" />
+    <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
-    <Compile Include="External\BusinessTypesTest.cs" />
+    <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
+    <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
+    <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />
+    <Compile Include="Contract\V2\ItContractsApiV2Test.cs" />
+    <Compile Include="Options\V2\OptionV2ApiTests.cs" />
     <Compile Include="Interfaces\V2\ItInterfaceApiV2Test.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationReadModelsTest.cs" />
     <Compile Include="GDPR\DataProcessingRegistrationsTest.cs" />
@@ -123,6 +129,8 @@
     <Compile Include="KLE\TaskRefIntegrityInput.cs" />
     <Compile Include="KLE\TaskUsageIntegrityInput.cs" />
     <Compile Include="Organizations\V2\OrganizationApiV2Test.cs" />
+    <Compile Include="Organizations\V2\OrganizationUnitsApiV2Test.cs" />
+    <Compile Include="Organizations\V2\OrganizationUserApiV2Test.cs" />
     <Compile Include="Projects\ItProjectTest.cs" />
     <Compile Include="ItSystem\ItSystemTests.cs" />
     <Compile Include="ItSystem\ItSystemHierarchy.cs" />
@@ -132,6 +140,7 @@
     <Compile Include="LocalAdminArea\LocalConfigTest.cs" />
     <Compile Include="Organizations\OrganizationTest.cs" />
     <Compile Include="ItSystem\UsingOrganizationsTest.cs" />
+    <Compile Include="Projects\V2\ItProjectsApiV2Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Qa\BrokenExternalReferencesReportTest.cs" />
     <Compile Include="References\ExternalReferencesTest.cs" />
@@ -148,9 +157,16 @@
     <Compile Include="Tools\DataProcessingRegistrationHelper.cs" />
     <Compile Include="Tools\DisposableExtensions.cs" />
     <Compile Include="Tools\EntityOptionHelper.cs" />
-    <Compile Include="Tools\External\BusinessTypeV2Helper.cs" />
+    <Compile Include="Tools\External\ItContractV2Helper.cs" />
+    <Compile Include="Tools\External\ItProjectV2Helper.cs" />
+    <Compile Include="Tools\External\ItSystemUsageV2Helper.cs" />
+    <Compile Include="Tools\External\KleOptionV2Helper.cs" />
+    <Compile Include="Tools\External\OptionV2ApiHelper.cs" />
     <Compile Include="Tools\External\InterfaceV2Helper.cs" />
+    <Compile Include="Tools\External\OrganizationUnitV2Helper.cs" />
+    <Compile Include="Tools\External\OrganizationUserV2Helper.cs" />
     <Compile Include="Tools\HttpApi.cs" />
+    <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
     <Compile Include="Tools\ItContractHelper.cs" />
@@ -171,9 +187,13 @@
     <Compile Include="Tools\OrganizationHelper.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
+    <Compile Include="Tools\TaskUsageHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />
     <Compile Include="Tools\External\ItSystemV2Helper.cs" />
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />
+    <Compile Include="Tools\UserHelper.cs" />
+    <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
+    <Compile Include="Users\UserTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -183,6 +203,10 @@
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
+      <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
+      <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
       <Name>Core.DomainModel</Name>

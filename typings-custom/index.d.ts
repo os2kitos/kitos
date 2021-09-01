@@ -15,3 +15,6 @@
 /// <reference path="moment/index.d.ts" />
 /// <reference path="selenium-webdriver/index.d.ts" />
 /// <reference path="ui-select/index.d.ts" />
+
+
+/// <reference path="js-sha256/index.d.ts" />

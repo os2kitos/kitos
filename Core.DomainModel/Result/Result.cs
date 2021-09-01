@@ -26,7 +26,7 @@ namespace Core.DomainModel.Result
         public TFailure Error => _state.ErrorValue;
 
         public static Result<TSuccess, TFailure> Success(TSuccess value) =>
-            new(new WithSuccessfulWithResult<TSuccess, TFailure>(value));
+            new(new WithSuccessfulResult<TSuccess, TFailure>(value));
 
 
         public static Result<TSuccess, TFailure> Failure(TFailure value) =>
@@ -83,9 +83,9 @@ namespace Core.DomainModel.Result
                 onFailure(ErrorValue);
         }
 
-        private sealed class WithSuccessfulWithResult<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
+        private sealed class WithSuccessfulResult<TSuccessValue, TErrorValue> : IWithResult<TSuccessValue, TErrorValue>
         {
-            public WithSuccessfulWithResult(TSuccessValue result)
+            public WithSuccessfulResult(TSuccessValue result)
             {
                 SuccessValue = result;
             }

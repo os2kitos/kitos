@@ -17,6 +17,8 @@ var source = "Presentation.Web",
 
     // e2e
     e2eFiles = source + "/Tests/**/*.e2e.spec.js",
+    e2eParallelFiles = source + "/Tests/01_Parallel/**/*.e2e.spec.js",
+    e2eSequentialFiles = source + "/Tests/02_Sequential/**/*.e2e.spec.js",
     e2eReport = "results-protractor",
 
     // coverage
@@ -39,6 +41,8 @@ module.exports = {
     appReportTypeScriptOut: appReportTypeScriptOut,
     sourceAppReport: sourceAppReport,
     e2eFiles: e2eFiles,
+    e2eParallelFiles: e2eParallelFiles,
+    e2eSequentialFiles: e2eSequentialFiles,
     e2eReport: e2eReport,
     coverage: coverage,
     frontendCoverageReport: frontendCoverageReport,

@@ -6,19 +6,23 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models;
-using Presentation.Web.Models.SystemRelations;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.SystemUsage
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class ItSystemUsageOverviewReadModelsTest : WithAutoFixture
     {
         [Fact]
@@ -143,7 +147,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId); //Using default organization as responsible organization unit
 
             //References
-            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), A<Display>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
+            var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
 
             //Main Contract
             var contract = await ItContractHelper.CreateContract(contractName, organizationId);
@@ -437,8 +441,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var organizationUnit1 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
-            var organizationUnit2 = await OrganizationHelper.SendCreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
+            var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
+            var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
 
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId);
             await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId);
@@ -509,7 +513,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
-            var businessType = await EntityOptionHelper.CreateBusinessTypeAsync(businessTypeName1, organizationId);
+            var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessTypeName1, organizationId);
 
             await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
 
@@ -518,7 +522,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await EntityOptionHelper.ChangeBusinessTypeNameAsync(businessType.Id, businessTypeName2);
+            await EntityOptionHelper.ChangeOptionTypeNameAsync(EntityOptionHelper.ResourceNames.BusinessType, businessType.Id, businessTypeName2);
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -1017,6 +1021,52 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             mainSystemReadModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
             mainSystemReadModel = Assert.Single(mainSystemReadModels);
             Assert.Equal(outgoingRelationSystemName_changed, mainSystemReadModel.OutgoingRelatedItSystemUsagesNamesAsCsv);
+        }
+
+        [Fact]
+        public async Task When_SystemRightIsDeleted_Role_Assignment_In_Readmodel_Is_Updated()
+        {
+            //Arrange
+            var organizationId = TestEnvironment.DefaultOrganizationId;
+            var organizationName = TestEnvironment.DefaultOrganizationName;
+
+            var systemName = A<string>();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
+            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
+
+            // Role assignment
+            var businessRoleDtos = await ItSystemUsageHelper.GetAvailableRolesAsync(organizationId);
+            var role = businessRoleDtos.First();
+            var availableUsers = await ItSystemUsageHelper.GetAvailableUsersAsync(organizationId);
+            var user = availableUsers.First();
+            using var assignRoleResponse = await ItSystemUsageHelper.SendAssignRoleRequestAsync(systemUsage.Id, organizationId, role.Id, user.Id);
+            Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
+
+
+            //Wait for read model to rebuild (wait for the LAST mutation)
+            await WaitForReadModelQueueDepletion();
+            await Console.Out.WriteLineAsync("Read models are up to date");
+
+            //Act 
+            var readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+
+            //Assert
+            var readModel = Assert.Single(readModels);
+            await Console.Out.WriteLineAsync("Read model found");
+            var roleAssignment = Assert.Single(readModel.RoleAssignments);
+            await Console.Out.WriteLineAsync("Found one role assignment as expected");
+
+            //Act - remove the right using the odata api
+            var rightId = DatabaseAccess.MapFromEntitySet<ItSystemRight, int>(rights => rights.AsQueryable().Single(x => x.ObjectId == readModel.SourceEntityId).Id);
+            await ItSystemUsageHelper.SendOdataDeleteRightRequestAsync(rightId).WithExpectedResponseCode(HttpStatusCode.NoContent).DisposeAsync();
+
+            //Assert
+            await WaitForReadModelQueueDepletion();
+            await Console.Out.WriteLineAsync("Read models are up to date");
+
+            readModels = (await ItSystemUsageHelper.QueryReadModelByNameContent(organizationId, systemName, 1, 0)).ToList();
+            readModel = Assert.Single(readModels);
+            Assert.Empty(readModel.RoleAssignments);
         }
 
         private async Task<ItSystemUsageOverviewReadModel> Test_For_IsActive_Based_On_ExpirationDate(DateTime expirationDate)

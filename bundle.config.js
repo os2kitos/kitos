@@ -14,7 +14,8 @@ module.exports = {
         npm("/tinymce/plugins/image/plugin.min.js"),
         npm("/tinymce/plugins/code/plugin.min.js"),
         npm("/tinymce/plugins/link/plugin.min.js"),
-        npm("/tinymce/themes/modern/theme.min.js")
+        npm("/tinymce/themes/modern/theme.min.js"),
+        npm("/js-sha256/src/sha256.js")
     ],
     libraryBundle: "library-bundle.min.js",
 

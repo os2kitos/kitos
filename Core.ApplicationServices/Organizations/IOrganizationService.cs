@@ -1,15 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
+using Core.DomainServices.Authorization;
+using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.Organizations
 {
     public interface IOrganizationService
     {
-        //returns a list of organizations that the user is a member of
-        IEnumerable<Organization> GetOrganizations(User user);
-
         //returns the default org unit for that user inside that organization
         //or null if none has been chosen
         OrganizationUnit GetDefaultUnit(Organization organization, User user);
@@ -21,5 +21,12 @@ namespace Core.ApplicationServices.Organizations
         bool CanChangeOrganizationType(Organization organization, OrganizationTypeKeys organizationType);
 
         Result<Organization, OperationFailure> CreateNewOrganization(Organization newOrg);
+
+        public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null);
+        public Result<IQueryable<Organization>, OperationError> GetAllOrganizations();
+        public IQueryable<Organization> SearchAccessibleOrganizations(params IDomainQuery<Organization>[] conditions);
+
+        public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria);
+        public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid);
     }
 }

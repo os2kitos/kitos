@@ -20,9 +20,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasRequired(t => t.Organization)
                 .WithMany(t => t.ItSystemUsages);
 
-            this.HasMany(t => t.OrgUnits)
-                .WithMany(t => t.ItSystemUsages);
-
             this.HasOptional(t => t.ResponsibleUsage)
                 .WithOptionalPrincipal(t => t.ResponsibleItSystemUsage);
 
@@ -36,11 +33,6 @@ namespace Infrastructure.DataAccess.Mapping
             this.HasOptional(t => t.SensitiveDataType)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.SensitiveDataTypeId);
-
-            this.HasOptional(t => t.Overview)
-                .WithMany()
-                .HasForeignKey(d => d.OverviewId)
-                .WillCascadeOnDelete(false);
 
             this.HasMany(t => t.UsedBy)
                 .WithRequired(t => t.ItSystemUsage)
@@ -94,6 +86,10 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.LinkToDirectoryUrlName)
                 .HasMaxLength(ItSystemUsage.LinkNameMaxLength)
                 .HasIndexAnnotation("ItSystemUsage_Index_LinkToDirectoryUrlName", 0);
+
+            Property(x => x.Uuid)
+                .IsRequired()
+                .HasUniqueIndexAnnotation("UX_ItSystemUsage_Uuid", 0);
         }
     }
 }

@@ -15,13 +15,7 @@
         Organization: IOrganization;
         /** The usage of task on this Organization Unit.Should be a subset of the TaskUsages of the parent department. */
         TaskUsages: Array<ITaskUsage>;
-        /** Local tasks that was created in this unit */
-        TaskRefs: Array<ITaskRef>;
         OwnedTasks: Array<ITaskRef>;
-        /** Gets or sets the delegated system usages. */
-        DelegatedSystemUsages: Array<IItSystemUsage>;
-        /** Gets or sets it system usages. */
-        ItSystemUsages: Array<IItSystemUsage>;
         /** Users which have set this as their default OrganizationUnit. */
         DefaultUsers: Array<IOrganizationRight>;
         /** This Organization Unit is using these IT Systems (Via ItSystemUsage) */

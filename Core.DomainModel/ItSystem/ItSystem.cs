@@ -5,7 +5,6 @@ using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
-using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
@@ -14,7 +13,7 @@ namespace Core.DomainModel.ItSystem
     /// <summary>
     /// Represents an it system.
     /// </summary>
-    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IHasAttachedOptions, IEntityWithEnabledStatus, IHasRightsHolder
+    public class ItSystem : ItSystemBase, IHasAccessModifier, IHierarchy<ItSystem>, IEntityWithExternalReferences, IEntityWithEnabledStatus, IHasRightsHolder
     {
         public const int MaxNameLength = 100;
 

@@ -4,11 +4,13 @@ using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using Core.ApplicationServices;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.ScheduledJobs;
 using Core.DomainModel.Advice;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Shared;
@@ -18,8 +20,8 @@ using Core.DomainServices.Notifications;
 using Core.DomainServices.Time;
 using Hangfire.Storage.Monitoring;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -32,39 +34,36 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IGenericRepository<Advice>> _adviceRepositoryMock;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IHangfireApi> _hangfireApiMock;
-        private readonly Mock<IGenericRepository<ItContract>> _contractRepository;
-        private readonly Mock<IGenericRepository<ItProject>> _projectRepository;
-        private readonly Mock<IGenericRepository<ItSystemUsage>> _systemUsageRepository;
-        private readonly Mock<IGenericRepository<DataProcessingRegistration>> _dataProcessingRepository;
         private readonly Mock<IUserNotificationService> _userNotificationService;
         private readonly Mock<IAdviceRootResolution> _adviceRootResolution;
+        private readonly Mock<IOperationClock> _operationClockMock;
 
         public AdviceServiceTest()
         {
-            _sut = new AdviceService();
+            _operationClockMock = new Mock<IOperationClock>();
+            _operationClockMock.Setup(x => x.Now).Returns(DateTime.Now);
             _mailClientMock = new Mock<IMailClient>();
-            _sut.MailClient = _mailClientMock.Object;
             _adviceRepositoryMock = new Mock<IGenericRepository<Advice>>();
-            _sut.AdviceRepository = _adviceRepositoryMock.Object;
-            _sut.AdviceSentRepository = Mock.Of<IGenericRepository<AdviceSent>>();
             _transactionManager = new Mock<ITransactionManager>();
-            _sut.TransactionManager = _transactionManager.Object;
             _hangfireApiMock = new Mock<IHangfireApi>();
-            _sut.HangfireApi = _hangfireApiMock.Object;
-            _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.Now);
-
-            _contractRepository = new Mock<IGenericRepository<ItContract>>();
-            _sut.ItContractRepository = _contractRepository.Object;
-            _projectRepository = new Mock<IGenericRepository<ItProject>>();
-            _sut.ItProjectRepository = _projectRepository.Object;
-            _systemUsageRepository = new Mock<IGenericRepository<ItSystemUsage>>();
-            _sut.ItSystemUsageRepository = _systemUsageRepository.Object;
-            _dataProcessingRepository = new Mock<IGenericRepository<DataProcessingRegistration>>();
-            _sut.DataProcessingRegistrations = _dataProcessingRepository.Object;
             _userNotificationService = new Mock<IUserNotificationService>();
-            _sut.UserNotificationService = _userNotificationService.Object;
             _adviceRootResolution = new Mock<IAdviceRootResolution>();
-            _sut.AdviceRootResolution = _adviceRootResolution.Object;
+            _sut = new AdviceService(
+                _mailClientMock.Object,
+                _adviceRepositoryMock.Object,
+                Mock.Of<IGenericRepository<AdviceSent>>(),
+                Mock.Of<IGenericRepository<ItContractRight>>(),
+                Mock.Of<IGenericRepository<ItProjectRight>>(),
+                Mock.Of<IGenericRepository<ItSystemRight>>(),
+                Mock.Of<IGenericRepository<DataProcessingRegistrationRight>>(),
+                Mock.Of<ILogger>(),
+                _transactionManager.Object,
+                Mock.Of<IOrganizationalUserContext>(),
+                _hangfireApiMock.Object,
+                _operationClockMock.Object,
+                _userNotificationService.Object,
+                _adviceRootResolution.Object
+            );
 
         }
 
@@ -83,7 +82,7 @@ namespace Tests.Unit.Core.ApplicationServices
             };
             SetupAdviceRepository(immediateAdvice);
             SetupTransactionManager();
-            _adviceRootResolution.Setup(x => x.Resolve(immediateAdvice)).Returns(new ItSystemUsage { OrganizationId = A<int>()});
+            _adviceRootResolution.Setup(x => x.Resolve(immediateAdvice)).Returns(new ItSystemUsage { OrganizationId = A<int>() });
             _userNotificationService.Setup(x => x.AddUserNotification(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>(), immediateAdvice.Type.Value, NotificationType.Advice)).Returns(new UserNotification());
 
             //Act
@@ -158,7 +157,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 StopDate = null,
                 Reciepients = CreateDefaultReceivers()
             };
-            _sut.OperationClock = Mock.Of<IOperationClock>(x => x.Now == DateTime.MaxValue);
+            _operationClockMock.Setup(x => x.Now).Returns(DateTime.MaxValue);
             SetupAdviceRepository(recurringAdvice);
             SetupTransactionManager();
 

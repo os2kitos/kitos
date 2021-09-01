@@ -22,8 +22,7 @@
             "kendoGridLauncherFactory",
             "needsWidthFixService",
             "overviewOptions",
-            "_",
-            "gridStateService"
+            "_"
         ];
 
         constructor(
@@ -33,8 +32,7 @@
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
-            _,
-            gridStateService: Services.IGridStateFactory
+            _
         ) {
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
@@ -49,8 +47,7 @@
                     registration.IsAgreementConcluded !==
                     Models.Api.Shared.YesNoIrrelevantOption[Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED];
             const getRoleKey = (role: Models.Generic.Roles.BusinessRoleDTO) => `role${role.id}`;
-            // Re-enable as part of: https://os2web.atlassian.net/browse/KITOSUDV-1674
-            //var gridState = gridStateService.getService(this.storageKey, user, itSystemUsageOverviewType);
+
             const replaceRoleQuery = (filterUrl, roleName, roleId) => {
                 var pattern = new RegExp(`(\\w+\\()${roleName}(,.*?\\))`, "i");
                 return filterUrl.replace(pattern, `RoleAssignments/any(c: $1c/UserFullName$2 and c/RoleId eq ${roleId})`);
@@ -185,40 +182,6 @@
                     });
                     return response;
                 })
-
-                // This part should not be visible for anyone just yet. Will be reintroduced in: https://os2web.atlassian.net/browse/KITOSUDV-1674
-
-                //.withToolbarEntry({
-                //    id: "filterOrg",
-                //    title: "Gem filter for organisation",
-                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                //    enabled: () => true,
-                //    onClick: () => {
-                //        if (confirm('Er du sikker på at du vil gemme nuværende filtre, sorteringer og opsætning af felter som standard til ' + user.currentOrganizationName)) {
-                //            gridState.saveGridProfileForOrg(this.mainGrid, itSystemUsageOverviewType);
-                //        }
-
-                //    },
-                //    show: user.isLocalAdmin,
-                //} as Utility.KendoGrid.IKendoToolbarEntry)
-                //.withToolbarEntry({
-                //    id: "removeFilterOrg",
-                //    title: "Slet filter for organisation",
-                //    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                //    position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                //    implementation: Utility.KendoGrid.KendoToolbarImplementation.Button,
-                //    enabled: () => true,
-                //    onClick: () => {
-                //        if (confirm('Er du sikker på at du vil slette standard opsætningen af felter til ' + user.currentOrganizationName)) {
-                //            gridState.deleteGridProfileForOrg(itSystemUsageOverviewType);
-                //        }
-                //    },
-                //    show: user.isLocalAdmin,
-                //} as Utility.KendoGrid.IKendoToolbarEntry)
-
-
                 .withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
@@ -369,8 +332,8 @@
                     .withExcelOnlyColumn(builder =>
                         builder
                             .withId(`systemUsage${getRoleKey(role)}_emails`)
+                            .withDataSourceName(getRoleKey(role))
                             .withTitle(`${role.name} Email"`)
-                            .dependOnColumnWithId(`systemUsage${getRoleKey(role)}`)
                             .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToEmailMap[dataItem.Id][role.id]))
                     )
             );
@@ -489,7 +452,7 @@
                             const decorationClass = dataItem.MainContractIsActive
                                 ? "fa-file text-success"
                                 : "fa-file-o text-muted";
-                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.Id}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
+                            return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
                         })
                         .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : ""))
                 .withColumn(builder =>

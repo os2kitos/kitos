@@ -3,19 +3,23 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response.Interface;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.Interface;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Interfaces.V2
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class ItInterfaceApiV2Test : WithAutoFixture
     {
 
@@ -823,6 +827,19 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Invoke_Endpoint_Blocked_From_rightsHolders()
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+
+            //Act
+            using var result = await InterfaceV2Helper.SendGetStakeholderInterfacesAsync(token);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, Organization rightsHolderOrganization)

@@ -37,7 +37,7 @@ namespace Presentation.Web.Infrastructure.Factories.Authentication
                     }, onNone: () => AnonymousAuthentication);
         }
 
-        private bool MapApiAccess(User user)
+        private static bool MapApiAccess(User user)
         {
             return user.HasApiAccess == true;
         }

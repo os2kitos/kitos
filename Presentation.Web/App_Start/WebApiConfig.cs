@@ -9,16 +9,15 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
-using Presentation.Web.Controllers.OData;
-using Presentation.Web.Controllers.OData.LocalOptionControllers;
+using Presentation.Web.Controllers.API.V1.OData;
+using Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers;
 using Core.DomainModel.LocalOptions;
-using Presentation.Web.Controllers.OData.OptionControllers;
+using Presentation.Web.Controllers.API.V1.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Presentation.Web.Controllers.OData.ReportsControllers;
 using Presentation.Web.Models;
-using Presentation.Web.Controllers.OData.AttachedOptions;
+using Presentation.Web.Controllers.API.V1.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
 using System.Collections.Generic;
@@ -31,6 +30,7 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
+using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web
 {
@@ -56,12 +56,14 @@ namespace Presentation.Web
 
             var route = config.MapODataServiceRoute(routeName: routeName, routePrefix: routePrefix, configureAction: (builder => builder
             .AddService(ServiceLifetime.Singleton, sp => GetModel())
-            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true})
+            .AddService<ODataUriResolver>(ServiceLifetime.Singleton, sp => new UnqualifiedCallAndEnumPrefixFreeResolver { EnableCaseInsensitive = true })
             .AddService<IEnumerable<IODataRoutingConvention>>(ServiceLifetime.Singleton, sp => ODataRoutingConventions.CreateDefaultWithAttributeRouting(routeName, config))));
 
             config.Formatters.Remove(config.Formatters.XmlFormatter);
             config.Filters.Add(new ExceptionLogFilterAttribute());
             config.Filters.Add(new RequireValidatedCSRFAttributed());
+            config.Filters.Add(new ValidateActionParametersAttribute());
+            config.Filters.Add(new DenyRightsHoldersAccessAttribute()); //By default block all actions for users with rights holders access in one or more organizations
             config.Count().Filter().OrderBy().Expand().Select().MaxTop(null);
         }
 
@@ -157,23 +159,6 @@ namespace Presentation.Web
             taskRefs.HasManyBinding(t => t.ItSystems, entitySetItSystems);
             taskRefs.EntityType.HasKey(x => x.Id);
 
-            var reportsMunicipalities = BindEntitySet<Organization, ReportsMunicipalitiesController>(builder);
-            reportsMunicipalities.HasManyBinding(o => o.ItSystems, entitySetItSystems);
-            reportsMunicipalities.HasManyBinding(o => o.BelongingSystems, entitySetItSystems);
-
-            var reportsItSystems = BindEntitySet<ItSystem, ReportsItSystemsController>(builder);
-            reportsItSystems.HasRequiredBinding(o => o.Organization, entitySetOrganizations);
-            reportsItSystems.HasRequiredBinding(o => o.BelongsTo, entitySetOrganizations);
-            reportsItSystems.HasManyBinding(i => i.Children, entitySetItSystems);
-            reportsItSystems.HasRequiredBinding(i => i.Parent, entitySetItSystems);
-
-            //singleton instead of entity type because of navigation conflict with 'ItSystemRoles'
-            BindEntitySet<ItSystemRole, ReportsItSystemRolesController>(builder);
-
-            //singleton instead of entity type because of navigation conflict with 'ItSystemRights'
-            var reportsItSystemContacts = BindTypeSet<ReportItSystemRightOutputDTO, ReportsITSystemContactsController>(builder);
-            reportsItSystemContacts.EntityType.HasKey(x => x.roleId);
-
             var orgNameSpace = entitySetOrganizations;
 
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder);
@@ -242,7 +227,7 @@ namespace Presentation.Web
 
             BindEntitySet<RegisterType, RegisterTypesController>(builder);
 
-            var sensitivePersonalDataTypes = BindEntitySet<SensitivePersonalDataType, SensistivePersonalDataTypesController>(builder);
+            var sensitivePersonalDataTypes = BindEntitySet<SensitivePersonalDataType, SensitivePersonalDataTypesController>(builder);
             sensitivePersonalDataTypes.HasManyBinding(b => b.References, entitySetItSystems);
 
             BindEntitySet<OptionExtendType, OptionExtendTypesController>(builder);
@@ -354,7 +339,7 @@ namespace Presentation.Web
 
             var getSensitivePersonalDataByUsageId = builder.Function("GetSensitivePersonalDataByUsageId");
             getSensitivePersonalDataByUsageId.Parameter<int>("id");
-            getSensitivePersonalDataByUsageId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensistivePersonalDataTypes");
+            getSensitivePersonalDataByUsageId.ReturnsCollectionFromEntitySet<SensitivePersonalDataType>("SensitivePersonalDataTypes");
             builder.StructuralTypes.First(t => t.ClrType == typeof(SensitivePersonalDataType)).AddProperty(typeof(SensitivePersonalDataType).GetProperty(nameof(SensitivePersonalDataType.Checked)));
             getSensitivePersonalDataByUsageId.Namespace = "gdpr";
 
@@ -366,8 +351,8 @@ namespace Presentation.Web
             var localSensitiveDataType = BindEntitySet<LocalSensitiveDataType, LocalSensitiveDataTypesController>(builder);
             localSensitiveDataType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localSensistivePersonalDataTypes = BindEntitySet<LocalSensitivePersonalDataType, LocalSensistivePersonalDataTypesController>(builder);
-            localSensistivePersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
+            var localSensitivePersonalDataTypes = BindEntitySet<LocalSensitivePersonalDataType, LocalSensitivePersonalDataTypesController>(builder);
+            localSensitivePersonalDataTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var localRegisterTypes = BindEntitySet<LocalRegisterType, LocalRegisterTypesController>(builder);
             localRegisterTypes.HasRequiredBinding(u => u.Organization, entitySetOrganizations);

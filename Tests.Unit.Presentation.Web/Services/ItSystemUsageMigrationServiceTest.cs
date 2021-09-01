@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Migration;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -14,7 +15,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
-using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
@@ -32,10 +32,10 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
-        private readonly Mock<IItContractRepository> _itContractRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly Mock<IItSystemUsageService> _itSystemUsageService;
         private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IItsystemUsageRelationsService> _itSystemUsageRelationService;
 
         public ItSystemUsageMigrationServiceTest()
         {
@@ -43,11 +43,11 @@ namespace Tests.Unit.Presentation.Web.Services
             _systemRepository = new Mock<IItSystemRepository>();
 
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
-            _itContractRepository = new Mock<IItContractRepository>();
             _transactionManager = new Mock<ITransactionManager>();
             _itSystemUsageService = new Mock<IItSystemUsageService>();
 
             _domainEventsMock = new Mock<IDomainEvents>();
+            _itSystemUsageRelationService = new Mock<IItsystemUsageRelationsService>();
             _sut = new ItSystemUsageMigrationService(
                 _authorizationContext.Object,
                 _transactionManager.Object,
@@ -55,6 +55,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
                 _itSystemUsageService.Object,
+                _itSystemUsageRelationService.Object,
                 _domainEventsMock.Object);
         }
 
@@ -655,7 +656,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private void VerifyModifyRelationCalled(SystemRelation relation, Times numberOfTimesCalled)
         {
-            _itSystemUsageService.Verify(x => x.ModifyRelation(
+            _itSystemUsageRelationService.Verify(x => x.ModifyRelation(
                 relation.FromSystemUsageId,
                 relation.Id,
                 relation.ToSystemUsageId,
@@ -783,7 +784,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 RelationInterface = null
             };
 
-            _itSystemUsageService
+            _itSystemUsageRelationService
                 .Setup(x => x.ModifyRelation(
                     relation.FromSystemUsageId,
                     relation.Id,

@@ -1,12 +1,13 @@
 ﻿using Presentation.Web.Models;
-using Presentation.Web.Models.External.V2.Request;
-using Presentation.Web.Models.External.V2.Response.Interface;
+using Presentation.Web.Models.API.V2.Request;
+using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Request.Interface;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External

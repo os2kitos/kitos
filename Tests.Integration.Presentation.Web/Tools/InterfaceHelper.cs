@@ -1,10 +1,13 @@
-﻿using System.Net;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -36,14 +39,17 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<ItInterfaceDTO> CreateInterface(ItInterfaceDTO input)
         {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            using var createdResponse = await SendCreateInterface(input);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateInterface(ItInterfaceDTO input, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/itinterface");
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(url, cookie, input))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItInterfaceDTO>();
-            }
+            return await HttpApi.PostWithCookieAsync(url, cookie, input);
         }
 
         public static async Task CreateInterfaces(params ItInterfaceDTO[] interfaces)
@@ -120,6 +126,20 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 return response;
             }
+        }
+
+        public static async Task<IEnumerable<ItInterfaceDTO>> GetInterfacesAsync(Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var url = TestEnvironment.CreateUrl($"odata/ItInterfaces");
+
+            using (var response = await HttpApi.GetWithCookieAsync(url, cookie))
+            {
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                return await response.ReadOdataListResponseBodyAsAsync<ItInterfaceDTO>();
+            }
+
         }
     }
 }

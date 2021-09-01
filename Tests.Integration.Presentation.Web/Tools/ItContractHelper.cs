@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
+using Presentation.Web.Models.API.V1;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -132,6 +133,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
                 return await okResponse.ReadResponseBodyAsKitosApiResponseAsync<ItContractDTO>();
+            }
+        }
+
+        public static async Task<HttpResponseMessage> SendAssignAgreementElementAsync(int contractId, int orgId, int agreementElementId)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using (var okResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"/api/itcontract/{contractId}?organizationId={orgId}&elemId={agreementElementId}"), cookie, null))
+            {
+                Assert.Equal(HttpStatusCode.OK, okResponse.StatusCode);
+                return okResponse;
             }
         }
 

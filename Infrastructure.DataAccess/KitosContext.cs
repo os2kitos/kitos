@@ -16,6 +16,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
+using Core.DomainModel.KendoConfig;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
@@ -281,6 +282,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new DataProcessingRegistrationOversightDateMap());
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsingSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new UserNotificationMap());
+            modelBuilder.Configurations.Add(new AttachedOptionMap());
         }
     }
 }

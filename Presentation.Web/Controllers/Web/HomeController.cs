@@ -4,7 +4,7 @@ using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
 using Infrastructure.Services.Types;
-using Presentation.Web.Models.FeatureToggle;
+using Presentation.Web.Models.Application.FeatureToggle;
 using Presentation.Web.Properties;
 
 namespace Presentation.Web.Controllers.Web

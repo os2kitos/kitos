@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.ApplicationServices.SystemUsage.Relations;
 using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.SystemUsage.Migration
@@ -28,6 +29,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly IItSystemRepository _systemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
         private readonly IItSystemUsageService _itSystemUsageService;
+        private readonly IItsystemUsageRelationsService _itsystemUsageRelationsService;
         private readonly IDomainEvents _domainEvents;
 
 
@@ -38,6 +40,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             IItSystemRepository systemRepository,
             IItSystemUsageRepository systemUsageRepository,
             IItSystemUsageService itSystemUsageService,
+            IItsystemUsageRelationsService itsystemUsageRelationsService,
             IDomainEvents domainEvents)
         {
             _authorizationContext = authorizationContext;
@@ -46,6 +49,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
             _itSystemUsageService = itSystemUsageService;
+            _itsystemUsageRelationsService = itsystemUsageRelationsService;
             _domainEvents = domainEvents;
         }
 
@@ -241,7 +245,7 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         {
             foreach (var relation in migration.AffectedSystemRelations)
             {
-                var modifyStatus = _itSystemUsageService.ModifyRelation(
+                var modifyStatus = _itsystemUsageRelationsService.ModifyRelation(
                     relation.FromSystemUsageId,
                     relation.Id,
                     relation.ToSystemUsageId,

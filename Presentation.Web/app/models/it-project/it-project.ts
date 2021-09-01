@@ -6,7 +6,6 @@
         Note: string;
         Name: string;
         Description: string;
-        AccessModifier: any;
         IsArchived: boolean;
         Esdh: string;
         Cmdb: string;
@@ -78,13 +77,6 @@
         /** The "milestones and tasks" table. */
         ItProjectStatuses: IItProjectStatus[];
 
-
-        /** Gets or sets the original it project identifier this it project was "cloned" from. */
-        OriginalId: number;
-        /** Gets or sets the original it project this it project was "cloned" from. */
-        Original: IItProject;
-        /** Gets or sets the it projects that were cloned from this it project. */
-        Clones: IItProject[];
         GoalStatus: IGoalStatus;
 
         ReferenceId: number;

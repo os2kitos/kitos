@@ -75,13 +75,12 @@
                     field: "externalReferenceId",
                     title: "Evt. dokumentID/Sagsnr./anden referenceContact"
                 }, {
-                    field: "created",
-                    title: "Oprettet",
-                    template: "#= kendo.toString(kendo.parseDate(created, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
-
+                    field: "lastChanged",
+                    title: "Ændret",
+                    template: "#= kendo.toString(kendo.parseDate(lastChanged, 'yyyy-MM-dd'), 'dd. MMMM yyyy') #"
                 }, {
-                    field: "objectOwner.fullName",
-                    title: "Oprettet af",
+                    field: "lastChangedByUser.fullName",
+                    title: "Senest ændret af",
                     width: 150
                 }, {
                     title: "Rediger",
