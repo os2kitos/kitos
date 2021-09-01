@@ -632,8 +632,6 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(assignment4, freshDTO.SystemUsages);
         }
 
-        //TODO: Update scenarios
-
         private async Task<(IdentityNamePairResponseDTO dataResponsible, IdentityNamePairResponseDTO basisForTransfer, DataProcessingRegistrationGeneralDataWriteRequestDTO inputDTO)> CreateGeneralDataInput(
            bool withDataProcessors,
            bool withSubDataProcessors,
