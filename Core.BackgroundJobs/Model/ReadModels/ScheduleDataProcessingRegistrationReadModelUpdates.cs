@@ -63,7 +63,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _dataProcessingRegistrationRepository.GetByOversightOptionId(update.SourceId).Select(x => x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetByOversightOptionId(update.SourceId).Select(x => x.Id).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -78,7 +78,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _dataProcessingRegistrationRepository.GetByDataResponsibleId(update.SourceId).Select(x => x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetByDataResponsibleId(update.SourceId).Select(x => x.Id).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -93,7 +93,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x => x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetByBasisForTransferId(update.SourceId).Select(x => x.Id).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -110,7 +110,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
 
                 //Org id is not stored in read model so search the source model
-                var ids = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId).Select(x => x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetByDataProcessorId(update.SourceId).Select(x => x.Id).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -126,7 +126,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 //System id is not stored in read model so search the source model
-                var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id);
+                var ids = _dataProcessingRegistrationRepository.GetBySystemId(update.SourceId).Select(x => x.Id).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -142,7 +142,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
                 //Contract id is not stored in read model so search the source model
-                var dataProcessingRegistrationIds = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id);
+                var dataProcessingRegistrationIds = _dataProcessingRegistrationRepository.GetByContractId(update.SourceId).Select(x => x.Id).ToList();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, dataProcessingRegistrationIds, update, transaction);
             }
@@ -158,7 +158,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
                     break;
 
                 using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
-                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId);
+                var ids = _readModelRepository.GetByUserId(update.SourceId).Select(x => x.SourceEntityId).ToList();
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
 
@@ -168,7 +168,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
         private int PerformUpdate(
             int updatesExecuted,
             HashSet<int> alreadyScheduledIds,
-            IQueryable<int> idsOfAffectedDprs,
+            IEnumerable<int> idsOfAffectedDprs,
             PendingReadModelUpdate sourceUpdate,
             IDatabaseTransaction transaction)
         {
