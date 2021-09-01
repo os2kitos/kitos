@@ -101,8 +101,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token);
-		}
-		
+        }
+
         public static async Task<DataProcessingRegistrationResponseDTO> PutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
         {
             using var response = await SendPutOversightAsync(token, uuid, payload);
