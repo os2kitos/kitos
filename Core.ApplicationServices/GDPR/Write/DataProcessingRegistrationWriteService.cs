@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
@@ -121,44 +120,36 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> UpdateRoles(DataProcessingRegistration dpr, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
-            // Compare lists to find which needs to be remove and which need to be added
-            var rightsKeys = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
-            var userRoleKeys = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+            var newRightsList = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
 
-            var toRemove = rightsKeys.Except(userRoleKeys);
-
-            var toAdd = userRoleKeys.Except(rightsKeys);
-
-            foreach (var userRolePair in toRemove)
+            foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
             {
-                var userId = _entityIdentityResolver.ResolveDbId<User>(userRolePair.UserUuid);
+                var userId = _entityIdentityResolver.ResolveDbId<User>(item.UserUuid);
                 if (userId.IsNone)
-                    return new OperationError($"Could not find user with Uuid: {userRolePair.UserUuid}", OperationFailure.BadInput);
+                    return new OperationError($"Could not find user with Uuid: {item.UserUuid}", OperationFailure.BadInput);
 
-                var roleId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistrationRole>(userRolePair.RoleUuid);
+                var roleId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistrationRole>(item.RoleUuid);
                 if (roleId.IsNone)
-                    return new OperationError($"Could not find role with Uuid: {userRolePair.RoleUuid}", OperationFailure.BadInput);
+                    return new OperationError($"Could not find role with Uuid: {item.RoleUuid}", OperationFailure.BadInput);
 
-                var removeResult = _applicationService.RemoveRole(dpr.Id, roleId.Value, userId.Value);
+                switch (delta)
+                {
+                    case EnumerableExtensions.EnumerableDelta.Added:
+                        var assignmentResult = _applicationService.AssignRole(dpr.Id, roleId.Value, userId.Value);
+                        if (assignmentResult.Failed)
+                            return new OperationError($"Failed to assign role with Uuid: {item.RoleUuid} from user with Uuid: {item.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+                        break;
 
-                if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
-            }
+                    case EnumerableExtensions.EnumerableDelta.Removed:
+                        var removeResult = _applicationService.RemoveRole(dpr.Id, roleId.Value, userId.Value);
+                        if (removeResult.Failed)
+                            return new OperationError($"Failed to remove role with Uuid: {item.RoleUuid} from user with Uuid: {item.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+                        break;
 
-            foreach (var userRolePair in toAdd)
-            {
-                var userId = _entityIdentityResolver.ResolveDbId<User>(userRolePair.UserUuid);
-                if (userId.IsNone)
-                    return new OperationError($"Could not find user with Uuid: {userRolePair.UserUuid}", OperationFailure.BadInput);
-
-                var roleId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistrationRole>(userRolePair.RoleUuid);
-                if (roleId.IsNone)
-                    return new OperationError($"Could not find role with Uuid: {userRolePair.RoleUuid}", OperationFailure.BadInput);
-
-                var assignmentResult = _applicationService.AssignRole(dpr.Id, roleId.Value, userId.Value);
-
-                if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             return dpr;
