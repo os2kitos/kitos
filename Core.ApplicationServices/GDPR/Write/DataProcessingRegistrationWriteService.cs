@@ -223,7 +223,7 @@ namespace Core.ApplicationServices.GDPR.Write
         {
             var dbId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistration>(dataProcessingRegistrationUuid);
 
-            if (dbId == null)
+            if (dbId.IsNone)
                 return new OperationError(OperationFailure.NotFound);
 
             return _applicationService

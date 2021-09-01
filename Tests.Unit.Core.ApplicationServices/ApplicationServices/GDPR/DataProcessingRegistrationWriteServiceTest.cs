@@ -1057,6 +1057,57 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             }
         }
 
+        [Fact]
+        public void Can_Delete()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var resolvedDbId = A<int>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistration>(uuid, resolvedDbId);
+            _dprServiceMock.Setup(x => x.Delete(resolvedDbId)).Returns(new DataProcessingRegistration());
+
+            //Act
+            var result = _sut.Delete(uuid);
+
+            //Assert
+            Assert.True(result.IsNone, "No errors should occur during deletion");
+        }
+
+        [Fact]
+        public void Cannot_Delete_If_Deletion_Fails()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var resolvedDbId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistration>(uuid, resolvedDbId);
+            _dprServiceMock.Setup(x => x.Delete(resolvedDbId)).Returns(operationError);
+
+            //Act
+            var result = _sut.Delete(uuid);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Same(operationError, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_Delete_If_IdentityResolutionFails()
+        {
+            //Arrange
+            var uuid = A<Guid>();
+            var resolvedDbId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistration>(uuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.Delete(uuid);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
         private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
             IEnumerable<Guid> systemUsageUuids = null)
