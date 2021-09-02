@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
@@ -109,7 +109,55 @@ namespace Core.ApplicationServices.GDPR.Write
                 .WithOptionalUpdate(parameters.Name, (registration, changedName) => _applicationService.UpdateName(registration.Id, changedName))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
-                .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData));
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData))
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Roles, UpdateRolesData));
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateRolesData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationRoles usageRoles)
+        {
+            return dpr.WithOptionalUpdate(usageRoles.UserRolePairs, UpdateRoles);
+        }
+
+        private Result<DataProcessingRegistration, OperationError> UpdateRoles(DataProcessingRegistration dpr, Maybe<IEnumerable<UserRolePair>> userRolePairs)
+        {
+            var newRightsList = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+            if (newRightsList.Distinct().Count() != newRightsList.Count)
+            {
+                return new OperationError($"Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput);
+            }
+
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
+
+            foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
+            {
+                var userId = _entityIdentityResolver.ResolveDbId<User>(item.UserUuid);
+                if (userId.IsNone)
+                    return new OperationError($"Could not find user with Uuid: {item.UserUuid}", OperationFailure.BadInput);
+
+                var roleId = _entityIdentityResolver.ResolveDbId<DataProcessingRegistrationRole>(item.RoleUuid);
+                if (roleId.IsNone)
+                    return new OperationError($"Could not find role with Uuid: {item.RoleUuid}", OperationFailure.BadInput);
+
+                switch (delta)
+                {
+                    case EnumerableExtensions.EnumerableDelta.Added:
+                        var assignmentResult = _applicationService.AssignRole(dpr.Id, roleId.Value, userId.Value);
+                        if (assignmentResult.Failed)
+                            return new OperationError($"Failed to assign role with Uuid: {item.RoleUuid} from user with Uuid: {item.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+                        break;
+
+                    case EnumerableExtensions.EnumerableDelta.Removed:
+                        var removeResult = _applicationService.RemoveRole(dpr.Id, roleId.Value, userId.Value);
+                        if (removeResult.Failed)
+                            return new OperationError($"Failed to remove role with Uuid: {item.RoleUuid} from user with Uuid: {item.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+                        break;
+
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+
+            return dpr;
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateOversightData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationOversightDataParameters parameters)

@@ -7,6 +7,7 @@ using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
@@ -1182,32 +1183,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
-        private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
-            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
-            IEnumerable<Guid> systemUsageUuids = null,
-            UpdatedDataProcessingRegistrationOversightDataParameters oversightData = null)
-        {
-            var organizationUuid = A<Guid>();
-            var parameters = new DataProcessingRegistrationModificationParameters
-            {
-                Name = A<string>().AsChangedValue(),
-                General = generalData.FromNullable(),
-                SystemUsageUuids = systemUsageUuids.FromNullable(),
-                Oversight = oversightData.FromNullable()
-            };
-            var createdRegistration = new DataProcessingRegistration
-            {
-                Id = A<int>(),
-                Uuid = A<Guid>()
-            };
-            var transaction = ExpectTransaction();
-            var orgDbId = A<int>();
-
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
-            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
-            return (organizationUuid, parameters, createdRegistration, transaction);
-        }
-
         [Fact]
         public void Can_Create_With_Oversight_OversightOptions()
         {
@@ -1711,6 +1686,289 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.RemoveOversightDate(createdRegistration.Id, It.IsAny<int>()), Times.Never);
             _dprServiceMock.Verify(x => x.AssignOversightDate(createdRegistration.Id, It.IsAny<DateTime>(), It.IsAny<string>()), Times.Never);
         
+        }
+
+        [Fact]
+        public void Can_Create_With_Roles()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var roleUuid = A<Guid>();
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() {CreateUserRolePair(roleUuid, userUuid)};
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+            var right = CreateRight(createdRegistration, roleUuid, roleId, userUuid, userId);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, roleId);
+            ExpectRoleAssignmentReturns(createdRegistration, roleId, userId, right);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+            _dprServiceMock.Verify(x => x.AssignRole(createdRegistration.Id, roleId, userId), Times.Once);
+            _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void Can_Create_With_No_Roles()
+        {
+            //Arrange
+            var roles = new UpdatedDataProcessingRegistrationRoles(){UserRolePairs = Maybe<IEnumerable<UserRolePair>>.None.AsChangedValue() };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Ok);
+            AssertTransactionCommitted(transaction);
+            _dprServiceMock.Verify(x => x.AssignRole(createdRegistration.Id, It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+            _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, It.IsAny<int>(), It.IsAny<int>()), Times.Never);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_RoleUuid_Not_Found()
+        {
+            //Arrange
+            var roleUuid = A<Guid>();
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid) };
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+            
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, Maybe<int>.None);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_UserUuid_Not_Found()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var roleUuid = A<Guid>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid) };
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, Maybe<int>.None);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, roleId);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_Role_Assignment_Fails()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var roleUuid = A<Guid>();
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid) };
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+
+            var error = A<OperationError>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, roleId);
+            ExpectRoleAssignmentReturns(createdRegistration, roleId, userId, error);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(error.FailureType, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_Duplicates()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var roleUuid = A<Guid>();
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid), CreateUserRolePair(roleUuid, userUuid) };
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+            var right = CreateRight(createdRegistration, roleUuid, roleId, userUuid, userId);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, roleId);
+            ExpectRoleAssignmentReturns(createdRegistration, roleId, userId, right);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Update_Roles_To_Remove_Them()
+        {
+            //Arrange
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites();
+
+            var newRight = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
+            var newUserRolePair = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(newRight.User.Uuid, newRight.UserId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(newRight.Role.Uuid, newRight.RoleId);
+
+            ExpectRoleAssignmentReturns(createdRegistration, newRight.RoleId, newRight.UserId, newRight);
+
+            var rightToRemove = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
+            
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(rightToRemove.User.Uuid, rightToRemove.UserId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(rightToRemove.Role.Uuid, rightToRemove.RoleId);
+
+            var rightToKeep = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
+            var userRolePairToKeep = CreateUserRolePair(rightToKeep.Role.Uuid, rightToKeep.User.Uuid);
+            createdRegistration.Rights.Add(rightToRemove);
+            createdRegistration.Rights.Add(rightToKeep);
+
+            ExpectRoleRemovalReturns(createdRegistration, rightToRemove.RoleId, rightToRemove.UserId, rightToRemove);
+            ExpectGetDataProcessingRegistrationReturns(createdRegistration.Uuid, createdRegistration);
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(new List<UserRolePair>()
+            {
+                newUserRolePair, userRolePairToKeep
+            });
+
+            var updateParameters = new DataProcessingRegistrationModificationParameters
+            {
+                Roles = roles
+            };
+
+            //Act
+            var updateResult = _sut.Update(createdRegistration.Uuid, updateParameters);
+
+            //Assert
+            Assert.True(updateResult.Ok);
+            AssertTransactionCommitted(transaction);
+            _dprServiceMock.Verify(x => x.AssignRole(createdRegistration.Id, newRight.RoleId, newRight.UserId), Times.Once);
+            _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, rightToRemove.RoleId, rightToRemove.UserId), Times.Once);
+
+            _dprServiceMock.Verify(x => x.AssignRole(createdRegistration.Id, rightToKeep.RoleId, rightToKeep.UserId), Times.Never);
+            _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, rightToKeep.RoleId, rightToKeep.UserId), Times.Never);
+        }
+
+        private void ExpectRoleAssignmentReturns(DataProcessingRegistration dpr, int roleId, int userId, Result<DataProcessingRegistrationRight, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.AssignRole(dpr.Id, roleId, userId)).Returns(result);
+        }
+
+        private void ExpectRoleRemovalReturns(DataProcessingRegistration dpr, int roleId, int userId, Result<DataProcessingRegistrationRight, OperationError> result)
+        {
+            _dprServiceMock.Setup(x => x.RemoveRole(dpr.Id, roleId, userId)).Returns(result);
+        }
+
+        private UpdatedDataProcessingRegistrationRoles CreateUpdatedDataProcessingRegistrationRoles(IEnumerable<UserRolePair> roles)
+        {
+            return new UpdatedDataProcessingRegistrationRoles
+            {
+                UserRolePairs = roles.FromNullable().AsChangedValue()
+            };
+        }
+
+        private (Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters, DataProcessingRegistration createdRegistration, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
+            UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
+            IEnumerable<Guid> systemUsageUuids = null,
+            UpdatedDataProcessingRegistrationOversightDataParameters oversightData = null,
+            UpdatedDataProcessingRegistrationRoles roles = null)
+        {
+            var organizationUuid = A<Guid>();
+            var parameters = new DataProcessingRegistrationModificationParameters
+            {
+                Name = A<string>().AsChangedValue(),
+                General = generalData.FromNullable(),
+                SystemUsageUuids = systemUsageUuids.FromNullable(),
+                Oversight = oversightData.FromNullable(),
+                Roles = roles.FromNullable()
+            };
+            var createdRegistration = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
+            var transaction = ExpectTransaction();
+            var orgDbId = A<int>();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
+            ExpectCreateDataProcessingRegistrationReturns(orgDbId, parameters, parameters.Name.NewValue, createdRegistration);
+            return (organizationUuid, parameters, createdRegistration, transaction);
+        }
+
+        private static UserRolePair CreateUserRolePair(Guid roleUuid, Guid userUuid)
+        {
+            return new UserRolePair()
+            {
+                RoleUuid = roleUuid,
+                UserUuid = userUuid
+            };
+        }
+
+        private DataProcessingRegistrationRight CreateRight(DataProcessingRegistration dpr, Guid roleUuid, int roleId, Guid userUuid, int userId)
+        {
+            return new DataProcessingRegistrationRight()
+            {
+                Object = dpr,
+                Role = new DataProcessingRegistrationRole()
+                {
+                    Id = roleId,
+                    Uuid = roleUuid
+                },
+                RoleId = roleId,
+                User = new User()
+                {
+                    Id = userId,
+                    Uuid = userUuid
+                },
+                UserId = userId
+            };
         }
 
         private void ExpectUpdateNameReturns(int dprId, string nameNewValue, Result<DataProcessingRegistration, OperationError> result)
