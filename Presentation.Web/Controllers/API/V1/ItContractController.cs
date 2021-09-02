@@ -372,5 +372,17 @@ namespace Presentation.Web.Controllers.API.V1
             }
             return base.Patch(id, organizationId, obj);
         }
+
+        public override HttpResponseMessage Post(int organizationId, ItContractDTO dto)
+        {
+            var result = _itContractService.CanCreateNewContractWithName(dto.Name,organizationId);
+            if (result.Failed)
+                return FromOperationError(result.Error);
+            
+            if (result.Value == false)
+                return Conflict("Name must be unique within the organization");
+
+            return base.Post(organizationId, dto);
+        }
     }
 }
