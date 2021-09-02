@@ -17,11 +17,8 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
-using Ninject.Infrastructure.Language;
 using Presentation.Web.Controllers.API.V1.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -85,13 +82,31 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 var projectsQuery = _itProjectService
                     .GetAvailableProjects(orgId, q)
-                    .OrderBy(_=>_.Name)
+                    .OrderBy(_ => _.Name)
                     .Take(take)
                     .AsEnumerable()
                     .MapToNamedEntityDTOs()
                     .ToList();
 
                 return Ok(projectsQuery);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Project names must be unique within the organization")]
+        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        {
+            try
+            {
+                return _itProjectService
+                    .CanCreateNewProjectWithName(checkname, orgId)
+                    .Select(result => result ? Ok() : Conflict("Name taken"))
+                    .Match(result => result, FromOperationError);
             }
             catch (Exception e)
             {
@@ -557,6 +572,16 @@ namespace Presentation.Web.Controllers.API.V1
             if (accessModToken != null && accessModToken.ToObject<AccessModifier>() == AccessModifier.Public && AllowEntityVisibilityControl(itProject) == false)
             {
                 return Forbidden();
+            }
+
+            if (obj.TryGetValue(nameof(ItProject.Name), StringComparison.OrdinalIgnoreCase, out var nameToken))
+            {
+                var name = nameToken.ToObject<string>();
+                var validationError = _itProjectService.ValidateNewName(id, name);
+
+                if (validationError.HasValue)
+                    return FromOperationError(validationError.Value);
+
             }
 
             return base.Patch(id, organizationId, obj);
