@@ -913,7 +913,36 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Empty(removedRoleResponse.Roles);
         }
 
-        private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
+        [Fact]
+        public async Task Can_POST_Full_DataProcessingRegistration()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var (dataResponsible, basisForTransfer, generalDataWriteRequestDto) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            var userForRole = await CreateUser(organization);
+            var role = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
+            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var systemUsage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system.Uuid });
+            var request = new CreateDataProcessingRegistrationRequestDTO()
+            {
+                Name = CreateName(),
+                General = generalDataWriteRequestDto,
+                Oversight = null,           //TODO
+                ExternalReferences = null,  //TODO - awaiting jmo branch
+                OrganizationUuid = organization.Uuid,
+                SystemUsageUuids = new []{systemUsage.Uuid},
+                Roles = new[] { new RoleAssignmentRequestDTO { RoleUuid = role.Uuid, UserUuid = userForRole.Uuid } }
+            };
+
+            //Act
+            var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+            dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
+
+            //Assert
+            //TODO: Assertions
+        }
+
+        private static void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
         {
             Assert.Empty(actual.OversightOptions);
             Assert.Null(actual.OversightOptionsRemark);
