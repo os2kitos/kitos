@@ -923,14 +923,28 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var role = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var systemUsage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system.Uuid });
+            var oversightDate1 = CreateOversightDate();
+            var oversightDate2 = CreateOversightDate();
+            var oversightOption = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem();
+
+            var oversightInput = new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = new[] { oversightOption.Uuid },
+                OversightOptionsRemark = A<string>(),
+                OversightInterval = A<OversightIntervalChoice>(),
+                OversightIntervalRemark = A<string>(),
+                IsOversightCompleted = YesNoUndecidedChoice.Yes,
+                OversightCompletedRemark = A<string>(),
+                OversightDates = new[] { oversightDate1, oversightDate2 }
+            };
             var request = new CreateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalDataWriteRequestDto,
-                Oversight = null,           //TODO
+                Oversight = oversightInput,
                 ExternalReferences = null,  //TODO - awaiting jmo branch
                 OrganizationUuid = organization.Uuid,
-                SystemUsageUuids = new []{systemUsage.Uuid},
+                SystemUsageUuids = new[] { systemUsage.Uuid },
                 Roles = new[] { new RoleAssignmentRequestDTO { RoleUuid = role.Uuid, UserUuid = userForRole.Uuid } }
             };
 
@@ -939,7 +953,13 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
 
             //Assert
-            //TODO: Assertions
+            AssertGeneralData(organization, dataResponsible, generalDataWriteRequestDto, basisForTransfer, dto);
+            AssertMultiAssignment(request.SystemUsageUuids, dto.SystemUsages);
+            AssertOversight(oversightInput, dto.Oversight);
+            Assert.Equal(request.Name, dto.Name);
+            AssertOrganizationReference(organization, dto.OrganizationContext);
+            AssertSingleRight(role, userForRole, dto.Roles);
+            //TODO: Assertions for external references
         }
 
         private static void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
