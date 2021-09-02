@@ -65,11 +65,13 @@ describe("For user without additional roles", () => {
 describe("For Local Administrator", () => {
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsLocalAdmin();
     });
 
     afterAll(() => {
         testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
     });
 
     it("Create IT contract is enabled", () => {
@@ -104,11 +106,13 @@ describe("For Local Administrator", () => {
 describe("For Global Administrator", () => {
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsGlobalAdmin();
     });
 
     afterAll(() => {
         testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
     });
 
     it("Create IT contract is enabled", () => {

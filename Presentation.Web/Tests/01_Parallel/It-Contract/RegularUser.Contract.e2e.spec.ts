@@ -13,6 +13,7 @@ describe("Regular user has access to features in the contract overview", () => {
     var testFixture = new TestFixtureWrapper();
 
     beforeAll(() => {
+        testFixture.enableLongRunningTest();
         loginHelper.loginAsRegularUser();
     });
 
@@ -23,6 +24,7 @@ describe("Regular user has access to features in the contract overview", () => {
 
     afterAll(() => {
         testFixture.cleanupState();
+        testFixture.disableLongRunningTest();
     });
 
     it("Reset Filter is clickable", () => {
