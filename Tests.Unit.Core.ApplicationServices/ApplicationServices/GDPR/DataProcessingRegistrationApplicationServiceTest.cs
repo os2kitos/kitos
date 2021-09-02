@@ -539,6 +539,49 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.SetMasterReference(id, A<int>()));
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Clear_Master_Reference(bool hasMasterReference)
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var referenceId = A<int>();
+            var masterToRemove = new ExternalReference() { Id = referenceId };
+
+            var registration = new DataProcessingRegistration
+            {
+                Reference = hasMasterReference ? masterToRemove : null
+            };
+
+            ExpectRepositoryGetToReturn(agreementId, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.ClearMasterReference(agreementId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Null(registration.Reference);
+            transaction.Verify(x => x.Commit());
+            if(hasMasterReference)
+                Assert.Same(masterToRemove, result.Value);
+        }
+
+        [Fact]
+        public void Cannot_Clear_Master_Reference_On_Dpa_If_WriteAccess_Is_Not_Permitted()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearMasterReference(id));
+        }
+
+        [Fact]
+        public void Cannot_Clear_Master_Reference_On_Dpa_With_Invalid_Dpa()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.ClearMasterReference(id));
+        }
+
         [Fact]
         public void Can_GetSystemsWhichCanBeAssigned()
         {

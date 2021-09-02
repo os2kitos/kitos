@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.DomainModel
 {
@@ -8,5 +9,6 @@ namespace Core.DomainModel
         ReferenceRootType GetRootType();
         Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference);
         Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference);
+        void ClearMasterReference();
     }
 }

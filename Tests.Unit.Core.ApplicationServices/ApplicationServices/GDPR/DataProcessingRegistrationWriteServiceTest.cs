@@ -1812,7 +1812,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownError(createResult, error, transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Failed to assign role with Uuid: {roleUuid} from user with Uuid: {userUuid}, with following error message:", error.FailureType, transaction);
         }
 
         [Fact]
@@ -1903,8 +1903,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
             
-            foreach (var externalReference in externalReferences)
-                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
+            ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1912,52 +1911,10 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
-            Assert.Equal(expectedMaster.Title, result.Value.Reference.Title);
         }
 
         [Fact]
-        public void Cannot_Create_With_ExternalReferences_But_No_Master()
-        {
-            //Arrange
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
-
-            foreach (var externalReference in externalReferences)
-                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "A master reference must be defined", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_ExternalReferences_And_Multiple_Masters()
-        {
-            //Arrange
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            //Set two masters
-            foreach (var master in externalReferences.Take(2))
-                master.MasterReference = true;
-
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
-
-            foreach (var externalReference in externalReferences)
-                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "Only one reference can be master reference", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_ExternalReferences_If_Add_Reference_Fails()
+        public void Cannot_Create_With_ExternalReferences_If_BatchUpdate_Fails()
         {
             //Arrange
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
@@ -1967,38 +1924,22 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
 
-            foreach (var externalReference in externalReferences)
-                ExpectAddExternalReferenceReturns(createdRegistration, externalReference, CreateExternalReference(externalReference));
-
             var operationError = A<OperationError>();
 
-            ExpectAddExternalReferenceReturns(createdRegistration, expectedMaster, operationError);
+            ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownError(result, operationError, transaction);
+            AssertFailureWithKnownErrorDetails(result, "Failed to update references with error message", operationError.FailureType, transaction);
         }
 
-        private void ExpectAddExternalReferenceReturns(DataProcessingRegistration dpr, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
+        private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
-            if (value.Ok)
-                dpr.AddExternalReference(value.Value);
             _referenceServiceMock
-                .Setup(x => x.AddReference(dpr.Id, ReferenceRootType.DataProcessingRegistration, externalReference.Title, externalReference.DocumentId, externalReference.Url))
+                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
                 .Returns(value);
-        }
-
-        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
-        {
-            return new ExternalReference
-            {
-                Id = A<int>(),
-                Title = externalReference.Title,
-                ExternalReferenceId = externalReference.DocumentId,
-                URL = externalReference.Url
-            };
         }
 
         private void ExpectRoleAssignmentReturns(DataProcessingRegistration dpr, int roleId, int userId, Result<DataProcessingRegistrationRight, OperationError> result)

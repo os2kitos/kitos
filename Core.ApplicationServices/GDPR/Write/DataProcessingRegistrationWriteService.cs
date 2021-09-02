@@ -16,7 +16,6 @@ using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Core.ApplicationServices.GDPR.Write
@@ -122,37 +121,13 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> PerformReferencesUpdate(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
-            //Clear existing state
-            dpr.ClearMasterReference();
-            _referenceService.DeleteByDataProcessingRegistrationId(dpr.Id);
-            var newReferences = externalReferences.ToList();
-            if (newReferences.Any())
-            {
-                var masterReferencesCount = newReferences.Count(x => x.MasterReference);
+            var updateResult = _referenceService.BatchUpdateExternalReferences(
+                ReferenceRootType.DataProcessingRegistration,
+                dpr.Id,
+                externalReferences.ToList());
 
-                switch (masterReferencesCount)
-                {
-                    case < 1:
-                        return new OperationError("A master reference must be defined", OperationFailure.BadInput);
-                    case > 1:
-                        return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
-                }
-
-                foreach (var referenceProperties in newReferences)
-                {
-                    var result = _referenceService.AddReference(dpr.Id, ReferenceRootType.DataProcessingRegistration, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-
-                    if (result.Failed)
-                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
-
-                    if (referenceProperties.MasterReference)
-                    {
-                        var masterReferenceResult = dpr.SetMasterReference(result.Value);
-                        if (masterReferenceResult.Failed)
-                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
-                    }
-                }
-            }
+            if (updateResult.HasValue)
+                return new OperationError($"Failed to update references with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
 
             return dpr;
         }
