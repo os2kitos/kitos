@@ -96,13 +96,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return new UpdatedDataProcessingRegistrationRoles
             {
-                UserRolePairs = (roleAssignmentResponseDtos.Any() ?
-                    Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
+                UserRolePairs = roleAssignmentResponseDtos.Any() ?
+                    roleAssignmentResponseDtos.Select(x => new UserRolePair
                     {
                         RoleUuid = x.RoleUuid,
                         UserUuid = x.UserUuid
-                    })) :
-                    Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue()
+                    }).FromNullable().AsChangedValue() :
+                    Maybe<IEnumerable<UserRolePair>>.None
             };
         }
     }

@@ -164,8 +164,13 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> UpdateRoles(DataProcessingRegistration dpr, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
-            var existingRightsList = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
             var newRightsList = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+            if (newRightsList.Distinct().Count() != newRightsList.Count)
+            {
+                return new OperationError($"Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput);
+            }
+
+            var existingRightsList = dpr.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
 
             foreach (var (delta, item) in existingRightsList.ComputeDelta(newRightsList, x => x))
             {

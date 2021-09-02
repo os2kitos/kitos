@@ -1822,6 +1822,35 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Cannot_Create_With_Roles_If_Duplicates()
+        {
+            //Arrange
+            var roleId = A<int>();
+            var roleUuid = A<Guid>();
+            var userId = A<int>();
+            var userUuid = A<Guid>();
+
+            var rolePairs = new List<UserRolePair>() { CreateUserRolePair(roleUuid, userUuid), CreateUserRolePair(roleUuid, userUuid) };
+
+            var roles = CreateUpdatedDataProcessingRegistrationRoles(rolePairs);
+
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(roles: roles);
+            var right = CreateRight(createdRegistration, roleUuid, roleId, userUuid, userId);
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<User>(userUuid, userId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingRegistrationRole>(roleUuid, roleId);
+            ExpectRoleAssignmentReturns(createdRegistration, roleId, userId, right);
+
+            //Act
+            var createResult = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(createResult.Failed);
+            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
+            AssertTransactionNotCommitted(transaction);
+        }
+
+        [Fact]
         public void Can_Update_Roles_To_Remove_Them()
         {
             //Arrange
