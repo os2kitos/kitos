@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                 DocumentId = x.DocumentId,
                 Url = x.Url,
                 MasterReference = x.MasterReference
-            });
+            }).ToList();
         }
 
         public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)

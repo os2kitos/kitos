@@ -1759,9 +1759,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Could not find role with Uuid: {roleUuid}", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1786,9 +1784,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Could not find user with Uuid: {userUuid}", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1816,9 +1812,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownError(createResult, error, transaction);
         }
 
         [Fact]
@@ -1845,9 +1839,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, "Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1939,9 +1931,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(result, "A master reference must be defined", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1963,9 +1953,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(result, "Only one reference can be master reference", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1990,9 +1978,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Equal(operationError.FailureType, result.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         private void ExpectAddExternalReferenceReturns(DataProcessingRegistration dpr, UpdatedExternalReferenceProperties externalReference, Result<ExternalReference, OperationError> value)
