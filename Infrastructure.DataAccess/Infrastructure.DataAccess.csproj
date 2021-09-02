@@ -1395,6 +1395,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Patch_Uuid_DataProcessingRegistration.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Ensure_dpr_contract_project_uniquename.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
