@@ -67,6 +67,13 @@ namespace Core.ApplicationServices.Project
                 return OperationFailure.Forbidden;
             }
 
+            var canCreateNewProjectWithName = CanCreateNewProjectWithName(name, organizationId);
+            if (canCreateNewProjectWithName.Failed)
+                return canCreateNewProjectWithName.Error.FailureType;
+
+            if (canCreateNewProjectWithName.Value == false)
+                return OperationFailure.Conflict;
+
             _projectRepository.Insert(project);
             _projectRepository.Save();
             _domainEvents.Raise(new EntityCreatedEvent<ItProject>(project));
@@ -190,8 +197,44 @@ namespace Core.ApplicationServices.Project
                 .GetProject(uuid)
                 .Match
                 (
-                    project => _authorizationContext.AllowReads(project) ? Result<ItProject, OperationError>.Success(project) : new OperationError(OperationFailure.Forbidden),
+                    WithReadAccess,
                     () => new OperationError(OperationFailure.NotFound)
+                );
+        }
+
+        private Result<ItProject, OperationError> WithReadAccess(ItProject project)
+        {
+            return _authorizationContext.AllowReads(project) ? Result<ItProject, OperationError>.Success(project) : new OperationError(OperationFailure.Forbidden);
+        }
+
+        public Result<bool, OperationError> CanCreateNewProjectWithName(string name, int orgId)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+
+            return _itProjectRepository.GetProjectsInOrganization(orgId).ByNameExact(name).Any() == false;
+        }
+
+        public Maybe<OperationError> ValidateNewName(int projectId, string newName)
+        {
+            if (string.IsNullOrWhiteSpace(newName))
+                return new OperationError(OperationFailure.BadInput);
+
+            return _itProjectRepository
+                .GetById(projectId)
+                .FromNullable()
+                .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound))
+                .Select(project => _itProjectRepository.GetProjectsInOrganization(project.OrganizationId).ByNameExact(newName).ExceptEntitiesWithIds(projectId).Any())
+                .Match
+                (
+                    overlapsFound =>
+                        overlapsFound ?
+                            new OperationError(OperationFailure.Conflict) :
+                            Maybe<OperationError>.None,
+                    error => error
                 );
         }
 

@@ -171,5 +171,19 @@ namespace Tests.Integration.Presentation.Web.Contract
             var deletedContractAdvices = await advicesResponse.Result.ReadOdataListResponseBodyAsAsync<Core.DomainModel.Advice.Advice>();
             Assert.True(deletedContractAdvices.Count == 0);
         }
+
+        [Fact]
+        public async Task Cannot_Create_With_Duplicate_Name_In_Same_Organization()
+        {
+            //Arrange
+            var name = A<string>();
+            using var r1 = await ItContractHelper.SendCreateContract(name, TestEnvironment.DefaultOrganizationId).WithExpectedResponseCode(HttpStatusCode.Created);
+
+            //Act
+            using var conflictedResponse = await ItContractHelper.SendCreateContract(name, TestEnvironment.DefaultOrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, conflictedResponse.StatusCode);
+        }
     }
 }

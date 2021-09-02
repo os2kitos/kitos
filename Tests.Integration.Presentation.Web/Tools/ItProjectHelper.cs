@@ -13,6 +13,17 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         public static async Task<ItProjectDTO> CreateProject(string name, int organizationId)
         {
+            using var createdResponse = await SendCreateProject(name, organizationId);
+            Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
+            var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItProjectDTO>();
+
+            Assert.Equal(organizationId, response.OrganizationId);
+            Assert.Equal(name, response.Name);
+            return response;
+        }
+
+        public static async Task<HttpResponseMessage> SendCreateProject(string name, int organizationId)
+        {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             var body = new
@@ -21,15 +32,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 organizationId = organizationId,
             };
 
-            using (var createdResponse = await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/itproject?organizationId={organizationId}"), cookie, body))
-            {
-                Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-                var response = await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<ItProjectDTO>();
-
-                Assert.Equal(organizationId, response.OrganizationId);
-                Assert.Equal(name, response.Name);
-                return response;
-            }
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/itproject?organizationId={organizationId}"), cookie, body);
         }
 
         public static async Task<ItProjectDTO> GetProjectAsync(int projectId)

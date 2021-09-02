@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -91,5 +92,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
             return Ok(result);
         }
+
+        [NonAction]
+        public override IHttpActionResult Post(int organizationId, ItContract entity) => throw new NotSupportedException();
     }
 }
