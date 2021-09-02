@@ -18,6 +18,7 @@ using Core.DomainServices.Extensions;
 using Infrastructure.Services.DomainEvents;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Exceptions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
@@ -499,6 +500,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             if (result.Error == OperationFailure.Forbidden)
                 throw new SecurityException();
+            if (result.Error == OperationFailure.Conflict)
+                throw new ConflictException();
             throw new InvalidOperationException(result.Error.ToString("G"));
         }
 
