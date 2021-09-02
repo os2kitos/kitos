@@ -210,8 +210,8 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin();
 
-                var existingReadModelUsageIds = _readModelRepository.GetByDataProcessingRegistrationId(update.SourceId).Select(x => x.SourceEntityId);
-                var currentUsageIds = _itSystemUsageRepository.GetByDataProcessingAgreement(update.SourceId).Select(x => x.Id);
+                var existingReadModelUsageIds = _readModelRepository.GetByDataProcessingRegistrationId(update.SourceId).Select(x => x.SourceEntityId).ToList();
+                var currentUsageIds = _itSystemUsageRepository.GetByDataProcessingAgreement(update.SourceId).Select(x => x.Id).ToList();
 
                 var ids = existingReadModelUsageIds.Concat(currentUsageIds).Distinct().ToList();
 
@@ -230,7 +230,7 @@ namespace Core.BackgroundJobs.Model.ReadModels
 
                 using var transaction = _transactionManager.Begin();
 
-                var ids = _readModelRepository.GetByItInterfaceId(update.SourceId).Select(x => x.SourceEntityId);
+                var ids = _readModelRepository.GetByItInterfaceId(update.SourceId).Select(x => x.SourceEntityId).ToList();
 
                 updatesExecuted = PerformUpdate(updatesExecuted, alreadyScheduledIds, ids, update, transaction);
             }
