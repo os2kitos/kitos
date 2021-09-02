@@ -18,6 +18,7 @@ using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -836,18 +837,24 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role = DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRole, DataProcessingRegistrationRole>(x => x.AsQueryable().First());
+            var role1 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
+            var role2 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 1, 1)).First();
             var roles = new List<RoleAssignmentRequestDTO>
             {
                 new()
                 {
-                    RoleUuid = role.Uuid,
+                    RoleUuid = role1.Uuid,
                     UserUuid = user1.Uuid
                 },
                 new()
                 {
-                    RoleUuid = role.Uuid,
+                    RoleUuid = role1.Uuid,
                     UserUuid = user2.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user1.Uuid
                 }
             };
 
@@ -863,9 +870,10 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Assert
             var freshReadDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
-            Assert.Equal(2, freshReadDTO.Roles.Count());
-            AssertSingleRight(role, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid));
-            AssertSingleRight(role, user2, freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
+            Assert.Equal(3, freshReadDTO.Roles.Count());
+            AssertSingleRight(role1, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid && x.Role.Uuid == role1.Uuid));
+            AssertSingleRight(role1, user2, freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
+            AssertSingleRight(role2, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid && x.Role.Uuid == role2.Uuid));
         }
 
         [Fact]
@@ -876,7 +884,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var user1 = await CreateUser(organization);
             var user2 = await CreateUser(organization);
-            var role = DatabaseAccess.MapFromEntitySet<DataProcessingRegistrationRole, DataProcessingRegistrationRole>(x => x.AsQueryable().First());
+            var role = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
 
             var createdDTO = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid });
 
@@ -1019,7 +1027,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
         }
 
-        private static void AssertSingleRight(DataProcessingRegistrationRole expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
+        private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
         {
             var actualRight = Assert.Single(rightList);
             Assert.Equal(expectedRole.Name, actualRight.Role.Name);
