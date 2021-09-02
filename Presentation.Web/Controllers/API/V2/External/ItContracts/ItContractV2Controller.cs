@@ -4,7 +4,6 @@ using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Contract;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using Swashbuckle.Swagger.Annotations;
 using System;
@@ -36,6 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="organizationUuid">Organization UUID filter</param>
         /// <param name="systemUuid">Associated system UUID filter</param>
         /// <param name="systemUsageUuid">Associated system usage UUID filter</param>
+        /// <param name="dataProcessingRegistrationUuid">Associated data processing registration UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
         /// <returns></returns>
         [HttpGet]
@@ -48,6 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid organizationUuid,
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
+            [NonEmptyGuid] Guid? dataProcessingRegistrationUuid = null,
             string nameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
@@ -61,6 +62,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             if (systemUsageUuid.HasValue)
                 refinements.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
+
+            if (dataProcessingRegistrationUuid.HasValue)
+                refinements.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
 
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
