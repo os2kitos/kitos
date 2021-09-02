@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Returns_Forbidden()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(false);
 
             //Act
             var result = _sut.AddProject(A<string>(), A<int>());
@@ -79,10 +79,13 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Configures_New_Project_And_Returns_Ok()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(true);
+            var organizationId = A<int>();
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(true);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(It.IsAny<int>())).Returns(new EnumerableQuery<ItProject>(new List<ItProject>()));
 
             //Act
-            var result = _sut.AddProject(A<string>(), A<int>());
+            var result = _sut.AddProject(A<string>(), organizationId);
 
             //Assert
             Assert.True(result.Ok);
@@ -99,6 +102,25 @@ namespace Tests.Unit.Presentation.Web.Services
                 var year = resultValue.EconomyYears.ToList()[i];
                 Assert.Equal(i, year.YearNumber);
             }
+        }
+
+
+        [Fact]
+        public void Add_Returns_Conflict_If_Name_Is_Taken()
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(true);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(It.IsAny<int>())).Returns(new EnumerableQuery<ItProject>(new List<ItProject> { new() { Id = A<int>(), Name = name } }));
+
+            //Act
+            var result = _sut.AddProject(name, organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error);
         }
 
         [Fact]
