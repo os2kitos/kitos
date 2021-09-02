@@ -11,11 +11,10 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Result;
 using Core.DomainServices;
-using Presentation.Web.Extensions;
 using Core.DomainServices.Authorization;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -49,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V1
         public virtual HttpResponseMessage Get(string q, int orgId, [FromUri] PagingModel<ItContract> paging)
         {
             var contractQuery = _itContractService.GetAllByOrganization(orgId, q);
-            
+
             var contractDTO = Page(contractQuery, paging)
                 .AsEnumerable()
                 .MapToNamedEntityDTOs()
@@ -317,6 +316,24 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(_ => Ok(), FromOperationError);
         }
 
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Contract names must be unique within the organization")]
+        public HttpResponseMessage GetCanCreateNewProjectWithName(string checkname, int orgId)
+        {
+            try
+            {
+                return _itContractService
+                    .CanCreateNewContractWithName(checkname, orgId)
+                    .Select(result => result ? Ok() : Conflict("Name taken"))
+                    .Match(result => result, FromOperationError);
+            }
+            catch (Exception e)
+            {
+                return LogError(e);
+            }
+        }
+
         private IEnumerable<ItSystemUsageSimpleDTO> MapSystemUsages(ItContract contract)
         {
             return Map<IEnumerable<ItSystemUsage>, IEnumerable<ItSystemUsageSimpleDTO>>(contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage));
@@ -341,6 +358,19 @@ namespace Presentation.Web.Controllers.API.V1
         {
             newContract.Uuid = Guid.NewGuid();
             base.PrepareNewObject(newContract);
+        }
+
+        public override HttpResponseMessage Patch(int id, int organizationId, JObject obj)
+        {
+            if (obj.TryGetValue(nameof(ItContract.Name), StringComparison.OrdinalIgnoreCase, out var nameToken))
+            {
+                var name = nameToken.ToObject<string>();
+                var validationError = _itContractService.ValidateNewName(id, name);
+
+                if (validationError.HasValue)
+                    return FromOperationError(validationError.Value);
+            }
+            return base.Patch(id, organizationId, obj);
         }
     }
 }

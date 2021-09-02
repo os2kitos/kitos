@@ -50,7 +50,7 @@ namespace Core.ApplicationServices.Contract
             _referenceService = referenceService;
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
-            _authorizationContext = authorizationContext; 
+            _authorizationContext = authorizationContext;
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
             _organizationService = organizationService;
@@ -112,7 +112,7 @@ namespace Core.ApplicationServices.Contract
                 }
             }
             return contract;
-            
+
         }
 
         public Result<DataProcessingRegistration, OperationError> AssignDataProcessingRegistration(int id, int dataProcessingRegistrationId)
@@ -167,6 +167,45 @@ namespace Core.ApplicationServices.Contract
                 );
         }
 
+        public Result<bool, OperationError> CanCreateNewContractWithName(string name, int organizationId)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return false;
+
+            if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.All)
+                return new OperationError(OperationFailure.Forbidden);
+
+            return SearchByName(organizationId, name).Any() == false;
+        }
+
+        public Maybe<OperationError> ValidateNewName(int contractId, string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return new OperationError(OperationFailure.BadInput);
+
+            return
+                _repository
+                    .GetById(contractId)
+                    .FromNullable()
+                    .Match(WithReadAccess, () => new OperationError(OperationFailure.NotFound))
+                    .Select(project => SearchByName(project.OrganizationId, name).ExceptEntitiesWithIds(contractId).Any())
+                    .Match
+                    (
+                        overlapsFound =>
+                            overlapsFound ? new OperationError(OperationFailure.Conflict) : Maybe<OperationError>.None,
+                        error => error
+                    );
+        }
+
+        private IQueryable<ItContract> SearchByName(int organizationId, string name)
+        {
+            return _repository.GetContractsInOrganization(organizationId).ByNameExact(name);
+        }
+
+        private Result<ItContract, OperationError> WithReadAccess(ItContract contract)
+        {
+            return _authorizationContext.AllowReads(contract) ? Result<ItContract, OperationError>.Success(contract) : new OperationError(OperationFailure.Forbidden);
+        }
 
         private static IEnumerable<EconomyStream> GetEconomyStreams(ItContract contract)
         {

@@ -5,6 +5,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Contract
 {
@@ -20,5 +21,7 @@ namespace Core.ApplicationServices.Contract
 
         Result<IQueryable<ItContract>, OperationError> GetContractsInOrganization(Guid organizationUuid, params IDomainQuery<ItContract>[] conditions);
         Result<ItContract, OperationError> GetContract(Guid uuid);
+        Result<bool,OperationError> CanCreateNewContractWithName(string name, int organizationId);
+        Maybe<OperationError> ValidateNewName(int contractId, string name);
     }
 }

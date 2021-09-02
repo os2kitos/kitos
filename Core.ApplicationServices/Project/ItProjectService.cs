@@ -212,7 +212,7 @@ namespace Core.ApplicationServices.Project
             if (string.IsNullOrWhiteSpace(name))
                 return false;
 
-            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) == OrganizationDataReadAccessLevel.None)
+            if (_authorizationContext.GetOrganizationReadAccessLevel(orgId) < OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
 
             return _itProjectRepository.GetProjectsInOrganization(orgId).ByNameExact(name).Any() == false;

@@ -99,7 +99,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict, Description = "It Project names must be unique within the organization")]
-        public HttpResponseMessage GetNameAvailable(string checkname, int orgId)
+        public HttpResponseMessage GetCanCreateNewProjectWithName(string checkname, int orgId)
         {
             try
             {
@@ -581,7 +581,6 @@ namespace Presentation.Web.Controllers.API.V1
 
                 if (validationError.HasValue)
                     return FromOperationError(validationError.Value);
-
             }
 
             return base.Patch(id, organizationId, obj);
