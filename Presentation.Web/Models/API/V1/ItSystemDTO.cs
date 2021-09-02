@@ -9,7 +9,6 @@ namespace Presentation.Web.Models.API.V1
         public ItSystemDTO()
         {
             TaskRefIds = new List<int>();
-            //CanUseInterfaceIds = new List<int>();
         }
 
         public int Id { get; set; }
@@ -65,8 +64,6 @@ namespace Presentation.Web.Models.API.V1
 
         public int? InterfaceId { get; set; }
 
-        public IEnumerable<DataRowDTO> DataRows { get; set; }
-
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
 
@@ -88,8 +85,5 @@ namespace Presentation.Web.Models.API.V1
         public ExternalReferenceDTO Reference;
         public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
         public string ArchiveDutyComment { get; set; }
-
-        public string LinkToDirectoryAdminUrlName { get; set; }
-        public string LinkToDirectoryAdminUrl { get; set; }
     }
 }

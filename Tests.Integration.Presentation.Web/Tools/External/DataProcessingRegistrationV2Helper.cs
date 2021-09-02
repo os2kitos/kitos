@@ -6,7 +6,6 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -97,6 +96,23 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutSystemsAsync(string token, Guid uuid, IEnumerable<Guid> payload)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/system-usages"), token, payload?.ToList());
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token);
+        }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
+        {
+            using var response = await SendPutOversightAsync(token, uuid, payload);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight"), token, payload);
         }
     }
 }

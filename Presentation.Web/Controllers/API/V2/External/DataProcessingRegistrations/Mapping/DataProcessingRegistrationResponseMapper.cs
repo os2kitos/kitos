@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private OversightIntervalChoice? MapOversightInterval(YearMonthIntervalOption? oversightInterval)
         {
-            return oversightInterval?.ToYesNoDontKnowChoice();
+            return oversightInterval?.ToIntervalChoice();
         }
 
         private static YesNoUndecidedChoice? MapYesNoUndecided(YesNoUndecidedOption? yesNoUndecidedOption)
