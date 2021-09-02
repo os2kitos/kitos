@@ -1,4 +1,5 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -15,6 +16,10 @@
             RenameIndex(table: "dbo.ItContract", name: "Contract_Index_Name", newName: "IX_Name");
             RenameIndex(table: "dbo.ItInterface", name: "UX_NamePerOrg", newName: "UX_NameAndVersionUniqueToOrg");
             RenameIndex(table: "dbo.ItProject", name: "Project_Index_Name", newName: "IX_Name");
+
+            //Ensures that names are unique prior to adding unique constraints
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Ensure_dpr_contract_project_uniquename.sql"));
+
             CreateIndex("dbo.ItSystem", "Name");
             CreateIndex("dbo.ItSystem", "OrganizationId");
             CreateIndex("dbo.DataProcessingRegistrations", new[] { "OrganizationId", "Name" }, unique: true, name: "UX_NameUniqueToOrg");

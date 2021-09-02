@@ -3,6 +3,7 @@ using System.Linq;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.Project
 {
@@ -25,5 +26,7 @@ namespace Core.ApplicationServices.Project
 
         Result<Handover, OperationFailure> DeleteHandoverParticipant(int projectId, int participantId);
         Result<ItProject, OperationError> GetProject(Guid uuid);
+        Result<bool,OperationError> CanCreateNewProjectWithName(string name, int orgId);
+        Maybe<OperationError> ValidateNewName(int projectId, string newName);
     }
 }

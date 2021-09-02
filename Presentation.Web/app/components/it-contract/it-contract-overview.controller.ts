@@ -113,7 +113,7 @@
                 controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
                     $scope.formData = {};
                     $scope.type = "IT Kontrakt";
-                    $scope.checkAvailbleUrl = "api/itProject/";
+                    $scope.checkAvailbleUrl = "api/itContract/";
 
                     $scope.saveAndProceed = () => {
 
