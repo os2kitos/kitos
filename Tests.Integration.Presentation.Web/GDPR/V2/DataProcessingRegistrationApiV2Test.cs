@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -14,7 +15,10 @@ using Presentation.Web.Models.API.V2.Response.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1.GDPR;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Options;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
@@ -825,7 +829,91 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertEmptiedOversight(updatedDPR3.Oversight);
         }
 
-        private static void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
+        [Fact]
+        public async Task Can_POST_With_Roles()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role1 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
+            var role2 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 1, 1)).First();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user2.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user1.Uuid
+                }
+            };
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            };
+
+            //Act
+            var createdDTO = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Assert
+            var freshReadDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
+            Assert.Equal(3, freshReadDTO.Roles.Count());
+            AssertSingleRight(role1, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid && x.Role.Uuid == role1.Uuid));
+            AssertSingleRight(role1, user2, freshReadDTO.Roles.Where(x => x.User.Uuid == user2.Uuid));
+            AssertSingleRight(role2, user1, freshReadDTO.Roles.Where(x => x.User.Uuid == user1.Uuid && x.Role.Uuid == role2.Uuid));
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Roles()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var user1 = await CreateUser(organization);
+            var user2 = await CreateUser(organization);
+            var role = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
+
+            var createdDTO = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid });
+
+            var initialRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user1.Uuid } };
+            var modifyRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user2.Uuid } };
+
+            //Act - Add role
+            using var addInitialRolesRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, initialRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            var initialRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
+            AssertSingleRight(role, user1, initialRoleResponse.Roles);
+
+            //Act - Modify role
+            using var modifiedRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, modifyRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            var modifiedRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
+            AssertSingleRight(role, user2, modifiedRoleResponse.Roles);
+
+            //Act - Remove role
+            using var removedRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>()).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            var removedRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
+            Assert.Empty(removedRoleResponse.Roles);
+        }
+
+        private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
         {
             Assert.Empty(actual.OversightOptions);
             Assert.Null(actual.OversightOptionsRemark);
@@ -939,6 +1027,16 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
         }
 
+        private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
+        {
+            var actualRight = Assert.Single(rightList);
+            Assert.Equal(expectedRole.Name, actualRight.Role.Name);
+            Assert.Equal(expectedRole.Uuid, actualRight.Role.Uuid);
+            Assert.Equal(expectedUser.Uuid, actualRight.User.Uuid);
+            Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
+        }
+
+
         private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
         {
             var dto = Assert.Single(dtos, dpr => dpr.Uuid == expectedContent.Uuid);
@@ -970,6 +1068,13 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
+        }
+
+        private async Task<User> CreateUser(Organization organization)
+        {
+            var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, organization.Id);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
+            return user;
         }
 
         private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)
