@@ -138,6 +138,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.PurchaseTypes, OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.PaymentModelTypes, OptionV2ApiHelper.ResourceName.ItContractPaymentModelTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.AgreementElementTypes, OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PaymentFrequencyTypes, OptionV2ApiHelper.ResourceName.ItContractPaymentFrequencyTypes };
         }
     }
 }
