@@ -4,7 +4,6 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
@@ -14,10 +13,10 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
 
@@ -39,6 +38,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
 
 
         public DataProcessingRegistrationApplicationService(
@@ -55,7 +55,8 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -71,6 +72,7 @@ namespace Core.ApplicationServices.GDPR
             _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
             _userContext = userContext;
+            _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -224,7 +226,7 @@ namespace Core.ApplicationServices.GDPR
             return WithReadAccess<IEnumerable<ItSystemUsage>>(id, registration =>
                 _systemAssignmentService
                     .GetApplicableSystems(registration)
-                    .Where(x=>x.ItSystem.Name.Contains(nameQuery))
+                    .Where(x => x.ItSystem.Name.Contains(nameQuery))
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.ItSystem.Name)
@@ -465,7 +467,7 @@ namespace Core.ApplicationServices.GDPR
                 var oversightDates = registration.SetOversightCompleted(isOversightCompleted);
                 if (oversightDates.HasValue)
                 {
-                    oversightDates.Value.ToList().ForEach(x => _oversightDateAssignmentService.Remove(x));
+                    oversightDates.Value.ToList().ForEach(_dataProcessingRegistrationOversightDateRepository.Delete);
                 }
                 return registration;
             });

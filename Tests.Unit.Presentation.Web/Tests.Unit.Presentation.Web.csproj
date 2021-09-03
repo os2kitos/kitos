@@ -206,7 +206,7 @@
     <Compile Include="DomainServices\Contract\QueryByDataProcessingRegistrationUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUsageUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
-    <Compile Include="DomainServices\DPR\QQueryByAgreementConcludedTest.cs" />
+    <Compile Include="DomainServices\DPR\QueryByAgreementConcludedTest.cs" />
     <Compile Include="DomainServices\DPR\QueryByDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySubDataProcessorUuidTest.cs" />
     <Compile Include="DomainServices\DPR\QueryBySystemUsageUuidTest.cs" />
