@@ -6,7 +6,6 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
-using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -708,16 +707,10 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightDate2 = CreateOversightDate();
             var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem() : default;
 
-            var input = new DataProcessingRegistrationOversightWriteRequestDTO()
-            {
-                OversightOptionUuids = withOversightOptions ? new[] { oversightOption.Uuid } : null,
-                OversightOptionsRemark = A<string>(),
-                OversightInterval = A<OversightIntervalChoice>(),
-                OversightIntervalRemark = A<string>(),
-                IsOversightCompleted = withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
-                OversightCompletedRemark = A<string>(),
-                OversightDates = withOversightDates ? new[] { oversightDate1, oversightDate2 } : new List<OversightDateDTO>()
-            };
+            var input = CreateOversightRequest(
+                withOversightOptions ? new[] { oversightOption.Uuid } : Array.Empty<Guid>(), 
+                withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(), 
+                withOversightDates ? new[] { oversightDate1, oversightDate2 } : Array.Empty<OversightDateDTO>());
 
             var request = new CreateDataProcessingRegistrationRequestDTO
             {
@@ -783,16 +776,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightDate2 = CreateOversightDate();
             var oversightOption1 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 0)).OrderBy(x => A<int>()).First();
 
-            var input1 = new DataProcessingRegistrationOversightWriteRequestDTO()
-            {
-                OversightOptionUuids = new[] { oversightOption1.Uuid },
-                OversightOptionsRemark = A<string>(),
-                OversightInterval = A<OversightIntervalChoice>(),
-                OversightIntervalRemark = A<string>(),
-                IsOversightCompleted = YesNoUndecidedChoice.Yes,
-                OversightCompletedRemark = A<string>(),
-                OversightDates = new[] { oversightDate1, oversightDate2 }
-            };
+            var input1 = CreateOversightRequest(new[] { oversightOption1.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate1, oversightDate2 });
+
 
             //Act - Update empty DPR
             var updatedDPR1 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input1);
@@ -805,16 +790,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightDate4 = CreateOversightDate();
             var oversightOption2 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 1)).OrderBy(x => A<int>()).First();
 
-            var input2 = new DataProcessingRegistrationOversightWriteRequestDTO()
-            {
-                OversightOptionUuids = new[] { oversightOption2.Uuid },
-                OversightOptionsRemark = A<string>(),
-                OversightInterval = A<OversightIntervalChoice>(),
-                OversightIntervalRemark = A<string>(),
-                IsOversightCompleted = YesNoUndecidedChoice.Yes,
-                OversightCompletedRemark = A<string>(),
-                OversightDates = new[] { oversightDate3, oversightDate4 }
-            };
+            var input2 = CreateOversightRequest(new[] { oversightOption2.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate3, oversightDate4 });
 
             var updatedDPR2 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input2);
 
@@ -987,16 +963,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferenceInputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var oversightInput = new DataProcessingRegistrationOversightWriteRequestDTO()
-            {
-                OversightOptionUuids = new[] { oversightOption.Uuid },
-                OversightOptionsRemark = A<string>(),
-                OversightInterval = A<OversightIntervalChoice>(),
-                OversightIntervalRemark = A<string>(),
-                IsOversightCompleted = YesNoUndecidedChoice.Yes,
-                OversightCompletedRemark = A<string>(),
-                OversightDates = new[] { oversightDate1, oversightDate2 }
-            };
+            var oversightInput = CreateOversightRequest(new[] {oversightOption.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1, oversightDate2});
+
             var request = new CreateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
@@ -1022,20 +990,143 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             AssertExternalReferenceResults(externalReferenceInputs, dto);
         }
 
+        [Fact]
+        public async Task Can_Put_All()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var createRequest = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            };
+            var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest);
+
+            var (dataResponsible1, basisForTransfer1, generalRequest1) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+            
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
+
+            var systemUsagesRequest1 = new List<Guid>() {system1Usage.Uuid};
+
+            var oversightDate1 = CreateOversightDate();
+            var oversightOption1 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 0)).OrderBy(x => A<int>()).First();
+
+            var oversightRequest1 = CreateOversightRequest(new[] {oversightOption1.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1});
+
+            var user1 = await CreateUser(organization);
+            var role1 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
+
+            var rolesRequest1 = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role1.Uuid, UserUuid = user1.Uuid } };
+
+            var referencesRequest1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var modifyRequest1 = new DataProcessingRegistrationWriteRequestDTO()
+            {
+                Name = CreateName(),
+                General = generalRequest1,
+                SystemUsageUuids = systemUsagesRequest1,
+                Oversight = oversightRequest1,
+                Roles = rolesRequest1,
+                ExternalReferences = referencesRequest1
+            };
+
+            //Act - Put on empty
+            using var response1 = await DataProcessingRegistrationV2Helper.SendPutAsync(token, newRegistration.Uuid, modifyRequest1).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert - Put on empty
+            var dto1 = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            Assert.Equal(modifyRequest1.Name, dto1.Name);
+            AssertGeneralData(organization, dataResponsible1, generalRequest1, basisForTransfer1, dto1);
+            AssertMultiAssignment(systemUsagesRequest1, dto1.SystemUsages);
+            AssertOversight(oversightRequest1, dto1.Oversight);
+            AssertSingleRight(role1, user1, dto1.Roles);
+            AssertExternalReferenceResults(referencesRequest1, dto1);
+
+            //Act - Put on filled
+            var (dataResponsible2, basisForTransfer2, generalRequest2) = await CreateGeneralDataInput(true, true, true, true, true, organization);
+
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+
+            var systemUsagesRequest2 = new List<Guid>() { system2Usage.Uuid };
+
+            var oversightDate2 = CreateOversightDate();
+            var oversightOption2 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 1)).OrderBy(x => A<int>()).First();
+
+            var oversightRequest2 = CreateOversightRequest(new[] { oversightOption2.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate2 });
+
+            var user2 = await CreateUser(organization);
+            var role2 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 1, 1)).First();
+
+            var rolesRequest2 = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role2.Uuid, UserUuid = user2.Uuid } };
+
+            var referencesRequest2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var modifyRequest2 = new DataProcessingRegistrationWriteRequestDTO()
+            {
+                Name = CreateName(),
+                General = generalRequest2,
+                SystemUsageUuids = systemUsagesRequest2,
+                Oversight = oversightRequest2,
+                Roles = rolesRequest2,
+                ExternalReferences = referencesRequest2
+            };
+
+            using var response2 = await DataProcessingRegistrationV2Helper.SendPutAsync(token, newRegistration.Uuid, modifyRequest2).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert - Put on filled
+            var dto2 = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            Assert.Equal(modifyRequest2.Name, dto2.Name);
+            AssertGeneralData(organization, dataResponsible2, generalRequest2, basisForTransfer2, dto2);
+            AssertMultiAssignment(systemUsagesRequest2, dto2.SystemUsages);
+            AssertOversight(oversightRequest2, dto2.Oversight);
+            AssertSingleRight(role2, user2, dto2.Roles);
+            AssertExternalReferenceResults(referencesRequest2, dto2);
+
+            //Act - Put to reset
+            var generalRequest3 = new DataProcessingRegistrationGeneralDataWriteRequestDTO();
+            var systemUsagesRequest3 = Array.Empty<Guid>(); 
+            
+            var referencesRequest3 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+
+            var modifyRequest3 = new DataProcessingRegistrationWriteRequestDTO()
+            {
+                Name = CreateName(),
+                General = generalRequest3,
+                SystemUsageUuids = systemUsagesRequest3,
+                Oversight = new DataProcessingRegistrationOversightWriteRequestDTO(),
+                Roles = Array.Empty<RoleAssignmentRequestDTO>(),
+                ExternalReferences = referencesRequest3
+            };
+
+            using var response3 = await DataProcessingRegistrationV2Helper.SendPutAsync(token, newRegistration.Uuid, modifyRequest3).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert - Put to reset
+            var dto3 = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            Assert.Equal(modifyRequest3.Name, dto3.Name);
+
+            generalRequest3.IsAgreementConcluded = YesNoIrrelevantChoice.Undecided;
+            generalRequest3.HasSubDataProcessors = YesNoUndecidedChoice.Undecided;
+            generalRequest3.TransferToInsecureThirdCountries = YesNoUndecidedChoice.Undecided;
+            AssertGeneralData(organization, null, generalRequest3, null, dto3);
+
+            AssertMultiAssignment(systemUsagesRequest3, dto3.SystemUsages);
+
+            AssertEmptiedOversight(dto3.Oversight);
+
+            Assert.Empty(dto3.Roles);
+
+            AssertExternalReferenceResults(referencesRequest3, dto3);
+        }
+
+        #region Asserters
+
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, DataProcessingRegistrationResponseDTO actual)
         {
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
                 .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
-        }
-
-        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
-        {
-            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
-            orderedRandomly.First().MasterReference = true;
-            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
-                externalReferenceDataDto.MasterReference = false;
-
-            return orderedRandomly;
         }
 
         private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
@@ -1070,7 +1161,99 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
                 Assert.Equal(expectedOversightDates[i].CompletedAt, actualOversightDates[i].CompletedAt);
                 Assert.Equal(expectedOversightDates[i].Remark, actualOversightDates[i].Remark);
             }
+        }
 
+        private void AssertGeneralData(
+            Organization organization,
+            IdentityNamePairResponseDTO inputDataResponsible,
+            DataProcessingRegistrationGeneralDataWriteRequestDTO input,
+            IdentityNamePairResponseDTO inputBasisForTransfer,
+            DataProcessingRegistrationResponseDTO actual)
+        {
+            AssertOrganizationReference(organization, actual.OrganizationContext);
+            AssertCrossReference(inputDataResponsible, actual.General.DataResponsible);
+            Assert.Equal(input.DataResponsibleRemark, actual.General.DataResponsibleRemark);
+            Assert.Equal(input.IsAgreementConcluded, actual.General.IsAgreementConcluded);
+            Assert.Equal(input.IsAgreementConcludedRemark, actual.General.IsAgreementConcludedRemark);
+            Assert.Equal(input.AgreementConcludedAt, actual.General.AgreementConcludedAt);
+            AssertCrossReference(inputBasisForTransfer, actual.General.BasisForTransfer);
+            Assert.Equal(input.TransferToInsecureThirdCountries, actual.General.TransferToInsecureThirdCountries);
+            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, actual.General.InsecureCountriesSubjectToDataTransfer);
+            AssertMultiAssignment(input.DataProcessorUuids, actual.General.DataProcessors);
+            Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
+            AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
+        }
+
+        private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
+        {
+            var actualRight = Assert.Single(rightList);
+            Assert.Equal(expectedRole.Name, actualRight.Role.Name);
+            Assert.Equal(expectedRole.Uuid, actualRight.Role.Uuid);
+            Assert.Equal(expectedUser.Uuid, actualRight.User.Uuid);
+            Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
+        }
+
+        private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
+        {
+            var dto = Assert.Single(dtos, dpr => dpr.Uuid == expectedContent.Uuid);
+            AssertExpectedShallowDPR(expectedContent, expectedOrganization, dto);
+        }
+
+        private static void AssertExpectedShallowDPR(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, DataProcessingRegistrationResponseDTO dto)
+        {
+            Assert.Equal(expectedContent.Uuid, dto.Uuid);
+            Assert.Equal(expectedContent.Name, dto.Name);
+            Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
+            Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
+            Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
+        }
+
+        private static void AssertOrganizationReference(Organization expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
+        {
+            Assert.Equal(expected.Name, organizationReferenceDTO.Name);
+            Assert.Equal(expected.Cvr, organizationReferenceDTO.Cvr);
+            Assert.Equal(expected.Uuid, organizationReferenceDTO.Uuid);
+        }
+        private static void AssertCrossReference(IdentityNamePairResponseDTO expected, IdentityNamePairResponseDTO actual)
+        {
+            Assert.Equal(expected?.Uuid, actual?.Uuid);
+            Assert.Equal(expected?.Name, actual?.Name);
+        }
+
+        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        {
+            var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
+            var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
+            Assert.Equal(expectedUuids.Count, actualUuids.Count);
+            Assert.Equal(expectedUuids, actualUuids);
+        }
+
+        #endregion
+
+        #region Creaters
+
+        private DataProcessingRegistrationOversightWriteRequestDTO CreateOversightRequest(IEnumerable<Guid> oversightOptionUuids, YesNoUndecidedChoice isOversightCompleted, IEnumerable<OversightDateDTO> oversightDates)
+        {
+            return new DataProcessingRegistrationOversightWriteRequestDTO()
+            {
+                OversightOptionUuids = oversightOptionUuids.ToList(),
+                OversightOptionsRemark = A<string>(),
+                OversightInterval = A<OversightIntervalChoice>(),
+                OversightIntervalRemark = A<string>(),
+                IsOversightCompleted = isOversightCompleted,
+                OversightCompletedRemark = A<string>(),
+                OversightDates = oversightDates.ToList()
+            };
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
         }
 
         private OversightDateDTO CreateOversightDate()
@@ -1131,51 +1314,6 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return (dataResponsible, basisForTransfer, inputDTO);
         }
 
-        private void AssertGeneralData(
-            Organization organization,
-            IdentityNamePairResponseDTO inputDataResponsible,
-            DataProcessingRegistrationGeneralDataWriteRequestDTO input,
-            IdentityNamePairResponseDTO inputBasisForTransfer,
-            DataProcessingRegistrationResponseDTO actual)
-        {
-            AssertOrganizationReference(organization, actual.OrganizationContext);
-            AssertCrossReference(inputDataResponsible, actual.General.DataResponsible);
-            Assert.Equal(input.DataResponsibleRemark, actual.General.DataResponsibleRemark);
-            Assert.Equal(input.IsAgreementConcluded, actual.General.IsAgreementConcluded);
-            Assert.Equal(input.IsAgreementConcludedRemark, actual.General.IsAgreementConcludedRemark);
-            Assert.Equal(input.AgreementConcludedAt, actual.General.AgreementConcludedAt);
-            AssertCrossReference(inputBasisForTransfer, actual.General.BasisForTransfer);
-            Assert.Equal(input.TransferToInsecureThirdCountries, actual.General.TransferToInsecureThirdCountries);
-            AssertMultiAssignment(input.InsecureCountriesSubjectToDataTransferUuids, actual.General.InsecureCountriesSubjectToDataTransfer);
-            AssertMultiAssignment(input.DataProcessorUuids, actual.General.DataProcessors);
-            Assert.Equal(input.HasSubDataProcessors, actual.General.HasSubDataProcessors);
-            AssertMultiAssignment(input.SubDataProcessorUuids, actual.General.SubDataProcessors);
-        }
-
-        private static void AssertSingleRight(RoleOptionResponseDTO expectedRole, User expectedUser, IEnumerable<RoleAssignmentResponseDTO> rightList)
-        {
-            var actualRight = Assert.Single(rightList);
-            Assert.Equal(expectedRole.Name, actualRight.Role.Name);
-            Assert.Equal(expectedRole.Uuid, actualRight.Role.Uuid);
-            Assert.Equal(expectedUser.Uuid, actualRight.User.Uuid);
-            Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
-        }
-
-
-        private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
-        {
-            var dto = Assert.Single(dtos, dpr => dpr.Uuid == expectedContent.Uuid);
-            AssertExpectedShallowDPR(expectedContent, expectedOrganization, dto);
-        }
-
-        private static void AssertExpectedShallowDPR(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, DataProcessingRegistrationResponseDTO dto)
-        {
-            Assert.Equal(expectedContent.Uuid, dto.Uuid);
-            Assert.Equal(expectedContent.Name, dto.Name);
-            Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
-            Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
-            Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
-        }
         private async Task<DataProcessingRegistrationDTO> CreateDPRAsync(int orgId)
         {
             return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
@@ -1215,29 +1353,11 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return $"{nameof(DataProcessingRegistrationApiV2Test)}{A<string>()}";
         }
 
-        private static void AssertOrganizationReference(Organization expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
-        {
-            Assert.Equal(expected.Name, organizationReferenceDTO.Name);
-            Assert.Equal(expected.Cvr, organizationReferenceDTO.Cvr);
-            Assert.Equal(expected.Uuid, organizationReferenceDTO.Uuid);
-        }
-        private static void AssertCrossReference(IdentityNamePairResponseDTO expected, IdentityNamePairResponseDTO actual)
-        {
-            Assert.Equal(expected?.Uuid, actual?.Uuid);
-            Assert.Equal(expected?.Name, actual?.Name);
-        }
-
-        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
-        {
-            var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
-            var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
-            Assert.Equal(expectedUuids.Count, actualUuids.Count);
-            Assert.Equal(expectedUuids, actualUuids);
-        }
-
         private string CreateEmail()
         {
             return $"{CreateName()}{DateTime.Now.Ticks}@kitos.dk";
         }
+
+        #endregion
     }
 }
