@@ -4,6 +4,7 @@ using Core.DomainModel.Notification;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -165,6 +166,11 @@ namespace Core.DomainModel.ItProject
         public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
         {
             return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
         }
 
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)

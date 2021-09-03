@@ -26,6 +26,7 @@ using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
+using ExpectedObjects;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -962,7 +963,79 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //TODO: Assertions for external references
         }
 
-        private static void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
+		[Fact]
+        public async Task Can_POST_With_ExternalReferences()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                ExternalReferences = inputs
+            };
+
+            //Act
+            var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            //Assert
+            var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
+            AssertExternalReferenceResults(inputs, dto);
+        }
+
+        [Fact]
+        public async Task Can_PUT_ExternalReferences()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+
+            var request = new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            };
+            var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
+
+            var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            //Act
+            using var response1 = await DataProcessingRegistrationV2Helper.SendPutExternalReferences(token, newRegistration.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            AssertExternalReferenceResults(inputs1, dto);
+
+            //Act - reset
+            var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+            using var response2 = await DataProcessingRegistrationV2Helper.SendPutExternalReferences(token, newRegistration.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
+            AssertExternalReferenceResults(inputs2, dto);
+        }
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, DataProcessingRegistrationResponseDTO actual)
+        {
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+
+        private void AssertEmptiedOversight(DataProcessingRegistrationOversightResponseDTO actual)
         {
             Assert.Empty(actual.OversightOptions);
             Assert.Null(actual.OversightOptionsRemark);
