@@ -135,6 +135,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
 
             yield return new[] { EntityOptionHelper.ResourceNames.ContractTypes, OptionV2ApiHelper.ResourceName.ItContractContractTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.ContractTemplateTypes, OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PurchaseTypes, OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes };
         }
     }
 }

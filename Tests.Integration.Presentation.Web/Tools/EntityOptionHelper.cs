@@ -23,6 +23,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             public const string ContractTypes = "ItContractTypes";
             public const string ContractTemplateTypes = "ItContractTemplateTypes";
+            public const string PurchaseTypes = "PurchaseFormTypes";
             public const string ContractRoles = "ItContractRoles";
 
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
