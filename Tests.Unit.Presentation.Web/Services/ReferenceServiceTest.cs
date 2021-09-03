@@ -24,6 +24,7 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -57,7 +58,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _referenceRepository.Object,
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
-                _contractRepository.Object, 
+                _contractRepository.Object,
                 _projectRepository.Object,
                 _dataProcessingRegistrationRepositoryMock.Object,
                 _authorizationContext.Object,
@@ -514,7 +515,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            var expectedMaster = externalReferences.RandomItem();
             expectedMaster.MasterReference = true;
 
             var masterReference = CreateExternalReference(expectedMaster);
@@ -529,6 +530,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.IsNone);
+            _dbTransaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -540,7 +542,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            var expectedMaster = externalReferences.RandomItem();
             expectedMaster.MasterReference = true;
 
             var masterReference = CreateExternalReference(expectedMaster);
@@ -555,6 +557,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.IsNone);
+            _dbTransaction.Verify(x => x.Commit());
         }
 
         [Fact]
@@ -566,7 +569,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            foreach (var master in externalReferences.Take(2)) 
+            foreach (var master in externalReferences.Take(2))
                 master.MasterReference = true;
 
             ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
@@ -614,7 +617,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            var expectedMaster = externalReferences.RandomItem();
             expectedMaster.MasterReference = true;
 
             var operationError = A<OperationError>();
@@ -641,10 +644,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootType = A<ReferenceRootType>();
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
 
             ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
             ExpectTransactionToBeSet();
@@ -668,10 +668,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var rootType = A<ReferenceRootType>();
             var rootId = A<int>();
             var root = new Mock<IEntityWithExternalReferences>();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
 
             ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
             ExpectAllowModifyReturns(root.Object, true);
@@ -696,7 +693,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var root = new Mock<IEntityWithExternalReferences>();
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
+            var expectedMaster = externalReferences.RandomItem();
             expectedMaster.MasterReference = true;
 
             root.Setup(x => x.ExternalReferences).Returns(new List<ExternalReference>());
@@ -827,7 +824,7 @@ namespace Tests.Unit.Presentation.Web.Services
             return new DataProcessingRegistration { Id = A<int>() };
         }
 
-        private static T AddExternalReference<T>(T system, ExternalReference reference) where T: IEntityWithExternalReferences
+        private static T AddExternalReference<T>(T system, ExternalReference reference) where T : IEntityWithExternalReferences
         {
             system.ExternalReferences.Add(reference);
             return system;

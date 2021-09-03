@@ -170,13 +170,13 @@ namespace Core.ApplicationServices.GDPR
                     .Match(result => result, () => new OperationError("Invalid reference Id", OperationFailure.BadInput)));
         }
 
-        public Result<ExternalReference, OperationError> ClearMasterReference(int id)
+        public Result<Maybe<ExternalReference>, OperationError> ClearMasterReference(int id)
         {
-            return Modify<ExternalReference>(id, registration =>
+            return Modify<Maybe<ExternalReference>>(id, registration =>
             {
                 var masterReference = registration.Reference;
                 registration.ClearMasterReference();
-                return masterReference;
+                return masterReference.FromNullable();
             });
         }
 

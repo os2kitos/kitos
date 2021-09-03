@@ -798,10 +798,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
 
             var input = new SystemUsageUpdateParameters
             {
@@ -825,10 +822,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
 
             var input = new SystemUsageUpdateParameters
             {

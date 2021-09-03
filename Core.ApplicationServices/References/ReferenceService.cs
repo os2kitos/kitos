@@ -161,49 +161,54 @@ namespace Core.ApplicationServices.References
             int rootId,
             IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
-            return
-                _referenceRepository
-                    .GetRootEntity(rootId, rootType)
-                    .Match(root =>
+            using var transaction = _transactionManager.Begin();
+
+            var error = _referenceRepository
+                .GetRootEntity(rootId, rootType)
+                .Match(root =>
+                {
+                    //Clear existing state
+                    root.ClearMasterReference();
+                    var deleteResult = DeleteExternalReferences(root);
+                    if (deleteResult.Failed)
+                        return new OperationError("Failed to delete old references", deleteResult.Error);
+
+                    var newReferences = externalReferences.ToList();
+                    if (newReferences.Any())
                     {
-                        //Clear existing state
-                        root.ClearMasterReference();
-                        var deleteResult = DeleteExternalReferences(root);
-                        if (deleteResult.Failed)
-                            return new OperationError("Failed to delete old references", deleteResult.Error);
+                        var masterReferencesCount = newReferences.Count(x => x.MasterReference);
 
-                        var newReferences = externalReferences.ToList();
-                        if (newReferences.Any())
+                        switch (masterReferencesCount)
                         {
-                            var masterReferencesCount = newReferences.Count(x => x.MasterReference);
-
-                            switch (masterReferencesCount)
-                            {
-                                case < 1:
-                                    return new OperationError("A master reference must be defined", OperationFailure.BadInput);
-                                case > 1:
-                                    return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
-                            }
-
-                            foreach (var referenceProperties in newReferences)
-                            {
-                                var result = AddReference(rootId, rootType, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-
-                                if (result.Failed)
-                                    return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
-
-                                if (referenceProperties.MasterReference)
-                                {
-                                    var masterReferenceResult = root.SetMasterReference(result.Value);
-                                    if (masterReferenceResult.Failed)
-                                        return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
-                                }
-                            }
+                            case < 1:
+                                return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                            case > 1:
+                                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
                         }
 
-                        return Maybe<OperationError>.None;
+                        foreach (var referenceProperties in newReferences)
+                        {
+                            var result = AddReference(rootId, rootType, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
 
-                    }, () => new OperationError(OperationFailure.NotFound));
+                            if (result.Failed)
+                                return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
+
+                            if (referenceProperties.MasterReference)
+                            {
+                                var masterReferenceResult = root.SetMasterReference(result.Value);
+                                if (masterReferenceResult.Failed)
+                                    return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
+                            }
+                        }
+                    }
+                    return Maybe<OperationError>.None;
+
+                }, () => new OperationError(OperationFailure.NotFound));
+
+            if (error.IsNone)
+                transaction.Commit();
+
+            return error;
         }
 
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)

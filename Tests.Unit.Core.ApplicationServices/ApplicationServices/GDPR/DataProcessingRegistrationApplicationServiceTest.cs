@@ -564,10 +564,12 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Null(registration.Reference);
             transaction.Verify(x => x.Commit());
-            if(hasMasterReference)
-                Assert.Same(masterToRemove, result.Value);
+            if (hasMasterReference)
+            {
+                Assert.True(result.Value.HasValue);
+                Assert.Same(masterToRemove, result.Value.Value);
+            }
         }
 
         [Fact]

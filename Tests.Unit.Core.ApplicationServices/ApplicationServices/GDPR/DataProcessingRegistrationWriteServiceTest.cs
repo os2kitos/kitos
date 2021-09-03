@@ -1896,11 +1896,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Can_Create_With_ExternalReferences()
         {
             //Arrange
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
-
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
             
             ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, Maybe<OperationError>.None);
@@ -1917,11 +1913,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         public void Cannot_Create_With_ExternalReferences_If_BatchUpdate_Fails()
         {
             //Arrange
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
-
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
 
             var operationError = A<OperationError>();
