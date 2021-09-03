@@ -7,6 +7,7 @@ using Core.DomainModel.Notification;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.GDPR
@@ -264,6 +265,12 @@ namespace Core.DomainModel.GDPR
         public Result<ExternalReference, OperationError> AddExternalReference(ExternalReference newReference)
         {
             return new AddReferenceCommand(this).AddExternalReference(newReference);
+        }
+
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
         }
 
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)

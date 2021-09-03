@@ -8,10 +8,12 @@ using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
@@ -31,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly DataProcessingRegistrationWriteService _sut;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
@@ -39,12 +42,14 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
+            _referenceServiceMock = new Mock<IReferenceService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _sut = new DataProcessingRegistrationWriteService(
                 _dprServiceMock.Object,
                 _identityResolverMock.Object,
+                _referenceServiceMock.Object, 
                 Mock.Of<ILogger>(),
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
@@ -1754,9 +1759,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Could not find role with Uuid: {roleUuid}", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1781,9 +1784,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Could not find user with Uuid: {userUuid}", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1811,9 +1812,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(error.FailureType, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, $"Failed to assign role with Uuid: {roleUuid} from user with Uuid: {userUuid}, with following error message:", error.FailureType, transaction);
         }
 
         [Fact]
@@ -1840,16 +1839,13 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var createResult = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(createResult.Failed);
-            Assert.Equal(OperationFailure.BadInput, createResult.Error.FailureType);
-            AssertTransactionNotCommitted(transaction);
+            AssertFailureWithKnownErrorDetails(createResult, "Duplicates of 'User Role Pairs' are not allowed", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
         public void Can_Update_Roles_To_Remove_Them()
         {
             //Arrange
-
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites();
 
             var newRight = CreateRight(createdRegistration, A<Guid>(), A<int>(), A<Guid>(), A<int>());
@@ -1896,6 +1892,48 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.RemoveRole(createdRegistration.Id, rightToKeep.RoleId, rightToKeep.UserId), Times.Never);
         }
 
+        [Fact]
+        public void Can_Create_With_ExternalReferences()
+        {
+            //Arrange
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+            
+            ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_If_BatchUpdate_Fails()
+        {
+            //Arrange
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            var operationError = A<OperationError>();
+
+            ExpectBatchUpdateExternalReferencesReturns(createdRegistration, externalReferences, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Failed to update references with error message", operationError.FailureType, transaction);
+        }
+
+        private void ExpectBatchUpdateExternalReferencesReturns(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.DataProcessingRegistration, dpr.Id, externalReferences))
+                .Returns(value);
+        }
+
         private void ExpectRoleAssignmentReturns(DataProcessingRegistration dpr, int roleId, int userId, Result<DataProcessingRegistrationRight, OperationError> result)
         {
             _dprServiceMock.Setup(x => x.AssignRole(dpr.Id, roleId, userId)).Returns(result);
@@ -1918,7 +1956,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             UpdatedDataProcessingRegistrationGeneralDataParameters generalData = null,
             IEnumerable<Guid> systemUsageUuids = null,
             UpdatedDataProcessingRegistrationOversightDataParameters oversightData = null,
-            UpdatedDataProcessingRegistrationRoles roles = null)
+            UpdatedDataProcessingRegistrationRoles roles = null,
+            IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null)
         {
             var organizationUuid = A<Guid>();
             var parameters = new DataProcessingRegistrationModificationParameters
@@ -1927,7 +1966,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 General = generalData.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Oversight = oversightData.FromNullable(),
-                Roles = roles.FromNullable()
+                Roles = roles.FromNullable(),
+                ExternalReferences = externalReferences.FromNullable()
             };
             var createdRegistration = new DataProcessingRegistration
             {

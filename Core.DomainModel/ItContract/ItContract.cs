@@ -8,6 +8,7 @@ using Core.DomainModel.GDPR;
 using System.Linq;
 using Infrastructure.Services.Types;
 using Core.DomainModel.Notification;
+using Infrastructure.Services.Extensions;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -559,6 +560,11 @@ namespace Core.DomainModel.ItContract
             return new AddReferenceCommand(this).AddExternalReference(newReference);
         }
 
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
+        }
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
             Reference = newReference;

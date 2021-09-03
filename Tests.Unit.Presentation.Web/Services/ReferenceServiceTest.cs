@@ -1,8 +1,12 @@
 ﻿using System;
-using System.Data;
+using System.Collections.Generic;
+using System.Linq;
+using AutoFixture;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -20,6 +24,7 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Moq;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -36,6 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
         private readonly Mock<IItContractRepository> _contractRepository;
         private readonly Mock<IItProjectRepository> _projectRepository;
+        private readonly Mock<IDataProcessingRegistrationRepository> _dataProcessingRegistrationRepositoryMock;
 
         public ReferenceServiceTest()
         {
@@ -44,17 +50,17 @@ namespace Tests.Unit.Presentation.Web.Services
             _authorizationContext = new Mock<IAuthorizationContext>();
             _transactionManager = new Mock<ITransactionManager>();
             _dbTransaction = new Mock<IDatabaseTransaction>();
-
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
             _contractRepository = new Mock<IItContractRepository>();
             _projectRepository = new Mock<IItProjectRepository>();
+            _dataProcessingRegistrationRepositoryMock = new Mock<IDataProcessingRegistrationRepository>();
             _sut = new ReferenceService(
                 _referenceRepository.Object,
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
-                _contractRepository.Object, 
-                _projectRepository.Object, 
-                Mock.Of<IDataProcessingRegistrationRepository>(),
+                _contractRepository.Object,
+                _projectRepository.Object,
+                _dataProcessingRegistrationRepositoryMock.Object,
                 _authorizationContext.Object,
                 _transactionManager.Object,
                 Mock.Of<IOperationClock>(x => x.Now == DateTime.Now),
@@ -350,6 +356,77 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void DeleteByDprId_Returns_NotFound()
+        {
+            //Arrange
+            var id = A<int>();
+            ExpectGetDataProcessingRegistrationReturns(id, null);
+
+            //Act
+            var result = _sut.DeleteByDataProcessingRegistrationId(id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByDprId_Returns_Forbidden_If_Not_Allowed_To_Modify_System()
+        {
+            //Arrange
+            var dpr = CreateDataProcessingRegistration();
+            ExpectGetDataProcessingRegistrationReturns(dpr.Id, dpr);
+            ExpectAllowModifyReturns(dpr, false);
+
+            //Act
+            var result = _sut.DeleteByDataProcessingRegistrationId(dpr.Id);
+
+            //Assert
+            Assert.False(result.Ok);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByDprId_Returns_Ok_If_No_References()
+        {
+            var dpr = CreateDataProcessingRegistration();
+            ExpectGetDataProcessingRegistrationReturns(dpr.Id, dpr);
+            ExpectAllowModifyReturns(dpr, true);
+
+            //Act
+            var result = _sut.DeleteByDataProcessingRegistrationId(dpr.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void DeleteByDprId_Returns_Ok_If_References()
+        {
+            //Arrange
+            var dpr = CreateDataProcessingRegistration();
+            var reference = CreateReference();
+            dpr = AddExternalReference(dpr, reference);
+            ExpectGetDataProcessingRegistrationReturns(dpr.Id, dpr);
+            ExpectAllowModifyReturns(dpr, true);
+            ExpectTransactionToBeSet();
+
+            //Act
+            var result = _sut.DeleteByDataProcessingRegistrationId(dpr.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            _dbTransaction.Verify(x => x.Rollback(), Times.Never);
+            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+        }
+
+        [Fact]
         public void AddReference_Returns_NotFound_If_Root_Is_NotFound()
         {
             //Arrange
@@ -429,6 +506,246 @@ namespace Tests.Unit.Presentation.Web.Services
             _referenceRepository.Verify(x => x.SaveRootEntity(entity.Object), Times.Never);
         }
 
+        [Fact]
+        public void Can_BatchUpdateExternalReferences_With_No_Previous_References()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.RandomItem();
+            expectedMaster.MasterReference = true;
+
+            var masterReference = CreateExternalReference(expectedMaster);
+            ExpectMasterReference(root, masterReference);
+            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.IsNone);
+            _dbTransaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Can_BatchUpdateExternalReferences_With_Previous_References()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.RandomItem();
+            expectedMaster.MasterReference = true;
+
+            var masterReference = CreateExternalReference(expectedMaster);
+            ExpectMasterReference(root, masterReference);
+            ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.IsNone);
+            _dbTransaction.Verify(x => x.Commit());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_With_Multiple_Masters()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            foreach (var master in externalReferences.Take(2))
+                master.MasterReference = true;
+
+            ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(new OperationError("Only one reference can be master reference", OperationFailure.BadInput), result.Value);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_With_No_Masters()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            ExpectRootDeleteAndAdd(root, externalReferences, externalReferences.Select(CreateExternalReference).ToList());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(new OperationError("A master reference must be defined", OperationFailure.BadInput), result.Value);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_If_Set_Master_Fails()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.RandomItem();
+            expectedMaster.MasterReference = true;
+
+            var operationError = A<OperationError>();
+            root.Setup(x => x.SetMasterReference(It.IsAny<ExternalReference>())).Returns(operationError);
+
+            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(operationError.FailureType, result.Value.FailureType);
+            Assert.Contains("Failed while setting the master reference:", result.Value.Message.GetValueOrEmptyString());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_If_Not_Allowed_To_Modify()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            ExpectAllowModifyReturns(root.Object, false);
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+            Assert.Contains("Failed to delete old references", result.Value.Message.GetValueOrEmptyString());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_If_Not_Found()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+
+            ExpectRootDeleteAndAdd(root, externalReferences, new List<ExternalReference>());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+
+            ExpectGetRootEntityReturns(rootId, rootType, Maybe<IEntityWithExternalReferences>.None);
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateExternalReferences_If_Add_Fails()
+        {
+            //Arrange
+            var rootType = A<ReferenceRootType>();
+            var rootId = A<int>();
+            var root = new Mock<IEntityWithExternalReferences>();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var expectedMaster = externalReferences.RandomItem();
+            expectedMaster.MasterReference = true;
+
+            root.Setup(x => x.ExternalReferences).Returns(new List<ExternalReference>());
+            ExpectAllowModifyReturns(root.Object, true);
+            ExpectTransactionToBeSet();
+            ExpectGetRootEntityReturns(rootId, rootType, root.Object.FromNullable());
+
+            var operationError = A<OperationError>();
+
+            root.Setup(x => x.AddExternalReference(It.IsAny<ExternalReference>())).Returns(operationError);
+
+            //Act
+            var result = _sut.BatchUpdateExternalReferences(rootType, rootId, externalReferences);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(operationError.FailureType, result.Value.FailureType);
+            Assert.Contains("Failed to add reference with data:", result.Value.Message.GetValueOrEmptyString());
+        }
+
+        private void ExpectMasterReference(Mock<IEntityWithExternalReferences> root, ExternalReference masterReference)
+        {
+            root.Setup(x => x.SetMasterReference(It.Is<ExternalReference>(er =>
+                    er.Title == masterReference.Title &&
+                    er.ExternalReferenceId == masterReference.ExternalReferenceId &&
+                    er.URL == masterReference.URL)))
+                .Returns(masterReference);
+        }
+
+        private void ExpectRootDeleteAndAdd(Mock<IEntityWithExternalReferences> root, IEnumerable<UpdatedExternalReferenceProperties> newReferences, IEnumerable<ExternalReference> oldReferences)
+        {
+            root.Setup(x => x.ExternalReferences).Returns(oldReferences.ToList());
+
+            foreach (var newReference in newReferences.ToList())
+            {
+                var newExtRef = CreateExternalReference(newReference);
+                ExpectAddReferenceReturns(root, newExtRef.Title, newExtRef.ExternalReferenceId, newExtRef.URL, newExtRef);
+            }
+
+        }
+
+        private ExternalReference CreateExternalReference(UpdatedExternalReferenceProperties externalReference)
+        {
+            return new ExternalReference
+            {
+                Id = A<int>(),
+                Title = externalReference.Title,
+                ExternalReferenceId = externalReference.DocumentId,
+                URL = externalReference.Url
+            };
+        }
+
         private static void ExpectAddReferenceReturns(Mock<IEntityWithExternalReferences> entity, string title, string externalReferenceId, string url, Result<ExternalReference, OperationError> result)
         {
             entity.Setup(x => x.AddExternalReference(It.Is<ExternalReference>(er =>
@@ -468,6 +785,11 @@ namespace Tests.Unit.Presentation.Web.Services
             _projectRepository.Setup(x => x.GetById(id)).Returns(project);
         }
 
+        private void ExpectGetDataProcessingRegistrationReturns(int id, DataProcessingRegistration dpr)
+        {
+            _dataProcessingRegistrationRepositoryMock.Setup(x => x.GetById(id)).Returns(dpr);
+        }
+
         private void ExpectTransactionToBeSet()
         {
             _transactionManager.Setup(x => x.Begin()).Returns(_dbTransaction.Object);
@@ -497,7 +819,12 @@ namespace Tests.Unit.Presentation.Web.Services
             return new ExternalReference { Id = A<int>() };
         }
 
-        private static T AddExternalReference<T>(T system, ExternalReference reference) where T: IEntityWithExternalReferences
+        private DataProcessingRegistration CreateDataProcessingRegistration()
+        {
+            return new DataProcessingRegistration { Id = A<int>() };
+        }
+
+        private static T AddExternalReference<T>(T system, ExternalReference reference) where T : IEntityWithExternalReferences
         {
             system.ExternalReferences.Add(reference);
             return system;

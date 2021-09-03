@@ -5,9 +5,11 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
@@ -22,6 +24,7 @@ namespace Core.ApplicationServices.GDPR.Write
     {
         private readonly IDataProcessingRegistrationApplicationService _applicationService;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
+        private readonly IReferenceService _referenceService;
         private readonly ILogger _logger;
         private readonly IDomainEvents _domainEvents;
         private readonly ITransactionManager _transactionManager;
@@ -30,6 +33,7 @@ namespace Core.ApplicationServices.GDPR.Write
         public DataProcessingRegistrationWriteService(
             IDataProcessingRegistrationApplicationService applicationService,
             IEntityIdentityResolver entityIdentityResolver,
+            IReferenceService referenceService,
             ILogger logger,
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
@@ -37,6 +41,7 @@ namespace Core.ApplicationServices.GDPR.Write
         {
             _applicationService = applicationService;
             _entityIdentityResolver = entityIdentityResolver;
+            _referenceService = referenceService;
             _logger = logger;
             _domainEvents = domainEvents;
             _transactionManager = transactionManager;
@@ -110,7 +115,21 @@ namespace Core.ApplicationServices.GDPR.Write
                 .Bind(registration => registration.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(registration => registration.WithOptionalUpdate(parameters.Oversight, UpdateOversightData))
-                .Bind(registration => registration.WithOptionalUpdate(parameters.Roles, UpdateRolesData));
+                .Bind(registration => registration.WithOptionalUpdate(parameters.Roles, UpdateRolesData))
+                .Bind(registration => registration.WithOptionalUpdate(parameters.ExternalReferences, PerformReferencesUpdate));
+        }
+
+        private Result<DataProcessingRegistration, OperationError> PerformReferencesUpdate(DataProcessingRegistration dpr, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            var updateResult = _referenceService.BatchUpdateExternalReferences(
+                ReferenceRootType.DataProcessingRegistration,
+                dpr.Id,
+                externalReferences.ToList());
+
+            if (updateResult.HasValue)
+                return new OperationError($"Failed to update references with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
+
+            return dpr;
         }
 
         private Result<DataProcessingRegistration, OperationError> UpdateRolesData(DataProcessingRegistration dpr, UpdatedDataProcessingRegistrationRoles usageRoles)
