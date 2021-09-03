@@ -3,7 +3,6 @@ using Core.DomainModel.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.DPR;
 using Infrastructure.Services.Types;
-using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -13,6 +12,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
+using Core.ApplicationServices.GDPR.Write;
+using Core.ApplicationServices.Model.GDPR.Write;
+using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
@@ -27,10 +30,20 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
     public class DataProcessingRegistrationV2Controller : ExternalBaseController
     {
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationService;
+        private readonly IDataProcessingRegistrationWriteService _writeService;
+        private readonly IDataProcessingRegistrationWriteModelMapper _writeModelMapper;
+        private readonly IDataProcessingRegistrationResponseMapper _responseMapper;
 
-        public DataProcessingRegistrationV2Controller(IDataProcessingRegistrationApplicationService dataProcessingRegistrationService)
+        public DataProcessingRegistrationV2Controller(
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationService,
+            IDataProcessingRegistrationWriteService writeService,
+            IDataProcessingRegistrationWriteModelMapper writeModelMapper,
+            IDataProcessingRegistrationResponseMapper responseMapper)
         {
             _dataProcessingRegistrationService = dataProcessingRegistrationService;
+            _writeService = writeService;
+            _writeModelMapper = writeModelMapper;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -55,7 +68,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? systemUsageUuid = null,
             [NonEmptyGuid] Guid? dataProcessorUuid = null,
             [NonEmptyGuid] Guid? subDataProcessorUuid = null,
-            [NonEmptyGuid] bool? agreementConcluded = null,
+            bool? agreementConcluded = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -72,12 +85,21 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (systemUsageUuid.HasValue)
                 conditions.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
 
+            if (dataProcessorUuid.HasValue)
+                conditions.Add(new QueryByDataProcessorUuid(dataProcessorUuid.Value));
+
+            if (subDataProcessorUuid.HasValue)
+                conditions.Add(new QueryBySubDataProcessorUuid(subDataProcessorUuid.Value));
+
+            if (agreementConcluded.HasValue)
+                conditions.Add(new QueryByAgreementConcluded(agreementConcluded.Value));
+
             return _dataProcessingRegistrationService
                 .Query(conditions.ToArray())
                 .OrderBy(dpr => dpr.Id)
                 .Page(paginationQuery)
                 .ToList()
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Transform(Ok);
         }
 
@@ -100,7 +122,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _dataProcessingRegistrationService
                 .GetByUuid(uuid)
-                .Select(x => x.MapIdentityNamePairDTO())
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -122,7 +144,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Create(request.OrganizationUuid, _writeModelMapper.FromPOST(request))
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(MapCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -145,7 +170,10 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, _writeModelMapper.FromPUT(request))
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -165,7 +193,9 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Delete(uuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         /// <summary>
@@ -188,30 +218,42 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    General = _writeModelMapper.MapGeneral(request)
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
-        /// Perform a full update of the "Systems" section of an existing data processing registration.
+        /// Perform a full update of the "SystemUsages" section of an existing data processing registration.
         /// Absent/nulled fields will result in a data reset in the targeted registration.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
+        /// <param name="systemUsageUuids"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("{uuid}/systems")]
+        [Route("{uuid}/system-usages")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUuids)
+        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUsageUuids)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    SystemUsageUuids = systemUsageUuids.FromNullable()
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -234,7 +276,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    Oversight = _writeModelMapper.MapOversight(request)
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -257,7 +305,13 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    Roles = _writeModelMapper.MapRoles(request)
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -280,7 +334,18 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(uuid, new DataProcessingRegistrationModificationParameters
+                {
+                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
+                })
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
     }
 }

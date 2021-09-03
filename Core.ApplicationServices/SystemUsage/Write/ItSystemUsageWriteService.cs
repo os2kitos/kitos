@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -109,7 +110,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         public Result<ItSystemUsage, OperationError> Create(SystemUsageCreationParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var systemResult = _systemService.GetSystem(parameters.SystemUuid);
             if (systemResult.Failed)
             {
@@ -143,7 +144,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
         }
         private Result<ItSystemUsage, OperationError> Update(Func<Result<ItSystemUsage, OperationError>> getItSystemUsage, SystemUsageUpdateParameters parameters)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var result = getItSystemUsage()
                     .Bind(WithWriteAccess)
@@ -273,36 +274,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
         {
             //Clear existing state
-            systemUsage.ClearMasterReference();
-            _referenceService.DeleteBySystemUsageId(systemUsage.Id);
-            var newReferences = externalReferences.ToList();
-            if (newReferences.Any())
-            {
-                var masterReferencesCount = newReferences.Count(x => x.MasterReference);
+            var updateResult = _referenceService.BatchUpdateExternalReferences(
+                ReferenceRootType.SystemUsage,
+                systemUsage.Id,
+                externalReferences);
 
-                switch (masterReferencesCount)
-                {
-                    case < 1:
-                        return new OperationError("A master reference must be defined", OperationFailure.BadInput);
-                    case > 1:
-                        return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
-                }
-
-                foreach (var referenceProperties in newReferences)
-                {
-                    var result = _referenceService.AddReference(systemUsage.Id, ReferenceRootType.SystemUsage, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
-
-                    if (result.Failed)
-                        return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
-
-                    if (referenceProperties.MasterReference)
-                    {
-                        var masterReferenceResult = systemUsage.SetMasterReference(result.Value);
-                        if (masterReferenceResult.Failed)
-                            return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
-                    }
-                }
-            }
+            if (updateResult.HasValue)
+                return new OperationError($"Failed to update references with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
 
             return systemUsage;
         }

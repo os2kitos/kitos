@@ -1,4 +1,4 @@
-﻿namespace Core.ApplicationServices.Model.SystemUsage.Write
+﻿namespace Core.ApplicationServices.Model.Shared.Write
 {
     public class UpdatedExternalReferenceProperties
     {

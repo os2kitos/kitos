@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Types;
 
 namespace Core.ApplicationServices.References
 {
@@ -14,5 +16,6 @@ namespace Core.ApplicationServices.References
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByContractId(int contractId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByProjectId(int projectId);
         Result<IEnumerable<ExternalReference>, OperationFailure> DeleteByDataProcessingRegistrationId(int id);
+        Maybe<OperationError> BatchUpdateExternalReferences(ReferenceRootType rootType, int rootId, IEnumerable<UpdatedExternalReferenceProperties> externalReferences);
     }
 }

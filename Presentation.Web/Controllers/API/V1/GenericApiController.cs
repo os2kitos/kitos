@@ -13,6 +13,7 @@ using Core.DomainServices.Queries;
 using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Types;
 using Ninject;
+using Presentation.Web.Exceptions;
 using Presentation.Web.Infrastructure.Extensions;
 using Presentation.Web.Models.API.V1;
 
@@ -169,6 +170,10 @@ namespace Presentation.Web.Controllers.API.V1
                 var savedItem = PostQuery(item);
                 RaiseNewObjectCreated(savedItem);
                 return NewObjectCreated(savedItem);
+            }
+            catch (ConflictException e)
+            {
+                return Conflict(string.Empty);
             }
             catch (SecurityException e)
             {

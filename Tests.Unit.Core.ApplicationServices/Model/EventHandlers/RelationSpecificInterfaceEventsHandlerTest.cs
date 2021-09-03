@@ -39,7 +39,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
                 CreateRelation(affectedInterface),
             };
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             _sut.Handle(new ExposingSystemChanged(affectedInterface, new ItSystem(), new ItSystem()));
@@ -61,7 +61,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
                 CreateRelation(affectedInterface),
             };
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             _sut.Handle(new EntityDeletedEvent<ItInterface>(affectedInterface));

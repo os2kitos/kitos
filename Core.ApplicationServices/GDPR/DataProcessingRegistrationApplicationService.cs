@@ -4,7 +4,6 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.GDPR;
@@ -14,10 +13,10 @@ using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Types;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Role;
 
@@ -39,6 +38,7 @@ namespace Core.ApplicationServices.GDPR
         private readonly IDataProcessingRegistrationOversightDateAssignmentService _oversightDateAssignmentService;
         private readonly ITransactionManager _transactionManager;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IGenericRepository<DataProcessingRegistrationOversightDate> _dataProcessingRegistrationOversightDateRepository;
 
 
         public DataProcessingRegistrationApplicationService(
@@ -55,7 +55,8 @@ namespace Core.ApplicationServices.GDPR
             IDataProcessingRegistrationOversightOptionsAssignmentService oversightOptionAssignmentService,
             IDataProcessingRegistrationOversightDateAssignmentService oversightDateAssignmentService,
             ITransactionManager transactionManager,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IGenericRepository<DataProcessingRegistrationOversightDate> dataProcessingRegistrationOversightDateRepository)
         {
             _authorizationContext = authorizationContext;
             _repository = repository;
@@ -71,6 +72,7 @@ namespace Core.ApplicationServices.GDPR
             _oversightDateAssignmentService = oversightDateAssignmentService;
             _transactionManager = transactionManager;
             _userContext = userContext;
+            _dataProcessingRegistrationOversightDateRepository = dataProcessingRegistrationOversightDateRepository;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(int organizationId, string name)
@@ -78,7 +80,7 @@ namespace Core.ApplicationServices.GDPR
             if (!_authorizationContext.AllowCreate<DataProcessingRegistration>(organizationId))
                 return new OperationError(OperationFailure.Forbidden);
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
             var error = _namingService.ValidateSuggestedNewRegistrationName(organizationId, name);
 
             if (error.HasValue)
@@ -106,7 +108,7 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> Delete(int id)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.Serializable);
+            using var transaction = _transactionManager.Begin();
 
             var result = _repository.GetById(id);
 
@@ -170,6 +172,16 @@ namespace Core.ApplicationServices.GDPR
                     .Match(result => result, () => new OperationError("Invalid reference Id", OperationFailure.BadInput)));
         }
 
+        public Result<Maybe<ExternalReference>, OperationError> ClearMasterReference(int id)
+        {
+            return Modify<Maybe<ExternalReference>>(id, registration =>
+            {
+                var masterReference = registration.Reference;
+                registration.ClearMasterReference();
+                return masterReference.FromNullable();
+            });
+        }
+
         public Result<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id)
         {
             return WithReadAccess<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles)>(
@@ -214,7 +226,7 @@ namespace Core.ApplicationServices.GDPR
             return WithReadAccess<IEnumerable<ItSystemUsage>>(id, registration =>
                 _systemAssignmentService
                     .GetApplicableSystems(registration)
-                    .Where(x=>x.ItSystem.Name.Contains(nameQuery))
+                    .Where(x => x.ItSystem.Name.Contains(nameQuery))
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.ItSystem.Name)
@@ -362,11 +374,6 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightIntervalRemark(int id, string remark)
         {
-            if (remark == null)
-            {
-                return new OperationError(OperationFailure.BadInput);
-            }
-
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.OversightIntervalRemark = remark;
@@ -414,7 +421,7 @@ namespace Core.ApplicationServices.GDPR
 
         private Result<TSuccess, OperationError> Modify<TSuccess>(int id, Func<DataProcessingRegistration, Result<TSuccess, OperationError>> mutation)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
 
             var result = _repository.GetById(id);
 
@@ -460,7 +467,7 @@ namespace Core.ApplicationServices.GDPR
                 var oversightDates = registration.SetOversightCompleted(isOversightCompleted);
                 if (oversightDates.HasValue)
                 {
-                    oversightDates.Value.ToList().ForEach(x => _oversightDateAssignmentService.Remove(registration, x.Id));
+                    oversightDates.Value.ToList().ForEach(_dataProcessingRegistrationOversightDateRepository.Delete);
                 }
                 return registration;
             });
@@ -483,11 +490,6 @@ namespace Core.ApplicationServices.GDPR
 
         public Result<DataProcessingRegistration, OperationError> UpdateOversightCompletedRemark(int id, string remark)
         {
-            if (remark == null)
-            {
-                return new OperationError(OperationFailure.BadInput);
-            }
-
             return Modify<DataProcessingRegistration>(id, registration =>
             {
                 registration.OversightCompletedRemark = remark;

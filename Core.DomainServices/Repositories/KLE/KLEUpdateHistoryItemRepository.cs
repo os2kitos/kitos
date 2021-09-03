@@ -25,7 +25,7 @@ namespace Core.DomainServices.Repositories.KLE
 
         public KLEUpdateHistoryItem Insert(DateTime version)
         {
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var result = _updateHistoryItems.Insert(new KLEUpdateHistoryItem(version));
             _updateHistoryItems.Save();
             transaction.Commit();

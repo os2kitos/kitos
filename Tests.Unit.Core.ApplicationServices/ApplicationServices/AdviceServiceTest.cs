@@ -266,7 +266,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private void SetupTransactionManager()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
         }
 
         private static List<AdviceUserRelation> CreateDefaultReceivers()

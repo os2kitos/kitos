@@ -5,9 +5,9 @@ import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
 import DataProcessingRegistrationEditMainPageObject =
-    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
+require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 import DataProcessingRegistrationEditOversightPageObject =
-    require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
+require("../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.oversight.po");
 
 class DataProcessingRegistrationHelper {
     private static readonly selectBasisForTransferSelectionId: string = "s2id_basisForTransfer_config";
@@ -123,7 +123,7 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getRemoveDataProcessorButton(name)
             .click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
     public static assignSubDataProcessor(name: string) {
@@ -147,7 +147,7 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getRemoveSubDataProcessorButton(name)
             .click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
 
@@ -162,7 +162,7 @@ class DataProcessingRegistrationHelper {
         return this.pageObject.getRemoveSystemButton(name)
             .click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
     public static openNewDpaDialog() {
@@ -204,7 +204,8 @@ class DataProcessingRegistrationHelper {
         return this.editOversightPo.getAssignOversightDateButton().click()
             .then(() => this.editOversightPo.getOversightDateModalDateField().sendKeys(date))
             .then(() => this.editOversightPo.getOversightDateModalRemarkField().sendKeys(remark))
-            .then(() => this.editOversightPo.getOversightDateModalSaveButton().click());
+            .then(() => this.editOversightPo.getOversightDateModalSaveButton().click())
+            .then(() => browser.waitForAngular());
     }
 
     public static verifyOversightDateAndRemark(date: string, remark: string) {
@@ -217,7 +218,7 @@ class DataProcessingRegistrationHelper {
         console.log(`Removing oversight date`);
         return this.editOversightPo.getRemoveOversightDateButton().click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
     private static validateSaveDpaClickable(isClickable: boolean) {
@@ -228,8 +229,7 @@ class DataProcessingRegistrationHelper {
 
     private static findDataProcessingRegistrationColumnFor(name: string) {
         return this.kendoToolbarWrapper.getFilteredColumnElement(
-            this.kendoToolbarWrapper.columnObjects().dpaName,
-            name);
+            this.kendoToolbarWrapper.columnObjects().dpaName, name);
     }
 
     private static waitForKendo() {
@@ -257,7 +257,7 @@ class DataProcessingRegistrationHelper {
         return this.editMainPo.getRemoveThirdCountryButton(thirdCountryName)
             .click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
     public static assignDataResponsible(dataResponsibleOptionName) {
@@ -275,7 +275,7 @@ class DataProcessingRegistrationHelper {
         return this.editOversightPo.getRemoveOversightOptionButton(name)
             .click()
             .then(() => browser.switchTo().alert().accept())
-            .then(()=>browser.waitForAngular());
+            .then(() => browser.waitForAngular());
     }
 
     static selectBasisForTransfer(basisForTransfer: string) {

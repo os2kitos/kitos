@@ -17,7 +17,7 @@ describe("Local admin is able to toggle DataProcessing", () => {
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsGlobalAdmin()
+        return loginHelper.loginAsGlobalAdmin()
             .then(() => SystemCatalogHelper.createSystem(systemName))
             .then(() => SystemCatalogHelper.createLocalSystem(systemName))
             .then(() => loginHelper.logout())

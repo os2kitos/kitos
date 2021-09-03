@@ -140,7 +140,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetInterfaceReturns(interfaceId, itInterface);
             ExpectAllowModifyReturns(itInterface, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateExposingSystem(interfaceId, null);
@@ -163,7 +163,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetSystemReturns(existingSystem.Id, existingSystem);
             ExpectAllowReadReturns(existingSystem, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateExposingSystem(interfaceId, existingSystem.Id);
@@ -187,7 +187,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectGetSystemReturns(newSystem.Id, newSystem);
             ExpectAllowReadReturns(newSystem, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(It.IsAny<IsolationLevel>())).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateExposingSystem(interfaceId, newSystem.Id);
@@ -271,7 +271,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetInterfaceReturns(interfaceId, interfaceToDelete);
             ExpectAllowDeleteReturns(interfaceToDelete, true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.Delete(interfaceId);
@@ -998,7 +998,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private Mock<IDatabaseTransaction> SetupTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             return transaction;
         }
 

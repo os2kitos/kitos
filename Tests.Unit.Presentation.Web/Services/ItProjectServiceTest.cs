@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Returns_Forbidden()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(false);
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(false);
 
             //Act
             var result = _sut.AddProject(A<string>(), A<int>());
@@ -79,10 +79,13 @@ namespace Tests.Unit.Presentation.Web.Services
         public void Add_Configures_New_Project_And_Returns_Ok()
         {
             //Arrange
-            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(),It.IsAny<ItProject>())).Returns(true);
+            var organizationId = A<int>();
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(true);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(It.IsAny<int>())).Returns(new EnumerableQuery<ItProject>(new List<ItProject>()));
 
             //Act
-            var result = _sut.AddProject(A<string>(), A<int>());
+            var result = _sut.AddProject(A<string>(), organizationId);
 
             //Assert
             Assert.True(result.Ok);
@@ -99,6 +102,25 @@ namespace Tests.Unit.Presentation.Web.Services
                 var year = resultValue.EconomyYears.ToList()[i];
                 Assert.Equal(i, year.YearNumber);
             }
+        }
+
+
+        [Fact]
+        public void Add_Returns_Conflict_If_Name_Is_Taken()
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+            _authorizationContext.Setup(x => x.AllowCreate<ItProject>(It.IsAny<int>(), It.IsAny<ItProject>())).Returns(true);
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(It.IsAny<int>())).Returns(new EnumerableQuery<ItProject>(new List<ItProject> { new() { Id = A<int>(), Name = name } }));
+
+            //Act
+            var result = _sut.AddProject(name, organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Conflict, result.Error);
         }
 
         [Fact]
@@ -142,7 +164,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var itProject = new ItProject() { Handover = new Handover() { Participants = new List<User>() { new User() } } };
             _itProjectRepo.Setup(x => x.GetByKey(id)).Returns(itProject);
             _authorizationContext.Setup(x => x.AllowDelete(itProject)).Returns(true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(databaseTransaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(databaseTransaction.Object);
             _referenceService.Setup(x => x.DeleteByProjectId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
@@ -442,6 +464,145 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CanCreateNewProjectWithName_Returns_Ok(bool overlapFound)
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+            var project1 = new ItProject { Name = A<string>() };
+            var project2 = new ItProject { Name = overlapFound ? name : A<string>() };
+
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(organizationId)).Returns(new List<ItProject> { project1, project2 }.AsQueryable());
+
+            //Act
+            var result = _sut.CanCreateNewProjectWithName(name, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(overlapFound == false, result.Value);
+        }
+
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void CanCreateNewProjectWithName_Returns_Forbidden_If_User_Does_Not_Have_Full_Access_In_Organization(OrganizationDataReadAccessLevel orgAccessThatFails)
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(orgAccessThatFails);
+
+            //Act
+            var result = _sut.CanCreateNewProjectWithName(name, organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Success_If_No_Overlaps()
+        {
+            //Arrange
+            var name = A<string>();
+            var id= A<int>();
+            var otherProject = new ItProject
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+
+            var itProject = new ItProject()
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetProjectByIdReturns(id,itProject);
+            _authorizationContext.Setup(x => x.AllowReads(itProject)).Returns(true);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(itProject.OrganizationId)).Returns(new List<ItProject> { otherProject, itProject }.AsQueryable());
+
+            //Act
+            var result = _sut.ValidateNewName(id,name);
+
+            //Assert
+            Assert.True(result.IsNone);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_Overlaps()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+            var otherProject = new ItProject
+            {
+                Id = A<int>(),
+                Name = name //overlap
+            };
+
+            var itProject = new ItProject()
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetProjectByIdReturns(id, itProject);
+            _authorizationContext.Setup(x => x.AllowReads(itProject)).Returns(true);
+            _specificProjectRepo.Setup(x => x.GetProjectsInOrganization(itProject.OrganizationId)).Returns(new List<ItProject> { otherProject, itProject }.AsQueryable());
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Conflict,result.Value.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_NotAllowedToAccessProject()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+
+            var itProject = new ItProject()
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetProjectByIdReturns(id, itProject);
+            _authorizationContext.Setup(x => x.AllowReads(itProject)).Returns(false);
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_ProjectNotFound()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+           
+            ExpectGetProjectByIdReturns(id, null);
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
         private void ExpectGetUserReturns(int participantId, User value)

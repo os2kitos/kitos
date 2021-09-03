@@ -164,7 +164,7 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.BadInput;
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using (var transaction = _transactionManager.Begin())
             {
                 newOrg = _orgRepository.Insert(newOrg);
                 _orgRepository.Save();

@@ -67,7 +67,7 @@ namespace Tests.Unit.Core.DomainServices.Notification
             var notificationWithRelatedEntity = ExpectRelatedEntity(relatedEntityType, relatedEntityId, notification);
 
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _userNotificationRepository.Setup(x => x.Add(It.IsAny<UserNotification>())).Returns(notificationWithRelatedEntity);
             _operationClock.Setup(x => x.Now).Returns(now);
 
@@ -87,7 +87,7 @@ namespace Tests.Unit.Core.DomainServices.Notification
             var notification = new UserNotification(A<string>(), A<string>(), NotificationType.Advice, A<int>(), A<int>(), now);
 
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object); 
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object); 
             _userNotificationRepository.Setup(x => x.DeleteById(notification.Id)).Returns(Maybe<OperationError>.None);
 
             //Act

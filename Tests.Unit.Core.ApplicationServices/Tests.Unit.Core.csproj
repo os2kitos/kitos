@@ -171,6 +171,7 @@
     <Compile Include="ApplicationServices\AdviceTriggerFactoryTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
+    <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />

@@ -71,7 +71,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             //Arrange
             _mockGenericUpdateHistoryItemRepository.Setup(r => r.Insert(It.IsAny<KLEUpdateHistoryItem>()));
             var mockDatabaseTransaction = new Mock<IDatabaseTransaction>();
-            _mockTransactionManager.Setup(t => t.Begin(IsolationLevel.ReadCommitted))
+            _mockTransactionManager.Setup(t => t.Begin())
                 .Returns(mockDatabaseTransaction.Object);
 
             //Act

@@ -189,7 +189,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var significance = A<int>() % 5;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddStakeholderAsync(OrganizationId,_project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
+            var result = await ItProjectHelper.AddStakeholderAsync(OrganizationId, _project.Id, name, roleName, downsides, benefits, howToHandle, significance, login);
 
             //Assert
             Assert.Equal(_project.Id, result.ItProjectId);
@@ -236,7 +236,7 @@ namespace Tests.Integration.Presentation.Web.Projects
             var responsibleUserId = TestEnvironment.DefaultUserId;
 
             //Act - perform the action with the actual role
-            var result = await ItProjectHelper.AddRiskAsync(OrganizationId,_project.Id, name, action, consequence, probability, responsibleUserId, login);
+            var result = await ItProjectHelper.AddRiskAsync(OrganizationId, _project.Id, name, action, consequence, probability, responsibleUserId, login);
 
             //Assert
             Assert.Equal(_project.Id, result.ItProjectId);
@@ -317,6 +317,21 @@ namespace Tests.Integration.Presentation.Web.Projects
                 //Assert
                 Assert.Equal(HttpStatusCode.OK, responseMessage.StatusCode);
             }
+        }
+
+        [Fact]
+        public async Task Cannot_Create_Project_With_Duplicated_Name()
+        {
+            //Arrange
+            var name = A<string>();
+
+            await ItProjectHelper.SendCreateProject(name, TestEnvironment.DefaultOrganizationId).WithExpectedResponseCode(HttpStatusCode.Created).DisposeAsync();
+
+            //Act -try to create a duplicate in same org
+            using var response = await ItProjectHelper.SendCreateProject(name, TestEnvironment.DefaultOrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
         }
     }
 }

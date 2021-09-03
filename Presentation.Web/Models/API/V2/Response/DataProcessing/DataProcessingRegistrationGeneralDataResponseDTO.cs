@@ -47,7 +47,7 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         /// <summary>
         /// Determines if the data processing involves sub data processors
         /// </summary>
-        public YesNoUndecidedChoice? HasSubDataProcesors { get; set; }
+        public YesNoUndecidedChoice? HasSubDataProcessors { get; set; }
         /// <summary>
         /// UUID's of the organization entities selected as sub data processors
         /// </summary>
