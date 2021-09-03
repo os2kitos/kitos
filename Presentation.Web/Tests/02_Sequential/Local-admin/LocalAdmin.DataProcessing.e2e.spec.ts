@@ -22,7 +22,7 @@ describe("Local admin is able to toggle DataProcessing", () => {
             .then(() => SystemCatalogHelper.createLocalSystem(systemName))
             .then(() => loginHelper.logout())
             .then(() => loginHelper.loginAsLocalAdmin())
-            .finally(doneFunc);
+            .thenFinally(doneFunc);
     });
 
     afterAll(() => {
