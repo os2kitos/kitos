@@ -10,6 +10,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
+using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Queries;
@@ -41,6 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _dprOversightDaterepositoryMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -58,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
             _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _dprOversightDaterepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -72,7 +75,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightOptionAssignmentServiceMock.Object,
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
-                _userContextMock.Object);
+                _userContextMock.Object,
+                _dprOversightDaterepositoryMock.Object);
         }
 
         [Fact]

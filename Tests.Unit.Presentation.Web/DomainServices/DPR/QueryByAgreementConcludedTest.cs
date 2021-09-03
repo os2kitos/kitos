@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.DomainServices.DPR
 {
-    public class QQueryByAgreementConcludedTest : WithAutoFixture
+    public class QueryByAgreementConcludedTest : WithAutoFixture
     {
         [Theory]
         [InlineData(true)]
