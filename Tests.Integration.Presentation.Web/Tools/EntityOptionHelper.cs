@@ -27,6 +27,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string PaymentModelTypes = "PaymentModelTypes";
             public const string AgreementElementTypes = "AgreementElementTypes";
             public const string PaymentFrequencyTypes = "PaymentFrequencyTypes";
+            public const string PriceRegulationTypes = "PriceRegulationTypes";
             public const string ContractRoles = "ItContractRoles";
 
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
