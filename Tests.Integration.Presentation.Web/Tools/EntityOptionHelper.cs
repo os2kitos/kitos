@@ -20,7 +20,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string RegisterTypes = "RegisterTypes";
             public const string SensitivePersonalDataTypes = "SensitivePersonalDataTypes";
             public const string SystemRoles = "ItSystemRoles";
+
             public const string ContractTypes = "ItContractTypes";
+            public const string ContractRoles = "ItContractRoles";
+
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
             public const string DataProcessingBasisForTransferOptions = "DataProcessingBasisForTransferOptions";
             public const string DataProcessingCountryOptions = "DataProcessingCountryOptions";

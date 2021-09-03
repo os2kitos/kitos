@@ -1,8 +1,6 @@
 ﻿using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Swashbuckle.Swagger.Annotations;
 using System;

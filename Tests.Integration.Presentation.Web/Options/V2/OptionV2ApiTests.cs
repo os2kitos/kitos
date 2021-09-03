@@ -114,6 +114,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
         {
             yield return new[] { EntityOptionHelper.ResourceNames.SystemRoles, OptionV2ApiHelper.ResourceName.ItSystemUsageRoles };
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingRegistrationRoles, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationRoles };
+            yield return new[] { EntityOptionHelper.ResourceNames.ContractRoles, OptionV2ApiHelper.ResourceName.ItContractRoles };
         }
 
         public static IEnumerable<object[]> GetRegularResources()

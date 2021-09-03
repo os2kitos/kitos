@@ -22,7 +22,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-location-types";
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
             public const string ItSystemUsageRoles = "it-system-usage-role-types";
+
             public const string ItContractContractTypes = "it-contract-contract-types";
+            public const string ItContractRoles = "it-contract-role-types";
+
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registration-data-responsible-types";
             public const string DataProcessingRegistrationBasisForTransfer = "data-processing-registration-basis-for-transfer-types";
             public const string DataProcessingRegistrationCountry = "data-processing-registration-country-types";
