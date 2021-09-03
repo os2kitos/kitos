@@ -27,6 +27,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItContractContractTemplateTypes = "it-contract-contract-template-types";
             public const string ItContractPurchaseTypes = "it-contract-purchase-types";
             public const string ItContractPaymentModelTypes = "it-contract-payment-model-types";
+            public const string ItContractAgreementElementTypes = "it-contract-agreement-element-types";
             public const string ItContractRoles = "it-contract-role-types";
 
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registration-data-responsible-types";
