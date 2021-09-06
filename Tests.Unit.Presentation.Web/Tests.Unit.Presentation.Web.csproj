@@ -226,6 +226,7 @@
     <Compile Include="DomainServices\QueryOrganizationByIdsOrSharedAccessTest.cs" />
     <Compile Include="DomainServices\QueryByOrganizationUuidTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryByRelationToSystemTest.cs" />
+    <Compile Include="DomainServices\SystemUsage\QueryByRelationToContractTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryByRelationToSystemUsageTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemNameContentTest.cs" />
     <Compile Include="DomainServices\SystemUsage\QueryBySystemUuidTest.cs" />
