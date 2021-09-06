@@ -23,12 +23,10 @@ describe("Data processing registration it-systems test", () => {
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
-        loginHelper.loginAsGlobalAdmin()
-            .then(() => SystemCatalogHelper.createSystemAndActivateLocally(system1))
-            .then(() => SystemCatalogHelper.createSystemAndActivateLocally(system2))
+        return loginHelper.loginAsLocalAdmin()
+            .then(() => dpaHelper.checkAndEnableDpaModule())
             .then(() => testFixture.cleanupState())
-            .then(() => loginHelper.loginAsLocalAdmin())
-            .then(() => dpaHelper.checkAndEnableDpaModule());
+            .then(() => loginHelper.loginAsGlobalAdmin());
     });
 
     afterAll(() => {
@@ -39,8 +37,9 @@ describe("Data processing registration it-systems test", () => {
     it("Assigning and removing systems",
         () => {
             const dprName = createName(3);
-
-            dpaHelper.createAndOpenDataProcessingRegistration(dprName)
+            SystemCatalogHelper.createSystemAndActivateLocally(system1)
+                .then(() => SystemCatalogHelper.createSystemAndActivateLocally(system2))
+                .then(() => dpaHelper.createAndOpenDataProcessingRegistration(dprName))
                 .then(() => dpaHelper.goToItSystems())
                 .then(() => dpaHelper.assignSystem(system1))
                 .then(() => dpaHelper.assignSystem(system2))
