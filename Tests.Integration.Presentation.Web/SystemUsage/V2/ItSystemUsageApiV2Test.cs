@@ -224,10 +224,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, relationToContractUuidFilter: contract.Uuid)).ToList();
 
             //Assert
-            // Get by contract returns both "To" and "From" system usages
-            Assert.Equal(3, dtos.Count);
+            // Get by contract returns only "From" system usages
+            Assert.Equal(2, dtos.Count);
             AssertExpectedUsageShallow(systemUsage1, dtos);
-            AssertExpectedUsageShallow(systemUsage2, dtos);
             AssertExpectedUsageShallow(relationTargetUsage, dtos);
         }
 

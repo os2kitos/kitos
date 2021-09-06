@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="organizationUuid">Query usages within a specific organization</param>
         /// <param name="relatedToSystemUuid">Query by systems with outgoing relations related to another system</param>
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
-        /// <param name="relatedToContractUuid">Query by contracts with relations to a system usage</param>
+        /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
