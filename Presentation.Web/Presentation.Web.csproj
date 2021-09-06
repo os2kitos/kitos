@@ -928,7 +928,6 @@
     <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\API\V1\CreateLocalAdminDTO.cs" />
-    <Compile Include="Controllers\API\V1\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\V1\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationController.cs" />
@@ -1228,8 +1227,6 @@
     <TypeScriptCompile Include="app\shared\showStatus\showStatus.directive.ts" />
     <TypeScriptCompile Include="app\components\it-project\simpleComment.directive.ts" />
     <TypeScriptCompile Include="app\components\it-project\squareTrafficLight.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\suggestNew\suggestNew.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\suggestNewRole\suggestNewRole.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\unique.directive.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
@@ -1375,8 +1372,6 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-project.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
-    <Content Include="app\components\local-config\suggestNewRole\suggestNewRole.view.html" />
-    <Content Include="app\components\local-config\suggestNew\suggestNew.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
     <Content Include="app\components\org\overview\org-overview.view.html" />
     <Content Include="app\components\org\overview\org-overview-modal-comment.view.html" />
