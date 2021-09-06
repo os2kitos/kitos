@@ -46,7 +46,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// </summary>
         public IEnumerable<Guid> DataProcessingRegistrationUuids { get; set; }
 
-        public ContractHandoverDataWriteRequestDTO Handover { get; set; }
+        public IEnumerable<HandoverTrialRequestDTO> HandoverTrials { get; set; }
         public ContractPaymentModelDataWriteRequestDTO PaymentModel { get; set; }
         public ContractAgreementPeriodDataWriteRequestDTO AgreementPeriod { get; set; }
         public ContractTerminationDataWriteRequestDTO Termination { get; set; }

@@ -274,7 +274,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         }
 
         /// <summary>
-        /// Updates an existing it-contract's handover data section
+        /// Updates an existing it-contract's handover trial registrations
         /// </summary>
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
         /// <returns></returns>
@@ -286,7 +286,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItProjectHandoverData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractHandoverDataWriteRequestDTO request)
+        public IHttpActionResult PutItProjectHandoverData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<HandoverTrialRequestDTO> request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

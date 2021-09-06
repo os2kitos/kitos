@@ -47,7 +47,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Data processing registrations associated with this it-contract
         /// </summary>
         public IEnumerable<IdentityNamePairResponseDTO> DataProcessingRegistrations { get; set; }
-        public ContractHandoverDataResponseDTO Handover { get; set; }
+        public IEnumerable<HandoverTrialResponseDTO> HandoverTrials { get; set; }
         public ContractPaymentModelDataResponseDTO PaymentModel { get; set; }
         public ContractAgreementPeriodDataResponseDTO AgreementPeriod { get; set; }
         public ContractTerminationDataResponseDTO Termination { get; set; }
