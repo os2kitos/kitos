@@ -101,8 +101,7 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${this.user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?($select=Uuid,AccessModifier,Id,Name,Version,ItInterfaceId,Url,UsedByOrganizationNames,LastChanged,Created)&" +
-                                                        "$expand=Interface($select=Name)," +
+            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface($select=Name)," +
                                                         "ObjectOwner($select=Name,LastName)," +
                                                         "Organization($select=Name)," +
                                                         "ExhibitedBy($expand=ItSystem($select=Name,Disabled;$expand=BelongsTo($select=Name)))," +
