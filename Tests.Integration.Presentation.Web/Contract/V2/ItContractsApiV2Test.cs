@@ -1,7 +1,6 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Linq;
@@ -30,9 +29,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             AssertContractResponseDTO(newContract, dto);
-            var agreementElement = Assert.Single(dto.AgreementElements);
-            Assert.Equal(expectedAgreementElement.Uuid, agreementElement.Uuid);
-            Assert.Equal(expectedAgreementElement.Name, agreementElement.Name);
         }
 
         [Fact]
@@ -243,34 +239,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual) 
         {
-
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.Name, actual.Name);
-
-            Assert.Equal(expected.Concluded, actual.ValidFrom);
-            Assert.Equal(expected.ExpirationDate, actual.ValidTo);
-            Assert.Equal(expected.Terminated, actual.TerminatedAt);
-            Assert.Equal(expected.IsActive, actual.IsValid);
-
-            if (expected.SupplierId.HasValue)
-            {
-                Assert.Equal(expected.SupplierName, actual.Supplier.Name);
-                Assert.Equal(expected.SupplierUuid, actual.Supplier.Uuid);
-            }
-            else
-            {
-                Assert.Null(actual.Supplier);
-            }
-
-            if (expected.ContractTypeId.HasValue)
-            {
-                Assert.Equal(expected.ContractTypeName, actual.ContractType.Name);
-                Assert.Equal(expected.ContractTypeUuid, actual.ContractType.Uuid);
-            }
-            else
-            {
-                Assert.Null(actual.Supplier);
-            }
         }
 
         private async Task<(ItContractDTO, AgreementElementType)> CreateContractWithAllDataSet(int orgId)

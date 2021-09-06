@@ -11,7 +11,6 @@ using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.KLE;
 using Swashbuckle.Swagger.Annotations;
