@@ -456,12 +456,11 @@
     <Compile Include="Models\API\V2\Types\Shared\YesNoUndecidedChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\JournalPeriodDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Generic\Validity\ValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\LocalKLEDeviationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ArchivingRegistrationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Shared\SimpleLinkDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\SystemRelationResponseDTO.cs" />
-    <Compile Include="Models\API\V2\SharedProperties\IHasValidationExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\ExpectedUsersIntervalDTO.cs" />
