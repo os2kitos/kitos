@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemUsageResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -155,7 +155,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]

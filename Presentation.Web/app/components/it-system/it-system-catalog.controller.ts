@@ -195,7 +195,14 @@
                 // everyone else are limited to within organizationnal context
                 itSystemBaseUrl = `/odata/Organizations(${this.user.currentOrganizationId})/ItSystems`;
             }
-            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType($select=Name),BelongsTo($select=Name),TaskRefs($select=Description,TaskKey),Parent($select=Name,Disabled),Organization($select=Id,Name),Usages($select=OrganizationId;$expand=Organization($select=Id,Name)),LastChangedByUser($select=Name,LastName),Reference($select=Title,URL,ExternalReferenceId)";
+            var itSystemUrl = itSystemBaseUrl + "?$expand=BusinessType($select=Name)," +
+                                                "BelongsTo($select=Name)," +
+                                                "TaskRefs($select=Description,TaskKey)," +
+                                                "Parent($select=Name,Disabled)," +
+                                                "Organization($select=Id,Name)," +
+                                                "Usages($select=OrganizationId;$expand=Organization($select=Id,Name))," +
+                                                "LastChangedByUser($select=Name,LastName)," +
+                                                "Reference($select=Title,URL,ExternalReferenceId)";
             // catalog grid
             this.mainGridOptions = {
                 autoBind: false, // disable auto fetch, it's done in the kendoRendered event handler

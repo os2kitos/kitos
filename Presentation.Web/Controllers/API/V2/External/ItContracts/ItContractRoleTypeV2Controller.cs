@@ -25,7 +25,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="organizationUuid">organization context for the It Contract role availability</param>
         /// <returns>A list of available It Contract role option types</returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RoleOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="organizationUuid">organization context for the handover trial types availability</param>
         /// <returns>A list of available It-Contract handover trial types</returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

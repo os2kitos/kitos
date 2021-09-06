@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <param name="organizationUuid">organization context for the Data Processing Registration role availability</param>
         /// <returns>A list of available Data Processing Registration role option types</returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<RoleOptionResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
