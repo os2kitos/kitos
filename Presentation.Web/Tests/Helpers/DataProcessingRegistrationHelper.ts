@@ -161,6 +161,7 @@ class DataProcessingRegistrationHelper {
         console.log("Removing system with name: " + name);
         return this.pageObject.getRemoveSystemButton(name)
             .click()
+            .then(() => browser.waitForAngular())
             .then(() => browser.switchTo().alert().accept())
             .then(() => browser.waitForAngular());
     }
