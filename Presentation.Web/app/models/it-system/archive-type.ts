@@ -3,7 +3,6 @@
     export interface IArchiveType extends IEntity {
         Name: string;
         IsActive: boolean;
-        IsSuggestion: boolean;
         Note: string;
         /** The ItSystems that has been marked with this ArchiveType */
         References: Array<ItSystemUsage.IItSystemUsage>;

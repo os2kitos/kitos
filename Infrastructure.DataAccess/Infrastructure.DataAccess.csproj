@@ -814,6 +814,10 @@
     <Compile Include="Migrations\202109010946467_Cleanup_ItSystem_Unused.designer.cs">
       <DependentUpon>202109010946467_Cleanup_ItSystem_Unused.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109060415217_OptionEntity_RemoveIsSuggestion.cs" />
+    <Compile Include="Migrations\202109060415217_OptionEntity_RemoveIsSuggestion.designer.cs">
+      <DependentUpon>202109060415217_OptionEntity_RemoveIsSuggestion.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1336,6 +1340,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202109010946467_Cleanup_ItSystem_Unused.resx">
       <DependentUpon>202109010946467_Cleanup_ItSystem_Unused.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109060415217_OptionEntity_RemoveIsSuggestion.resx">
+      <DependentUpon>202109060415217_OptionEntity_RemoveIsSuggestion.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

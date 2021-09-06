@@ -7,7 +7,6 @@
         HasWriteAccess: boolean;
         Name: string;
         IsActive: boolean;
-        IsSuggestion: boolean;
         Description?: any;
         ObjectOwnerId: number;
         LastChanged: Date;
