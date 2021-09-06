@@ -3,8 +3,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainServices.Queries;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
-using Presentation.Web.Models.API.V2.Response;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
@@ -21,7 +19,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItProjects
     /// <summary>
     /// API for the projects stored in KITOS.
     /// </summary>
-    [RoutePrefix("api/v2")]
+    [RoutePrefix("api/v2/it-projects")]
     public class ItProjectV2Controller : ExternalBaseController
     {
         private readonly IItProjectService _itProjectService;
@@ -38,7 +36,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItProjects
         /// <param name="nameContent">Name content filter</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("it-projects")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -70,7 +68,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItProjects
         /// <param name="uuid">Specific IT-Project UUID</param>
         /// <returns>Specific data related to the IT-Project</returns>
         [HttpGet]
-        [Route("it-projects/{uuid}")]
+        [Route("{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IdentityNamePairResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

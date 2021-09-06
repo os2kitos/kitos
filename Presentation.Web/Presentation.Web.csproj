@@ -393,6 +393,17 @@
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractHandoverDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractPaymentModelDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractPaymentsDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractResponsibleDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractSupplierDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractTerminationDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\CreateNewContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationGeneralDataWriteRequestDTO.cs" />
