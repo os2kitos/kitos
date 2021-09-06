@@ -41,7 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.External.KLE
         /// <param name="kleCategory">Query by KLE category</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(VersionedKLEResponseDTO<IEnumerable<KLEDetailsDTO>>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]

@@ -12,19 +12,19 @@ using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
-    [RoutePrefix("api/v2/it-contract-contract-types")]
-    public class ItContractContractTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, ItContractType>
+    [RoutePrefix("api/v2/it-contract-purchase-types")]
+    public class ItContractPurchaseTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, PurchaseFormType>
     {
-        public ItContractContractTypeV2Controller(IOptionsApplicationService<ItContract, ItContractType> optionService)
+        public ItContractPurchaseTypeV2Controller(IOptionsApplicationService<ItContract, PurchaseFormType> optionService)
             : base(optionService)
         {
         }
 
         /// <summary>
-        /// Returns It-Contract contract type options 
+        /// Returns It-Contract purchase type options 
         /// </summary>
-        /// <param name="organizationUuid">organization context for the contract types availability</param>
-        /// <returns>A list of available It-Contract contract types</returns>
+        /// <param name="organizationUuid">organization context for the purchase types availability</param>
+        /// <returns>A list of available It-Contract purchase types</returns>
         [HttpGet]
         [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
@@ -37,21 +37,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         }
 
         /// <summary>
-        /// Returns requested It-Contract contract type
+        /// Returns requested It-Contract purchase type
         /// </summary>
-        /// <param name="contractTypeUuid">contract type identifier</param>
-        /// <param name="organizationUuid">organization context for the contract type availability</param>
-        /// <returns>A uuid and name pair with boolean to mark if the contract type is available in the organization</returns>
+        /// <param name="purchaseTypeUuid">purchase type identifier</param>
+        /// <param name="organizationUuid">organization context for the purchase type availability</param>
+        /// <returns>A uuid and name pair with boolean to mark if the purchase type is available in the organization</returns>
         [HttpGet]
-        [Route("{contractTypeUuid}")]
+        [Route("{purchaseTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid contractTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid purchaseTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
-            return GetSingle(contractTypeUuid, organizationUuid);
+            return GetSingle(purchaseTypeUuid, organizationUuid);
         }
     }
 }

@@ -384,7 +384,29 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItSystemUsage, RegisterType, LocalRegisterType>(kernel);
 
             //IT-Contract
+            RegisterOptionsService<ItContractRight, ItContractRole, LocalItContractRole>(kernel);
+
             RegisterOptionsService<ItContract, ItContractType, LocalItContractType>(kernel);
+
+            RegisterOptionsService<ItContract, ItContractTemplateType, LocalItContractTemplateType>(kernel);
+
+            RegisterOptionsService<ItContract, PurchaseFormType, LocalPurchaseFormType>(kernel);
+
+            RegisterOptionsService<ItContract, PaymentModelType, LocalPaymentModelType>(kernel);
+
+            RegisterOptionsService<ItContract, AgreementElementType, LocalAgreementElementType>(kernel);
+
+            RegisterOptionsService<ItContract, PaymentFreqencyType, LocalPaymentFreqencyType>(kernel);
+
+            RegisterOptionsService<ItContract, PriceRegulationType, LocalPriceRegulationType>(kernel);
+
+            RegisterOptionsService<ItContract, ProcurementStrategyType, LocalProcurementStrategyType>(kernel);
+
+            RegisterOptionsService<ItContract, OptionExtendType, LocalOptionExtendType>(kernel);
+
+            RegisterOptionsService<ItContract, TerminationDeadlineType, LocalTerminationDeadlineType>(kernel);
+
+            RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
 
             //Attached options services
             kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>

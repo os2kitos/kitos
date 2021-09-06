@@ -12,19 +12,19 @@ using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
-    [RoutePrefix("api/v2/it-contract-contract-types")]
-    public class ItContractContractTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, ItContractType>
+    [RoutePrefix("api/v2/it-contract-notice-period-month-types")]
+    public class ItContractNoticePeriodMonthTypeV2Controller : BaseRegularOptionTypeV2Controller<ItContract, TerminationDeadlineType>
     {
-        public ItContractContractTypeV2Controller(IOptionsApplicationService<ItContract, ItContractType> optionService)
+        public ItContractNoticePeriodMonthTypeV2Controller(IOptionsApplicationService<ItContract, TerminationDeadlineType> optionService)
             : base(optionService)
         {
         }
 
         /// <summary>
-        /// Returns It-Contract contract type options 
+        /// Returns It-Contract notice period month type options 
         /// </summary>
-        /// <param name="organizationUuid">organization context for the contract types availability</param>
-        /// <returns>A list of available It-Contract contract types</returns>
+        /// <param name="organizationUuid">organization context for the notice period month types availability</param>
+        /// <returns>A list of available It-Contract notice period month types</returns>
         [HttpGet]
         [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
@@ -37,21 +37,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         }
 
         /// <summary>
-        /// Returns requested It-Contract contract type
+        /// Returns requested It-Contract notice period month type
         /// </summary>
-        /// <param name="contractTypeUuid">contract type identifier</param>
-        /// <param name="organizationUuid">organization context for the contract type availability</param>
-        /// <returns>A uuid and name pair with boolean to mark if the contract type is available in the organization</returns>
+        /// <param name="noticePeriodMonthTypeUuid">notice period month type identifier</param>
+        /// <param name="organizationUuid">organization context for the notice period month type availability</param>
+        /// <returns>A uuid and name pair with boolean to mark if the notice period month type is available in the organization</returns>
         [HttpGet]
-        [Route("{contractTypeUuid}")]
+        [Route("{noticePeriodMonthTypeUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RegularOptionExtendedResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid contractTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid noticePeriodMonthTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
-            return GetSingle(contractTypeUuid, organizationUuid);
+            return GetSingle(noticePeriodMonthTypeUuid, organizationUuid);
         }
     }
 }
