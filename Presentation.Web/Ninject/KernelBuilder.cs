@@ -402,6 +402,8 @@ namespace Presentation.Web.Ninject
 
             RegisterOptionsService<ItContract, ProcurementStrategyType, LocalProcurementStrategyType>(kernel);
 
+            RegisterOptionsService<ItContract, OptionExtendType, LocalOptionExtendType>(kernel);
+
             //Attached options services
             kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>
                 new AttachedOptionsAssignmentService<RegisterType, ItSystemUsage>(OptionType.REGISTERTYPEDATA,
