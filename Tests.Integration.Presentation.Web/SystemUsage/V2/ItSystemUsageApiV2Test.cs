@@ -200,6 +200,38 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Filtered_By_RelationContractUuId()
+        {
+            //Arrange - setup multiple relations across orgs
+            var (token, user, organization1, _) = await CreatePrerequisitesAsync();
+
+            var system1 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system2 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+            var relationTargetSystem = await CreateSystemAsync(organization1.Id, AccessModifier.Public);
+
+            var systemUsage1 = await ItSystemHelper.TakeIntoUseAsync(system1.dbId, organization1.Id);
+            var systemUsage2 = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization1.Id);
+            var systemUsage3 = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization1.Id);
+            var relationTargetUsage = await ItSystemHelper.TakeIntoUseAsync(relationTargetSystem.dbId, organization1.Id);
+
+            var contract = await ItContractHelper.CreateContract(CreateName(), organization1.Id);
+
+            await CreateRelationAsync(systemUsage1, relationTargetUsage, contract);
+            await CreateRelationAsync(relationTargetUsage, systemUsage2, contract);
+            await CreateRelationAsync(systemUsage3, relationTargetUsage);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, relationToContractUuidFilter: contract.Uuid)).ToList();
+
+            //Assert
+            // Get by contract returns only "From" system usages
+            Assert.Equal(2, dtos.Count);
+            AssertExpectedUsageShallow(systemUsage1, dtos);
+            AssertExpectedUsageShallow(relationTargetUsage, dtos);
+        }
+
+        [Fact]
         public async Task Can_Get_All_ItSystemUsages_Filtered_By_SystemNameContent()
         {
             //Arrange
@@ -2098,9 +2130,9 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return $"{nameof(ItSystemUsageApiV2Test)}{A<string>()}";
         }
 
-        private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage)
+        private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage, ItContractDTO contract = null)
         {
-            return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id });
+            return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id, ContractId = contract?.Id});
         }
     }
 }

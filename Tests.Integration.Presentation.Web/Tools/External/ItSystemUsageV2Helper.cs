@@ -35,6 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? systemUuidFilter = null,
             Guid? relationToSystemUuidFilter = null,
             Guid? relationToSystemUsageUuidFilter = null,
+            Guid? relationToContractUuidFilter = null,
             string systemNameContentFilter = null,
             int? page = null,
             int? pageSize = null)
@@ -52,6 +53,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (relationToSystemUsageUuidFilter.HasValue)
                 criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString()));
+
+            if (relationToContractUuidFilter.HasValue)
+                criteria.Add(new KeyValuePair<string, string>("relatedToContractUuid", relationToContractUuidFilter.Value.ToString()));
 
             if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
                 criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
