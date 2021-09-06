@@ -101,7 +101,13 @@
                 itInterfaceBaseUrl = `/odata/Organizations(${this.user.currentOrganizationId})/ItInterfaces`;
             }
 
-            var itInterfaceUrl = itInterfaceBaseUrl + "?$expand=Interface,ObjectOwner,Organization,ExhibitedBy($expand=ItSystem,ItSystem($expand=BelongsTo)),LastChangedByUser,DataRows($expand=DataType)";
+            var itInterfaceUrl = itInterfaceBaseUrl + "?($select=Uuid,AccessModifier,Id,Name,Version,ItInterfaceId,Url,UsedByOrganizationNames,LastChanged,Created)&" +
+                                                        "$expand=Interface($select=Name)," +
+                                                        "ObjectOwner($select=Name,LastName)," +
+                                                        "Organization($select=Name)," +
+                                                        "ExhibitedBy($expand=ItSystem($select=Name,Disabled;$expand=BelongsTo($select=Name)))," +
+                                                        "LastChangedByUser($select=Name,LastName)," +
+                                                        "DataRows($expand=DataType($select=Name))";
             this.canCreate = this.userAccessRights.canCreate;
 
             this.mainGridOptions = {
