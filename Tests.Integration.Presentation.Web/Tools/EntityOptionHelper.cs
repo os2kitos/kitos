@@ -30,6 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string PriceRegulationTypes = "PriceRegulationTypes";
             public const string ProcurementStrategyTypes = "ProcurementStrategyTypes";
             public const string AgreementExtensionOptionTypes = "OptionExtendTypes";
+            public const string NoticePeriodMonthTypes = "TerminationDeadlineTypes";
             public const string ContractRoles = "ItContractRoles";
 
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";

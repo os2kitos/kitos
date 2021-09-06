@@ -32,6 +32,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItContractPriceRegulationTypes = "it-contract-price-regulation-types";
             public const string ItContractProcurementStrategyTypes = "it-contract-procurement-strategy-types";
             public const string ItContractAgreementExtensionOptionTypes = "it-contract-agreement-extension-option-types";
+            public const string ItContractNoticePeriodMonthTypes = "it-contract-notice-period-month-types";
             public const string ItContractRoles = "it-contract-role-types";
 
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registration-data-responsible-types";

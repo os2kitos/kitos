@@ -368,6 +368,7 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPriceRegulationTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractProcurementStrategyV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementExtensionOptionsTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractNoticePeriodMonthTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPurchaseTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTemplateTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
