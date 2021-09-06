@@ -448,13 +448,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             {
                 Uuid = contract.Uuid,
                 Name = contract.Name,
-                ContractType = contract.ContractTypeId.HasValue ? contract.ContractType.MapIdentityNamePairDTO() : null,
-                Supplier = contract.SupplierId.HasValue ? contract.Supplier.MapShallowOrganizationResponseDTO() : null,
-                AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.MapIdentityNamePairDTO()),
-                ValidFrom = contract.Concluded,
-                ValidTo = contract.ExpirationDate,
-                TerminatedAt = contract.Terminated,
-                IsValid = contract.IsActive
             };
         }
     }
