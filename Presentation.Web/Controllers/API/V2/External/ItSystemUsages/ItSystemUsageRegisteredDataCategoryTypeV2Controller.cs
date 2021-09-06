@@ -26,7 +26,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="organizationUuid">organization context for the type availability</param>
         /// <returns>A list of available types</returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]

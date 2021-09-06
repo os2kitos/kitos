@@ -24,7 +24,7 @@
     }
 
     public goToSubMenuElement(srefName: string) {
-        console.log("Nanvigating to sub menu ", srefName);
+        console.log("Navigating to sub menu ", srefName);
         return element(by.css(`[data-ui-sref="${srefName}"`)).click()
             .then(() => browser.waitForAngular());
     }

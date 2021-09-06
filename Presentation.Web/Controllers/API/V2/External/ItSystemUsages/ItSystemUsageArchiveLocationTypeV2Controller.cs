@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="organizationUuid">organization context for the archive locations availability</param>
         /// <returns>A list of available It-System Usage archive locations</returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<IdentityNamePairResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
