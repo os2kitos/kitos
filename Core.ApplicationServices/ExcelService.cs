@@ -139,13 +139,11 @@ namespace Core.ApplicationServices
                     RowIndex = rowIndex,
                     Name = row.Field<string>(1),
                     ItContractId = row.Field<string>(2),
-                    Esdh = row.Field<string>(3),
-                    Folder = row.Field<string>(4),
-                    Note = row.Field<string>(5),
-                    ConcludedText = row.Field<string>(6),
-                    IrrevocableToText = row.Field<string>(7),
-                    ExpirationDateText = row.Field<string>(8),
-                    TerminatedText = row.Field<string>(9),
+                    Note = row.Field<string>(3),
+                    ConcludedText = row.Field<string>(4),
+                    IrrevocableToText = row.Field<string>(5),
+                    ExpirationDateText = row.Field<string>(6),
+                    TerminatedText = row.Field<string>(7),
                 };
 
                 // validate that name exists
@@ -241,8 +239,6 @@ namespace Core.ApplicationServices
                 {
                     Name = contractRow.Name,
                     ItContractId = contractRow.ItContractId,
-                    Esdh = contractRow.Esdh,
-                    Folder = contractRow.Folder,
                     Note = contractRow.Note,
                     Concluded = contractRow.Concluded,
                     IrrevocableTo = contractRow.IrrevocableTo,
@@ -653,8 +649,6 @@ namespace Core.ApplicationServices
             public int RowIndex { get; set; }
             public string Name { get; set; }
             public string ItContractId { get; set; }
-            public string Esdh { get; set; }
-            public string Folder { get; set; }
             public string Note { get; set; }
             public DateTime? Concluded { get; set; }
             public DateTime? IrrevocableTo { get; set; }
@@ -717,7 +711,7 @@ namespace Core.ApplicationServices
                 var irrevocableTo = contract.IrrevocableTo.HasValue ? contract.IrrevocableTo.Value.ToShortDateString() : null;
                 var expirationDate = contract.ExpirationDate.HasValue ? contract.ExpirationDate.Value.ToShortDateString() : null;
                 var terminated = contract.Terminated.HasValue ? contract.Terminated.Value.ToShortDateString() : null;
-                table.Rows.Add(contract.Id, contract.Name, contract.ItContractId, contract.Esdh, contract.Folder, contract.Note, concluded, irrevocableTo, expirationDate, terminated);
+                table.Rows.Add(contract.Id, contract.Name, contract.ItContractId, contract.Note, concluded, irrevocableTo, expirationDate, terminated);
             }
 
             return table;
