@@ -29,8 +29,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Procurement = MapProcurement(contract),
                 Supplier = MapSupplier(contract),
                 Responsible = MapResponsible(contract),
-                SystemUsages = contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage?.MapIdentityNamePairDTO()).ToList(),
-                DataProcessingRegistrations = contract.DataProcessingRegistrations.Select(x => x.MapIdentityNamePairDTO()).ToList(),
+                SystemUsages = contract.AssociatedSystemUsages?.Select(x => x.ItSystemUsage?.MapIdentityNamePairDTO()).ToList(),
+                DataProcessingRegistrations = contract.DataProcessingRegistrations?.Select(x => x.MapIdentityNamePairDTO()).ToList(),
                 HandoverTrials = MapHandoverTrials(contract),
                 PaymentModel = MapPaymentModel(contract),
                 AgreementPeriod = MapAgreementPeriod(contract),
@@ -77,8 +77,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new ()
             {
-                External = contract.ExternEconomyStreams.Select(MapPaymentResponseDTO).ToList(),
-                Internal = contract.InternEconomyStreams.Select(MapPaymentResponseDTO).ToList()
+                External = contract.ExternEconomyStreams?.Select(MapPaymentResponseDTO).ToList(),
+                Internal = contract.InternEconomyStreams?.Select(MapPaymentResponseDTO).ToList()
             };
         }
 
@@ -99,12 +99,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static List<RoleAssignmentResponseDTO> MapRoles(ItContract contract)
         {
-            return contract.Rights.Select(ToRoleResponseDTO).ToList();
+            return contract.Rights?.Select(ToRoleResponseDTO).ToList();
         }
 
         private static List<ExternalReferenceDataDTO> MapExternalReferences(ItContract contract)
         {
-            return contract.ExternalReferences.Select(x => MapExternalReferenceDTO(contract, x)).ToList();
+            return contract.ExternalReferences?.Select(x => MapExternalReferenceDTO(contract, x)).ToList();
         }
 
         private static ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
@@ -115,7 +115,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentModel = contract.PaymentModel?.MapIdentityNamePairDTO(),
                 PaymentFrequency = contract.PaymentFreqency?.MapIdentityNamePairDTO(),
                 PriceRegulation = contract.PriceRegulation?.MapIdentityNamePairDTO(),
-                PaymentMileStones = contract.PaymentMilestones.Select(MapPaymentMilestones).ToList()
+                PaymentMileStones = contract.PaymentMilestones?.Select(MapPaymentMilestones).ToList()
             };
         }
 
@@ -131,7 +131,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
         {
-            return contract.HandoverTrials.Select(MapHandoverTrial).ToList();
+            return contract.HandoverTrials?.Select(MapHandoverTrial).ToList();
         }
 
         private static HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
@@ -199,7 +199,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Notes = contract.Note,
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),
                 ContractType = contract.ContractType?.MapIdentityNamePairDTO(),
-                AgreementElements = contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList(),
+                AgreementElements = contract.AssociatedAgreementElementTypes?.Select(x => x.AgreementElementType?.MapIdentityNamePairDTO()).ToList(),
                 Validity = new ValidityResponseDTO
                 {
                     EnforcedValid = contract.Active,

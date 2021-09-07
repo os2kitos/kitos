@@ -31,6 +31,7 @@ namespace Core.DomainModel.ItContract
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
+            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
         }
 
