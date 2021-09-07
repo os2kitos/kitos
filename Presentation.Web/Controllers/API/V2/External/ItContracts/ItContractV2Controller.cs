@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -26,10 +26,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
     public class ItContractV2Controller : ExternalBaseController
     {
         private readonly IItContractService _itContractService;
+        private readonly IItContractWriteModelMapper _writeModelMapper;
 
-        public ItContractV2Controller(IItContractService itContractService)
+        public ItContractV2Controller(IItContractService itContractService, IItContractWriteModelMapper writeModelMapper)
         {
             _itContractService = itContractService;
+            _writeModelMapper = writeModelMapper;
         }
 
         /// <summary>

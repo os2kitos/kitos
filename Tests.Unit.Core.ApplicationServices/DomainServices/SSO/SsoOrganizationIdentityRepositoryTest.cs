@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainModel.SSO;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;

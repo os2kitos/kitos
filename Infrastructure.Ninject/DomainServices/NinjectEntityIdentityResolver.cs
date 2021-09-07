@@ -1,9 +1,11 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
-using Infrastructure.Services.Types;
+
 using Ninject;
 
 namespace Infrastructure.Ninject.DomainServices

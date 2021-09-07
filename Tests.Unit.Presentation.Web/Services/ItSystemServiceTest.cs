@@ -7,7 +7,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
@@ -17,13 +16,15 @@ using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

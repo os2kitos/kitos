@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices.SystemUsage

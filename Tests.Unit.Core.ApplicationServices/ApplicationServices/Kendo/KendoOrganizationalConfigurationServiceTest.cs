@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.KendoConfig;
-using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Kendo;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

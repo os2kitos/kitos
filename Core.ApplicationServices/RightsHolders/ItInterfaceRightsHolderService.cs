@@ -6,7 +6,6 @@ using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
@@ -18,6 +17,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.RightsHolders
 {

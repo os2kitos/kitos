@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
-using Core.DomainModel.Result;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

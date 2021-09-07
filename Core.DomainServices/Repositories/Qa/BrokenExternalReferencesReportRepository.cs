@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.Qa.References;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Qa
 {

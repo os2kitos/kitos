@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
@@ -14,6 +16,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -21,15 +24,13 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Newtonsoft.Json;
 using Serilog;
 

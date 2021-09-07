@@ -4,13 +4,14 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;

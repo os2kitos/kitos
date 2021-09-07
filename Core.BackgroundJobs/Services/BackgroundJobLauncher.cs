@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.BackgroundJobs.Factories;
 using Core.BackgroundJobs.Model;
 using Core.BackgroundJobs.Model.ExternalLinks;
 using Core.BackgroundJobs.Model.ReadModels;
-using Core.DomainModel.Result;
 using Infrastructure.Services.BackgroundJobs;
 using Serilog;
 

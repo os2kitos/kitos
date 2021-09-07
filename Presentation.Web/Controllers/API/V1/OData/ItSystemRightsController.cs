@@ -10,9 +10,9 @@ using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData

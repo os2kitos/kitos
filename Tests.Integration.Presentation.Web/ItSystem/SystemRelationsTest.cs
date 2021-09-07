@@ -3,10 +3,11 @@ using System.ComponentModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using ExpectedObjects;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;

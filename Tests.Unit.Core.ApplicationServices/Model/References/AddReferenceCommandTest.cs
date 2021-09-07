@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Moq;
 using Xunit;
 

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.TaskRefs
 {

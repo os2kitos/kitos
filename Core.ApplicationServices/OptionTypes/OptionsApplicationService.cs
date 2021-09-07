@@ -1,11 +1,11 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
 using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.OptionTypes
 {

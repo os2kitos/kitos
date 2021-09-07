@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Xunit;
 using Core.ApplicationServices.Shared;
 using Core.DomainModel.Organization;
-using Infrastructure.Services.Extensions;
-using Infrastructure.Services.Types;
+
+
 using Tests.Integration.Presentation.Web.Tools;
 
 namespace Tests.Integration.Presentation.Web.Constraints

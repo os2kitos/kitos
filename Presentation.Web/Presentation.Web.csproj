@@ -375,6 +375,8 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
@@ -1669,6 +1671,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

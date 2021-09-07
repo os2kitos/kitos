@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItProject;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Project
 {

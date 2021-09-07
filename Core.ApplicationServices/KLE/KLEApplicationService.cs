@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.TaskRefs;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.KLE
 {

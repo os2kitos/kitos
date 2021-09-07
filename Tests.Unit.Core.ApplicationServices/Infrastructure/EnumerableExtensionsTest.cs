@@ -1,5 +1,6 @@
 ﻿using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Extensions;
+
 using Xunit;
 
 namespace Tests.Unit.Core.Infrastructure

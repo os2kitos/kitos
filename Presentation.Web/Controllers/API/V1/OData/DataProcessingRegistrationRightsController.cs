@@ -7,10 +7,10 @@ using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
+using Core.DomainModel.Events;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DomainEvents;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {

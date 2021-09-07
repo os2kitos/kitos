@@ -5,14 +5,15 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Result;
 using Core.DomainServices.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;

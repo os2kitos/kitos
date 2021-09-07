@@ -1,9 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Security.Claims;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
-using Infrastructure.Services.Types;
+
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Moq;

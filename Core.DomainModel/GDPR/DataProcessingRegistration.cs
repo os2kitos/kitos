@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Notification;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Infrastructure.Services.Extensions;
-using Infrastructure.Services.Types;
+
+
 
 namespace Core.DomainModel.GDPR
 {

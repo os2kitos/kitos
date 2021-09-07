@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainServices;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries.User;
-using Infrastructure.Services.Types;
+
 
 namespace Infrastructure.DataAccess
 {

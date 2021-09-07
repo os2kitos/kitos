@@ -1,8 +1,10 @@
 ﻿using System.Security.Principal;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.DomainModel;
 using Core.DomainServices;
-using Infrastructure.Services.Types;
+
 using Microsoft.Owin;
 using Serilog;
 

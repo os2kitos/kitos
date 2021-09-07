@@ -1,7 +1,7 @@
 ﻿using System.Linq;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.GDPR
 {

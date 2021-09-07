@@ -1,6 +1,6 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Core.DomainModel.Result;
+using Core.Abstractions.Types;
 
 namespace Core.BackgroundJobs.Model
 {

@@ -2,11 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Extensions;
-using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
 {

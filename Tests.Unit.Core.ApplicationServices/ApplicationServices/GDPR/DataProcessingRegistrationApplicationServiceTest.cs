@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel;
@@ -8,7 +9,6 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -18,7 +18,7 @@ using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

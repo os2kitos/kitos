@@ -1,5 +1,6 @@
-﻿using Core.DomainModel;
-using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel;
+
 
 namespace Core.DomainServices.Advice
 {

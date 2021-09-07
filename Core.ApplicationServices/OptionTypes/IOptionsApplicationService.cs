@@ -1,7 +1,7 @@
 ﻿using Core.DomainModel;
-using Core.DomainModel.Result;
 using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.OptionTypes
 {

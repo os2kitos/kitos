@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Types;
+
 
 namespace Core.ApplicationServices
 {

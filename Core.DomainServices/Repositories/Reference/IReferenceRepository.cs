@@ -1,7 +1,8 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.References;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Reference
 {

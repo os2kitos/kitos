@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.References
 {

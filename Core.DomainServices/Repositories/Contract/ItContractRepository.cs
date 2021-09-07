@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Contract
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
@@ -11,7 +12,6 @@ using Core.DomainModel.Shared;
 using Core.DomainModel.Users;
 using Core.DomainServices.Model;
 using Core.DomainServices.Options;
-using Infrastructure.Services.Delegates;
 
 namespace Core.DomainServices.SystemUsage
 {

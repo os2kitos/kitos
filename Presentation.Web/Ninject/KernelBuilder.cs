@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Security;
 using AutoMapper;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Interface;
@@ -68,10 +71,9 @@ using Infrastructure.Services.Caching;
 using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
-using Infrastructure.Services.Types;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
@@ -103,6 +105,7 @@ using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
 using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -193,6 +196,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
+            kernel.Bind<IItContractWriteService>().To<ItContractWriteService>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
@@ -255,12 +259,15 @@ namespace Presentation.Web.Ninject
         private void RegisterMappers(IKernel kernel)
         {
             //System usage
-            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
-            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode); //Depends on scoped services, so command scope, not singleton
+            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InSingletonScope();
 
             //Data processing
-            kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
-            kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InSingletonScope();
+            kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InSingletonScope();
+
+            //Contracts
+            kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InSingletonScope();
         }
 
         private void RegisterSSO(IKernel kernel)

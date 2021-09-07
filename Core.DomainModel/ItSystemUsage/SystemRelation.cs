@@ -1,9 +1,10 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Extensions;
-using Infrastructure.Services.Types;
+
+
 
 namespace Core.DomainModel.ItSystemUsage
 {

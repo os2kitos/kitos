@@ -63,16 +63,6 @@
     <Compile Include="DataAccess\IDatabaseTransaction.cs" />
     <Compile Include="DataAccess\IEntityTypeResolver.cs" />
     <Compile Include="DataAccess\ITransactionManager.cs" />
-    <Compile Include="Delegates\Factory.cs" />
-    <Compile Include="DomainEvents\EntityCreatedEvent.cs" />
-    <Compile Include="DomainEvents\EntityDeletedEvent.cs" />
-    <Compile Include="DomainEvents\EntityLifeCycleEvent.cs" />
-    <Compile Include="DomainEvents\EntityUpdatedEvent.cs" />
-    <Compile Include="DomainEvents\IDomainEvent.cs" />
-    <Compile Include="DomainEvents\IDomainEventHandler.cs" />
-    <Compile Include="DomainEvents\IDomainEvents.cs" />
-    <Compile Include="DomainEvents\NamedEntityChangedNameEvent.cs" />
-    <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Http\EndpointValidation.cs" />
     <Compile Include="Http\EndpointValidationService.cs" />
@@ -88,9 +78,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Types\EnumerableExtensions.cs" />
-    <Compile Include="Types\Maybe.cs" />
-    <Compile Include="Types\ObjectExtensions.cs" />
     <Compile Include="Types\TypeHierarchyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -100,6 +87,12 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

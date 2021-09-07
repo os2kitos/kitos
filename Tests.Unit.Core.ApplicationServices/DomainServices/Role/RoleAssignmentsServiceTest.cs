@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

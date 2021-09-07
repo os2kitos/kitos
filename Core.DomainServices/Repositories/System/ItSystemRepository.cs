@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.System
 {

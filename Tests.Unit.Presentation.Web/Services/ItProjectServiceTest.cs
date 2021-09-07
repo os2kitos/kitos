@@ -2,20 +2,20 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

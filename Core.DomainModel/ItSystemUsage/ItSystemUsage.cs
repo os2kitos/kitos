@@ -7,13 +7,15 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Infrastructure.Services.Types;
+
 using Core.DomainModel.Notification;
 using System;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.ItSystem.DataTypes;
-using Infrastructure.Services.Extensions;
+
 
 namespace Core.DomainModel.ItSystemUsage
 {

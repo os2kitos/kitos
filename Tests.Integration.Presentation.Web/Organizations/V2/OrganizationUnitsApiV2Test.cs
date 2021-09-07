@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;

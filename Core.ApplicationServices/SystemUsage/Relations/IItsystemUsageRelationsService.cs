@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.SystemUsage.Relations
 {

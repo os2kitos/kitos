@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Contract
 {

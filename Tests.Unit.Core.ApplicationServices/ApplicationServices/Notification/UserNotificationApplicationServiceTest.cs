@@ -1,14 +1,14 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Notification;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
-using Infrastructure.Services.Types;
+
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

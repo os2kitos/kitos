@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices
 {
