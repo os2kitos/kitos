@@ -32,9 +32,9 @@ BEGIN
 
     UPDATE ItContract
     SET Running = null
-    WHERE Running != 0 OR Running != 1 OR Running != 2 
+    WHERE Running IS NULL OR Running = ''
 
     UPDATE ItContract
     SET ByEnding = null
-    WHERE ByEnding != 0 OR ByEnding != 1 OR ByEnding != 2 
+    WHERE ByEnding IS NULL OR ByEnding = ''
 END
