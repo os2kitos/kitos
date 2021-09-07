@@ -375,14 +375,9 @@ namespace Presentation.Web.Controllers.API.V1
 
         public override HttpResponseMessage Post(int organizationId, ItContractDTO dto)
         {
-            var result = _itContractService.CanCreateNewContractWithName(dto.Name,organizationId);
-            if (result.Failed)
-                return FromOperationError(result.Error);
-            
-            if (result.Value == false)
-                return Conflict("Name must be unique within the organization");
-
-            return base.Post(organizationId, dto);
+            return _itContractService
+                .Create(organizationId, dto.Name)
+                .Match(NewObjectCreated, FromOperationError);
         }
     }
 }

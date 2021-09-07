@@ -57,6 +57,28 @@ namespace Core.ApplicationServices.Contract
             _organizationService = organizationService;
         }
 
+        public Result<ItContract, OperationError> Create(int organizationId, string name)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            if (!_authorizationContext.AllowCreate<ItContract>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
+            var result = CanCreateNewContractWithName(name, organizationId);
+
+            if (result.Failed)
+                return result.Error;
+
+            if (!result.Value)
+                return new OperationError("Name taken", OperationFailure.Conflict);
+
+            var itContract = new ItContract { OrganizationId = organizationId, Name = name };
+            itContract = _repository.Add(itContract);
+            _domainEvents.Raise(new EntityCreatedEvent<ItContract>(itContract));
+            transaction.Commit();
+
+            return itContract;
+        }
+
         public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
         {
             var contracts = _repository.GetContractsInOrganization(orgId);

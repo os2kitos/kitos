@@ -76,5 +76,12 @@ namespace Core.DomainServices.Repositories.Contract
         {
             return _contractRepository.AsQueryable().ByUuid(uuid).FromNullable();
         }
+
+        public ItContract Add(ItContract itContract)
+        {
+            var contract = _contractRepository.Insert(itContract);
+            _contractRepository.Save();
+            return contract;
+        }
     }
 }
