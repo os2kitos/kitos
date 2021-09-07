@@ -103,6 +103,7 @@ using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
+using Infrastructure.Ninject.ApplicationServices;
 using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
@@ -229,6 +230,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
+            kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);

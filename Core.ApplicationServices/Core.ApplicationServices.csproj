@@ -150,6 +150,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
+    <Compile Include="OptionTypes\IOptionResolver.cs" />
     <Compile Include="OptionTypes\OptionsApplicationService.cs" />
     <Compile Include="OptionTypes\IOptionsApplicationService.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />

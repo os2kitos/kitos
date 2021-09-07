@@ -23,14 +23,14 @@ namespace Core.ApplicationServices.OptionTypes
             _organizationRepository = organizationRepository;
         }
 
-        public Result<(TOption option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid businessTypeUuid)
+        public Result<(TOption option, bool available), OperationError> GetOptionType(Guid organizationUuid, Guid optionTypeUuid)
         {
             var orgId = ResolveOrgId(organizationUuid);
             if (orgId.Failed)
             {
                 return orgId.Error;
             }
-            var businessTypeResult = _optionsTypeService.GetOptionByUuid(orgId.Value, businessTypeUuid);
+            var businessTypeResult = _optionsTypeService.GetOptionByUuid(orgId.Value, optionTypeUuid);
             if (businessTypeResult.IsNone)
             {
                 return new OperationError(OperationFailure.NotFound);
