@@ -2047,7 +2047,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _databaseControlMock.Verify(x => x.SaveChanges(), Times.AtLeastOnce);
             transactionMock.Verify(x => x.Commit());
         }
-        private void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
+        private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
         {
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
