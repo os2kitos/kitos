@@ -702,7 +702,7 @@ namespace Core.ApplicationServices
             var table = new DataTable("IT Kontrakter");
 
             // add columns according to fields added below
-            for (var i = 0; i < 10; i++)
+            for (var i = 0; i < 8; i++)
                 table.Columns.Add();
 
             foreach (var contract in itContracts)
