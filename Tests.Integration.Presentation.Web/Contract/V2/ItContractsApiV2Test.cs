@@ -266,7 +266,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var requestDto = new CreateNewContractRequestDTO()
+            var requestDto = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName()
