@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -26,10 +26,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
     public class ItContractV2Controller : ExternalBaseController
     {
         private readonly IItContractService _itContractService;
+        private readonly IItContractResponseMapper _responseMapper;
 
-        public ItContractV2Controller(IItContractService itContractService)
+        public ItContractV2Controller(IItContractService itContractService, IItContractResponseMapper responseMapper)
         {
             _itContractService = itContractService;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -52,6 +54,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
             [NonEmptyGuid] Guid? dataProcessingRegistrationUuid = null,
+            [NonEmptyGuid] Guid? responsibleOrgUnitUuid = null,
+            [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
@@ -69,6 +73,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (dataProcessingRegistrationUuid.HasValue)
                 refinements.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
 
+            if (responsibleOrgUnitUuid.HasValue)
+                refinements.Add(new QueryByResponsibleOrganizationUnitUuid(responsibleOrgUnitUuid.Value));
+
+            if (supplierUuid.HasValue)
+                refinements.Add(new QueryBySupplierUuid(supplierUuid.Value));
+
             if (!string.IsNullOrWhiteSpace(nameContent))
                 refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
 
@@ -76,7 +86,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
                 .GetContractsInOrganization(organizationUuid, refinements.ToArray())
                 .Select(x => x.OrderBy(contract => contract.Id))
                 .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(ToItContractResponseDto).ToList())
+                .Select(x => x.ToList().Select(_responseMapper.MapContractDTO).ToList())
                 .Match(Ok, FromOperationError);
         }
 
@@ -99,7 +109,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             return _itContractService
                 .GetContract(uuid)
-                .Select(ToItContractResponseDto)
+                .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -439,16 +449,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
                 return BadRequest(ModelState);
 
             throw new NotImplementedException();
-        }
-
-        private static ItContractResponseDTO ToItContractResponseDto(ItContract contract)
-        {
-            //TODO: To response mapper
-            return new()
-            {
-                Uuid = contract.Uuid,
-                Name = contract.Name,
-            };
         }
     }
 }
