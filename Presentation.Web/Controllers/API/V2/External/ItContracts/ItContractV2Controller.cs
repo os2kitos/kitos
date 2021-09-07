@@ -14,6 +14,7 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.ApplicationServices.Contract.Write;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
+using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -472,6 +473,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             {
                 Uuid = contract.Uuid,
                 Name = contract.Name,
+                OrganizationContext = contract.Organization.MapShallowOrganizationResponseDTO()
             };
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Request.Contract;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -29,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.ToString("D")));
 
-            if(systemUuid.HasValue)
+            if (systemUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
 
             if (systemUsageUuid.HasValue)
@@ -57,6 +58,18 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendGetItContractAsync(string token, Guid uuid)
         {
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{uuid:D}"), token);
+        }
+
+        public static async Task<HttpResponseMessage> SendPostContractAsync(string token, CreateNewContractRequestDTO dto)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
+        }
+
+        public static async Task<ItContractResponseDTO> PostContractAsync(string token, CreateNewContractRequestDTO dto)
+        {
+            using var result = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
+            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+            return await result.ReadResponseBodyAsAsync<ItContractResponseDTO>();
         }
     }
 }
