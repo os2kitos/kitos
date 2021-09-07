@@ -483,7 +483,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (løbende)
         /// </value>
-        public string Running { get; set; }
+        public YearSegmentOption? Running { get; set; }
 
         /// <summary>
         ///
@@ -491,7 +491,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (indtil udgangen af)
         /// </value>
-        public string ByEnding { get; set; }
+        public YearSegmentOption? ByEnding { get; set; }
 
         #endregion
 

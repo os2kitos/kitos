@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel;
 using Core.DomainModel.ItContract;
@@ -40,7 +41,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractAgreementPeriodDataResponseDTO MapAgreementPeriod(ItContract contract)
+        private static ContractAgreementPeriodDataResponseDTO MapAgreementPeriod(ItContract contract)
         {
             return new ()
             {
@@ -53,7 +54,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractTerminationDataResponseDTO MapTermination(ItContract contract)
+        private static ContractTerminationDataResponseDTO MapTermination(ItContract contract)
         {
             return new ()
             {
@@ -62,17 +63,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractTerminationTermsResponseDTO MapTerminationTerms(ItContract contract)
+        private static ContractTerminationTermsResponseDTO MapTerminationTerms(ItContract contract)
         {
             return new ()
             {
                 NoticePeriodMonths = contract.TerminationDeadline?.MapIdentityNamePairDTO(),
-                //NoticeByEndOf = contract.Running, //TODO: Fix string => enum
-                //NoticePeriodExtendsCurrent = contract.ByEnding //TODO: Fix string => enum
+                NoticeByEndOf = contract.Running?.ToYearSegmentChoice(), 
+                NoticePeriodExtendsCurrent = contract.ByEnding?.ToYearSegmentChoice()
             };
         }
 
-        private ContractPaymentsDataResponseDTO MapPayments(ItContract contract)
+        private static ContractPaymentsDataResponseDTO MapPayments(ItContract contract)
         {
             return new ()
             {
@@ -81,7 +82,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private PaymentResponseDTO MapPaymentResponseDTO(EconomyStream economyStream)
+        private static PaymentResponseDTO MapPaymentResponseDTO(EconomyStream economyStream)
         {
             return new ()
             {
@@ -96,17 +97,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private List<RoleAssignmentResponseDTO> MapRoles(ItContract contract)
+        private static List<RoleAssignmentResponseDTO> MapRoles(ItContract contract)
         {
             return contract.Rights.Select(ToRoleResponseDTO).ToList();
         }
 
-        private List<ExternalReferenceDataDTO> MapExternalReferences(ItContract contract)
+        private static List<ExternalReferenceDataDTO> MapExternalReferences(ItContract contract)
         {
             return contract.ExternalReferences.Select(x => MapExternalReferenceDTO(contract, x)).ToList();
         }
 
-        private ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
+        private static ContractPaymentModelDataResponseDTO MapPaymentModel(ItContract contract)
         {
             return new ()
             {
@@ -118,7 +119,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private PaymentMileStoneDTO MapPaymentMilestones(PaymentMilestone paymentMilestone)
+        private static PaymentMileStoneDTO MapPaymentMilestones(PaymentMilestone paymentMilestone)
         {
             return new ()
             {
@@ -128,12 +129,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
+        private static List<HandoverTrialResponseDTO> MapHandoverTrials(ItContract contract)
         {
             return contract.HandoverTrials.Select(MapHandoverTrial).ToList();
         }
 
-        private HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
+        private static HandoverTrialResponseDTO MapHandoverTrial(HandoverTrial handoverTrial)
         {
             return new ()
             {
@@ -143,7 +144,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractResponsibleDataResponseDTO MapResponsible(ItContract contract)
+        private static ContractResponsibleDataResponseDTO MapResponsible(ItContract contract)
         {
             return new ()
             {
@@ -154,7 +155,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractSupplierDataResponseDTO MapSupplier(ItContract contract)
+        private static ContractSupplierDataResponseDTO MapSupplier(ItContract contract)
         {
             return new ()
             {
@@ -165,7 +166,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ContractProcurementDataResponseDTO MapProcurement(ItContract contract)
+        private static ContractProcurementDataResponseDTO MapProcurement(ItContract contract)
         {
             return new()
             {
@@ -175,13 +176,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ProcurementPlanDTO MapProcurementPlan(ItContract contract)
+        private static ProcurementPlanDTO MapProcurementPlan(ItContract contract)
         {
-            //TODO: Fix
-            throw new System.NotImplementedException();
+            if (!contract.ProcurementPlanHalf.HasValue)
+                return null;
+
+            if (!contract.ProcurementPlanYear.HasValue)
+                return null;
+
+            return new ProcurementPlanDTO()
+            {
+                HalfOfYear = Convert.ToByte(contract.ProcurementPlanHalf.Value),
+                Year = contract.ProcurementPlanYear.Value
+            };
         }
 
-        private ContractGeneralDataResponseDTO MapGeneral(ItContract contract)
+        private static ContractGeneralDataResponseDTO MapGeneral(ItContract contract)
         {
             return new()
             {

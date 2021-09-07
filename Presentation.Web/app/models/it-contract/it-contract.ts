@@ -95,9 +95,9 @@
         OptionExtend: IOptionExtend;
         ExtendMultiplier: number;
         /** (løbende) */
-        Running: string;
+        Running: YearSegmentOption;
         /** (indtil udgangen af) */
-        ByEnding: string;
+        ByEnding: YearSegmentOption;
         /** Gets or sets the handover trials. */
         HandoverTrials: Array<IHandoverTrial>;
 
