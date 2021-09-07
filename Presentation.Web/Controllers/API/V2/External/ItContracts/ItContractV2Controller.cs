@@ -11,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Results;
+using Core.ApplicationServices.Contract.Write;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -27,11 +29,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
     {
         private readonly IItContractService _itContractService;
         private readonly IItContractWriteModelMapper _writeModelMapper;
+        private readonly IItContractWriteService _writeService;
 
-        public ItContractV2Controller(IItContractService itContractService, IItContractWriteModelMapper writeModelMapper)
+        public ItContractV2Controller(IItContractService itContractService, IItContractWriteModelMapper writeModelMapper, IItContractWriteService writeService)
         {
             _itContractService = itContractService;
             _writeModelMapper = writeModelMapper;
+            _writeService = writeService;
         }
 
         /// <summary>
@@ -122,7 +126,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+
+            var parameters = _writeModelMapper.FromPOST(request);
+
+            return _writeService
+                .Create(request.OrganizationUuid, parameters)
+                .Select(ToItContractResponseDto)
+                .Match(MapCreatedResponse, FromOperationError);
         }
 
         /// <summary>
@@ -144,7 +154,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            var parameters = _writeModelMapper.FromPUT(request);
+
+            return _writeService
+                .Update(contractUuid, parameters)
+                .Select(ToItContractResponseDto)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -165,7 +180,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Delete(contractUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         /// <summary>
@@ -441,6 +458,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
                 return BadRequest(ModelState);
 
             throw new NotImplementedException();
+        }
+
+        private CreatedNegotiatedContentResult<ItContractResponseDTO> MapCreatedResponse(ItContractResponseDTO dto)
+        {
+            return Created($"{Request.RequestUri.AbsoluteUri.TrimEnd('/')}/{dto.Uuid}", dto);
         }
 
         private static ItContractResponseDTO ToItContractResponseDto(ItContract contract)

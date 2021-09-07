@@ -2,7 +2,6 @@
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.DPR;
-
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
