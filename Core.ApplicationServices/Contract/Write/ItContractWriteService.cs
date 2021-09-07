@@ -40,14 +40,17 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
         {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
             using var transaction = _transactionManager.Begin();
+
+            if (parameters.Name.IsUnchanged)
+                return new OperationError("Name must be provided", OperationFailure.BadInput);
 
             var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgId.IsNone)
                 return new OperationError("Organization id not valid", OperationFailure.BadInput);
-
-            if (parameters.Name.IsUnchanged)
-                return new OperationError("Name must be provided", OperationFailure.BadInput);
 
             var nameNewValue = parameters.Name.NewValue;
 
@@ -68,6 +71,9 @@ namespace Core.ApplicationServices.Contract.Write
 
         public Result<ItContract, OperationError> Update(Guid itContractUuid, ItContractModificationParameters parameters)
         {
+            if (parameters == null)
+                throw new ArgumentNullException(nameof(parameters));
+
             using var transaction = _transactionManager.Begin();
 
             var updateResult = _contractService
@@ -84,7 +90,7 @@ namespace Core.ApplicationServices.Contract.Write
             return updateResult;
         }
 
-        public Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
+        private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
             return contract.WithOptionalUpdate(parameters.Name, UpdateName);
         }

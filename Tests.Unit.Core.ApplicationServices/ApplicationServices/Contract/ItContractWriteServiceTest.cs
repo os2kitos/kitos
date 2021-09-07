@@ -3,14 +3,18 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Organization;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Moq;
+using Moq.Language.Flow;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -89,6 +93,85 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(error.HasValue);
             Assert.Equal(OperationFailure.NotFound, error.Value.FailureType);
             Assert.Equal("Invalid contract uuid", error.Value.Message.Value);
+        }
+
+        [Fact]
+        public void Can_Create_With_Name()
+        {
+            //Arrange
+            var name = A<string>();
+            var parameters = new ItContractModificationParameters() { Name = name.AsChangedValue() };
+            var transaction = ExpectTransaction();
+            var organizationUuid = A<Guid>();
+            var itContract = new ItContract() { Id = A<int>(), Uuid = A<Guid>() };
+            var organizationId = A<int>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, organizationId);
+            ExpectCreateReturns(organizationId, name, itContract);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Same(itContract, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_Creation_Fails()
+        {
+            //Arrange
+            var name = A<string>();
+            var parameters = new ItContractModificationParameters() { Name = name.AsChangedValue() };
+            var transaction = ExpectTransaction();
+            var organizationUuid = A<Guid>();
+            var organizationId = A<int>();
+            var operationError = A<OperationError>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, organizationId);
+            ExpectCreateReturns(organizationId, name, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_If_OrganizationId_Resolution_Fails()
+        {
+            //Arrange
+            var name = A<string>();
+            var parameters = new ItContractModificationParameters() { Name = name.AsChangedValue() };
+            var transaction = ExpectTransaction();
+            var organizationUuid = A<Guid>();
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, Maybe<int>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Organization id not valid", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_Without_Defined_Name()
+        {
+            //Arrange
+            var parameters = new ItContractModificationParameters();
+            var transaction = ExpectTransaction();
+            var organizationUuid = A<Guid>();
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Name must be provided", OperationFailure.BadInput, transaction);
+        }
+
+        private void ExpectCreateReturns(int organizationId, string name, Result<ItContract, OperationError> result)
+        {
+            _itContractServiceMock.Setup(x => x.Create(organizationId, name)).Returns(result);
         }
 
         private void ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<T>(Guid? uuid, Maybe<int> dbId) where T : class, IHasUuid, IHasId
