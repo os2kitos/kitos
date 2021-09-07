@@ -6,35 +6,35 @@ Content:
 */
 
 BEGIN
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET Running = 0
     WHERE Running = 'calendarYear'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET ByEnding = 0
     WHERE ByEnding = 'calendarYear'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET Running = 1
     WHERE Running = 'quater'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET ByEnding = 1
     WHERE ByEnding = 'quater'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET Running = 2
     WHERE Running = 'month'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET ByEnding = 2
     WHERE ByEnding = 'month'
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET Running = null
     WHERE Running IS NULL OR Running = ''
 
-    UPDATE ItContract
+    UPDATE [ItContract]
     SET ByEnding = null
     WHERE ByEnding IS NULL OR ByEnding = ''
 END
