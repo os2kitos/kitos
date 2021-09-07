@@ -180,7 +180,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _identityResolverMock.Setup(x => x.ResolveDbId<T>(uuid.Value)).Returns(dbId);
         }
 
-        private void AssertFailureWithKnownError(Result<ItContract, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
+        private static void AssertFailureWithKnownError(Result<ItContract, OperationError> result, OperationError operationError, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Equal(operationError, result.Error);

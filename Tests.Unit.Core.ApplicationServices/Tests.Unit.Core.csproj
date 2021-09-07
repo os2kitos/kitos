@@ -174,7 +174,7 @@
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
-    <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
+    <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
