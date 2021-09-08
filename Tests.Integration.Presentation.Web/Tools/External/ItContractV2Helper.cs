@@ -11,15 +11,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class ItContractV2Helper
     {
-        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
+        public static async Task<IEnumerable<ItContractResponseDTO>> GetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
         {
-            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, nameContent, page, pageSize);
+            using var response = await SendGetItContractsAsync(token, organizationUuid, systemUuid, systemUsageUuid, dataProcessingRegistrationUuid, responsibleOrgUnitUuid, supplierUuid, nameContent, page, pageSize);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItContractResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid organizationUuid, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
+        public static async Task<HttpResponseMessage> SendGetItContractsAsync(string token, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessingRegistrationUuid = null, Guid? responsibleOrgUnitUuid = null, Guid? supplierUuid = null, string nameContent = null, int page = 0, int pageSize = 10)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -27,7 +27,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 new("pageSize", pageSize.ToString("D")),
             };
 
-            queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.ToString("D")));
+            if(organizationUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
             if(systemUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
@@ -37,6 +38,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (dataProcessingRegistrationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("dataProcessingRegistrationUuid", dataProcessingRegistrationUuid.Value.ToString("D")));
+
+            if (responsibleOrgUnitUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("responsibleOrgUnitUuid", responsibleOrgUnitUuid.Value.ToString("D")));
+
+            if (supplierUuid.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("supplierUuid", supplierUuid.Value.ToString("D")));
 
             if (nameContent != null)
                 queryParameters.Add(new KeyValuePair<string, string>("nameContent", nameContent));

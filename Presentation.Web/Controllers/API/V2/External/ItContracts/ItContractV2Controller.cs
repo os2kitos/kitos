@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
@@ -50,7 +51,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(
-            [NonEmptyGuid] Guid organizationUuid,
+            [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
             [NonEmptyGuid] Guid? dataProcessingRegistrationUuid = null,
@@ -62,32 +63,36 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refinements = new List<IDomainQuery<ItContract>>();
+            var conditions = new List<IDomainQuery<ItContract>>();
+
+            if(organizationUuid.HasValue)
+                conditions.Add(new QueryByOrganizationUuid<ItContract>(organizationUuid.Value));
 
             if (systemUuid.HasValue)
-                refinements.Add(new QueryBySystemUuid(systemUuid.Value));
+                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
 
             if (systemUsageUuid.HasValue)
-                refinements.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
+                conditions.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
 
             if (dataProcessingRegistrationUuid.HasValue)
-                refinements.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
+                conditions.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
 
             if (responsibleOrgUnitUuid.HasValue)
-                refinements.Add(new QueryByResponsibleOrganizationUnitUuid(responsibleOrgUnitUuid.Value));
+                conditions.Add(new QueryByResponsibleOrganizationUnitUuid(responsibleOrgUnitUuid.Value));
 
             if (supplierUuid.HasValue)
-                refinements.Add(new QueryBySupplierUuid(supplierUuid.Value));
+                conditions.Add(new QueryBySupplierUuid(supplierUuid.Value));
 
             if (!string.IsNullOrWhiteSpace(nameContent))
-                refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
+                conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
             return _itContractService
-                .GetContractsInOrganization(organizationUuid, refinements.ToArray())
-                .Select(x => x.OrderBy(contract => contract.Id))
-                .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(_responseMapper.MapContractDTO).ToList())
-                .Match(Ok, FromOperationError);
+                .Query(conditions.ToArray())
+                .OrderBy(contract => contract.Id)
+                .Page(paginationQuery)
+                .ToList()
+                .Select(_responseMapper.MapContractDTO)
+                .Transform(Ok);
         }
 
         /// <summary>
