@@ -23,9 +23,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public DataProcessingRegistrationWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(
-                typeof(DataProcessingRegistrationWriteRequestDTO).GetProperties().Select(x => x.Name)
-                    .ToHashSet());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(GetAllRootProperties());
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -112,21 +110,84 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
         }
 
-        [Fact]
-        public void FromPUT_Assigns_ResetData_To_Undefined_Sections()
+        [Theory]
+        [InlineData(false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, true, false)]
+        [InlineData(false, false, false, true, false, false)]
+        [InlineData(false, false, true, false, false, false)]
+        [InlineData(false, true, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Sections(
+            bool noName,
+            bool noGeneralData,
+            bool noSystems,
+            bool noOversight,
+            bool noRoles,
+            bool noReferences)
         {
-            //TODO: Must be a theory and one more for POST as wellwith the same outcome
             //Arrange
             var input = new DataProcessingRegistrationWriteRequestDTO();
+            var properties = GetAllRootProperties();
+            if (noName) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Name));
+            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
+            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
+            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
+            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
+            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
 
             //Act
             var output = _sut.FromPUT(input);
 
             //Assert that method patched empty values before mapping
-            Assert.NotNull(input.General);
-            Assert.NotNull(input.SystemUsageUuids);
-            AssertGeneralData(input.General, output.General.Value);
-            Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
+            Assert.Equal(noName, output.Name.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noOversight, output.Oversight.IsNone);
+            Assert.Equal(noRoles, output.Roles.IsNone);
+            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
+        }
+
+        [Theory]
+        [InlineData(false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, true, false)]
+        [InlineData(false, false, false, true, false, false)]
+        [InlineData(false, false, true, false, false, false)]
+        [InlineData(false, true, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true)]
+        public void FromPOST_Ignores_Undefined_Sections(
+           bool noName,
+           bool noGeneralData,
+           bool noSystems,
+           bool noOversight,
+           bool noRoles,
+           bool noReferences)
+        {
+            //Arrange
+            var input = new DataProcessingRegistrationWriteRequestDTO();
+            var properties = GetAllRootProperties();
+            if (noName) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Name));
+            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
+            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
+            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
+            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
+            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
+
+            //Act
+            var output = _sut.FromPOST(input);
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noName, output.Name.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noOversight, output.Oversight.IsNone);
+            Assert.Equal(noRoles, output.Roles.IsNone);
+            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
         }
 
         [Fact]
@@ -254,6 +315,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(orderedExpected[i].CompletedAt, orderedActual[i].CompletedAt);
                 Assert.Equal(orderedExpected[i].Remark, orderedActual[i].Remark);
             }
+        }
+
+        private static HashSet<string> GetAllRootProperties()
+        {
+            return typeof(DataProcessingRegistrationWriteRequestDTO).GetProperties().Select(x => x.Name)
+                .ToHashSet();
         }
     }
 }
