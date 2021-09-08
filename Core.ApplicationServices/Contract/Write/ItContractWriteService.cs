@@ -43,10 +43,10 @@ namespace Core.ApplicationServices.Contract.Write
             if (parameters == null)
                 throw new ArgumentNullException(nameof(parameters));
 
-            using var transaction = _transactionManager.Begin();
-
             if (parameters.Name.IsUnchanged)
                 return new OperationError("Name must be provided", OperationFailure.BadInput);
+
+            using var transaction = _transactionManager.Begin();
 
             var orgId = _entityIdentityResolver.ResolveDbId<Organization>(organizationUuid);
             if (orgId.IsNone)
