@@ -1,11 +1,19 @@
 ﻿using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
+using Core.ApplicationServices.Model.Shared;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
-    public class ItContractWriteModelMapper : IItContractWriteModelMapper
+    public class ItContractWriteModelMapper : WriteModelMapperBase, IItContractWriteModelMapper
     {
+        public ItContractWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
+            : base(currentHttpRequest)
+        {
+        }
+
         public ItContractModificationParameters FromPOST(ContractWriteRequestDTO dto)
         {
             return Map(dto);
@@ -16,13 +24,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return Map(dto);
         }
 
-        private static ItContractModificationParameters Map(ContractWriteRequestDTO dto)
+        private ItContractModificationParameters Map(ContractWriteRequestDTO dto)
         {
-            //TODO: Use the fallback mechanism
-
             return new ItContractModificationParameters
             {
-                Name = dto.Name.AsChangedValue()
+                Name = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None
             };
         }
     }
