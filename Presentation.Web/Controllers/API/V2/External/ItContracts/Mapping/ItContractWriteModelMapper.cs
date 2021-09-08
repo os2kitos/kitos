@@ -18,6 +18,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ItContractModificationParameters Map(ContractWriteRequestDTO dto)
         {
+            //TODO: Use the fallback mechanism
+
             return new ItContractModificationParameters
             {
                 Name = dto.Name.AsChangedValue()

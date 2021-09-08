@@ -362,6 +362,7 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />

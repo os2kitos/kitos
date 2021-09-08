@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
-
 using System.Linq;
 using Core.Abstractions.Types;
+using Moq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
@@ -17,10 +18,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class DataProcessingRegistrationWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly DataProcessingRegistrationWriteModelMapper _sut;
+        private Mock<ICurrentHttpRequest> _currentHttpRequestMock;
 
         public DataProcessingRegistrationWriteModelMapperTest()
         {
-            _sut = new DataProcessingRegistrationWriteModelMapper();
+            _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(
+                typeof(DataProcessingRegistrationWriteRequestDTO).GetProperties().Select(x => x.Name)
+                    .ToHashSet());
+            _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
         [Fact]
@@ -93,20 +99,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
-        public void FromPOST_Ignores_Undefined_Sections()
-        {
-            //Arrange
-            var input = new DataProcessingRegistrationWriteRequestDTO();
-
-            //Act
-            var output = _sut.FromPOST(input);
-
-            //Assert undefined sections are ignored
-            Assert.True(output.SystemUsageUuids.IsNone);
-            Assert.True(output.General.IsNone);
-        }
-
-        [Fact]
         public void FromPUT_Maps_All_Sections()
         {
             //Arrange
@@ -123,6 +115,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         [Fact]
         public void FromPUT_Assigns_ResetData_To_Undefined_Sections()
         {
+            //TODO: Must be a theory and one more for POST as wellwith the same outcome
             //Arrange
             var input = new DataProcessingRegistrationWriteRequestDTO();
 
