@@ -137,6 +137,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
         /// <summary>
         /// Updates an existing it-contract
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged. 
         /// </summary>
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
         /// <param name="request">Full update of the contract</param>
