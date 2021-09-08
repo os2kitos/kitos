@@ -8,7 +8,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel.ItSystem.DataTypes;
-
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -18,9 +18,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
     public class ItSystemUsageWriteModelMapper : IItSystemUsageWriteModelMapper
     {
+        private readonly ICurrentHttpRequest _currentHttpRequest;
+
+        public ItSystemUsageWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
+        {
+            _currentHttpRequest = currentHttpRequest;
+        }
+
         public SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request)
         {
-            return new SystemUsageUpdateParameters
+
+            var parameters = new SystemUsageUpdateParameters
             {
                 GeneralProperties = request.General.FromNullable().Select(MapGeneralData),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
@@ -30,17 +38,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 GDPR = request.GDPR.FromNullable().Select(MapGDPR),
                 Archiving = request.Archiving.FromNullable().Select(MapArchiving)
             };
+
+            return parameters;
         }
 
         public SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request)
         {
-            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
-            var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
-            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
-            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
-            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
+            var providedValueKeys = _currentHttpRequest.GetDefinedJsonRootProperties();
+            var generalDataInput = WithResetDataIfPropertyIsDefined(request.General, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.General));
+            var orgUsageInput = WithResetDataIfPropertyIsDefined(request.OrganizationUsage, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage));
+            var kleInput = WithResetDataIfPropertyIsDefined(request.LocalKleDeviations, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations));
+            var roles = WithResetDataIfPropertyIsDefined(request.Roles, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
+            var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(request.ExternalReferences, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>());
+            var gdpr = WithResetDataIfPropertyIsDefined(request.GDPR, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.GDPR));
+            var archiving = WithResetDataIfPropertyIsDefined(request.Archiving, providedValueKeys, nameof(UpdateItSystemUsageRequestDTO.Archiving));
+
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralDataUpdate),
@@ -51,6 +63,28 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 GDPR = gdpr.FromNullable().Select(MapGDPR),
                 Archiving = archiving.FromNullable().Select(MapArchiving)
             };
+        }
+
+        private static TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, ISet<string> providedSectionKeys, string expectedSectionKey) where TSection : new()
+        {
+            var response = deserializedValue;
+            if (providedSectionKeys.Contains(expectedSectionKey))
+            {
+                response = deserializedValue ?? new TSection();
+            }
+
+            return response;
+        }
+
+        private static TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, ISet<string> providedSectionKeys, string expectedSectionKey, Func<TSection> fallbackFactory)
+        {
+            var response = deserializedValue;
+            if (providedSectionKeys.Contains(expectedSectionKey))
+            {
+                response = deserializedValue ?? fallbackFactory();
+            }
+
+            return response;
         }
 
         public UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)

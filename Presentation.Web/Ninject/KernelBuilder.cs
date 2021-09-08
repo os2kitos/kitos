@@ -108,6 +108,7 @@ using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Infrastructure.Model.Request;
 
 namespace Presentation.Web.Ninject
 {
@@ -135,6 +136,7 @@ namespace Presentation.Web.Ninject
 
             _builderActions.Add(kernel => kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel));
             _builderActions.Add(kernel => kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>());
+            _builderActions.Add(kernel => kernel.Bind<ICurrentHttpRequest>().To<CurrentAspNetRequest>());
 
             //Register automapper
             _builderActions.Add(kernel => kernel.Bind<IMapper>().ToConstant(MappingConfig.CreateMapper()).InSingletonScope());
@@ -261,15 +263,15 @@ namespace Presentation.Web.Ninject
         private void RegisterMappers(IKernel kernel)
         {
             //System usage
-            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode); //Depends on scoped services, so command scope, not singleton
-            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InSingletonScope();
+            kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
 
             //Data processing
-            kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InSingletonScope();
-            kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InSingletonScope();
+            kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InCommandScope(Mode);
 
             //Contracts
-            kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InSingletonScope();
+            kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InCommandScope(Mode);
         }
 
         private void RegisterSSO(IKernel kernel)
