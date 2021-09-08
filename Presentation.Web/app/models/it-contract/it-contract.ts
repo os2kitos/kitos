@@ -7,10 +7,6 @@
         Note: string;
         /** Gets or sets it contract identifier defined by the user. */
         ItContractId: string;
-        /** Gets or sets a reference to relevant documents in an extern ESDH system. */
-        Esdh: string;
-        /** Gets or sets a path to relevant documents in a folder. */
-        Folder: string;
         /** Gets or sets the supplier contract signer. */
         SupplierContractSigner: string;
         /** Gets or sets a value indicating whether this instance has supplier signed. */
@@ -64,14 +60,6 @@
         /** Gets or sets the chosen agreement elements. */
         AgreementElements: Array<IAgreementElement>;
 
-        /** Gets or sets the operation test expected. */
-        OperationTestExpected: Date;
-        /** Gets or sets the operation test approved. */
-        OperationTestApproved: Date;
-        /** Gets or sets the operational acceptance test expected. */
-        OperationalAcceptanceTestExpected: Date;
-        /** Gets or sets the operational acceptance test approved. */
-        OperationalAcceptanceTestApproved: Date;
         /** When the contract began. (indgået) */
         Concluded: Date;
         /** Gets or sets the duration in years. (varighed) */

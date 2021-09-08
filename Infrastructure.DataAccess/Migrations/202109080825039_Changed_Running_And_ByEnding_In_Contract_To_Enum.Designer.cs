@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum"; }
+            get { return "202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum"; }
         }
         
         string IMigrationMetadata.Source

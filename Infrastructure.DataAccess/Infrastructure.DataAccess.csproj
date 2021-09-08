@@ -818,9 +818,13 @@
     <Compile Include="Migrations\202109060415217_OptionEntity_RemoveIsSuggestion.designer.cs">
       <DependentUpon>202109060415217_OptionEntity_RemoveIsSuggestion.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs" />
-    <Compile Include="Migrations\202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum.Designer.cs">
-      <DependentUpon>202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
+    <Compile Include="Migrations\202109061324234_ItContract_Cleanup.cs" />
+    <Compile Include="Migrations\202109061324234_ItContract_Cleanup.designer.cs">
+      <DependentUpon>202109061324234_ItContract_Cleanup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs" />
+    <Compile Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.designer.cs">
+      <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1348,8 +1352,11 @@
     <EmbeddedResource Include="Migrations\202109060415217_OptionEntity_RemoveIsSuggestion.resx">
       <DependentUpon>202109060415217_OptionEntity_RemoveIsSuggestion.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum.resx">
-      <DependentUpon>202109070753428_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202109061324234_ItContract_Cleanup.resx">
+      <DependentUpon>202109061324234_ItContract_Cleanup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.resx">
+      <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
