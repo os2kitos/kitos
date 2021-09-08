@@ -15,7 +15,6 @@ using System.Web.Http.Results;
 using Core.ApplicationServices.Contract.Write;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
-using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -32,14 +31,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         private readonly IItContractService _itContractService;
         private readonly IItContractWriteModelMapper _writeModelMapper;
         private readonly IItContractWriteService _writeService;
-        private readonly ICurrentHttpRequest _currentHttpRequest; //TODO: Use in mapper
 
-        public ItContractV2Controller(IItContractService itContractService, IItContractWriteModelMapper writeModelMapper, IItContractWriteService writeService, ICurrentHttpRequest currentHttpRequest)
+        public ItContractV2Controller(IItContractService itContractService, IItContractWriteModelMapper writeModelMapper, IItContractWriteService writeService)
         {
             _itContractService = itContractService;
             _writeModelMapper = writeModelMapper;
             _writeService = writeService;
-            _currentHttpRequest = currentHttpRequest;
         }
 
         /// <summary>
@@ -129,9 +126,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-
-            //TODO: appears the resolution fails
-            var definedJsonRootProperties = _currentHttpRequest.GetDefinedJsonRootProperties();
 
             var parameters = _writeModelMapper.FromPOST(request);
 
