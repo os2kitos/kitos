@@ -1,6 +1,6 @@
-﻿using Core.DomainModel.References;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.References;
+
 
 namespace Core.DomainModel
 {

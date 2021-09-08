@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices
 {

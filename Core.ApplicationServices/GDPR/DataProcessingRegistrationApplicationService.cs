@@ -2,7 +2,6 @@
 using Core.ApplicationServices.Shared;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -10,10 +9,12 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;

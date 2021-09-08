@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
 using Core.DomainServices;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Authorization
 {

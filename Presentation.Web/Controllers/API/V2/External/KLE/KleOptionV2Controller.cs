@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.KLE;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;

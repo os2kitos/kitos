@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel;
 using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
@@ -13,7 +14,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.SystemUsage;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.SystemUsage
 {

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.Extensions
+﻿namespace Core.DomainModel.Extensions
 {
     public static class OrmTrackingExtensions
     {

@@ -1,10 +1,11 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.SSO.Factories;
 using Core.DomainModel;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.SSO.State
 {

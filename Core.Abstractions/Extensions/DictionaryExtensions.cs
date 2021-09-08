@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Infrastructure.Services.Types;
 
-namespace Core.DomainModel.Result
+namespace Core.Abstractions.Extensions
 {
     public static class DictionaryExtensions
     {

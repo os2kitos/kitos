@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 
-namespace Infrastructure.Services.Types
+namespace Core.Abstractions.Extensions
 {
     public static class ObjectExtensions
     {

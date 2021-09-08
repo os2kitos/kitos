@@ -1,5 +1,5 @@
 ﻿using System;
-using Core.DomainModel.Result;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel.References
 {

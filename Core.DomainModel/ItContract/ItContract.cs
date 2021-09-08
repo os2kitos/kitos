@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.GDPR;
 using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
+
 using Core.DomainModel.Notification;
-using Infrastructure.Services.Extensions;
+
 
 // ReSharper disable VirtualMemberCallInConstructor
 

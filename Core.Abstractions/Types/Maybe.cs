@@ -1,6 +1,7 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 
-namespace Infrastructure.Services.Types
+namespace Core.Abstractions.Types
 {
     public sealed class Maybe<T>
     {

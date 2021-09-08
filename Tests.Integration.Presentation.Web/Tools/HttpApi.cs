@@ -8,11 +8,12 @@ using System.Net.Http.Headers;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
-using Infrastructure.Services.Types;
+
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models;

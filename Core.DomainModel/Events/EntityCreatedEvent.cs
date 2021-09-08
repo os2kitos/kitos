@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.DomainEvents
+﻿namespace Core.DomainModel.Events
 {
     public class EntityCreatedEvent<TEntity> : EntityLifeCycleEvent<TEntity>
     {

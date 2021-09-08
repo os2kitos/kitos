@@ -1,8 +1,8 @@
 ﻿using System.Net.Http;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1

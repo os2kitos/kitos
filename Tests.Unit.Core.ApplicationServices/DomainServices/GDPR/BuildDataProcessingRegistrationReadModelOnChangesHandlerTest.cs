@@ -1,4 +1,5 @@
 ﻿using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices;
@@ -7,7 +8,6 @@ using Core.DomainServices.Model.EventHandlers;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

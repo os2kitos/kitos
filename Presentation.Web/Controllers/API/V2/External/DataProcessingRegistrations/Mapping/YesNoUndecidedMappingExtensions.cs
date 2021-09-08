@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Core.DomainModel.Result;
+using Core.Abstractions.Extensions;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V2.Types.Shared;
 

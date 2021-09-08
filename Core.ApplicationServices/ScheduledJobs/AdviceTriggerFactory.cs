@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Helpers;
 using Core.DomainModel.Advice;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.ScheduledJobs
 {

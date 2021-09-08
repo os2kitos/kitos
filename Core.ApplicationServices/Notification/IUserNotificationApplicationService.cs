@@ -1,8 +1,8 @@
 ﻿using Core.DomainModel.Notification;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
-using Infrastructure.Services.Types;
+
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.Notification
 {

@@ -1,5 +1,4 @@
 ﻿using Core.DomainModel.Notification;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -8,12 +7,13 @@ using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.DomainServices.Notifications
 {

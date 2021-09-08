@@ -8,19 +8,19 @@ using Core.ApplicationServices.System;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.SSO.Factories;
 using Core.ApplicationServices.SSO.Model;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.ApplicationServices.SSO.State

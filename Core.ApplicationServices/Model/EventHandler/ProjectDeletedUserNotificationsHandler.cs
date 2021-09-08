@@ -2,8 +2,8 @@
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainServices.Repositories.Notification;
-using Infrastructure.Services.DomainEvents;
 using System.Linq;
+using Core.DomainModel.Events;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {

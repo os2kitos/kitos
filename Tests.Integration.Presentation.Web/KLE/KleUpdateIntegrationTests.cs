@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystemUsage;
@@ -13,7 +14,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using ExpectedObjects;
 using Infrastructure.DataAccess;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;

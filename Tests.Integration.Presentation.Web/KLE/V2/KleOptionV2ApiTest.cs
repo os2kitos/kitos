@@ -5,10 +5,11 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries.KLE;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;

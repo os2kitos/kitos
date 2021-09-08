@@ -1,5 +1,5 @@
-﻿using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.Organization;
 
 namespace Core.ApplicationServices.Organizations
 {

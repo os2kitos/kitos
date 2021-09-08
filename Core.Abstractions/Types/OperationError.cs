@@ -1,6 +1,6 @@
-﻿using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Extensions;
 
-namespace Core.DomainModel.Result
+namespace Core.Abstractions.Types
 {
     public class OperationError
     {

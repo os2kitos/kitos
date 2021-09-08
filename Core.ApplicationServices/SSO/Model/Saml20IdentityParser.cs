@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using dk.nita.saml20.identity;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.SSO.Model
 {

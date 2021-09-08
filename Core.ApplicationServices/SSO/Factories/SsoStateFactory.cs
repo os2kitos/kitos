@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.ApplicationServices.SSO.State;
@@ -10,7 +11,7 @@ using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using dk.nita.saml20.identity;
 using Infrastructure.Services.Cryptography;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.ApplicationServices.SSO.Factories

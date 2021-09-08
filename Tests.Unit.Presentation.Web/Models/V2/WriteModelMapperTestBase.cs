@@ -1,5 +1,6 @@
-﻿using Core.ApplicationServices.Model.Shared;
-using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Shared;
+
 using Tests.Toolkit.Patterns;
 using Xunit;
 

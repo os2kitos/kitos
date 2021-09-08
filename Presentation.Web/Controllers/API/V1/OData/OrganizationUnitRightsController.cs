@@ -4,7 +4,7 @@ using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using System.Web.Http;
 using System.Linq;
-using Infrastructure.Services.DomainEvents;
+using Core.DomainModel.Events;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 

@@ -8,8 +8,8 @@ using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System.Net;
+using Core.DomainModel.Events;
 using Core.DomainServices.Repositories.Project;
-using Infrastructure.Services.DomainEvents;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 
 namespace Presentation.Web.Controllers.API.V1.OData

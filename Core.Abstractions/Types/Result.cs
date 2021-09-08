@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Core.DomainModel.Result
+namespace Core.Abstractions.Types
 {
     public sealed class Result<TSuccess, TFailure>
     {

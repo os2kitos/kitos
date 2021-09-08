@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
@@ -10,16 +12,15 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Serilog;
 using Tests.Toolkit.Extensions;
@@ -2046,7 +2047,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _databaseControlMock.Verify(x => x.SaveChanges(), Times.AtLeastOnce);
             transactionMock.Verify(x => x.Commit());
         }
-        private void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
+        private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
         {
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }

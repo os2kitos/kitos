@@ -6,7 +6,9 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V2.Request.Contract;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -237,7 +239,48 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         }
 
-        private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual) 
+        [Fact]
+        public async Task POST_With_Name_Alone()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(requestDto.Name, contractDTO.Name);
+            Assert.Equal(organization.Name, contractDTO.OrganizationContext.Name);
+            Assert.Equal(organization.Cvr, contractDTO.OrganizationContext.Cvr);
+            Assert.Equal(organization.Uuid, contractDTO.OrganizationContext.Uuid);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Duplicate_Name_In_Same_Org()
+        {
+
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+
+            //Act
+            await ItContractV2Helper.PostContractAsync(token, requestDto);
+            using var duplicateResponse = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
+        }
+
+        private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);
             Assert.Equal(expected.Name, actual.Name);
@@ -272,8 +315,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private async Task<Organization> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", A<OrganizationTypeKeys>(), AccessModifier.Public);
             return organization;
         }
 
@@ -284,7 +326,22 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private string CreateEmail()
         {
-            return $"{A<string>()}@test.dk";
+            return $"{nameof(ItContractsApiV2Test)}{A<string>()}@test.dk";
+        }
+
+        private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync()
+        {
+            var organization = await CreateOrganizationAsync();
+            var (user, token) = await CreateApiUser(organization);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
+            return (token, user, organization);
+        }
+
+        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
         }
     }
 }

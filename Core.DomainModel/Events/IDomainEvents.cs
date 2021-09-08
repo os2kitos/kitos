@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Infrastructure.Services.DomainEvents
+﻿namespace Core.DomainModel.Events
 {
     public interface IDomainEvents
     {

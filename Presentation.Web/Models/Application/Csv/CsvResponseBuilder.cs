@@ -7,8 +7,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
-using Infrastructure.Services.Types;
+
 
 namespace Presentation.Web.Models.Application.Csv
 {

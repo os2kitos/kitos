@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices.Context;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.GDPR
 {

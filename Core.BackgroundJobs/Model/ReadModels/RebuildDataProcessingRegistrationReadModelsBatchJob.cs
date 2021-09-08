@@ -3,15 +3,15 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainModel.Result;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels

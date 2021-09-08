@@ -12,7 +12,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.GDPR
 {

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Services.DomainEvents
+﻿namespace Core.DomainModel.Events
 {
     public interface IDomainEventHandler<in T>
     {

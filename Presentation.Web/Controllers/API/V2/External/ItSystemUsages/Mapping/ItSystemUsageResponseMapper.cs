@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DataTypes;
@@ -9,7 +10,7 @@ using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Organization;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;

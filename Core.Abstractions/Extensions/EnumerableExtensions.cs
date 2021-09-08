@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Infrastructure.Services.Types
+namespace Core.Abstractions.Extensions
 {
     public static class EnumerableExtensions
     {

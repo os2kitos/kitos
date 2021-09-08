@@ -169,11 +169,12 @@
     </Compile>
     <Compile Include="ApplicationServices\AdviceServiceTest.cs" />
     <Compile Include="ApplicationServices\AdviceTriggerFactoryTest.cs" />
+    <Compile Include="ApplicationServices\Contract\ItContractWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
-    <Compile Include="ApplicationServices\ItContractServiceTest.cs" />
+    <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
@@ -247,6 +248,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

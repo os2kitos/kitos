@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -16,8 +18,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.ApplicationServices.Contract
@@ -54,6 +55,28 @@ namespace Core.ApplicationServices.Contract
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
             _organizationService = organizationService;
+        }
+
+        public Result<ItContract, OperationError> Create(int organizationId, string name)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            if (!_authorizationContext.AllowCreate<ItContract>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
+            var result = CanCreateNewContractWithName(name, organizationId);
+
+            if (result.Failed)
+                return result.Error;
+
+            if (!result.Value)
+                return new OperationError("Name taken", OperationFailure.Conflict);
+
+            var itContract = new ItContract { OrganizationId = organizationId, Name = name };
+            itContract = _repository.Add(itContract);
+            _domainEvents.Raise(new EntityCreatedEvent<ItContract>(itContract));
+            transaction.Commit();
+
+            return itContract;
         }
 
         public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)

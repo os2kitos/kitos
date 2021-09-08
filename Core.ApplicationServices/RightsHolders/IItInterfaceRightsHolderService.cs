@@ -1,10 +1,10 @@
 ﻿using Core.ApplicationServices.Model.Interface;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.RightsHolders
 {

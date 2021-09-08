@@ -5,12 +5,12 @@ using System.Net;
 using System;
 using Core.DomainModel;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.DomainModel.Result;
+using Core.DomainModel.Events;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Ninject;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;

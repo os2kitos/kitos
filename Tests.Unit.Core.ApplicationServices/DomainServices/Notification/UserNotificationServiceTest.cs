@@ -10,15 +10,15 @@ using Core.DomainServices.Repositories.Notification;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Moq;
 using System.Data;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
 using Core.DomainServices.Time;
 using System;
+using Core.Abstractions.Types;
 using Serilog;
 
 namespace Tests.Unit.Core.DomainServices.Notification

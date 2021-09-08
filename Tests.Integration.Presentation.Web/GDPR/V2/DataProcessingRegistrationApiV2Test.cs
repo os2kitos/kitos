@@ -6,8 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;

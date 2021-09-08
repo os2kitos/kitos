@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
-using Infrastructure.Services.Types;
+
 using System.Linq;
+using Core.Abstractions.Types;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;

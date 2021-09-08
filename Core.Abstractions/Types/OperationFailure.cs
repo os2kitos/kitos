@@ -1,4 +1,4 @@
-﻿namespace Core.DomainModel.Result
+﻿namespace Core.Abstractions.Types
 {
     public enum OperationFailure
     {

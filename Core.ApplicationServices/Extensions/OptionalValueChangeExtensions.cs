@@ -1,7 +1,7 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Extensions
 {

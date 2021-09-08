@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Authorization.Policies
 {

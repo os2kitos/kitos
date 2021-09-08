@@ -5,9 +5,10 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure.Attributes;
 using System.Linq;
 using System.Web.Http;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization.Permissions;
-using Infrastructure.Services.Types;
+
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 
