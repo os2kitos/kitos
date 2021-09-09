@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
@@ -92,7 +93,28 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
-            return contract.WithOptionalUpdate(parameters.Name, UpdateName);
+            return contract.WithOptionalUpdate(parameters.Name, UpdateName)
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract));
+        }
+
+        private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
+        {
+            if (!newParentUuid.HasValue)
+            {
+                contract.ClearParent();
+                return Maybe<OperationError>.None;
+            }
+
+            var getResult = _contractService.GetContract(newParentUuid.Value);
+
+            if (getResult.Failed)
+                return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
+
+            var assignResult = contract.SetParent(getResult.Value);
+            if(assignResult.Failed)
+                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
+
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)

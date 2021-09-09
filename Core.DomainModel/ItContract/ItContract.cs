@@ -558,5 +558,21 @@ namespace Core.DomainModel.ItContract
                 Object = this
             };
         }
+
+        public void ClearParent()
+        {
+            Parent.Track();
+            Parent = null;
+        }
+
+        public Result<ItContract, OperationError> SetParent(ItContract newParent)
+        {
+            if (OrganizationId == newParent.OrganizationId)
+            {
+                Parent = newParent;
+                return newParent;
+            }
+            return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
+        }
     }
 }

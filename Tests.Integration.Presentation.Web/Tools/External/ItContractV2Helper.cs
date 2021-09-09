@@ -78,5 +78,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Assert.Equal(HttpStatusCode.Created, result.StatusCode);
             return await result.ReadResponseBodyAsAsync<ItContractResponseDTO>();
         }
+
+        public static async Task<HttpResponseMessage> SendPutContractAsync(string token, Guid contractUuid, ContractWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, dto);
+        }
     }
 }
