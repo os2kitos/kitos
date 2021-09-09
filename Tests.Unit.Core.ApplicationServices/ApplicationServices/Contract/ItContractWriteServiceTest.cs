@@ -8,13 +8,12 @@ using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Events;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 using Moq;
-using Moq.Language.Flow;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -29,6 +28,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
+        private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
 
         public ItContractWriteServiceTest()
         {
@@ -38,7 +38,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _transactionManagerMock = new Mock<ITransactionManager>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object);
+            _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object);
         }
 
         [Fact]

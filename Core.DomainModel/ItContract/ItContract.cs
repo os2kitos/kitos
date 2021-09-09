@@ -587,5 +587,21 @@ namespace Core.DomainModel.ItContract
 
             return Maybe<OperationError>.None;
         }
+
+        public Maybe<OperationError> SetAgreementElements(IEnumerable<AgreementElementType> agreementElementTypes)
+        {
+            var agreementElements = agreementElementTypes.Select(type=>new ItContractAgreementElementTypes()
+            {
+                ItContract = this,
+                AgreementElementType = type
+            }).ToList();
+
+            if (agreementElements.Select(x => x.AgreementElementType.Uuid).Distinct().Count() != agreementElements.Count)
+                return new OperationError("agreement elements must not contain duplicates", OperationFailure.BadInput);
+
+            agreementElements.MirrorTo(AssociatedAgreementElementTypes, p => p.AgreementElementType.Uuid);
+
+            return Maybe<OperationError>.None;
+        }
     }
 }

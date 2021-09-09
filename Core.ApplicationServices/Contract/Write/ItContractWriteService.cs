@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
@@ -10,6 +11,7 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -24,6 +26,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
+        private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -31,7 +34,8 @@ namespace Core.ApplicationServices.Contract.Write
             IOptionResolver optionResolver,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IDatabaseControl databaseControl)
+            IDatabaseControl databaseControl,
+            IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -39,6 +43,7 @@ namespace Core.ApplicationServices.Contract.Write
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
+            _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -112,12 +117,37 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements));
         }
 
-        private Maybe<OperationError> UpdateAgreementElements(ItContract arg1, IEnumerable<Guid> arg2)
+        private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
         {
-            throw new NotImplementedException();
+            var agreementElementTypes = new List<AgreementElementType>();
+            foreach (var uuid in agreementElements)
+            {
+                var result = _optionResolver.GetOptionType<ItContract, AgreementElementType>(contract.Organization.Uuid, uuid);
+                if (result.Failed)
+                {
+                    return new OperationError($"Failed resolving agreement element with uuid:{uuid}. Message:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
+                }
+
+                var resultValue = result.Value;
+                if (resultValue.available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
+                {
+                    return new OperationError($"Tried to add agreement element which is not available in the organization: {uuid}", OperationFailure.BadInput);
+                }
+                agreementElementTypes.Add(resultValue.option);
+            }
+
+            var before = contract.AssociatedAgreementElementTypes.ToList();
+
+            var error = contract.SetAgreementElements(agreementElementTypes);
+            if (error.IsNone)
+            {
+                var after = before.Except(contract.AssociatedAgreementElementTypes);
+                after.ToList().ForEach(_itContractAgreementElementTypesRepository.Delete);
+            }
+            return error;
         }
 
-        private Maybe<OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
+        private static Maybe<OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
         {
             if (generalData.ValidFrom.IsUnchanged && generalData.ValidTo.IsUnchanged)
                 return Maybe<OperationError>.None;
