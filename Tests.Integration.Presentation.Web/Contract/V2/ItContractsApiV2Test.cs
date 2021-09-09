@@ -9,10 +9,12 @@ using System.Threading.Tasks;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -473,7 +475,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            
+
             var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
             var contractDTO = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
@@ -537,6 +539,9 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
+            var contractType = withContractType ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes, organization.Uuid, 10, 0)).RandomItem() : null;
+            var contractTemplateType = withContractTemplate ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes, organization.Uuid, 10, 0)).RandomItem() : null;
+            var agreementElements = withAgreementElements ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes, organization.Uuid, 10, 0)).RandomItems(2).ToList() : null;
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
@@ -544,13 +549,55 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 General = new ContractGeneralDataWriteRequestDTO()
                 {
                     Notes = A<string>(),
-                    ContractId = A<string>()
+                    ContractId = A<string>(),
+                    ContractTypeUuid = contractType?.Uuid,
+                    ContractTemplateUuid = contractTemplateType?.Uuid,
+                    AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
+                    Validity = new ValidityWriteRequestDTO()
+                    {
+                        ValidFrom = DateTime.Now,
+                        EnforcedValid = A<bool>(),
+                        ValidTo = DateTime.Now.AddDays(2)
+                    }
                 }
             };
 
             //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
-            //Asse
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertGeneralDataSection(request, dto, contractType, contractTemplateType, agreementElements, freshDTO);
+        }
+
+        private static void AssertGeneralDataSection(
+            CreateNewContractRequestDTO request,
+            ItContractResponseDTO inputData,
+            IdentityNamePairResponseDTO expectedContractType,
+            IdentityNamePairResponseDTO expectedContractTemplateType,
+            List<IdentityNamePairResponseDTO> expectedAgreementElements,
+            ItContractResponseDTO freshDTO)
+        {
+            Assert.Equal(request.General.Notes, inputData.General.Notes);
+            Assert.Equal(request.General.ContractId, inputData.General.ContractId);
+            AssertCrossReference(expectedContractType, freshDTO.General.ContractType);
+            AssertCrossReference(expectedContractTemplateType, freshDTO.General.ContractTemplate);
+            Assert.Equal(request.General.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
+            Assert.Equal(request.General.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
+            Assert.Equal(request.General.Validity?.EnforcedValid, freshDTO.General.Validity?.EnforcedValid);
+
+            if (expectedAgreementElements == null)
+                Assert.Empty(freshDTO.General.AgreementElements);
+            else
+            {
+                var expectedElements = expectedAgreementElements.OrderBy(x => x.Uuid).ToList();
+                var actualAgreementElements = freshDTO.General.AgreementElements.OrderBy(x => x.Uuid).ToList();
+                Assert.Equal(expectedElements.Count, actualAgreementElements.Count);
+                for (var i = 0; i < expectedElements.Count; i++)
+                {
+                    AssertCrossReference(expectedElements[i], actualAgreementElements[i]);
+                }
+            }
         }
 
         private async Task<Organization> CreateOrganizationAsync()
@@ -570,7 +617,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return $"{nameof(ItContractsApiV2Test)}{A<string>()}@test.dk";
         }
 
-        private static void AssertCrossReference<T>(T expected, IdentityNamePairResponseDTO actual) where T : IHasNameExternal, IHasUuidExternal
+        private static void AssertCrossReference<TExpected, TActual>(TExpected expected, TActual actual) where TExpected : IHasNameExternal, IHasUuidExternal where TActual : IHasNameExternal, IHasUuidExternal
         {
             Assert.Equal(expected?.Uuid, actual?.Uuid);
             Assert.Equal(expected?.Name, actual?.Name);
