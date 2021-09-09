@@ -20,7 +20,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new ItContractModificationParameters
             {
-                Name = dto.Name.AsChangedValue()
+                Name = dto.Name.AsChangedValue(),
+                ParentContractUuid = dto.ParentContractUuid.AsChangedValue()
             };
         }
     }

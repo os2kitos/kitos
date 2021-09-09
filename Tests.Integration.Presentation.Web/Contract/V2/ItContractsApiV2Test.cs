@@ -280,6 +280,129 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
         }
 
+        [Fact]
+        public async Task Can_POST_With_Parent()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var parent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                ParentContractUuid = parent.Uuid
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(parent.Name, contractDTO.ParentContract.Name);
+            Assert.Equal(parent.Uuid, contractDTO.ParentContract.Uuid);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Parent_From_Other_Organization()
+        {
+            //Arrange
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync();
+            var parent = await ItContractHelper.CreateContract(CreateName(), organization2.Id);
+
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                ParentContractUuid = parent.Uuid
+            };
+
+            //Act
+            using var createResponse = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, createResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Unknown_Parent()
+        {
+            //Arrange
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                ParentContractUuid = A<Guid>()
+            };
+
+            //Act
+            using var createResponse = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, createResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Parent()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var parent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            var updateRequest1 = new ContractWriteRequestDTO()
+            {
+                Name = CreateName(),
+                ParentContractUuid = parent.Uuid
+            };
+
+            //Act - Update from empty
+            var updatedResponse1 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest1);
+
+            //Assert - Update from empty
+            Assert.Equal(HttpStatusCode.OK, updatedResponse1.StatusCode);
+            var updatedContractDTO1 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            Assert.Equal(parent.Name, updatedContractDTO1.ParentContract.Name);
+            Assert.Equal(parent.Uuid, updatedContractDTO1.ParentContract.Uuid);
+
+            //Act - Update from filled
+            var newParent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var updateRequest2 = new ContractWriteRequestDTO()
+            {
+                Name = CreateName(),
+                ParentContractUuid = newParent.Uuid
+            };
+            var updatedResponse2 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest2);
+
+            //Assert - Update from filled
+            Assert.Equal(HttpStatusCode.OK, updatedResponse2.StatusCode);
+            var updatedContractDTO2 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            Assert.Equal(newParent.Name, updatedContractDTO2.ParentContract.Name);
+            Assert.Equal(newParent.Uuid, updatedContractDTO2.ParentContract.Uuid);
+
+            //Act - Update to empty
+            var updateRequest3 = new ContractWriteRequestDTO()
+            {
+                Name = CreateName(),
+                ParentContractUuid = null
+            };
+            var updatedResponse3 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest3);
+
+            //Assert - Update to empty
+            Assert.Equal(HttpStatusCode.OK, updatedResponse3.StatusCode);
+            var updatedContractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            Assert.Null(updatedContractDTO3.ParentContract);
+        }
+
         private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual)
         {
             Assert.Equal(expected.Uuid, actual.Uuid);

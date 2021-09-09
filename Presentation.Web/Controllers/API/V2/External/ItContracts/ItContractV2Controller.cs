@@ -473,7 +473,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             {
                 Uuid = contract.Uuid,
                 Name = contract.Name,
-                OrganizationContext = contract.Organization.MapShallowOrganizationResponseDTO()
+                OrganizationContext = contract.Organization.MapShallowOrganizationResponseDTO(),
+                ParentContract = contract.Parent?.MapIdentityNamePairDTO()
             };
         }
     }

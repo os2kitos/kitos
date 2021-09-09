@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
@@ -92,7 +93,27 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
-            return contract.WithOptionalUpdate(parameters.Name, UpdateName);
+            return contract.WithOptionalUpdate(parameters.Name, UpdateName)
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract));
+        }
+
+        private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
+        {
+            if (!newParentUuid.HasValue)
+            {
+                contract.Parent = null;
+                contract.ParentId = null;
+                return Maybe<OperationError>.None;
+            }
+
+            var getResult = _contractService.GetContract(newParentUuid.Value);
+
+            if (getResult.Failed)
+                return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
+
+            contract.Parent = getResult.Value;
+
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)
