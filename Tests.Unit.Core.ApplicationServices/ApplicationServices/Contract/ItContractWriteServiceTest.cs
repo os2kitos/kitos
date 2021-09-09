@@ -5,6 +5,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -12,6 +13,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -168,6 +170,98 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             AssertFailureWithKnownErrorDetails(result, "Name must be provided", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_Parent()
+        {
+            //Arrange
+            var parentUuid = A<Guid>();
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parentUuid);
+            var parent = new ItContract() { Id = A<int>(), Uuid = parentUuid, OrganizationId = createdContract.OrganizationId };
+            ExpectGetReturns(parent.Uuid, parent);
+
+            //Act
+            var result = _sut.Create(orgUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(parent, result.Value.Parent);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_No_Parent()
+        {
+            //Arrange
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: null);
+
+            //Act
+            var result = _sut.Create(orgUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Null(result.Value.Parent);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Parent_If_Get_Fails()
+        {
+            //Arrange
+            var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>() };
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var operationError = A<OperationError>();
+            ExpectGetReturns(parent.Uuid, operationError);
+
+            //Act
+            var result = _sut.Create(orgUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Failed to get contract with Uuid:", operationError.FailureType, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Parent_If_Different_Organizations()
+        {
+            //Arrange
+            var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>(), OrganizationId = A<int>() };
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            ExpectGetReturns(parent.Uuid, parent);
+
+            //Act
+            var result = _sut.Create(orgUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Failed to set parent with Uuid:", OperationFailure.BadInput, transaction);
+        }
+
+        private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
+            Guid? parentUuid = null
+            )
+        {
+            var organizationUuid = A<Guid>();
+            var parameters = new ItContractModificationParameters
+            {
+                Name = A<string>().AsChangedValue(),
+                ParentContractUuid = parentUuid.AsChangedValue()
+            };
+            var createdContract = new ItContract()
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>(),
+                OrganizationId = A<int>()
+            };
+            var transaction = ExpectTransaction();
+
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, createdContract.OrganizationId);
+            ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
+            return (organizationUuid, parameters, createdContract, transaction);
+        }
+
+        private void ExpectGetReturns(Guid contractUuid, Result<ItContract, OperationError> result)
+        {
+            _itContractServiceMock.Setup(x => x.GetContract(contractUuid)).Returns(result);
         }
 
         private void ExpectCreateReturns(int organizationId, string name, Result<ItContract, OperationError> result)

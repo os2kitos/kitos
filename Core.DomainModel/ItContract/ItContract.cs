@@ -602,6 +602,22 @@ namespace Core.DomainModel.ItContract
             agreementElements.MirrorTo(AssociatedAgreementElementTypes, p => p.AgreementElementType.Uuid);
 
             return Maybe<OperationError>.None;
+		}
+
+        public void ClearParent()
+        {
+            Parent.Track();
+            Parent = null;
+        }
+
+        public Result<ItContract, OperationError> SetParent(ItContract newParent)
+        {
+            if (OrganizationId == newParent.OrganizationId)
+            {
+                Parent = newParent;
+                return newParent;
+            }
+            return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
         }
     }
 }

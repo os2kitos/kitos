@@ -102,6 +102,7 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return contract
                 .WithOptionalUpdate(parameters.Name, UpdateName)
+				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(contract => contract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
         }
 
@@ -210,6 +211,24 @@ namespace Core.ApplicationServices.Contract.Write
 
                 updateValue(contract, option.option);
             }
+        }
+
+        private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
+        {
+            if (!newParentUuid.HasValue)
+            {
+                contract.ClearParent();
+                return Maybe<OperationError>.None;
+            }
+
+            var getResult = _contractService.GetContract(newParentUuid.Value);
+
+            if (getResult.Failed)
+                return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
+
+            var assignResult = contract.SetParent(getResult.Value);
+            if(assignResult.Failed)
+                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
 
             return Maybe<OperationError>.None;
         }
