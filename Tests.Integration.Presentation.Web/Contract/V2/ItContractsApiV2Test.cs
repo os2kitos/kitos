@@ -380,6 +380,30 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                General = new ContractGeneralDataWriteRequestDTO()
+                {
+                    Notes = A<string>(),
+                    ContractId = A<string>()
+                }
+            };
+
+            //Act
+
+            //Asse
+        }
+
         private async Task<Organization> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
@@ -421,7 +445,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private async Task<ItContractDTO> CreateContractAsync(int orgId, string name = null)
         {
-            if(name == null)
+            if (name == null)
                 return await ItContractHelper.CreateContract(CreateName(), orgId);
 
             return await ItContractHelper.CreateContract(name, orgId);
