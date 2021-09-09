@@ -558,5 +558,17 @@ namespace Core.DomainModel.ItContract
                 Object = this
             };
         }
+
+        public void ResetContractType()
+        {
+            ContractType?.Track();
+            ContractType = null;
+        }
+
+        public void ResetContractTemplate()
+        {
+            ContractTemplate?.Track();
+            ContractTemplate = null;
+        }
     }
 }

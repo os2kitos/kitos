@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -92,7 +95,88 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
-            return contract.WithOptionalUpdate(parameters.Name, UpdateName);
+            return contract
+                .WithOptionalUpdate(parameters.Name, UpdateName)
+                .Bind(contract => contract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
+        }
+
+        private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
+        {
+            return contract
+                .WithOptionalUpdate(generalData.ContractId, (c, newValue) => c.ItContractId = newValue)
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTypeUuid, UpdateContractType))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTemplateUuid, UpdateContractTemplate))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.Notes, (c, newValue) => c.Note = newValue))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
+                .Bind(itContract => UpdateValidityPeriod(itContract, generalData))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements));
+        }
+
+        private Maybe<OperationError> UpdateAgreementElements(ItContract arg1, IEnumerable<Guid> arg2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Result<ItContract, OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
+        {
+            //TODO: As in itsystemusage
+            throw new NotImplementedException();
+        }
+
+        private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
+        {
+            return UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                contractTemplateUuid,
+                c => c.ResetContractTemplate(),
+                c => c.ContractTemplate,
+                (c, newValue) => c.ContractTemplate = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdateContractType(ItContract contract, Guid? contractTypeId)
+        {
+            return UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                contractTypeId,
+                c => c.ResetContractType(),
+                c => c.ContractType,
+                (c, newValue) => c.ContractType = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TOption>(
+            ItContract contract,
+            Guid? optionTypeUuid,
+            Action<ItContract> onReset,
+            Func<ItContract, TOption> getCurrentValue,
+            Action<ItContract, TOption> updateValue) where TOption : OptionEntity<ItContract>
+        {
+            if (optionTypeUuid == null)
+            {
+                onReset(contract);
+            }
+            else
+            {
+                var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
+                if (optionType.Failed)
+                {
+                    return new OperationError($"Failure while resolving {typeof(TOption).Namespace} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
+                }
+
+                var option = optionType.Value;
+                var currentValue = getCurrentValue(contract);
+                if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
+                {
+                    return new OperationError($"The changed {typeof(TOption).Namespace} points to an option which is not available in the organization", OperationFailure.BadInput);
+                }
+
+                updateValue(contract, option.option);
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)
