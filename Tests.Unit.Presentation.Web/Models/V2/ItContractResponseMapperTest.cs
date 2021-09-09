@@ -356,7 +356,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
             else
             {
-                Assert.Null(dto.PaymentModel.PaymentMileStones);
+                Assert.Empty(dto.PaymentModel.PaymentMileStones);
             }
         }
 
@@ -423,8 +423,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             }
             else
             {
-                Assert.Null(dto.Payments.External);
-                Assert.Null(dto.Payments.Internal);
+                Assert.Empty(dto.Payments.External);
+                Assert.Empty(dto.Payments.Internal);
             }
         }
 
@@ -863,7 +863,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             if (agreementElements == null)
             {
-                Assert.Null(actualIdentities);
+                Assert.Empty(actualIdentities);
             }
             else
             {
