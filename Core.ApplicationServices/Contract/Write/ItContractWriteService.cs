@@ -101,8 +101,7 @@ namespace Core.ApplicationServices.Contract.Write
         {
             if (!newParentUuid.HasValue)
             {
-                contract.Parent = null;
-                contract.ParentId = null;
+                contract.ClearParent();
                 return Maybe<OperationError>.None;
             }
 
@@ -111,7 +110,9 @@ namespace Core.ApplicationServices.Contract.Write
             if (getResult.Failed)
                 return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
 
-            contract.Parent = getResult.Value;
+            var assignResult = contract.SetParent(getResult.Value);
+            if(assignResult.Failed)
+                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
 
             return Maybe<OperationError>.None;
         }

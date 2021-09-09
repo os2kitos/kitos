@@ -175,8 +175,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Can_Create_With_Parent()
         {
             //Arrange
-            var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>() };
-            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var parentUuid = A<Guid>();
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parentUuid);
+            var parent = new ItContract() { Id = A<int>(), Uuid = parentUuid, OrganizationId = createdContract.OrganizationId };
             ExpectGetReturns(parent.Uuid, parent);
 
             //Act
@@ -219,6 +220,21 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "Failed to get contract with Uuid:", operationError.FailureType, transaction);
         }
 
+        [Fact]
+        public void Cannot_Create_With_Parent_If_Different_Organizations()
+        {
+            //Arrange
+            var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>(), OrganizationId = A<int>() };
+            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            ExpectGetReturns(parent.Uuid, parent);
+
+            //Act
+            var result = _sut.Create(orgUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Failed to set parent with Uuid:", OperationFailure.BadInput, transaction);
+        }
+
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null
             )
@@ -232,13 +248,13 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var createdContract = new ItContract()
             {
                 Id = A<int>(),
-                Uuid = A<Guid>()
+                Uuid = A<Guid>(),
+                OrganizationId = A<int>()
             };
             var transaction = ExpectTransaction();
-            var orgDbId = A<int>();
 
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, orgDbId);
-            ExpectCreateReturns(orgDbId, parameters.Name.NewValue, createdContract);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, createdContract.OrganizationId);
+            ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
             return (organizationUuid, parameters, createdContract, transaction);
         }
 
