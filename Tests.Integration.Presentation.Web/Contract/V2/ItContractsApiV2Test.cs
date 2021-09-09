@@ -539,27 +539,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var contractType = withContractType ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes, organization.Uuid, 10, 0)).RandomItem() : null;
-            var contractTemplateType = withContractTemplate ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes, organization.Uuid, 10, 0)).RandomItem() : null;
-            var agreementElements = withAgreementElements ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes, organization.Uuid, 10, 0)).RandomItems(2).ToList() : null;
+             var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization,withContractType, withContractTemplate, withAgreementElements);
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
-                General = new ContractGeneralDataWriteRequestDTO()
-                {
-                    Notes = A<string>(),
-                    ContractId = A<string>(),
-                    ContractTypeUuid = contractType?.Uuid,
-                    ContractTemplateUuid = contractTemplateType?.Uuid,
-                    AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
-                    Validity = new ValidityWriteRequestDTO()
-                    {
-                        ValidFrom = DateTime.Now,
-                        EnforcedValid = A<bool>(),
-                        ValidTo = DateTime.Now.AddDays(2)
-                    }
-                }
+                General = generalDataWriteRequestDto
             };
 
             //Act
@@ -567,24 +552,98 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertGeneralDataSection(request, dto, contractType, contractTemplateType, agreementElements, freshDTO);
+            AssertGeneralDataSection(request.General, contractType, contractTemplateType, agreementElements, freshDTO);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_GeneralData()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+            };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Act
+            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            using var response1 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
+            Assert.Equal(HttpStatusCode.OK,response1.StatusCode);
+                
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+
+            //Act - new values
+            (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false);
+            using var response2 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertGeneralDataSection(generalDataWriteRequestDto, contractType, contractTemplateType, agreementElements, freshDTO);
+
+            //Act - reset
+            var resetRequest = new ContractGeneralDataWriteRequestDTO();
+            using var response3 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, resetRequest);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);
+        }
+
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(Organization organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        {
+            var contractType = withContractType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
+                    organization.Uuid, 10, 0)).RandomItem()
+                : null;
+            var contractTemplateType = withContractTemplate
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes,
+                    organization.Uuid, 10, 0)).RandomItem()
+                : null;
+            var agreementElements = withAgreementElements
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes,
+                    organization.Uuid, 10, 0)).RandomItems(2).ToList()
+                : null;
+            var generalDataWriteRequestDto = new ContractGeneralDataWriteRequestDTO()
+            {
+                Notes = A<string>(),
+                ContractId = A<string>(),
+                ContractTypeUuid = contractType?.Uuid,
+                ContractTemplateUuid = contractTemplateType?.Uuid,
+                AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
+                Validity = new ValidityWriteRequestDTO()
+                {
+                    ValidFrom = DateTime.Now,
+                    EnforcedValid = A<bool>(),
+                    ValidTo = DateTime.Now.AddDays(2)
+                }
+            };
+
+            return (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto);
         }
 
         private static void AssertGeneralDataSection(
-            CreateNewContractRequestDTO request,
-            ItContractResponseDTO inputData,
+            ContractGeneralDataWriteRequestDTO request,
             IdentityNamePairResponseDTO expectedContractType,
             IdentityNamePairResponseDTO expectedContractTemplateType,
             List<IdentityNamePairResponseDTO> expectedAgreementElements,
             ItContractResponseDTO freshDTO)
         {
-            Assert.Equal(request.General.Notes, inputData.General.Notes);
-            Assert.Equal(request.General.ContractId, inputData.General.ContractId);
+            Assert.Equal(request.Notes, freshDTO.General.Notes);
+            Assert.Equal(request.ContractId, freshDTO.General.ContractId);
             AssertCrossReference(expectedContractType, freshDTO.General.ContractType);
             AssertCrossReference(expectedContractTemplateType, freshDTO.General.ContractTemplate);
-            Assert.Equal(request.General.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
-            Assert.Equal(request.General.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
-            Assert.Equal(request.General.Validity?.EnforcedValid, freshDTO.General.Validity?.EnforcedValid);
+            Assert.Equal(request.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
+            Assert.Equal(request.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
+            Assert.Equal(request.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);
