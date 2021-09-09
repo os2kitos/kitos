@@ -375,6 +375,10 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\PaymentAuditStatusMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\YearSegmentMappingExtension.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
@@ -686,6 +690,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />

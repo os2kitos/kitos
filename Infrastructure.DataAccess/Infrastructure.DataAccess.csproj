@@ -822,6 +822,10 @@
     <Compile Include="Migrations\202109061324234_ItContract_Cleanup.designer.cs">
       <DependentUpon>202109061324234_ItContract_Cleanup.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs" />
+    <Compile Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.designer.cs">
+      <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1351,6 +1355,9 @@
     <EmbeddedResource Include="Migrations\202109061324234_ItContract_Cleanup.resx">
       <DependentUpon>202109061324234_ItContract_Cleanup.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.resx">
+      <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1411,6 +1418,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Ensure_dpr_contract_project_uniquename.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Running_And_ByEnding.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

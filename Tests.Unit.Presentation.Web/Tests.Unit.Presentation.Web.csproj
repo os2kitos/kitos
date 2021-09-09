@@ -203,6 +203,8 @@
     <Compile Include="Authorization\RootEntityCrudAuthorizationTest.cs" />
     <Compile Include="Context\OwinAuthenticationContextFactoryTest.cs" />
     <Compile Include="Controllers\CronStringHelperTests.cs" />
+    <Compile Include="DomainServices\Contract\QueryBySupplierUuidTest.cs" />
+    <Compile Include="DomainServices\Contract\QueryByResponsibleOrganizationUnitUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryByDataProcessingRegistrationUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUsageUuidTest.cs" />
     <Compile Include="DomainServices\Contract\QueryBySystemUuidTest.cs" />
@@ -255,6 +257,7 @@
     <Compile Include="Infrastructure\SimpleLinkNameMaxLengthAttributeTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
+    <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />

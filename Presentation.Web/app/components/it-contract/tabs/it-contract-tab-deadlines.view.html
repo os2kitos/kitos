@@ -308,10 +308,11 @@
                                            data-label="Løbende"
                                            data-options="deadlineOptions"
                                            data-placeholder="Vælg varighed"
-                                           data-ng-model="contract.running"
+                                           data-ng-model="running"
                                            data-ng-disabled="!hasWriteAccess"
                                            data-auto-save-url="{{ autosaveUrl }}"
-                                           data-field="running">
+                                           data-field="running"
+                                           data-ng-changed="updateRunning()">
                             </select-simple>
                         </div>
 
@@ -320,10 +321,11 @@
                                            data-label="Inden udgangen af"
                                            data-options="deadlineOptions"
                                            data-placeholder="Vælg varighed"
-                                           data-ng-model="contract.byEnding"
+                                           data-ng-model="byEnding"
                                            data-ng-disabled="!hasWriteAccess"
                                            data-auto-save-url="{{ autosaveUrl }}"
-                                           data-field="byEnding">
+                                           data-field="byEnding"
+                                           data-ng-changed="updateByEnding()">
                             </select-simple>
                         </div>
                     </div>

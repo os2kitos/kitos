@@ -36,13 +36,19 @@
             $scope.durationMonths = $scope.contract.durationMonths;
             $scope.durationOngoing = $scope.contract.durationOngoing;
 
-            $scope.deadlineOptions = [
-                { id: "", text: Kitos.Constants.Select2.EmptyField },
-                { id: "calendarYear", text: "Kalenderår" },
-                { id: "quater", text: "Kvartal" },
-                { id: "month", text: "Måned" },
 
-            ]
+            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.running);
+            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.byEnding);
+
+            $scope.updateRunning = () => {
+                $scope.contract.running = $scope.running.id;
+            }
+
+            $scope.updateByEnding = () => {
+                $scope.contract.byEnding = $scope.byEnding.id;
+            }
+
+            $scope.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
 
             $scope.saveDurationYears = () => {
                 if ($scope.durationYears === "") {

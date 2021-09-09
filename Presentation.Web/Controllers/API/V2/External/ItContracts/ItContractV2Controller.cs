@@ -11,7 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
-using Presentation.Web.Controllers.API.V2.Mapping;
+using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -26,10 +27,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
     public class ItContractV2Controller : ExternalBaseController
     {
         private readonly IItContractService _itContractService;
+        private readonly IItContractResponseMapper _responseMapper;
 
-        public ItContractV2Controller(IItContractService itContractService)
+        public ItContractV2Controller(IItContractService itContractService, IItContractResponseMapper responseMapper)
         {
             _itContractService = itContractService;
+            _responseMapper = responseMapper;
         }
 
         /// <summary>
@@ -48,36 +51,48 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItContracts(
-            [NonEmptyGuid] Guid organizationUuid,
+            [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             [NonEmptyGuid] Guid? systemUsageUuid = null,
             [NonEmptyGuid] Guid? dataProcessingRegistrationUuid = null,
+            [NonEmptyGuid] Guid? responsibleOrgUnitUuid = null,
+            [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var refinements = new List<IDomainQuery<ItContract>>();
+            var conditions = new List<IDomainQuery<ItContract>>();
+
+            if(organizationUuid.HasValue)
+                conditions.Add(new QueryByOrganizationUuid<ItContract>(organizationUuid.Value));
 
             if (systemUuid.HasValue)
-                refinements.Add(new QueryBySystemUuid(systemUuid.Value));
+                conditions.Add(new QueryBySystemUuid(systemUuid.Value));
 
             if (systemUsageUuid.HasValue)
-                refinements.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
+                conditions.Add(new QueryBySystemUsageUuid(systemUsageUuid.Value));
 
             if (dataProcessingRegistrationUuid.HasValue)
-                refinements.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
+                conditions.Add(new QueryByDataProcessingRegistrationUuid(dataProcessingRegistrationUuid.Value));
+
+            if (responsibleOrgUnitUuid.HasValue)
+                conditions.Add(new QueryByResponsibleOrganizationUnitUuid(responsibleOrgUnitUuid.Value));
+
+            if (supplierUuid.HasValue)
+                conditions.Add(new QueryBySupplierUuid(supplierUuid.Value));
 
             if (!string.IsNullOrWhiteSpace(nameContent))
-                refinements.Add(new QueryByPartOfName<ItContract>(nameContent));
+                conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
             return _itContractService
-                .GetContractsInOrganization(organizationUuid, refinements.ToArray())
-                .Select(x => x.OrderBy(contract => contract.Id))
-                .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList().Select(ToItContractResponseDto).ToList())
-                .Match(Ok, FromOperationError);
+                .Query(conditions.ToArray())
+                .OrderBy(contract => contract.Id)
+                .Page(paginationQuery)
+                .ToList()
+                .Select(_responseMapper.MapContractDTO)
+                .Transform(Ok);
         }
 
         /// <summary>
@@ -99,7 +114,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             return _itContractService
                 .GetContract(uuid)
-                .Select(ToItContractResponseDto)
+                .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }
 
@@ -439,16 +454,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
                 return BadRequest(ModelState);
 
             throw new NotImplementedException();
-        }
-
-        private static ItContractResponseDTO ToItContractResponseDto(ItContract contract)
-        {
-            //TODO: To response mapper
-            return new()
-            {
-                Uuid = contract.Uuid,
-                Name = contract.Name,
-            };
         }
     }
 }

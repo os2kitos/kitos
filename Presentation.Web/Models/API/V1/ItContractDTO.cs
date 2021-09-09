@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -70,8 +71,8 @@ namespace Presentation.Web.Models.API.V1
         }
         public int? ObjectOwnerId { get; set; }
 
-        public string Running { get; set; }
-        public string ByEnding { get; set; }
+        public YearSegmentOption? Running { get; set; }
+        public YearSegmentOption? ByEnding { get; set; }
         public bool? Active { get; set; }
         public bool? IsActive { get; set; }
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }
