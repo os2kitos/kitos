@@ -574,5 +574,36 @@ namespace Core.DomainModel.ItContract
             }
             return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
         }
+
+        public void ResetProcurementStrategy()
+        {
+            ProcurementStrategy.Track();
+            ProcurementStrategy = null;
+        }
+
+        public void ResetPurchaseForm()
+        {
+            PurchaseForm.Track();
+            PurchaseForm = null;
+        }
+
+        public Maybe<OperationError> UpdateProcurementPlan(Maybe<byte> newHalfOfYear, Maybe<int> newYear)
+        {
+            if (newHalfOfYear.IsNone && newYear.IsNone)
+            {
+                ProcurementPlanHalf = null;
+                ProcurementPlanYear = null;
+                return Maybe<OperationError>.None;
+            }
+
+            if (newHalfOfYear.IsNone && newYear.HasValue || newHalfOfYear.HasValue && newYear.IsNone)
+            {
+                return new OperationError("Both parts of procurement plan needs to be set", OperationFailure.BadInput);
+            }
+
+            ProcurementPlanHalf = newHalfOfYear.Value;
+            ProcurementPlanYear = newYear.Value;
+            return Maybe<OperationError>.None;
+        }
     }
 }

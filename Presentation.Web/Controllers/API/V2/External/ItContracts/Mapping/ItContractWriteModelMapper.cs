@@ -1,5 +1,6 @@
 ﻿using System;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -44,8 +45,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             {
                 ProcurementStrategyUuid = request.ProcurementStrategyUuid.AsChangedValue(),
                 PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
-                HalfOfYear = request.ProcurementPlan?.HalfOfYear.FromNullable().AsChangedValue(),
-                Year = request.ProcurementPlan?.Year.FromNullable().AsChangedValue()
+                HalfOfYear = (request.ProcurementPlan?.HalfOfYear ?? Maybe<byte>.None).AsChangedValue(),
+                Year = (request.ProcurementPlan?.Year ?? Maybe<int>.None).AsChangedValue()
             };
         }
     }
