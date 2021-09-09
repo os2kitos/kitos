@@ -436,7 +436,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var parent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+
+            var parentRequestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+
+            var parent = await ItContractV2Helper.PostContractAsync(token, parentRequestDto);
 
             var requestDto = new CreateNewContractRequestDTO()
             {

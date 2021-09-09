@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Extensions;
+﻿using System;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Presentation.Web.Controllers.API.V2.External.Generic;
@@ -30,7 +31,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
-                ParentContractUuid = dto.ParentContractUuid.AsChangedValue()
+                ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None
             };
         }
     }
