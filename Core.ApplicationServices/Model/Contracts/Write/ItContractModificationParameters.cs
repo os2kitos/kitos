@@ -8,5 +8,7 @@ namespace Core.ApplicationServices.Model.Contracts.Write
     {
         public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
         public OptionalValueChange<Guid?> ParentContractUuid { get; set; } = OptionalValueChange<Guid?>.None;
+
+        public Maybe<ItContractProcurementModificationParameters> Procurement = Maybe<ItContractProcurementModificationParameters>.None;
     }
 }

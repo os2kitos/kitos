@@ -94,7 +94,31 @@ namespace Core.ApplicationServices.Contract.Write
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
             return contract.WithOptionalUpdate(parameters.Name, UpdateName)
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement));
+        }
+
+        private Result<ItContract, OperationError> UpdateProcurement(ItContract contract, ItContractProcurementModificationParameters procurementParameters)
+        {
+            return contract
+                .WithOptionalUpdate(procurementParameters.ProcurementStrategyUuid, UpdateProcurementStrategy)
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.PurchaseTypeUuid, UpdatePurchaseType))
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters, UpdateProcurementPlan))
+        }
+
+        private Maybe<OperationError> UpdateProcurementPlan(ItContract contract, ItContractProcurementModificationParameters arg2)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Maybe<OperationError> UpdateProcurementStrategy(ItContract contract, Guid? procurementStrategyUuid)
+        {
+            throw new NotImplementedException();
         }
 
         private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)

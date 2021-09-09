@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -28,10 +29,23 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private ItContractModificationParameters Map<T>(T dto) where T: ContractWriteRequestDTO, IHasNameExternal
         {
+            var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
-                ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None
+                ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
+                Procurement = procurement.FromNullable().Select(MapProcurement)
+            };
+        }
+
+        public ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO request)
+        {
+            return new()
+            {
+                ProcurementStrategyUuid = request.ProcurementStrategyUuid.AsChangedValue(),
+                PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
+                HalfOfYear = request.ProcurementPlan?.HalfOfYear.FromNullable().AsChangedValue(),
+                Year = request.ProcurementPlan?.Year.FromNullable().AsChangedValue()
             };
         }
     }
