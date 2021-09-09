@@ -570,5 +570,22 @@ namespace Core.DomainModel.ItContract
             ContractTemplate?.Track();
             ContractTemplate = null;
         }
+
+        public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
+        {
+            var validFromDate = newValidFrom?.Date;
+            var validToDate = newValidTo?.Date;
+
+            if (validFromDate.HasValue && validToDate.HasValue && validFromDate.Value.Date > validToDate.Value.Date)
+            {
+                return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
+            }
+
+            Concluded = validFromDate;
+
+            ExpirationDate = validToDate;
+
+            return Maybe<OperationError>.None;
+        }
     }
 }

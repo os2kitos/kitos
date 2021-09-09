@@ -108,7 +108,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTemplateUuid, UpdateContractTemplate))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.Notes, (c, newValue) => c.Note = newValue))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
-                .Bind(itContract => UpdateValidityPeriod(itContract, generalData))
+                .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements));
         }
 
@@ -117,10 +117,15 @@ namespace Core.ApplicationServices.Contract.Write
             throw new NotImplementedException();
         }
 
-        private Result<ItContract, OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
+        private Maybe<OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
         {
-            //TODO: As in itsystemusage
-            throw new NotImplementedException();
+            if (generalData.ValidFrom.IsUnchanged && generalData.ValidTo.IsUnchanged)
+                return Maybe<OperationError>.None;
+
+            var newValidFrom = generalData.ValidFrom.MapDateTimeOptionalChangeWithFallback(itContract.Concluded);
+            var newValidTo = generalData.ValidTo.MapDateTimeOptionalChangeWithFallback(itContract.ExpirationDate);
+
+            return itContract.UpdateContractValidityPeriod(newValidFrom, newValidTo);
         }
 
         private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
