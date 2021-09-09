@@ -41,19 +41,11 @@
             $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.byEnding);
 
             $scope.updateRunning = () => {
-                if ($scope.running === undefined || $scope.running === null) {
-                    $scope.contract.running = null;
-                } else {
-                    $scope.contract.running = $scope.running.id;
-                }
+                $scope.contract.running = $scope.running?.id;
             }
 
             $scope.updateByEnding = () => {
-                if ($scope.byEnding === undefined || $scope.byEnding === null) {
-                    $scope.contract.byEnding = null;
-                } else {
-                    $scope.contract.byEnding = $scope.byEnding.id;
-                }
+                $scope.contract.byEnding = $scope.byEnding?.id;
             }
 
             $scope.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
