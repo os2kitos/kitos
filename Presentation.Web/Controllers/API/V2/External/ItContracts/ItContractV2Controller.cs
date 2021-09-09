@@ -151,7 +151,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContract([NonEmptyGuid] Guid contractUuid, [FromBody] ContractWriteRequestDTO request)
+        public IHttpActionResult PutItContract([NonEmptyGuid] Guid contractUuid, [FromBody] UpdateContractRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

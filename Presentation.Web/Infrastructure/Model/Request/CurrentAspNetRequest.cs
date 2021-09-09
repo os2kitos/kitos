@@ -19,9 +19,11 @@ namespace Presentation.Web.Infrastructure.Model.Request
 
         public ISet<string> GetDefinedJsonRootProperties()
         {
+            var requestInputStream = HttpContext.Current.Request.InputStream;
             try
             {
-                using var jsonTextReader = new JsonTextReader(new StreamReader(HttpContext.Current.Request.InputStream));
+                requestInputStream.Position = 0;
+                using var jsonTextReader = new JsonTextReader(new StreamReader(requestInputStream));
                 var properties = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var root = JObject.ReadFrom(jsonTextReader);
                 foreach (var token in root.Children())
@@ -35,6 +37,10 @@ namespace Presentation.Web.Infrastructure.Model.Request
             {
                 _logger.ForContext<CurrentAspNetRequest>().Error(e, "Failed while inpecting root properties");
                 return new HashSet<string>();
+            }
+            finally
+            {
+                requestInputStream.Position = 0;
             }
         }
     }

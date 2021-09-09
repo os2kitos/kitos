@@ -421,6 +421,8 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />

@@ -28,7 +28,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Name_From_Post(string name)
         {
             //Arrange
-            var requestDto = new ContractWriteRequestDTO() { Name = name };
+            var requestDto = new CreateNewContractRequestDTO { Name = name };
 
             //Act
             var modificationParameters = _sut.FromPOST(requestDto);
@@ -44,7 +44,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Name_From_Put(string name)
         {
             //Arrange
-            var requestDto = new ContractWriteRequestDTO() { Name = name };
+            var requestDto = new UpdateContractRequestDTO { Name = name };
 
             //Act
             var modificationParameters = _sut.FromPUT(requestDto);
@@ -61,9 +61,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Arrange
 
             var rootProperties = GetRootProperties();
-            if (noName) rootProperties.Remove(nameof(ContractWriteRequestDTO.Name));
+            if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
-            var emptyInput = new ContractWriteRequestDTO();
+            var emptyInput = new UpdateContractRequestDTO();
 
             //Act
             var output = _sut.FromPUT(emptyInput);
@@ -74,7 +74,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static HashSet<string> GetRootProperties()
         {
-            return typeof(ContractWriteRequestDTO).GetProperties().Select(x => x.Name).ToHashSet();
+            return typeof(CreateNewContractRequestDTO).GetProperties().Select(x => x.Name).ToHashSet();
         }
     }
 }

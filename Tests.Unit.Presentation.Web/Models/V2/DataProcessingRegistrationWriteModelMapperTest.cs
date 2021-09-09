@@ -86,7 +86,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPOST_Maps_All_Sections()
         {
             //Arrange
-            var input = A<DataProcessingRegistrationWriteRequestDTO>();
+            var input = A<CreateDataProcessingRegistrationRequestDTO>();
 
             //Act
             var output = _sut.FromPOST(input);
@@ -100,7 +100,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void FromPUT_Maps_All_Sections()
         {
             //Arrange
-            var input = A<DataProcessingRegistrationWriteRequestDTO>();
+            var input = A<UpdateDataProcessingRegistrationRequestDTO>();
 
             //Act
             var output = _sut.FromPUT(input);
@@ -128,9 +128,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noReferences)
         {
             //Arrange
-            var input = new DataProcessingRegistrationWriteRequestDTO();
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
             var properties = GetAllRootProperties();
-            if (noName) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Name));
+            if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
             if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
@@ -168,9 +168,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noReferences)
         {
             //Arrange
-            var input = new DataProcessingRegistrationWriteRequestDTO();
+            var input = new CreateDataProcessingRegistrationRequestDTO();
             var properties = GetAllRootProperties();
-            if (noName) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Name));
+            if (noName) properties.Remove(nameof(CreateDataProcessingRegistrationRequestDTO.Name));
             if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
@@ -319,7 +319,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static HashSet<string> GetAllRootProperties()
         {
-            return typeof(DataProcessingRegistrationWriteRequestDTO).GetProperties().Select(x => x.Name)
+            return typeof(UpdateDataProcessingRegistrationRequestDTO).GetProperties().Select(x => x.Name)
                 .ToHashSet();
         }
     }
