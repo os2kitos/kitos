@@ -272,6 +272,8 @@ namespace Presentation.Web.Ninject
 
             //Contracts
             kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItContractResponseMapper>().To<ItContractResponseMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)

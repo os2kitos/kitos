@@ -1,8 +1,8 @@
 ﻿using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -19,224 +19,311 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
     public class ItContractsApiV2Test : WithAutoFixture
     {
         [Fact]
-        public async Task GET_Contract_Returns_Ok()
+        public async Task Can_GET_Specific_Contract()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-
-            var (newContract, expectedAgreementElement) = await CreateContractWithAllDataSet(TestEnvironment.DefaultOrganizationId);
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newContract = await CreateContractAsync(organization.Id);
 
             //Act
-            var dto = await ItContractV2Helper.GetItContractAsync(regularUserToken.Token, newContract.Uuid);
+            var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
 
             //Assert
-            AssertContractResponseDTO(newContract, dto);
+            AssertExpectedShallowContract(newContract, organization, dto);
         }
 
         [Fact]
-        public async Task GET_Contract_Returns_Forbidden()
+        public async Task Cannot_Get_Contract_If_Unknown()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var newOrg = await CreateOrganizationAsync();
-            var newContract = await ItContractHelper.CreateContract(A<string>(), newOrg.Id);
+            var (token, user, organization) = await CreatePrerequisitesAsync();
 
             //Act
-            using var response = await ItContractV2Helper.SendGetItContractAsync(regularUserToken.Token, newContract.Uuid);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contract_Returns_NotFound()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractAsync(regularUserToken.Token, A<Guid>());
+            using var response = await ItContractV2Helper.SendGetItContractAsync(token, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
-        public async Task GET_Contract_Returns_BadRequest_For_Empty_Uuid()
+        public async Task Cannot_Get_Contract_If_NotAllowedTo()
         {
             //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync();
+            var newContract = await CreateContractAsync(organization2.Id);
 
             //Act
-            using var response = await ItContractV2Helper.SendGetItContractAsync(regularUserToken.Token, Guid.Empty);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Ok()
-        {
-            //Arrange
-            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
-            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
-            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
-
-            //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, page: 0, pageSize: 100);
-
-            //Assert
-            Assert.Equal(2, contracts.Count());
-
-            var contract1 = contracts.First(x => x.Uuid == newContract1.Uuid);
-            AssertContractResponseDTO(newContract1, contract1);
-
-            var contract2 = contracts.First(x => x.Uuid == newContract2.Uuid);
-            AssertContractResponseDTO(newContract2, contract2);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Ok_With_Name_Content_Filtering()
-        {
-            //Arrange
-            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
-            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
-            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
-
-            //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, nameContent: newContract1.Name, page: 0, pageSize: 100);
-
-            //Assert
-            var contract = Assert.Single(contracts);
-            AssertContractResponseDTO(newContract1, contract);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Ok_With_System_Filtering()
-        {
-            //Arrange
-            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
-            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
-            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
-            await ItContractHelper.AddItSystemUsage(newContract1.Id, systemUsage.Id, organization.Id);
-
-            //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, systemUuid: system.Uuid, page: 0, pageSize: 100);
-            //Assert
-            var contract = Assert.Single(contracts);
-            AssertContractResponseDTO(newContract1, contract);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Ok_With_SystemUsage_Filtering()
-        {
-            //Arrange
-            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
-            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
-            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
-
-            var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organization.Id);
-            await ItContractHelper.AddItSystemUsage(newContract1.Id, systemUsage.Id, organization.Id);
-
-            //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, systemUsageUuid: systemUsage.Uuid, nameContent: null, page: 0, pageSize: 100);
-
-            //Assert
-            var contract = Assert.Single(contracts);
-            AssertContractResponseDTO(newContract1, contract);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Ok_With_DataProcessingRegistration_Filtering()
-        {
-            //Arrange
-            var (regularUserToken, organization) = await CreateUserInNewOrganizationAsync();
-            var (newContract1, _) = await CreateContractWithAllDataSet(organization.Id);
-            var (newContract2, _) = await CreateContractWithAllDataSet(organization.Id);
-
-            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, CreateName());
-            await ItContractHelper.SendAssignDataProcessingRegistrationAsync(newContract1.Id, dpr.Id);
-
-            //Act
-            var contracts = await ItContractV2Helper.GetItContractsAsync(regularUserToken, organization.Uuid, dataProcessingRegistrationUuid: dpr.Uuid, nameContent: null, page: 0, pageSize: 100);
-
-            //Assert
-            var contract = Assert.Single(contracts);
-            AssertContractResponseDTO(newContract1, contract);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_BadRequest_For_Empty_Organization_Uuid()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organizationUuid: Guid.Empty, page: 0, pageSize: 100);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_BadRequest_For_Empty_System_Uuid()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUuid: Guid.Empty, page: 0, pageSize: 100);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_BadRequest_For_Empty_SystemUsage_Uuid()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, systemUsageUuid: Guid.Empty, page: 0, pageSize: 100);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_BadRequest_For_Empty_DataProcessingRegistration_Uuid()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, defaultOrgUuid, dataProcessingRegistrationUuid: Guid.Empty, page: 0, pageSize: 100);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-        }
-
-        [Fact]
-        public async Task GET_Contracts_Returns_Forbidden_For_Organization_Where_User_Has_No_Roles()
-        {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organization.Uuid, page: 0, pageSize: 100);
+            using var response = await ItContractV2Helper.SendGetItContractAsync(token, newContract.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_Get_Contract_If_Empty_Uuid_In_Request()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractAsync(token, Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token)).ToList();
+
+            //Assert
+            Assert.Equal(2, contracts.Count());
+            AssertExpectedShallowContracts(contract1, organization, contracts);
+            AssertExpectedShallowContracts(contract2, organization, contracts);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_Paging()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            var contract3 = await CreateContractAsync(organization.Id);
+
+            //Act
+            var page1Contracts = (await ItContractV2Helper.GetItContractsAsync(token, page: 0, pageSize: 2)).ToList();
+            var page2Contracts = (await ItContractV2Helper.GetItContractsAsync(token, page: 1, pageSize: 2)).ToList();
+
+            //Assert
+            Assert.Equal(2, page1Contracts.Count());
+            AssertExpectedShallowContracts(contract1, organization, page1Contracts);
+            AssertExpectedShallowContracts(contract2, organization, page1Contracts);
+
+            var page2Contract = Assert.Single(page2Contracts);
+            AssertExpectedShallowContract(contract3, organization, page2Contract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_User_OrganizationFiltering_Implicit()
+        {
+            //Arrange
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization1.Id);
+            var organization2 = await CreateOrganizationAsync();
+            var contract2 = await CreateContractAsync(organization2.Id);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization1, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_OrganizationFiltering_Explicit()
+        {
+            //Arrange
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization1.Id);
+            var organization2 = await CreateOrganizationAsync();
+            var contract2 = await CreateContractAsync(organization2.Id);
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, organizationUuid: organization1.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization1, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_SystemFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
+            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract1.Id, newSystemUsage.Id, organization.Id);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, systemUuid: newSystem.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_SystemUsageFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var newSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Local);
+            var newSystemUsage = await ItSystemHelper.TakeIntoUseAsync(newSystem.Id, organization.Id);
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            await ItContractHelper.AddItSystemUsage(contract1.Id, newSystemUsage.Id, organization.Id);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, systemUsageUuid: newSystemUsage.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_DPRFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, CreateName());
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            using var dprAssignmentResponse = await ItContractHelper.SendAssignDataProcessingRegistrationAsync(contract1.Id, dpr.Id);
+            Assert.Equal(HttpStatusCode.OK, dprAssignmentResponse.StatusCode);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, dataProcessingRegistrationUuid: dpr.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_ResponsibleOrgUnitFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var orgUnit = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organization.Id, CreateName());
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            using var responsibleOrgUnitAssignmentResponse = await ItContractHelper.SendAssignResponsibleOrgUnitAsync(contract1.Id, orgUnit.Id, organization.Id);
+            Assert.Equal(HttpStatusCode.OK, responsibleOrgUnitAssignmentResponse.StatusCode);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, responsibleOrgUnitUuid: orgUnit.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_SupplierFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var supplier = await CreateOrganizationAsync();
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            using var supplierAssignmentResponse = await ItContractHelper.SendAssignSupplierAsync(contract1.Id, supplier.Id, organization.Id);
+            Assert.Equal(HttpStatusCode.OK, supplierAssignmentResponse.StatusCode);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, supplierUuid: supplier.Uuid)).ToList();
+
+            //Assert
+            var retrievedContract = Assert.Single(contracts);
+            AssertExpectedShallowContract(contract1, organization, retrievedContract);
+        }
+
+        [Fact]
+        public async Task Can_GET_All_Contracts_With_NameContentFiltering()
+        {
+            //Arrange
+            var content = $"CONTENT_{A<Guid>()}";
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization.Id, $"{content}ONE");
+            var contract2 = await CreateContractAsync(organization.Id, $"TWO{content}");
+            var contract3 = await CreateContractAsync(organization.Id);
+
+            //Act
+            var contracts = (await ItContractV2Helper.GetItContractsAsync(token, nameContent: content)).ToList();
+
+            //Assert
+            Assert.Equal(2, contracts.Count);
+            AssertExpectedShallowContracts(contract1, organization, contracts);
+            AssertExpectedShallowContracts(contract2, organization, contracts);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_Organization_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, organizationUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_System_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, systemUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_SystemUsage_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, systemUsageUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_DPR_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, dataProcessingRegistrationUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_ResponsibleOrgUnit_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, responsibleOrgUnitUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]
@@ -280,36 +367,17 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.Conflict, duplicateResponse.StatusCode);
         }
 
-        private static void AssertContractResponseDTO(ItContractDTO expected, ItContractResponseDTO actual)
+        [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_Supplier_Uuid()
         {
-            Assert.Equal(expected.Uuid, actual.Uuid);
-            Assert.Equal(expected.Name, actual.Name);
-        }
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
-        private async Task<(ItContractDTO, AgreementElementType)> CreateContractWithAllDataSet(int orgId)
-        {
-            var newContract = await ItContractHelper.CreateContract(CreateName(), orgId);
-            var contractType = DatabaseAccess.MapFromEntitySet<ItContractType, ItContractType>(x => x.AsQueryable().First());
-            var supplier = DatabaseAccess.MapFromEntitySet<Organization, Organization>(x => x.AsQueryable().First());
-            var agreementElement = DatabaseAccess.MapFromEntitySet<AgreementElementType, AgreementElementType>(x => x.AsQueryable().First());
-            var patchObject = new
-            {
-                concluded = DateTime.Now,
-                expirationDate = DateTime.Now.AddDays(1),
-                terminated = DateTime.Now.AddDays(2),
-                supplierId = supplier.Id,
-                contractTypeId = contractType.Id
-            };
-            await ItContractHelper.SendAssignAgreementElementAsync(newContract.Id, orgId, agreementElement.Id).DisposeAsync();
-            var updatedContract = await ItContractHelper.PatchContract(newContract.Id, orgId, patchObject);
-            return (updatedContract, agreementElement);
-        }
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, supplierUuid: Guid.Empty);
 
-        private async Task<(string token, Organization createdOrganization)> CreateUserInNewOrganizationAsync()
-        {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true);
-            return (token, org);
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private async Task<Organization> CreateOrganizationAsync()
@@ -329,15 +397,44 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return $"{nameof(ItContractsApiV2Test)}{A<string>()}@test.dk";
         }
 
+        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        {
+            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
+            return (user, userAndGetToken.token);
+        }
+
+        private static void AssertExpectedShallowContracts(ItContractDTO expectedContent, Organization expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
+        {
+            var dto = Assert.Single(dtos, contract => contract.Uuid == expectedContent.Uuid);
+            AssertExpectedShallowContract(expectedContent, expectedOrganization, dto);
+        }
+
+        private static void AssertExpectedShallowContract(ItContractDTO expectedContent, Organization expectedOrganization, ItContractResponseDTO dto)
+        {
+            Assert.Equal(expectedContent.Uuid, dto.Uuid);
+            Assert.Equal(expectedContent.Name, dto.Name);
+            Assert.Equal(expectedOrganization.Uuid, dto.OrganizationContext.Uuid);
+            Assert.Equal(expectedOrganization.Name, dto.OrganizationContext.Name);
+            Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
+        }
+
+        private async Task<ItContractDTO> CreateContractAsync(int orgId, string name = null)
+        {
+            if(name == null)
+                return await ItContractHelper.CreateContract(CreateName(), orgId);
+
+            return await ItContractHelper.CreateContract(name, orgId);
+        }
+
         private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync();
-            var (user, token) = await CreateApiUser(organization);
+            var (user, token) = await CreateApiUserAsync(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             return (token, user, organization);
         }
-
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUserAsync(Organization organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));

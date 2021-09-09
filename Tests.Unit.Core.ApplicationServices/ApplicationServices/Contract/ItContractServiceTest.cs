@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -16,6 +15,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
+using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
 
@@ -38,6 +38,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public ItContractServiceTest()
         {
@@ -50,6 +51,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItContractService(
                 _contractRepository.Object,
                 _economyStreamRepository.Object,
@@ -59,7 +61,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _authorizationContext.Object,
                 _logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
-                _organizationServiceMock.Object);
+                _organizationServiceMock.Object,
+                _userContextMock.Object);
         }
 
         [Fact]
@@ -287,51 +290,72 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
-        public void GetContractsInOrganization_Returns_Projects()
+        public void Query_Returns_All_Contracts()
         {
             //Arrange
-            var orgUuid = A<Guid>();
-            var orgId = A<int>();
-            var org = new Organization()
-            {
-                Id = orgId,
-                Uuid = orgUuid
-            };
-            var contractUuid = A<Guid>();
-            var contract = new ItContract()
-            {
-                Uuid = contractUuid,
-                OrganizationId = orgId
-            };
-
-            _organizationServiceMock.Setup(x => x.GetOrganization(orgUuid, OrganizationDataReadAccessLevel.All)).Returns(org);
-            _contractRepository.Setup(x => x.GetContractsInOrganization(orgId)).Returns(new List<ItContract>() { contract }.AsQueryable());
+            var numberOfContracts = Math.Abs(A<int>());
+            var registrations = CreateListOfContracts(numberOfContracts);
+            _contractRepository.Setup(x => x.AsQueryable()).Returns(registrations.AsQueryable());
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.GetContractsInOrganization(orgUuid);
+            var contracts = _sut.Query();
 
             //Assert
-            Assert.True(result.Ok);
-            var contractResult = Assert.Single(result.Value.ToList());
-            Assert.Equal(contractUuid, contractResult.Uuid);
+            Assert.Equal(numberOfContracts, contracts.Count());
         }
 
         [Fact]
-        public void GetContractsInOrganization_Returns_Error_From_OrganizationService()
+        public void Query_Returns_All_Contracts_From_Organizations_Where_User_Has_Access()
         {
             //Arrange
-            var orgUuid = A<Guid>();
+            var org1 = A<int>();
+            var org2 = A<int>();
+            var contract1 = new ItContract() { Id = A<int>(), OrganizationId = org1 };
+            var contract2 = new ItContract() { Id = A<int>(), OrganizationId = org2 };
 
-            var operationError = new OperationError(A<OperationFailure>());
+            var registrations = new List<ItContract>() { contract1, contract2, new ItContract { Id = A<int>() } };
 
-            _organizationServiceMock.Setup(x => x.GetOrganization(orgUuid, OrganizationDataReadAccessLevel.All)).Returns(operationError);
+            _contractRepository.Setup(x => x.AsQueryable()).Returns(registrations.AsQueryable());
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.None);
+            _userContextMock.Setup(x => x.OrganizationIds).Returns(new List<int>() { org1, org2 });
 
             //Act
-            var result = _sut.GetContractsInOrganization(orgUuid);
+            var contracts = _sut.Query();
 
             //Assert
-            Assert.True(result.Failed);
-            Assert.Same(operationError, result.Error);
+            Assert.Equal(2, contracts.Count());
+            var result1 = Assert.Single(contracts.Where(x => x.OrganizationId == org1));
+            Assert.Same(contract1, result1);
+
+            var result2 = Assert.Single(contracts.Where(x => x.OrganizationId == org2));
+            Assert.Same(contract2, result2);
+        }
+
+        [Fact]
+        public void Query_Returns_Contracts_Which_Satisfies_Conditions()
+        {
+            //Arrange
+            var org1 = new Organization() { Id = A<int>(), Uuid = A<Guid>() };
+            var org2 = new Organization() { Id = A<int>(), Uuid = A<Guid>() };
+
+            var contract1 = new ItContract() { Id = A<int>(), Organization = org1 };
+            var contract2 = new ItContract() { Id = A<int>(), Organization = org2 };
+
+            var registrations = new List<ItContract>() { contract1, contract2, new ItContract { Id = A<int>() } }.AsQueryable();
+            var queryMock = new Mock<IDomainQuery<ItContract>>();
+            queryMock.Setup(x => x.Apply(registrations)).Returns(new List<ItContract>() { contract1 }.AsQueryable());
+            var conditions = new List<IDomainQuery<ItContract>>() { queryMock.Object };
+
+            _contractRepository.Setup(x => x.AsQueryable()).Returns(registrations);
+            ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var contracts = _sut.Query(conditions.ToArray());
+
+            //Assert
+            var result = Assert.Single(contracts);
+            Assert.Same(contract1, result);
         }
 
         [Theory]
@@ -470,6 +494,21 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.HasValue);
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+        }
+
+        private void ExpectCrossOrganizationReadAccess(CrossOrganizationDataReadAccessLevel crossOrganizationReadAccessLevel)
+        {
+            _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(crossOrganizationReadAccessLevel);
+        }
+
+        private List<ItContract> CreateListOfContracts(int numberOfItems)
+        {
+            var contracts = new List<ItContract>();
+            for (int i = 0; i < numberOfItems; i++)
+            {
+                contracts.Add(new ItContract() { Id = A<int>() });
+            }
+            return contracts;
         }
 
         private EconomyStream CreateEconomyStream()
