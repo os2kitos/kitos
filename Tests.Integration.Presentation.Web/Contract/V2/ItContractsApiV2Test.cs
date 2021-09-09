@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.SharedProperties;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
@@ -327,6 +329,19 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Cannot_GET_Contracts_With_Empty_Supplier_Uuid()
+        {
+            //Arrange
+            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
+
+            //Act
+            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, supplierUuid: Guid.Empty);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
         public async Task POST_With_Name_Alone()
         {
             //Arrange
@@ -372,7 +387,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var parent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
             var requestDto = new CreateNewContractRequestDTO()
             {
@@ -385,12 +400,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
 
             //Assert
-            Assert.Equal(parent.Name, contractDTO.ParentContract.Name);
-            Assert.Equal(parent.Uuid, contractDTO.ParentContract.Uuid);
+            AssertCrossReference(parent, contractDTO.ParentContract);
         }
 
         [Fact]
-        public async Task Cannot_POST_With_Parent_From_Other_Organization()
+        public async Task Cannot_POST_With_Parent_If_Not_Allowed_To_Read_Parent()
         {
             //Arrange
             var (token, user, organization1) = await CreatePrerequisitesAsync();
@@ -409,6 +423,29 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Parent_If_Parent_In_Different_Organization()
+        {
+            //Arrange
+            var (token, user, organization1) = await CreatePrerequisitesAsync();
+            var organization2 = await CreateOrganizationAsync();
+            await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization2.Id).DisposeAsync();
+            var parent = await ItContractHelper.CreateContract(CreateName(), organization2.Id);
+
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                ParentContractUuid = parent.Uuid
+            };
+
+            //Act
+            using var createResponse = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, createResponse.StatusCode);
         }
 
         [Fact]
@@ -436,22 +473,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
+            
+            var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
-            var parentRequestDto = new CreateNewContractRequestDTO()
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName()
-            };
-
-            var parent = await ItContractV2Helper.PostContractAsync(token, parentRequestDto);
-
-            var requestDto = new CreateNewContractRequestDTO()
-            {
-                OrganizationUuid = organization.Uuid,
-                Name = CreateName()
-            };
-
-            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
 
             var updateRequest1 = new UpdateContractRequestDTO()
             {
@@ -465,11 +490,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert - Update from empty
             Assert.Equal(HttpStatusCode.OK, updatedResponse1.StatusCode);
             var updatedContractDTO1 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
-            Assert.Equal(parent.Name, updatedContractDTO1.ParentContract.Name);
-            Assert.Equal(parent.Uuid, updatedContractDTO1.ParentContract.Uuid);
+            AssertCrossReference(parent, updatedContractDTO1.ParentContract);
 
             //Act - Update from filled
-            var newParent = await ItContractHelper.CreateContract(CreateName(), organization.Id);
+            var newParent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
             var updateRequest2 = new UpdateContractRequestDTO()
             {
                 Name = CreateName(),
@@ -480,8 +504,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert - Update from filled
             Assert.Equal(HttpStatusCode.OK, updatedResponse2.StatusCode);
             var updatedContractDTO2 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
-            Assert.Equal(newParent.Name, updatedContractDTO2.ParentContract.Name);
-            Assert.Equal(newParent.Uuid, updatedContractDTO2.ParentContract.Uuid);
+            AssertCrossReference(newParent, updatedContractDTO2.ParentContract);
 
             //Act - Update to empty
             var updateRequest3 = new UpdateContractRequestDTO()
@@ -496,18 +519,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var updatedContractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
             Assert.Null(updatedContractDTO3.ParentContract);
         }
-        
-        [Fact]
-        public async Task Cannot_GET_Contracts_With_Empty_Supplier_Uuid()
+
+        private CreateNewContractRequestDTO CreateNewSimpleRequest(Guid organizationUuid)
         {
-            //Arrange
-            var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
-
-            //Act
-            using var response = await ItContractV2Helper.SendGetItContractsAsync(regularUserToken.Token, supplierUuid: Guid.Empty);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            return new CreateNewContractRequestDTO()
+            {
+                Name = CreateName(),
+                OrganizationUuid = organizationUuid
+            };
         }
 
         private async Task<Organization> CreateOrganizationAsync()
@@ -527,11 +546,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return $"{nameof(ItContractsApiV2Test)}{A<string>()}@test.dk";
         }
 
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private static void AssertCrossReference<T>(T expected, IdentityNamePairResponseDTO actual) where T : IHasNameExternal, IHasUuidExternal
         {
-            var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
-            return (user, userAndGetToken.token);
+            Assert.Equal(expected?.Uuid, actual?.Uuid);
+            Assert.Equal(expected?.Name, actual?.Name);
         }
 
         private static void AssertExpectedShallowContracts(ItContractDTO expectedContent, Organization expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
