@@ -4,8 +4,9 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
-
+using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -16,10 +17,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class ItSystemUsageWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly ItSystemUsageWriteModelMapper _sut;
+        private readonly Mock<ICurrentHttpRequest> _currentHttpRequestMock;
 
         public ItSystemUsageWriteModelMapperTest()
         {
-            _sut = new ItSystemUsageWriteModelMapper();
+            _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties())
+                .Returns(GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>());
+            _sut = new ItSystemUsageWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
         [Fact]
@@ -533,12 +538,56 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.MapRelation(input);
 
             //Assert
-            Assert.Equal(input.ToSystemUsageUuid,output.ToSystemUsageUuid);
-            Assert.Equal(input.AssociatedContractUuid,output.AssociatedContractUuid);
-            Assert.Equal(input.RelationFrequencyUuid,output.RelationFrequencyUuid);
-            Assert.Equal(input.RelationInterfaceUuid,output.UsingInterfaceUuid);
-            Assert.Equal(input.Description,output.Description);
-            Assert.Equal(input.UrlReference,output.UrlReference);
+            Assert.Equal(input.ToSystemUsageUuid, output.ToSystemUsageUuid);
+            Assert.Equal(input.AssociatedContractUuid, output.AssociatedContractUuid);
+            Assert.Equal(input.RelationFrequencyUuid, output.RelationFrequencyUuid);
+            Assert.Equal(input.RelationInterfaceUuid, output.UsingInterfaceUuid);
+            Assert.Equal(input.Description, output.Description);
+            Assert.Equal(input.UrlReference, output.UrlReference);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public void FromPut_Ignores_Root_Level_Sections_Not_Present_In_The_Request(
+            bool noGeneralSection,
+            bool noRoles,
+            bool noKle,
+            bool noOrgUsage,
+            bool noReferences,
+            bool noArchiving,
+            bool noGdpr)
+        {
+            //Arrange
+            var emptyInput = new UpdateItSystemUsageRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>();
+            if (noGeneralSection) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.General));
+            if (noRoles) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Roles));
+            if (noKle) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations));
+            if (noOrgUsage) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage));
+            if (noReferences) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences));
+            if (noArchiving) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Archiving));
+            if (noGdpr) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.GDPR));
+
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+
+            //Act
+            var output = _sut.FromPUT(emptyInput);
+
+            //Assert that all sections are mapped as changed - including undefined sections
+            Assert.Equal(output.GeneralProperties.IsNone, noGeneralSection);
+            Assert.Equal(output.Roles.IsNone, noRoles);
+            Assert.Equal(output.KLE.IsNone, noKle);
+            Assert.Equal(output.OrganizationalUsage.IsNone, noOrgUsage);
+            Assert.Equal(output.ExternalReferences.IsNone, noReferences);
+            Assert.Equal(output.Archiving.IsNone, noArchiving);
+            Assert.Equal(output.GDPR.IsNone, noGdpr);
         }
 
         private static void AssertLinkMapping(SimpleLinkDTO sourceData, OptionalValueChange<Maybe<NamedLink>> actual)
@@ -570,6 +619,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(actual.NewValue.HasValue);
             var mappedUuids = actual.NewValue.Value;
             Assert.Equal(expected, mappedUuids);
+        }
+
+        private static HashSet<string> GetAllInputPropertyNames<T>()
+        {
+            return typeof(T).GetProperties().Select(x => x.Name).ToHashSet();
         }
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
@@ -55,7 +56,7 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// <summary>
         /// Role assignments
         /// </summary>
-        public IEnumerable<RoleAssignmentRequestDTO> Roles { get; set; }
+        public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
         public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
     }
 }

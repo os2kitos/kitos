@@ -152,7 +152,8 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         /// <summary>
         /// Perform a full update of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged. 
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
         /// <param name="request"></param>
@@ -165,7 +166,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationWriteRequestDTO request)
+        public IHttpActionResult PutDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] UpdateDataProcessingRegistrationRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

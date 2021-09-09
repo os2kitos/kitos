@@ -372,7 +372,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
             //Act
-            var changedDTO = await DataProcessingRegistrationV2Helper.PutAsync(token, dto.Uuid, new DataProcessingRegistrationWriteRequestDTO() { Name = name2 });
+            var changedDTO = await DataProcessingRegistrationV2Helper.PutAsync(token, dto.Uuid, new UpdateDataProcessingRegistrationRequestDTO() { Name = name2 });
 
             //Assert
             Assert.Equal(name2, changedDTO.Name);
@@ -391,7 +391,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest2);
 
             //Act - try to change name of dpr2 to that of dpr1
-            using var response = await DataProcessingRegistrationV2Helper.SendPutAsync(token, dpr2.Uuid, new DataProcessingRegistrationWriteRequestDTO() { Name = name1 });
+            using var response = await DataProcessingRegistrationV2Helper.SendPutAsync(token, dpr2.Uuid, new UpdateDataProcessingRegistrationRequestDTO() { Name = name1 });
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -1023,7 +1023,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var referencesRequest1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var modifyRequest1 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest1 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest1,
@@ -1065,7 +1065,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var referencesRequest2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var modifyRequest2 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest2 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest2,
@@ -1092,7 +1092,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             
             var referencesRequest3 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
 
-            var modifyRequest3 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest3 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest3,

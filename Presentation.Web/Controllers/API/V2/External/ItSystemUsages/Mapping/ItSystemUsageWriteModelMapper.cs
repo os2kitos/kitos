@@ -8,7 +8,8 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel.ItSystem.DataTypes;
-
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -16,11 +17,17 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
-    public class ItSystemUsageWriteModelMapper : IItSystemUsageWriteModelMapper
+    public class ItSystemUsageWriteModelMapper : WriteModelMapperBase, IItSystemUsageWriteModelMapper
     {
+        public ItSystemUsageWriteModelMapper(ICurrentHttpRequest currentHttpRequest) 
+            : base(currentHttpRequest)
+        {
+        }
+
         public SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request)
         {
-            return new SystemUsageUpdateParameters
+
+            var parameters = new SystemUsageUpdateParameters
             {
                 GeneralProperties = request.General.FromNullable().Select(MapGeneralData),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
@@ -30,17 +37,20 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 GDPR = request.GDPR.FromNullable().Select(MapGDPR),
                 Archiving = request.Archiving.FromNullable().Select(MapArchiving)
             };
+
+            return parameters;
         }
 
         public SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request)
         {
-            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
-            var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
-            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
-            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
-            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
+            var generalDataInput = WithResetDataIfPropertyIsDefined(request.General, nameof(UpdateItSystemUsageRequestDTO.General));
+            var orgUsageInput = WithResetDataIfPropertyIsDefined(request.OrganizationUsage, nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage));
+            var kleInput = WithResetDataIfPropertyIsDefined(request.LocalKleDeviations, nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations));
+            var roles = WithResetDataIfPropertyIsDefined(request.Roles, nameof(UpdateItSystemUsageRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
+            var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(request.ExternalReferences, nameof(UpdateItSystemUsageRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>());
+            var gdpr = WithResetDataIfPropertyIsDefined(request.GDPR, nameof(UpdateItSystemUsageRequestDTO.GDPR));
+            var archiving = WithResetDataIfPropertyIsDefined(request.Archiving, nameof(UpdateItSystemUsageRequestDTO.Archiving));
+
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralDataUpdate),
