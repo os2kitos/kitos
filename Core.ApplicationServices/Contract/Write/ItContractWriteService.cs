@@ -102,7 +102,7 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return contract
                 .WithOptionalUpdate(parameters.Name, UpdateName)
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(contract => contract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
         }
 
@@ -211,6 +211,7 @@ namespace Core.ApplicationServices.Contract.Write
 
                 updateValue(contract, option.option);
             }
+            return Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
@@ -226,11 +227,13 @@ namespace Core.ApplicationServices.Contract.Write
             if (getResult.Failed)
                 return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
 
-            var assignResult = contract.SetParent(getResult.Value);
-            if(assignResult.Failed)
-                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
-
-            return Maybe<OperationError>.None;
+            return contract
+                .SetParent(getResult.Value)
+                .Match
+                (
+                    error => new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {error.Message.GetValueOrEmptyString()}",
+                        error.FailureType), () => Maybe<OperationError>.None
+                );
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)

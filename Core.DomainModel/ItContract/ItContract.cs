@@ -610,12 +610,12 @@ namespace Core.DomainModel.ItContract
             Parent = null;
         }
 
-        public Result<ItContract, OperationError> SetParent(ItContract newParent)
+        public Maybe<OperationError> SetParent(ItContract newParent)
         {
             if (OrganizationId == newParent.OrganizationId)
             {
                 Parent = newParent;
-                return newParent;
+                return Maybe<OperationError>.None;
             }
             return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
         }
