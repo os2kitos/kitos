@@ -54,14 +54,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName)
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData)
         {
             //Arrange
-
             var rootProperties = GetRootProperties();
+
             if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
+            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
+
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -70,6 +74,27 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(noName, output.Name.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+        }
+
+        [Fact]
+        public void Can_Map_General()
+        {
+            //Arrange
+            var input = A<ContractGeneralDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            Assert.Equal(input.ContractId,AssertPropertyContainsDataChange(output.ContractId));
+            Assert.Equal(input.ContractTypeUuid,AssertPropertyContainsDataChange(output.ContractTypeUuid));
+            Assert.Equal(input.ContractTemplateUuid,AssertPropertyContainsDataChange(output.ContractTemplateUuid));
+            Assert.Equal(input.AgreementElementUuids,AssertPropertyContainsDataChange(output.AgreementElementUuids));
+            Assert.Equal(input.Notes,AssertPropertyContainsDataChange(output.Notes));
+            Assert.Equal(input.Validity.ValidFrom,AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Validity.ValidTo,AssertPropertyContainsDataChange(output.ValidTo));
+            Assert.Equal(input.Validity.EnforcedValid,AssertPropertyContainsDataChange(output.EnforceValid));
         }
 
         private static HashSet<string> GetRootProperties()
