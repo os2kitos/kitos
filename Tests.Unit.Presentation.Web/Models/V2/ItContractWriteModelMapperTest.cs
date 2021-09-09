@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
@@ -87,14 +88,52 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.MapGeneralData(input);
 
             //Assert
-            Assert.Equal(input.ContractId,AssertPropertyContainsDataChange(output.ContractId));
-            Assert.Equal(input.ContractTypeUuid,AssertPropertyContainsDataChange(output.ContractTypeUuid));
-            Assert.Equal(input.ContractTemplateUuid,AssertPropertyContainsDataChange(output.ContractTemplateUuid));
-            Assert.Equal(input.AgreementElementUuids,AssertPropertyContainsDataChange(output.AgreementElementUuids));
-            Assert.Equal(input.Notes,AssertPropertyContainsDataChange(output.Notes));
-            Assert.Equal(input.Validity.ValidFrom,AssertPropertyContainsDataChange(output.ValidFrom));
-            Assert.Equal(input.Validity.ValidTo,AssertPropertyContainsDataChange(output.ValidTo));
-            Assert.Equal(input.Validity.EnforcedValid,AssertPropertyContainsDataChange(output.EnforceValid));
+            AssertGeneralData(input, output);
+        }
+
+        [Fact]
+        public void FromPost_Maps_General()
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO()
+            {
+                General = A<ContractGeneralDataWriteRequestDTO>()
+            };
+
+            //Act
+            var output = _sut.FromPOST(input).General;
+
+            //Assert
+            AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
+        }
+
+        [Fact]
+        public void FromPut_Maps_General()
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO()
+            {
+                General = A<ContractGeneralDataWriteRequestDTO>()
+            };
+
+            //Act
+            var output = _sut.FromPUT(input).General;
+
+            //Assert
+            AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
+        }
+
+        private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,
+            ItContractGeneralDataModificationParameters output)
+        {
+            Assert.Equal(input.ContractId, AssertPropertyContainsDataChange(output.ContractId));
+            Assert.Equal(input.ContractTypeUuid, AssertPropertyContainsDataChange(output.ContractTypeUuid));
+            Assert.Equal(input.ContractTemplateUuid, AssertPropertyContainsDataChange(output.ContractTemplateUuid));
+            Assert.Equal(input.AgreementElementUuids, AssertPropertyContainsDataChange(output.AgreementElementUuids));
+            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));
+            Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
+            Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
         }
 
         private static HashSet<string> GetRootProperties()
