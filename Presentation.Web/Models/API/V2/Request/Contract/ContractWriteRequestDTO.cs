@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Core.DomainModel.ItContract;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -10,15 +8,6 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
 {
     public class ContractWriteRequestDTO
     {
-        /// <summary>
-        /// Name of the contract.
-        /// Constraints:
-        ///     - Max length: 200 characters
-        ///     - Must be unique within the organization
-        /// </summary>
-        [Required(AllowEmptyStrings = false)]
-        [MaxLength(ItContractConstraints.MaxNameLength)]
-        public string Name { get; set; }
         /// <summary>
         /// UUID of the optional parent contract
         /// Constraints:

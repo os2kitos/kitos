@@ -175,6 +175,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
         /// <summary>
         /// Updates the properties of the system usage.
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged. 
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>

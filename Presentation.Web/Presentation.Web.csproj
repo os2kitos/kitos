@@ -362,6 +362,7 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />
@@ -405,6 +406,8 @@
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Infrastructure\Model\Request\CurrentAspNetRequest.cs" />
+    <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
@@ -418,6 +421,8 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
