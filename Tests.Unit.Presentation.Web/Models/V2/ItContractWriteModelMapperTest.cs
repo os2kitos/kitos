@@ -57,17 +57,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(true, true, true)]
-        [InlineData(false, true, true)]
-        [InlineData(true, false, true)]
-        [InlineData(false, false, true)]
-        [InlineData(false, false, false)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noParent, bool noProcurement)
+        [InlineData(false, false, false, false)]
+        [InlineData(true, false, false, false)]
+        [InlineData(false, true, false, false)]
+        [InlineData(false, false, true, false)]
+        [InlineData(false, false, false, true)]
+        [InlineData(true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noProcurement)
         {
             //Arrange
-
             var rootProperties = GetRootProperties();
+
             if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
+            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
             if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
@@ -78,7 +80,54 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(noName, output.Name.IsUnchanged);
-            Assert.Equal(noParent, output.ParentContractUuid.IsUnchanged);
+			Assert.Equal(noParent, output.ParentContractUuid.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noProcurement, output.Procurement.IsNone);
+        }
+
+        [Fact]
+        public void Can_Map_General()
+        {
+            //Arrange
+            var input = A<ContractGeneralDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapGeneralData(input);
+
+            //Assert
+            AssertGeneralData(input, output);
+        }
+
+        [Fact]
+        public void FromPost_Maps_General()
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO()
+            {
+                General = A<ContractGeneralDataWriteRequestDTO>()
+            };
+
+            //Act
+            var output = _sut.FromPOST(input).General;
+
+            //Assert
+            AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
+        }
+
+        [Fact]
+        public void FromPut_Maps_General()
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO()
+            {
+                General = A<ContractGeneralDataWriteRequestDTO>()
+            };
+
+            //Act
+            var output = _sut.FromPUT(input).General;
+
+            //Assert
+            AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
         }
 
         [Theory]
@@ -147,6 +196,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(modificationParameters.Procurement.HasValue);
             var procurementDto = modificationParameters.Procurement.Value;
             AssertProcurement(hasValues, requestDto, procurementDto);
+        }
+
+        private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,
+            ItContractGeneralDataModificationParameters output)
+        {
+            Assert.Equal(input.ContractId, AssertPropertyContainsDataChange(output.ContractId));
+            Assert.Equal(input.ContractTypeUuid, AssertPropertyContainsDataChange(output.ContractTypeUuid));
+            Assert.Equal(input.ContractTemplateUuid, AssertPropertyContainsDataChange(output.ContractTemplateUuid));
+            Assert.Equal(input.AgreementElementUuids, AssertPropertyContainsDataChange(output.AgreementElementUuids));
+            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.Notes));
+            Assert.Equal(input.Validity.ValidFrom, AssertPropertyContainsDataChange(output.ValidFrom));
+            Assert.Equal(input.Validity.ValidTo, AssertPropertyContainsDataChange(output.ValidTo));
+            Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
         }
 
         private static void AssertProcurement(bool hasValues, ContractWriteRequestDTO expected, ItContractProcurementModificationParameters actual)

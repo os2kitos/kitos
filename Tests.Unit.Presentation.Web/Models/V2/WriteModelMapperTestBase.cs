@@ -18,6 +18,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return sourceData.NewValue.Value;
         }
 
+        protected static T AssertPropertyContainsDataChange<T>(Maybe<T> sourceData)
+        {
+            Assert.True(sourceData.HasValue);
+            return sourceData.Value;
+        }
+
         protected static T AssertPropertyContainsDataChange<T>(OptionalValueChange<T> sourceData)
         {
             Assert.True(sourceData.HasChange);

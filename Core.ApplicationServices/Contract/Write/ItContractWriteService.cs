@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -9,6 +12,7 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -23,6 +27,8 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly ITransactionManager _transactionManager;
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
+        private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
+        private readonly IAuthorizationContext _authorizationContext;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -30,7 +36,9 @@ namespace Core.ApplicationServices.Contract.Write
             IOptionResolver optionResolver,
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
-            IDatabaseControl databaseControl)
+            IDatabaseControl databaseControl,
+            IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
+            IAuthorizationContext authorizationContext)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -38,6 +46,8 @@ namespace Core.ApplicationServices.Contract.Write
             _transactionManager = transactionManager;
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
+            _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
+            _authorizationContext = authorizationContext;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -80,6 +90,7 @@ namespace Core.ApplicationServices.Contract.Write
 
             var updateResult = _contractService
                 .GetContract(itContractUuid)
+                .Bind(WithWriteAccess)
                 .Bind(contract => ApplyUpdates(contract, parameters));
 
             if (updateResult.Ok)
@@ -92,11 +103,100 @@ namespace Core.ApplicationServices.Contract.Write
             return updateResult;
         }
 
+        private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
+        {
+            if (!_authorizationContext.AllowModify(contract))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return contract;
+        }
+
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
-            return contract.WithOptionalUpdate(parameters.Name, UpdateName)
+            return contract
+                .WithOptionalUpdate(parameters.Name, UpdateName)
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement));
+        }
+
+        private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
+        {
+            return contract
+                .WithOptionalUpdate(generalData.ContractId, (c, newValue) => c.ItContractId = newValue)
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTypeUuid, UpdateContractType))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTemplateUuid, UpdateContractTemplate))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.Notes, (c, newValue) => c.Note = newValue))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
+                .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements));
+        }
+
+        private Maybe<OperationError> UpdateAgreementElements(ItContract contract, IEnumerable<Guid> agreementElements)
+        {
+            var agreementElementTypes = new List<AgreementElementType>();
+            foreach (var uuid in agreementElements)
+            {
+                var result = _optionResolver.GetOptionType<ItContract, AgreementElementType>(contract.Organization.Uuid, uuid);
+                if (result.Failed)
+                {
+                    return new OperationError($"Failed resolving agreement element with uuid:{uuid}. Message:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
+                }
+
+                var resultValue = result.Value;
+                if (resultValue.available == false && contract.AssociatedAgreementElementTypes.Any(x => x.AgreementElementType.Uuid == uuid) == false)
+                {
+                    return new OperationError($"Tried to add agreement element which is not available in the organization: {uuid}", OperationFailure.BadInput);
+                }
+                agreementElementTypes.Add(resultValue.option);
+            }
+
+            var before = contract.AssociatedAgreementElementTypes.ToList();
+
+            var error = contract.SetAgreementElements(agreementElementTypes);
+            if (error.IsNone)
+            {
+                var after = before.Except(contract.AssociatedAgreementElementTypes);
+                after.ToList().ForEach(_itContractAgreementElementTypesRepository.Delete);
+            }
+            return error;
+        }
+
+        private static Maybe<OperationError> UpdateValidityPeriod(ItContract itContract, ItContractGeneralDataModificationParameters generalData)
+        {
+            if (generalData.ValidFrom.IsUnchanged && generalData.ValidTo.IsUnchanged)
+                return Maybe<OperationError>.None;
+
+            var newValidFrom = generalData.ValidFrom.MapDateTimeOptionalChangeWithFallback(itContract.Concluded);
+            var newValidTo = generalData.ValidTo.MapDateTimeOptionalChangeWithFallback(itContract.ExpirationDate);
+
+            return itContract.UpdateContractValidityPeriod(newValidFrom, newValidTo);
+        }
+
+        private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
+        {
+            return UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                contractTemplateUuid,
+                c => c.ResetContractTemplate(),
+                c => c.ContractTemplate,
+                (c, newValue) => c.ContractTemplate = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdateContractType(ItContract contract, Guid? contractTypeId)
+        {
+            return UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                contractTypeId,
+                c => c.ResetContractType(),
+                c => c.ContractType,
+                (c, newValue) => c.ContractType = newValue
+            );
         }
 
         private Result<ItContract, OperationError> UpdateProcurement(ItContract contract, ItContractProcurementModificationParameters procurementParameters)
@@ -157,11 +257,13 @@ namespace Core.ApplicationServices.Contract.Write
             if (getResult.Failed)
                 return new OperationError($"Failed to get contract with Uuid: {newParentUuid.Value} with error message: {getResult.Error.Message.GetValueOrEmptyString()}", getResult.Error.FailureType);
 
-            var assignResult = contract.SetParent(getResult.Value);
-            if(assignResult.Failed)
-                return new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {assignResult.Error.Message.GetValueOrEmptyString()}", assignResult.Error.FailureType);
-
-            return Maybe<OperationError>.None;
+            return contract
+                .SetParent(getResult.Value)
+                .Match
+                (
+                    error => new OperationError($"Failed to set parent with Uuid: {newParentUuid.Value} on contract with Uuid: {contract.Uuid} with error message: {error.Message.GetValueOrEmptyString()}",
+                        error.FailureType), () => Maybe<OperationError>.None
+                );
         }
 
         private Maybe<OperationError> UpdateName(ItContract contract, string newName)

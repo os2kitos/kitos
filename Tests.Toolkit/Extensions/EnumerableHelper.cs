@@ -11,5 +11,11 @@ namespace Tests.Toolkit.Extensions
             var fixture = new Fixture();
             return src.OrderBy(_ => fixture.Create<int>()).First();
         }
+
+        public static IEnumerable<T> RandomItems<T>(this IEnumerable<T> src, int howMany)
+        {
+            var fixture = new Fixture();
+            return src.OrderBy(_ => fixture.Create<int>()).Take(howMany).ToList();
+        }
     }
 }
