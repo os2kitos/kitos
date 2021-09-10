@@ -189,12 +189,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var parentUuid = A<Guid>();
-            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parentUuid);
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parentUuid);
             var parent = new ItContract() { Id = A<int>(), Uuid = parentUuid, OrganizationId = createdContract.OrganizationId };
             ExpectGetReturns(parent.Uuid, parent);
 
             //Act
-            var result = _sut.Create(orgUuid, parameters);
+            var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -206,10 +206,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Can_Create_With_No_Parent()
         {
             //Arrange
-            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: null);
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: null);
 
             //Act
-            var result = _sut.Create(orgUuid, parameters);
+            var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
@@ -222,12 +222,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>() };
-            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
             var operationError = A<OperationError>();
             ExpectGetReturns(parent.Uuid, operationError);
 
             //Act
-            var result = _sut.Create(orgUuid, parameters);
+            var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             AssertFailureWithKnownErrorDetails(result, "Failed to get contract with Uuid:", operationError.FailureType, transaction);
@@ -238,11 +238,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             //Arrange
             var parent = new ItContract() { Id = A<int>(), Uuid = A<Guid>(), OrganizationId = A<int>() };
-            var (orgUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(parentUuid: parent.Uuid);
             ExpectGetReturns(parent.Uuid, parent);
 
             //Act
-            var result = _sut.Create(orgUuid, parameters);
+            var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             AssertFailureWithKnownErrorDetails(result, "Failed to set parent with Uuid:", OperationFailure.BadInput, transaction);
@@ -496,6 +496,164 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ItContractType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
 
+        
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, false, false)]
+        [InlineData(false, true, false)]
+        [InlineData(false, false, true)]
+        [InlineData(false, false, false)]
+        public void Can_Create_With_Procurement(bool withStrategy, bool withPurchase, bool withPlan)
+        {
+            //Arrange
+            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(withStrategy, withPurchase, withPlan);
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid.GetValueOrDefault(), (new ProcurementStrategyType() { Uuid = procurementStrategyUuid.GetValueOrDefault() }, true));
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid.GetValueOrDefault(), (new PurchaseFormType() { Uuid = purchaseTypeUuid.GetValueOrDefault() }, true));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertProcurement(procurement, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Procurement_If_ProcurementStrategy_Is_Not_Available()
+        {
+            //Arrange
+            var procurementStrategyUuid = A<Guid>();
+            var procurement = new ItContractProcurementModificationParameters()
+            {
+                ProcurementStrategyUuid = ((Guid?)procurementStrategyUuid).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid, (new ProcurementStrategyType(), false));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "The changed ProcurementStrategyType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Procurement_If_ProcurementStrategy_Is_Not_Found()
+        {
+            //Arrange
+            var procurementStrategyUuid = A<Guid>();
+            var procurement = new ItContractProcurementModificationParameters()
+            {
+                ProcurementStrategyUuid = ((Guid?)procurementStrategyUuid).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+
+            var operationError = A<OperationError>();
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ProcurementStrategyType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Procurement_If_PurchaseType_Is_Not_Available()
+        {
+            //Arrange
+            var purchaseTypeUuid = A<Guid>();
+            var procurement = new ItContractProcurementModificationParameters()
+            {
+                PurchaseTypeUuid = ((Guid?)purchaseTypeUuid).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid, (new PurchaseFormType(), false));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "The changed PurchaseFormType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Procurement_If_PurchaseType_Is_Not_Found()
+        {
+            //Arrange
+            var purchaseTypeUuid = A<Guid>();
+            var procurement = new ItContractProcurementModificationParameters()
+            {
+                PurchaseTypeUuid = ((Guid?)purchaseTypeUuid).AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+
+            var operationError = A<OperationError>();
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving PurchaseFormType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(3)]
+        [InlineData(10)]
+        public void Cannot_Create_With_Procurement_If_Half_Of_Year_Is_Other_Than_1_Or_2(int halfOfYear)
+        {
+            //Arrange
+            var procurement = new ItContractProcurementModificationParameters()
+            {
+                ProcurementPlan = (Convert.ToByte(halfOfYear), A<int>()).FromNullable().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Half Of Year has to be either 1 or 2", OperationFailure.BadInput, transaction);
+        }
+
+        private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
+        {
+            var procurementStrategyUuid = withStrategy ? A<Guid>() : (Guid?)null;
+            var purchaseTypeUuid = withPurchase ? A<Guid>() : (Guid?)null;
+            var procurement = new ItContractProcurementModificationParameters
+            {
+                ProcurementStrategyUuid = procurementStrategyUuid.AsChangedValue(),
+                PurchaseTypeUuid = purchaseTypeUuid.AsChangedValue(),
+                ProcurementPlan = (withPlan ? (CreateValidHalfOfYearByte(), A<int>()) : Maybe<(byte half, int year)>.None).AsChangedValue()
+            };
+            return (procurementStrategyUuid, purchaseTypeUuid, procurement);
+        }
+
+        private byte CreateValidHalfOfYearByte()
+        {
+            return Convert.ToByte(A<int>() % 1 + 1);
+        }
+
+        private static void AssertProcurement(ItContractProcurementModificationParameters expected, ItContract actual)
+        {
+            Assert.Equal(expected.ProcurementStrategyUuid.NewValue, actual.ProcurementStrategy?.Uuid);
+            Assert.Equal(expected.PurchaseTypeUuid.NewValue, actual.PurchaseForm?.Uuid);
+            if (expected.ProcurementPlan.HasChange && expected.ProcurementPlan.NewValue.HasValue)
+            {
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, actual.ProcurementPlanHalf);
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.year, actual.ProcurementPlanYear);
+            }
+            else
+            {
+                Assert.Null(actual.ProcurementPlanHalf);
+                Assert.Null(actual.ProcurementPlanYear);
+            }
+        }
+
         private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<ItContract>
         {
             if (optionTypeUuid.HasValue)
@@ -503,27 +661,33 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
-            Guid? parentUuid = null
+            Guid? parentUuid = null,
+            ItContractProcurementModificationParameters procurement = null
             )
         {
-            var organizationUuid = A<Guid>();
+            var organization = new Organization()
+            {
+                Id = A<int>(),
+                Uuid = A<Guid>()
+            };
             var parameters = new ItContractModificationParameters
             {
                 Name = A<string>().AsChangedValue(),
-                ParentContractUuid = parentUuid.AsChangedValue()
+                ParentContractUuid = parentUuid.AsChangedValue(),
+                Procurement = procurement.FromNullable()
             };
             var createdContract = new ItContract()
             {
                 Id = A<int>(),
                 Uuid = A<Guid>(),
-                OrganizationId = A<int>(),
-                Organization = new Organization() { Uuid = organizationUuid }
+                OrganizationId = organization.Id,
+                Organization = organization
             };
             var transaction = ExpectTransaction();
 
-            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, createdContract.OrganizationId);
+            ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organization.Uuid, createdContract.OrganizationId);
             ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
-            return (organizationUuid, parameters, createdContract, transaction);
+            return (organization.Uuid, parameters, createdContract, transaction);
         }
 
         private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(

@@ -9,6 +9,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -32,11 +33,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         private ItContractModificationParameters Map<T>(T dto) where T : ContractWriteRequestDTO, IHasNameExternal
         {
             var generalData = WithResetDataIfPropertyIsDefined(dto.General, nameof(ContractWriteRequestDTO.General));
+            var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
 				ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
-                General = generalData.FromNullable().Select(MapGeneralData)
+                General = generalData.FromNullable().Select(MapGeneralData),
+                Procurement = procurement.FromNullable().Select(MapProcurement)
             };
         }
 
@@ -53,6 +56,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ValidTo = (input.Validity?.ValidTo ?? Maybe<DateTime>.None).AsChangedValue(),
                 EnforceValid = (input.Validity?.EnforcedValid ?? Maybe<bool>.None).AsChangedValue()
             };
+        }
+
+        public ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO request)
+        {
+            return new()
+            {
+                ProcurementStrategyUuid = request.ProcurementStrategyUuid.AsChangedValue(),
+                PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
+                ProcurementPlan = MapProcurementPlan(request.ProcurementPlan).AsChangedValue()
+            };
+        }
+
+        private static Maybe<(byte half, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
+        {
+            return plan == null ? Maybe<(byte half, int year)>.None : (plan.HalfOfYear, plan.Year);
         }
     }
 }

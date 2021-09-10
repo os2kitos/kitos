@@ -118,7 +118,8 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(parameters.Name, UpdateName)
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement));
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -198,35 +199,48 @@ namespace Core.ApplicationServices.Contract.Write
             );
         }
 
-        private Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TOption>(
-            ItContract contract,
-            Guid? optionTypeUuid,
-            Action<ItContract> onReset,
-            Func<ItContract, TOption> getCurrentValue,
-            Action<ItContract, TOption> updateValue) where TOption : OptionEntity<ItContract>
+        private Result<ItContract, OperationError> UpdateProcurement(ItContract contract, ItContractProcurementModificationParameters procurementParameters)
         {
-            if (optionTypeUuid == null)
-            {
-                onReset(contract);
-            }
-            else
-            {
-                var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
-                if (optionType.Failed)
-                {
-                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
-                }
+            return contract
+                .WithOptionalUpdate(procurementParameters.ProcurementStrategyUuid, UpdateProcurementStrategy)
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.PurchaseTypeUuid, UpdatePurchaseType))
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.ProcurementPlan, UpdateProcurementPlan));
+        }
 
-                var option = optionType.Value;
-                var currentValue = getCurrentValue(contract);
-                if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
-                {
-                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
-                }
-
-                updateValue(contract, option.option);
+        private static Maybe<OperationError> UpdateProcurementPlan(ItContract contract, Maybe<(byte half, int year)> plan)
+        {
+            if (plan.IsNone)
+            {
+                contract.ResetProcurementPlan();
+                return Maybe<OperationError>.None;
             }
-            return Maybe<OperationError>.None;
+
+            var updateResult = contract.UpdateProcurementPlan(plan.Value);
+            return updateResult.HasValue 
+                ? new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType) 
+                : Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
+        {
+            return UpdateIndependentOptionTypeAssignment(
+                contract,
+                purchaseTypeUuid,
+                c => c.ResetPurchaseForm(),
+                c => c.PurchaseForm,
+                (c, newValue) => c.PurchaseForm = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdateProcurementStrategy(ItContract contract, Guid? procurementStrategyUuid)
+        {
+            return UpdateIndependentOptionTypeAssignment(
+                contract,
+                procurementStrategyUuid,
+                c => c.ResetProcurementStrategy(),
+                c => c.ProcurementStrategy,
+                (c, newValue) => c.ProcurementStrategy = newValue
+            );
         }
 
         private Maybe<OperationError> UpdateParentContract(ItContract contract, Guid? newParentUuid)
@@ -272,6 +286,38 @@ namespace Core.ApplicationServices.Contract.Write
             return _contractService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
+        }
+
+        private Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TOption>(
+            ItContract contract,
+            Guid? optionTypeUuid,
+            Action<ItContract> onReset,
+            Func<ItContract, TOption> getCurrentValue,
+            Action<ItContract, TOption> updateValue) where TOption : OptionEntity<ItContract>
+        {
+            if (optionTypeUuid == null)
+            {
+                onReset(contract);
+            }
+            else
+            {
+                var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
+                if (optionType.Failed)
+                {
+                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
+                }
+
+                var option = optionType.Value;
+                var currentValue = getCurrentValue(contract);
+                if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
+                {
+                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
+                }
+
+                updateValue(contract, option.option);
+            }
+
+            return Maybe<OperationError>.None;
         }
     }
 }

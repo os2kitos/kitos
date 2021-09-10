@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using AutoFixture;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.Contract;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
@@ -487,7 +489,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             };
 
             //Act - Update from empty
-            var updatedResponse1 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest1);
+            using var updatedResponse1 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest1);
 
             //Assert - Update from empty
             Assert.Equal(HttpStatusCode.OK, updatedResponse1.StatusCode);
@@ -501,7 +503,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Name = CreateName(),
                 ParentContractUuid = newParent.Uuid
             };
-            var updatedResponse2 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest2);
+            using var updatedResponse2 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest2);
 
             //Assert - Update from filled
             Assert.Equal(HttpStatusCode.OK, updatedResponse2.StatusCode);
@@ -514,12 +516,172 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Name = CreateName(),
                 ParentContractUuid = null
             };
-            var updatedResponse3 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest3);
+            using var updatedResponse3 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, updateRequest3);
 
             //Assert - Update to empty
             Assert.Equal(HttpStatusCode.OK, updatedResponse3.StatusCode);
             var updatedContractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
             Assert.Null(updatedContractDTO3.ParentContract);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_Procurement()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var(procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Procurement = procurementRequest
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            AssertProcurement(procurementRequest, procurementStrategy, purchaseType, contractDTO.Procurement);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_Procurement_If_ProcurementPlan_Is_Null()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            procurementRequest.ProcurementPlan = null;
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Procurement = procurementRequest
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            AssertProcurement(procurementRequest, procurementStrategy, purchaseType, contractDTO.Procurement);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Procurement_If_Unknown_Strategy()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            procurementRequest.ProcurementStrategyUuid = A<Guid>();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Procurement = procurementRequest
+            };
+
+            //Act
+            using var response = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_Procurement_If_Unknown_PurchaseType()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            procurementRequest.PurchaseTypeUuid = A<Guid>();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Procurement = procurementRequest
+            };
+
+            //Act
+            using var response = await ItContractV2Helper.SendPostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Procurement()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var newContract = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
+
+            var (procurementRequest1, procurementStrategy1, purchaseType1) = await CreateProcurementRequestAsync(organization.Uuid);
+
+            //Act - Update from empty
+            using var updatedResponse1 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest1);
+
+            //Assert - Update from empty
+            Assert.Equal(HttpStatusCode.OK, updatedResponse1.StatusCode);
+            var updatedContractDTO1 = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            AssertProcurement(procurementRequest1, procurementStrategy1, purchaseType1, updatedContractDTO1.Procurement);
+
+            //Act - Update from filled
+            var (procurementRequest2, procurementStrategy2, purchaseType2) = await CreateProcurementRequestAsync(organization.Uuid);
+
+            using var updatedResponse2 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest2);
+
+            //Assert - Update from filled
+            Assert.Equal(HttpStatusCode.OK, updatedResponse2.StatusCode);
+            var updatedContractDTO2 = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            AssertProcurement(procurementRequest2, procurementStrategy2, purchaseType2, updatedContractDTO2.Procurement);
+
+            //Act - Update to empty
+            var procurementRequest3 = new ContractProcurementDataWriteRequestDTO();
+
+            using var updatedResponse3 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest3);
+
+            //Assert - Update to empty
+            Assert.Equal(HttpStatusCode.OK, updatedResponse3.StatusCode);
+            var updatedContractDTO3 = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            Assert.Null(updatedContractDTO3.Procurement.ProcurementStrategy);
+            Assert.Null(updatedContractDTO3.Procurement.PurchaseType);
+            Assert.Null(updatedContractDTO3.Procurement.ProcurementPlan);
+        }
+
+        private static void AssertProcurement(ContractProcurementDataWriteRequestDTO expected, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType, ContractProcurementDataResponseDTO actual)
+        {
+            AssertCrossReference(procurementStrategy, actual.ProcurementStrategy);
+            AssertCrossReference(purchaseType, actual.PurchaseType);
+            if (expected.ProcurementPlan == null)
+            {
+                Assert.Null(actual.ProcurementPlan);
+            }
+            else
+            {
+                Assert.Equal(expected.ProcurementPlan.HalfOfYear, actual.ProcurementPlan.HalfOfYear);
+                Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
+            }
+        }
+
+        private async Task<(ContractProcurementDataWriteRequestDTO request, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType)> CreateProcurementRequestAsync(Guid organizationUuid)
+        {
+            var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
+            var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
+            var request = new ContractProcurementDataWriteRequestDTO()
+            {
+                ProcurementStrategyUuid = procurementStrategy.Uuid,
+                PurchaseTypeUuid = purchaseType.Uuid,
+                ProcurementPlan = new ProcurementPlanDTO()
+                {
+                    HalfOfYear = Convert.ToByte((A<int>() % 1) + 1),
+                    Year = A<int>()
+                }
+            };
+            return (request, procurementStrategy, purchaseType);
         }
 
         private CreateNewContractRequestDTO CreateNewSimpleRequest(Guid organizationUuid)
