@@ -505,7 +505,7 @@ namespace Core.DomainModel.ItContract
 
         public void ClearMasterReference()
         {
-            Reference.Track();
+            Reference?.Track();
             Reference = null;
         }
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
@@ -606,7 +606,7 @@ namespace Core.DomainModel.ItContract
 
         public void ClearParent()
         {
-            Parent.Track();
+            Parent?.Track();
             Parent = null;
         }
 
@@ -640,6 +640,37 @@ namespace Core.DomainModel.ItContract
         {
             ResponsibleOrganizationUnit?.Track();
             ResponsibleOrganizationUnit = null;
+		}
+		
+        public void ResetProcurementStrategy()
+        {
+            ProcurementStrategy?.Track();
+            ProcurementStrategy = null;
+        }
+
+        public void ResetPurchaseForm()
+        {
+            PurchaseForm?.Track();
+            PurchaseForm = null;
+        }
+
+        public void ResetProcurementPlan()
+        {
+            ProcurementPlanHalf = null;
+            ProcurementPlanYear = null;
+        }
+
+        public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
+        {
+            var (half, year) = plan;
+            if (half != 1 && half != 2)
+            {
+                return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
+            }
+
+            ProcurementPlanHalf = half;
+            ProcurementPlanYear = year;
+            return Maybe<OperationError>.None;
         }
     }
 }

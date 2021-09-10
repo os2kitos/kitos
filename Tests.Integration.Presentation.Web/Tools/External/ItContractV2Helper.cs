@@ -92,6 +92,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutContractResponsibleAsync(string token, Guid contractUuid, ContractResponsibleDataWriteRequestDTO dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/responsible"), token, dto);
+		}
+		
+        public static async Task<HttpResponseMessage> SendPutProcurementAsync(string token, Guid contractUuid, ContractProcurementDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/procurement"), token, dto);
         }
     }
 }
