@@ -516,7 +516,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Ok);
-            AssertProcurement(procurement, result.Value, withPlan);
+            AssertProcurement(procurement, result.Value);
             AssertTransactionCommitted(transaction);
         }
 
@@ -601,26 +601,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Cannot_Create_With_Procurement_If_Not_Both_Parts_Of_ProcurementPlan_Is_Set(bool hasYear)
-        {
-            //Arrange
-            var procurement = new ItContractProcurementModificationParameters()
-            {
-                HalfOfYear = (hasYear ? Maybe<byte>.None : CreateValidHalfOfYearByte()).AsChangedValue(),
-                Year = (hasYear ? A<int>() : Maybe<int>.None).AsChangedValue()
-            };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Both parts of procurement plan needs to be set", OperationFailure.BadInput, transaction);
-        }
-
-        [Theory]
         [InlineData(0)]
         [InlineData(3)]
         [InlineData(10)]
@@ -629,8 +609,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var procurement = new ItContractProcurementModificationParameters()
             {
-                HalfOfYear = Convert.ToByte(halfOfYear).FromNullable().AsChangedValue(),
-                Year = A<int>().FromNullable().AsChangedValue()
+                ProcurementPlan = (Convert.ToByte(halfOfYear), A<int>()).FromNullable().AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
 
@@ -645,14 +624,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             var procurementStrategyUuid = withStrategy ? A<Guid>() : (Guid?)null;
             var purchaseTypeUuid = withPurchase ? A<Guid>() : (Guid?)null;
-            var halfOfYear = withPlan ? CreateValidHalfOfYearByte() : Maybe<byte>.None;
-            var year = withPlan ? A<int>() : Maybe<int>.None;
             var procurement = new ItContractProcurementModificationParameters
             {
                 ProcurementStrategyUuid = procurementStrategyUuid.AsChangedValue(),
                 PurchaseTypeUuid = purchaseTypeUuid.AsChangedValue(),
-                HalfOfYear = halfOfYear.AsChangedValue(),
-                Year = year.AsChangedValue()
+                ProcurementPlan = (withPlan ? (CreateValidHalfOfYearByte(), A<int>()) : Maybe<(byte half, int year)>.None).AsChangedValue()
             };
             return (procurementStrategyUuid, purchaseTypeUuid, procurement);
         }
@@ -662,14 +638,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             return Convert.ToByte(A<int>() % 1 + 1);
         }
 
-        private static void AssertProcurement(ItContractProcurementModificationParameters expected, ItContract actual, bool withPlan)
+        private static void AssertProcurement(ItContractProcurementModificationParameters expected, ItContract actual)
         {
             Assert.Equal(expected.ProcurementStrategyUuid.NewValue, actual.ProcurementStrategy?.Uuid);
             Assert.Equal(expected.PurchaseTypeUuid.NewValue, actual.PurchaseForm?.Uuid);
-            if (withPlan)
+            if (expected.ProcurementPlan.HasChange && expected.ProcurementPlan.NewValue.HasValue)
             {
-                Assert.Equal(expected.HalfOfYear.NewValue.Value, actual.ProcurementPlanHalf);
-                Assert.Equal(expected.Year.NewValue.Value, actual.ProcurementPlanYear);
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, actual.ProcurementPlanHalf);
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.year, actual.ProcurementPlanYear);
             }
             else
             {

@@ -632,27 +632,21 @@ namespace Core.DomainModel.ItContract
             PurchaseForm = null;
         }
 
-        public Maybe<OperationError> UpdateProcurementPlan(Maybe<byte> newHalfOfYear, Maybe<int> newYear)
+        public void ResetProcurementPlan()
         {
-            if (newHalfOfYear.IsNone && newYear.IsNone)
-            {
-                ProcurementPlanHalf = null;
-                ProcurementPlanYear = null;
-                return Maybe<OperationError>.None;
-            }
+            ProcurementPlanHalf = null;
+            ProcurementPlanYear = null;
+        }
 
-            if (newHalfOfYear.IsNone && newYear.HasValue || newHalfOfYear.HasValue && newYear.IsNone)
-            {
-                return new OperationError("Both parts of procurement plan needs to be set", OperationFailure.BadInput);
-            }
-
-            if (newHalfOfYear.Value != 1 && newHalfOfYear.Value != 2)
+        public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
+        {
+            if (plan.half != 1 && plan.half != 2)
             {
                 return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
             }
 
-            ProcurementPlanHalf = newHalfOfYear.Value;
-            ProcurementPlanYear = newYear.Value;
+            ProcurementPlanHalf = plan.half;
+            ProcurementPlanYear = plan.year;
             return Maybe<OperationError>.None;
         }
     }

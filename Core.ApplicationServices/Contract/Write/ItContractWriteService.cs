@@ -204,22 +204,21 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(procurementParameters.ProcurementStrategyUuid, UpdateProcurementStrategy)
                 .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.PurchaseTypeUuid, UpdatePurchaseType))
-                .Bind(itContract => UpdateProcurementPlan(itContract, procurementParameters));
+                .Bind(itContract => itContract.WithOptionalUpdate(procurementParameters.ProcurementPlan, UpdateProcurementPlan));
         }
 
-        private static Result<ItContract, OperationError> UpdateProcurementPlan(ItContract contract, ItContractProcurementModificationParameters procurementParameters)
+        private static Maybe<OperationError> UpdateProcurementPlan(ItContract contract, Maybe<(byte half, int year)> plan)
         {
-            if (procurementParameters.HalfOfYear.IsUnchanged && procurementParameters.Year.IsUnchanged)
-                return contract;
+            if (plan.IsNone)
+            {
+                contract.ResetProcurementPlan();
+                return Maybe<OperationError>.None;
+            }
 
-            var newHalfOfYear = procurementParameters.HalfOfYear.NewValue;
-            var newYear = procurementParameters.Year.NewValue;
-
-            var updateResult = contract.UpdateProcurementPlan(newHalfOfYear, newYear);
-            if (updateResult.HasValue)
-                return new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType);
-
-            return contract;
+            var updateResult = contract.UpdateProcurementPlan(plan.Value);
+            return updateResult.HasValue 
+                ? new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType) 
+                : Maybe<OperationError>.None;
         }
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
