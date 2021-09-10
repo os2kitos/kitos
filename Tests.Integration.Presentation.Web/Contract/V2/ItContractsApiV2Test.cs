@@ -541,7 +541,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-             var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization,withContractType, withContractTemplate, withAgreementElements);
+            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements);
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
@@ -572,8 +572,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Act
             var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true);
             using var response1 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
-            Assert.Equal(HttpStatusCode.OK,response1.StatusCode);
-                
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
@@ -598,6 +598,57 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public async Task Can_POST_With_Responsible(bool withOrgUnit, bool withSignedAt, bool withSignedBy)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var contractResponsibleDataWriteRequestDto = await CreateContractResponsibleDataRequestDTO(token, organization, withOrgUnit, withSignedAt, withSignedBy);
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Responsible = contractResponsibleDataWriteRequestDto
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertResponsible(contractResponsibleDataWriteRequestDto, freshDTO);
+        }
+
+        private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
+        {
+            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Responsible.Signed);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt, freshDTO.Responsible.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Responsible.SignedBy);
+        }
+
+        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, Organization organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
+        {
+            var organizationUnit = withOrgUnit
+                ? (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).RandomItem()
+                : null;
+            var contractResponsibleDataWriteRequestDto = new ContractResponsibleDataWriteRequestDTO
+            {
+                Signed = A<bool>(),
+                SignedAt = withSignedAt ? A<DateTime>() : null,
+                SignedBy = withSignedBy ? A<string>() : null,
+                OrganizationUnitUuid = organizationUnit?.Uuid
+            };
+            return contractResponsibleDataWriteRequestDto;
         }
 
         private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(Organization organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
