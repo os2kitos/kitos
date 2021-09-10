@@ -628,6 +628,47 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertResponsible(contractResponsibleDataWriteRequestDto, freshDTO);
         }
 
+        [Fact]
+        public async Task Can_PUT_With_Responsible()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+            };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Act
+            var changes = await CreateContractResponsibleDataRequestDTO(token, organization, false, false, false);
+            var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertResponsible(changes, freshDTO);
+
+            //Act - change all
+            changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
+            var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertResponsible(changes, freshDTO);
+
+            //Act - full reset
+            changes = new ContractResponsibleDataWriteRequestDTO();
+            var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertResponsible(changes, freshDTO);
+        }
+
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
         {
             Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
