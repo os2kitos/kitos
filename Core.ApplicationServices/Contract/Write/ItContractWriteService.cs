@@ -156,9 +156,9 @@ namespace Core.ApplicationServices.Contract.Write
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
                         var associationToRemove = contract.AssociatedSystemUsages.Single(x => x.ItSystemUsage.Uuid == uuid);
-                        var removeResult = contract.AssociatedSystemUsages.Remove(associationToRemove);
+                        var removeSucceeded = contract.AssociatedSystemUsages.Remove(associationToRemove);
 
-                        if (removeResult)
+                        if (!removeSucceeded)
                             return new OperationError(
                                 $"Failed to remove Associated SystemUsage with Uuid: {uuid} from Contract with Uuid: {contract.Uuid}",
                                 OperationFailure.BadState);
