@@ -650,5 +650,36 @@ namespace Core.DomainModel.ItContract
             ProcurementPlanYear = year;
             return Maybe<OperationError>.None;
         }
+
+        public Maybe<OperationError> AssignSystemUsage(int systemUsageId)
+        {
+            if (AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsageId))
+            {
+                return new OperationError($"SystemUsage with Id: {systemUsageId} already assigned", OperationFailure.Conflict);
+            }
+
+            AssociatedSystemUsages.Add(new ItContractItSystemUsage()
+            {
+                ItContractId = Id,
+                ItSystemUsageId = systemUsageId
+            });
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveSystemUsage(int systemUsageId)
+        {
+            try
+            {
+                var toBeRemoved = AssociatedSystemUsages.Single(x => x.ItSystemUsageId == systemUsageId);
+                var removeSucceeded = AssociatedSystemUsages.Remove(toBeRemoved);
+                return removeSucceeded 
+                    ? Maybe<OperationError>.None 
+                    : new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsageId}", OperationFailure.BadState);
+            }
+            catch (InvalidOperationException e)
+            {
+                return new OperationError($"Failed RemoveSystemUsage operation with error message: {e.Message}", OperationFailure.UnknownError);
+            }
+        }
     }
 }

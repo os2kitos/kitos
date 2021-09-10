@@ -138,30 +138,29 @@ namespace Core.ApplicationServices.Contract.Write
 
             foreach (var (delta, uuid) in changes)
             {
+
+                var usageId = _entityIdentityResolver.ResolveDbId<ItSystemUsage>(uuid);
+
+                if (usageId.IsNone)
+                    return new OperationError($"No SystemUsage found with Uuid: {uuid}", OperationFailure.BadInput);
+
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var usageId = _entityIdentityResolver.ResolveDbId<ItSystemUsage>(uuid);
-
-                        if (usageId.IsNone)
-                            return new OperationError($"No SystemUsage found with Uuid: {uuid}", OperationFailure.BadInput);
-
-
-                        contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage()
+                        var assignResult = contract.AssignSystemUsage(usageId.Value);
+                        if (assignResult.HasValue)
                         {
-                            ItContractId = contract.Id,
-                            ItSystemUsageId = usageId.Value
-                        });
+                            return new OperationError($"Failed to assign system usage with error message: {assignResult.Value.Message.GetValueOrEmptyString()}", assignResult.Value.FailureType);
+                        }
 
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var associationToRemove = contract.AssociatedSystemUsages.Single(x => x.ItSystemUsage.Uuid == uuid);
-                        var removeSucceeded = contract.AssociatedSystemUsages.Remove(associationToRemove);
+                        var removeResult = contract.RemoveSystemUsage(usageId.Value);
 
-                        if (!removeSucceeded)
-                            return new OperationError(
-                                $"Failed to remove Associated SystemUsage with Uuid: {uuid} from Contract with Uuid: {contract.Uuid}",
-                                OperationFailure.BadState);
+                        if (removeResult.HasValue)
+                        {
+                            return new OperationError($"Failed to remove system usage with error message: {removeResult.Value.Message.GetValueOrEmptyString()}", removeResult.Value.FailureType);
+                        }
 
                         break;
                     default:

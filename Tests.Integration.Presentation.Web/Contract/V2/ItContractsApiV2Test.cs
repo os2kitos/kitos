@@ -788,7 +788,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Update_Systems()
+        public async Task Can_PUT_With_SystemUsages()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
