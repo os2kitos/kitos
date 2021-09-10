@@ -533,8 +533,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         [Theory]
         [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
         [InlineData(true, false, true)]
         [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
         public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements)
         {
             //Arrange

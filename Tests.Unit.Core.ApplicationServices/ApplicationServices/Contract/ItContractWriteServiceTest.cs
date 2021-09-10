@@ -9,7 +9,6 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
-using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -262,32 +261,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
 
-            var contractId = A<string>();
-            var contractTypeUuid = withContractType ? A<Guid>() : (Guid?)null;
-            var contractTemplateUuid = withContractTemplate ? A<Guid>() : (Guid?)null;
-            var enforceValid = A<bool>();
-            var validFrom = withValidFrom ? A<DateTime>().Date : (DateTime?)null;
-            var validTo = withValidTo ? (validFrom ?? A<DateTime>()).AddDays(Math.Abs(A<int>() % 100)).Date : (DateTime?)null;
-            var agreementElementUuids = withAgreementElements ? Many<Guid>().ToList() : new List<Guid>();
-            var parameters = new ItContractGeneralDataModificationParameters
-            {
-                ContractId = contractId.AsChangedValue(),
-                ContractTypeUuid = ((Guid?)contractTypeUuid).AsChangedValue(),
-                ContractTemplateUuid = ((Guid?)contractTemplateUuid).AsChangedValue(),
-                EnforceValid = enforceValid.FromNullable().AsChangedValue(),
-                ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
-                ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
-                AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
-            };
+            var (contractId,
+                contractTypeUuid,
+                contractTemplateUuid,
+                enforceValid,
+                validFrom,
+                validTo,
+                agreementElementUuids,
+                agreementElementTypes,
+                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, organizationUuid);
 
             itContractModificationParameters.General = parameters;
-
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractType>(organizationUuid, contractTypeUuid, (new ItContractType() { Uuid = contractTypeUuid.GetValueOrDefault() }, true));
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractTemplateType>(organizationUuid, contractTemplateUuid, (new ItContractTemplateType() { Uuid = contractTemplateUuid.GetValueOrDefault() }, true));
-            var agreementElementTypes = agreementElementUuids.ToDictionary(uuid => uuid, uuid => new AgreementElementType() { Id = A<int>(), Uuid = uuid });
-
-            foreach (var agreementElementType in agreementElementTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<AgreementElementType>(organizationUuid, agreementElementType.Key, (agreementElementType.Value, true));
 
 
             // Act
@@ -297,15 +281,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
             var contract = result.Value;
-            Assert.Equal(contractId, contract.ItContractId);
-            Assert.Equal(contractTypeUuid, contract.ContractType?.Uuid);
-            Assert.Equal(contractTemplateUuid, contract.ContractTemplate?.Uuid);
-            Assert.Equal(validFrom, contract.Concluded);
-            Assert.Equal(validTo, contract.ExpirationDate);
-            Assert.Equal(enforceValid, contract.Active);
-            Assert.Equal(agreementElementTypes.Count, contract.AssociatedAgreementElementTypes.Count);
-            var agreementElementsDiff = agreementElementUuids.Except(contract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.Uuid)).ToList();
-            Assert.Empty(agreementElementsDiff);
+            AssertGeneralSection(contractId, contractTypeUuid, contractTemplateUuid, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
         }
 
         [Fact]
@@ -473,7 +449,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ItContractTemplateType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
 
-        //TODO: from here
         [Fact]
         public void Cannot_Create_With_GeneralData_If_Contract_Type_Is_Not_Available()
         {
@@ -549,6 +524,68 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organizationUuid, createdContract.OrganizationId);
             ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
             return (organizationUuid, parameters, createdContract, transaction);
+        }
+
+        private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(
+          bool withContractType,
+          bool withContractTemplate,
+          bool withAgreementElements,
+          bool withValidFrom,
+          bool withValidTo,
+          Guid organizationUuid)
+        {
+            var contractId = A<string>();
+            var contractTypeUuid = withContractType ? A<Guid>() : (Guid?)null;
+            var contractTemplateUuid = withContractTemplate ? A<Guid>() : (Guid?)null;
+            var enforceValid = A<bool>();
+            var validFrom = withValidFrom ? A<DateTime>().Date : (DateTime?)null;
+            var validTo = withValidTo ? (validFrom ?? A<DateTime>()).AddDays(Math.Abs(A<int>() % 100)).Date : (DateTime?)null;
+            var agreementElementUuids = withAgreementElements ? Many<Guid>().ToList() : new List<Guid>();
+            var parameters = new ItContractGeneralDataModificationParameters
+            {
+                ContractId = contractId.AsChangedValue(),
+                ContractTypeUuid = ((Guid?)contractTypeUuid).AsChangedValue(),
+                ContractTemplateUuid = ((Guid?)contractTemplateUuid).AsChangedValue(),
+                EnforceValid = enforceValid.FromNullable().AsChangedValue(),
+                ValidFrom = validFrom?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
+                ValidTo = validTo?.FromNullable().AsChangedValue() ?? Maybe<DateTime>.None.AsChangedValue(),
+                AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
+            };
+
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractType>(organizationUuid, contractTypeUuid,
+                (new ItContractType() { Uuid = contractTypeUuid.GetValueOrDefault() }, true));
+            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractTemplateType>(organizationUuid, contractTemplateUuid,
+                (new ItContractTemplateType() { Uuid = contractTemplateUuid.GetValueOrDefault() }, true));
+            var agreementElementTypes = agreementElementUuids.ToDictionary(uuid => uuid,
+                uuid => new AgreementElementType() { Id = A<int>(), Uuid = uuid });
+
+            foreach (var agreementElementType in agreementElementTypes)
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<AgreementElementType>(organizationUuid, agreementElementType.Key,
+                    (agreementElementType.Value, true));
+            return (contractId, contractTypeUuid, contractTemplateUuid, enforceValid, validFrom, validTo, agreementElementUuids, agreementElementTypes, parameters);
+        }
+
+        private static void AssertGeneralSection(
+            string expectedContractId,
+            Guid? expectedContractTypeUuid,
+            Guid? expectedContractTemplateUuid,
+            DateTime? expectedValidFrom,
+            DateTime? expectedValidTo,
+            bool expectedEnforceValid,
+            Dictionary<Guid, AgreementElementType> expectedAgreementElementTypes,
+            List<Guid> expectedAgreementElementUuids,
+            ItContract actualContract)
+        {
+            Assert.Equal(expectedContractId, actualContract.ItContractId);
+            Assert.Equal(expectedContractTypeUuid, actualContract.ContractType?.Uuid);
+            Assert.Equal(expectedContractTemplateUuid, actualContract.ContractTemplate?.Uuid);
+            Assert.Equal(expectedValidFrom, actualContract.Concluded);
+            Assert.Equal(expectedValidTo, actualContract.ExpirationDate);
+            Assert.Equal(expectedEnforceValid, actualContract.Active);
+            Assert.Equal(expectedAgreementElementTypes.Count, actualContract.AssociatedAgreementElementTypes.Count);
+            var agreementElementsDiff = expectedAgreementElementUuids
+                .Except(actualContract.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType.Uuid)).ToList();
+            Assert.Empty(agreementElementsDiff);
         }
 
         private void ExpectGetReturns(Guid contractUuid, Result<ItContract, OperationError> result)
