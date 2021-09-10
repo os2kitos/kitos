@@ -601,6 +601,11 @@ namespace Core.DomainModel.ItContract
                 return new OperationError("Both parts of procurement plan needs to be set", OperationFailure.BadInput);
             }
 
+            if (newHalfOfYear.Value != 1 && newHalfOfYear.Value != 2)
+            {
+                return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
+            }
+
             ProcurementPlanHalf = newHalfOfYear.Value;
             ProcurementPlanYear = newYear.Value;
             return Maybe<OperationError>.None;

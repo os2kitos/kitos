@@ -203,14 +203,14 @@ namespace Core.ApplicationServices.Contract.Write
                 var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
                 if (optionType.Failed)
                 {
-                    return new OperationError($"Failure while resolving {typeof(TOption).Namespace} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
+                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
                 }
 
                 var option = optionType.Value;
                 var currentValue = getCurrentValue(contract);
                 if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
                 {
-                    return new OperationError($"The changed {typeof(TOption).Namespace} points to an option which is not available in the organization", OperationFailure.BadInput);
+                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
                 }
 
                 updateValue(contract, option.option);
