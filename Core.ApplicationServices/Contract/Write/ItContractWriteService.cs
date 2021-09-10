@@ -119,7 +119,21 @@ namespace Core.ApplicationServices.Contract.Write
                 .WithOptionalUpdate(parameters.Name, UpdateName)
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments));
+        }
+
+        private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
+        {
+            return UpdateMultiAssignment
+            (
+                "system usage",
+                contract,
+                systemUsageUuids.FromNullable(),
+                itContract => itContract.AssociatedSystemUsages,
+                (itContract, id) => _contractService.AssignSystem(itContract.Id, id),
+                (itContract, id) => _contractService.RemoveSystem(itContract.Id, id)
+            ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -316,6 +330,53 @@ namespace Core.ApplicationServices.Contract.Write
                 }
 
                 updateValue(contract, option.option);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdateMultiAssignment<TAssignment>(
+           string subject,
+           ItContract contract,
+           Maybe<IEnumerable<Guid>> assignedItemUuid,
+           Func<ItContract, IEnumerable<TAssignment>> getExistingState,
+           Func<ItContract, int, Result<TAssignment, OperationError>> assign,
+           Func<ItContract, int, Result<TAssignment, OperationError>> unAssign)
+           where TAssignment : class, IHasId, IHasUuid
+        {
+            var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
+            if (newUuids.Distinct().Count() != newUuids.Count)
+            {
+                return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
+            }
+            var existingAssignments = getExistingState(contract).ToDictionary(x => x.Uuid);
+            var existingUuids = existingAssignments.Values.Select(x => x.Uuid).ToList();
+
+            var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
+            foreach (var (delta, uuid) in changes)
+            {
+                switch (delta)
+                {
+                    case EnumerableExtensions.EnumerableDelta.Added:
+                        var dbId = _entityIdentityResolver.ResolveDbId<TAssignment>(uuid);
+
+                        if (dbId.IsNone)
+                            return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
+                        var addResult = assign(contract, dbId.Value);
+
+                        if (addResult.Failed)
+                            return addResult.Error;
+
+                        break;
+                    case EnumerableExtensions.EnumerableDelta.Removed:
+                        var removeResult = unAssign(contract, existingAssignments[uuid].Id);
+                        if (removeResult.Failed)
+                            return removeResult.Error;
+
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
             }
 
             return Maybe<OperationError>.None;
