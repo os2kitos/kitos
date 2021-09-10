@@ -44,7 +44,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto)
         {
-            return new ItContractResponsibleDataModificationParameters()
+            return new ()
             {
                 OrganizationUnitUuid = dto.OrganizationUnitUuid.AsChangedValue(),
                 Signed = dto.Signed.AsChangedValue(),

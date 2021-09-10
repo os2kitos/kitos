@@ -458,7 +458,7 @@ namespace Core.DomainModel.ItContract
         #endregion
 
         #region Elementtypes
-        
+
         public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
         #endregion
 
@@ -590,7 +590,7 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> SetAgreementElements(IEnumerable<AgreementElementType> agreementElementTypes)
         {
-            var agreementElements = agreementElementTypes.Select(type=>new ItContractAgreementElementTypes()
+            var agreementElements = agreementElementTypes.Select(type => new ItContractAgreementElementTypes()
             {
                 ItContract = this,
                 AgreementElementType = type
@@ -599,10 +599,10 @@ namespace Core.DomainModel.ItContract
             if (agreementElements.Select(x => x.AgreementElementType.Uuid).Distinct().Count() != agreementElements.Count)
                 return new OperationError("agreement elements must not contain duplicates", OperationFailure.BadInput);
 
-            agreementElements.MirrorTo(AssociatedAgreementElementTypes, p => p.AgreementElementType.Uuid);
+            agreementElements.MirrorTo(AssociatedAgreementElementTypes, assignment => assignment.AgreementElementType.Uuid);
 
             return Maybe<OperationError>.None;
-		}
+        }
 
         public void ClearParent()
         {
@@ -618,6 +618,28 @@ namespace Core.DomainModel.ItContract
                 return Maybe<OperationError>.None;
             }
             return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
+        }
+
+        public Maybe<OperationError> SetResponsibleOrganizationUnit(Guid organizationUnitUuid)
+        {
+            if (organizationUnitUuid != ResponsibleOrganizationUnit?.Uuid)
+            {
+                var organizationUnit = Organization.GetOrganizationUnit(organizationUnitUuid);
+                if (organizationUnit.IsNone)
+                {
+                    return new OperationError("UUID of responsible organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput);
+                }
+
+                ResponsibleOrganizationUnit = organizationUnit.Value;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetResponsibleOrganizationUnit()
+        {
+            ResponsibleOrganizationUnit?.Track();
+            ResponsibleOrganizationUnit = null;
         }
     }
 }
