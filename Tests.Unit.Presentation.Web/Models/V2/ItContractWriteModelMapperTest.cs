@@ -177,7 +177,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.True(modificationParameters.Procurement.HasValue);
             var procurementDto = modificationParameters.Procurement.Value;
-            AssertProcurement(hasValues, requestDto, procurementDto);
+            AssertProcurement(hasValues, procurement, procurementDto);
         }
 
         [Theory]
@@ -195,7 +195,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.True(modificationParameters.Procurement.HasValue);
             var procurementDto = modificationParameters.Procurement.Value;
-            AssertProcurement(hasValues, requestDto, procurementDto);
+            AssertProcurement(hasValues, procurement, procurementDto);
+        }
+
+        [Fact]
+        public void Can_Map_Procurement()
+        {
+            //Arrange
+            var input = A<ContractProcurementDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapProcurement(input);
+
+            //Assert
+            AssertProcurement(true, input, output);
         }
 
         private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,
@@ -211,14 +224,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Validity.EnforcedValid, AssertPropertyContainsDataChange(output.EnforceValid));
         }
 
-        private static void AssertProcurement(bool hasValues, ContractWriteRequestDTO expected, ItContractProcurementModificationParameters actual)
+        private static void AssertProcurement(bool hasValues, ContractProcurementDataWriteRequestDTO expected, ItContractProcurementModificationParameters actual)
         {
-            Assert.Equal(expected.Procurement.ProcurementStrategyUuid, AssertPropertyContainsDataChange(actual.ProcurementStrategyUuid));
-            Assert.Equal(expected.Procurement.PurchaseTypeUuid, AssertPropertyContainsDataChange(actual.PurchaseTypeUuid));
+            Assert.Equal(expected.ProcurementStrategyUuid, AssertPropertyContainsDataChange(actual.ProcurementStrategyUuid));
+            Assert.Equal(expected.PurchaseTypeUuid, AssertPropertyContainsDataChange(actual.PurchaseTypeUuid));
             if (hasValues)
             {
-                Assert.Equal(expected.Procurement.ProcurementPlan.HalfOfYear, AssertPropertyContainsDataChange(actual.HalfOfYear));
-                Assert.Equal(expected.Procurement.ProcurementPlan.Year, AssertPropertyContainsDataChange(actual.Year));
+                Assert.Equal(expected.ProcurementPlan.HalfOfYear, AssertPropertyContainsDataChange(actual.HalfOfYear));
+                Assert.Equal(expected.ProcurementPlan.Year, AssertPropertyContainsDataChange(actual.Year));
             }
             else
             {
