@@ -496,7 +496,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ItContractType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
 
-        
+
         [Theory]
         [InlineData(true, true, true)]
         [InlineData(true, false, false)]
@@ -620,6 +620,29 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Half Of Year has to be either 1 or 2", OperationFailure.BadInput, transaction);
         }
 
+        [Fact]
+        public void Can_Create_With_Responsible()
+        {
+            //Arrange
+            var responsible = new ItContractResponsibleDataModificationParameters()
+            {
+                OrganizationUnitUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                Signed = A<bool>().AsChangedValue(),
+                SignedAt = ((DateTime?)A<DateTime>()).AsChangedValue(),
+                SignedBy = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(responsible: responsible);
+            var correctOrganizationUnit = new OrganizationUnit() { Uuid = responsible.OrganizationUnitUuid.NewValue.GetValueOrDefault() };
+            createdContract.Organization.OrgUnits.Add(new OrganizationUnit());
+            createdContract.Organization.OrgUnits.Add(correctOrganizationUnit);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            //TODO: Assertions
+        }
+
         private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
         {
             var procurementStrategyUuid = withStrategy ? A<Guid>() : (Guid?)null;
@@ -662,7 +685,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
-            ItContractProcurementModificationParameters procurement = null
+            ItContractProcurementModificationParameters procurement = null,
+            ItContractResponsibleDataModificationParameters responsible = null
             )
         {
             var organization = new Organization()
@@ -674,7 +698,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 Name = A<string>().AsChangedValue(),
                 ParentContractUuid = parentUuid.AsChangedValue(),
-                Procurement = procurement.FromNullable()
+                Procurement = procurement.FromNullable(),
+                Responsible = responsible.FromNullable()
             };
             var createdContract = new ItContract()
             {
