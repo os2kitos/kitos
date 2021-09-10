@@ -119,7 +119,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .WithOptionalUpdate(parameters.Name, UpdateName)
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement));
+				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData));
         }
 

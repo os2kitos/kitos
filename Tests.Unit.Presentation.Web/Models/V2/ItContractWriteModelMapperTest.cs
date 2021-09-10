@@ -57,12 +57,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false)]
-        [InlineData(true, false, false, false)]
-        [InlineData(false, true, false, false)]
-        [InlineData(false, false, true, false)]
-        [InlineData(false, false, false, true)]
-        [InlineData(true, true, true, true)]
+        [InlineData(false, false, false, false,false)]
+        [InlineData(false, false, false, false,true)]
+        [InlineData(false, false, false, true, false)]
+        [InlineData(false, false, true, false,false)]
+        [InlineData(false, true, false, false,false)]
+        [InlineData(true, false, false, false,false)]
+        [InlineData(true, true, true, true, true)]
         public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible,bool noProcurement)
         {
             //Arrange
