@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -27,6 +28,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IDomainEvents _domainEvents;
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
+        private readonly IAuthorizationContext _authorizationContext;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -35,7 +37,8 @@ namespace Core.ApplicationServices.Contract.Write
             ITransactionManager transactionManager,
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
-            IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository)
+            IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
+            IAuthorizationContext authorizationContext)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -44,6 +47,7 @@ namespace Core.ApplicationServices.Contract.Write
             _domainEvents = domainEvents;
             _databaseControl = databaseControl;
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
+            _authorizationContext = authorizationContext;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -86,6 +90,7 @@ namespace Core.ApplicationServices.Contract.Write
 
             var updateResult = _contractService
                 .GetContract(itContractUuid)
+                .Bind(WithWriteAccess)
                 .Bind(contract => ApplyUpdates(contract, parameters));
 
             if (updateResult.Ok)
@@ -98,12 +103,22 @@ namespace Core.ApplicationServices.Contract.Write
             return updateResult;
         }
 
+        private Result<ItContract, OperationError> WithWriteAccess(ItContract contract)
+        {
+            if (!_authorizationContext.AllowModify(contract))
+            {
+                return new OperationError(OperationFailure.Forbidden);
+            }
+
+            return contract;
+        }
+
         private Result<ItContract, OperationError> ApplyUpdates(ItContract contract, ItContractModificationParameters parameters)
         {
             return contract
                 .WithOptionalUpdate(parameters.Name, UpdateName)
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
-                .Bind(contract => contract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData));
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -199,14 +214,14 @@ namespace Core.ApplicationServices.Contract.Write
                 var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
                 if (optionType.Failed)
                 {
-                    return new OperationError($"Failure while resolving {typeof(TOption).Namespace} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
+                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
                 }
 
                 var option = optionType.Value;
                 var currentValue = getCurrentValue(contract);
                 if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
                 {
-                    return new OperationError($"The changed {typeof(TOption).Namespace} points to an option which is not available in the organization", OperationFailure.BadInput);
+                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
                 }
 
                 updateValue(contract, option.option);
