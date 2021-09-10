@@ -640,13 +640,14 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
         {
-            if (plan.half != 1 && plan.half != 2)
+            var (half, year) = plan;
+            if (half != 1 && half != 2)
             {
                 return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
             }
 
-            ProcurementPlanHalf = plan.half;
-            ProcurementPlanYear = plan.year;
+            ProcurementPlanHalf = half;
+            ProcurementPlanYear = year;
             return Maybe<OperationError>.None;
         }
     }
