@@ -122,6 +122,7 @@
     <Compile Include="IUserService.cs" />
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractResponsibleDataModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
