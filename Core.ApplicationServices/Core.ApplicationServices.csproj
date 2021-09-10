@@ -120,6 +120,7 @@
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />

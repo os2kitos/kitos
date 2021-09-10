@@ -20,6 +20,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Model.Contracts.Write;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -72,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
             var conditions = new List<IDomainQuery<ItContract>>();
 
-            if(organizationUuid.HasValue)
+            if (organizationUuid.HasValue)
                 conditions.Add(new QueryByOrganizationUuid<ItContract>(organizationUuid.Value));
 
             if (systemUuid.HasValue)
@@ -192,14 +193,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContract([NonEmptyGuid] Guid contractUuid, [FromBody] ContractGeneralDataWriteRequestDTO request)
+        public IHttpActionResult PutItContractGeneralData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractGeneralDataWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeService
-                .Delete(contractUuid)
-                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
+            var parameters = new ItContractModificationParameters()
+            {
+                General = _writeModelMapper.MapGeneralData(request)
+            };
+
+            return _writeService.Update(contractUuid, parameters)
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -215,7 +221,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractGeneralData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractProcurementDataWriteRequestDTO request)
+        public IHttpActionResult PutItContractProcurementData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractProcurementDataWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -474,7 +480,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Delete(contractUuid)
+                .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
         }
 
         private CreatedNegotiatedContentResult<ItContractResponseDTO> MapCreatedResponse(ItContractResponseDTO dto)

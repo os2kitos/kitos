@@ -559,18 +559,63 @@ namespace Core.DomainModel.ItContract
             };
         }
 
+        public void ResetContractType()
+        {
+            ContractType?.Track();
+            ContractType = null;
+        }
+
+        public void ResetContractTemplate()
+        {
+            ContractTemplate?.Track();
+            ContractTemplate = null;
+        }
+
+        public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
+        {
+            var validFromDate = newValidFrom?.Date;
+            var validToDate = newValidTo?.Date;
+
+            if (validFromDate.HasValue && validToDate.HasValue && validFromDate.Value.Date > validToDate.Value.Date)
+            {
+                return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
+            }
+
+            Concluded = validFromDate;
+
+            ExpirationDate = validToDate;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> SetAgreementElements(IEnumerable<AgreementElementType> agreementElementTypes)
+        {
+            var agreementElements = agreementElementTypes.Select(type=>new ItContractAgreementElementTypes()
+            {
+                ItContract = this,
+                AgreementElementType = type
+            }).ToList();
+
+            if (agreementElements.Select(x => x.AgreementElementType.Uuid).Distinct().Count() != agreementElements.Count)
+                return new OperationError("agreement elements must not contain duplicates", OperationFailure.BadInput);
+
+            agreementElements.MirrorTo(AssociatedAgreementElementTypes, p => p.AgreementElementType.Uuid);
+
+            return Maybe<OperationError>.None;
+		}
+
         public void ClearParent()
         {
             Parent.Track();
             Parent = null;
         }
 
-        public Result<ItContract, OperationError> SetParent(ItContract newParent)
+        public Maybe<OperationError> SetParent(ItContract newParent)
         {
             if (OrganizationId == newParent.OrganizationId)
             {
                 Parent = newParent;
-                return newParent;
+                return Maybe<OperationError>.None;
             }
             return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
         }
