@@ -230,13 +230,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected.PurchaseTypeUuid, AssertPropertyContainsDataChange(actual.PurchaseTypeUuid));
             if (hasValues)
             {
-                Assert.Equal(expected.ProcurementPlan.HalfOfYear, AssertPropertyContainsDataChange(actual.HalfOfYear));
-                Assert.Equal(expected.ProcurementPlan.Year, AssertPropertyContainsDataChange(actual.Year));
+                var (half, year) = AssertPropertyContainsDataChange(actual.ProcurementPlan);
+                Assert.Equal(expected.ProcurementPlan.HalfOfYear, half);
+                Assert.Equal(expected.ProcurementPlan.Year, year);
             }
             else
             {
-                AssertPropertyContainsResetDataChange(actual.HalfOfYear);
-                AssertPropertyContainsResetDataChange(actual.Year);
+                AssertPropertyContainsResetDataChange(actual.ProcurementPlan);
             }
         }
 

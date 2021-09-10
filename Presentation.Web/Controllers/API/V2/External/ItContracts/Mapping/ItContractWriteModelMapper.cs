@@ -9,6 +9,7 @@ using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.SharedProperties;
+using Presentation.Web.Models.API.V2.Types.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -65,9 +66,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             {
                 ProcurementStrategyUuid = request.ProcurementStrategyUuid.AsChangedValue(),
                 PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
-                HalfOfYear = (request.ProcurementPlan?.HalfOfYear ?? Maybe<byte>.None).AsChangedValue(),
-                Year = (request.ProcurementPlan?.Year ?? Maybe<int>.None).AsChangedValue()
+                ProcurementPlan = MapProcurementPlan(request.ProcurementPlan).AsChangedValue()
             };
+        }
+
+        private static Maybe<(byte half, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
+        {
+            return plan == null ? Maybe<(byte half, int year)>.None : (plan.HalfOfYear, plan.Year);
         }
     }
 }
