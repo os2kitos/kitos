@@ -640,8 +640,8 @@ namespace Core.DomainModel.ItContract
         {
             ResponsibleOrganizationUnit?.Track();
             ResponsibleOrganizationUnit = null;
-		}
-		
+        }
+
         public void ResetProcurementStrategy()
         {
             ProcurementStrategy?.Track();
@@ -670,6 +670,19 @@ namespace Core.DomainModel.ItContract
 
             ProcurementPlanHalf = half;
             ProcurementPlanYear = year;
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSupplierOrganization()
+        {
+            Supplier.Track();
+            Supplier = null;
+        }
+
+        public Maybe<OperationError> SetSupplierOrganization(Organization.Organization organization)
+        {
+            Supplier = organization ?? throw new ArgumentNullException(nameof(organization));
+
             return Maybe<OperationError>.None;
         }
     }

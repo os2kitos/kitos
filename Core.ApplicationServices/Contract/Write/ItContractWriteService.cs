@@ -8,11 +8,13 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
+using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -29,6 +31,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IOrganizationService _organizationService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -38,7 +41,8 @@ namespace Core.ApplicationServices.Contract.Write
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext,
+            IOrganizationService organizationService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -48,6 +52,7 @@ namespace Core.ApplicationServices.Contract.Write
             _databaseControl = databaseControl;
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
+            _organizationService = organizationService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -120,19 +125,48 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData));
+        }
+
+        private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)
+        {
+            return contract
+                .WithOptionalUpdate(parameters.OrganizationUuid, UpdateSupplierOrganization)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.HasSupplierSigned = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.SupplierContractSigner = newValue));
+        }
+
+        private Maybe<OperationError> UpdateSupplierOrganization(ItContract contract, Guid? organizationId)
+        {
+            if (!organizationId.HasValue)
+            {
+                contract.ResetSupplierOrganization();
+            }
+            else
+            {
+                var organizationResult = _organizationService.GetOrganization(organizationId.Value);
+                if (organizationResult.Failed)
+                {
+                    return new OperationError("Failed to get supplier organization:" + organizationResult.Error.Message.GetValueOrEmptyString(),organizationResult.Error.FailureType);
+                }
+
+                return contract.SetSupplierOrganization(organizationResult.Value);
+            }
+            return Maybe<OperationError>.None;
         }
 
         private static Result<ItContract, OperationError> UpdateResponsibleData(ItContract contract, ItContractResponsibleDataModificationParameters parameters)
         {
             return contract
-                .WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateOrganizationUnit)
+                .WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateResponsibleOrganizationUnit)
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.IsSigned = newValue))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.ContractSigner = newValue));
         }
 
-        private static Maybe<OperationError> UpdateOrganizationUnit(ItContract contract, Guid? organizationUnitUuid)
+        private static Maybe<OperationError> UpdateResponsibleOrganizationUnit(ItContract contract, Guid? organizationUnitUuid)
         {
             if (organizationUnitUuid.HasValue)
             {

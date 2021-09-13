@@ -10,6 +10,7 @@ using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
@@ -44,7 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>());
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>(), Mock.Of<IOrganizationService>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
