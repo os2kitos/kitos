@@ -90,7 +90,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.False(supplier.Signed);
             Assert.Null(supplier.SignedBy);
             Assert.Null(supplier.SignedAt);
-            Assert.Null(supplier.SupplierOrganization);
+            Assert.Null(supplier.Organization);
 
             var responsible = dto.Responsible;
             Assert.False(responsible.Signed);
@@ -207,11 +207,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(contract.SupplierSignedDate, dto.Supplier.SignedAt);
             if (withOptionalCrossReferences)
             {
-                AssertOrganization(contract.Supplier, dto.Supplier.SupplierOrganization);
+                AssertOrganization(contract.Supplier, dto.Supplier.Organization);
             }
             else
             {
-                Assert.Null(dto.Supplier.SupplierOrganization);
+                Assert.Null(dto.Supplier.Organization);
             }
         }
 

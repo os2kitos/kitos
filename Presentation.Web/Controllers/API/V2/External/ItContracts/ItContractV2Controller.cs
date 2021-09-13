@@ -191,7 +191,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractGeneralData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractGeneralDataWriteRequestDTO request)
         {
@@ -219,7 +218,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractProcurementData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractProcurementDataWriteRequestDTO request)
         {
@@ -246,14 +244,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractSupplierData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractSupplierDataWriteRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(contractUuid, new ItContractModificationParameters()
+                {
+                    Supplier = _writeModelMapper.MapSupplier(request)
+                })
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>
@@ -267,7 +270,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractResponsibleData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractResponsibleDataWriteRequestDTO request)
         {
@@ -296,7 +298,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractSystemUsages([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<Guid> systemUsageUuids)
         {
@@ -318,7 +319,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractDataProcessingRegistrations([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<Guid> dataProcessingRegistrationUuids)
         {
@@ -339,7 +339,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractHandoverData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<HandoverTrialRequestDTO> request)
         {
@@ -360,7 +359,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractPaymentModelData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractPaymentModelDataWriteRequestDTO request)
         {
@@ -381,7 +379,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractAgreementPeriodData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractAgreementPeriodDataWriteRequestDTO request)
         {
@@ -402,7 +399,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractTerminationData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractTerminationDataWriteRequestDTO request)
         {
@@ -423,7 +419,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractPaymentData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractPaymentsDataWriteRequestDTO request)
         {
@@ -444,7 +439,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractRoleAssignmentData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
         {
@@ -465,7 +459,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public IHttpActionResult PutItContractExternalReferencesData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
         {
