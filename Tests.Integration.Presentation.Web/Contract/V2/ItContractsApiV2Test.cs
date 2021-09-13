@@ -788,6 +788,30 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Cannot_POST_With_SystemUsages_From_Different_Org()
+        {
+            //Arrange
+            var (token1, _, organization1) = await CreatePrerequisitesAsync();
+            var (token2, _, organization2) = await CreatePrerequisitesAsync();
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization1.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization2.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token1, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization1.Uuid, SystemUuid = system1.Uuid });
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token2, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization2.Uuid, SystemUuid = system2.Uuid });
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                SystemUsageUuids = new[] { system1Usage.Uuid, system2Usage.Uuid }
+            };
+
+            //Act
+            var response = await ItContractV2Helper.SendPostContractAsync(token1, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
         public async Task Can_PUT_With_SystemUsages()
         {
             //Arrange

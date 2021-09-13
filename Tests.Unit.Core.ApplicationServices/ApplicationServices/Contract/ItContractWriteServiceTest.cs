@@ -10,9 +10,11 @@ using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
@@ -34,6 +36,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
+        private readonly Mock<IItSystemUsageService> _usageServiceMock;
+        private readonly Mock<IAuthorizationContext> _authContext;
 
         public ItContractWriteServiceTest()
         {
@@ -44,7 +48,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>());
+            _usageServiceMock = new Mock<IItSystemUsageService>();
+            _authContext = new Mock<IAuthorizationContext>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _usageServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -620,6 +626,136 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Half Of Year has to be either 1 or 2", OperationFailure.BadInput, transaction);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_SystemUsages(bool hasUsages)
+        {
+            //Arrange
+            Configure(f => f
+                .Customize<ItSystemUsage>(o => o
+                    .OmitAutoProperties()
+                    .With(usage => usage.Id)
+                    .With(usage => usage.Uuid)
+                )
+            );
+            var systemUsages = hasUsages ? Many<ItSystemUsage>().ToList() : new List<ItSystemUsage>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsages.Select(x => x.Uuid).ToList());
+
+            foreach (var usage in systemUsages)
+            {
+                ExpectGetSystemUsageReturns(usage.Uuid, usage);   
+            }
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertSystemUsages(systemUsages, result.Value.AssociatedSystemUsages);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_SystemUsages_If_Duplicates()
+        {
+            //Arrange
+            var duplicateGuid = A<Guid>();
+            var usageUuids = new List<Guid>() {duplicateGuid, duplicateGuid};
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids.ToList());
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, "Duplicates of 'SystemUsages' are not allowed", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_SystemUsages_If_Get_SystemUsage_Fails()
+        {
+            //Arrange
+            var usage = new ItSystemUsage() {Id = A<int>(), Uuid = A<Guid>()};
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid>{usage.Uuid});
+
+            var operationError = A<OperationError>();
+            ExpectGetSystemUsageReturns(usage.Uuid, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, $"Failed to get system usage with Uuid: {usage.Uuid}, with error message", operationError.FailureType, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_SystemUsages_If_Usage_Already_Assigned()
+        {
+            //Arrange
+            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid> { usage.Uuid });
+            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage{ ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id});
+            ExpectGetSystemUsageReturns(usage.Uuid, usage);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertSystemUsages(new List<ItSystemUsage>{usage}, result.Value.AssociatedSystemUsages);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_SystemUsages_To_Remove_Usage()
+        {
+            //Arrange
+            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid>());
+            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
+            ExpectGetSystemUsageReturns(usage.Uuid, usage);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertSystemUsages(new List<ItSystemUsage>(), result.Value.AssociatedSystemUsages);
+            AssertTransactionCommitted(transaction);
+        }
+
+        private void ExpectNameValidationSuccess(int contractId, string newName)
+        {
+            _itContractServiceMock.Setup(x => x.ValidateNewName(contractId, newName)).Returns(Maybe<OperationError>.None);
+        }
+
+        private void ExpectAllowModifySuccess(ItContract contract)
+        {
+            _authContext.Setup(x => x.AllowModify(contract)).Returns(true);
+        }
+
+        private static void AssertSystemUsages(IEnumerable<ItSystemUsage> expected, IEnumerable<ItContractItSystemUsage> actual)
+        {
+            var orderedExpected = expected.OrderBy(x => x.Id).ToList();
+            var orderedActual = actual.OrderBy(x => x.ItSystemUsageId).ToList();
+
+            Assert.Equal(orderedExpected.Count, orderedActual.Count);
+            for (var i = 0; i < orderedExpected.Count; i++)
+            {
+                Assert.Equal(orderedExpected[i].Id, orderedActual[i].ItSystemUsageId);
+            }
+        }
+
+        private void ExpectGetSystemUsageReturns(Guid usageUuid, Result<ItSystemUsage, OperationError> result)
+        {
+            _usageServiceMock.Setup(x => x.GetByUuid(usageUuid)).Returns(result);
+        }
+
         private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
         {
             var procurementStrategyUuid = withStrategy ? A<Guid>() : (Guid?)null;
@@ -662,7 +798,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
-            ItContractProcurementModificationParameters procurement = null
+            ItContractProcurementModificationParameters procurement = null,
+            IEnumerable<Guid> systemUsageUuids = null
             )
         {
             var organization = new Organization()
@@ -674,7 +811,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 Name = A<string>().AsChangedValue(),
                 ParentContractUuid = parentUuid.AsChangedValue(),
-                Procurement = procurement.FromNullable()
+                Procurement = procurement.FromNullable(),
+                SystemUsageUuids = systemUsageUuids.FromNullable()
             };
             var createdContract = new ItContract()
             {

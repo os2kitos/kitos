@@ -8,10 +8,10 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
@@ -30,6 +30,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IItSystemUsageService _usageService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -39,7 +40,8 @@ namespace Core.ApplicationServices.Contract.Write
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
-            IAuthorizationContext authorizationContext)
+            IAuthorizationContext authorizationContext, 
+            IItSystemUsageService usageService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -49,6 +51,7 @@ namespace Core.ApplicationServices.Contract.Write
             _databaseControl = databaseControl;
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
+            _usageService = usageService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -139,15 +142,15 @@ namespace Core.ApplicationServices.Contract.Write
             foreach (var (delta, uuid) in changes)
             {
 
-                var usageId = _entityIdentityResolver.ResolveDbId<ItSystemUsage>(uuid);
+                var getUsageResult = _usageService.GetByUuid(uuid);
 
-                if (usageId.IsNone)
-                    return new OperationError($"No SystemUsage found with Uuid: {uuid}", OperationFailure.BadInput);
+                if (getUsageResult.Failed)
+                    return new OperationError($"Failed to get system usage with Uuid: {uuid}, with error message: {getUsageResult.Error.Message.GetValueOrEmptyString()}", getUsageResult.Error.FailureType);
 
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var assignResult = contract.AssignSystemUsage(usageId.Value);
+                        var assignResult = contract.AssignSystemUsage(getUsageResult.Value.Id);
                         if (assignResult.HasValue)
                         {
                             return new OperationError($"Failed to assign system usage with error message: {assignResult.Value.Message.GetValueOrEmptyString()}", assignResult.Value.FailureType);
@@ -155,7 +158,7 @@ namespace Core.ApplicationServices.Contract.Write
 
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeResult = contract.RemoveSystemUsage(usageId.Value);
+                        var removeResult = contract.RemoveSystemUsage(getUsageResult.Value.Id);
 
                         if (removeResult.HasValue)
                         {
