@@ -5,11 +5,11 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -31,6 +31,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IItSystemUsageService _usageService;
+        private readonly IUpdateAssignmentHelper _updateAssignmentHelper;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -41,7 +42,8 @@ namespace Core.ApplicationServices.Contract.Write
             IDatabaseControl databaseControl,
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext, 
-            IItSystemUsageService usageService)
+            IItSystemUsageService usageService,
+            IUpdateAssignmentHelper updateAssignmentHelper)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -52,6 +54,7 @@ namespace Core.ApplicationServices.Contract.Write
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
             _usageService = usageService;
+            _updateAssignmentHelper = updateAssignmentHelper;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -150,49 +153,24 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
-            var usageUuids = systemUsageUuids.ToList();
-            if (usageUuids.Distinct().Count() != usageUuids.Count)
-            {
-                return new OperationError($"Duplicates of 'SystemUsages' are not allowed", OperationFailure.BadInput);
-            }
+            return _updateAssignmentHelper.UpdateMultiAssignment
+             (
+                 "system usage",
+                 contract,
+                 systemUsageUuids.FromNullable(),
+                 itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage),
+                 (itContract, id) => AssignSystemUsage(itContract, id),
+                 (itContract, id) => itContract.RemoveSystemUsage(id)
+             ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+        }
 
-            var existingUuids = contract.AssociatedSystemUsages.Select(x => x.ItSystemUsage.Uuid).ToList();
+        private Maybe<OperationError> AssignSystemUsage(ItContract contract, int usageId)
+        {
+            var usageResult = _usageService.GetById(usageId).FromNullable();
+            if (usageResult.IsNone)
+                return new OperationError($"It System Usage with Id: {usageId}, could not be found", OperationFailure.NotFound);
 
-            var changes = existingUuids.ComputeDelta(usageUuids, uuid => uuid).ToList();
-
-            foreach (var (delta, uuid) in changes)
-            {
-
-                var getUsageResult = _usageService.GetByUuid(uuid);
-
-                if (getUsageResult.Failed)
-                    return new OperationError($"Failed to get system usage with Uuid: {uuid}, with error message: {getUsageResult.Error.Message.GetValueOrEmptyString()}", getUsageResult.Error.FailureType);
-
-                switch (delta)
-                {
-                    case EnumerableExtensions.EnumerableDelta.Added:
-                        var assignResult = contract.AssignSystemUsage(getUsageResult.Value.Id);
-                        if (assignResult.HasValue)
-                        {
-                            return new OperationError($"Failed to assign system usage with error message: {assignResult.Value.Message.GetValueOrEmptyString()}", assignResult.Value.FailureType);
-                        }
-
-                        break;
-                    case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeResult = contract.RemoveSystemUsage(getUsageResult.Value.Id);
-
-                        if (removeResult.HasValue)
-                        {
-                            return new OperationError($"Failed to remove system usage with error message: {removeResult.Value.Message.GetValueOrEmptyString()}", removeResult.Value.FailureType);
-                        }
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return contract;
+            return contract.AssignSystemUsage(usageResult.Value);
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -250,7 +228,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
         {
-            return UpdateIndependentOptionTypeAssignment
+            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTemplateUuid,
@@ -262,7 +240,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractType(ItContract contract, Guid? contractTypeId)
         {
-            return UpdateIndependentOptionTypeAssignment
+            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTypeId,
@@ -296,7 +274,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
         {
-            return UpdateIndependentOptionTypeAssignment(
+            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment(
                 contract,
                 purchaseTypeUuid,
                 c => c.ResetPurchaseForm(),
@@ -307,7 +285,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateProcurementStrategy(ItContract contract, Guid? procurementStrategyUuid)
         {
-            return UpdateIndependentOptionTypeAssignment(
+            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment(
                 contract,
                 procurementStrategyUuid,
                 c => c.ResetProcurementStrategy(),
@@ -359,38 +337,6 @@ namespace Core.ApplicationServices.Contract.Write
             return _contractService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
-        }
-
-        private Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TOption>(
-            ItContract contract,
-            Guid? optionTypeUuid,
-            Action<ItContract> onReset,
-            Func<ItContract, TOption> getCurrentValue,
-            Action<ItContract, TOption> updateValue) where TOption : OptionEntity<ItContract>
-        {
-            if (optionTypeUuid == null)
-            {
-                onReset(contract);
-            }
-            else
-            {
-                var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
-                if (optionType.Failed)
-                {
-                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
-                }
-
-                var option = optionType.Value;
-                var currentValue = getCurrentValue(contract);
-                if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
-                {
-                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
-                }
-
-                updateValue(contract, option.option);
-            }
-
-            return Maybe<OperationError>.None;
         }
     }
 }

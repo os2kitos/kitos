@@ -673,18 +673,22 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> AssignSystemUsage(int systemUsageId)
+        public Maybe<OperationError> AssignSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            if (AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsageId))
-            {
-                return new OperationError($"SystemUsage with Id: {systemUsageId} already assigned", OperationFailure.Conflict);
-            }
+            if (systemUsage.OrganizationId != OrganizationId)
+                return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
+            
+            if(AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
+                return new OperationError($"It System Usage with Id: {systemUsage.Id}, already assigned to Contract", OperationFailure.Conflict);
 
-            AssociatedSystemUsages.Add(new ItContractItSystemUsage()
+            var newAssign = new ItContractItSystemUsage
             {
-                ItContractId = Id,
-                ItSystemUsageId = systemUsageId
-            });
+                ItContract = this,
+                ItSystemUsage = systemUsage
+            };
+
+            AssociatedSystemUsages.Add(newAssign);
+
             return Maybe<OperationError>.None;
         }
 

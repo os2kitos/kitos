@@ -306,7 +306,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             return _writeService
                 .Update(contractUuid, new ItContractModificationParameters
                 {
-                    SystemUsageUuids = systemUsageUuids.FromNullable()
+                    SystemUsageUuids = systemUsageUuids.FromNullable() ?? new List<Guid>()
                 })
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);

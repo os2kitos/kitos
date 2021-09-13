@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.SystemUsage;
@@ -38,6 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
+        private readonly Mock<IUpdateAssignmentHelper> _updateAssignmentHelper;
 
         public ItContractWriteServiceTest()
         {
@@ -50,7 +52,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _authContext = new Mock<IAuthorizationContext>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _usageServiceMock.Object);
+            _updateAssignmentHelper = new Mock<IUpdateAssignmentHelper>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _usageServiceMock.Object, _updateAssignmentHelper.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -275,7 +278,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 validTo,
                 agreementElementUuids,
                 agreementElementTypes,
-                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, organizationUuid);
+                parameters) = SetupGeneralSectionInput(withContractType, withContractTemplate, withAgreementElements, withValidFrom, withValidTo, createdContract, organizationUuid);
 
             itContractModificationParameters.General = parameters;
 
@@ -839,6 +842,16 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             }
         }
 
+        private void ExpectUpdateIndependentReturns<TOption>(ItContract contract, Guid? optionUuid, Maybe<OperationError> result) where TOption : OptionEntity<ItContract>
+        {
+            if (optionUuid.HasValue)
+            {
+                _updateAssignmentHelper
+                    .Setup(x => x.UpdateIndependentOptionTypeAssignment(contract, optionUuid, It.IsAny<Action<ItContract>>(), It.IsAny<Func<ItContract, TOption>>(), It.IsAny<Action<ItContract, TOption>>()))
+                    .Returns(result);
+            }
+        }
+
         private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<ItContract>
         {
             if (optionTypeUuid.HasValue)
@@ -885,6 +898,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
           bool withAgreementElements,
           bool withValidFrom,
           bool withValidTo,
+          ItContract contract,
           Guid organizationUuid)
         {
             var contractId = A<string>();
@@ -905,10 +919,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
 
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractType>(organizationUuid, contractTypeUuid,
-                (new ItContractType() { Uuid = contractTypeUuid.GetValueOrDefault() }, true));
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractTemplateType>(organizationUuid, contractTemplateUuid,
-                (new ItContractTemplateType() { Uuid = contractTemplateUuid.GetValueOrDefault() }, true));
+            ExpectUpdateIndependentReturns<ItContractType>(contract, contractTypeUuid, Maybe<OperationError>.None);
+
+            ExpectUpdateIndependentReturns<ItContractTemplateType>(contract, contractTemplateUuid, Maybe<OperationError>.None);
+
             var agreementElementTypes = agreementElementUuids.ToDictionary(uuid => uuid,
                 uuid => new AgreementElementType() { Id = A<int>(), Uuid = uuid });
 

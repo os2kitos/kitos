@@ -116,6 +116,8 @@
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\Write\DataProcessingRegistrationWriteService.cs" />
     <Compile Include="GDPR\Write\IDataProcessingRegistrationWriteService.cs" />
+    <Compile Include="Generic\Write\IUpdateAssignmentHelper.cs" />
+    <Compile Include="Generic\Write\UpdateAssignmentHelper.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
