@@ -57,14 +57,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false,false)]
-        [InlineData(false, false, false, false,true)]
+        [InlineData(false, false, false, false, false)]
+        [InlineData(false, false, false, false, true)]
         [InlineData(false, false, false, true, false)]
-        [InlineData(false, false, true, false,false)]
-        [InlineData(false, true, false, false,false)]
-        [InlineData(true, false, false, false,false)]
+        [InlineData(false, false, true, false, false)]
+        [InlineData(false, true, false, false, false)]
+        [InlineData(true, false, false, false, false)]
         [InlineData(true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible,bool noProcurement)
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -211,8 +211,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Signed, AssertPropertyContainsDataChange(output.Signed));
             Assert.Equal(input.SignedAt, AssertPropertyContainsDataChange(output.SignedAt));
             Assert.Equal(input.SignedBy, AssertPropertyContainsDataChange(output.SignedBy));
-		}
-		
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]

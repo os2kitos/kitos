@@ -821,10 +821,19 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertResponsible(changes, freshDTO);
 
-            //Act - full reset
-            changes = new ContractResponsibleDataWriteRequestDTO();
+            //Act - change all again
+            changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
             var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertResponsible(changes, freshDTO);
+
+            //Act - full reset
+            changes = new ContractResponsibleDataWriteRequestDTO();
+            var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
