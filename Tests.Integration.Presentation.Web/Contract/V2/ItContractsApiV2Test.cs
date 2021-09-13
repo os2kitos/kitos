@@ -840,12 +840,98 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertResponsible(changes, freshDTO);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public async Task Can_POST_With_Supplier(bool withOrg, bool withSignedAt, bool withSignedBy)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var input = await CreateContractSupplierDataRequestDTO(token, organization, withOrg, withSignedAt, withSignedBy);
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Supplier = input
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertSupplier(input, freshDTO);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Supplier()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+            };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Act
+            var changes = await CreateContractSupplierDataRequestDTO(token, organization, false, false, false);
+            var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertSupplier(changes, freshDTO);
+
+            //Act - change all
+            changes = await CreateContractSupplierDataRequestDTO(token, organization, true, true, true);
+            var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertSupplier(changes, freshDTO);
+
+            //Act - change all again
+            changes = await CreateContractSupplierDataRequestDTO(token, organization, true, true, true);
+            var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertSupplier(changes, freshDTO);
+
+            //Act - full reset
+            changes = new ContractSupplierDataWriteRequestDTO();
+            var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertSupplier(changes, freshDTO);
+        }
+
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
         {
             Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
             Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Responsible.Signed);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt, freshDTO.Responsible.SignedAt);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Responsible.SignedBy);
+        }
+
+        private static void AssertSupplier(ContractSupplierDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
+        {
+            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUuid, freshDTO.Supplier.Organization?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Supplier.Signed);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt, freshDTO.Supplier.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
         }
 
         private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, Organization organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
@@ -859,6 +945,21 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 SignedAt = withSignedAt ? A<DateTime>() : null,
                 SignedBy = withSignedBy ? A<string>() : null,
                 OrganizationUnitUuid = organizationUnit?.Uuid
+            };
+            return contractResponsibleDataWriteRequestDto;
+        }
+
+        private async Task<ContractSupplierDataWriteRequestDTO> CreateContractSupplierDataRequestDTO(string token, Organization organization, bool withOrg, bool withSignedAt, bool withSignedBy)
+        {
+            var organizationUnit = withOrg
+                ? (await OrganizationHelper.GetOrganizationAsync(TestEnvironment.DefaultOrganizationId))
+                : null;
+            var contractResponsibleDataWriteRequestDto = new ContractSupplierDataWriteRequestDTO
+            {
+                Signed = A<bool>(),
+                SignedAt = withSignedAt ? A<DateTime>() : null,
+                SignedBy = withSignedBy ? A<string>() : null,
+                OrganizationUuid = organizationUnit?.Uuid
             };
             return contractResponsibleDataWriteRequestDto;
         }
@@ -927,7 +1028,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         private async Task<Organization> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
-            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", A<OrganizationTypeKeys>(), AccessModifier.Public);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             return organization;
         }
 
