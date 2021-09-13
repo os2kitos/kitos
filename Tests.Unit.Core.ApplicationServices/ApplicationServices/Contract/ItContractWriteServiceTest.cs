@@ -628,7 +628,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 OrganizationUnitUuid = ((Guid?)A<Guid>()).AsChangedValue(),
                 Signed = A<bool>().AsChangedValue(),
-                SignedAt = ((DateTime?)A<DateTime>()).AsChangedValue(),
+                SignedAt = A<DateTime?>().AsChangedValue(),
                 SignedBy = A<string>().AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(responsible: responsible);
@@ -640,7 +640,33 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            //TODO: Assertions
+            Assert.True(result.Ok);
+            var contract = result.Value;
+            Assert.Equal(responsible.OrganizationUnitUuid.NewValue, contract.ResponsibleOrganizationUnit?.Uuid);
+            Assert.Equal(responsible.Signed.NewValue, contract.IsSigned);
+            Assert.Equal(responsible.SignedAt.NewValue, contract.SignedDate);
+            Assert.Equal(responsible.SignedBy.NewValue, contract.ContractSigner);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Responsible_If_Responsible_Unit_Does_Not_Exist_On_Contract_Organization()
+        {
+            //Arrange
+            var responsible = new ItContractResponsibleDataModificationParameters()
+            {
+                OrganizationUnitUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(responsible: responsible);
+            var existingUnit = new OrganizationUnit() { Uuid = Guid.NewGuid() };
+            createdContract.Organization.OrgUnits.Add(existingUnit);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, "UUID of responsible organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput,transaction);
         }
 
         private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
