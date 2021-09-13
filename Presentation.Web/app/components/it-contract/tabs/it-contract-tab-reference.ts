@@ -81,6 +81,7 @@
                     }, {
                         field: "lastChangedByUser.fullName",
                         title: "Senest ændret af",
+                        template: dateItem => dateItem.lastChangedByUser?.fullName || dateItem.objectOwner?.fullName,
                         width: 150
                     }, {
                         title: "Rediger",
