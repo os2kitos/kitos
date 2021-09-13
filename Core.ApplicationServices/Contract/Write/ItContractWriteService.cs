@@ -124,7 +124,28 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ParentContractUuid, UpdateParentContract))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments));
+        }
+
+        private static Result<ItContract, OperationError> UpdateResponsibleData(ItContract contract, ItContractResponsibleDataModificationParameters parameters)
+        {
+            return contract
+                .WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateOrganizationUnit)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.IsSigned = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.ContractSigner = newValue));
+        }
+
+        private static Maybe<OperationError> UpdateOrganizationUnit(ItContract contract, Guid? organizationUnitUuid)
+        {
+            if (organizationUnitUuid.HasValue)
+            {
+                return contract.SetResponsibleOrganizationUnit(organizationUnitUuid.Value);
+            }
+            contract.ResetResponsibleOrganizationUnit();
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
@@ -268,8 +289,8 @@ namespace Core.ApplicationServices.Contract.Write
             }
 
             var updateResult = contract.UpdateProcurementPlan(plan.Value);
-            return updateResult.HasValue 
-                ? new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType) 
+            return updateResult.HasValue
+                ? new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType)
                 : Maybe<OperationError>.None;
         }
 
