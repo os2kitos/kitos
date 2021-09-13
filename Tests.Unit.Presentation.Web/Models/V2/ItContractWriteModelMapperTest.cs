@@ -57,13 +57,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false)]
-        [InlineData(true, false, false, false)]
-        [InlineData(false, true, false, false)]
-        [InlineData(false, false, true, false)]
-        [InlineData(false, false, false, true)]
-        [InlineData(true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noProcurement)
+        [InlineData(false, false, false, false, false)]
+        [InlineData(false, false, false, false, true)]
+        [InlineData(false, false, false, true, false)]
+        [InlineData(false, false, true, false, false)]
+        [InlineData(false, true, false, false, false)]
+        [InlineData(true, false, false, false, false)]
+        [InlineData(true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -71,6 +72,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
             if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
             if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
+            if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
@@ -80,8 +82,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(noName, output.Name.IsUnchanged);
-			Assert.Equal(noParent, output.ParentContractUuid.IsUnchanged);
+            Assert.Equal(noParent, output.ParentContractUuid.IsUnchanged);
             Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noResponsible, output.Responsible.IsNone);
             Assert.Equal(noProcurement, output.Procurement.IsNone);
         }
 
@@ -160,6 +163,54 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(requestDto.ParentContractUuid, AssertPropertyContainsDataChange(modificationParameters.ParentContractUuid));
+        }
+
+        [Fact]
+        public void Can_Map_Responsible()
+        {
+            //Arrange
+            var input = A<ContractResponsibleDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapResponsible(input);
+
+            //Assert
+            AssertResponsible(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Responsible_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractResponsibleDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Responsible = input });
+
+            //Assert
+            AssertResponsible(input, output.Responsible.Value);
+        }
+
+        [Fact]
+        public void Can_Map_Responsible_FromPUT()
+        {
+            //Arrange
+            var input = A<ContractResponsibleDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO { Responsible = input });
+
+            //Assert
+            AssertResponsible(input, output.Responsible.Value);
+        }
+
+        private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO input,
+            ItContractResponsibleDataModificationParameters output)
+        {
+            Assert.Equal(input.OrganizationUnitUuid, AssertPropertyContainsDataChange(output.OrganizationUnitUuid));
+            Assert.Equal(input.Signed, AssertPropertyContainsDataChange(output.Signed));
+            Assert.Equal(input.SignedAt, AssertPropertyContainsDataChange(output.SignedAt));
+            Assert.Equal(input.SignedBy, AssertPropertyContainsDataChange(output.SignedBy));
         }
 
         [Theory]
