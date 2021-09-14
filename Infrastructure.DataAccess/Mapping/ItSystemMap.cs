@@ -8,13 +8,21 @@ namespace Infrastructure.DataAccess.Mapping
         {
             // Properties
 
-            // BUG there's an issue with indexing http://stackoverflow.com/questions/26055140/ef-migrations-drops-index-when-adding-compsite-index
-            this.Property(x => x.OrganizationId)
-                .HasUniqueIndexAnnotation("UX_NamePerOrg", 0);
             this.Property(x => x.Name)
-                .HasMaxLength(ItSystem.MaxNameLength) // http://stackoverflow.com/questions/1827063/mysql-error-key-specification-without-a-key-length
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_NamePerOrg", 1);
+                .HasMaxLength(ItSystem.MaxNameLength)
+                .IsRequired();
+
+            HasIndex(x => new { x.OrganizationId, x.Name })
+                .IsUnique(true)
+                .HasName("UX_NameUniqueToOrg");
+
+            HasIndex(x => x.OrganizationId)
+                .IsUnique(false)
+                .HasName("IX_OrganizationId");
+
+            HasIndex(x => x.Name)
+                .IsUnique(false)
+                .HasName("IX_Name");
 
             // Table & Column Mappings
             this.ToTable("ItSystem");

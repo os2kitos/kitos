@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
@@ -43,6 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDataProcessingRegistrationOversightOptionsAssignmentService> _oversightOptionAssignmentServiceMock;
         private readonly Mock<IDataProcessingRegistrationOversightDateAssignmentService> _oversightDateAssignmentServiceMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
+        private readonly Mock<IGenericRepository<DataProcessingRegistrationOversightDate>> _dprOversightDaterepositoryMock;
 
         public DataProcessingRegistrationApplicationServiceTest()
         {
@@ -60,6 +60,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _oversightOptionAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightOptionsAssignmentService>();
             _oversightDateAssignmentServiceMock = new Mock<IDataProcessingRegistrationOversightDateAssignmentService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
+            _dprOversightDaterepositoryMock = new Mock<IGenericRepository<DataProcessingRegistrationOversightDate>>();
             _sut = new DataProcessingRegistrationApplicationService(
                 _authorizationContextMock.Object,
                 _repositoryMock.Object,
@@ -74,7 +75,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _oversightOptionAssignmentServiceMock.Object,
                 _oversightDateAssignmentServiceMock.Object,
                 _transactionManagerMock.Object,
-                _userContextMock.Object);
+                _userContextMock.Object,
+                _dprOversightDaterepositoryMock.Object);
         }
 
         [Fact]
@@ -85,7 +87,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var name = A<string>();
 
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             ExpectAllowCreateReturns(organizationId, true);
             _namingServiceMock.Setup(x => x.ValidateSuggestedNewRegistrationName(organizationId, name)).Returns(Maybe<OperationError>.None);
             _repositoryMock
@@ -143,7 +145,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowDeleteReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.Serializable)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.Delete(id);
@@ -206,7 +208,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             _namingServiceMock.Setup(x => x.ChangeName(registration, name)).Returns(Maybe<OperationError>.None);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateName(id, name);
@@ -390,7 +392,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             ExpectRepositoryGetToReturn(agreementId, registration);
             ExpectAllowModifyReturns(registration, true);
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             _roleAssignmentServiceMock.Setup(x => x.AssignRole(registration, roleId, userId)).Returns(serviceResult);
 
             //Act
@@ -433,7 +435,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
 
             ExpectRepositoryGetToReturn(agreementId, registration);
             ExpectAllowModifyReturns(registration, true);
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             _roleAssignmentServiceMock.Setup(x => x.RemoveRole(registration, roleId, userId)).Returns(serviceResult);
 
             //Act
@@ -474,7 +476,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             _referenceRepositoryMock.Setup(x => x.Get(referenceId)).Returns(expectedNewMasterReference);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.SetMasterReference(agreementId, referenceId);
@@ -541,6 +543,51 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.SetMasterReference(id, A<int>()));
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Clear_Master_Reference(bool hasMasterReference)
+        {
+            //Arrange
+            var agreementId = A<int>();
+            var referenceId = A<int>();
+            var masterToRemove = new ExternalReference() { Id = referenceId };
+
+            var registration = new DataProcessingRegistration
+            {
+                Reference = hasMasterReference ? masterToRemove : null
+            };
+
+            ExpectRepositoryGetToReturn(agreementId, registration);
+            ExpectAllowModifyReturns(registration, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.ClearMasterReference(agreementId);
+
+            //Assert
+            Assert.True(result.Ok);
+            transaction.Verify(x => x.Commit());
+            if (hasMasterReference)
+            {
+                Assert.True(result.Value.HasValue);
+                Assert.Same(masterToRemove, result.Value.Value);
+            }
+        }
+
+        [Fact]
+        public void Cannot_Clear_Master_Reference_On_Dpa_If_WriteAccess_Is_Not_Permitted()
+        {
+            Test_Command_Which_Fails_With_Dpr_Insufficient_WriteAccess(id => _sut.ClearMasterReference(id));
+        }
+
+        [Fact]
+        public void Cannot_Clear_Master_Reference_On_Dpa_With_Invalid_Dpa()
+        {
+            Test_Command_Which_Fails_With_Dpr_NotFound(id => _sut.ClearMasterReference(id));
+        }
+
         [Fact]
         public void Can_GetSystemsWhichCanBeAssigned()
         {
@@ -587,7 +634,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             _systemAssignmentServiceMock.Setup(x => x.AssignSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.AssignSystem(id, systemId);
@@ -622,7 +669,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectAllowModifyReturns(registration, true);
             _systemAssignmentServiceMock.Setup(x => x.RemoveSystem(registration, systemId)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.RemoveSystem(id, systemId);
@@ -910,7 +957,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateOversightInterval(id, oversightInterval);
@@ -938,7 +985,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateOversightIntervalRemark(id, oversightIntervalRemark);
@@ -959,7 +1006,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
             return transaction;
         }
 
@@ -973,7 +1020,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateIsAgreementConcluded(id, isAgreementConcluded);
@@ -997,7 +1044,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateIsAgreementConcluded(id, clearingSetting);
@@ -1026,7 +1073,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateAgreementConcludedAt(id, dateTime);
@@ -1047,7 +1094,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             ExpectRepositoryGetToReturn(id, registration);
             ExpectAllowModifyReturns(registration, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.UpdateAgreementConcludedAt(id, null);

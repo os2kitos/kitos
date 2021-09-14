@@ -21,6 +21,7 @@ namespace Core.ApplicationServices.GDPR
         Result<IQueryable<DataProcessingRegistration>, OperationError> GetOrganizationData(int organizationId, int skip, int take);
         Result<DataProcessingRegistration, OperationError> UpdateName(int id, string name);
         Result<ExternalReference, OperationError> SetMasterReference(int id, int referenceId);
+        Result<Maybe<ExternalReference>, OperationError> ClearMasterReference(int id);
         Result<(DataProcessingRegistration registration, IEnumerable<DataProcessingRegistrationRole> roles), OperationError> GetAvailableRoles(int id);
         Result<IEnumerable<User>, OperationError> GetUsersWhichCanBeAssignedToRole(int id, int roleId, string nameEmailQuery, int pageSize);
         Result<DataProcessingRegistrationRight, OperationError> AssignRole(int id, int roleId, int userId);
@@ -44,8 +45,10 @@ namespace Core.ApplicationServices.GDPR
         Result<DataProcessingCountryOption, OperationError> AssignInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingCountryOption, OperationError> RemoveInsecureThirdCountry(int id, int countryId);
         Result<DataProcessingBasisForTransferOption, OperationError> AssignBasisForTransfer(int id, int basisForTransferId);
+        /// <returns>Error if clear operation fails or BadState of no basis for transfer is assigned</returns>
         Result<DataProcessingBasisForTransferOption, OperationError> ClearBasisForTransfer(int id);
         Result<DataProcessingDataResponsibleOption, OperationError> AssignDataResponsible(int id, int dataResponsibleId);
+        /// <returns>Error if clear operation fails or BadState of no data responsible is assigned</returns>
         Result<DataProcessingDataResponsibleOption, OperationError> ClearDataResponsible(int id);
         Result<DataProcessingRegistration, OperationError> UpdateDataResponsibleRemark(int id, string remark);
         Result<DataProcessingOversightOption, OperationError> AssignOversightOption(int id, int oversightOptionId);

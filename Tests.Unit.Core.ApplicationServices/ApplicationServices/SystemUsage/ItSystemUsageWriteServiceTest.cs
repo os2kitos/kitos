@@ -8,6 +8,7 @@ using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.KLE;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.Project;
@@ -797,19 +798,16 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
 
             var input = new SystemUsageUpdateParameters
             {
                 ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
             };
-            foreach (var externalReference in externalReferences)
-                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
+
+            ExpectBatchUpdateExternalReferencesReturns(itSystemUsage, externalReferences, Maybe<OperationError>.None);
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
 
             //Act
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
@@ -817,83 +815,39 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             //Assert
             Assert.True(result.Ok);
             AssertTransactionCommitted(transactionMock);
-            Assert.Equal(expectedMaster.Title, result.Value.Reference.Title);
         }
 
         [Fact]
-        public void Cannot_Create_With_ExternalReferences_But_No_Master()
+        public void Cannot_Create_With_ExternalReferences_If_BatchUpdate_Fails()
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
 
             var input = new SystemUsageUpdateParameters
             {
                 ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
             };
-
-            //Act
-            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailure(result, OperationFailure.BadInput, transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_ExternalReferences_And_Multiple_Masters()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-
-            //Set two masters
-            foreach (var master in externalReferences.Take(2))
-                master.MasterReference = true;
-
-            var input = new SystemUsageUpdateParameters
-            {
-                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
-            };
-
-            //Act
-            var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailure(result, OperationFailure.BadInput, transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_ExternalReferences_If_Add_Reference_Fails()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
-            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
-            var expectedMaster = externalReferences.OrderBy(x => A<int>()).First();
-            expectedMaster.MasterReference = true;
             var operationError = A<OperationError>();
 
-            var input = new SystemUsageUpdateParameters
-            {
-                ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>()
-            };
-            foreach (var externalReference in externalReferences.Where(x => x.MasterReference == false))
-                ExpectAddExternalReferenceReturns(itSystemUsage, externalReference, CreateExternalReference(externalReference));
-            ExpectAddExternalReferenceReturns(itSystemUsage, expectedMaster, operationError);
+            ExpectBatchUpdateExternalReferencesReturns(itSystemUsage, externalReferences, operationError);
+
+            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
 
             //Act
             var result = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            AssertFailureWithExpectedOperationError(result, operationError, transactionMock);
+            Assert.True(result.Failed);
+            Assert.Equal(operationError.FailureType, result.Error.FailureType);
+            AssertTransactionNotCommitted(transactionMock);
+        }
+
+        private void ExpectBatchUpdateExternalReferencesReturns(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.SystemUsage, systemUsage.Id, externalReferences))
+                .Returns(value);
         }
 
         [Fact]
@@ -2825,7 +2779,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         private Mock<IDatabaseTransaction> ExpectTransaction()
         {
             var trasactionMock = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(trasactionMock.Object);
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
             return trasactionMock;
         }
     }

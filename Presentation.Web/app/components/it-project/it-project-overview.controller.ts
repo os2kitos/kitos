@@ -114,7 +114,7 @@
                             organizationId: self.user.currentOrganizationId
                         };
 
-                        var msg = self.notify.addInfoMessage('Opretter system...', false);
+                        var msg = self.notify.addInfoMessage('Opretter projekt...', false);
 
                         self.$http.post(`api/itproject?organizationId=${self.user.currentOrganizationId}`, payload)
                             .then(function onSuccess(result: any) {

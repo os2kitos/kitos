@@ -32,7 +32,7 @@ namespace Core.DomainServices.Repositories.Qa
                 throw new ArgumentNullException(nameof(report));
             }
 
-            using (var transaction = _transactionManager.Begin(IsolationLevel.Serializable))
+            using (var transaction = _transactionManager.Begin())
             {
                 var existing = _repository.AsQueryable().FirstOrDefault();
                 if (existing != null)

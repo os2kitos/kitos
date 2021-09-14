@@ -804,6 +804,9 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
 
+            using var isOversightCompletedResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, isOversightCompletedResponse.StatusCode);
+
             //Act
             using var response = await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registrationDto.Id, oversightDate, oversightRemark);
 
@@ -823,6 +826,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
+
+            using var isOversightCompletedResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, isOversightCompletedResponse.StatusCode);
+
             using var assignResponse = await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registrationDto.Id, oversightDate, oversightRemark);
 
             Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
@@ -850,6 +857,10 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
+
+            using var isOversightCompletedResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);
+            Assert.Equal(HttpStatusCode.OK, isOversightCompletedResponse.StatusCode);
+
             using var assignResponse = await DataProcessingRegistrationHelper.SendAssignOversightDateRequestAsync(registrationDto.Id, oversightDate, oversightRemark);
 
             Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);

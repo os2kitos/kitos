@@ -111,7 +111,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetContractReturns(contractId, itContract);
             ExpectAllowDeleteReturns(itContract, true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _referenceService.Setup(x => x.DeleteByContractId(contractId)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new List<ExternalReference>()));
 
             //Act
@@ -176,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(contract, true);
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.AssignDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.AssignDataProcessingRegistration(id, dataProcessingRegistrationId);
@@ -211,7 +211,7 @@ namespace Tests.Unit.Core.ApplicationServices
             ExpectAllowModifyReturns(contract, true);
             _contractDataProcessingRegistrationAssignmentService.Setup(x => x.RemoveDataProcessingRegistration(contract, dataProcessingRegistrationId)).Returns(dataProcessingRegistration);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var result = _sut.RemoveDataProcessingRegistration(id, dataProcessingRegistrationId);
@@ -332,6 +332,144 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.Failed);
             Assert.Same(operationError, result.Error);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void CanCreateNewContractWithName_Returns_Ok(bool overlapFound)
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+            var contract1 = new ItContract { Name = A<string>() };
+            var contract2 = new ItContract { Name = overlapFound ? name : A<string>() };
+
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(OrganizationDataReadAccessLevel.All);
+            _contractRepository.Setup(x => x.GetContractsInOrganization(organizationId)).Returns(new List<ItContract> { contract1, contract2 }.AsQueryable());
+
+            //Act
+            var result = _sut.CanCreateNewContractWithName(name, organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(overlapFound == false, result.Value);
+        }
+
+        [Theory]
+        [InlineData(OrganizationDataReadAccessLevel.None)]
+        [InlineData(OrganizationDataReadAccessLevel.Public)]
+        [InlineData(OrganizationDataReadAccessLevel.RightsHolder)]
+        public void CanCreateNewContractWithName_Returns_Forbidden_If_User_Does_Not_Have_Full_Access_In_Organization(OrganizationDataReadAccessLevel orgAccessThatFails)
+        {
+            //Arrange
+            var name = A<string>();
+            var organizationId = A<int>();
+
+            _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(orgAccessThatFails);
+
+            //Act
+            var result = _sut.CanCreateNewContractWithName(name, organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Success_If_No_Overlaps()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+            var otherContract = new ItContract
+            {
+                Id = A<int>(),
+                Name = A<string>()
+            };
+
+            var contract = new ItContract
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetContractReturns(id, contract);
+            _authorizationContext.Setup(x => x.AllowReads(contract)).Returns(true);
+            _contractRepository.Setup(x => x.GetContractsInOrganization(contract.OrganizationId)).Returns(new List<ItContract> { otherContract, contract }.AsQueryable());
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.IsNone);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_Overlaps()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+            var otherContract = new ItContract
+            {
+                Id = A<int>(),
+                Name = name //overlapping name
+            };
+
+            var contract = new ItContract
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetContractReturns(id, contract);
+            _authorizationContext.Setup(x => x.AllowReads(contract)).Returns(true);
+            _contractRepository.Setup(x => x.GetContractsInOrganization(contract.OrganizationId)).Returns(new List<ItContract> { otherContract, contract }.AsQueryable());
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Conflict,result.Value.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_NotAllowedToAccessContract()
+        {
+            //Arrange
+            var name = A<string>();
+            var id = A<int>();
+
+            var contract = new ItContract
+            {
+                Id = id,
+                OrganizationId = A<int>(),
+            };
+            ExpectGetContractReturns(id, contract);
+            _authorizationContext.Setup(x => x.AllowReads(contract)).Returns(false);
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void ValidateNewName_Returns_Error_If_ContractNotFound()
+        {  //Arrange
+            var name = A<string>();
+            var id = A<int>();
+
+            ExpectGetContractReturns(id, null);
+
+            //Act
+            var result = _sut.ValidateNewName(id, name);
+
+            //Assert
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
         private EconomyStream CreateEconomyStream()

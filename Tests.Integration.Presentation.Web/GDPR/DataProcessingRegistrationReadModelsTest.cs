@@ -91,9 +91,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             //Basis for transfer
-            var options = (await DataProcessingRegistrationHelper.GetBasisForTransferOptionsAsync(TestEnvironment.DefaultOrganizationId)).ToList();
-            var basisForTransfer = options[Math.Abs(A<int>()) % options.Count];
-
+            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(organizationId);
+            var basisForTransfer = dataOptions.BasisForTransferOptions.First();
             using var assignResponse = await DataProcessingRegistrationHelper.SendAssignBasisForTransferRequestAsync(registration.Id, basisForTransfer.Id);
             Assert.Equal(HttpStatusCode.OK, assignResponse.StatusCode);
 
@@ -103,7 +102,6 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, setInsecureCountryStateResponse.StatusCode);
 
             //Set data responsible
-            var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(organizationId);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var setDataResponsibleResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registration.Id, dataResponsibleOption.Id);
             Assert.Equal(HttpStatusCode.OK, setDataResponsibleResponse.StatusCode);

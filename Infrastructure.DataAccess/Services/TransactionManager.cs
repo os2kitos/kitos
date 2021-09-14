@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Services
             _context = context;
         }
 
-        public IDatabaseTransaction Begin(IsolationLevel isolationLevel)
+        public IDatabaseTransaction Begin()
         {
             var currentTransaction = _context.Database.CurrentTransaction;
             if (currentTransaction != null)

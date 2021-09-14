@@ -5,6 +5,7 @@ using System.Linq;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
+using Infrastructure.Services.Extensions;
 using Infrastructure.Services.Types;
 
 namespace Core.DomainModel.ItSystem
@@ -19,7 +20,6 @@ namespace Core.DomainModel.ItSystem
 
         public ItSystem()
         {
-            ArchivePeriods = new List<ArchivePeriod>();
             ItInterfaceExhibits = new List<ItInterfaceExhibit>();
             Children = new List<ItSystem>();
             TaskRefs = new List<TaskRef>();
@@ -89,8 +89,6 @@ namespace Core.DomainModel.ItSystem
         /// </value>
         public virtual BusinessType BusinessType { get; set; }
 
-        public virtual ICollection<ArchivePeriod> ArchivePeriods { get; set; }
-
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
 
         public virtual ICollection<AccessType> AccessTypes { get; set; }
@@ -122,6 +120,11 @@ namespace Core.DomainModel.ItSystem
         {
             return new AddReferenceCommand(this).AddExternalReference(newReference);
         }
+        public void ClearMasterReference()
+        {
+            Reference.Track();
+            Reference = null;
+        }
 
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
         {
@@ -136,9 +139,6 @@ namespace Core.DomainModel.ItSystem
         public ArchiveDutyRecommendationTypes? ArchiveDuty { get; set; }
 
         public string ArchiveDutyComment { get; set; }
-
-        public string LinkToDirectoryAdminUrl { get; set; }
-        public string LinkToDirectoryAdminUrlName { get; set; }
 
         public bool TryGetInterfaceExhibit(out ItInterfaceExhibit interfaceExhibit, int interfaceId)
         {

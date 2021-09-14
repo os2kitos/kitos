@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity.Infrastructure.Annotations;
 using Core.DomainModel.ItSystem;
 
 namespace Infrastructure.DataAccess.Mapping
@@ -11,32 +9,32 @@ namespace Infrastructure.DataAccess.Mapping
             // Properties
             this.Property(x => x.Version).HasMaxLength(ItInterface.MaxVersionLength);
 
-            // BUG there's an issue with indexing http://stackoverflow.com/questions/26055140/ef-migrations-drops-index-when-adding-compsite-index
-            this.Property(x => x.OrganizationId)
-                .HasUniqueIndexAnnotation("UX_NamePerOrg", 0);
+            this.Property(x => x.OrganizationId);
             this.Property(x => x.Name)
                 .HasMaxLength(ItInterface.MaxNameLength)
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_NamePerOrg", 1);
+                .IsRequired();
             this.Property(x => x.ItInterfaceId)
                 .HasMaxLength(ItInterface.MaxNameLength)
-                // this should really be optional but because
-                // MySql doesn't follow the SQL standard
-                // when it comes to unique indexs with nulls in them - we can't...
-                // http://bugs.mysql.com/bug.php?id=8173
-                // So instead we set it to an empty string :´(
-                // TODO we're no longer using MySql so we can fix this
-                .IsRequired()
-                .HasUniqueIndexAnnotation("UX_NamePerOrg", 2);
+                .IsRequired();
+
+            HasIndex(x => new { x.OrganizationId, x.Name, x.ItInterfaceId })
+                .IsUnique(true)
+                .HasName("UX_NameAndVersionUniqueToOrg");
+
+            HasIndex(x => x.OrganizationId)
+                .IsUnique(false)
+                .HasName("IX_OrganizationId");
+
+            HasIndex(x => x.Name)
+                .IsUnique(false)
+                .HasName("IX_Name");
+
+            HasIndex(x => x.Version)
+                .IsUnique(false)
+                .HasName("IX_Version");
 
             // Table & Column Mappings
             this.ToTable("ItInterface");
-
-            // Relationships
-            // Udkommenteret ifm. OS2KITOS-663
-            //this.HasMany(t => t.CanBeUsedBy)
-            //    .WithRequired(t => t.ItInterface)
-            //    .HasForeignKey(d => d.ItInterfaceId);
 
             this.HasOptional(t => t.Interface)
                 .WithMany(d => d.References)

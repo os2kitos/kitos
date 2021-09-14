@@ -355,7 +355,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var transaction = new Mock<IDatabaseTransaction>();
             ExpectGetUsageByKeyReturns(id, itSystemUsage);
             _authorizationContext.Setup(x => x.AllowDelete(itSystemUsage)).Returns(true);
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
             _referenceService.Setup(x => x.DeleteBySystemUsageId(id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
 
             //Act
@@ -559,7 +559,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
@@ -590,7 +590,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             ExpectAllowModifyReturns(itSystemUsage, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
@@ -616,7 +616,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, false);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var removeResult = _sut.RemoveAllArchivePeriods(itSystemUsage.Id);
@@ -637,7 +637,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
@@ -657,7 +657,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
 
             ExpectAllowModifyReturns(itSystemUsage, true);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
@@ -678,7 +678,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, false);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, archivePeriod.StartDate, archivePeriod.EndDate, archivePeriod.UniqueArchiveId, archivePeriod.Approved);
@@ -702,7 +702,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             ExpectAllowModifyReturns(itSystemUsage, true);
             _usageRepository.Setup(x => x.GetByKey(itSystemUsage.Id)).Returns(itSystemUsage);
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.ReadCommitted)).Returns(transaction.Object);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
             var addResult = _sut.AddArchivePeriod(itSystemUsage.Id, startDate, endDate, archiveId, approved);

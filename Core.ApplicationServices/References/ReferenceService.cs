@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainModel.Result;
@@ -14,6 +15,8 @@ using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.DomainEvents;
+using Infrastructure.Services.Types;
+using Newtonsoft.Json;
 
 namespace Core.ApplicationServices.References
 {
@@ -153,6 +156,61 @@ namespace Core.ApplicationServices.References
                 .Match(r => r, () => OperationFailure.NotFound);
         }
 
+        public Maybe<OperationError> BatchUpdateExternalReferences(
+            ReferenceRootType rootType,
+            int rootId,
+            IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var error = _referenceRepository
+                .GetRootEntity(rootId, rootType)
+                .Match(root =>
+                {
+                    //Clear existing state
+                    root.ClearMasterReference();
+                    var deleteResult = DeleteExternalReferences(root);
+                    if (deleteResult.Failed)
+                        return new OperationError("Failed to delete old references", deleteResult.Error);
+
+                    var newReferences = externalReferences.ToList();
+                    if (newReferences.Any())
+                    {
+                        var masterReferencesCount = newReferences.Count(x => x.MasterReference);
+
+                        switch (masterReferencesCount)
+                        {
+                            case < 1:
+                                return new OperationError("A master reference must be defined", OperationFailure.BadInput);
+                            case > 1:
+                                return new OperationError("Only one reference can be master reference", OperationFailure.BadInput);
+                        }
+
+                        foreach (var referenceProperties in newReferences)
+                        {
+                            var result = AddReference(rootId, rootType, referenceProperties.Title, referenceProperties.DocumentId, referenceProperties.Url);
+
+                            if (result.Failed)
+                                return new OperationError($"Failed to add reference with data:{JsonConvert.SerializeObject(referenceProperties)}. Error:{result.Error.Message.GetValueOrEmptyString()}", result.Error.FailureType);
+
+                            if (referenceProperties.MasterReference)
+                            {
+                                var masterReferenceResult = root.SetMasterReference(result.Value);
+                                if (masterReferenceResult.Failed)
+                                    return new OperationError($"Failed while setting the master reference:{masterReferenceResult.Error.Message.GetValueOrEmptyString()}", masterReferenceResult.Error.FailureType);
+                            }
+                        }
+                    }
+                    return Maybe<OperationError>.None;
+
+                }, () => new OperationError(OperationFailure.NotFound));
+
+            if (error.IsNone)
+                transaction.Commit();
+
+            return error;
+        }
+
         private Result<IEnumerable<ExternalReference>, OperationFailure> DeleteExternalReferences(IEntityWithExternalReferences root)
         {
             if (root == null)
@@ -165,7 +223,7 @@ namespace Core.ApplicationServices.References
                 return OperationFailure.Forbidden;
             }
 
-            using var transaction = _transactionManager.Begin(IsolationLevel.ReadCommitted);
+            using var transaction = _transactionManager.Begin();
             var systemExternalReferences = root.ExternalReferences.ToList();
 
             if (systemExternalReferences.Count == 0)

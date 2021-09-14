@@ -685,7 +685,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private Mock<IDatabaseTransaction> ExpectBeginTransaction()
         {
             var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManager.Setup(x => x.Begin(IsolationLevel.Serializable))
+            _transactionManager.Setup(x => x.Begin())
                 .Returns(transaction.Object);
             return transaction;
         }
