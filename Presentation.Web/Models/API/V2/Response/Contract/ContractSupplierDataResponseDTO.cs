@@ -6,9 +6,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
     public class ContractSupplierDataResponseDTO
     {
         /// <summary>
-        /// Optional reference to the supplier
+        /// Optional reference to the supplier organization
         /// </summary>
-        public ShallowOrganizationResponseDTO SupplierOrganization { get; set; }
+        public ShallowOrganizationResponseDTO Organization { get; set; }
         /// <summary>
         /// Determines if the contract has been signed by the supplier
         /// </summary>

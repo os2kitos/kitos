@@ -57,14 +57,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false)]
-        [InlineData(false, false, false, false, true)]
-        [InlineData(false, false, false, true, false)]
-        [InlineData(false, false, true, false, false)]
-        [InlineData(false, true, false, false, false)]
-        [InlineData(true, false, false, false, false)]
-        [InlineData(true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement)
+        [InlineData(false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, true, false)]
+        [InlineData(false, false, false, true, false, false)]
+        [InlineData(false, false, true, false, false, false)]
+        [InlineData(false, true, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -74,6 +75,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
             if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
+            if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -86,6 +88,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noGeneralData, output.General.IsNone);
             Assert.Equal(noResponsible, output.Responsible.IsNone);
             Assert.Equal(noProcurement, output.Procurement.IsNone);
+            Assert.Equal(noSupplier, output.Supplier.IsNone);
         }
 
         [Fact]
@@ -202,6 +205,53 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertResponsible(input, output.Responsible.Value);
+        }
+
+        [Fact]
+        public void Can_Map_Supplier()
+        {
+            //Arrange
+            var input = A<ContractSupplierDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapSupplier(input);
+
+            //Assert
+            AssertSupplier(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Supplier_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractSupplierDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Supplier = input });
+
+            //Assert
+            AssertSupplier(input, output.Supplier.Value);
+        }
+
+        [Fact]
+        public void Can_Map_Supplier_FromPUT()
+        {
+            //Arrange
+            var input = A<ContractSupplierDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO { Supplier = input });
+
+            //Assert
+            AssertSupplier(input, output.Supplier.Value);
+        }
+
+        private static void AssertSupplier(ContractSupplierDataWriteRequestDTO input, ItContractSupplierModificationParameters output)
+        {
+            Assert.Equal(input.OrganizationUuid, AssertPropertyContainsDataChange(output.OrganizationUuid));
+            Assert.Equal(input.Signed, AssertPropertyContainsDataChange(output.Signed));
+            Assert.Equal(input.SignedAt, AssertPropertyContainsDataChange(output.SignedAt));
+            Assert.Equal(input.SignedBy, AssertPropertyContainsDataChange(output.SignedBy));
         }
 
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO input,

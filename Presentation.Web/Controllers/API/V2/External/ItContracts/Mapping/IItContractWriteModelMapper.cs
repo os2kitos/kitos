@@ -9,6 +9,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto);
         ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO generalDataDto);
         ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO request);
-		ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto);
+        ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto);
+        ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto);
     }
 }
