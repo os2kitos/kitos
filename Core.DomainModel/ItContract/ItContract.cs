@@ -705,8 +705,8 @@ namespace Core.DomainModel.ItContract
 
             HandoverTrials.Add(new HandoverTrial()
             {
-                Approved = approved,
-                Expected = expected,
+                Approved = approved?.Date,
+                Expected = expected?.Date,
                 ItContract = this,
                 HandoverTrialType = trialType
             });

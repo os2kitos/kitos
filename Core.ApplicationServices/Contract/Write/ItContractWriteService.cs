@@ -168,7 +168,7 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(parameters.OrganizationUuid, UpdateSupplierOrganization)
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.HasSupplierSigned = newValue))
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue?.Date))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.SupplierContractSigner = newValue));
         }
 
@@ -196,7 +196,7 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateResponsibleOrganizationUnit)
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.IsSigned = newValue))
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue?.Date))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.ContractSigner = newValue));
         }
 
