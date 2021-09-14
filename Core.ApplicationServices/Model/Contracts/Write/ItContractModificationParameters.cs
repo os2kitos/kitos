@@ -15,5 +15,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<ItContractSupplierModificationParameters> Supplier { get; set; } = Maybe<ItContractSupplierModificationParameters>.None;
 
         public Maybe<IEnumerable<Guid>> SystemUsageUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
+        public Maybe<IEnumerable<Guid>> DataProcessingRegistrationUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
     }
 }

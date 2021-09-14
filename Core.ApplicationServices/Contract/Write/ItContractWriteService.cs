@@ -12,6 +12,7 @@ using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -131,7 +132,8 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations));
         }
 
         private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)
@@ -180,6 +182,19 @@ namespace Core.ApplicationServices.Contract.Write
             contract.ResetResponsibleOrganizationUnit();
 
             return Maybe<OperationError>.None;
+        }
+
+        private Result<ItContract, OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
+        {
+            return _assignmentUpdateService.UpdateMultiAssignment<ItContract, DataProcessingRegistration, DataProcessingRegistration>
+            (
+                "data processing registration",
+                contract,
+                dataProcessingRegistrationUuids.FromNullable(),
+                itContract => itContract.DataProcessingRegistrations,
+                (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error),
+                (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error)
+            ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
         }
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)

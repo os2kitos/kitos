@@ -10,6 +10,7 @@ using AutoFixture;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -1048,6 +1049,69 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment4, freshDTO.SystemUsages);
+        }
+
+        [Fact]
+        public async Task Can_POST_With_DataProcessingRegistrations()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+                {
+                    Name = CreateName(),
+                    OrganizationUuid = organization.Uuid
+                });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { dpr1.Uuid, dpr2.Uuid }
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(request.DataProcessingRegistrationUuids, freshDTO.DataProcessingRegistrations);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_DataProcessingRegistrations_From_Different_Org()
+        {
+            //Arrange
+            var (token1, _, organization1) = await CreatePrerequisitesAsync();
+            var (token2, _, organization2) = await CreatePrerequisitesAsync();
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token1, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization1.Uuid
+            });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token2, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization2.Uuid
+            });
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { dpr1.Uuid, dpr2.Uuid }
+            };
+            // Using global admin as they have full access between organizations
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            var response = await ItContractV2Helper.SendPostContractAsync(globalAdminToken.Token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)

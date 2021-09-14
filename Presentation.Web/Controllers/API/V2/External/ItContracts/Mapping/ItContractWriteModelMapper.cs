@@ -37,6 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
+            var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -45,7 +46,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Procurement = procurement.FromNullable().Select(MapProcurement),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Responsible = responsibleData.FromNullable().Select(MapResponsible),
-                Supplier = supplier.FromNullable().Select(MapSupplier)
+                Supplier = supplier.FromNullable().Select(MapSupplier),
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
         }
 
