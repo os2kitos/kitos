@@ -36,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IGenericRepository<HandoverTrial>> _handoverTrialRepository;
 
         public ItContractWriteServiceTest()
         {
@@ -47,7 +48,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>(), _organizationServiceMock.Object);
+            _handoverTrialRepository = new Mock<IGenericRepository<HandoverTrial>>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>(), _organizationServiceMock.Object, _handoverTrialRepository.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

@@ -31,6 +31,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
+        private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -41,7 +42,8 @@ namespace Core.ApplicationServices.Contract.Write
             IDatabaseControl databaseControl,
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IGenericRepository<HandoverTrial> handoverTrialRepository)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -52,6 +54,7 @@ namespace Core.ApplicationServices.Contract.Write
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
+            _handoverTrialRepository = handoverTrialRepository;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -125,7 +128,17 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
+        }
+
+        private static Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
+        {
+            //TODO:  Must migrate to use the multi assignment part
+            //TODO: In the "add" metod, assert that the handover trial is valid (either approved OR the other one)
+
+            //TODO: Delete "removed" so track them while being removed
+            throw new NotImplementedException();
         }
 
         private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)
