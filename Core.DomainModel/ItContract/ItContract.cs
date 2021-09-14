@@ -692,20 +692,18 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> RemoveSystemUsage(int systemUsageId)
+        public Maybe<OperationError> RemoveSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
         {
-            try
+            var toBeRemoved = AssociatedSystemUsages.Where(x => x.ItSystemUsageId == systemUsage.Id).ToList();
+
+            foreach (var contractUsageToRemove in toBeRemoved)
             {
-                var toBeRemoved = AssociatedSystemUsages.Single(x => x.ItSystemUsageId == systemUsageId);
-                var removeSucceeded = AssociatedSystemUsages.Remove(toBeRemoved);
-                return removeSucceeded 
-                    ? Maybe<OperationError>.None 
-                    : new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsageId}", OperationFailure.BadState);
+                var removeSucceeded = AssociatedSystemUsages.Remove(contractUsageToRemove);
+                if(!removeSucceeded)
+                    return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
             }
-            catch (InvalidOperationException e)
-            {
-                return new OperationError($"Failed RemoveSystemUsage operation with error message: {e.Message}", OperationFailure.UnknownError);
-            }
+           
+            return Maybe<OperationError>.None;
         }
     }
 }

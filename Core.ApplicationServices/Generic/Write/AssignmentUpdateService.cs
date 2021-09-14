@@ -9,12 +9,12 @@ using System.Linq;
 
 namespace Core.ApplicationServices.Generic.Write
 {
-    public class UpdateAssignmentHelper : IUpdateAssignmentHelper
+    public class AssignmentUpdateService : IAssignmentUpdateService
     {
         private readonly IOptionResolver _optionResolver;
         private readonly IEntityIdentityResolver _entityIdentityResolver;
 
-        public UpdateAssignmentHelper(IOptionResolver optionResolver, IEntityIdentityResolver entityIdentityResolver)
+        public AssignmentUpdateService(IOptionResolver optionResolver, IEntityIdentityResolver entityIdentityResolver)
         {
             _optionResolver = optionResolver;
             _entityIdentityResolver = entityIdentityResolver;
@@ -54,14 +54,15 @@ namespace Core.ApplicationServices.Generic.Write
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> UpdateMultiAssignment<TDestination, TAssignment>(
+        public Maybe<OperationError> UpdateMultiAssignment<TDestination, TAssignment, TKey>(
             string subject,
             TDestination destination,
             Maybe<IEnumerable<Guid>> assignedItemUuid,
             Func<TDestination, IEnumerable<TAssignment>> getExistingState,
-            Func<TDestination, int, Maybe<OperationError>> assign,
-            Func<TDestination, int, Maybe<OperationError>> unAssign)
+            Func<TDestination, TKey, Maybe<OperationError>> assign,
+            Func<TDestination, TKey, Maybe<OperationError>> unAssign)
                 where TAssignment : class, IHasId, IHasUuid
+                where TKey : class, IHasId, IHasUuid
                 where TDestination : IOwnedByOrganization
         {
             var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
@@ -75,21 +76,22 @@ namespace Core.ApplicationServices.Generic.Write
             var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
             foreach (var (delta, uuid) in changes)
             {
+
+                var dbEntity = _entityIdentityResolver.ResolveDbEntity<TKey>(uuid);
+                if (dbEntity.IsNone)
+                    return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
+
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var dbId = _entityIdentityResolver.ResolveDbId<TAssignment>(uuid);
-
-                        if (dbId.IsNone)
-                            return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
-                        var addResult = assign(destination, dbId.Value);
+                        var addResult = assign(destination, dbEntity.Value);
 
                         if (addResult.HasValue)
                             return new OperationError($"Failed to add during multi assignment with error message: {addResult.Value.Message.GetValueOrEmptyString()}", addResult.Value.FailureType);
 
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeError = unAssign(destination, existingAssignments[uuid].Id);
+                        var removeError = unAssign(destination, dbEntity.Value);
                         if (removeError.HasValue)
                             return new OperationError($"Failed to remove during multi assignment with error message: {removeError.Value.Message.GetValueOrEmptyString()}", removeError.Value.FailureType); ;
 

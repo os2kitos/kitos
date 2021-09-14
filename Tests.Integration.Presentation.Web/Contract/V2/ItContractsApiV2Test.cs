@@ -904,12 +904,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Name = CreateName(),
                 SystemUsageUuids = new[] { system1Usage.Uuid, system2Usage.Uuid }
             };
+            // Using global admin as they have full access between organizations
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
 
             //Act
-            var response = await ItContractV2Helper.SendPostContractAsync(token1, request);
+            var response = await ItContractV2Helper.SendPostContractAsync(globalAdminToken.Token, request);
 
             //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Fact]

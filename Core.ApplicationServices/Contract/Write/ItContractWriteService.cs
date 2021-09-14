@@ -9,9 +9,9 @@ using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
-using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
@@ -30,8 +30,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IDatabaseControl _databaseControl;
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IItSystemUsageService _usageService;
-        private readonly IUpdateAssignmentHelper _updateAssignmentHelper;
+        private readonly IAssignmentUpdateService _assignmentUpdateService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -41,9 +40,8 @@ namespace Core.ApplicationServices.Contract.Write
             IDomainEvents domainEvents,
             IDatabaseControl databaseControl,
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
-            IAuthorizationContext authorizationContext, 
-            IItSystemUsageService usageService,
-            IUpdateAssignmentHelper updateAssignmentHelper)
+            IAuthorizationContext authorizationContext,
+            IAssignmentUpdateService assignmentUpdateService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -53,8 +51,7 @@ namespace Core.ApplicationServices.Contract.Write
             _databaseControl = databaseControl;
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
-            _usageService = usageService;
-            _updateAssignmentHelper = updateAssignmentHelper;
+            _assignmentUpdateService = assignmentUpdateService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -153,24 +150,15 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
-            return _updateAssignmentHelper.UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
              (
                  "system usage",
                  contract,
                  systemUsageUuids.FromNullable(),
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage),
-                 (itContract, id) => AssignSystemUsage(itContract, id),
-                 (itContract, id) => itContract.RemoveSystemUsage(id)
+                 (itContract, usage) => itContract.AssignSystemUsage(usage),
+                 (itContract, usage) => itContract.RemoveSystemUsage(usage)
              ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
-        }
-
-        private Maybe<OperationError> AssignSystemUsage(ItContract contract, int usageId)
-        {
-            var usageResult = _usageService.GetById(usageId).FromNullable();
-            if (usageResult.IsNone)
-                return new OperationError($"It System Usage with Id: {usageId}, could not be found", OperationFailure.NotFound);
-
-            return contract.AssignSystemUsage(usageResult.Value);
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -228,7 +216,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
         {
-            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTemplateUuid,
@@ -240,7 +228,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractType(ItContract contract, Guid? contractTypeId)
         {
-            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTypeId,
@@ -274,7 +262,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
         {
-            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment(
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment(
                 contract,
                 purchaseTypeUuid,
                 c => c.ResetPurchaseForm(),
@@ -285,7 +273,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateProcurementStrategy(ItContract contract, Guid? procurementStrategyUuid)
         {
-            return _updateAssignmentHelper.UpdateIndependentOptionTypeAssignment(
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment(
                 contract,
                 procurementStrategyUuid,
                 c => c.ResetProcurementStrategy(),

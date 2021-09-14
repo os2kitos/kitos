@@ -11,7 +11,6 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
-using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
@@ -37,9 +36,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
-        private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
-        private readonly Mock<IUpdateAssignmentHelper> _updateAssignmentHelper;
+        private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
 
         public ItContractWriteServiceTest()
         {
@@ -50,10 +48,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
-            _usageServiceMock = new Mock<IItSystemUsageService>();
             _authContext = new Mock<IAuthorizationContext>();
-            _updateAssignmentHelper = new Mock<IUpdateAssignmentHelper>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _usageServiceMock.Object, _updateAssignmentHelper.Object);
+            _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _assignmentUpdateServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -412,54 +409,30 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Fact]
-        public void Cannot_Create_With_GeneralData_If_Contract_Template_Is_Not_Available()
+        public void Cannot_Create_With_GeneralData_If_UpdateIndependentOptionTypeAssignment_For_ContractTemplate_Fails()
         {
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
 
-            var contractTemplateId = A<Guid>();
+            var contractTemplateUuid = A<Guid>();
             var parameters = new ItContractGeneralDataModificationParameters
             {
-                ContractTemplateUuid = ((Guid?)contractTemplateId).AsChangedValue()
+                ContractTemplateUuid = ((Guid?)contractTemplateUuid).AsChangedValue()
             };
-
-            itContractModificationParameters.General = parameters;
-
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractTemplateType>(organizationUuid, contractTemplateId, (new ItContractTemplateType(), false));
-
-            // Act
-            var result = _sut.Create(organizationUuid, itContractModificationParameters);
-
-            // Assert
-            AssertFailureWithKnownErrorDetails(result, "The changed ItContractTemplateType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_GeneralData_If_Contract_Template_Fails_To_Fetch()
-        {
-            // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
-
-            var contractTemplateId = A<Guid>();
-            var parameters = new ItContractGeneralDataModificationParameters
-            {
-                ContractTemplateUuid = ((Guid?)contractTemplateId).AsChangedValue()
-            };
-
             itContractModificationParameters.General = parameters;
 
             var operationError = A<OperationError>();
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractTemplateType>(organizationUuid, contractTemplateId, operationError);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ItContractTemplateType>(createdContract, contractTemplateUuid, operationError);
 
             // Act
             var result = _sut.Create(organizationUuid, itContractModificationParameters);
 
             // Assert
-            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ItContractTemplateType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         [Fact]
-        public void Cannot_Create_With_GeneralData_If_Contract_Type_Is_Not_Available()
+        public void Cannot_Create_With_GeneralData_If_UpdateIndependentOptionTypeAssignment_For_ContractType_Fails()
         {
             // Arrange
             var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
@@ -469,42 +442,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             {
                 ContractTypeUuid = ((Guid?)contractTypeUuid).AsChangedValue()
             };
-
-            itContractModificationParameters.General = parameters;
-
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractType>(organizationUuid, contractTypeUuid, (new ItContractType(), false));
-
-            // Act
-            var result = _sut.Create(organizationUuid, itContractModificationParameters);
-
-            // Assert
-            AssertFailureWithKnownErrorDetails(result, "The changed ItContractType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_GeneralData_If_Contract_Type_Fails_To_Fetch()
-        {
-            // Arrange
-            var (organizationUuid, itContractModificationParameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
-
-            var typeId = A<Guid>();
-            var parameters = new ItContractGeneralDataModificationParameters
-            {
-                ContractTypeUuid = ((Guid?)typeId).AsChangedValue()
-            };
-
             itContractModificationParameters.General = parameters;
 
             var operationError = A<OperationError>();
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ItContractType>(organizationUuid, typeId, operationError);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ItContractType>(createdContract, contractTypeUuid, operationError);
 
             // Act
             var result = _sut.Create(organizationUuid, itContractModificationParameters);
 
             // Assert
-            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ItContractType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
-
 
         [Theory]
         [InlineData(true, true, true)]
@@ -517,8 +465,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Arrange
             var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(withStrategy, withPurchase, withPlan);
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid.GetValueOrDefault(), (new ProcurementStrategyType() { Uuid = procurementStrategyUuid.GetValueOrDefault() }, true));
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid.GetValueOrDefault(), (new PurchaseFormType() { Uuid = purchaseTypeUuid.GetValueOrDefault() }, true));
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurementStrategyUuid, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, purchaseTypeUuid, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -530,47 +478,28 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Fact]
-        public void Cannot_Create_With_Procurement_If_ProcurementStrategy_Is_Not_Available()
+        public void Cannot_Create_With_Procurement_If_UpdateIndependentOptionTypeAssignment_For_ProcurementStrategy_Fails()
         {
             //Arrange
             var procurementStrategyUuid = A<Guid>();
             var procurement = new ItContractProcurementModificationParameters()
             {
-                ProcurementStrategyUuid = ((Guid?)procurementStrategyUuid).AsChangedValue()
-            };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid, (new ProcurementStrategyType(), false));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "The changed ProcurementStrategyType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_Procurement_If_ProcurementStrategy_Is_Not_Found()
-        {
-            //Arrange
-            var procurementStrategyUuid = A<Guid>();
-            var procurement = new ItContractProcurementModificationParameters()
-            {
-                ProcurementStrategyUuid = ((Guid?)procurementStrategyUuid).AsChangedValue()
+                ProcurementStrategyUuid = ((Guid?) procurementStrategyUuid).AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
 
             var operationError = A<OperationError>();
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<ProcurementStrategyType>(organizationUuid, procurementStrategyUuid, operationError);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurementStrategyUuid, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving ProcurementStrategyType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         [Fact]
-        public void Cannot_Create_With_Procurement_If_PurchaseType_Is_Not_Available()
+        public void Cannot_Create_With_Procurement_If_UpdateIndependentOptionTypeAssignment_For_PurchaseForm_Fails()
         {
             //Arrange
             var purchaseTypeUuid = A<Guid>();
@@ -579,34 +508,15 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 PurchaseTypeUuid = ((Guid?)purchaseTypeUuid).AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid, (new PurchaseFormType(), false));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "The changed PurchaseFormType points to an option which is not available in the organization", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_Procurement_If_PurchaseType_Is_Not_Found()
-        {
-            //Arrange
-            var purchaseTypeUuid = A<Guid>();
-            var procurement = new ItContractProcurementModificationParameters()
-            {
-                PurchaseTypeUuid = ((Guid?)purchaseTypeUuid).AsChangedValue()
-            };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-
+            
             var operationError = A<OperationError>();
-            ExpectGetOptionTypeReturnsIfInputIdIsDefined<PurchaseFormType>(organizationUuid, purchaseTypeUuid, operationError);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, purchaseTypeUuid, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownErrorDetails(result, $"Failure while resolving PurchaseFormType option:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         [Theory]
@@ -684,90 +594,47 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Can_Create_With_SystemUsages(bool hasUsages)
         {
             //Arrange
-            Configure(f => f
-                .Customize<ItSystemUsage>(o => o
-                    .OmitAutoProperties()
-                    .With(usage => usage.Id)
-                    .With(usage => usage.Uuid)
-                )
-            );
-            var systemUsages = hasUsages ? Many<ItSystemUsage>().ToList() : new List<ItSystemUsage>();
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsages.Select(x => x.Uuid).ToList());
+            var usageUuids = hasUsages ? Many<Guid>().ToList() : new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
 
-            foreach (var usage in systemUsages)
-            {
-                ExpectGetSystemUsageReturns(usage.Uuid, usage);   
-            }
+            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
-            AssertSystemUsages(systemUsages, result.Value.AssociatedSystemUsages);
             AssertTransactionCommitted(transaction);
         }
 
         [Fact]
-        public void Cannot_Create_With_SystemUsages_If_Duplicates()
+        public void Cannot_Create_With_SystemUsages_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
-            var duplicateGuid = A<Guid>();
-            var usageUuids = new List<Guid>() {duplicateGuid, duplicateGuid};
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids.ToList());
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, "Duplicates of 'SystemUsages' are not allowed", OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_SystemUsages_If_Get_SystemUsage_Fails()
-        {
-            //Arrange
-            var usage = new ItSystemUsage() {Id = A<int>(), Uuid = A<Guid>()};
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid>{usage.Uuid});
+            var usageUuids = Many<Guid>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
 
             var operationError = A<OperationError>();
-            ExpectGetSystemUsageReturns(usage.Uuid, operationError);
+            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, $"Failed to get system usage with Uuid: {usage.Uuid}, with error message", operationError.FailureType, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         [Fact]
-        public void Can_Create_With_SystemUsages_If_Usage_Already_Assigned()
+        public void Can_Update_With_SystemUsages_If_Usage_Already_Assigned()
         {
             //Arrange
             var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid> { usage.Uuid });
+            var usageUuids = new List<Guid> { usage.Uuid };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
             createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage{ ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id});
-            ExpectGetSystemUsageReturns(usage.Uuid, usage);
 
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            Assert.True(result.Ok);
-            AssertSystemUsages(new List<ItSystemUsage>{usage}, result.Value.AssociatedSystemUsages);
-            AssertTransactionCommitted(transaction);
-        }
-
-        [Fact]
-        public void Can_Update_With_SystemUsages_To_Remove_Usage()
-        {
-            //Arrange
-            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: new List<Guid>());
-            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
-            ExpectGetSystemUsageReturns(usage.Uuid, usage);
+            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
             ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
@@ -777,7 +644,28 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Ok);
-            AssertSystemUsages(new List<ItSystemUsage>(), result.Value.AssociatedSystemUsages);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_SystemUsages_To_Remove_Usage()
+        {
+            //Arrange
+            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
+            var usageUuids = new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
+            
+            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
         }
 
@@ -789,23 +677,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private void ExpectAllowModifySuccess(ItContract contract)
         {
             _authContext.Setup(x => x.AllowModify(contract)).Returns(true);
-        }
-
-        private static void AssertSystemUsages(IEnumerable<ItSystemUsage> expected, IEnumerable<ItContractItSystemUsage> actual)
-        {
-            var orderedExpected = expected.OrderBy(x => x.Id).ToList();
-            var orderedActual = actual.OrderBy(x => x.ItSystemUsageId).ToList();
-
-            Assert.Equal(orderedExpected.Count, orderedActual.Count);
-            for (var i = 0; i < orderedExpected.Count; i++)
-            {
-                Assert.Equal(orderedExpected[i].Id, orderedActual[i].ItSystemUsageId);
-            }
-        }
-
-        private void ExpectGetSystemUsageReturns(Guid usageUuid, Result<ItSystemUsage, OperationError> result)
-        {
-            _usageServiceMock.Setup(x => x.GetByUuid(usageUuid)).Returns(result);
         }
 
         private (Guid? procurementStrategyUuid, Guid? purchaseTypeUuid, ItContractProcurementModificationParameters parameters) CreateProcurementParameters(bool withStrategy, bool withPurchase, bool withPlan)
@@ -828,8 +699,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
         private static void AssertProcurement(ItContractProcurementModificationParameters expected, ItContract actual)
         {
-            Assert.Equal(expected.ProcurementStrategyUuid.NewValue, actual.ProcurementStrategy?.Uuid);
-            Assert.Equal(expected.PurchaseTypeUuid.NewValue, actual.PurchaseForm?.Uuid);
             if (expected.ProcurementPlan.HasChange && expected.ProcurementPlan.NewValue.HasValue)
             {
                 Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, actual.ProcurementPlanHalf);
@@ -842,14 +711,31 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             }
         }
 
-        private void ExpectUpdateIndependentReturns<TOption>(ItContract contract, Guid? optionUuid, Maybe<OperationError> result) where TOption : OptionEntity<ItContract>
+        private void ExpectUpdateMultiAssignmentReturns<TAssignment, TKey>(ItContract contract, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result) 
+            where TAssignment : class, IHasId, IHasUuid
+            where TKey : class, IHasId, IHasUuid
         {
-            if (optionUuid.HasValue)
-            {
-                _updateAssignmentHelper
-                    .Setup(x => x.UpdateIndependentOptionTypeAssignment(contract, optionUuid, It.IsAny<Action<ItContract>>(), It.IsAny<Func<ItContract, TOption>>(), It.IsAny<Action<ItContract, TOption>>()))
-                    .Returns(result);
-            }
+            _assignmentUpdateServiceMock
+                .Setup(x => x.UpdateMultiAssignment(
+                    It.IsAny<string>(), 
+                    contract, 
+                    assignmentUuids, 
+                    It.IsAny<Func<ItContract, IEnumerable<TAssignment>>>(), 
+                    It.IsAny<Func<ItContract, TKey, Maybe<OperationError>>>(), 
+                    It.IsAny<Func<ItContract, TKey, Maybe<OperationError>>>()))
+                .Returns(result);
+        }
+
+        private void ExpectUpdateIndependentOptionTypeAssignmentReturns<TOption>(ItContract contract, Guid? optionUuid, Maybe<OperationError> result) where TOption : OptionEntity<ItContract>
+        {
+            _assignmentUpdateServiceMock
+                .Setup(x => x.UpdateIndependentOptionTypeAssignment(
+                    contract, 
+                    optionUuid, 
+                    It.IsAny<Action<ItContract>>(), 
+                    It.IsAny<Func<ItContract, TOption>>(), 
+                    It.IsAny<Action<ItContract, TOption>>()))
+                .Returns(result);
         }
 
         private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<ItContract>
@@ -919,9 +805,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 AgreementElementUuids = agreementElementUuids.AsChangedValue<IEnumerable<Guid>>()
             };
 
-            ExpectUpdateIndependentReturns<ItContractType>(contract, contractTypeUuid, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ItContractType>(contract, contractTypeUuid, Maybe<OperationError>.None);
 
-            ExpectUpdateIndependentReturns<ItContractTemplateType>(contract, contractTemplateUuid, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ItContractTemplateType>(contract, contractTemplateUuid, Maybe<OperationError>.None);
 
             var agreementElementTypes = agreementElementUuids.ToDictionary(uuid => uuid,
                 uuid => new AgreementElementType() { Id = A<int>(), Uuid = uuid });
@@ -944,8 +830,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ItContract actualContract)
         {
             Assert.Equal(expectedContractId, actualContract.ItContractId);
-            Assert.Equal(expectedContractTypeUuid, actualContract.ContractType?.Uuid);
-            Assert.Equal(expectedContractTemplateUuid, actualContract.ContractTemplate?.Uuid);
             Assert.Equal(expectedValidFrom, actualContract.Concluded);
             Assert.Equal(expectedValidTo, actualContract.ExpirationDate);
             Assert.Equal(expectedEnforceValid, actualContract.Active);
