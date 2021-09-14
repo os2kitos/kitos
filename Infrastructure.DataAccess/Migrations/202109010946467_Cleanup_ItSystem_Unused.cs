@@ -1,4 +1,5 @@
-﻿namespace Infrastructure.DataAccess.Migrations
+﻿using Infrastructure.DataAccess.Tools;
+namespace Infrastructure.DataAccess.Migrations
 {
     using System;
     using System.Data.Entity.Migrations;
@@ -12,8 +13,9 @@
             DropColumn("dbo.ItSystem", "LinkToDirectoryAdminUrl");
             DropColumn("dbo.ItSystem", "LinkToDirectoryAdminUrlName");
             DropColumn("dbo.ArchivePeriod", "ItSystem_Id");
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("ExternalReferences_Fix_MissingLastUpdated.sql"));
         }
-        
+
         public override void Down()
         {
             AddColumn("dbo.ArchivePeriod", "ItSystem_Id", c => c.Int());

@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 SignedBy = contract.SupplierContractSigner,
                 Signed = contract.HasSupplierSigned,
                 SignedAt = contract.SupplierSignedDate,
-                SupplierOrganization = contract.Supplier?.MapShallowOrganizationResponseDTO()
+                Organization = contract.Supplier?.MapShallowOrganizationResponseDTO()
             };
         }
 

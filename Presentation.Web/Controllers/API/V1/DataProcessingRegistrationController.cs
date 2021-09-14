@@ -759,8 +759,11 @@ namespace Presentation.Web.Controllers.API.V1
             return value
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.LastChangedByUser))
+                .Include(dataProcessingRegistration => dataProcessingRegistration.ExternalReferences.Select(x=>x.ObjectOwner))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.ObjectOwner)
+                .Include(dataProcessingRegistration => dataProcessingRegistration.Reference.LastChangedByUser)
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights.Select(_ => _.Role))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.Rights.Select(_ => _.User))
                 .Include(dataProcessingRegistration => dataProcessingRegistration.SystemUsages)
@@ -930,7 +933,7 @@ namespace Presentation.Web.Controllers.API.V1
                 ReferenceId = reference.ExternalReferenceId,
                 Url = reference.URL,
                 LastChanged = reference.LastChanged,
-                LastChangedByUser = reference.LastChangedByUser?.MapToNamedEntityDTO()
+                LastChangedByUser = (reference.LastChangedByUser ?? reference.ObjectOwner)?.MapToNamedEntityDTO()
             };
         }
 

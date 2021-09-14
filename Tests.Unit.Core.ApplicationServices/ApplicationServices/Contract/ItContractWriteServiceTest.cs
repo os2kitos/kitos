@@ -11,6 +11,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
@@ -36,6 +37,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
+        private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
 
@@ -48,9 +50,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _domainEventsMock = new Mock<IDomainEvents>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
+            _organizationServiceMock = new Mock<IOrganizationService>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _assignmentUpdateServiceMock.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -585,7 +588,58 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, "UUID of responsible organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput,transaction);
+            AssertFailureWithKnownErrorDetails(result, "UUID of responsible organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Can_Create_With_Supplier()
+        {
+            //Arrange
+            var supplier = new ItContractSupplierModificationParameters()
+            {
+                OrganizationUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                Signed = A<bool>().AsChangedValue(),
+                SignedAt = A<DateTime?>().AsChangedValue(),
+                SignedBy = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(supplier: supplier);
+            var organization = new Organization() { Uuid = supplier.OrganizationUuid.NewValue.GetValueOrDefault() };
+            _organizationServiceMock.Setup(x => x.GetOrganization(organization.Uuid, null)).Returns(organization);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            var contract = result.Value;
+            Assert.Equal(supplier.OrganizationUuid.NewValue, contract.Supplier?.Uuid);
+            Assert.Equal(supplier.Signed.NewValue, contract.HasSupplierSigned);
+            Assert.Equal(supplier.SignedAt.NewValue, contract.SupplierSignedDate);
+            Assert.Equal(supplier.SignedBy.NewValue, contract.SupplierContractSigner);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Supplier_If_Organization_Resolution_Fails()
+        {
+            //Arrange
+            var supplier = new ItContractSupplierModificationParameters()
+            {
+                OrganizationUuid = ((Guid?)A<Guid>()).AsChangedValue(),
+                Signed = A<bool>().AsChangedValue(),
+                SignedAt = A<DateTime?>().AsChangedValue(),
+                SignedBy = A<string>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(supplier: supplier);
+            var operationError = A<OperationError>();
+            _organizationServiceMock.Setup(x => x.GetOrganization(supplier.OrganizationUuid.NewValue.GetValueOrDefault(), null)).Returns(operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, $"Failed to get supplier organization:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
 
         [Theory]
@@ -748,6 +802,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Guid? parentUuid = null,
             ItContractProcurementModificationParameters procurement = null,
             ItContractResponsibleDataModificationParameters responsible = null,
+            ItContractSupplierModificationParameters supplier = null,
             IEnumerable<Guid> systemUsageUuids = null
             )
         {
@@ -762,6 +817,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 ParentContractUuid = parentUuid.AsChangedValue(),
                 Procurement = procurement.FromNullable(),
                 Responsible = responsible.FromNullable(),
+                Supplier = supplier.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable()
             };
             var createdContract = new ItContract()
@@ -862,7 +918,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertTransactionNotCommitted(transaction);
         }
 
-        private void AssertFailureWithKnownErrorDetails(Result<ItContract, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
+        private static void AssertFailureWithKnownErrorDetails(Result<ItContract, OperationError> result, string errorMessageContent, OperationFailure failure, Mock<IDatabaseTransaction> transaction)
         {
             Assert.True(result.Failed);
             Assert.Contains(errorMessageContent, result.Error.Message.GetValueOrEmptyString());

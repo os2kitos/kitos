@@ -99,6 +99,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/procurement"), token, dto);
         }
 
+        public static async Task<HttpResponseMessage> SendPutContractSupplierAsync(string token, Guid contractUuid, ContractSupplierDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/supplier"), token, dto);
+        }
+
         public static async Task<HttpResponseMessage> SendPutSystemUsagesAsync(string token, Guid contractUuid, IEnumerable<Guid> dto)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/system-usages"), token, dto);

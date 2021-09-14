@@ -640,8 +640,8 @@ namespace Core.DomainModel.ItContract
         {
             ResponsibleOrganizationUnit?.Track();
             ResponsibleOrganizationUnit = null;
-		}
-		
+        }
+
         public void ResetProcurementStrategy()
         {
             ProcurementStrategy?.Track();
@@ -663,7 +663,7 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
         {
             var (half, year) = plan;
-            if (half != 1 && half != 2)
+            if (half is < 1 or > 2)
             {
                 return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
             }
@@ -703,6 +703,23 @@ namespace Core.DomainModel.ItContract
                     return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
             }
            
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSupplierOrganization()
+        {
+            Supplier.Track();
+            Supplier = null;
+        }
+
+        public Maybe<OperationError> SetSupplierOrganization(Organization.Organization organization)
+        {
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+
+            if (Supplier == null || organization.Uuid != Supplier.Uuid)
+                Supplier = organization;
+
             return Maybe<OperationError>.None;
         }
     }

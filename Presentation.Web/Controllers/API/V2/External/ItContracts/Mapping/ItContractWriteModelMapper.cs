@@ -35,6 +35,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var generalData = WithResetDataIfPropertyIsDefined(dto.General, nameof(ContractWriteRequestDTO.General));
             var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible));
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
+            var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
             return new ItContractModificationParameters
             {
@@ -43,7 +44,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 General = generalData.FromNullable().Select(MapGeneralData),
                 Procurement = procurement.FromNullable().Select(MapProcurement),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
-                Responsible = responsibleData.FromNullable().Select(MapResponsible)
+                Responsible = responsibleData.FromNullable().Select(MapResponsible),
+                Supplier = supplier.FromNullable().Select(MapSupplier)
+            };
+        }
+
+        public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
+        {
+            return new()
+            {
+                OrganizationUuid = dto.OrganizationUuid.AsChangedValue(),
+                Signed = dto.Signed.AsChangedValue(),
+                SignedAt = dto.SignedAt.AsChangedValue(),
+                SignedBy = dto.SignedBy.AsChangedValue()
             };
         }
 
