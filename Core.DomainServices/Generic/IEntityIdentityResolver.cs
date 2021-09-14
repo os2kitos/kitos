@@ -12,6 +12,5 @@ namespace Core.DomainServices.Generic
     {
         Maybe<Guid> ResolveUuid<T>(int dbId) where T : class, IHasUuid, IHasId;
         Maybe<int> ResolveDbId<T>(Guid uuid) where T : class, IHasUuid, IHasId;
-        Maybe<T> ResolveDbEntity<T>(Guid uuid) where T : class, IHasUuid, IHasId;
     }
 }

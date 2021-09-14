@@ -12,6 +12,7 @@ using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
@@ -40,6 +41,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
+        private readonly Mock<IItSystemUsageService> _usageServiceMock;
 
         public ItContractWriteServiceTest()
         {
@@ -53,7 +55,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _organizationServiceMock = new Mock<IOrganizationService>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object);
+            _usageServiceMock = new Mock<IItSystemUsageService>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -765,18 +768,19 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             }
         }
 
-        private void ExpectUpdateMultiAssignmentReturns<TAssignment, TKey>(ItContract contract, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result) 
-            where TAssignment : class, IHasId, IHasUuid
-            where TKey : class, IHasId, IHasUuid
+        private void ExpectUpdateMultiAssignmentReturns<TAssignmentInput, TAssignmentState>(ItContract contract, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result) 
+            where TAssignmentInput : class, IHasId, IHasUuid
+            where TAssignmentState : class, IHasId, IHasUuid
         {
             _assignmentUpdateServiceMock
-                .Setup(x => x.UpdateMultiAssignment(
+                .Setup(x => x.UpdateUniqueMultiAssignment(
                     It.IsAny<string>(), 
                     contract, 
                     assignmentUuids, 
-                    It.IsAny<Func<ItContract, IEnumerable<TAssignment>>>(), 
-                    It.IsAny<Func<ItContract, TKey, Maybe<OperationError>>>(), 
-                    It.IsAny<Func<ItContract, TKey, Maybe<OperationError>>>()))
+                    It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
+                    It.IsAny<Func<ItContract, IEnumerable<TAssignmentState>>>(), 
+                    It.IsAny<Func<ItContract, TAssignmentInput, Maybe<OperationError>>>(), 
+                    It.IsAny<Func<ItContract, TAssignmentState, Maybe<OperationError>>>()))
                 .Returns(result);
         }
 

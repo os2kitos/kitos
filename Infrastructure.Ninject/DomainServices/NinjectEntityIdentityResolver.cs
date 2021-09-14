@@ -42,14 +42,5 @@ namespace Infrastructure.Ninject.DomainServices
                 .FromNullable()
                 .Select(x => x.Id);
         }
-
-        public Maybe<T> ResolveDbEntity<T>(Guid uuid) where T : class, IHasUuid, IHasId
-        {
-            return _kernel
-                .Get<IGenericRepository<T>>()
-                .AsQueryable()
-                .ByUuid(uuid)
-                .FromNullable();
-        }
     }
 }
