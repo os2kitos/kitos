@@ -20,7 +20,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             public const string RegisterTypes = "RegisterTypes";
             public const string SensitivePersonalDataTypes = "SensitivePersonalDataTypes";
             public const string SystemRoles = "ItSystemRoles";
+
             public const string ContractTypes = "ItContractTypes";
+            public const string ContractTemplateTypes = "ItContractTemplateTypes";
+            public const string PurchaseTypes = "PurchaseFormTypes";
+            public const string PaymentModelTypes = "PaymentModelTypes";
+            public const string AgreementElementTypes = "AgreementElementTypes";
+            public const string PaymentFrequencyTypes = "PaymentFrequencyTypes";
+            public const string PriceRegulationTypes = "PriceRegulationTypes";
+            public const string ProcurementStrategyTypes = "ProcurementStrategyTypes";
+            public const string AgreementExtensionOptionTypes = "OptionExtendTypes";
+            public const string NoticePeriodMonthTypes = "TerminationDeadlineTypes";
+            public const string HandoverTrialTypes = "HandoverTrialTypes";
+            public const string ContractRoles = "ItContractRoles";
+
             public const string DataProcessingDataResponsibleOptions = "DataProcessingDataResponsibleOptions";
             public const string DataProcessingBasisForTransferOptions = "DataProcessingBasisForTransferOptions";
             public const string DataProcessingCountryOptions = "DataProcessingCountryOptions";

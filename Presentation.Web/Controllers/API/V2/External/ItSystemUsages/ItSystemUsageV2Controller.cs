@@ -55,10 +55,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="organizationUuid">Query usages within a specific organization</param>
         /// <param name="relatedToSystemUuid">Query by systems with outgoing relations related to another system</param>
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
+        /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemUsageResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -66,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUsageUuid = null,
+            [NonEmptyGuid] Guid? relatedToContractUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -83,6 +85,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             if (relatedToSystemUsageUuid.HasValue)
                 conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
+
+            if (relatedToContractUuid.HasValue)
+                conditions.Add(new QueryByRelationToContract(relatedToContractUuid.Value));
 
             if (systemUuid.HasValue)
                 conditions.Add(new QueryBySystemUuid(systemUuid.Value));
@@ -150,7 +155,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]

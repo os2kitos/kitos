@@ -13,5 +13,6 @@ namespace Core.DomainServices.Repositories.Contract
         void DeleteContract(ItContract contract);
         void Update(ItContract contract);
         Maybe<ItContract> GetContract(Guid uuid);
+        IQueryable<ItContract> AsQueryable();
     }
 }

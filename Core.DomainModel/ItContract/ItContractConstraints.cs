@@ -3,6 +3,6 @@ namespace Core.DomainModel.ItContract
 {
     public class ItContractConstraints
     {
-        public static int MaxNameLength = 200;
+        public const int MaxNameLength = 200;
     }
 }

@@ -12,6 +12,7 @@ using Core.DomainServices.Repositories.Organization;
 using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Generic.Validity;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
@@ -178,7 +179,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 AssociatedProjects = systemUsage.ItProjects.Select(project => project.MapIdentityNamePairDTO()).ToList(),
                 NumberOfExpectedUsers = MapExpectedUsers(systemUsage),
                 SystemVersion = systemUsage.Version,
-                Validity = new ItSystemUsageValidityResponseDTO
+                Validity = new ValidityResponseDTO
                 {
                     EnforcedValid = systemUsage.Active,
                     Valid = systemUsage.IsActive,

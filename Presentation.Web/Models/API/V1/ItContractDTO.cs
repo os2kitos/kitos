@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.DomainModel.ItContract;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -10,15 +11,9 @@ namespace Presentation.Web.Models.API.V1
         public string Name { get; set; }
         public string Note { get; set; }
         public string ItContractId { get; set; }
-        public string Esdh { get; set; }
-        public string Folder { get; set; }
         public string SupplierContractSigner { get; set; }
         public bool HasSupplierSigned { get; set; }
         public DateTime? SupplierSignedDate { get; set; }
-        public DateTime? OperationTestExpected { get; set; }
-        public DateTime? OperationTestApproved { get; set; }
-        public DateTime? OperationalAcceptanceTestExpected { get; set; }
-        public DateTime? OperationalAcceptanceTestApproved { get; set; }
         public DateTime? Concluded { get; set; }
         public int? DurationYears { get; set; }
         public int? DurationMonths { get; set; }
@@ -76,8 +71,8 @@ namespace Presentation.Web.Models.API.V1
         }
         public int? ObjectOwnerId { get; set; }
 
-        public string Running { get; set; }
-        public string ByEnding { get; set; }
+        public YearSegmentOption? Running { get; set; }
+        public YearSegmentOption? ByEnding { get; set; }
         public bool? Active { get; set; }
         public bool? IsActive { get; set; }
         public ICollection<ExternalReferenceDTO> ExternalReferences { get; set; }

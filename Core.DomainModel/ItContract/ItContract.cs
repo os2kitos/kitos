@@ -31,6 +31,7 @@ namespace Core.DomainModel.ItContract
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
+            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
         }
 
@@ -116,22 +117,6 @@ namespace Core.DomainModel.ItContract
         ///     User defined it contract identifier.
         /// </value>
         public string ItContractId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a reference to relevant documents in an extern ESDH system.
-        /// </summary>
-        /// <value>
-        ///     Extern reference  to ESDH system.
-        /// </value>
-        public string Esdh { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a path to relevant documents in a folder.
-        /// </summary>
-        /// <value>
-        ///     Path to folder containing relevant documents.
-        /// </value>
-        public string Folder { get; set; }
 
         /// <summary>
         ///     Gets or sets the supplier contract signer.
@@ -344,50 +329,6 @@ namespace Core.DomainModel.ItContract
         #region Deadlines (aftalefrister)
 
         /// <summary>
-        ///     Gets or sets the operation test expected.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> funktionsprøve: forventet"
-        /// </remarks>
-        /// <value>
-        ///     The operation test expected.
-        /// </value>
-        public DateTime? OperationTestExpected { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operation test approved.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> funktionsprøve: godkendt"
-        /// </remarks>
-        /// <value>
-        ///     The operation test approved.
-        /// </value>
-        public DateTime? OperationTestApproved { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operational acceptance test expected.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> driftovertagelsesprøve: forventet"
-        /// </remarks>
-        /// <value>
-        ///     The operational acceptance test expected.
-        /// </value>
-        public DateTime? OperationalAcceptanceTestExpected { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operational acceptance test approved.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> driftovertagelsesprøve: godkendt"
-        /// </remarks>
-        /// <value>
-        ///     The operational acceptance test approved.
-        /// </value>
-        public DateTime? OperationalAcceptanceTestApproved { get; set; }
-
-        /// <summary>
         ///     When the contract began. (indgået)
         /// </summary>
         /// <value>
@@ -483,7 +424,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (løbende)
         /// </value>
-        public string Running { get; set; }
+        public YearSegmentOption? Running { get; set; }
 
         /// <summary>
         ///
@@ -491,7 +432,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (indtil udgangen af)
         /// </value>
-        public string ByEnding { get; set; }
+        public YearSegmentOption? ByEnding { get; set; }
 
         #endregion
 

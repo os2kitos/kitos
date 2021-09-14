@@ -114,6 +114,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
         {
             yield return new[] { EntityOptionHelper.ResourceNames.SystemRoles, OptionV2ApiHelper.ResourceName.ItSystemUsageRoles };
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingRegistrationRoles, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationRoles };
+            yield return new[] { EntityOptionHelper.ResourceNames.ContractRoles, OptionV2ApiHelper.ResourceName.ItContractRoles };
         }
 
         public static IEnumerable<object[]> GetRegularResources()
@@ -126,11 +127,23 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             yield return new[] { EntityOptionHelper.ResourceNames.ArchiveTestLocations, OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations };
             yield return new[] { EntityOptionHelper.ResourceNames.SensitivePersonalDataTypes, OptionV2ApiHelper.ResourceName.ItSystemSensitivePersonalDataTypes };
             yield return new[] { EntityOptionHelper.ResourceNames.RegisterTypes, OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes };
-            yield return new[] { EntityOptionHelper.ResourceNames.ContractTypes, OptionV2ApiHelper.ResourceName.ItContractContractTypes };
+
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingDataResponsibleOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationDataResponsible };
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingBasisForTransferOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationBasisForTransfer };
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingCountryOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationCountry };
             yield return new[] { EntityOptionHelper.ResourceNames.DataProcessingOversightOptions, OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight };
+
+            yield return new[] { EntityOptionHelper.ResourceNames.ContractTypes, OptionV2ApiHelper.ResourceName.ItContractContractTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.ContractTemplateTypes, OptionV2ApiHelper.ResourceName.ItContractContractTemplateTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PurchaseTypes, OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PaymentModelTypes, OptionV2ApiHelper.ResourceName.ItContractPaymentModelTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.AgreementElementTypes, OptionV2ApiHelper.ResourceName.ItContractAgreementElementTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PaymentFrequencyTypes, OptionV2ApiHelper.ResourceName.ItContractPaymentFrequencyTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.PriceRegulationTypes, OptionV2ApiHelper.ResourceName.ItContractPriceRegulationTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.ProcurementStrategyTypes, OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.AgreementExtensionOptionTypes, OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.NoticePeriodMonthTypes, OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes };
+            yield return new[] { EntityOptionHelper.ResourceNames.HandoverTrialTypes, OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes };
         }
     }
 }

@@ -103,6 +103,7 @@ using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
 using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
+using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -261,6 +262,10 @@ namespace Presentation.Web.Ninject
             //Data processing
             kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InCommandScope(Mode);
+
+            //Contract
+            kernel.Bind<IItContractResponseMapper>().To<ItContractResponseMapper>().InCommandScope(Mode);
+
         }
 
         private void RegisterSSO(IKernel kernel)
@@ -384,7 +389,29 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItSystemUsage, RegisterType, LocalRegisterType>(kernel);
 
             //IT-Contract
+            RegisterOptionsService<ItContractRight, ItContractRole, LocalItContractRole>(kernel);
+
             RegisterOptionsService<ItContract, ItContractType, LocalItContractType>(kernel);
+
+            RegisterOptionsService<ItContract, ItContractTemplateType, LocalItContractTemplateType>(kernel);
+
+            RegisterOptionsService<ItContract, PurchaseFormType, LocalPurchaseFormType>(kernel);
+
+            RegisterOptionsService<ItContract, PaymentModelType, LocalPaymentModelType>(kernel);
+
+            RegisterOptionsService<ItContract, AgreementElementType, LocalAgreementElementType>(kernel);
+
+            RegisterOptionsService<ItContract, PaymentFreqencyType, LocalPaymentFreqencyType>(kernel);
+
+            RegisterOptionsService<ItContract, PriceRegulationType, LocalPriceRegulationType>(kernel);
+
+            RegisterOptionsService<ItContract, ProcurementStrategyType, LocalProcurementStrategyType>(kernel);
+
+            RegisterOptionsService<ItContract, OptionExtendType, LocalOptionExtendType>(kernel);
+
+            RegisterOptionsService<ItContract, TerminationDeadlineType, LocalTerminationDeadlineType>(kernel);
+
+            RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
 
             //Attached options services
             kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>
