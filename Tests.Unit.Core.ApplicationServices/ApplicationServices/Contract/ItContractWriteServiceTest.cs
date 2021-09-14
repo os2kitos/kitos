@@ -649,7 +649,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = result.Value;
             Assert.Equal(responsible.OrganizationUnitUuid.NewValue, contract.ResponsibleOrganizationUnit?.Uuid);
             Assert.Equal(responsible.Signed.NewValue, contract.IsSigned);
-            Assert.Equal(responsible.SignedAt.NewValue, contract.SignedDate);
+            Assert.Equal(responsible.SignedAt.NewValue?.Date, contract.SignedDate);
             Assert.Equal(responsible.SignedBy.NewValue, contract.ContractSigner);
             AssertTransactionCommitted(transaction);
         }
@@ -697,7 +697,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = result.Value;
             Assert.Equal(supplier.OrganizationUuid.NewValue, contract.Supplier?.Uuid);
             Assert.Equal(supplier.Signed.NewValue, contract.HasSupplierSigned);
-            Assert.Equal(supplier.SignedAt.NewValue, contract.SupplierSignedDate);
+            Assert.Equal(supplier.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(supplier.SignedBy.NewValue, contract.SupplierContractSigner);
             AssertTransactionCommitted(transaction);
         }
