@@ -132,13 +132,35 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
         }
 
-        private static Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
+        private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
         {
-            //TODO:  Must migrate to use the multi assignment part
-            //TODO: In the "add" metod, assert that the handover trial is valid (either approved OR the other one)
+            var handoverTrialTypes = new Dictionary<Guid, HandoverTrialType>();
+            var updates = parameters.ToList();
+            foreach (var uuid in updates.Select(x => x.HandoverTrialTypeUuid).Distinct().ToList())
+            {
+                var optionType = _optionResolver.GetOptionType<HandoverTrial, HandoverTrialType>(contract.Organization.Uuid, uuid);
+                if (optionType.Failed)
+                    return new OperationError($"Failed to fetch option with uuid:{uuid}. Message:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
 
-            //TODO: Delete "removed" so track them while being removed
-            throw new NotImplementedException();
+                if (!optionType.Value.available && contract.HandoverTrials.Any(x => x.HandoverTrialType.Uuid == uuid) == false)
+                    return new OperationError($"Cannot take new handover trial ({uuid}) into use which is not available in the organization", OperationFailure.BadInput);
+
+                handoverTrialTypes[uuid] = optionType.Value.option;
+            }
+
+            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            var handoverTrials = contract.HandoverTrials.ToList();
+            handoverTrials.ForEach(_handoverTrialRepository.Delete);
+            contract.ResetHandoverTrials();
+
+            foreach (var newHandoverTrial in updates)
+            {
+                var error = contract.AddHandoverTrial(handoverTrialTypes[newHandoverTrial.HandoverTrialTypeUuid], newHandoverTrial.ExpectedAt, newHandoverTrial.ApprovedAt);
+                if (error.HasValue)
+                    return new OperationError("Failed adding handover trial:" + error.Value.Message.GetValueOrEmptyString(), error.Value.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)
@@ -161,7 +183,7 @@ namespace Core.ApplicationServices.Contract.Write
                 var organizationResult = _organizationService.GetOrganization(organizationId.Value);
                 if (organizationResult.Failed)
                 {
-                    return new OperationError($"Failed to get supplier organization:{organizationResult.Error.Message.GetValueOrEmptyString()}",organizationResult.Error.FailureType);
+                    return new OperationError($"Failed to get supplier organization:{organizationResult.Error.Message.GetValueOrEmptyString()}", organizationResult.Error.FailureType);
                 }
 
                 return contract.SetSupplierOrganization(organizationResult.Value);

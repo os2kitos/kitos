@@ -689,5 +689,28 @@ namespace Core.DomainModel.ItContract
 
             return Maybe<OperationError>.None;
         }
+
+        public void ResetHandoverTrials()
+        {
+            HandoverTrials.Clear();
+        }
+
+        public Maybe<OperationError> AddHandoverTrial(HandoverTrialType trialType, DateTime? expected, DateTime? approved)
+        {
+            if (trialType == null)
+                throw new ArgumentNullException(nameof(trialType));
+
+            if (expected.HasValue == false && approved.HasValue == false)
+                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
+
+            HandoverTrials.Add(new HandoverTrial()
+            {
+                Approved = approved,
+                Expected = expected,
+                ItContract = this,
+                HandoverTrialType = trialType
+            });
+            return Maybe<OperationError>.None;
+        }
     }
 }
