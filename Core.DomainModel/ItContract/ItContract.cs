@@ -663,7 +663,7 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
         {
             var (half, year) = plan;
-            if (half != 1 && half != 2)
+            if (half is < 1 or > 2)
             {
                 return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
             }
@@ -681,7 +681,11 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> SetSupplierOrganization(Organization.Organization organization)
         {
-            Supplier = organization ?? throw new ArgumentNullException(nameof(organization));
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+
+            if (Supplier == null || organization.Uuid != Supplier.Uuid)
+                Supplier = organization;
 
             return Maybe<OperationError>.None;
         }

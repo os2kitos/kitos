@@ -14,7 +14,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Core.DomainServices.Authorization;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
 
@@ -149,7 +148,7 @@ namespace Core.ApplicationServices.Contract.Write
                 var organizationResult = _organizationService.GetOrganization(organizationId.Value);
                 if (organizationResult.Failed)
                 {
-                    return new OperationError("Failed to get supplier organization:" + organizationResult.Error.Message.GetValueOrEmptyString(),organizationResult.Error.FailureType);
+                    return new OperationError($"Failed to get supplier organization:{organizationResult.Error.Message.GetValueOrEmptyString()}",organizationResult.Error.FailureType);
                 }
 
                 return contract.SetSupplierOrganization(organizationResult.Value);
