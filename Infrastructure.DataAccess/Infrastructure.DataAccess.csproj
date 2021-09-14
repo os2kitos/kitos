@@ -1424,6 +1424,9 @@
     <EmbeddedResource Include="Migrations\SQLScripts\Ensure_dpr_contract_project_uniquename.sql" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\ExternalReferences_Fix_MissingLastUpdated.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Running_And_ByEnding.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
