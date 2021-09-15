@@ -136,7 +136,6 @@ namespace Core.DomainServices.Role
 
         public Maybe<OperationError> BatchUpdateRoles(TModel model, IEnumerable<(Guid roleUuid, Guid userUuid)> roleAssignments)
         {
-            //TODO: Unit test it - migreate from the other test
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (roleAssignments == null) throw new ArgumentNullException(nameof(roleAssignments));
 

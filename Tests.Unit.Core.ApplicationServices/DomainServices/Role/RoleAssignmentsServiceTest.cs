@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -13,7 +14,7 @@ using Xunit;
 namespace Tests.Unit.Core.DomainServices.Role
 {
     public abstract class RoleAssignmentsServiceTest<TModel, TRight, TRole> : WithAutoFixture
-        where TRight : Entity, IRight<TModel, TRight, TRole>
+        where TRight : Entity, IRight<TModel, TRight, TRole>, new()
         where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
         where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
     {
@@ -22,7 +23,7 @@ namespace Tests.Unit.Core.DomainServices.Role
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IGenericRepository<TRight>> _rightRepositoryMock;
 
-        public RoleAssignmentsServiceTest()
+        protected RoleAssignmentsServiceTest()
         {
             _optionsServiceMock = new Mock<IOptionsService<TRight, TRole>>();
             _userRepository = new Mock<IUserRepository>();
@@ -227,7 +228,7 @@ namespace Tests.Unit.Core.DomainServices.Role
 
         [Fact]
         public void Cannot_RemoveRole_If_No_Existing_Assignment()
-        {  
+        {
             //Arrange
             var roleId = A<int>();
             var userId = A<int>();
@@ -255,7 +256,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
             var model = CreateModel((A<int>(), userId));
-            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>()}, new User { Id = userId, Uuid = userUuid } };
+            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>() }, new User { Id = userId, Uuid = userUuid } };
             var agreementRole = CreateRole(roleId, roleUuid);
             ExpectAvailableOption(model, roleId, agreementRole);
             ExpectOrganizationUsers(model, Maybe<string>.None, users);
@@ -394,7 +395,53 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
-        //TODO: Test batch update!
+        [Fact]
+        public void BatchUpdateRoles_Mirrors_Requested_Role_Assignments_To_Target()
+        {
+            //Arrange
+            var model = CreateModel();
+            var rightThatIsKept = new TRight
+            {
+                User = CreateUser(),
+                Role = CreateRole()
+            };
+            var rightThatIsRemoved = new TRight
+            {
+                Role = CreateRole()
+            };
+            model.Rights.Add(rightThatIsKept);
+            model.Rights.Add(rightThatIsRemoved);
+
+            var newState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (rightThatIsKept.Role.Uuid,rightThatIsKept.User.Uuid),
+                (A<Guid>(),A<Guid>()),
+
+                //Same user as the removed right but different role
+                (A<Guid>(),rightThatIsRemoved.User.Uuid),
+            };
+
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, newState);
+
+            //Assert
+            Assert.True(error.IsNone);
+            //TODO: Check changes to the model
+        }
+
+        //TODO: error cases
+        // case 1: Failure removing
+        // case 2: Failure adding
+
+        private User CreateUser()
+        {
+            return new User()
+            {
+                Uuid = A<Guid>(),
+                Id = A<int>()
+            };
+        }
 
         private void ExpectAvailableRoles(TModel model, TRole[] availableRoles)
         {
@@ -450,7 +497,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             {
                 _optionsServiceMock.Setup(x => x.GetOptionByUuid(orgId, roleUuid)).Returns(Maybe<(TRole option, bool available)>.None);
             }
-            
+
         }
     }
 }
