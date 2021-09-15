@@ -11,6 +11,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
@@ -779,7 +780,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);
@@ -801,7 +802,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);

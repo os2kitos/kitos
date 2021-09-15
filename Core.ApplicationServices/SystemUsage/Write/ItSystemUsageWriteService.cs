@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -30,8 +29,6 @@ using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
-
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.Write
@@ -262,14 +259,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return _registerTypeAssignmentService
                 .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
             return _sensitivePersonDataAssignmentService
                 .UpdateAssignedOptions(systemUsage, sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -686,7 +683,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     return (usage.Id, usageRelation.Value);
                 })
                 .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

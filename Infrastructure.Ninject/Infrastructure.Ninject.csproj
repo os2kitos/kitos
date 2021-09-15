@@ -47,6 +47,7 @@
     <Compile Include="ApplicationServices\NinjectIOptionResolver.cs" />
     <Compile Include="DomainServices\NinjectDomainEventsAdapter.cs" />
     <Compile Include="DomainServices\NinjectEntityIdentityResolver.cs" />
+    <Compile Include="DomainServices\NinjectEntityResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

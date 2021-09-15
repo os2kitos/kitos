@@ -198,8 +198,8 @@ namespace Core.ApplicationServices.Contract.Write
                 dataProcessingRegistrationUuids.FromNullable(),
                 (dprUuid) => _dataProcessingRegistrationApplicationService.GetByUuid(dprUuid),
                 itContract => itContract.DataProcessingRegistrations,
-                (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error),
-                (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error)
+                (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
+                (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
             ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
         }
 
