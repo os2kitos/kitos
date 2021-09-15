@@ -11,9 +11,11 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
-using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.References;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -21,6 +23,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
@@ -43,6 +46,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IGenericRepository<HandoverTrial>> _handoverTrialRepository;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
@@ -59,11 +63,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _handoverTrialRepository = new Mock<IGenericRepository<HandoverTrial>>();
+            _referenceServiceMock = new Mock<IReferenceService>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -938,6 +943,52 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _itContractServiceMock.Setup(x => x.ValidateNewName(contractId, newName)).Returns(Maybe<OperationError>.None);
         }
 
+        [Fact]
+        public void Can_Create_With_ExternalReferences()
+        {
+            //Arrange
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            parameters.ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>();
+
+            ExpectBatchUpdateExternalReferencesReturns(createdContract, externalReferences, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_ExternalReferences_If_BatchUpdate_Fails()
+        {
+            //Arrange
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(externalReferences: externalReferences);
+
+            parameters.ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>();
+
+            var updateError = A<OperationError>();
+            ExpectBatchUpdateExternalReferencesReturns(createdContract, externalReferences, updateError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, $"Failed to update references with error message: {updateError.Message.GetValueOrEmptyString()}", updateError.FailureType, transaction);
+        }
+
+        private void ExpectBatchUpdateExternalReferencesReturns(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
+        {
+            _referenceServiceMock
+                .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.Contract, contract.Id, externalReferences))
+                .Returns(value);
+        }
+
         private void ExpectAllowModifySuccess(ItContract contract)
         {
             _authContext.Setup(x => x.AllowModify(contract)).Returns(true);
@@ -1021,6 +1072,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ItContractResponsibleDataModificationParameters responsible = null,
             ItContractSupplierModificationParameters supplier = null,
             IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
+            IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null,
             IEnumerable<Guid> systemUsageUuids = null,
             IEnumerable<Guid> dataProcessingRegistrationUuids = null
             )
@@ -1038,6 +1090,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Responsible = responsible.FromNullable(),
                 Supplier = supplier.FromNullable(),
                 HandoverTrials = handoverTrialUpdates.FromNullable(),
+                ExternalReferences = externalReferences.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
