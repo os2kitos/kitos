@@ -175,6 +175,7 @@
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationWriteServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\GDPRExportReportServiceTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractServiceTest.cs" />
+    <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
@@ -230,6 +231,7 @@
     <Compile Include="Model\EventHandlers\RelationSpecificInterfaceEventsHandlerTest.cs" />
     <Compile Include="Model\HasRightsEntityTest.cs" />
     <Compile Include="Model\ItAdvice\ItAdviceTests.cs" />
+    <Compile Include="Model\ItContractTest.cs" />
     <Compile Include="Model\ItInterfaceTest.cs" />
     <Compile Include="Model\ItSystemUsageTest.cs" />
     <Compile Include="Model\References\AddReferenceCommandTest.cs" />

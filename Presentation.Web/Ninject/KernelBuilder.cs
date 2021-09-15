@@ -109,6 +109,7 @@ using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.M
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
+using Core.ApplicationServices.Generic.Write;
 
 namespace Presentation.Web.Ninject
 {
@@ -233,6 +234,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
             kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
+            kernel.Bind<IAssignmentUpdateService>().To<AssignmentUpdateService>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);

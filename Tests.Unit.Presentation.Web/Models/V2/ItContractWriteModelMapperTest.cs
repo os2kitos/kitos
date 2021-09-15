@@ -57,16 +57,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, true, false)]
-        [InlineData(false, false, false, false, true, false, false)]
-        [InlineData(false, false, false, true, false, false, false)]
-        [InlineData(false, false, true, false, false, false, false)]
-        [InlineData(false, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials)
+        [InlineData(false, false, false, false, false, false, false, false)]
+		[InlineData(false, false, false, false, false, false, false, true)]
+		[InlineData(false, false, false, false, false, false, true, false)]
+		[InlineData(false, false, false, false, false, true, false, false)]
+		[InlineData(false, false, false, false, true, false, false, false)]
+		[InlineData(false, false, false, true, false, false, false, false)]
+		[InlineData(false, false, true, false, false, false, false, false)]
+		[InlineData(false, true, false, false, false, false, false, false)]
+		[InlineData(true, false, false, false, false, false, false, false)]
+		[InlineData(true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -78,6 +79,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
             if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
+            if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
+			
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -92,6 +95,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noProcurement, output.Procurement.IsNone);
             Assert.Equal(noSupplier, output.Supplier.IsNone);
             Assert.Equal(noHandoverTrials, output.HandoverTrials.IsNone);
+            Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
         }
 
         [Fact]
@@ -365,6 +369,54 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertProcurement(true, input, output);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_SystemUsages_From_Post(bool hasValues)
+        {
+            //Arrange
+            var systemUsageUuids = hasValues ? new[] {A<Guid>(), A<Guid>()} : new Guid[0];
+            var requestDto = new CreateNewContractRequestDTO { SystemUsageUuids = systemUsageUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPOST(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.SystemUsageUuids.HasValue);
+            var modifiedUuids = modificationParameters.SystemUsageUuids.Value;
+            AssertUuids(systemUsageUuids, modifiedUuids);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_SystemUsages_From_Put(bool hasValues)
+        {
+            //Arrange
+            var systemUsageUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new UpdateContractRequestDTO { SystemUsageUuids = systemUsageUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPUT(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.SystemUsageUuids.HasValue);
+            var modifiedUuids = modificationParameters.SystemUsageUuids.Value;
+            AssertUuids(systemUsageUuids, modifiedUuids);
+        }
+
+        private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)
+        {
+            var orderedExpected = expected.OrderBy(x => x).ToList();
+            var orderedActual = actual.OrderBy(x => x).ToList();
+
+            Assert.Equal(orderedExpected.Count, orderedActual.Count);
+            for (var i = 0; i < orderedExpected.Count; i++)
+            {
+                Assert.Equal(orderedExpected[i], orderedActual[i]);
+            }
         }
 
         private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,
