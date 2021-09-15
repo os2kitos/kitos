@@ -921,7 +921,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownError(result, updateError, transaction);
+            AssertFailureWithKnownErrorDetails(result, $"Failed while updating role assignments:{updateError.Message.GetValueOrEmptyString()}", updateError.FailureType, transaction);
         }
 
         private void ExpectBatchUpdateRoleAssignmentsReturn(ItContract createdContract, List<UserRolePair> roleAssignments, Maybe<OperationError> value)
