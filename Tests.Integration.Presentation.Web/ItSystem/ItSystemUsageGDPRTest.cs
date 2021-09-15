@@ -41,8 +41,6 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         }
 
-
-
         [Fact]
         public async Task Can_Change_IsBusinessCritical()
         {
@@ -253,7 +251,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var usage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
             var dataProcessingRegistrationDto = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistrationDto.Id, YesNoIrrelevantOption.YES);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistrationDto.Id, YesNoIrrelevantOption.YES).DisposeAsync();
             using var setSystemResponse = await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistrationDto.Id, usage.Id);
             Assert.Equal(HttpStatusCode.OK, setSystemResponse.StatusCode);
             var body = new

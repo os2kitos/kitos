@@ -39,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
             {
-                var response = await client.SendAsync(requestMessage);
+                using var response = await client.SendAsync(requestMessage);
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
@@ -72,7 +72,7 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
             {
-                var response = await client.SendAsync(requestMessage);
+                using var response = await client.SendAsync(requestMessage);
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
@@ -106,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.Security
             //Act
             using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
             {
-                var response = await client.SendAsync(requestMessage);
+                using var response = await client.SendAsync(requestMessage);
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
