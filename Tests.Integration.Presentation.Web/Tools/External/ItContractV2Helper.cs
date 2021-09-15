@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
@@ -118,6 +119,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendPutExternalReferences(string token, Guid contractUuid, List<ExternalReferenceDataDTO> request)
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/external-references"), token, request);
+        }
+
+        public static async Task<HttpResponseMessage> SendPutRoles(string token, Guid contractUuid, List<RoleAssignmentRequestDTO> request)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/roles"), token, request);
         }
     }
 }
