@@ -731,7 +731,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         [InlineData(true, false, true)]
         [InlineData(false, true, true)]
         [InlineData(false, false, false)]
-        public void Can_Create_With_HandoverTrials(bool oneWithBothDates, bool oneWithExpectedOnly, bool oneWithApprovedO'nly)
+        public void Can_Create_With_HandoverTrials(bool oneWithBothDates, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
         {
             //Arrange
             var handoverTrialUpdates = CreateHandoverTrialUpdates(oneWithBothDates, oneWithExpectedOnly, oneWithApprovedOnly);
