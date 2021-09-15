@@ -134,6 +134,37 @@ namespace Core.DomainServices.Role
             return RemoveRole(model, roleId.Value, userId.Value);
         }
 
+        public Maybe<OperationError> BatchUpdateRoles(TModel model, IEnumerable<(Guid roleUuid, Guid userUuid)> roleAssignments)
+        {
+            //TODO: Unit test it - migreate from the other test
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (roleAssignments == null) throw new ArgumentNullException(nameof(roleAssignments));
+
+            List<(Guid roleUuid, Guid userUuid)> existingKeys = model.Rights.Select(x => (x.Role.Uuid, x.User.Uuid)).ToList();
+            List<(Guid roleUuid, Guid userUuid)> nextStateKeys = roleAssignments.ToList();
+
+            var toRemove = existingKeys.Except(nextStateKeys);
+            var toAdd = nextStateKeys.Except(existingKeys);
+
+            foreach (var userRolePair in toRemove)
+            {
+                var removeResult = RemoveRole(model, userRolePair.roleUuid, userRolePair.userUuid);
+
+                if (removeResult.Failed)
+                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.roleUuid} from user with Uuid: {userRolePair.userUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+            }
+
+            foreach (var userRolePair in toAdd)
+            {
+                var assignmentResult = AssignRole(model, userRolePair.roleUuid, userRolePair.userUuid);
+
+                if (assignmentResult.Failed)
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.roleUuid} from user with Uuid: {userRolePair.userUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
         private Result<int, OperationError> GetUserByUuid(Guid userUuid)
         {
             var user = _userRepository.GetByUuid(userUuid);

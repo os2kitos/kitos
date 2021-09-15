@@ -809,7 +809,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractResponsibleDataRequestDTO(token, organization, false, false, false);
-            var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -818,7 +818,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -827,7 +827,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -836,7 +836,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractResponsibleDataWriteRequestDTO();
-            var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -887,7 +887,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractSupplierDataRequestDTO(false, false, false);
-            var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -896,7 +896,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -905,7 +905,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -914,7 +914,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractSupplierDataWriteRequestDTO();
-            var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -1210,7 +1210,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
 
             //Act
-            var response = await ItContractV2Helper.SendPostContractAsync(globalAdminToken.Token, request);
+            using var response = await ItContractV2Helper.SendPostContractAsync(globalAdminToken.Token, request);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);

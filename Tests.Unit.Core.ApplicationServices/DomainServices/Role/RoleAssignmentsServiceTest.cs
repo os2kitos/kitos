@@ -394,6 +394,8 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
+        //TODO: Test batch update!
+
         private void ExpectAvailableRoles(TModel model, TRole[] availableRoles)
         {
             _optionsServiceMock.Setup(x => x.GetAvailableOptions(model.OrganizationId))
