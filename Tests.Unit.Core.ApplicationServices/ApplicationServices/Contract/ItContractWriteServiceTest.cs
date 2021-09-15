@@ -24,6 +24,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Extensions;
@@ -64,7 +65,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object,_assignmentUpdateServiceMock.Object, _usageServiceMock.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object,_assignmentUpdateServiceMock.Object, _usageServiceMock.Object,Mock.Of<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)

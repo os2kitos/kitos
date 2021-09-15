@@ -20,6 +20,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Contract.Write
@@ -39,6 +40,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IReferenceService _referenceService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
+        private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -52,8 +54,10 @@ namespace Core.ApplicationServices.Contract.Write
             IOrganizationService organizationService,
             IGenericRepository<HandoverTrial> handoverTrialRepository,
             IReferenceService referenceService,
-            IAssignmentUpdateService assignmentUpdateService, 
-            IItSystemUsageService usageService)
+            IAssignmentUpdateService assignmentUpdateService,
+            IItSystemUsageService usageService,
+            IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService
+            )
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -68,6 +72,7 @@ namespace Core.ApplicationServices.Contract.Write
             _referenceService = referenceService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
+            _roleAssignmentService = roleAssignmentService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -142,9 +147,19 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles));
+        }
+
+        private Maybe<OperationError> UpdateRoles(ItContract contract, IEnumerable<UserRolePair> input)
+        {
+            var roleAssignments = input
+                .Select(pair => (pair.RoleUuid, pair.UserUuid))
+                .ToList();
+
+            return _roleAssignmentService.BatchUpdateRoles(contract, roleAssignments);
         }
 
         private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
