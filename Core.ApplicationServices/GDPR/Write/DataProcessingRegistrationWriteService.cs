@@ -33,7 +33,6 @@ namespace Core.ApplicationServices.GDPR.Write
         private readonly ITransactionManager _transactionManager;
         private readonly IDatabaseControl _databaseControl;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
-        private readonly IEntityResolver _entityResolver;
 
         public DataProcessingRegistrationWriteService(
             IDataProcessingRegistrationApplicationService applicationService,
@@ -43,8 +42,7 @@ namespace Core.ApplicationServices.GDPR.Write
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
             IDatabaseControl databaseControl, 
-            IAssignmentUpdateService assignmentUpdateService,
-            IEntityResolver entityResolver)
+            IAssignmentUpdateService assignmentUpdateService)
         {
             _applicationService = applicationService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -54,7 +52,6 @@ namespace Core.ApplicationServices.GDPR.Write
             _transactionManager = transactionManager;
             _databaseControl = databaseControl;
             _assignmentUpdateService = assignmentUpdateService;
-            _entityResolver = entityResolver;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters)
