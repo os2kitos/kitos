@@ -5,6 +5,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -15,7 +16,6 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
@@ -39,6 +39,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IReferenceService _referenceService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
+        private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -53,7 +54,8 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<HandoverTrial> handoverTrialRepository,
             IReferenceService referenceService,
             IAssignmentUpdateService assignmentUpdateService, 
-            IItSystemUsageService usageService)
+            IItSystemUsageService usageService, 
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -68,6 +70,7 @@ namespace Core.ApplicationServices.Contract.Write
             _referenceService = referenceService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
+            _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -142,6 +145,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
 				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
@@ -240,9 +244,23 @@ namespace Core.ApplicationServices.Contract.Write
             return Maybe<OperationError>.None;
         }
 
+        private Result<ItContract, OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
+        {
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
+            (
+                "data processing registration",
+                contract,
+                dataProcessingRegistrationUuids.FromNullable(),
+                (dprUuid) => _dataProcessingRegistrationApplicationService.GetByUuid(dprUuid),
+                itContract => itContract.DataProcessingRegistrations.ToList(),
+                (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
+                (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
+            ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+        }
+
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
-            return _assignmentUpdateService.UpdateUniqueMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
              (
                  "system usage",
                  contract,

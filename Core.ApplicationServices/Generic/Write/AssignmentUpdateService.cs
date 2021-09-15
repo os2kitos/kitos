@@ -60,7 +60,6 @@ namespace Core.ApplicationServices.Generic.Write
             Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
             Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign)
             where TAssignmentState : class, IHasId, IHasUuid
-            where TAssignmentInput : class, IHasId, IHasUuid
         {
             var newUuids = assignedItemUuids.Match(uuids => uuids.ToList(), () => new List<Guid>());
             if (newUuids.Distinct().Count() != newUuids.Count)
@@ -76,11 +75,11 @@ namespace Core.ApplicationServices.Generic.Write
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var dbEntity = getAssignmentInputFromKey(uuid);
-                        if (dbEntity.Failed)
+                        var assignmentInputResult = getAssignmentInputFromKey(uuid);
+                        if (assignmentInputResult.Failed)
                             return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignmentInput).Name}: {uuid}", OperationFailure.BadInput);
 
-                        var addResult = assign(destination, dbEntity.Value);
+                        var addResult = assign(destination, assignmentInputResult.Value);
 
                         if (addResult.HasValue)
                             return new OperationError($"Failed to add during multi assignment with error message: {addResult.Value.Message.GetValueOrEmptyString()}", addResult.Value.FailureType);
