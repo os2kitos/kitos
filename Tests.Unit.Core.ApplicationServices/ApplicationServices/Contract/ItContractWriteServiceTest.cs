@@ -42,6 +42,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<IGenericRepository<HandoverTrial>> _handoverTrialRepository;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
@@ -57,11 +58,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _databaseControlMock = new Mock<IDatabaseControl>();
             _agreementElementTypeRepository = new Mock<IGenericRepository<ItContractAgreementElementTypes>>();
             _organizationServiceMock = new Mock<IOrganizationService>();
+            _handoverTrialRepository = new Mock<IGenericRepository<HandoverTrial>>();
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -574,7 +576,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = result.Value;
             Assert.Equal(responsible.OrganizationUnitUuid.NewValue, contract.ResponsibleOrganizationUnit?.Uuid);
             Assert.Equal(responsible.Signed.NewValue, contract.IsSigned);
-            Assert.Equal(responsible.SignedAt.NewValue, contract.SignedDate);
+            Assert.Equal(responsible.SignedAt.NewValue?.Date, contract.SignedDate);
             Assert.Equal(responsible.SignedBy.NewValue, contract.ContractSigner);
             AssertTransactionCommitted(transaction);
         }
@@ -622,7 +624,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var contract = result.Value;
             Assert.Equal(supplier.OrganizationUuid.NewValue, contract.Supplier?.Uuid);
             Assert.Equal(supplier.Signed.NewValue, contract.HasSupplierSigned);
-            Assert.Equal(supplier.SignedAt.NewValue, contract.SupplierSignedDate);
+            Assert.Equal(supplier.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
             Assert.Equal(supplier.SignedBy.NewValue, contract.SupplierContractSigner);
             AssertTransactionCommitted(transaction);
         }
@@ -649,8 +651,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Failed);
             AssertFailureWithKnownErrorDetails(result, $"Failed to get supplier organization:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
-
-        [Theory]
+		
+		[Theory]
         [InlineData(true)]
         [InlineData(false)]
         public void Can_Create_With_SystemUsages(bool hasUsages)
@@ -668,8 +670,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
         }
-
-        [Fact]
+		
+		[Fact]
         public void Cannot_Create_With_SystemUsages_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
@@ -684,10 +686,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownError(result, operationError, transaction);
+			AssertFailureWithKnownError(result, operationError, transaction);
         }
-
-        [Fact]
+		
+		 [Fact]
         public void Can_Update_With_SystemUsages_If_Usage_Already_Assigned()
         {
             //Arrange
@@ -699,7 +701,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);
@@ -721,7 +723,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);
@@ -788,6 +790,125 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             //Assert
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
+        }
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public void Can_Create_With_HandoverTrials(bool oneWithBothDates, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
+        {
+            //Arrange
+            var handoverTrialUpdates = CreateHandoverTrialUpdates(oneWithBothDates, oneWithExpectedOnly, oneWithApprovedOnly);
+
+            var handoverTrialTypes = handoverTrialUpdates
+                .Select(x => new HandoverTrialType
+                {
+                    Uuid = x.HandoverTrialTypeUuid
+                }).ToDictionary(x => x.Uuid);
+
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
+            createdContract.HandoverTrials.Add(new HandoverTrial()); //Ensure existing is cleared
+
+            foreach (var handoverTrialType in handoverTrialTypes)
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
+				
+			//Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+			var itContract = result.Value;
+            Assert.Equal(handoverTrialTypes.Count, itContract.HandoverTrials.Count);
+            Assert.All(itContract.HandoverTrials, trial => Assert.True(handoverTrialTypes.ContainsKey(trial.HandoverTrialType.Uuid)));
+			AssertTransactionCommitted(transaction);
+		}
+
+        [Fact]
+        public void Cannot_Create_With_HandoverTrials_If_Option_Is_Not_Available()
+        {
+            //Arrange
+            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
+
+            var handoverTrialTypes = handoverTrialUpdates
+                .Select(x => new HandoverTrialType
+                {
+                    Uuid = x.HandoverTrialTypeUuid
+                }).ToDictionary(x => x.Uuid);
+
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
+
+            var failingTypeUuid = handoverTrialTypes.RandomItem().Key;
+            foreach (var handoverTrialType in handoverTrialTypes)
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, handoverTrialType.Key != failingTypeUuid));
+			
+			//Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+			AssertFailureWithKnownErrorDetails(result, $"Cannot take new handover trial ({failingTypeUuid}) into use which is not available in the organization", OperationFailure.BadInput, transaction);
+		}
+
+        [Fact]
+        public void Cannot_Create_With_HandoverTrials_If_Option_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
+
+            var handoverTrialTypes = handoverTrialUpdates
+                .Select(x => new HandoverTrialType
+                {
+                    Uuid = x.HandoverTrialTypeUuid
+                }).ToDictionary(x => x.Uuid);
+
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
+
+            var failingTypeUuid = handoverTrialTypes.RandomItem().Key;
+            var error = A<OperationError>();
+            foreach (var handoverTrialType in handoverTrialTypes)
+            {
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, handoverTrialType.Key == failingTypeUuid ? error : (handoverTrialType.Value, true));
+            }
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, $"Failed to fetch option with uuid:{failingTypeUuid}. Message:{error.Message.GetValueOrEmptyString()}", error.FailureType, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_HandoverTrials_If_At_Least_One_Date_Is_Not_Provided()
+        {
+            //Arrange
+            var handoverTrialUpdates = new[] {new ItContractHandoverTrialUpdate() {HandoverTrialTypeUuid = A<Guid>()}};
+
+            var handoverTrialTypes = handoverTrialUpdates
+                .Select(x => new HandoverTrialType
+                {
+                    Uuid = x.HandoverTrialTypeUuid
+                }).ToDictionary(x => x.Uuid);
+
+            var (organizationUuid, parameters, createdContract, transaction) =
+                SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
+            createdContract.HandoverTrials.Add(new HandoverTrial()); //Ensure existing is cleared
+
+            foreach (var handoverTrialType in handoverTrialTypes)
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid,
+                    handoverTrialType.Key, (handoverTrialType.Value, true));
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result,
+                "Failed adding handover trial:Error: expected and approved cannot both be null",
+                OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -888,11 +1009,18 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 _optionResolverMock.Setup(x => x.GetOptionType<ItContract, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
         }
 
+        private void ExpectGetOptionTypeReturnsIfInputIdIsDefined<TReference, TOption>(Guid organizationUuid, Guid? optionTypeUuid, Result<(TOption, bool), OperationError> result) where TOption : OptionEntity<TReference>
+        {
+            if (optionTypeUuid.HasValue)
+                _optionResolverMock.Setup(x => x.GetOptionType<TReference, TOption>(organizationUuid, optionTypeUuid.Value)).Returns(result);
+        }
+
         private (Guid organizationUuid, ItContractModificationParameters parameters, ItContract createdContract, Mock<IDatabaseTransaction> transaction) SetupCreateScenarioPrerequisites(
             Guid? parentUuid = null,
             ItContractProcurementModificationParameters procurement = null,
             ItContractResponsibleDataModificationParameters responsible = null,
             ItContractSupplierModificationParameters supplier = null,
+            IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
             IEnumerable<Guid> systemUsageUuids = null,
             IEnumerable<Guid> dataProcessingRegistrationUuids = null
             )
@@ -909,6 +1037,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Procurement = procurement.FromNullable(),
                 Responsible = responsible.FromNullable(),
                 Supplier = supplier.FromNullable(),
+                HandoverTrials = handoverTrialUpdates.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
@@ -924,6 +1053,26 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(organization.Uuid, createdContract.OrganizationId);
             ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
             return (organization.Uuid, parameters, createdContract, transaction);
+        }
+		
+		private List<ItContractHandoverTrialUpdate> CreateHandoverTrialUpdates(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
+        {
+            var handoverTrialUpdates = new List<ItContractHandoverTrialUpdate>();
+
+            if (withBothDates) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, true));
+            if (withExpectedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, false));
+            if (withApprovedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(false, true));
+            return handoverTrialUpdates;
+        }
+
+        private ItContractHandoverTrialUpdate CreateHandoverTrialUpdate(bool withExpected, bool withApproved)
+        {
+            return new ItContractHandoverTrialUpdate()
+            {
+                HandoverTrialTypeUuid = A<Guid>(),
+                ApprovedAt = withApproved ? A<DateTime>() : null,
+                ExpectedAt = withExpected ? A<DateTime>() : null
+            };
         }
 
         private (string contractId, Guid? contractTypeUuid, Guid? contractTemplateUuid, bool enforceValid, DateTime? validFrom, DateTime? validTo, List<Guid> agreementElementUuids, Dictionary<Guid, AgreementElementType> agreementElementTypes, ItContractGeneralDataModificationParameters parameters) SetupGeneralSectionInput(

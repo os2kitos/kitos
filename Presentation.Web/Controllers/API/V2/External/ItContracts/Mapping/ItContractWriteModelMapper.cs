@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
@@ -36,6 +37,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible));
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
+            var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>());
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             return new ItContractModificationParameters
@@ -47,8 +49,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Responsible = responsibleData.FromNullable().Select(MapResponsible),
                 Supplier = supplier.FromNullable().Select(MapSupplier),
+                HandoverTrials = handoverTrials.FromNullable().Select(MapHandOverTrials),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
+        }
+
+        public IEnumerable<ItContractHandoverTrialUpdate> MapHandOverTrials(IEnumerable<HandoverTrialRequestDTO> dtos)
+        {
+            return dtos.Select(x => new ItContractHandoverTrialUpdate()
+            {
+                HandoverTrialTypeUuid = x.HandoverTrialTypeUuid,
+                ApprovedAt = x.ApprovedAt,
+                ExpectedAt = x.ExpectedAt
+            }).ToList();
         }
 
         public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
