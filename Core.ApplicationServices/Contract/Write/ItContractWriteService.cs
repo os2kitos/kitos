@@ -8,13 +8,16 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
@@ -33,6 +36,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
+        private readonly IReferenceService _referenceService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
 
@@ -47,6 +51,7 @@ namespace Core.ApplicationServices.Contract.Write
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
             IGenericRepository<HandoverTrial> handoverTrialRepository,
+            IReferenceService referenceService,
             IAssignmentUpdateService assignmentUpdateService, 
             IItSystemUsageService usageService)
         {
@@ -60,6 +65,7 @@ namespace Core.ApplicationServices.Contract.Write
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
             _handoverTrialRepository = handoverTrialRepository;
+            _referenceService = referenceService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
         }
@@ -137,7 +143,22 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
 				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
+        }
+
+        private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            return _referenceService
+                .BatchUpdateExternalReferences(
+                    ReferenceRootType.Contract,
+                    contract.Id,
+                    externalReferences.ToList())
+                .Match
+                (
+                    error => new OperationError($"Failed to update references with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType),
+                    () => Maybe<OperationError>.None
+                );
         }
 
         private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)

@@ -121,13 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         }
         public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
-            return references.Select(x => new UpdatedExternalReferenceProperties
-            {
-                Title = x.Title,
-                DocumentId = x.DocumentId,
-                Url = x.Url,
-                MasterReference = x.MasterReference
-            });
+            return BaseMapReferences(references);
         }
         public UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
         {

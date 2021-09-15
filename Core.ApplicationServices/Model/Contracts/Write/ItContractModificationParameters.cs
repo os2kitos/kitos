@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 
 namespace Core.ApplicationServices.Model.Contracts.Write
 {
@@ -14,6 +15,7 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<ItContractResponsibleDataModificationParameters> Responsible { get; set; } = Maybe<ItContractResponsibleDataModificationParameters>.None;
         public Maybe<ItContractSupplierModificationParameters> Supplier { get; set; } = Maybe<ItContractSupplierModificationParameters>.None;
         public Maybe<IEnumerable<ItContractHandoverTrialUpdate>> HandoverTrials { get; set; } = Maybe<IEnumerable<ItContractHandoverTrialUpdate>>.None;
+        public Maybe<IEnumerable<UpdatedExternalReferenceProperties>> ExternalReferences { get; set; } = Maybe<IEnumerable<UpdatedExternalReferenceProperties>>.None;
         public Maybe<IEnumerable<Guid>> SystemUsageUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
     }
 }

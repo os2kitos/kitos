@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Contracts.Write;
+using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Types.Contract;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -57,17 +59,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false)]
-		[InlineData(false, false, false, false, false, false, false, true)]
-		[InlineData(false, false, false, false, false, false, true, false)]
-		[InlineData(false, false, false, false, false, true, false, false)]
-		[InlineData(false, false, false, false, true, false, false, false)]
-		[InlineData(false, false, false, true, false, false, false, false)]
-		[InlineData(false, false, true, false, false, false, false, false)]
-		[InlineData(false, true, false, false, false, false, false, false)]
-		[InlineData(true, false, false, false, false, false, false, false)]
-		[InlineData(true, true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages)
+        [InlineData(false, false, false, false, false, false, false, false, false)]
+		[InlineData(false, false, false, false, false, false, false, false, true)]
+		[InlineData(false, false, false, false, false, false, false, true, false)]
+		[InlineData(false, false, false, false, false, false, true, false, false)]
+		[InlineData(false, false, false, false, false, true, false, false, false)]
+		[InlineData(false, false, false, false, true, false, false, false, false)]
+		[InlineData(false, false, false, true, false, false, false, false, false)]
+		[InlineData(false, false, true, false, false, false, false, false, false)]
+		[InlineData(false, true, false, false, false, false, false, false, false)]
+		[InlineData(true, false, false, false, false, false, false, false, false)]
+		[InlineData(true, true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -79,6 +82,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
             if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
+            if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
 			
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
@@ -95,6 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noProcurement, output.Procurement.IsNone);
             Assert.Equal(noSupplier, output.Supplier.IsNone);
             Assert.Equal(noHandoverTrials, output.HandoverTrials.IsNone);
+            Assert.Equal(noExternalReferences, output.ExternalReferences.IsNone);
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
         }
 
@@ -371,6 +376,45 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertProcurement(true, input, output);
         }
 
+        [Fact]
+        public void Can_Map_ExternalReferences()
+        {
+            //Arrange
+            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+
+            //Act
+            var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
+
+            //Assert
+            AssertExternalReferences(mappedReferences, references);
+        }
+
+        [Fact]
+        public void Can_Map_ExternalReferences_FromPUT()
+        {
+            //Arrange
+            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+
+            //Act
+            var mappedReferences = _sut.FromPUT(new UpdateContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
+
+            //Assert
+            AssertExternalReferences(mappedReferences, references);
+        }
+
+        [Fact]
+        public void Can_Map_ExternalReferences_FromPOST()
+        {
+            //Arrange
+            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+
+            //Act
+            var mappedReferences = _sut.FromPOST(new CreateNewContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
+
+            //Assert
+            AssertExternalReferences(mappedReferences, references);
+        }
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -417,6 +461,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             {
                 Assert.Equal(orderedExpected[i], orderedActual[i]);
             }
+        }
+		
+		private static void AssertExternalReferences(List<UpdatedExternalReferenceProperties> mappedReferences, List<ExternalReferenceDataDTO> references)
+        {
+            Assert.Equal(mappedReferences.Count, mappedReferences.Count);
+            for (var i = 0; i < mappedReferences.Count; i++)
+            {
+                var expected = references[i];
+                var actual = mappedReferences[i];
+                Assert.Equal(expected.Url, actual.Url);
+                Assert.Equal(expected.Title, actual.Title);
+                Assert.Equal(expected.DocumentId, actual.DocumentId);
+                Assert.Equal(expected.MasterReference, actual.MasterReference);
+			}
         }
 
         private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,

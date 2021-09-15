@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using Core.ApplicationServices.Model.Shared.Write;
 using Presentation.Web.Infrastructure.Model.Request;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
@@ -38,6 +41,17 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected bool ClientRequestsChangeTo(string expectedSectionKey)
         {
             return _currentRequestRootProperties.Value.Contains(expectedSectionKey);
+        }
+
+        protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            return references.Select(x => new UpdatedExternalReferenceProperties
+            {
+                Title = x.Title,
+                DocumentId = x.DocumentId,
+                Url = x.Url,
+                MasterReference = x.MasterReference
+            });
         }
     }
 }

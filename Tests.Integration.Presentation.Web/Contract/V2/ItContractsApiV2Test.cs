@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
 using Core.DomainServices.Extensions;
+using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
@@ -16,6 +17,7 @@ using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Extensions;
@@ -1059,6 +1061,79 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             return handoverTrials;
         }
+
+        [Fact]
+        public async Task Can_POST_With_ExternalReferences()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var inputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            var request = new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                ExternalReferences = inputs
+            };
+
+            //Act
+            var newContract = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
+            AssertExternalReferenceResults(inputs, dto);
+        }
+
+        [Fact]
+        public async Task Can_PUT_ExternalReferences()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+
+            var request = new CreateNewContractRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            };
+            var newContract = await ItContractV2Helper.PostContractAsync(token, request);
+
+            var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+
+            //Act
+            using var response1 = await ItContractV2Helper.SendPutExternalReferences(token, newContract.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            AssertExternalReferenceResults(inputs1, dto);
+
+            //Act - reset
+            var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
+            using var response2 = await ItContractV2Helper.SendPutExternalReferences(token, newContract.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
+
+            //Assert
+            dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
+            AssertExternalReferenceResults(inputs2, dto);
+        }
+
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
+        {
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
+
 
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
         {
