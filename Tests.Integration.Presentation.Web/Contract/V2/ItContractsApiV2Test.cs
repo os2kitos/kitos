@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AutoFixture;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -1112,6 +1111,65 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_DataProcessingRegistrations()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var dpr3 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var request = new CreateNewContractRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            var assignment1 = new[] { dpr1.Uuid };
+            var assignment2 = new[] { dpr1.Uuid, dpr2.Uuid };
+            var assignment3 = new[] { dpr3.Uuid, dpr2.Uuid };
+            var assignment4 = Array.Empty<Guid>();
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment1, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment2, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment3, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment4, freshDTO.DataProcessingRegistrations);
         }
 
         private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)

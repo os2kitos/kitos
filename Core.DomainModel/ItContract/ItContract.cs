@@ -524,6 +524,9 @@ namespace Core.DomainModel.ItContract
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
 
+            if (registration.OrganizationId != OrganizationId)
+                return new OperationError("Cannot assign Data Processing Registration to Contract within different Organization", OperationFailure.BadInput);
+
             if (GetAssignedDataProcessingRegistration(registration.Id).HasValue)
                 return new OperationError("Data processing registration is already assigned", OperationFailure.Conflict);
 
@@ -675,6 +678,8 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> AssignSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
         {
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
+
             if (systemUsage.OrganizationId != OrganizationId)
                 return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
             
@@ -694,6 +699,8 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> RemoveSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
         {
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
+
             var toBeRemoved = AssociatedSystemUsages.Where(x => x.ItSystemUsageId == systemUsage.Id).ToList();
 
             foreach (var contractUsageToRemove in toBeRemoved)

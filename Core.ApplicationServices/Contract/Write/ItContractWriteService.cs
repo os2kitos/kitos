@@ -5,17 +5,15 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
 using Core.DomainModel.Events;
-using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
@@ -37,6 +35,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IOrganizationService _organizationService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
+        private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -49,7 +48,8 @@ namespace Core.ApplicationServices.Contract.Write
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
             IAssignmentUpdateService assignmentUpdateService, 
-            IItSystemUsageService usageService)
+            IItSystemUsageService usageService, 
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -62,6 +62,7 @@ namespace Core.ApplicationServices.Contract.Write
             _organizationService = organizationService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
+            _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -190,11 +191,12 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
         {
-            return _assignmentUpdateService.UpdateMultiAssignment<ItContract, DataProcessingRegistration, DataProcessingRegistration>
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "data processing registration",
                 contract,
                 dataProcessingRegistrationUuids.FromNullable(),
+                (dprUuid) => _dataProcessingRegistrationApplicationService.GetByUuid(dprUuid),
                 itContract => itContract.DataProcessingRegistrations,
                 (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error),
                 (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).Match((_) => Maybe<OperationError>.None, error => error)
@@ -203,7 +205,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
-            return _assignmentUpdateService.UpdateUniqueMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
              (
                  "system usage",
                  contract,

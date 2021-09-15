@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.OptionTypes;
@@ -42,6 +43,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
+        private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
 
         public ItContractWriteServiceTest()
         {
@@ -56,7 +58,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object);
+            _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
