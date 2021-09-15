@@ -57,16 +57,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, true, false)]
-        [InlineData(false, false, false, false, true, false, false)]
-        [InlineData(false, false, false, true, false, false, false)]
-        [InlineData(false, false, true, false, false, false, false)]
-        [InlineData(false, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noSystemUsages)
+        [InlineData(false, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, true, false)]
+        [InlineData(false, false, false, false, false, true, false, false)]
+        [InlineData(false, false, false, false, true, false, false, false)]
+        [InlineData(false, false, false, true, false, false, false, false)]
+        [InlineData(false, false, true, false, false, false, false, false)]
+        [InlineData(false, true, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noSystemUsages, bool noDataProcessingRegistrations)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -78,6 +79,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
+            if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -92,6 +94,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noProcurement, output.Procurement.IsNone);
             Assert.Equal(noSupplier, output.Supplier.IsNone);
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
         }
 
         [Fact]
@@ -349,6 +352,42 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(modificationParameters.SystemUsageUuids.HasValue);
             var modifiedUuids = modificationParameters.SystemUsageUuids.Value;
             AssertUuids(systemUsageUuids, modifiedUuids);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_DataProcessingRegistrations_From_Post(bool hasValues)
+        {
+            //Arrange
+            var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new CreateNewContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPOST(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
+            var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
+            AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_DataProcessingRegistrations_From_Put(bool hasValues)
+        {
+            //Arrange
+            var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new UpdateContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPUT(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
+            var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
+            AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
         }
 
         private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)

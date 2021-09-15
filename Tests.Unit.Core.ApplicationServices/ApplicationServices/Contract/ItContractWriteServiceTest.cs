@@ -16,6 +16,7 @@ using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -729,6 +730,87 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertTransactionCommitted(transaction);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_DataProcessingRegistrations(bool hasUsages)
+        {
+            //Arrange
+            var dprUuids = hasUsages ? Many<Guid>().ToList() : new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_DataProcessingRegistrations_If_UpdateMultiAssignment_Fails()
+        {
+            //Arrange
+            var dprUuids = Many<Guid>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_DataProcessingRegistrations_If_Usage_Already_Assigned()
+        {
+            //Arrange
+            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            var dprUuids = new List<Guid> { dpr.Uuid };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            createdContract.DataProcessingRegistrations.Add(dpr);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_DataProcessingRegistrations_To_Remove_Usage()
+        {
+            //Arrange
+            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            var dprUuids = new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            createdContract.DataProcessingRegistrations.Add(dpr);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         private void ExpectNameValidationSuccess(int contractId, string newName)
         {
             _itContractServiceMock.Setup(x => x.ValidateNewName(contractId, newName)).Returns(Maybe<OperationError>.None);
@@ -810,7 +892,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ItContractProcurementModificationParameters procurement = null,
             ItContractResponsibleDataModificationParameters responsible = null,
             ItContractSupplierModificationParameters supplier = null,
-            IEnumerable<Guid> systemUsageUuids = null
+            IEnumerable<Guid> systemUsageUuids = null,
+            IEnumerable<Guid> dataProcessingRegistrationUuids = null
             )
         {
             var organization = new Organization()
@@ -825,7 +908,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Procurement = procurement.FromNullable(),
                 Responsible = responsible.FromNullable(),
                 Supplier = supplier.FromNullable(),
-                SystemUsageUuids = systemUsageUuids.FromNullable()
+                SystemUsageUuids = systemUsageUuids.FromNullable(),
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
             var createdContract = new ItContract()
             {
