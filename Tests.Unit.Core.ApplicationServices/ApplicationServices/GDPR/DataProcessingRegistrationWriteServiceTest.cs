@@ -40,7 +40,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
-        private readonly Mock<IEntityResolver> _entityResolverMock;
 
         public DataProcessingRegistrationWriteServiceTest()
         {
@@ -51,7 +50,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _transactionManagerMock = new Mock<ITransactionManager>();
             _databaseControlMock = new Mock<IDatabaseControl>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
-            _entityResolverMock = new Mock<IEntityResolver>();
             _sut = new DataProcessingRegistrationWriteService(
                 _dprServiceMock.Object,
                 _identityResolverMock.Object,
@@ -60,8 +58,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
                 _databaseControlMock.Object,
-                _assignmentUpdateServiceMock.Object,
-                _entityResolverMock.Object);
+                _assignmentUpdateServiceMock.Object);
         }
         protected override void OnFixtureCreated(Fixture fixture)
         {
@@ -887,7 +884,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            ExpectUpdateMultiAssignmentReturns<DataProcessingCountryOption, DataProcessingCountryOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingCountryOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -909,7 +906,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
             var operationError = A<OperationError>();
-            ExpectUpdateMultiAssignmentReturns<DataProcessingCountryOption, DataProcessingCountryOption>(createdRegistration, inputUuids, operationError);
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingCountryOption>(createdRegistration, inputUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -932,7 +929,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            ExpectUpdateMultiAssignmentReturns<Organization, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -954,7 +951,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
             var operationError = A<OperationError>();
-            ExpectUpdateMultiAssignmentReturns<Organization, Organization>(createdRegistration, inputUuids, operationError);
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -977,7 +974,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            ExpectUpdateMultiAssignmentReturns<Organization, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
             
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -999,7 +996,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
             var operationError = A<OperationError>(); 
-            ExpectUpdateMultiAssignmentReturns<Organization, Organization>(createdRegistration, inputUuids, operationError);
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1018,7 +1015,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var usageUuids = hasUsages ? Many<Guid>().ToList() : new List<Guid>();
             var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
 
-            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1036,7 +1033,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
 
             var operationError = A<OperationError>();
-            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(registration, usageUuids, operationError);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1056,7 +1053,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             registration.SystemUsages.Add(usage);
 
             ExpectGetDataProcessingRegistrationReturns(registration.Uuid, registration);
-            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
             parameters.Name = OptionalValueChange<string>.None;
 
             //Act
@@ -1077,7 +1074,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             registration.SystemUsages.Add(usage);
 
             ExpectGetDataProcessingRegistrationReturns(registration.Uuid, registration);
-            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
             parameters.Name = OptionalValueChange<string>.None;
 
             //Act
@@ -1153,7 +1150,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
 
-            ExpectUpdateMultiAssignmentReturns<DataProcessingOversightOption, DataProcessingOversightOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingOversightOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -1175,7 +1172,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
 
             var operationError = A<OperationError>();
-            ExpectUpdateMultiAssignmentReturns<DataProcessingOversightOption, DataProcessingOversightOption>(createdRegistration, inputUuids, operationError);
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingOversightOption>(createdRegistration, inputUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
@@ -2012,7 +2009,6 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         private void ExpectUpdateMultiAssignmentReturns<TAssignmentInput, TAssignmentState>(DataProcessingRegistration registration, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result)
-            where TAssignmentInput : class, IHasId, IHasUuid
             where TAssignmentState : class, IHasId, IHasUuid
         {
             _assignmentUpdateServiceMock
