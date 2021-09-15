@@ -472,7 +472,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            var parameters = new ItContractModificationParameters
+            {
+                ExternalReferences = _writeModelMapper.MapReferences(request ?? new List<ExternalReferenceDataDTO>()).FromNullable()
+            };
+
+            return _writeService.Update(contractUuid, parameters)
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

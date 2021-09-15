@@ -7,12 +7,15 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
+using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
@@ -32,6 +35,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
+        private readonly IReferenceService _referenceService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -43,7 +47,8 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
-            IGenericRepository<HandoverTrial> handoverTrialRepository)
+            IGenericRepository<HandoverTrial> handoverTrialRepository,
+            IReferenceService referenceService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -55,6 +60,7 @@ namespace Core.ApplicationServices.Contract.Write
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
             _handoverTrialRepository = handoverTrialRepository;
+            _referenceService = referenceService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -129,7 +135,22 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
+        }
+
+        private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
+        {
+            return _referenceService
+                .BatchUpdateExternalReferences(
+                    ReferenceRootType.Contract,
+                    contract.Id,
+                    externalReferences.ToList())
+                .Match
+                (
+                    error => new OperationError($"Failed to update references with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType),
+                    () => Maybe<OperationError>.None
+                );
         }
 
         private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)

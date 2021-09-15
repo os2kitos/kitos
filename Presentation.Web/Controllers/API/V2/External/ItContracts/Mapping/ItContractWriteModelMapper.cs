@@ -6,11 +6,13 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.Shared.Write;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -38,6 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
             var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>());
+            var references = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(ContractWriteRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>());
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -46,7 +49,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Procurement = procurement.FromNullable().Select(MapProcurement),
                 Responsible = responsibleData.FromNullable().Select(MapResponsible),
                 Supplier = supplier.FromNullable().Select(MapSupplier),
-                HandoverTrials = handoverTrials.FromNullable().Select(MapHandOverTrials)
+                HandoverTrials = handoverTrials.FromNullable().Select(MapHandOverTrials),
+                ExternalReferences = references.FromNullable().Select(MapReferences)
             };
         }
 
@@ -105,6 +109,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
                 ProcurementPlan = MapProcurementPlan(request.ProcurementPlan).AsChangedValue()
             };
+        }
+
+        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
+        {
+            return BaseMapReferences(dtos);
         }
 
         private static Maybe<(byte half, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
