@@ -11,7 +11,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
@@ -47,7 +46,7 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
-            IGenericRepository<HandoverTrial> handoverTrialRepository
+            IGenericRepository<HandoverTrial> handoverTrialRepository,
             IAssignmentUpdateService assignmentUpdateService, 
             IItSystemUsageService usageService)
         {

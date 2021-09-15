@@ -10,6 +10,7 @@ using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
@@ -696,7 +697,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);
@@ -718,7 +719,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
-            ExpectNameValidationSuccess(createdContract.Id, parameters.Name.NewValue);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
             var result = _sut.Update(createdContract.Uuid, parameters);
@@ -843,11 +844,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "Failed adding handover trial:Error: expected and approved cannot both be null", OperationFailure.BadInput, transaction);
         }
 
-        private void ExpectNameValidationSuccess(int contractId, string newName)
-        {
-            _itContractServiceMock.Setup(x => x.ValidateNewName(contractId, newName)).Returns(Maybe<OperationError>.None);
-        }
-
         private void ExpectAllowModifySuccess(ItContract contract)
         {
             _authContext.Setup(x => x.AllowModify(contract)).Returns(true);
@@ -930,7 +926,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ItContractProcurementModificationParameters procurement = null,
             ItContractResponsibleDataModificationParameters responsible = null,
             ItContractSupplierModificationParameters supplier = null,
-            IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null
+            IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
             IEnumerable<Guid> systemUsageUuids = null
             )
         {
@@ -946,7 +942,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Procurement = procurement.FromNullable(),
                 Responsible = responsible.FromNullable(),
                 Supplier = supplier.FromNullable(),
-                HandoverTrials = handoverTrialUpdates.FromNullable()
+                HandoverTrials = handoverTrialUpdates.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable()
             };
             var createdContract = new ItContract()
