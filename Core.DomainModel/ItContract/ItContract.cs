@@ -673,6 +673,39 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
+        public Maybe<OperationError> AssignSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
+        {
+            if (systemUsage.OrganizationId != OrganizationId)
+                return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
+            
+            if(AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
+                return new OperationError($"It System Usage with Id: {systemUsage.Id}, already assigned to Contract", OperationFailure.Conflict);
+
+            var newAssign = new ItContractItSystemUsage
+            {
+                ItContract = this,
+                ItSystemUsage = systemUsage
+            };
+
+            AssociatedSystemUsages.Add(newAssign);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
+        {
+            var toBeRemoved = AssociatedSystemUsages.Where(x => x.ItSystemUsageId == systemUsage.Id).ToList();
+
+            foreach (var contractUsageToRemove in toBeRemoved)
+            {
+                var removeSucceeded = AssociatedSystemUsages.Remove(contractUsageToRemove);
+                if(!removeSucceeded)
+                    return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
+            }
+           
+            return Maybe<OperationError>.None;
+        }
+
         public void ResetSupplierOrganization()
         {
             Supplier.Track();

@@ -36,12 +36,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible));
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
             var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
+            var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
                 ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
                 General = generalData.FromNullable().Select(MapGeneralData),
                 Procurement = procurement.FromNullable().Select(MapProcurement),
+                SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Responsible = responsibleData.FromNullable().Select(MapResponsible),
                 Supplier = supplier.FromNullable().Select(MapSupplier)
             };

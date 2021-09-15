@@ -303,7 +303,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(contractUuid, new ItContractModificationParameters
+                {
+                    SystemUsageUuids = systemUsageUuids.FromNullable() ?? new List<Guid>()
+                })
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

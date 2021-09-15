@@ -23,7 +23,6 @@ namespace Infrastructure.Ninject.DomainServices
             _kernel = kernel;
         }
 
-
         public Maybe<Guid> ResolveUuid<T>(int dbId) where T : class, IHasUuid, IHasId
         {
             return _kernel
