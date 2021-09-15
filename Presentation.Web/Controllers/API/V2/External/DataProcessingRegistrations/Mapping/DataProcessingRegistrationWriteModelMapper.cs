@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
-using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
@@ -101,13 +100,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return new UpdatedDataProcessingRegistrationRoles
             {
-                UserRolePairs = roleAssignmentResponseDtos.Any() ?
-                    roleAssignmentResponseDtos.Select(x => new UserRolePair
-                    {
-                        RoleUuid = x.RoleUuid,
-                        UserUuid = x.UserUuid
-                    }).FromNullable().AsChangedValue() :
-                    Maybe<IEnumerable<UserRolePair>>.None
+                UserRolePairs = BaseMapRoleAssignments(roleAssignmentResponseDtos)
             };
         }
     }

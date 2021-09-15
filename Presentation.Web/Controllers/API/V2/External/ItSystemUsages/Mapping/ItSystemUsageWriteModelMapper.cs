@@ -159,13 +159,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new UpdatedSystemUsageRoles
             {
-                UserRolePairs = (roleAssignmentResponseDtos.Any() ?
-                    Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
-                    {
-                        RoleUuid = x.RoleUuid,
-                        UserUuid = x.UserUuid
-                    })) :
-                    Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue()
+                UserRolePairs = BaseMapRoleAssignments(roleAssignmentResponseDtos)
             };
         }
 
