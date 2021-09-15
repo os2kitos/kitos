@@ -20,7 +20,7 @@ namespace Core.ApplicationServices.Generic.Write
             string subject,
             TDestination destination,
             Maybe<IEnumerable<Guid>> assignedItemUuids,
-            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromInputKey,
+            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromKey,
             Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
             Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
             Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign)

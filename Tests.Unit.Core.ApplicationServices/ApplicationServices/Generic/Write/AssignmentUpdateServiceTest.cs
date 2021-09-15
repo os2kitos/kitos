@@ -7,7 +7,6 @@ using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Generic;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -160,12 +159,12 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Can_UpdateMultiAssignment_Adds_New_Assignments()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var assignedStubs = Many<HasIdAndUuidStub>().ToList();
             foreach (var assignedStub in assignedStubs)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedStub.Uuid, assignedStub);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedStub.Uuid, assignedStub);
             }
 
             assignMock
@@ -177,7 +176,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 A<string>(),
                 ownedByOrganizationMock.Object,
                 assignedStubs.Select(x => x.Uuid).ToList(),
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -193,12 +192,12 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Can_UpdateMultiAssignment_Does_Perform_Updates_If_No_Changes_Assignments()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var assignedStubs = Many<HasIdAndUuidStub>().ToList();
             foreach (var assignedStub in assignedStubs)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedStub.Uuid, assignedStub);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedStub.Uuid, assignedStub);
             }
 
             getExistingStateMock
@@ -214,7 +213,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 A<string>(),
                 ownedByOrganizationMock.Object,
                 assignedStubs.Select(x => x.Uuid).ToList(),
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -230,12 +229,12 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Can_UpdateMultiAssignment_Removes_Existing_Assignments_No_Longer_Present()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var assignedStubs = Many<HasIdAndUuidStub>().ToList();
             foreach (var assignedStub in assignedStubs)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedStub.Uuid, assignedStub);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedStub.Uuid, assignedStub);
             }
 
             getExistingStateMock
@@ -251,7 +250,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 A<string>(),
                 ownedByOrganizationMock.Object,
                 Maybe<IEnumerable<Guid>>.None,
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -267,7 +266,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Cannot_UpdateMultiAssignment_If_Duplicates()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var duplicateUuid = A<Guid>();
             var subject = A<string>();
@@ -278,7 +277,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 subject,
                 ownedByOrganizationMock.Object,
                 assignedUuids,
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -296,14 +295,14 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Cannot_UpdateMultiAssignment_If_EntityResolve_Fails()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var subject = A<string>();
             var assignedUuids = new List<Guid>() { A<Guid>() };
             var operationError = A<OperationError>();
             foreach (var assignedUuid in assignedUuids)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedUuid, operationError);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedUuid, operationError);
             }
 
             //Act
@@ -311,7 +310,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 subject,
                 ownedByOrganizationMock.Object,
                 assignedUuids,
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -329,12 +328,12 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Cannot_UpdateMultiAssignment_If_Assign_Fails()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var assignedStubs = Many<HasIdAndUuidStub>().ToList();
             foreach (var assignedStub in assignedStubs)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedStub.Uuid, assignedStub);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedStub.Uuid, assignedStub);
             }
 
             var operationError = A<OperationError>();
@@ -347,7 +346,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 A<string>(),
                 ownedByOrganizationMock.Object,
                 assignedStubs.Select(x => x.Uuid).ToList(),
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -365,12 +364,12 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
         public void Cannot_UpdateMultiAssignment_If_Unassign_Fails()
         {
             //Arrange
-            var (getAssignmentInputFromInputKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
+            var (getAssignmentInputFromKeyMock, getExistingStateMock, assignMock, unAssignMock) = CreateUpdateMultiAssignmentFunctionMocks();
             var (organizationUuid, ownedByOrganizationMock) = CreateOwnedByOrganizationMock();
             var assignedStubs = Many<HasIdAndUuidStub>().ToList();
             foreach (var assignedStub in assignedStubs)
             {
-                ExpectResolveDbEntityReturns(getAssignmentInputFromInputKeyMock, assignedStub.Uuid, assignedStub);
+                ExpectGetAssignmentInputFromKeyReturns(getAssignmentInputFromKeyMock, assignedStub.Uuid, assignedStub);
             }
 
             getExistingStateMock
@@ -387,7 +386,7 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
                 A<string>(),
                 ownedByOrganizationMock.Object,
                 Maybe<IEnumerable<Guid>>.None,
-                getAssignmentInputFromInputKeyMock.Object,
+                getAssignmentInputFromKeyMock.Object,
                 getExistingStateMock.Object,
                 assignMock.Object,
                 unAssignMock.Object);
@@ -401,13 +400,13 @@ namespace Tests.Unit.Core.ApplicationServices.Generic.Write
             unAssignMock.Verify(x => x(ownedByOrganizationMock.Object, It.IsAny<HasIdAndUuidStub>()), Times.Once);
         }
 
-        private void ExpectResolveDbEntityReturns(Mock<Func<Guid, Result<HasIdAndUuidStub, OperationError>>> getAssignmentInputFromInputKeyMock, Guid entityUuid, Result<HasIdAndUuidStub, OperationError> result)
+        private static void ExpectGetAssignmentInputFromKeyReturns(Mock<Func<Guid, Result<HasIdAndUuidStub, OperationError>>> getAssignmentInputFromKeyMock, Guid entityUuid, Result<HasIdAndUuidStub, OperationError> result)
         {
-            getAssignmentInputFromInputKeyMock.Setup(x => x(entityUuid)).Returns(result);
+            getAssignmentInputFromKeyMock.Setup(x => x(entityUuid)).Returns(result);
         }
 
         private static (
-            Mock<Func<Guid, Result<HasIdAndUuidStub, OperationError>>> getAssignmentInputFromInputKeyMock,
+            Mock<Func<Guid, Result<HasIdAndUuidStub, OperationError>>> getAssignmentInputFromKeyMock,
             Mock<Func<IOwnedByOrganization, IEnumerable<HasIdAndUuidStub>>> getExistingStateMock,
             Mock<Func<IOwnedByOrganization, HasIdAndUuidStub, Maybe<OperationError>>> assignMock,
             Mock<Func<IOwnedByOrganization, HasIdAndUuidStub, Maybe<OperationError>>> unAssignMock

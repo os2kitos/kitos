@@ -55,7 +55,7 @@ namespace Core.ApplicationServices.Generic.Write
             string subject,
             TDestination destination,
             Maybe<IEnumerable<Guid>> assignedItemUuids,
-            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromInputKey,
+            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromKey,
             Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
             Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
             Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign)
@@ -76,7 +76,7 @@ namespace Core.ApplicationServices.Generic.Write
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
-                        var dbEntity = getAssignmentInputFromInputKey(uuid);
+                        var dbEntity = getAssignmentInputFromKey(uuid);
                         if (dbEntity.Failed)
                             return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignmentInput).Name}: {uuid}", OperationFailure.BadInput);
 
