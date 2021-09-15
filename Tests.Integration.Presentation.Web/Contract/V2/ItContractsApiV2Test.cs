@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -919,11 +920,151 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertSupplier(changes, freshDTO);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public async Task Can_POST_With_HandoverTrials(bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+            var handoverTrials = await CreateHandoverTrials(organization, oneWithBothExpectedAndApproved, oneWithExpectedOnly, oneWithApprovedOnly);
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                HandoverTrials = handoverTrials
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertHandoverTrials(request.HandoverTrials, responseDto);
+        }
+
+        [Fact]
+        public async Task Can_PUT_HandoverTrials()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+
+
+            var request = new CreateNewContractRequestDTO
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+            };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Act
+            var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
+            using var response1 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertHandoverTrials(handoverTrials, responseDto);
+
+            //Act 
+            handoverTrials = await CreateHandoverTrials(organization, true, true, false);
+            using var response2 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertHandoverTrials(handoverTrials, responseDto);
+
+            //Act 
+            handoverTrials = await CreateHandoverTrials(organization, true, false, false);
+            using var response3 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertHandoverTrials(handoverTrials, responseDto);
+
+            //Act 
+            handoverTrials = new List<HandoverTrialRequestDTO>();
+            using var response4 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
+
+            //Assert
+            responseDto = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertHandoverTrials(handoverTrials, responseDto);
+        }
+
+        private static void AssertHandoverTrials(IEnumerable<HandoverTrialRequestDTO> request, ItContractResponseDTO responseDto)
+        {
+            var expectedHandoverTrials = request
+                .OrderBy(x => x.HandoverTrialTypeUuid)
+                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
+                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
+                .ToList();
+            var actualHandoverTrials = responseDto.HandoverTrials
+                .OrderBy(x => x.HandoverTrialType.Uuid)
+                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
+                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
+                .ToList();
+
+            Assert.Equal(expectedHandoverTrials.Count, actualHandoverTrials.Count);
+            for (var i = 0; i < actualHandoverTrials.Count; i++)
+            {
+                var expected = expectedHandoverTrials[i];
+                var actual = actualHandoverTrials[i];
+                Assert.Equal(expected.HandoverTrialTypeUuid, actual.HandoverTrialType.Uuid);
+                Assert.Equal(expected.ExpectedAt?.Date, actual.ExpectedAt);
+                Assert.Equal(expected.ApprovedAt?.Date, actual.ApprovedAt);
+            }
+        }
+
+        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(Organization organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
+        {
+            var handoverTrialTypes = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes, organization.Uuid, 10, 0)).ToList();
+            var handoverTrials = new List<HandoverTrialRequestDTO>();
+
+            //Add three valid combinations
+            if (oneWithBothExpectedAndApproved)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ExpectedAt = A<DateTime>(),
+                    ApprovedAt = A<DateTime>()
+                }));
+            }
+
+            if (oneWithExpectedOnly)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ExpectedAt = A<DateTime>(),
+                }));
+            }
+
+            if (oneWithApprovedOnly)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO()
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ApprovedAt = A<DateTime>()
+                }));
+            }
+
+            return handoverTrials;
+        }
+
         private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
         {
             Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
             Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Responsible.Signed);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt, freshDTO.Responsible.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Responsible.SignedAt);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Responsible.SignedBy);
         }
 
@@ -931,7 +1072,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUuid, freshDTO.Supplier.Organization?.Uuid);
             Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Supplier.Signed);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt, freshDTO.Supplier.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Supplier.SignedAt);
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
         }
 

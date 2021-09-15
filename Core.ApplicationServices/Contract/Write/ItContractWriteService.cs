@@ -11,7 +11,6 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
-using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
@@ -19,7 +18,6 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-
 
 namespace Core.ApplicationServices.Contract.Write
 {
@@ -34,6 +32,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IGenericRepository<ItContractAgreementElementTypes> _itContractAgreementElementTypesRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
+        private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
 
@@ -47,6 +46,7 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
+            IGenericRepository<HandoverTrial> handoverTrialRepository,
             IAssignmentUpdateService assignmentUpdateService, 
             IItSystemUsageService usageService)
         {
@@ -59,6 +59,7 @@ namespace Core.ApplicationServices.Contract.Write
             _itContractAgreementElementTypesRepository = itContractAgreementElementTypesRepository;
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
+            _handoverTrialRepository = handoverTrialRepository;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
         }
@@ -134,8 +135,40 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.General, UpdateGeneralData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
+				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
+        }
+
+        private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
+        {
+            var handoverTrialTypes = new Dictionary<Guid, HandoverTrialType>();
+            var updates = parameters.ToList();
+            foreach (var uuid in updates.Select(x => x.HandoverTrialTypeUuid).Distinct().ToList())
+            {
+                var optionType = _optionResolver.GetOptionType<HandoverTrial, HandoverTrialType>(contract.Organization.Uuid, uuid);
+                if (optionType.Failed)
+                    return new OperationError($"Failed to fetch option with uuid:{uuid}. Message:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
+
+                if (!optionType.Value.available && contract.HandoverTrials.Any(x => x.HandoverTrialType.Uuid == uuid) == false)
+                    return new OperationError($"Cannot take new handover trial ({uuid}) into use which is not available in the organization", OperationFailure.BadInput);
+
+                handoverTrialTypes[uuid] = optionType.Value.option;
+            }
+
+            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            var handoverTrials = contract.HandoverTrials.ToList();
+            handoverTrials.ForEach(_handoverTrialRepository.Delete);
+            contract.ResetHandoverTrials();
+
+            foreach (var newHandoverTrial in updates)
+            {
+                var error = contract.AddHandoverTrial(handoverTrialTypes[newHandoverTrial.HandoverTrialTypeUuid], newHandoverTrial.ExpectedAt, newHandoverTrial.ApprovedAt);
+                if (error.HasValue)
+                    return new OperationError("Failed adding handover trial:" + error.Value.Message.GetValueOrEmptyString(), error.Value.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
         }
 
         private Result<ItContract, OperationError> UpdateSupplierData(ItContract contract, ItContractSupplierModificationParameters parameters)
@@ -143,7 +176,7 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(parameters.OrganizationUuid, UpdateSupplierOrganization)
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.HasSupplierSigned = newValue))
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SupplierSignedDate = newValue?.Date))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.SupplierContractSigner = newValue));
         }
 
@@ -158,7 +191,7 @@ namespace Core.ApplicationServices.Contract.Write
                 var organizationResult = _organizationService.GetOrganization(organizationId.Value);
                 if (organizationResult.Failed)
                 {
-                    return new OperationError($"Failed to get supplier organization:{organizationResult.Error.Message.GetValueOrEmptyString()}",organizationResult.Error.FailureType);
+                    return new OperationError($"Failed to get supplier organization:{organizationResult.Error.Message.GetValueOrEmptyString()}", organizationResult.Error.FailureType);
                 }
 
                 return contract.SetSupplierOrganization(organizationResult.Value);
@@ -171,7 +204,7 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .WithOptionalUpdate(parameters.OrganizationUnitUuid, UpdateResponsibleOrganizationUnit)
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.Signed, (c, newValue) => c.IsSigned = newValue))
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedAt, (c, newValue) => c.SignedDate = newValue?.Date))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.SignedBy, (c, newValue) => c.ContractSigner = newValue));
         }
 
@@ -194,7 +227,7 @@ namespace Core.ApplicationServices.Contract.Write
                  contract,
                  systemUsageUuids.FromNullable(),
                  (systemUsageUuid) => _usageService.GetByUuid(systemUsageUuid),
-                 itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage),
+                 itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)
              ).Match<Result<ItContract, OperationError>>(error => error, () => contract);

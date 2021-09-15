@@ -1,4 +1,5 @@
-﻿using Core.ApplicationServices.Contract;
+﻿
+using Core.ApplicationServices.Contract;
 using Core.DomainModel.ItContract;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Contract;
@@ -339,7 +340,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
         /// <returns></returns>
         [HttpPut]
-        [Route("{contractUuid}/handover")]
+        [Route("{contractUuid}/handover-trials")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -350,7 +351,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            var parameters = new ItContractModificationParameters
+            {
+                HandoverTrials = _writeModelMapper.MapHandOverTrials(request ?? new List<HandoverTrialRequestDTO>()).FromNullable()
+            };
+
+            return _writeService.Update(contractUuid, parameters)
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

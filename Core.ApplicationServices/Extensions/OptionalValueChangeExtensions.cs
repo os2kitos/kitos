@@ -48,6 +48,19 @@ namespace Core.ApplicationServices.Extensions
 
         public static Result<TTarget, OperationError> WithOptionalUpdate<TTarget, TValue>(
             this TTarget target,
+            Maybe<TValue> optionalUpdate,
+            Func<TTarget, TValue, Maybe<OperationError>> updateCommand)
+        {
+            return optionalUpdate
+                .Match
+                (
+                    changedValue => updateCommand(target, changedValue).Match<Result<TTarget, OperationError>>(error => error, () => target),
+                    () => target
+                );
+        }
+
+        public static Result<TTarget, OperationError> WithOptionalUpdate<TTarget, TValue>(
+            this TTarget target,
             OptionalValueChange<TValue> optionalUpdate,
             Func<TTarget, TValue, Maybe<OperationError>> updateCommand)
         {

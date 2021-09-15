@@ -57,16 +57,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, true, false)]
-        [InlineData(false, false, false, false, true, false, false)]
-        [InlineData(false, false, false, true, false, false, false)]
-        [InlineData(false, false, true, false, false, false, false)]
-        [InlineData(false, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noSystemUsages)
+        [InlineData(false, false, false, false, false, false, false, false)]
+		[InlineData(false, false, false, false, false, false, false, true)]
+		[InlineData(false, false, false, false, false, false, true, false)]
+		[InlineData(false, false, false, false, false, true, false, false)]
+		[InlineData(false, false, false, false, true, false, false, false)]
+		[InlineData(false, false, false, true, false, false, false, false)]
+		[InlineData(false, false, true, false, false, false, false, false)]
+		[InlineData(false, true, false, false, false, false, false, false)]
+		[InlineData(true, false, false, false, false, false, false, false)]
+		[InlineData(true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -77,7 +78,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
             if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
             if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
+            if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
+			
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -91,6 +94,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noResponsible, output.Responsible.IsNone);
             Assert.Equal(noProcurement, output.Procurement.IsNone);
             Assert.Equal(noSupplier, output.Supplier.IsNone);
+            Assert.Equal(noHandoverTrials, output.HandoverTrials.IsNone);
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
         }
 
@@ -247,6 +251,58 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertSupplier(input, output.Supplier.Value);
+        }
+
+        [Fact]
+        public void Can_Map_HandoverTrials()
+        {
+            //Arrange
+            var input = Many<HandoverTrialRequestDTO>().ToList();
+
+            //Act
+            var output = _sut.MapHandOverTrials(input);
+
+            //Assert
+            AssertHandoverTrials(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_HandoverTrials_FromPOST()
+        {
+            //Arrange
+            var input = Many<HandoverTrialRequestDTO>().ToList();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { HandoverTrials = input });
+
+            //Assert
+            AssertHandoverTrials(input, output.HandoverTrials.Value);
+        }
+
+        [Fact]
+        public void Can_Map_HandoverTrials_FromPUT()
+        {
+            //Arrange
+            var input = Many<HandoverTrialRequestDTO>().ToList();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO { HandoverTrials = input });
+
+            //Assert
+            AssertHandoverTrials(input, output.HandoverTrials.Value);
+        }
+
+        private static void AssertHandoverTrials(List<HandoverTrialRequestDTO> input, IEnumerable<ItContractHandoverTrialUpdate> output)
+        {
+            var expected = input.OrderBy(x => x.HandoverTrialTypeUuid).ToList();
+            var actual = output.OrderBy(x => x.HandoverTrialTypeUuid).ToList();
+            Assert.Equal(expected.Count, actual.Count);
+            foreach (var pair in expected.Zip(actual, (e, a) => new { inputDTO = e, mappedChange = a }))
+            {
+                Assert.Equal(pair.inputDTO.ApprovedAt, pair.mappedChange.ApprovedAt);
+                Assert.Equal(pair.inputDTO.ExpectedAt, pair.mappedChange.ExpectedAt);
+                Assert.Equal(pair.inputDTO.HandoverTrialTypeUuid, pair.mappedChange.HandoverTrialTypeUuid);
+            }
         }
 
         private static void AssertSupplier(ContractSupplierDataWriteRequestDTO input, ItContractSupplierModificationParameters output)
