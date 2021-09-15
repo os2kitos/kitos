@@ -738,10 +738,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         [InlineData(true, false, true)]
         [InlineData(false, true, true)]
         [InlineData(false, false, false)]
-        public void Can_Create_With_HandoverTrials(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
+        public void Can_Create_With_HandoverTrials(bool oneWithBothDates, bool oneWithExpectedOnly, bool oneWithApprovedO'nly)
         {
             //Arrange
-            var handoverTrialUpdates = CreateHandoverTrialUpdates(withBothDates, withExpectedOnly, withApprovedOnly);
+            var handoverTrialUpdates = CreateHandoverTrialUpdates(oneWithBothDates, oneWithExpectedOnly, oneWithApprovedOnly);
 
             var handoverTrialTypes = handoverTrialUpdates
                 .Select(x => new HandoverTrialType
