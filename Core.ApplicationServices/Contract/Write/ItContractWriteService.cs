@@ -11,12 +11,8 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
-<<<<<<< HEAD
 using Core.ApplicationServices.References;
-using Core.DomainModel;
-=======
 using Core.ApplicationServices.SystemUsage;
->>>>>>> c80210b0dc3af2e4b291058a208df42f5a27d1cc
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;

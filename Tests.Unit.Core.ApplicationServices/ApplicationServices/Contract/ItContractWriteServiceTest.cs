@@ -11,13 +11,10 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
-using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.Model.Shared;
-using Core.ApplicationServices.OptionTypes;
-using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
@@ -47,7 +44,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IGenericRepository<ItContractAgreementElementTypes>> _agreementElementTypeRepository;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IGenericRepository<HandoverTrial>> _handoverTrialRepository;
-        private Mock<IReferenceService> _referenceServiceMock;
+        private readonly Mock<IReferenceService> _referenceServiceMock;
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
@@ -64,7 +61,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _organizationServiceMock = new Mock<IOrganizationService>();
             _handoverTrialRepository = new Mock<IGenericRepository<HandoverTrial>>();
             _referenceServiceMock = new Mock<IReferenceService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, Mock.Of<IAuthorizationContext>(), _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object);
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
@@ -897,26 +893,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _referenceServiceMock
                 .Setup(x => x.BatchUpdateExternalReferences(ReferenceRootType.Contract, contract.Id, externalReferences))
                 .Returns(value);
-        }
-
-		private List<ItContractHandoverTrialUpdate> CreateHandoverTrialUpdates(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
-        {
-            var handoverTrialUpdates = new List<ItContractHandoverTrialUpdate>();
-
-            if (withBothDates) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, true));
-            if (withExpectedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(true, false));
-            if (withApprovedOnly) handoverTrialUpdates.Add(CreateHandoverTrialUpdate(false, true));
-            return handoverTrialUpdates;
-        }
-
-        private ItContractHandoverTrialUpdate CreateHandoverTrialUpdate(bool withExpected, bool withApproved)
-        {
-            return new ItContractHandoverTrialUpdate()
-            {
-                HandoverTrialTypeUuid = A<Guid>(),
-                ApprovedAt = withApproved ? A<DateTime>() : null,
-                ExpectedAt = withExpected ? A<DateTime>() : null
-            };
         }
 
         private void ExpectAllowModifySuccess(ItContract contract)
