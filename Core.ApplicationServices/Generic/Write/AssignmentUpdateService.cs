@@ -2,7 +2,6 @@
 using Core.Abstractions.Types;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
-using Core.DomainServices.Generic;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +11,10 @@ namespace Core.ApplicationServices.Generic.Write
     public class AssignmentUpdateService : IAssignmentUpdateService
     {
         private readonly IOptionResolver _optionResolver;
-        private readonly IEntityIdentityResolver _entityIdentityResolver;
 
-        public AssignmentUpdateService(IOptionResolver optionResolver, IEntityIdentityResolver entityIdentityResolver)
+        public AssignmentUpdateService(IOptionResolver optionResolver)
         {
             _optionResolver = optionResolver;
-            _entityIdentityResolver = entityIdentityResolver;
         }
 
         public Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TDestination, TOption>(
@@ -54,18 +51,18 @@ namespace Core.ApplicationServices.Generic.Write
             return Maybe<OperationError>.None;
         }
 
-        public Maybe<OperationError> UpdateMultiAssignment<TDestination, TAssignment, TKey>(
+        public Maybe<OperationError> UpdateUniqueMultiAssignment<TDestination, TAssignmentInput, TAssignmentState>(
             string subject,
             TDestination destination,
-            Maybe<IEnumerable<Guid>> assignedItemUuid,
-            Func<TDestination, IEnumerable<TAssignment>> getExistingState,
-            Func<TDestination, TKey, Maybe<OperationError>> assign,
-            Func<TDestination, TKey, Maybe<OperationError>> unAssign)
-                where TAssignment : class, IHasId, IHasUuid
-                where TKey : class, IHasId, IHasUuid
-                where TDestination : IOwnedByOrganization
+            Maybe<IEnumerable<Guid>> assignedItemUuids,
+            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromKey,
+            Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
+            Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
+            Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign)
+            where TAssignmentState : class, IHasId, IHasUuid
+            where TAssignmentInput : class, IHasId, IHasUuid
         {
-            var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
+            var newUuids = assignedItemUuids.Match(uuids => uuids.ToList(), () => new List<Guid>());
             if (newUuids.Distinct().Count() != newUuids.Count)
             {
                 return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
@@ -76,14 +73,13 @@ namespace Core.ApplicationServices.Generic.Write
             var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
             foreach (var (delta, uuid) in changes)
             {
-
-                var dbEntity = _entityIdentityResolver.ResolveDbEntity<TKey>(uuid);
-                if (dbEntity.IsNone)
-                    return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
-
                 switch (delta)
                 {
                     case EnumerableExtensions.EnumerableDelta.Added:
+                        var dbEntity = getAssignmentInputFromKey(uuid);
+                        if (dbEntity.Failed)
+                            return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignmentInput).Name}: {uuid}", OperationFailure.BadInput);
+
                         var addResult = assign(destination, dbEntity.Value);
 
                         if (addResult.HasValue)
@@ -91,7 +87,7 @@ namespace Core.ApplicationServices.Generic.Write
 
                         break;
                     case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeError = unAssign(destination, dbEntity.Value);
+                        var removeError = unAssign(destination, existingAssignments[uuid]);
                         if (removeError.HasValue)
                             return new OperationError($"Failed to remove during multi assignment with error message: {removeError.Value.Message.GetValueOrEmptyString()}", removeError.Value.FailureType); ;
 

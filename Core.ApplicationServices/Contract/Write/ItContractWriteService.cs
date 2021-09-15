@@ -10,6 +10,7 @@ using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -35,6 +36,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationService _organizationService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
+        private readonly IItSystemUsageService _usageService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -46,7 +48,8 @@ namespace Core.ApplicationServices.Contract.Write
             IGenericRepository<ItContractAgreementElementTypes> itContractAgreementElementTypesRepository,
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
-            IAssignmentUpdateService assignmentUpdateService)
+            IAssignmentUpdateService assignmentUpdateService, 
+            IItSystemUsageService usageService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -58,6 +61,7 @@ namespace Core.ApplicationServices.Contract.Write
             _authorizationContext = authorizationContext;
             _organizationService = organizationService;
             _assignmentUpdateService = assignmentUpdateService;
+            _usageService = usageService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -199,11 +203,12 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
-            return _assignmentUpdateService.UpdateMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
              (
                  "system usage",
                  contract,
                  systemUsageUuids.FromNullable(),
+                 (systemUsageUuid) => _usageService.GetByUuid(systemUsageUuid),
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)

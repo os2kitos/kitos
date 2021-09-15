@@ -16,15 +16,15 @@ namespace Core.ApplicationServices.Generic.Write
                 where TOption : OptionEntity<TDestination>
                 where TDestination : IOwnedByOrganization;
 
-        public Maybe<OperationError> UpdateMultiAssignment<TDestination, TAssignment, TKey>(
+        public Maybe<OperationError> UpdateUniqueMultiAssignment<TDestination, TAssignmentInput, TAssignmentState>(
             string subject,
             TDestination destination,
-            Maybe<IEnumerable<Guid>> assignedItemUuid,
-            Func<TDestination, IEnumerable<TAssignment>> getExistingState,
-            Func<TDestination, TKey, Maybe<OperationError>> assign,
-            Func<TDestination, TKey, Maybe<OperationError>> unAssign)
-                where TAssignment : class, IHasId, IHasUuid
-                where TKey : class, IHasId, IHasUuid
-                where TDestination : IOwnedByOrganization;
+            Maybe<IEnumerable<Guid>> assignedItemUuids,
+            Func<Guid, Result<TAssignmentInput, OperationError>> getAssignmentInputFromKey,
+            Func<TDestination, IEnumerable<TAssignmentState>> getExistingState,
+            Func<TDestination, TAssignmentInput, Maybe<OperationError>> assign,
+            Func<TDestination, TAssignmentState, Maybe<OperationError>> unAssign)
+                where TAssignmentState : class, IHasId, IHasUuid
+                where TAssignmentInput : class, IHasId, IHasUuid;
     }
 }
