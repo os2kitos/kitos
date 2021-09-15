@@ -5,21 +5,26 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
+<<<<<<< HEAD
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+=======
+using Core.ApplicationServices.SystemUsage;
+>>>>>>> c80210b0dc3af2e4b291058a208df42f5a27d1cc
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-
 
 namespace Core.ApplicationServices.Contract.Write
 {
@@ -36,6 +41,8 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IOrganizationService _organizationService;
         private readonly IGenericRepository<HandoverTrial> _handoverTrialRepository;
         private readonly IReferenceService _referenceService;
+        private readonly IAssignmentUpdateService _assignmentUpdateService;
+        private readonly IItSystemUsageService _usageService;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -48,7 +55,9 @@ namespace Core.ApplicationServices.Contract.Write
             IAuthorizationContext authorizationContext,
             IOrganizationService organizationService,
             IGenericRepository<HandoverTrial> handoverTrialRepository,
-            IReferenceService referenceService)
+            IReferenceService referenceService,
+            IAssignmentUpdateService assignmentUpdateService, 
+            IItSystemUsageService usageService)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -61,6 +70,8 @@ namespace Core.ApplicationServices.Contract.Write
             _organizationService = organizationService;
             _handoverTrialRepository = handoverTrialRepository;
             _referenceService = referenceService;
+            _assignmentUpdateService = assignmentUpdateService;
+            _usageService = usageService;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -135,6 +146,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Procurement, UpdateProcurement))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
+				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
         }
@@ -232,6 +244,20 @@ namespace Core.ApplicationServices.Contract.Write
             return Maybe<OperationError>.None;
         }
 
+        private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
+        {
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment<ItContract, ItSystemUsage, ItSystemUsage>
+             (
+                 "system usage",
+                 contract,
+                 systemUsageUuids.FromNullable(),
+                 (systemUsageUuid) => _usageService.GetByUuid(systemUsageUuid),
+                 itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
+                 (itContract, usage) => itContract.AssignSystemUsage(usage),
+                 (itContract, usage) => itContract.RemoveSystemUsage(usage)
+             ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+        }
+
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
         {
             return contract
@@ -287,7 +313,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractTemplate(ItContract contract, Guid? contractTemplateUuid)
         {
-            return UpdateIndependentOptionTypeAssignment
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTemplateUuid,
@@ -299,7 +325,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateContractType(ItContract contract, Guid? contractTypeId)
         {
-            return UpdateIndependentOptionTypeAssignment
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
                 contract,
                 contractTypeId,
@@ -333,7 +359,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)
         {
-            return UpdateIndependentOptionTypeAssignment(
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment(
                 contract,
                 purchaseTypeUuid,
                 c => c.ResetPurchaseForm(),
@@ -344,7 +370,7 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdateProcurementStrategy(ItContract contract, Guid? procurementStrategyUuid)
         {
-            return UpdateIndependentOptionTypeAssignment(
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment(
                 contract,
                 procurementStrategyUuid,
                 c => c.ResetProcurementStrategy(),
@@ -396,38 +422,6 @@ namespace Core.ApplicationServices.Contract.Write
             return _contractService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, failure => new OperationError("Failed deleting contract", failure));
-        }
-
-        private Maybe<OperationError> UpdateIndependentOptionTypeAssignment<TOption>(
-            ItContract contract,
-            Guid? optionTypeUuid,
-            Action<ItContract> onReset,
-            Func<ItContract, TOption> getCurrentValue,
-            Action<ItContract, TOption> updateValue) where TOption : OptionEntity<ItContract>
-        {
-            if (optionTypeUuid == null)
-            {
-                onReset(contract);
-            }
-            else
-            {
-                var optionType = _optionResolver.GetOptionType<ItContract, TOption>(contract.Organization.Uuid, optionTypeUuid.Value);
-                if (optionType.Failed)
-                {
-                    return new OperationError($"Failure while resolving {typeof(TOption).Name} option:{optionType.Error.Message.GetValueOrEmptyString()}", optionType.Error.FailureType);
-                }
-
-                var option = optionType.Value;
-                var currentValue = getCurrentValue(contract);
-                if (option.available == false && (currentValue == null || currentValue.Uuid != optionTypeUuid.Value))
-                {
-                    return new OperationError($"The changed {typeof(TOption).Name} points to an option which is not available in the organization", OperationFailure.BadInput);
-                }
-
-                updateValue(contract, option.option);
-            }
-
-            return Maybe<OperationError>.None;
         }
     }
 }
