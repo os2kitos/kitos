@@ -16,5 +16,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<IEnumerable<ItContractHandoverTrialUpdate>> HandoverTrials { get; set; } = Maybe<IEnumerable<ItContractHandoverTrialUpdate>>.None;
         public Maybe<IEnumerable<Guid>> SystemUsageUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
         public Maybe<IEnumerable<Guid>> DataProcessingRegistrationUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
+        public Maybe<ItContractPaymentModelModificationParameters> PaymentModel { get; set; } = Maybe<ItContractPaymentModelModificationParameters>.None;
     }
 }

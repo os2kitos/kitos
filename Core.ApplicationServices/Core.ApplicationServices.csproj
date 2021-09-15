@@ -125,6 +125,8 @@
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractHandoverTrialUpdate.cs" />
     <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPaymentMilestone.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPaymentModelModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractResponsibleDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />

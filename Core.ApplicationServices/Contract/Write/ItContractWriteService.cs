@@ -141,7 +141,8 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters));
         }
 
         private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
@@ -235,6 +236,67 @@ namespace Core.ApplicationServices.Contract.Write
                 (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
                 (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
             ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+        }
+
+        private Result<ItContract, OperationError> UpdatePaymentModelParameters(ItContract contract, ItContractPaymentModelModificationParameters parameters)
+        {
+            return contract
+                .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.HasValue ? newValue.Value : null)
+                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentFrequencyUuid, UpdatePaymentFrequency))
+                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentModelUuid, UpdatePaymentModel))
+                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PriceRegulationUuid, UpdatePriceRegulation))
+                .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentMileStones, UpdatePaymentMileStones));
+        }
+
+        private static Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
+        {
+            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            contract.ResetPaymentMilestones();
+
+            foreach (var newMilestone in milestones)
+            {
+                var error = contract.AddPaymentMilestone(newMilestone.Title, newMilestone.Expected, newMilestone.Approved);
+                if (error.HasValue)
+                    return new OperationError("Failed adding payment milestone:" + error.Value.Message.GetValueOrEmptyString(), error.Value.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        private Maybe<OperationError> UpdatePriceRegulation(ItContract contract, Guid? priceRegulationUuid)
+        {
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                priceRegulationUuid,
+                c => c.ResetPriceRegulation(),
+                c => c.PriceRegulation,
+                (c, newValue) => c.PriceRegulation = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdatePaymentModel(ItContract contract, Guid? paymentModelUuid)
+        {
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                paymentModelUuid,
+                c => c.ResetPaymentModel(),
+                c => c.PaymentModel,
+                (c, newValue) => c.PaymentModel = newValue
+            );
+        }
+
+        private Maybe<OperationError> UpdatePaymentFrequency(ItContract contract, Guid? paymentFrequencyUuid)
+        {
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                paymentFrequencyUuid,
+                c => c.ResetPaymentFrequency(),
+                c => c.PaymentFreqency,
+                (c, newValue) => c.PaymentFreqency = newValue
+            );
         }
 
         private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)

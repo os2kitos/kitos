@@ -13,5 +13,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto);
         ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto);
         IEnumerable<ItContractHandoverTrialUpdate> MapHandOverTrials(IEnumerable<HandoverTrialRequestDTO> dtos);
+        ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO request);
     }
 }

@@ -1314,6 +1314,86 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertMultiAssignment(assignment4, freshDTO.DataProcessingRegistrations);
         }
 
+        [Theory]
+        [InlineData(true, true, true, true)]
+        [InlineData(true, true, true, false)]
+        [InlineData(true, true, false, true)]
+        [InlineData(true, false, true, true)]
+        [InlineData(false, false, true, true)]
+        [InlineData(false, false, false, false)]
+        public async Task Can_POST_With_PaymentModel(bool withPaymentFrequencyType, bool withPaymentModelType, bool withPriceRegulationType, bool withMilestones)
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType) = await CreatePaymentModelRequestAsync(organization.Uuid, withPaymentFrequencyType, withPaymentModelType, withPriceRegulationType, withMilestones);
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                PaymentModel = paymentModelRequest
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            AssertPaymentModel(paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType, contractDTO.PaymentModel);
+        }
+
+        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO expected, IdentityNamePairResponseDTO paymentFrequencyType, IdentityNamePairResponseDTO paymentModelType, IdentityNamePairResponseDTO priceRegulationType, ContractPaymentModelDataResponseDTO actual)
+        {
+            Assert.Equal(expected.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
+            AssertCrossReference(paymentFrequencyType, actual.PaymentFrequency);
+            AssertCrossReference(paymentModelType, actual.PaymentModel);
+            AssertCrossReference(priceRegulationType, actual.PriceRegulation);
+
+            var expectedMilestones = expected.PaymentMileStones.OrderBy(x => x.Title).ToList();
+            var actualMilestones = actual.PaymentMileStones.OrderBy(x => x.Title).ToList();
+
+            Assert.Equal(expectedMilestones.Count, actualMilestones.Count);
+            for (var i = 0; i < expectedMilestones.Count; i++)
+            {
+                Assert.Equal(expectedMilestones[i].Title, actualMilestones[i].Title);
+                Assert.Equal(expectedMilestones[i].Expected?.Date, actualMilestones[i].Expected?.Date);
+                Assert.Equal(expectedMilestones[i].Approved?.Date, actualMilestones[i].Approved?.Date);
+            }
+        }
+
+        private async Task<(
+            ContractPaymentModelDataWriteRequestDTO paymentModelRequest, 
+            IdentityNamePairResponseDTO paymentFrequencyType, 
+            IdentityNamePairResponseDTO paymentModelType, 
+            IdentityNamePairResponseDTO priceRegulationType)> 
+            CreatePaymentModelRequestAsync(Guid organizationUuid, bool withPaymentFrequencyType, bool withPaymentModelType, bool withPriceRegulationType, bool withMilestones)
+        {
+            var paymentFrequencyType = withPaymentFrequencyType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPaymentFrequencyTypes,
+                    organizationUuid, 10, 0)).RandomItem()
+                : null;
+
+            var paymentModelType = withPaymentModelType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPaymentModelTypes,
+                    organizationUuid, 10, 0)).RandomItem()
+                : null;
+
+            var priceRegulationType = withPriceRegulationType
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPriceRegulationTypes,
+                    organizationUuid, 10, 0)).RandomItem()
+                : null;
+
+            var paymentModelRequest = new ContractPaymentModelDataWriteRequestDTO()
+            {
+                OperationsRemunerationStartedAt = A<DateTime>(),
+                PaymentFrequencyUuid = paymentFrequencyType?.Uuid,
+                PaymentModelUuid = paymentModelType?.Uuid,
+                PriceRegulationUuid = priceRegulationType?.Uuid,
+                PaymentMileStones = withMilestones ? Many<PaymentMileStoneDTO>().ToList() : new List<PaymentMileStoneDTO>()
+            };
+
+            return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);
+        }
+
         private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
