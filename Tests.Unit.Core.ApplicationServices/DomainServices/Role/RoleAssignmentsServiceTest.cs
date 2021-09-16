@@ -104,8 +104,10 @@ namespace Tests.Unit.Core.DomainServices.Role
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(roleId, result.Value.Role.Id);
-            Assert.Equal(userId, result.Value.User.Id);
+            var newRight = result.Value;
+            Assert.Equal(roleId, newRight.Role.Id);
+            Assert.Equal(userId, newRight.User.Id);
+            Assert.Contains(model.Rights, x => x == newRight);
         }
 
         [Fact]
@@ -185,6 +187,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             var removedRight = result.Value;
             Assert.Equal(roleId, removedRight.RoleId);
             Assert.Equal(userId, removedRight.UserId);
+            Assert.DoesNotContain(model.Rights, x => x == removedRight);
             _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
         }
 
@@ -268,8 +271,10 @@ namespace Tests.Unit.Core.DomainServices.Role
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(roleId, result.Value.Role.Id);
-            Assert.Equal(userId, result.Value.User.Id);
+            var newRight = result.Value;
+            Assert.Equal(roleId, newRight.Role.Id);
+            Assert.Equal(userId, newRight.User.Id);
+            Assert.Contains(model.Rights, x => x == newRight);
         }
 
         [Fact]
@@ -331,8 +336,6 @@ namespace Tests.Unit.Core.DomainServices.Role
             var model = CreateModel((roleId, userId));
             var user = new User { Id = userId, Uuid = userUuid };
             var agreementRole = CreateRole(roleId, roleUuid);
-            ExpectOption(model, roleId, agreementRole);
-            ExpectGetUser(userId, user);
             ExpectGetUserByUuid(userUuid, user);
             ExpectGetRoleByUuid(model.OrganizationId, roleUuid, agreementRole);
 
@@ -344,11 +347,12 @@ namespace Tests.Unit.Core.DomainServices.Role
             var removedRight = result.Value;
             Assert.Equal(roleId, removedRight.RoleId);
             Assert.Equal(userId, removedRight.UserId);
+            Assert.DoesNotContain(model.Rights, x => x == removedRight);
             _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
         }
 
         [Fact]
-        public void Can_RemoveRole_Using_Uuid_If_User_Does_Not_Exist()
+        public void Cannot_RemoveRole_Using_Uuid_If_User_Does_Not_Exist()
         {
             //Arrange
             var roleId = A<int>();
@@ -356,10 +360,8 @@ namespace Tests.Unit.Core.DomainServices.Role
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
             var model = CreateModel((roleId, userId));
-            var user = new User { Id = userId, Uuid = userUuid };
             var agreementRole = CreateRole(roleId, roleUuid);
             ExpectOption(model, roleId, agreementRole);
-            ExpectGetUser(userId, user);
             ExpectGetUserByUuid(userUuid, Maybe<User>.None);
             ExpectGetRoleByUuid(model.OrganizationId, roleUuid, agreementRole);
 
@@ -400,39 +402,61 @@ namespace Tests.Unit.Core.DomainServices.Role
         {
             //Arrange
             var model = CreateModel();
-            var rightThatIsKept = new TRight
-            {
-                User = CreateUser(),
-                Role = CreateRole()
-            };
-            var rightThatIsRemoved = new TRight
-            {
-                Role = CreateRole()
-            };
+            var rightThatIsKept = CreateRight();
+            var rightThatIsRemoved = CreateRight();
+            model.Rights.Clear();
             model.Rights.Add(rightThatIsKept);
             model.Rights.Add(rightThatIsRemoved);
 
-            var newState = new List<(Guid roleUuid, Guid userUuid)>()
+            var expectedAddition1 = CreateRight();
+            var expectedAddition2 = CreateRight(rightThatIsRemoved.User);
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
             {
-                (rightThatIsKept.Role.Uuid,rightThatIsKept.User.Uuid),
-                (A<Guid>(),A<Guid>()),
+                (rightThatIsKept.Role.Uuid, rightThatIsKept.User.Uuid),
+                (expectedAddition1.Role.Uuid,expectedAddition1.User.Uuid),
 
                 //Same user as the removed right but different role
-                (A<Guid>(),rightThatIsRemoved.User.Uuid),
+                (expectedAddition2.Role.Uuid,expectedAddition2.User.Uuid)
             };
 
+            SetupAdditionPrerequisites(model, expectedAddition1.Role, expectedAddition1.User);
+            SetupAdditionPrerequisites(model, expectedAddition2.Role, expectedAddition2.User);
+
+            ExpectOrganizationUsers(model, Maybe<string>.None, expectedAddition1.User, expectedAddition2.User);
 
             //Act
-            var error = _sut.BatchUpdateRoles(model, newState);
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
 
             //Assert
             Assert.True(error.IsNone);
-            //TODO: Check changes to the model
+            var actualState = model.Rights.Select(r => (r.Role.Uuid, r.User.Uuid)).ToList();
+            Assert.Equal(requestedNewState, actualState);
         }
 
         //TODO: error cases
         // case 1: Failure removing
         // case 2: Failure adding
+
+        private void SetupAdditionPrerequisites(TModel model, TRole role, User user)
+        {
+            ExpectGetRoleByUuid(model.OrganizationId, role.Uuid, role);
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectAvailableOption(model, role.Id, role);
+        }
+
+        private TRight CreateRight(User predefinedUser = null)
+        {
+            var role = CreateRole();
+            var user = predefinedUser ?? CreateUser();
+            return new TRight
+            {
+                Role = role,
+                User = user,
+                RoleId = role.Id,
+                UserId = user.Id
+            };
+        }
 
         private User CreateUser()
         {
@@ -461,7 +485,7 @@ namespace Tests.Unit.Core.DomainServices.Role
                 .Returns(agreementRole.Select(role => (role, true)));
         }
 
-        private void ExpectOrganizationUsers(TModel model, Maybe<string> emailQuery, User[] users)
+        private void ExpectOrganizationUsers(TModel model, Maybe<string> emailQuery, params User[] users)
         {
             _userRepository.Setup(x => x.SearchOrganizationUsers(model.OrganizationId, emailQuery))
                 .Returns(users.AsQueryable());

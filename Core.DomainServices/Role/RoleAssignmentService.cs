@@ -94,7 +94,7 @@ namespace Core.DomainServices.Role
             if (roleId.Failed)
                 return roleId.Error;
 
-            return AssignRole(model, roleId.Value, userId.Value);
+            return AssignRole(model, roleId.Value.Id, userId.Value.Id);
         }
 
         public Result<TRight, OperationError> RemoveRole(TModel model, int roleId, int userId)
@@ -110,7 +110,12 @@ namespace Core.DomainServices.Role
             if (role.IsNone)
                 return new OperationError($"Role Id {roleId} is invalid'", OperationFailure.BadInput);
 
-            var removeResult = model.RemoveRole(role.Value.option, user.Value);
+            return RemoveRole(model, role.Value.option, user.Value);
+        }
+
+        private Result<TRight, OperationError> RemoveRole(TModel model, TRole role, User user)
+        {
+            var removeResult = model.RemoveRole(role, user);
             if (removeResult.Failed)
                 return removeResult.Error;
 
@@ -139,18 +144,20 @@ namespace Core.DomainServices.Role
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (roleAssignments == null) throw new ArgumentNullException(nameof(roleAssignments));
 
+            var existingRights = model.Rights.ToDictionary(x=>(x.Role.Uuid,x.User.Uuid));
             List<(Guid roleUuid, Guid userUuid)> existingKeys = model.Rights.Select(x => (x.Role.Uuid, x.User.Uuid)).ToList();
-            List<(Guid roleUuid, Guid userUuid)> nextStateKeys = roleAssignments.ToList();
+            var nextStateKeys = roleAssignments.ToList();
 
-            var toRemove = existingKeys.Except(nextStateKeys);
-            var toAdd = nextStateKeys.Except(existingKeys);
+            var toRemove = existingKeys.Except(nextStateKeys).ToList();
+            var toAdd = nextStateKeys.Except(existingKeys).ToList();
 
-            foreach (var userRolePair in toRemove)
+            foreach (var ruleUserPair in toRemove)
             {
-                var removeResult = RemoveRole(model, userRolePair.roleUuid, userRolePair.userUuid);
+                var existingRight = existingRights[ruleUserPair];
+                var removeResult = model.RemoveRole(existingRight.Role, existingRight.User);
 
                 if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.roleUuid} from user with Uuid: {userRolePair.userUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+                    return new OperationError($"Failed to remove role with Uuid: {ruleUserPair.roleUuid} from user with Uuid: {ruleUserPair.userUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
             }
 
             foreach (var userRolePair in toAdd)
@@ -164,7 +171,7 @@ namespace Core.DomainServices.Role
             return Maybe<OperationError>.None;
         }
 
-        private Result<int, OperationError> GetUserByUuid(Guid userUuid)
+        private Result<User, OperationError> GetUserByUuid(Guid userUuid)
         {
             var user = _userRepository.GetByUuid(userUuid);
             if (user.IsNone)
@@ -172,10 +179,10 @@ namespace Core.DomainServices.Role
                 return new OperationError($"Could not find user with Uuid: {userUuid}", OperationFailure.BadInput);
             }
 
-            return user.Value.Id;
+            return user.Value;
         }
 
-        private Result<int, OperationError> GetRoleByUuid(int organizationId, Guid roleUuid)
+        private Result<TRole, OperationError> GetRoleByUuid(int organizationId, Guid roleUuid)
         {
             var roleResult = _localRoleOptionsService.GetOptionByUuid(organizationId, roleUuid);
             if (roleResult.IsNone)
@@ -183,7 +190,7 @@ namespace Core.DomainServices.Role
                 return new OperationError($"Could not find role with Uuid: {roleUuid}", OperationFailure.BadInput);
             }
 
-            return roleResult.Value.option.Id;
+            return roleResult.Value.option;
         }
     }
 }
