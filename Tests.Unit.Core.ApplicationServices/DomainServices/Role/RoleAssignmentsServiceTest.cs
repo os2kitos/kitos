@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -434,9 +434,114 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.Equal(requestedNewState, actualState);
         }
 
-        //TODO: error cases
-        // case 1: Failure removing
-        // case 2: Failure adding
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_New_User_Is_Not_In_Organization()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var expectedAddition1 = CreateRight();
+            var expectedAddition2 = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (expectedAddition1.Role.Uuid,expectedAddition1.User.Uuid),
+                (expectedAddition2.Role.Uuid,expectedAddition2.User.Uuid)
+            };
+
+            SetupAdditionPrerequisites(model, expectedAddition1.Role, expectedAddition1.User);
+            SetupAdditionPrerequisites(model, expectedAddition2.Role, expectedAddition2.User);
+
+            //user 2 is not in organization
+            ExpectOrganizationUsers(model, Maybe<string>.None, expectedAddition1.User);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {expectedAddition2.Role.Uuid} from user with Uuid: {expectedAddition2.User.Uuid}, with following error message: User Id {expectedAddition2.User.Id} is invalid in the context of assign role {expectedAddition2.Role.Id} to {typeof(TModel)} with id {model.Id} in organization with id '{model.OrganizationId}'", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_Role_Is_Not_Available()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectAvailableOption(model, addition.RoleId, Maybe<TRole>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Invalid role id", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_Role_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectGetRoleByUuid(model.OrganizationId, addition.Role.Uuid, Maybe<TRole>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find role with Uuid: {addition.Role.Uuid}", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_User_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectGetUserByUuid(addition.User.Uuid, Maybe<User>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find user with Uuid: {addition.User.Uuid}", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+        }
 
         private void SetupAdditionPrerequisites(TModel model, TRole role, User user)
         {
