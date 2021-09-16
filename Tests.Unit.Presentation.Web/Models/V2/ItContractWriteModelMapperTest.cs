@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel.ItContract;
@@ -634,16 +635,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
             Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
             Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
-            if (hasValues)
-            {
-                Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue);
-                AssertPaymentMilestones(input.PaymentMileStones, output.PaymentMileStones.Value);
-            }
-            else
-            {
-                Assert.True(output.OperationsRemunerationStartedAt.NewValue.IsNone);
-                Assert.True(output.PaymentMileStones.IsNone);
-            }
+            Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue.Match(val => val, () => (DateTime?)null));
+            AssertPaymentMilestones(
+                input.PaymentMileStones.FromNullable().Match(val => val, () => new List<PaymentMileStoneDTO>()), 
+                output.PaymentMileStones.Match(val => val, () => new List<ItContractPaymentMilestone>()));
         }
 
         private static void AssertPaymentMilestones(IEnumerable<PaymentMileStoneDTO> input, IEnumerable<ItContractPaymentMilestone> output)
