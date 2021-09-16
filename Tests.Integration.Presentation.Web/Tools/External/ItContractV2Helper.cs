@@ -130,5 +130,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/data-processing-registrations"), token, dto);
         }
+
+        public static async Task<HttpResponseMessage> SendPutAgreementPeriodAsync(string token, Guid contractUuid, ContractAgreementPeriodDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/agreement-period"), token, dto);
+        }
     }
 }

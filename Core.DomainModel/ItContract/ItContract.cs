@@ -769,9 +769,9 @@ namespace Core.DomainModel.ItContract
             OptionExtend = null;
         }
 
-        public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool? ongoing)
+        public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool ongoing)
         {
-            if (ongoing == true && (durationMonths.HasValue || durationYears.HasValue))
+            if (ongoing && (durationMonths.HasValue || durationYears.HasValue))
                 return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadState);
 
             if (durationYears.GetValueOrDefault() < 0)
@@ -782,7 +782,7 @@ namespace Core.DomainModel.ItContract
             if (months is < 0 or > 11)
                 return new OperationError($"{nameof(durationMonths)} cannot be below 0 or above 11", OperationFailure.BadInput);
 
-            DurationOngoing = ongoing == true;
+            DurationOngoing = ongoing;
             DurationYears = durationYears;
             DurationMonths = durationMonths;
 

@@ -25,7 +25,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Constraints:
         ///     - If set to true, the DurationMonths/Years must be null
         /// </summary>
-        public bool? IsContinuous { get; set; }
+        public bool IsContinuous { get; set; }
         /// <summary>
         /// Optional agreement extension option
         /// Constraints:
