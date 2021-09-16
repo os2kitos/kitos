@@ -26,6 +26,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Extensions;
@@ -50,6 +51,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IAuthorizationContext> _authContext;
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
+        private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
         private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
 
         public ItContractWriteServiceTest()
@@ -67,8 +69,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _authContext = new Mock<IAuthorizationContext>();
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
+            _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _dprServiceMock.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object,_dprServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -502,7 +505,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var procurementStrategyUuid = A<Guid>();
             var procurement = new ItContractProcurementModificationParameters()
             {
-                ProcurementStrategyUuid = ((Guid?) procurementStrategyUuid).AsChangedValue()
+                ProcurementStrategyUuid = ((Guid?)procurementStrategyUuid).AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
 
@@ -526,7 +529,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 PurchaseTypeUuid = ((Guid?)purchaseTypeUuid).AsChangedValue()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(procurement: procurement);
-            
+
             var operationError = A<OperationError>();
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, purchaseTypeUuid, operationError);
 
@@ -656,8 +659,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Failed);
             AssertFailureWithKnownErrorDetails(result, $"Failed to get supplier organization:{operationError.Message.GetValueOrEmptyString()}", operationError.FailureType, transaction);
         }
-		
-		[Theory]
+
+        [Theory]
         [InlineData(true)]
         [InlineData(false)]
         public void Can_Create_With_SystemUsages(bool hasUsages)
@@ -675,8 +678,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             Assert.True(result.Ok);
             AssertTransactionCommitted(transaction);
         }
-		
-		[Fact]
+
+        [Fact]
         public void Cannot_Create_With_SystemUsages_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
@@ -691,17 +694,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             Assert.True(result.Failed);
-			AssertFailureWithKnownError(result, operationError, transaction);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
-		
-		 [Fact]
+
+        [Fact]
         public void Can_Update_With_SystemUsages_If_Usage_Already_Assigned()
         {
             //Arrange
             var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
             var usageUuids = new List<Guid> { usage.Uuid };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
-            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage{ ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id});
+            createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
 
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
@@ -724,7 +727,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var usageUuids = new List<Guid>();
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
             createdContract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContract = createdContract, ItContractId = createdContract.Id, ItSystemUsage = usage, ItSystemUsageId = usage.Id });
-            
+
             ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, usageUuids, Maybe<OperationError>.None);
             ExpectGetReturns(createdContract.Uuid, createdContract);
             ExpectAllowModifySuccess(createdContract);
@@ -819,17 +822,17 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             foreach (var handoverTrialType in handoverTrialTypes)
                 ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
-				
-			//Act
+
+            //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
-			var itContract = result.Value;
+            var itContract = result.Value;
             Assert.Equal(handoverTrialTypes.Count, itContract.HandoverTrials.Count);
             Assert.All(itContract.HandoverTrials, trial => Assert.True(handoverTrialTypes.ContainsKey(trial.HandoverTrialType.Uuid)));
-			AssertTransactionCommitted(transaction);
-		}
+            AssertTransactionCommitted(transaction);
+        }
 
         [Fact]
         public void Cannot_Create_With_HandoverTrials_If_Option_Is_Not_Available()
@@ -848,14 +851,14 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var failingTypeUuid = handoverTrialTypes.RandomItem().Key;
             foreach (var handoverTrialType in handoverTrialTypes)
                 ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, handoverTrialType.Key != failingTypeUuid));
-			
-			//Act
+
+            //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
-			AssertFailureWithKnownErrorDetails(result, $"Cannot take new handover trial ({failingTypeUuid}) into use which is not available in the organization", OperationFailure.BadInput, transaction);
-		}
+            AssertFailureWithKnownErrorDetails(result, $"Cannot take new handover trial ({failingTypeUuid}) into use which is not available in the organization", OperationFailure.BadInput, transaction);
+        }
 
         [Fact]
         public void Cannot_Create_With_HandoverTrials_If_Option_Cannot_Be_Resolved()
@@ -982,6 +985,51 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, $"Failed to update references with error message: {updateError.Message.GetValueOrEmptyString()}", updateError.FailureType, transaction);
         }
 
+        [Fact]
+        public void Can_Create_With_Roles()
+        {
+            //Arrange
+            var roleAssignments = Many<UserRolePair>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(roleAssignments: roleAssignments);
+            ExpectBatchUpdateRoleAssignmentsReturn(createdContract, roleAssignments, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Roles_If_BatchUpdate_Fails()
+        {
+            //Arrange
+            var roleAssignments = Many<UserRolePair>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(roleAssignments: roleAssignments);
+            var updateError = A<OperationError>();
+            ExpectBatchUpdateRoleAssignmentsReturn(createdContract, roleAssignments, updateError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownErrorDetails(result, $"Failed while updating role assignments:{updateError.Message.GetValueOrEmptyString()}", updateError.FailureType, transaction);
+        }
+
+        private void ExpectBatchUpdateRoleAssignmentsReturn(ItContract createdContract, List<UserRolePair> roleAssignments, Maybe<OperationError> value)
+        {
+            _roleAssignmentService
+                .Setup(x => x.BatchUpdateRoles(createdContract, It.Is<IEnumerable<(Guid, Guid)>>(input => MatchExpectedRoleAssignments(input, roleAssignments))))
+                .Returns(value);
+        }
+
+        private static bool MatchExpectedRoleAssignments(IEnumerable<(Guid, Guid)> input, List<UserRolePair> expected)
+        {
+            return input.SequenceEqual(expected.Select(r => (r.RoleUuid, r.UserUuid)));
+        }
+
         private void ExpectBatchUpdateExternalReferencesReturns(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences, Maybe<OperationError> value)
         {
             _referenceServiceMock
@@ -1026,18 +1074,18 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             }
         }
 
-        private void ExpectUpdateMultiAssignmentReturns<TAssignmentInput, TAssignmentState>(ItContract contract, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result) 
+        private void ExpectUpdateMultiAssignmentReturns<TAssignmentInput, TAssignmentState>(ItContract contract, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result)
             where TAssignmentInput : class, IHasId, IHasUuid
             where TAssignmentState : class, IHasId, IHasUuid
         {
             _assignmentUpdateServiceMock
                 .Setup(x => x.UpdateUniqueMultiAssignment(
-                    It.IsAny<string>(), 
-                    contract, 
-                    assignmentUuids, 
+                    It.IsAny<string>(),
+                    contract,
+                    assignmentUuids,
                     It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
-                    It.IsAny<Func<ItContract, IEnumerable<TAssignmentState>>>(), 
-                    It.IsAny<Func<ItContract, TAssignmentInput, Maybe<OperationError>>>(), 
+                    It.IsAny<Func<ItContract, IEnumerable<TAssignmentState>>>(),
+                    It.IsAny<Func<ItContract, TAssignmentInput, Maybe<OperationError>>>(),
                     It.IsAny<Func<ItContract, TAssignmentState, Maybe<OperationError>>>()))
                 .Returns(result);
         }
@@ -1046,10 +1094,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             _assignmentUpdateServiceMock
                 .Setup(x => x.UpdateIndependentOptionTypeAssignment(
-                    contract, 
-                    optionUuid, 
-                    It.IsAny<Action<ItContract>>(), 
-                    It.IsAny<Func<ItContract, TOption>>(), 
+                    contract,
+                    optionUuid,
+                    It.IsAny<Action<ItContract>>(),
+                    It.IsAny<Func<ItContract, TOption>>(),
                     It.IsAny<Action<ItContract, TOption>>()))
                 .Returns(result);
         }
@@ -1074,6 +1122,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
             IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null,
             IEnumerable<Guid> systemUsageUuids = null,
+            IEnumerable<UserRolePair> roleAssignments = null,
             IEnumerable<Guid> dataProcessingRegistrationUuids = null
             )
         {
@@ -1092,6 +1141,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 HandoverTrials = handoverTrialUpdates.FromNullable(),
                 ExternalReferences = externalReferences.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
+                Roles = roleAssignments.FromNullable(),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
             var createdContract = new ItContract()
@@ -1107,8 +1157,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             ExpectCreateReturns(createdContract.OrganizationId, parameters.Name.NewValue, createdContract);
             return (organization.Uuid, parameters, createdContract, transaction);
         }
-		
-		private List<ItContractHandoverTrialUpdate> CreateHandoverTrialUpdates(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
+
+        private List<ItContractHandoverTrialUpdate> CreateHandoverTrialUpdates(bool withBothDates, bool withExpectedOnly, bool withApprovedOnly)
         {
             var handoverTrialUpdates = new List<ItContractHandoverTrialUpdate>();
 

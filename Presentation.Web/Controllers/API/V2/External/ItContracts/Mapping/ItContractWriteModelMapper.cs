@@ -10,6 +10,7 @@ using Core.ApplicationServices.Model.Shared.Write;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -42,7 +43,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>());
             var references = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(ContractWriteRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>());
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
+            var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
+			
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -54,8 +57,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Supplier = supplier.FromNullable().Select(MapSupplier),
                 HandoverTrials = handoverTrials.FromNullable().Select(MapHandOverTrials),
                 ExternalReferences = references.FromNullable().Select(MapReferences),
+                Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
+        }
+
+        public IEnumerable<UserRolePair> MapRoles(IEnumerable<RoleAssignmentRequestDTO> dtos)
+        {
+            return BaseMapRoleAssignments(dtos.ToList()).Value
+                .Match(assignments => assignments, Array.Empty<UserRolePair>);
         }
 
         public IEnumerable<ItContractHandoverTrialUpdate> MapHandOverTrials(IEnumerable<HandoverTrialRequestDTO> dtos)

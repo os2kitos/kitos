@@ -7,6 +7,7 @@ using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
@@ -59,19 +60,31 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false, false, true, false)]
-		[InlineData(false, false, false, false, false, false, false, true, false, false)]
-		[InlineData(false, false, false, false, false, false, true, false, false, false)]
-		[InlineData(false, false, false, false, false, true, false, false, false, false)]
-		[InlineData(false, false, false, false, true, false, false, false, false, false)]
-		[InlineData(false, false, false, true, false, false, false, false, false, false)]
-		[InlineData(false, false, true, false, false, false, false, false, false, false)]
-		[InlineData(false, true, false, false, false, false, false, false, false, false)]
-		[InlineData(true, false, false, false, false, false, false, false, false, false)]
-		[InlineData(true, true, true, true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences, bool noDataProcessingRegistrations)
+        [InlineData(false, false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false, false, true, false)]
+        [InlineData(false, false, false, false, false, false, false, false, true, false, false)]
+        [InlineData(false, false, false, false, false, false, false, true, false, false, false)]
+        [InlineData(false, false, false, false, false, false, true, false, false, false, false)]
+        [InlineData(false, false, false, false, false, true, false, false, false, false, false)]
+        [InlineData(false, false, false, false, true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, true, false, false, false, false, false, false, false)]
+        [InlineData(false, false, true, false, false, false, false, false, false, false, false)]
+        [InlineData(false, true, false, false, false, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(
+            bool noName, 
+            bool noGeneralData, 
+            bool noParent, 
+            bool noResponsible, 
+            bool noProcurement, 
+            bool noSupplier, 
+            bool noHandoverTrials, 
+            bool noSystemUsages, 
+            bool noExternalReferences, 
+            bool noDataProcessingRegistrations,
+            bool noRoles)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -86,6 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
             if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
+            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -423,7 +437,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_SystemUsages_From_Post(bool hasValues)
         {
             //Arrange
-            var systemUsageUuids = hasValues ? new[] {A<Guid>(), A<Guid>()} : new Guid[0];
+            var systemUsageUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
             var requestDto = new CreateNewContractRequestDTO { SystemUsageUuids = systemUsageUuids };
 
             //Act
@@ -453,6 +467,45 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertUuids(systemUsageUuids, modifiedUuids);
         }
 
+        [Fact]
+        public void Can_Map_Roles()
+        {
+            //Arrange
+            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+
+            //Act
+            var rolePairs = _sut.MapRoles(roles).ToList();
+
+            //Assert
+            AssertRoles(roles, rolePairs);
+        }
+
+        [Fact]
+        public void Can_Map_Roles_FromPUT()
+        {
+            //Arrange
+            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+
+            //Act
+            var result = _sut.FromPUT(new UpdateContractRequestDTO() { Roles = roles });
+
+            //Assert
+            AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
+        }
+
+        [Fact]
+        public void Can_Map_Roles_FromPOST()
+        {
+            //Arrange
+            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+
+            //Act
+            var result = _sut.FromPOST(new CreateNewContractRequestDTO { Roles = roles });
+
+            //Assert
+            AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
+        }
+		
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -488,6 +541,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
             AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
         }
+		
+		private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
+        {
+            Assert.Equal(roles.Count, rolePairs.Count);
+            for (var i = 0; i < rolePairs.Count; i++)
+            {
+                var expected = roles[i];
+                var actual = rolePairs[i];
+                Assert.Equal(expected.RoleUuid, actual.RoleUuid);
+                Assert.Equal(expected.UserUuid, actual.UserUuid);
+            }
+		}
 
         private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)
         {
@@ -500,8 +565,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(orderedExpected[i], orderedActual[i]);
             }
         }
-		
-		private static void AssertExternalReferences(List<UpdatedExternalReferenceProperties> mappedReferences, List<ExternalReferenceDataDTO> references)
+
+        private static void AssertExternalReferences(List<UpdatedExternalReferenceProperties> mappedReferences, List<ExternalReferenceDataDTO> references)
         {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)
@@ -512,7 +577,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.Title, actual.Title);
                 Assert.Equal(expected.DocumentId, actual.DocumentId);
                 Assert.Equal(expected.MasterReference, actual.MasterReference);
-			}
+            }
         }
 
         private static void AssertGeneralData(ContractGeneralDataWriteRequestDTO input,

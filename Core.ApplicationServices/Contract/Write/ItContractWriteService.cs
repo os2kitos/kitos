@@ -20,6 +20,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Role;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.Contract.Write
@@ -39,6 +40,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IReferenceService _referenceService;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
+        private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
 
         public ItContractWriteService(
@@ -55,6 +57,7 @@ namespace Core.ApplicationServices.Contract.Write
             IReferenceService referenceService,
             IAssignmentUpdateService assignmentUpdateService, 
             IItSystemUsageService usageService, 
+			IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService)
         {
             _contractService = contractService;
@@ -70,6 +73,7 @@ namespace Core.ApplicationServices.Contract.Write
             _referenceService = referenceService;
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
+            _roleAssignmentService = roleAssignmentService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
         }
 
@@ -148,7 +152,19 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
 				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles));
+        }
+
+        private Maybe<OperationError> UpdateRoles(ItContract contract, IEnumerable<UserRolePair> input)
+        {
+            var roleAssignments = input
+                .Select(pair => (pair.RoleUuid, pair.UserUuid))
+                .ToList();
+
+            return _roleAssignmentService
+                .BatchUpdateRoles(contract, roleAssignments)
+                .Select(error => new OperationError($"Failed while updating role assignments:{error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
         private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -158,11 +174,7 @@ namespace Core.ApplicationServices.Contract.Write
                     ReferenceRootType.Contract,
                     contract.Id,
                     externalReferences.ToList())
-                .Match
-                (
-                    error => new OperationError($"Failed to update references with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType),
-                    () => Maybe<OperationError>.None
-                );
+                .Select(error => new OperationError($"Failed to update references with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
         }
 
         private Maybe<OperationError> UpdateHandOverTrials(ItContract contract, IEnumerable<ItContractHandoverTrialUpdate> parameters)
@@ -244,7 +256,7 @@ namespace Core.ApplicationServices.Contract.Write
             return Maybe<OperationError>.None;
         }
 
-        private Result<ItContract, OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
+        private Maybe<OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
@@ -255,10 +267,10 @@ namespace Core.ApplicationServices.Contract.Write
                 itContract => itContract.DataProcessingRegistrations.ToList(),
                 (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
                 (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
-            ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+            );
         }
 
-        private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
+        private Maybe<OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
              (
@@ -269,7 +281,7 @@ namespace Core.ApplicationServices.Contract.Write
                  itContract => itContract.AssociatedSystemUsages.Select(x => x.ItSystemUsage).ToList(),
                  (itContract, usage) => itContract.AssignSystemUsage(usage),
                  (itContract, usage) => itContract.RemoveSystemUsage(usage)
-             ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+             );
         }
 
         private Result<ItContract, OperationError> UpdateGeneralData(ItContract contract, ItContractGeneralDataModificationParameters generalData)
@@ -365,10 +377,10 @@ namespace Core.ApplicationServices.Contract.Write
                 return Maybe<OperationError>.None;
             }
 
-            var updateResult = contract.UpdateProcurementPlan(plan.Value);
-            return updateResult.HasValue
-                ? new OperationError($"Failed to update procurement plan with error message: {updateResult.Value.Message.GetValueOrEmptyString()}", updateResult.Value.FailureType)
-                : Maybe<OperationError>.None;
+            return contract
+                .UpdateProcurementPlan(plan.Value)
+                .Select(error => new OperationError($"Failed to update procurement plan with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
+
         }
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Data.Entity.Migrations.Model;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -10,10 +9,8 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
-
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
-using Presentation.Web.Models.API.V2.Response;
 using Presentation.Web.Models.API.V2.Response.System;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -618,7 +615,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             };
 
             //Act
-            var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
+            using var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdSystem.StatusCode);
@@ -640,7 +637,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             };
 
             //Act 
-            var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
+            using var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdSystem.StatusCode);
@@ -663,7 +660,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             };
 
             //Act 
-            var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
+            using var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdSystem.StatusCode);
@@ -693,7 +690,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             };
 
             //Act 
-            var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
+            using var createdSystem = await ItSystemV2Helper.SendCreateRightsHolderSystemAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdSystem.StatusCode);

@@ -7,8 +7,6 @@ using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;

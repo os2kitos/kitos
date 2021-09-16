@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -43,7 +42,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var mainSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var childSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login).DisposeAsync();
 
             var token = await HttpApi.GetTokenAsync(role);
             var url = TestEnvironment.CreateUrl($"api/itsystem/{childSystem.Id}?hierarchy=true");

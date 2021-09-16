@@ -334,7 +334,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act
             await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var newUsage = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            using var newUsage = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, newUsage.StatusCode);
@@ -877,7 +877,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             //Act - Add archiving data
-            var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, inputs);
+            using var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, inputs);
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
@@ -890,7 +890,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
             var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
 
-            var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
+            using var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
@@ -898,7 +898,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
+            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -912,15 +912,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            using var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, usageDTO.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, usageDTO.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
-            var notGetResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            using var notGetResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.NotFound, notGetResult.StatusCode);
         }
 
@@ -931,7 +931,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, A<Guid>());
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
@@ -945,15 +945,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token2, user2, organization2, system2) = await CreatePrerequisitesAsync();
 
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token1, CreatePostRequest(organization1.Uuid, system1.Uuid));
-            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            using var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token2, usageDTO.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token2, usageDTO.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
-            var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            using var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getStillExistsResult.StatusCode);
         }
 

@@ -7,8 +7,6 @@ using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using ExpectedObjects;
-
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -153,7 +151,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, true, true);
-            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input).DisposeAsync();
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
             var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, null, relationToEdit.FrequencyType, relationToEdit.Interface);
@@ -180,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, true, true);
-            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input).DisposeAsync();
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
             var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, null, relationToEdit.Interface);
@@ -207,7 +205,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         {
             //Arrange
             var input = await PrepareFullRelationAsync(true, true, true);
-            await SystemRelationHelper.SendPostRelationRequestAsync(input);
+            await SystemRelationHelper.SendPostRelationRequestAsync(input).DisposeAsync();
             var relations = await SystemRelationHelper.GetRelationsFromAsync(input.FromUsageId);
             var relationToEdit = relations.Single();
             var edited = PrepareEditedRelation(relationToEdit, relationToEdit.ToUsage, relationToEdit.Contract, relationToEdit.FrequencyType, null);
