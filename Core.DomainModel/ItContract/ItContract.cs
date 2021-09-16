@@ -756,8 +756,7 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
         {
             if (extendMultiplier < 0)
-                return new OperationError(nameof(extendMultiplier) + "must be above or equal to 0",
-                    OperationFailure.BadInput);
+                return new OperationError($"{nameof(extendMultiplier)} must be above or equal to 0", OperationFailure.BadInput);
 
             ExtendMultiplier = extendMultiplier;
             return Maybe<OperationError>.None;
@@ -778,16 +777,16 @@ namespace Core.DomainModel.ItContract
                 return new OperationError($"{nameof(durationYears)} cannot be below 0", OperationFailure.BadInput);
 
             var months = durationMonths.GetValueOrDefault();
-            
+
             if (months is < 0 or > 11)
                 return new OperationError($"{nameof(durationMonths)} cannot be below 0 or above 11", OperationFailure.BadInput);
 
             DurationOngoing = ongoing;
             DurationYears = durationYears;
             DurationMonths = durationMonths;
-			
-			return Maybe<OperationError>.None;
-		}
+
+            return Maybe<OperationError>.None;
+        }
 
         public void ResetPaymentFrequency()
         {
@@ -815,7 +814,7 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
         {
-            if(string.IsNullOrEmpty(title))
+            if (string.IsNullOrEmpty(title))
                 return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
 
             if (expected.HasValue == false && approved.HasValue == false)

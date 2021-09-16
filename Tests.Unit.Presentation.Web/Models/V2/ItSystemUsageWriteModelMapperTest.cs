@@ -440,15 +440,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPropertyContainsResetDataChange(output.ArchiveJournalPeriods);
         }
 
+        public static IEnumerable<object[]> GetUndefinedSectionsInput()
+        {
+            return CreateGetUndefinedSectionsInput(7);
+        }
+
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, true, false, false)]
-        [InlineData(true, true, true, true, false, false, false)]
-        [InlineData(true, true, true, false, false, false, false)]
-        [InlineData(true, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false)]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPOST_Maps_All_Defined_Sections_And_Undefined_Are_Mapped_As_Unchanged(
             bool generalNull,
             bool rolesNull,
@@ -486,14 +484,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, true, false, false)]
-        [InlineData(true, true, true, true, false, false, false)]
-        [InlineData(true, true, true, false, false, false, false)]
-        [InlineData(true, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false)]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPUT_Maps_All_Sections_Including_Null_Sections(
            bool generalNull,
            bool rolesNull,

@@ -110,15 +110,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
         }
 
+        public static IEnumerable<object[]> GetUndefinedSectionsInput()
+        {
+            return CreateGetUndefinedSectionsInput(6);
+        }
+
         [Theory]
-        [InlineData(false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, true, false)]
-        [InlineData(false, false, false, true, false, false)]
-        [InlineData(false, false, true, false, false, false)]
-        [InlineData(false, true, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true)]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPUT_Ignores_Undefined_Sections(
             bool noName,
             bool noGeneralData,
@@ -151,14 +149,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, true, false)]
-        [InlineData(false, false, false, true, false, false)]
-        [InlineData(false, false, true, false, false, false)]
-        [InlineData(false, true, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true)]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPOST_Ignores_Undefined_Sections(
            bool noName,
            bool noGeneralData,
