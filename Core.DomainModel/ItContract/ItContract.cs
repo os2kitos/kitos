@@ -774,6 +774,14 @@ namespace Core.DomainModel.ItContract
             if (ongoing == true && (durationMonths.HasValue || durationYears.HasValue))
                 return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadState);
 
+            if (durationYears.GetValueOrDefault() < 0)
+                return new OperationError($"{nameof(durationYears)} cannot be below 0", OperationFailure.BadInput);
+
+            var months = durationMonths.GetValueOrDefault();
+            
+            if (months is < 0 or > 11)
+                return new OperationError($"{nameof(durationMonths)} cannot be below 0 or above 11", OperationFailure.BadInput);
+
             DurationOngoing = ongoing == true;
             DurationYears = durationYears;
             DurationMonths = durationMonths;

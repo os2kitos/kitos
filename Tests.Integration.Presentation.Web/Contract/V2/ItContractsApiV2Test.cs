@@ -1354,16 +1354,16 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertRoleAssignments(roles4, freshReadDTO);
         }
 
-		[Fact]
+        [Fact]
         public async Task Can_POST_With_DataProcessingRegistrations()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
-                {
-                    Name = CreateName(),
-                    OrganizationUuid = organization.Uuid
-                });
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
             var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
             {
                 Name = CreateName(),
@@ -1475,8 +1475,47 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment4, freshDTO.DataProcessingRegistrations);
         }
-		
-		private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
+
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, false)]
+        [InlineData(false, false, false)]
+        public async Task Can_POST_With_AgreementPeriod(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate)
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var extensionOption = hasExtensionOption ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes, organization.Uuid, 10, 0)).RandomItem() : null;
+            var input = new ContractAgreementPeriodDataWriteRequestDTO
+            {
+                DurationMonths = isContinuous ? null : A<int>() % 12,
+                DurationYears = isContinuous ? null : Math.Abs(A<int>()),
+                IsContinuous = isContinuous,
+                ExtensionOptionsUsed = Math.Abs(A<int>()),
+                IrrevocableUntil = hasIrrevocableDate ? A<DateTime>() : null,
+                ExtensionOptionsUuid = extensionOption?.Uuid
+            };
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                AgreementPeriod = input
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).AgreementPeriod;
+            Assert.Equal(input.DurationMonths, freshDTO.DurationMonths);
+            Assert.Equal(input.DurationYears, freshDTO.DurationYears);
+            Assert.Equal(input.IsContinuous, freshDTO.IsContinuous);
+            Assert.Equal(input.ExtensionOptionsUsed, freshDTO.ExtensionOptionsUsed);
+            Assert.Equal(input.ExtensionOptionsUuid, freshDTO.ExtensionOptions?.Uuid);
+            Assert.Equal(input.IrrevocableUntil, freshDTO.IrrevocableUntil);
+        }
+
+        private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
         {
             var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
             var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();

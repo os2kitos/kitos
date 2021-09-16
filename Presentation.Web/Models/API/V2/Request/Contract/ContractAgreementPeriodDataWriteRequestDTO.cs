@@ -11,14 +11,14 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Constraints:
         ///     - If DurationMonths/Years are defined then IsContinuous must be null or false
         /// </summary>
-        [Range(1, int.MaxValue)]
+        [Range(0, int.MaxValue)]
         public int? DurationYears { get; set; }
         /// <summary>
         /// If the agreement has a fixed duration, optionally define the years + months for which it is valid
         /// Constraints:
         ///     - If DurationMonths/Years are defined then IsContinuous must be null or false
         /// </summary>
-        [Range(1,11)]
+        [Range(0,11)]
         public int? DurationMonths { get; set; }
         /// <summary>
         /// Determines if the agreement has no fixed duration
