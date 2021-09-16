@@ -753,7 +753,6 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
-<<<<<<< HEAD
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
         {
             if (extendMultiplier < 0)
