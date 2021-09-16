@@ -63,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var option = options.First(x => x.Name.Equals(newName)); //Get the newly created type.
 
             //Disable the option
-            await EntityOptionHelper.SendChangeOptionIsObligatoryAsync(apiv1OptionResource, createdType.Id, false);
+            await EntityOptionHelper.SendChangeOptionIsObligatoryAsync(apiv1OptionResource, createdType.Id, false).DisposeAsync();
 
             //Act
             var result = await OptionV2ApiHelper.GetOptionAsync(apiv2OptionResource, option.Uuid, organizationUuid);

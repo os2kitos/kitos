@@ -587,30 +587,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
-            // Compare lists to find which needs to be remove and which need to be added
-            var rightsKeys = systemUsage.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
-            var userRoleKeys = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+            var roleAssignments = userRolePairs
+                .Select(x => x.Select(pair => (pair.RoleUuid, pair.UserUuid)))
+                .GetValueOrFallback(new List<(Guid RoleUuid, Guid UserUuid)>());
 
-            var toRemove = rightsKeys.Except(userRoleKeys);
-            var toAdd = userRoleKeys.Except(rightsKeys);
-
-            foreach (var userRolePair in toRemove)
-            {
-                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
-
-                if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
-            }
-
-            foreach (var userRolePair in toAdd)
-            {
-                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
-
-                if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
-            }
-
-            return systemUsage;
+            return _roleAssignmentService
+                .BatchUpdateRoles(systemUsage, roleAssignments)
+                .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)

@@ -104,20 +104,20 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Assert.Equal(HttpStatusCode.Created, assignRoleResponse.StatusCode);
 
             // System changes
-            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled);
-            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId); // Using default organization as BelongsTo
+            await ItSystemHelper.SendSetDisabledRequestAsync(system.Id, systemDisabled).DisposeAsync();
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).DisposeAsync();
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organizationId, organizationId).DisposeAsync(); // Using default organization as BelongsTo
 
             var availableBusinessTypeOptions = (await ItSystemHelper.GetBusinessTypeOptionsAsync(organizationId)).ToList();
             var businessType = availableBusinessTypeOptions[Math.Abs(A<int>()) % availableBusinessTypeOptions.Count];
-            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId).DisposeAsync();
 
             var taskRefs = (await ItSystemHelper.GetAvailableTaskRefsRequestAsync(system.Id)).ToList();
             var taskRef = taskRefs[Math.Abs(A<int>()) % taskRefs.Count];
-            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId);
+            await ItSystemHelper.SendAddTaskRefRequestAsync(system.Id, taskRef.TaskRef.Id, organizationId).DisposeAsync();
 
             // Parent system 
-            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled);
+            await ItSystemHelper.SendSetDisabledRequestAsync(systemParent.Id, systemParentDisabled).DisposeAsync();
 
             // System Usage changes
             var body = new
@@ -143,8 +143,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItSystemUsageHelper.SetIsHoldingDocumentRequestAsync(systemUsage.Id, isHoldingDocument);
 
             // Responsible Organization Unit
-            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId); //Adding default organization as organization unit
-            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId); //Using default organization as responsible organization unit
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationId, organizationId).DisposeAsync(); //Adding default organization as organization unit
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationId).DisposeAsync(); //Using default organization as responsible organization unit
 
             //References
             var reference = await ReferencesHelper.CreateReferenceAsync(A<string>(), A<string>(), A<string>(), dto => dto.ItSystemUsage_Id = systemUsage.Id);
@@ -158,7 +158,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItContractHelper.PatchContract(contract.Id, organizationId, contractUpdateBody);
             await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
 
-            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id);
+            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id).DisposeAsync();
 
             // Project
             var project = await ItProjectHelper.CreateProject(projectName, organizationId);
@@ -173,8 +173,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             // DataProcessingRegistrations
             var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
             var dataProcessingRegistration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dataProcessingRegistrationName);
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
-            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id).DisposeAsync();
 
             // DependsOnInterfaces + IncomingSystemUsages + outgoing system usages
             var outgoingRelationSystemName = A<string>();
@@ -407,7 +407,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);
             var systemParent = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemParentName, organizationId, AccessModifier.Public);
-            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(system.Id, systemParent.Id, organizationId).DisposeAsync();
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             //Wait for read model to rebuild (wait for the LAST mutation)
@@ -415,7 +415,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await ItSystemHelper.SendSetNameRequestAsync(systemParent.Id, newSystemParentName, organizationId);
+            await ItSystemHelper.SendSetNameRequestAsync(systemParent.Id, newSystemParentName, organizationId).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -444,16 +444,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var organizationUnit1 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName1);
             var organizationUnit2 = await OrganizationHelper.CreateOrganizationUnitRequestAsync(organizationId, orgUnitName2);
 
-            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId);
-            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId);
-            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id);
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id, organizationId).DisposeAsync();
+            await ItSystemUsageHelper.SendAddOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id, organizationId).DisposeAsync();
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit1.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id);
+            await ItSystemUsageHelper.SendSetResponsibleOrganizationUnitRequestAsync(systemUsage.Id, organizationUnit2.Id).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -481,14 +481,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var organization1 = await OrganizationHelper.CreateOrganizationAsync(defaultOrganizationId, organizationName1, "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
-            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization1.Id, defaultOrganizationId);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, organization1.Id, defaultOrganizationId).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await OrganizationHelper.SendChangeOrganizationNameRequestAsync(organization1.Id, organizationName2, defaultOrganizationId);
+            await OrganizationHelper.SendChangeOrganizationNameRequestAsync(organization1.Id, organizationName2, defaultOrganizationId).DisposeAsync();
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
@@ -515,7 +515,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
 
             var businessType = await EntityOptionHelper.CreateOptionTypeAsync(EntityOptionHelper.ResourceNames.BusinessType, businessTypeName1, organizationId);
 
-            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId);
+            await ItSystemHelper.SendSetBusinessTypeRequestAsync(system.Id, businessType.Id, organizationId).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -555,14 +555,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             await ItContractHelper.PatchContract(contract.Id, organizationId, contractUpdateBody);
             await ItContractHelper.AddItSystemUsage(contract.Id, systemUsage.Id, organizationId);
 
-            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id);
+            await ItSystemUsageHelper.SendSetMainContractRequestAsync(systemUsage.Id, contract.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await ItContractHelper.SendDeleteContractRequestAsync(contract.Id);
+            await ItContractHelper.SendDeleteContractRequestAsync(contract.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -600,7 +600,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await ItProjectHelper.SendDeleteProjectAsync(project.Id);
+            await ItProjectHelper.SendDeleteProjectAsync(project.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -636,7 +636,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await ItProjectHelper.SendChangeNameRequestAsync(project.Id, newProjectName, organizationId);
+            await ItProjectHelper.SendChangeNameRequestAsync(project.Id, newProjectName, organizationId).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -667,16 +667,16 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             var systemUsage = await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             var dataProcessingRegistration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, dataProcessingRegistrationName);
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, A<YesNoIrrelevantOption>());
-            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id);
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, A<YesNoIrrelevantOption>()).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dataProcessingRegistration.Id, systemUsage.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(dataProcessingRegistration.Id, newDataProcessingRegistrationName);
-            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption);
+            await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(dataProcessingRegistration.Id, newDataProcessingRegistrationName).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendChangeIsAgreementConcludedRequestAsync(dataProcessingRegistration.Id, yesNoIrrelevantOption).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -730,7 +730,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await InterfaceHelper.SendChangeNameRequestAsync(relationInterface.Id, newRelationInterfaceName, organizationId);
+            await InterfaceHelper.SendChangeNameRequestAsync(relationInterface.Id, newRelationInterfaceName, organizationId).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -794,7 +794,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
             Console.Out.WriteLine("Read models are up to date");
 
             //Act 
-            await SystemRelationHelper.SendDeleteRelationRequestAsync(systemUsage.Id, relation.Id);
+            await SystemRelationHelper.SendDeleteRelationRequestAsync(systemUsage.Id, relation.Id).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();
@@ -871,7 +871,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
                 relation.Description,
                 relation.Reference);
 
-            await SystemRelationHelper.SendPatchRelationRequestAsync(newOutgoingRelationDTO);
+            await SystemRelationHelper.SendPatchRelationRequestAsync(newOutgoingRelationDTO).DisposeAsync();
 
             //Wait for read model to rebuild (wait for the LAST mutation)
             await WaitForReadModelQueueDepletion();

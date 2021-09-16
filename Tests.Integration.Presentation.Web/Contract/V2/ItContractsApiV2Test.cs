@@ -3,19 +3,24 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -810,7 +815,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractResponsibleDataRequestDTO(token, organization, false, false, false);
-            var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -819,7 +824,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -828,7 +833,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -837,7 +842,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractResponsibleDataWriteRequestDTO();
-            var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -888,7 +893,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractSupplierDataRequestDTO(false, false, false);
-            var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -897,7 +902,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -906,7 +911,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -915,7 +920,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractSupplierDataWriteRequestDTO();
-            var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -1119,54 +1124,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertExternalReferenceResults(inputs2, dto);
         }
 
-        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
-        {
-            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
-            orderedRandomly.First().MasterReference = true;
-            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
-                externalReferenceDataDto.MasterReference = false;
-
-            return orderedRandomly;
-        }
-
-        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
-        {
-            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
-                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
-        }
-
-
-        private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
-        {
-            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Responsible.Signed);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Responsible.SignedAt);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Responsible.SignedBy);
-        }
-
-        private static void AssertSupplier(ContractSupplierDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
-        {
-            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUuid, freshDTO.Supplier.Organization?.Uuid);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Supplier.Signed);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Supplier.SignedAt);
-            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
-        }
-
-        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, Organization organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
-        {
-            var organizationUnit = withOrgUnit
-                ? (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).RandomItem()
-                : null;
-            var contractResponsibleDataWriteRequestDto = new ContractResponsibleDataWriteRequestDTO
-            {
-                Signed = A<bool>(),
-                SignedAt = withSignedAt ? A<DateTime>() : null,
-                SignedBy = withSignedBy ? A<string>() : null,
-                OrganizationUnitUuid = organizationUnit?.Uuid
-            };
-            return contractResponsibleDataWriteRequestDto;
-        }
-
         [Fact]
         public async Task Can_POST_With_SystemUsages()
         {
@@ -1268,6 +1225,136 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Can_POST_With_Roles()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var user1 = await CreateApiUserAsync(organization);
+            var user2 = await CreateApiUserAsync(organization);
+            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = contractRoles.First();
+            var role2 = contractRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.user.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.user.Uuid
+                }
+            };
+
+            //Act
+            var createdDTO = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO()
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+                Roles = roles
+            });
+
+            //Assert
+            var freshReadDTO = await ItContractV2Helper.GetItContractAsync(token, createdDTO.Uuid);
+            AssertRoleAssignments(roles, freshReadDTO);
+        }
+
+        [Fact]
+        public async Task Can_PUT_Modify_Roles()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var user1 = await CreateApiUserAsync(organization);
+            var user2 = await CreateApiUserAsync(organization);
+            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = contractRoles.First();
+            var role2 = contractRoles.Last();
+
+            //initial roles
+            var roles1 = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.user.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.user.Uuid
+                }
+            };
+
+            //Switched roles
+            var roles2 = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user1.user.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user2.user.Uuid
+                }
+            };
+
+            //reduced roles
+            var roles3 = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user1.user.Uuid
+                }
+            };
+
+            //Empty roles
+            var roles4 = new List<RoleAssignmentRequestDTO>();
+
+            var createdDTO = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO()
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid,
+            });
+
+            //Act
+            using var put1 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles1);
+            Assert.Equal(HttpStatusCode.OK, put1.StatusCode);
+
+            //Assert
+            var freshReadDTO = await ItContractV2Helper.GetItContractAsync(token, createdDTO.Uuid);
+            AssertRoleAssignments(roles1, freshReadDTO);
+
+            //Act - switch roles
+            using var put2 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles2);
+            Assert.Equal(HttpStatusCode.OK, put2.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItContractV2Helper.GetItContractAsync(token, createdDTO.Uuid);
+            AssertRoleAssignments(roles2, freshReadDTO);
+
+            //Act - reduce roles
+            using var put3 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles3);
+            Assert.Equal(HttpStatusCode.OK, put3.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItContractV2Helper.GetItContractAsync(token, createdDTO.Uuid);
+            AssertRoleAssignments(roles3, freshReadDTO);
+
+            //Act - clear
+            using var put4 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles4);
+            Assert.Equal(HttpStatusCode.OK, put4.StatusCode);
+
+            //Assert
+            freshReadDTO = await ItContractV2Helper.GetItContractAsync(token, createdDTO.Uuid);
+            AssertRoleAssignments(roles4, freshReadDTO);
+        }
+
+		[Fact]
         public async Task Can_POST_With_DataProcessingRegistrations()
         {
             //Arrange
@@ -1387,6 +1474,25 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment4, freshDTO.DataProcessingRegistrations);
+        }
+		
+		private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
+        {
+            var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
+            var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
+            Assert.Equal(expectedRoles.Count, expectedRoles.Count);
+            for (var i = 0; i < actualroles.Count; i++)
+            {
+                var expected = expectedRoles[i];
+                var actual = actualroles[i];
+                AssertRoleAssignment(expected, actual);
+            }
+        }
+
+        private static void AssertRoleAssignment(RoleAssignmentRequestDTO expected, RoleAssignmentResponseDTO actual)
+        {
+            Assert.Equal(expected.RoleUuid, actual.Role?.Uuid);
+            Assert.Equal(expected.UserUuid, actual.User?.Uuid);
         }
 
         [Theory]
@@ -1686,6 +1792,53 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
+        }
+        private IEnumerable<ExternalReferenceDataDTO> WithRandomMaster(IEnumerable<ExternalReferenceDataDTO> references)
+        {
+            var orderedRandomly = references.OrderBy(x => A<int>()).ToList();
+            orderedRandomly.First().MasterReference = true;
+            foreach (var externalReferenceDataDto in orderedRandomly.Skip(1))
+                externalReferenceDataDto.MasterReference = false;
+
+            return orderedRandomly;
+        }
+
+        private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
+        {
+            expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
+                .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
+        }
+
+
+        private static void AssertResponsible(ContractResponsibleDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
+        {
+            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUnitUuid, freshDTO.Responsible.OrganizationUnit?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Responsible.Signed);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Responsible.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Responsible.SignedBy);
+        }
+
+        private static void AssertSupplier(ContractSupplierDataWriteRequestDTO contractResponsibleDataWriteRequestDto, ItContractResponseDTO freshDTO)
+        {
+            Assert.Equal(contractResponsibleDataWriteRequestDto.OrganizationUuid, freshDTO.Supplier.Organization?.Uuid);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.Signed, freshDTO.Supplier.Signed);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedAt?.Date, freshDTO.Supplier.SignedAt);
+            Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
+        }
+
+        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, Organization organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
+        {
+            var organizationUnit = withOrgUnit
+                ? (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).RandomItem()
+                : null;
+            var contractResponsibleDataWriteRequestDto = new ContractResponsibleDataWriteRequestDTO
+            {
+                Signed = A<bool>(),
+                SignedAt = withSignedAt ? A<DateTime>() : null,
+                SignedBy = withSignedBy ? A<string>() : null,
+                OrganizationUnitUuid = organizationUnit?.Uuid
+            };
+            return contractResponsibleDataWriteRequestDto;
         }
     }
 }

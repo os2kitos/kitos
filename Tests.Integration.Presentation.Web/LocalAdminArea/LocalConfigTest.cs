@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             const int organizationId = TestEnvironment.SecondOrganizationId;
 
             //Act - perform the action with the actual role
-            var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
+            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -37,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             //Act - perform the action with the actual role
-            var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
+            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, result.StatusCode);
@@ -179,7 +179,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             //Act - perform the action with the actual role
-            var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
+            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);
@@ -202,7 +202,7 @@ namespace Tests.Integration.Presentation.Web.LocalAdminArea
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             //Act - perform the action with the actual role
-            var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
+            using var result = await LocalConfigHelper.SendUpdateConfigRequestAsync(body, organizationId);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, result.StatusCode);

@@ -11,6 +11,7 @@ namespace Tests.Unit.Core.DomainServices.Role
         {
             return new()
             {
+                Id = A<int>(),
                 OrganizationId = A<int>(),
                 Rights = new List<ItSystemRight>
                 {

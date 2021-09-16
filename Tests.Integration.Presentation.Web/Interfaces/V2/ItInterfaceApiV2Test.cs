@@ -216,7 +216,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var uuid = A<Guid>();
 
             //Act
-            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, uuid);
+            using var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
@@ -234,7 +234,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, null, TestEnvironment.DefaultOrganizationId).DisposeAsync();
 
             //Act
-            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
+            using var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -252,7 +252,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, TestEnvironment.SecondOrganizationId, TestEnvironment.DefaultOrganizationId).DisposeAsync();
 
             //Act
-            var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
+            using var result = await InterfaceV2Helper.SendGetRightsholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -303,7 +303,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
 
             //Act
-            var result = await InterfaceV2Helper.SendGetStakeholderInterfaceAsync(token, itInterface.Uuid);
+            using var result = await InterfaceV2Helper.SendGetStakeholderInterfaceAsync(token, itInterface.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -504,7 +504,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
 
             //Act
-            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+            using var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdInterface.StatusCode);
@@ -514,7 +514,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Post_ItInterface_As_Rightsholder_To_Organization_Where_User_Is_Not_RightsHolder()
         {
             //Arrange
-            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync(); 
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
             var defaultOrgUuid = DatabaseAccess.GetEntityUuid<Organization>(TestEnvironment.DefaultOrganizationId);
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
 
@@ -528,7 +528,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
 
             //Act
-            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+            using var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdInterface.StatusCode);
@@ -551,7 +551,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
 
             //Act
-            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+            using var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, createdInterface.StatusCode);
@@ -578,7 +578,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
 
             //Act
-            var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
+            using var createdInterface = await InterfaceV2Helper.SendCreateRightsHolderItInterfaceAsync(token, input);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, createdInterface.StatusCode);
@@ -647,7 +647,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             using var response = await InterfaceV2Helper.SendUpdateRightsHolderItInterfaceAsync(token, A<Guid>(), updateParameters);
 
             //Assert
-            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode); 
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
         [Fact]
@@ -679,7 +679,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
         [Theory]
         [InlineData(true, true, true, true)]
-        [InlineData( true, true, true, false)]
+        [InlineData(true, true, true, false)]
         [InlineData(true, true, false, true)]
         [InlineData(true, false, true, true)]
         [InlineData(false, true, true, true)]
@@ -879,7 +879,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var org2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
 
             var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Id, true);
-            await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id);
+            await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id).DisposeAsync();
 
             return (token, org1, org2);
         }

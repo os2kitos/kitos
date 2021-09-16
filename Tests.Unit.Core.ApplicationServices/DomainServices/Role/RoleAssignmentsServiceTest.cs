@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
-
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -13,7 +15,7 @@ using Xunit;
 namespace Tests.Unit.Core.DomainServices.Role
 {
     public abstract class RoleAssignmentsServiceTest<TModel, TRight, TRole> : WithAutoFixture
-        where TRight : Entity, IRight<TModel, TRight, TRole>
+        where TRight : Entity, IRight<TModel, TRight, TRole>, new()
         where TRole : OptionEntity<TRight>, IRoleEntity, IOptionReference<TRight>
         where TModel : HasRightsEntity<TModel, TRight, TRole>, IOwnedByOrganization
     {
@@ -21,16 +23,19 @@ namespace Tests.Unit.Core.DomainServices.Role
         private readonly Mock<IOptionsService<TRight, TRole>> _optionsServiceMock;
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IGenericRepository<TRight>> _rightRepositoryMock;
+        private readonly Mock<IDatabaseTransaction> _transaction;
 
-        public RoleAssignmentsServiceTest()
+        protected RoleAssignmentsServiceTest()
         {
             _optionsServiceMock = new Mock<IOptionsService<TRight, TRole>>();
             _userRepository = new Mock<IUserRepository>();
             _rightRepositoryMock = new Mock<IGenericRepository<TRight>>();
+            _transaction = new Mock<IDatabaseTransaction>();
             _sut = new RoleAssignmentService<TRight, TRole, TModel>(
                 _optionsServiceMock.Object,
                 _userRepository.Object,
-                _rightRepositoryMock.Object);
+                _rightRepositoryMock.Object,
+                Mock.Of<ITransactionManager>(x => x.Begin() == _transaction.Object));
         }
 
         [Fact]
@@ -103,8 +108,10 @@ namespace Tests.Unit.Core.DomainServices.Role
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(roleId, result.Value.Role.Id);
-            Assert.Equal(userId, result.Value.User.Id);
+            var newRight = result.Value;
+            Assert.Equal(roleId, newRight.Role.Id);
+            Assert.Equal(userId, newRight.User.Id);
+            Assert.Contains(model.Rights, x => x == newRight);
         }
 
         [Fact]
@@ -184,6 +191,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             var removedRight = result.Value;
             Assert.Equal(roleId, removedRight.RoleId);
             Assert.Equal(userId, removedRight.UserId);
+            Assert.DoesNotContain(model.Rights, x => x == removedRight);
             _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
         }
 
@@ -227,7 +235,7 @@ namespace Tests.Unit.Core.DomainServices.Role
 
         [Fact]
         public void Cannot_RemoveRole_If_No_Existing_Assignment()
-        {  
+        {
             //Arrange
             var roleId = A<int>();
             var userId = A<int>();
@@ -255,7 +263,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
             var model = CreateModel((A<int>(), userId));
-            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>()}, new User { Id = userId, Uuid = userUuid } };
+            var users = new[] { new User { Id = A<int>(), Uuid = A<Guid>() }, new User { Id = userId, Uuid = userUuid } };
             var agreementRole = CreateRole(roleId, roleUuid);
             ExpectAvailableOption(model, roleId, agreementRole);
             ExpectOrganizationUsers(model, Maybe<string>.None, users);
@@ -267,8 +275,10 @@ namespace Tests.Unit.Core.DomainServices.Role
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(roleId, result.Value.Role.Id);
-            Assert.Equal(userId, result.Value.User.Id);
+            var newRight = result.Value;
+            Assert.Equal(roleId, newRight.Role.Id);
+            Assert.Equal(userId, newRight.User.Id);
+            Assert.Contains(model.Rights, x => x == newRight);
         }
 
         [Fact]
@@ -330,8 +340,6 @@ namespace Tests.Unit.Core.DomainServices.Role
             var model = CreateModel((roleId, userId));
             var user = new User { Id = userId, Uuid = userUuid };
             var agreementRole = CreateRole(roleId, roleUuid);
-            ExpectOption(model, roleId, agreementRole);
-            ExpectGetUser(userId, user);
             ExpectGetUserByUuid(userUuid, user);
             ExpectGetRoleByUuid(model.OrganizationId, roleUuid, agreementRole);
 
@@ -343,11 +351,12 @@ namespace Tests.Unit.Core.DomainServices.Role
             var removedRight = result.Value;
             Assert.Equal(roleId, removedRight.RoleId);
             Assert.Equal(userId, removedRight.UserId);
+            Assert.DoesNotContain(model.Rights, x => x == removedRight);
             _rightRepositoryMock.Verify(x => x.Delete(removedRight), Times.Once);
         }
 
         [Fact]
-        public void Can_RemoveRole_Using_Uuid_If_User_Does_Not_Exist()
+        public void Cannot_RemoveRole_Using_Uuid_If_User_Does_Not_Exist()
         {
             //Arrange
             var roleId = A<int>();
@@ -355,10 +364,8 @@ namespace Tests.Unit.Core.DomainServices.Role
             var roleUuid = A<Guid>();
             var userUuid = A<Guid>();
             var model = CreateModel((roleId, userId));
-            var user = new User { Id = userId, Uuid = userUuid };
             var agreementRole = CreateRole(roleId, roleUuid);
             ExpectOption(model, roleId, agreementRole);
-            ExpectGetUser(userId, user);
             ExpectGetUserByUuid(userUuid, Maybe<User>.None);
             ExpectGetRoleByUuid(model.OrganizationId, roleUuid, agreementRole);
 
@@ -394,6 +401,186 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
 
+        [Fact]
+        public void BatchUpdateRoles_Mirrors_Requested_Role_Assignments_To_Target()
+        {
+            //Arrange
+            var model = CreateModel();
+            var rightThatIsKept = CreateRight();
+            var rightThatIsRemoved = CreateRight();
+            model.Rights.Clear();
+            model.Rights.Add(rightThatIsKept);
+            model.Rights.Add(rightThatIsRemoved);
+
+            var expectedAddition1 = CreateRight();
+            var expectedAddition2 = CreateRight(rightThatIsRemoved.User);
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (rightThatIsKept.Role.Uuid, rightThatIsKept.User.Uuid),
+                (expectedAddition1.Role.Uuid,expectedAddition1.User.Uuid),
+
+                //Same user as the removed right but different role
+                (expectedAddition2.Role.Uuid,expectedAddition2.User.Uuid)
+            };
+
+            SetupAdditionPrerequisites(model, expectedAddition1.Role, expectedAddition1.User);
+            SetupAdditionPrerequisites(model, expectedAddition2.Role, expectedAddition2.User);
+
+            ExpectOrganizationUsers(model, Maybe<string>.None, expectedAddition1.User, expectedAddition2.User);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.IsNone);
+            var actualState = model.Rights.Select(r => (r.Role.Uuid, r.User.Uuid)).ToList();
+            Assert.Equal(requestedNewState, actualState);
+            _transaction.Verify(x => x.Commit(), Times.Once());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_New_User_Is_Not_In_Organization()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var expectedAddition1 = CreateRight();
+            var expectedAddition2 = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (expectedAddition1.Role.Uuid,expectedAddition1.User.Uuid),
+                (expectedAddition2.Role.Uuid,expectedAddition2.User.Uuid)
+            };
+
+            SetupAdditionPrerequisites(model, expectedAddition1.Role, expectedAddition1.User);
+            SetupAdditionPrerequisites(model, expectedAddition2.Role, expectedAddition2.User);
+
+            //user 2 is not in organization
+            ExpectOrganizationUsers(model, Maybe<string>.None, expectedAddition1.User);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {expectedAddition2.Role.Uuid} from user with Uuid: {expectedAddition2.User.Uuid}, with following error message: User Id {expectedAddition2.User.Id} is invalid in the context of assign role {expectedAddition2.Role.Id} to {typeof(TModel)} with id {model.Id} in organization with id '{model.OrganizationId}'", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_Role_Is_Not_Available()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectAvailableOption(model, addition.RoleId, Maybe<TRole>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Invalid role id", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_Role_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectGetRoleByUuid(model.OrganizationId, addition.Role.Uuid, Maybe<TRole>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find role with Uuid: {addition.Role.Uuid}", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
+        }
+
+        [Fact]
+        public void Cannot_BatchUpdateRoles_If_User_Cannot_Be_Resolved()
+        {
+            //Arrange
+            var model = CreateModel();
+            model.Rights.Clear();
+
+            var addition = CreateRight();
+
+            var requestedNewState = new List<(Guid roleUuid, Guid userUuid)>()
+            {
+                (addition.Role.Uuid,addition.User.Uuid),
+            };
+
+            SetupAdditionPrerequisites(model, addition.Role, addition.User);
+            ExpectGetUserByUuid(addition.User.Uuid, Maybe<User>.None);
+
+            //Act
+            var error = _sut.BatchUpdateRoles(model, requestedNewState);
+
+            //Assert
+            Assert.True(error.HasValue);
+            Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find user with Uuid: {addition.User.Uuid}", error.Value.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
+        }
+
+        private void SetupAdditionPrerequisites(TModel model, TRole role, User user)
+        {
+            ExpectGetRoleByUuid(model.OrganizationId, role.Uuid, role);
+            ExpectGetUserByUuid(user.Uuid, user);
+            ExpectAvailableOption(model, role.Id, role);
+        }
+
+        private TRight CreateRight(User predefinedUser = null)
+        {
+            var role = CreateRole();
+            var user = predefinedUser ?? CreateUser();
+            return new TRight
+            {
+                Role = role,
+                User = user,
+                RoleId = role.Id,
+                UserId = user.Id
+            };
+        }
+
+        private User CreateUser()
+        {
+            return new User()
+            {
+                Uuid = A<Guid>(),
+                Id = A<int>()
+            };
+        }
+
         private void ExpectAvailableRoles(TModel model, TRole[] availableRoles)
         {
             _optionsServiceMock.Setup(x => x.GetAvailableOptions(model.OrganizationId))
@@ -412,7 +599,7 @@ namespace Tests.Unit.Core.DomainServices.Role
                 .Returns(agreementRole.Select(role => (role, true)));
         }
 
-        private void ExpectOrganizationUsers(TModel model, Maybe<string> emailQuery, User[] users)
+        private void ExpectOrganizationUsers(TModel model, Maybe<string> emailQuery, params User[] users)
         {
             _userRepository.Setup(x => x.SearchOrganizationUsers(model.OrganizationId, emailQuery))
                 .Returns(users.AsQueryable());
@@ -448,7 +635,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             {
                 _optionsServiceMock.Setup(x => x.GetOptionByUuid(orgId, roleUuid)).Returns(Maybe<(TRole option, bool available)>.None);
             }
-            
+
         }
     }
 }
