@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
+using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -22,16 +23,19 @@ namespace Tests.Unit.Core.DomainServices.Role
         private readonly Mock<IOptionsService<TRight, TRole>> _optionsServiceMock;
         private readonly Mock<IUserRepository> _userRepository;
         private readonly Mock<IGenericRepository<TRight>> _rightRepositoryMock;
+        private readonly Mock<IDatabaseTransaction> _transaction;
 
         protected RoleAssignmentsServiceTest()
         {
             _optionsServiceMock = new Mock<IOptionsService<TRight, TRole>>();
             _userRepository = new Mock<IUserRepository>();
             _rightRepositoryMock = new Mock<IGenericRepository<TRight>>();
+            _transaction = new Mock<IDatabaseTransaction>();
             _sut = new RoleAssignmentService<TRight, TRole, TModel>(
                 _optionsServiceMock.Object,
                 _userRepository.Object,
-                _rightRepositoryMock.Object);
+                _rightRepositoryMock.Object,
+                Mock.Of<ITransactionManager>(x => x.Begin() == _transaction.Object));
         }
 
         [Fact]
@@ -432,6 +436,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.True(error.IsNone);
             var actualState = model.Rights.Select(r => (r.Role.Uuid, r.User.Uuid)).ToList();
             Assert.Equal(requestedNewState, actualState);
+            _transaction.Verify(x => x.Commit(), Times.Once());
         }
 
         [Fact]
@@ -463,6 +468,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.True(error.HasValue);
             Assert.Equal($"Failed to assign role with Uuid: {expectedAddition2.Role.Uuid} from user with Uuid: {expectedAddition2.User.Uuid}, with following error message: User Id {expectedAddition2.User.Id} is invalid in the context of assign role {expectedAddition2.Role.Id} to {typeof(TModel)} with id {model.Id} in organization with id '{model.OrganizationId}'", error.Value.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
         }
 
         [Fact]
@@ -489,6 +495,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.True(error.HasValue);
             Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Invalid role id", error.Value.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
         }
 
         [Fact]
@@ -515,6 +522,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.True(error.HasValue);
             Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find role with Uuid: {addition.Role.Uuid}", error.Value.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
         }
 
         [Fact]
@@ -541,6 +549,7 @@ namespace Tests.Unit.Core.DomainServices.Role
             Assert.True(error.HasValue);
             Assert.Equal($"Failed to assign role with Uuid: {addition.Role.Uuid} from user with Uuid: {addition.User.Uuid}, with following error message: Could not find user with Uuid: {addition.User.Uuid}", error.Value.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, error.Value.FailureType);
+            _transaction.Verify(x => x.Commit(), Times.Never());
         }
 
         private void SetupAdditionPrerequisites(TModel model, TRole role, User user)

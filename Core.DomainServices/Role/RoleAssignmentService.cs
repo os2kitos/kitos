@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Options;
+using Infrastructure.Services.DataAccess;
 
 
 namespace Core.DomainServices.Role
@@ -18,15 +19,18 @@ namespace Core.DomainServices.Role
         private readonly IOptionsService<TRight, TRole> _localRoleOptionsService;
         private readonly IUserRepository _userRepository;
         private readonly IGenericRepository<TRight> _rightsRepository;
+        private readonly ITransactionManager _transactionManager;
 
         public RoleAssignmentService(
             IOptionsService<TRight, TRole> localRoleOptionsService,
             IUserRepository userRepository,
-            IGenericRepository<TRight> rightsRepository)
+            IGenericRepository<TRight> rightsRepository,
+            ITransactionManager transactionManager)
         {
             _localRoleOptionsService = localRoleOptionsService;
             _userRepository = userRepository;
             _rightsRepository = rightsRepository;
+            _transactionManager = transactionManager;
         }
 
         public IEnumerable<TRole> GetApplicableRoles(TModel model)
@@ -141,10 +145,12 @@ namespace Core.DomainServices.Role
 
         public Maybe<OperationError> BatchUpdateRoles(TModel model, IEnumerable<(Guid roleUuid, Guid userUuid)> roleAssignments)
         {
+            using var transaction = _transactionManager.Begin();
+
             if (model == null) throw new ArgumentNullException(nameof(model));
             if (roleAssignments == null) throw new ArgumentNullException(nameof(roleAssignments));
 
-            var existingRights = model.Rights.ToDictionary(x=>(x.Role.Uuid,x.User.Uuid));
+            var existingRights = model.Rights.ToDictionary(x => (x.Role.Uuid, x.User.Uuid));
             List<(Guid roleUuid, Guid userUuid)> existingKeys = model.Rights.Select(x => (x.Role.Uuid, x.User.Uuid)).ToList();
             var nextStateKeys = roleAssignments.ToList();
 
@@ -154,7 +160,7 @@ namespace Core.DomainServices.Role
             foreach (var ruleUserPair in toRemove)
             {
                 var existingRight = existingRights[ruleUserPair];
-                var removeResult = model.RemoveRole(existingRight.Role, existingRight.User);
+                var removeResult = RemoveRole(model, existingRight.Role, existingRight.User);
 
                 if (removeResult.Failed)
                     return new OperationError($"Failed to remove role with Uuid: {ruleUserPair.roleUuid} from user with Uuid: {ruleUserPair.userUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
@@ -168,6 +174,7 @@ namespace Core.DomainServices.Role
                     return new OperationError($"Failed to assign role with Uuid: {userRolePair.roleUuid} from user with Uuid: {userRolePair.userUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
             }
 
+            transaction.Commit();
             return Maybe<OperationError>.None;
         }
 
