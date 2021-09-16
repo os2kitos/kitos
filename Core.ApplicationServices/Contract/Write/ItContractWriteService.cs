@@ -256,7 +256,7 @@ namespace Core.ApplicationServices.Contract.Write
             return Maybe<OperationError>.None;
         }
 
-        private Result<ItContract, OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
+        private Maybe<OperationError> UpdateDataProcessingRegistrations(ItContract contract, IEnumerable<Guid> dataProcessingRegistrationUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
@@ -267,10 +267,10 @@ namespace Core.ApplicationServices.Contract.Write
                 itContract => itContract.DataProcessingRegistrations.ToList(),
                 (itContract, registration) => itContract.AssignDataProcessingRegistration(registration).MatchFailure(),
                 (itContract, registration) => itContract.RemoveDataProcessingRegistration(registration).MatchFailure()
-            ).Match<Result<ItContract, OperationError>>(error => error, () => contract);
+            );
         }
 
-        private Result<ItContract, OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
+        private Maybe<OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
              (
