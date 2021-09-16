@@ -584,5 +584,67 @@ namespace Tests.Unit.Core.Model
             Assert.Contains("Data processing registration not assigned", result.Error.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
+
+        [Fact]
+        public void Can_ResetPaymentFrequency()
+        {
+            //Arrange
+            var sut = new ItContract()
+            {
+                PaymentFreqency = new PaymentFreqencyType()
+            };
+
+            //Act
+            sut.ResetPaymentFrequency();
+
+            //Assert
+            Assert.Null(sut.PaymentFreqency);
+        }
+
+        [Fact]
+        public void Can_ResetPaymentModel()
+        {
+            //Arrange
+            var sut = new ItContract()
+            {
+                PaymentModel = new PaymentModelType()
+            };
+
+            //Act
+            sut.ResetPaymentModel();
+
+            //Assert
+            Assert.Null(sut.PaymentModel);
+        }
+
+        [Fact]
+        public void Can_ResetPriceRegulation()
+        {
+            //Arrange
+            var sut = new ItContract()
+            {
+                PriceRegulation = new PriceRegulationType()
+            };
+
+            //Act
+            sut.ResetPriceRegulation();
+
+            //Assert
+            Assert.Null(sut.PriceRegulation);
+        }
+
+        [Fact]
+        public void Can_ResetPaymentMilestones()
+        {
+            //Arrange
+            var sut = new ItContract();
+            sut.PaymentMilestones.Add(new PaymentMilestone());
+
+            //Act
+            sut.ResetPaymentMilestones();
+
+            //Assert
+            Assert.Empty(sut.PaymentMilestones);
+        }
     }
 }

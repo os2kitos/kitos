@@ -52,6 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
+            var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
 
             return new ItContractModificationParameters
             {
@@ -66,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ExternalReferences = references.FromNullable().Select(MapReferences),
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
+				PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
                 AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod)
             };
         }
@@ -106,6 +108,23 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ApprovedAt = x.ApprovedAt,
                 ExpectedAt = x.ExpectedAt
             }).ToList();
+        }
+
+        public ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO dto)
+        {
+            return new()
+            {
+                OperationsRemunerationStartedAt = (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                PaymentFrequencyUuid = dto.PaymentFrequencyUuid.AsChangedValue(),
+                PaymentModelUuid = dto.PaymentModelUuid.AsChangedValue(),
+                PriceRegulationUuid = dto.PriceRegulationUuid.AsChangedValue(),
+                PaymentMileStones = dto.PaymentMileStones?.Select(x => new ItContractPaymentMilestone()
+                {
+                    Title = x.Title,
+                    Approved = x.Approved,
+                    Expected = x.Expected
+                }).ToList()
+            };
         }
 
         public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)

@@ -753,6 +753,7 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
+<<<<<<< HEAD
         public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
         {
             if (extendMultiplier < 0)
@@ -785,6 +786,48 @@ namespace Core.DomainModel.ItContract
             DurationOngoing = ongoing;
             DurationYears = durationYears;
             DurationMonths = durationMonths;
+			
+			return Maybe<OperationError>.None;
+		}
+
+        public void ResetPaymentFrequency()
+        {
+            PaymentFreqency.Track();
+            PaymentFreqency = null;
+        }
+
+        public void ResetPaymentModel()
+        {
+            PaymentModel.Track();
+            PaymentModel = null;
+        }
+
+        public void ResetPriceRegulation()
+        {
+            PriceRegulation.Track();
+            PriceRegulation = null;
+        }
+
+        public void ResetPaymentMilestones()
+        {
+            PaymentMilestones.Track();
+            PaymentMilestones.Clear();
+        }
+
+        public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
+        {
+            if(string.IsNullOrEmpty(title))
+                return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
+
+            if (expected.HasValue == false && approved.HasValue == false)
+                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
+
+            PaymentMilestones.Add(new PaymentMilestone()
+            {
+                Title = title,
+                Expected = expected?.Date,
+                Approved = approved?.Date
+            });
 
             return Maybe<OperationError>.None;
         }
