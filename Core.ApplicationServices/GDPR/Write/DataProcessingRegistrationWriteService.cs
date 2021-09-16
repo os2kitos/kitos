@@ -33,7 +33,6 @@ namespace Core.ApplicationServices.GDPR.Write
         private readonly ITransactionManager _transactionManager;
         private readonly IDatabaseControl _databaseControl;
         private readonly IAssignmentUpdateService _assignmentUpdateService;
-        private readonly IEntityResolver _entityResolver;
 
         public DataProcessingRegistrationWriteService(
             IDataProcessingRegistrationApplicationService applicationService,
@@ -43,8 +42,7 @@ namespace Core.ApplicationServices.GDPR.Write
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
             IDatabaseControl databaseControl, 
-            IAssignmentUpdateService assignmentUpdateService,
-            IEntityResolver entityResolver)
+            IAssignmentUpdateService assignmentUpdateService)
         {
             _applicationService = applicationService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -54,7 +52,6 @@ namespace Core.ApplicationServices.GDPR.Write
             _transactionManager = transactionManager;
             _databaseControl = databaseControl;
             _assignmentUpdateService = assignmentUpdateService;
-            _entityResolver = entityResolver;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters)
@@ -233,9 +230,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 "oversight options",
                 dpr,
                 oversightOptionUuids,
-                oversightUuid => _entityResolver.ResolveEntityFromUuid<DataProcessingOversightOption>(oversightUuid),
-                registration => registration.OversightOptions,
-                (registration, oversightOption) => _applicationService.AssignOversightOption(registration.Id, oversightOption.Id).MatchFailure(),
+                oversightUuid => _entityIdentityResolver.ResolveDbId<DataProcessingOversightOption>(oversightUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {oversightUuid}", OperationFailure.BadInput)),
+                registration => registration.OversightOptions.ToList(),
+                (registration, oversightOptionId) => _applicationService.AssignOversightOption(registration.Id, oversightOptionId).MatchFailure(),
                 (registration, oversightOption) => _applicationService.RemoveOversightOption(registration.Id, oversightOption.Id).MatchFailure()
             );
         }
@@ -263,9 +260,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 "system usage",
                 dpr,
                 systemUsageUuids.FromNullable(),
-                usageUuid => _entityResolver.ResolveEntityFromUuid<ItSystemUsage>(usageUuid),
-                registration => registration.SystemUsages,
-                (registration, usage) => _applicationService.AssignSystem(registration.Id, usage.Id).MatchFailure(),
+                usageUuid => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(usageUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {usageUuid}", OperationFailure.BadInput)),
+                registration => registration.SystemUsages.ToList(),
+                (registration, usageId) => _applicationService.AssignSystem(registration.Id, usageId).MatchFailure(),
                 (registration, usage) => _applicationService.RemoveSystem(registration.Id, usage.Id).MatchFailure()
             ).Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
         }
@@ -277,9 +274,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 "sub data processor",
                 dpr,
                 organizationUuids,
-                subDataProcessorUuid => _entityResolver.ResolveEntityFromUuid<Organization>(subDataProcessorUuid),
-                registration => registration.SubDataProcessors,
-                (registration, subDataProcessor) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure(),
+                subDataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(subDataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {subDataProcessorUuid}", OperationFailure.BadInput)),
+                registration => registration.SubDataProcessors.ToList(),
+                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId).MatchFailure(),
                 (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure()
                 );
         }
@@ -291,9 +288,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 "data processor",
                 dpr,
                 organizationUuids,
-                dataProcessorUuid => _entityResolver.ResolveEntityFromUuid<Organization>(dataProcessorUuid),
-                registration => registration.DataProcessors,
-                (registration, dataProcessor) => _applicationService.AssignDataProcessor(registration.Id, dataProcessor.Id).MatchFailure(),
+                dataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(dataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {dataProcessorUuid}", OperationFailure.BadInput)),
+                registration => registration.DataProcessors.ToList(),
+                (registration, dataProcessorId) => _applicationService.AssignDataProcessor(registration.Id, dataProcessorId).MatchFailure(),
                 (registration, dataProcessor) => _applicationService.RemoveDataProcessor(registration.Id, dataProcessor.Id).MatchFailure()
             );
         }
@@ -305,9 +302,9 @@ namespace Core.ApplicationServices.GDPR.Write
                 "insecure third country",
                 dpr,
                 countryOptionUuids,
-                optionUuid => _entityResolver.ResolveEntityFromUuid<DataProcessingCountryOption>(optionUuid),
-                registration => registration.InsecureCountriesSubjectToDataTransfer,
-                (registration, countryOption) => _applicationService.AssignInsecureThirdCountry(registration.Id, countryOption.Id).MatchFailure(),
+                optionUuid => _entityIdentityResolver.ResolveDbId<DataProcessingCountryOption>(optionUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {optionUuid}", OperationFailure.BadInput)),
+                registration => registration.InsecureCountriesSubjectToDataTransfer.ToList(),
+                (registration, countryOptionId) => _applicationService.AssignInsecureThirdCountry(registration.Id, countryOptionId).MatchFailure(),
                 (registration, countryOption) => _applicationService.RemoveInsecureThirdCountry(registration.Id, countryOption.Id).MatchFailure()
             );
         }

@@ -53,13 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
-            return references.Select(x => new UpdatedExternalReferenceProperties
-            {
-                Title = x.Title,
-                DocumentId = x.DocumentId,
-                Url = x.Url,
-                MasterReference = x.MasterReference
-            }).ToList();
+            return BaseMapReferences(references); ;
         }
 
         public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
