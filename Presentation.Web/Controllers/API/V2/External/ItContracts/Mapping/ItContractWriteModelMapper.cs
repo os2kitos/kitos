@@ -74,11 +74,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new()
             {
-                OperationsRemunerationStartedAt = dto.OperationsRemunerationStartedAt?.FromNullable().AsChangedValue(),
+                OperationsRemunerationStartedAt = (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
                 PaymentFrequencyUuid = dto.PaymentFrequencyUuid.AsChangedValue(),
                 PaymentModelUuid = dto.PaymentModelUuid.AsChangedValue(),
                 PriceRegulationUuid = dto.PriceRegulationUuid.AsChangedValue(),
-                PaymentMileStones = dto.PaymentMileStones.Select(x => new ItContractPaymentMilestone()
+                PaymentMileStones = dto.PaymentMileStones?.Select(x => new ItContractPaymentMilestone()
                 {
                     Title = x.Title,
                     Approved = x.Approved,

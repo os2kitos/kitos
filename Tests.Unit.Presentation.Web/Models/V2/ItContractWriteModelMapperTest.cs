@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.DomainModel.ItContract;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
@@ -59,19 +60,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false, false, true, false)]
-		[InlineData(false, false, false, false, false, false, false, true, false, false)]
-		[InlineData(false, false, false, false, false, false, true, false, false, false)]
-		[InlineData(false, false, false, false, false, true, false, false, false, false)]
-		[InlineData(false, false, false, false, true, false, false, false, false, false)]
-		[InlineData(false, false, false, true, false, false, false, false, false, false)]
-		[InlineData(false, false, true, false, false, false, false, false, false, false)]
-		[InlineData(false, true, false, false, false, false, false, false, false, false)]
-		[InlineData(true, false, false, false, false, false, false, false, false, false)]
-		[InlineData(true, true, true, true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences, bool noDataProcessingRegistrations)
+        [InlineData(false, false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false, false, true, false)]
+        [InlineData(false, false, false, false, false, false, false, false, true, false, false)]
+		[InlineData(false, false, false, false, false, false, false, true, false, false, false)]
+		[InlineData(false, false, false, false, false, false, true, false, false, false, false)]
+		[InlineData(false, false, false, false, false, true, false, false, false, false, false)]
+		[InlineData(false, false, false, false, true, false, false, false, false, false, false)]
+		[InlineData(false, false, false, true, false, false, false, false, false, false, false)]
+		[InlineData(false, false, true, false, false, false, false, false, false, false, false)]
+		[InlineData(false, true, false, false, false, false, false, false, false, false, false)]
+		[InlineData(true, false, false, false, false, false, false, false, false, false, false)]
+		[InlineData(true, true, true, true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences, bool noDataProcessingRegistrations, bool noPaymentModel)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -86,6 +88,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
             if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
+            if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -103,6 +106,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noExternalReferences, output.ExternalReferences.IsNone);
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
             Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
+            Assert.Equal(noPaymentModel, output.PaymentModel.IsNone);
         }
 
         [Fact]
@@ -487,6 +491,108 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
             var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
             AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_PaymentModel(bool hasValues)
+        {
+            //Arrange
+            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
+            var input = new ContractPaymentModelDataWriteRequestDTO()
+            {
+                OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
+                PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
+                PaymentModelUuid = hasValues ? A<Guid>() : null,
+                PriceRegulationUuid = hasValues ? A<Guid>() : null,
+                PaymentMileStones = milestones
+            };
+
+            //Act
+            var output = _sut.MapPaymentModel(input);
+
+            //Assert
+            AssertPaymentModel(input, output, hasValues);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_PaymentModel_FromPOST(bool hasValues)
+        {
+            //Arrange
+            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
+            var input = new ContractPaymentModelDataWriteRequestDTO()
+            {
+                OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
+                PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
+                PaymentModelUuid = hasValues ? A<Guid>() : null,
+                PriceRegulationUuid = hasValues ? A<Guid>() : null,
+                PaymentMileStones = milestones
+            };
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { PaymentModel = input });
+
+            //Assert
+            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_PaymentModel_FromPUT(bool hasValues)
+        {
+            //Arrange
+            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
+            var input = new ContractPaymentModelDataWriteRequestDTO()
+            {
+                OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
+                PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
+                PaymentModelUuid = hasValues ? A<Guid>() : null,
+                PriceRegulationUuid = hasValues ? A<Guid>() : null,
+                PaymentMileStones = milestones
+            };
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO { PaymentModel = input });
+
+            //Assert
+            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+        }
+
+        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output, bool hasValues)
+        {
+            if (hasValues)
+            {
+                Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue);
+                Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
+                Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
+                Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
+                AssertPaymentMilestones(input.PaymentMileStones, output.PaymentMileStones.Value);
+            }
+            else
+            {
+                Assert.True(output.OperationsRemunerationStartedAt.NewValue.IsNone);
+                Assert.Null(output.PaymentFrequencyUuid.NewValue);
+                Assert.Null(output.PaymentModelUuid.NewValue);
+                Assert.Null(output.PriceRegulationUuid.NewValue);
+                Assert.True(output.PaymentMileStones.IsNone);
+            }
+        }
+
+        private static void AssertPaymentMilestones(IEnumerable<PaymentMileStoneDTO> input, IEnumerable<ItContractPaymentMilestone> output)
+        {
+            var expected = input.OrderBy(x => x.Title).ToList();
+            var actual = output.OrderBy(x => x.Title).ToList();
+            Assert.Equal(expected.Count, actual.Count);
+            foreach (var pair in expected.Zip(actual, (e, a) => new { inputDTO = e, mappedChange = a }))
+            {
+                Assert.Equal(pair.inputDTO.Approved, pair.mappedChange.Approved);
+                Assert.Equal(pair.inputDTO.Expected, pair.mappedChange.Expected);
+                Assert.Equal(pair.inputDTO.Title, pair.mappedChange.Title);
+            }
         }
 
         private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)

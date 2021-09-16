@@ -1416,6 +1416,74 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPaymentModel(paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType, contractDTO.PaymentModel);
         }
 
+        [Fact]
+        public async Task Can_PUT_With_PaymentModel()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var (paymentModelRequest1, paymentFrequencyType1, paymentModelType1, priceRegulationType1) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, true);
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Act
+            using var response1 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest1);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var contractDTO1 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest1, paymentFrequencyType1, paymentModelType1, priceRegulationType1, contractDTO1.PaymentModel);
+
+            //Act
+            var (paymentModelRequest2, paymentFrequencyType2, paymentModelType2, priceRegulationType2) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, false);
+            using var response2 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest2);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            var contractDTO2 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest2, paymentFrequencyType2, paymentModelType2, priceRegulationType2, contractDTO2.PaymentModel);
+
+            //Act
+            var (paymentModelRequest3, paymentFrequencyType3, paymentModelType3, priceRegulationType3) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, false, false);
+            using var response3 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest3);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            var contractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest3, paymentFrequencyType3, paymentModelType3, priceRegulationType3, contractDTO3.PaymentModel);
+
+            //Act
+            var (paymentModelRequest4, paymentFrequencyType4, paymentModelType4, priceRegulationType4) = await CreatePaymentModelRequestAsync(organization.Uuid, true, false, false, false);
+            using var response4 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest4);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
+
+            //Assert
+            var contractDTO4 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest4, paymentFrequencyType4, paymentModelType4, priceRegulationType4, contractDTO4.PaymentModel);
+
+            //Act
+            var (paymentModelRequest5, paymentFrequencyType5, paymentModelType5, priceRegulationType5) = await CreatePaymentModelRequestAsync(organization.Uuid, false, false, false, false);
+            using var response5 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest5);
+            Assert.Equal(HttpStatusCode.OK, response5.StatusCode);
+
+            //Assert
+            var contractDTO5 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest5, paymentFrequencyType5, paymentModelType5, priceRegulationType5, contractDTO5.PaymentModel);
+
+            //Act
+            var paymentModelRequest6 = new ContractPaymentModelDataWriteRequestDTO();
+            using var response6 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest6);
+            Assert.Equal(HttpStatusCode.OK, response6.StatusCode);
+
+            //Assert
+            var contractDTO6 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertPaymentModel(paymentModelRequest6, null, null, null, contractDTO6.PaymentModel);
+        }
+
         private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO expected, IdentityNamePairResponseDTO paymentFrequencyType, IdentityNamePairResponseDTO paymentModelType, IdentityNamePairResponseDTO priceRegulationType, ContractPaymentModelDataResponseDTO actual)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
@@ -1423,15 +1491,22 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertCrossReference(paymentModelType, actual.PaymentModel);
             AssertCrossReference(priceRegulationType, actual.PriceRegulation);
 
-            var expectedMilestones = expected.PaymentMileStones.OrderBy(x => x.Title).ToList();
-            var actualMilestones = actual.PaymentMileStones.OrderBy(x => x.Title).ToList();
-
-            Assert.Equal(expectedMilestones.Count, actualMilestones.Count);
-            for (var i = 0; i < expectedMilestones.Count; i++)
+            if (expected.PaymentMileStones == null)
             {
-                Assert.Equal(expectedMilestones[i].Title, actualMilestones[i].Title);
-                Assert.Equal(expectedMilestones[i].Expected?.Date, actualMilestones[i].Expected?.Date);
-                Assert.Equal(expectedMilestones[i].Approved?.Date, actualMilestones[i].Approved?.Date);
+                Assert.Empty(actual.PaymentMileStones);
+            }
+            else
+            {
+                var expectedMilestones = expected.PaymentMileStones.OrderBy(x => x.Title).ToList();
+                var actualMilestones = actual.PaymentMileStones.OrderBy(x => x.Title).ToList();
+
+                Assert.Equal(expectedMilestones.Count, actualMilestones.Count);
+                for (var i = 0; i < expectedMilestones.Count; i++)
+                {
+                    Assert.Equal(expectedMilestones[i].Title, actualMilestones[i].Title);
+                    Assert.Equal(expectedMilestones[i].Expected?.Date, actualMilestones[i].Expected?.Date);
+                    Assert.Equal(expectedMilestones[i].Approved?.Date, actualMilestones[i].Approved?.Date);
+                }
             }
         }
 

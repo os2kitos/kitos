@@ -40,6 +40,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IAssignmentUpdateService _assignmentUpdateService;
         private readonly IItSystemUsageService _usageService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
+        private readonly IGenericRepository<PaymentMilestone> _paymentMilestoneRepository;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -55,7 +56,8 @@ namespace Core.ApplicationServices.Contract.Write
             IReferenceService referenceService,
             IAssignmentUpdateService assignmentUpdateService, 
             IItSystemUsageService usageService, 
-            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService)
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService, 
+            IGenericRepository<PaymentMilestone> paymentMilestoneRepository)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -71,6 +73,7 @@ namespace Core.ApplicationServices.Contract.Write
             _assignmentUpdateService = assignmentUpdateService;
             _usageService = usageService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
+            _paymentMilestoneRepository = paymentMilestoneRepository;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -269,16 +272,18 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentMileStones, UpdatePaymentMileStones));
         }
 
-        private static Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
+        private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
         {
             //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            var paymentMilestones = contract.PaymentMilestones.ToList();
+            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
             contract.ResetPaymentMilestones();
 
             foreach (var newMilestone in milestones)
             {
                 var error = contract.AddPaymentMilestone(newMilestone.Title, newMilestone.Expected, newMilestone.Approved);
                 if (error.HasValue)
-                    return new OperationError("Failed adding payment milestone:" + error.Value.Message.GetValueOrEmptyString(), error.Value.FailureType);
+                    return new OperationError($"Failed adding payment milestone: {error.Value.Message.GetValueOrEmptyString()}", error.Value.FailureType);
             }
 
             return Maybe<OperationError>.None;
