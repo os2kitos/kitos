@@ -60,19 +60,31 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false, false, true, false)]
-		[InlineData(false, false, false, false, false, false, false, true, false, false)]
-		[InlineData(false, false, false, false, false, false, true, false, false, false)]
-		[InlineData(false, false, false, false, false, true, false, false, false, false)]
-		[InlineData(false, false, false, false, true, false, false, false, false, false)]
-		[InlineData(false, false, false, true, false, false, false, false, false, false)]
-		[InlineData(false, false, true, false, false, false, false, false, false, false)]
-		[InlineData(false, true, false, false, false, false, false, false, false, false)]
-		[InlineData(true, false, false, false, false, false, false, false, false, false)]
-		[InlineData(true, true, true, true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences, bool noDataProcessingRegistrations)
+        [InlineData(false, false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false, false, true, false)]
+        [InlineData(false, false, false, false, false, false, false, false, true, false, false)]
+        [InlineData(false, false, false, false, false, false, false, true, false, false, false)]
+        [InlineData(false, false, false, false, false, false, true, false, false, false, false)]
+        [InlineData(false, false, false, false, false, true, false, false, false, false, false)]
+        [InlineData(false, false, false, false, true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, true, false, false, false, false, false, false, false)]
+        [InlineData(false, false, true, false, false, false, false, false, false, false, false)]
+        [InlineData(false, true, false, false, false, false, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(true, true, true, true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(
+            bool noName, 
+            bool noGeneralData, 
+            bool noParent, 
+            bool noResponsible, 
+            bool noProcurement, 
+            bool noSupplier, 
+            bool noHandoverTrials, 
+            bool noSystemUsages, 
+            bool noExternalReferences, 
+            bool noDataProcessingRegistrations,
+            bool noRoles)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -87,6 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
             if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
+            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
