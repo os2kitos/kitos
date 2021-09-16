@@ -16,6 +16,7 @@ using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
@@ -1353,7 +1354,129 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertRoleAssignments(roles4, freshReadDTO);
         }
 
-        private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
+		[Fact]
+        public async Task Can_POST_With_DataProcessingRegistrations()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+                {
+                    Name = CreateName(),
+                    OrganizationUuid = organization.Uuid
+                });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { dpr1.Uuid, dpr2.Uuid }
+            };
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(request.DataProcessingRegistrationUuids, freshDTO.DataProcessingRegistrations);
+        }
+
+        [Fact]
+        public async Task Cannot_POST_With_DataProcessingRegistrations_From_Different_Org()
+        {
+            //Arrange
+            var (token1, _, organization1) = await CreatePrerequisitesAsync();
+            var (token2, _, organization2) = await CreatePrerequisitesAsync();
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token1, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization1.Uuid
+            });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token2, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization2.Uuid
+            });
+            var request = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName(),
+                DataProcessingRegistrationUuids = new[] { dpr1.Uuid, dpr2.Uuid }
+            };
+            // Using global admin as they have full access between organizations
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using var response = await ItContractV2Helper.SendPostContractAsync(globalAdminToken.Token, request);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_DataProcessingRegistrations()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var dpr3 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+
+            var request = new CreateNewContractRequestDTO { Name = CreateName(), OrganizationUuid = organization.Uuid };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            var assignment1 = new[] { dpr1.Uuid };
+            var assignment2 = new[] { dpr1.Uuid, dpr2.Uuid };
+            var assignment3 = new[] { dpr3.Uuid, dpr2.Uuid };
+            var assignment4 = Array.Empty<Guid>();
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment1, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment2, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment3, freshDTO.DataProcessingRegistrations);
+
+            //Act
+            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Assert
+            freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
+            AssertMultiAssignment(assignment4, freshDTO.DataProcessingRegistrations);
+        }
+		
+		private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
         {
             var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
             var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
@@ -1372,7 +1495,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expected.UserUuid, actual.User?.Uuid);
         }
 
-        private static void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
             var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();

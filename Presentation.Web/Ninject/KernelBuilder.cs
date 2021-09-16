@@ -235,6 +235,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
             kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
             kernel.Bind<IAssignmentUpdateService>().To<AssignmentUpdateService>().InCommandScope(Mode);
+            kernel.Bind<IEntityResolver>().To<NinjectEntityResolver>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);

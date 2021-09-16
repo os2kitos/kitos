@@ -45,6 +45,7 @@
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
+    <Compile Include="Extensions\ResultExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Types\Factory.cs" />
     <Compile Include="Types\Maybe.cs" />

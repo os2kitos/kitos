@@ -60,18 +60,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false, true, false)]
-        [InlineData(false, false, false, false, false, false, true, false, false)]
-        [InlineData(false, false, false, false, false, true, false, false, false)]
-        [InlineData(false, false, false, false, true, false, false, false, false)]
-        [InlineData(false, false, false, true, false, false, false, false, false)]
-        [InlineData(false, false, true, false, false, false, false, false, false)]
-        [InlineData(false, true, false, false, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true, true, true, true)]
-        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences)
+        [InlineData(false, false, false, false, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false, false, false, true)]
+        [InlineData(false, false, false, false, false, false, false, false, true, false)]
+		[InlineData(false, false, false, false, false, false, false, true, false, false)]
+		[InlineData(false, false, false, false, false, false, true, false, false, false)]
+		[InlineData(false, false, false, false, false, true, false, false, false, false)]
+		[InlineData(false, false, false, false, true, false, false, false, false, false)]
+		[InlineData(false, false, false, true, false, false, false, false, false, false)]
+		[InlineData(false, false, true, false, false, false, false, false, false, false)]
+		[InlineData(false, true, false, false, false, false, false, false, false, false)]
+		[InlineData(true, false, false, false, false, false, false, false, false, false)]
+		[InlineData(true, true, true, true, true, true, true, true, true, true)]
+        public void FromPUT_Ignores_Undefined_Root_Sections(bool noName, bool noGeneralData, bool noParent, bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages, bool noExternalReferences, bool noDataProcessingRegistrations)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -85,7 +86,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
             if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
             if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
-
+            if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -102,6 +103,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noHandoverTrials, output.HandoverTrials.IsNone);
             Assert.Equal(noExternalReferences, output.ExternalReferences.IsNone);
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
         }
 
         [Fact]
@@ -490,8 +492,44 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
         }
+		
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_DataProcessingRegistrations_From_Post(bool hasValues)
+        {
+            //Arrange
+            var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new CreateNewContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
 
-        private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
+            //Act
+            var modificationParameters = _sut.FromPOST(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
+            var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
+            AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_DataProcessingRegistrations_From_Put(bool hasValues)
+        {
+            //Arrange
+            var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new UpdateContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPUT(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
+            var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
+            AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
+        }
+		
+		private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
         {
             Assert.Equal(roles.Count, rolePairs.Count);
             for (var i = 0; i < rolePairs.Count; i++)
@@ -501,7 +539,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.RoleUuid, actual.RoleUuid);
                 Assert.Equal(expected.UserUuid, actual.UserUuid);
             }
-        }
+		}
 
         private static void AssertUuids(IEnumerable<Guid> expected, IEnumerable<Guid> actual)
         {

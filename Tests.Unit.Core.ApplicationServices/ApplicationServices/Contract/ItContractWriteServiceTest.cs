@@ -8,6 +8,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -18,6 +19,7 @@ using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -50,6 +52,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
         private readonly Mock<IItSystemUsageService> _usageServiceMock;
         private readonly Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>> _roleAssignmentService;
+        private readonly Mock<IDataProcessingRegistrationApplicationService> _dprServiceMock;
 
         public ItContractWriteServiceTest()
         {
@@ -67,7 +70,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _usageServiceMock = new Mock<IItSystemUsageService>();
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object);
+            _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object,_dprServiceMock.Object);
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -738,6 +742,65 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         }
 
         [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_DataProcessingRegistrations(bool hasUsages)
+        {
+            //Arrange
+            var dprUuids = hasUsages ? Many<Guid>().ToList() : new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_DataProcessingRegistrations_If_UpdateMultiAssignment_Fails()
+        {
+            //Arrange
+            var dprUuids = Many<Guid>().ToList();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_DataProcessingRegistrations_If_Usage_Already_Assigned()
+        {
+            //Arrange
+            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            var dprUuids = new List<Guid> { dpr.Uuid };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            createdContract.DataProcessingRegistrations.Add(dpr);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Theory]
         [InlineData(true, true, true)]
         [InlineData(true, true, false)]
         [InlineData(true, false, true)]
@@ -830,7 +893,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_HandoverTrials_If_At_Least_One_Date_Is_Not_Provided()
         {
             //Arrange
-            var handoverTrialUpdates = new[] { new ItContractHandoverTrialUpdate() { HandoverTrialTypeUuid = A<Guid>() } };
+            var handoverTrialUpdates = new[] {new ItContractHandoverTrialUpdate() {HandoverTrialTypeUuid = A<Guid>()}};
 
             var handoverTrialTypes = handoverTrialUpdates
                 .Select(x => new HandoverTrialType
@@ -838,18 +901,49 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                     Uuid = x.HandoverTrialTypeUuid
                 }).ToDictionary(x => x.Uuid);
 
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
+            var (organizationUuid, parameters, createdContract, transaction) =
+                SetupCreateScenarioPrerequisites(handoverTrialUpdates: handoverTrialUpdates);
             createdContract.HandoverTrials.Add(new HandoverTrial()); //Ensure existing is cleared
 
             foreach (var handoverTrialType in handoverTrialTypes)
-                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid,
+                    handoverTrialType.Key, (handoverTrialType.Value, true));
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Failed);
-            AssertFailureWithKnownErrorDetails(result, "Failed adding handover trial:Error: expected and approved cannot both be null", OperationFailure.BadInput, transaction);
+            AssertFailureWithKnownErrorDetails(result,
+                "Failed adding handover trial:Error: expected and approved cannot both be null",
+                OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_DataProcessingRegistrations_To_Remove_Usage()
+        {
+            //Arrange
+            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            var dprUuids = new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            createdContract.DataProcessingRegistrations.Add(dpr);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
+        private void ExpectNameValidationSuccess(int contractId, string newName)
+        {
+            _itContractServiceMock.Setup(x => x.ValidateNewName(contractId, newName)).Returns(Maybe<OperationError>.None);
         }
 
         [Fact]
@@ -1028,8 +1122,9 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             IEnumerable<ItContractHandoverTrialUpdate> handoverTrialUpdates = null,
             IEnumerable<UpdatedExternalReferenceProperties> externalReferences = null,
             IEnumerable<Guid> systemUsageUuids = null,
-            IEnumerable<UserRolePair> roleAssignments = null
-                )
+            IEnumerable<UserRolePair> roleAssignments = null,
+            IEnumerable<Guid> dataProcessingRegistrationUuids = null
+            )
         {
             var organization = new Organization()
             {
@@ -1046,7 +1141,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 HandoverTrials = handoverTrialUpdates.FromNullable(),
                 ExternalReferences = externalReferences.FromNullable(),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
-                Roles = roleAssignments.FromNullable()
+                Roles = roleAssignments.FromNullable(),
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
             };
             var createdContract = new ItContract()
             {

@@ -307,7 +307,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             return _writeService
                 .Update(contractUuid, new ItContractModificationParameters
                 {
-                    SystemUsageUuids = systemUsageUuids.FromNullable() ?? new List<Guid>()
+                    SystemUsageUuids = (systemUsageUuids ?? new List<Guid>()).FromNullable()
                 })
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
@@ -331,7 +331,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            throw new NotImplementedException();
+            return _writeService
+                .Update(contractUuid, new ItContractModificationParameters
+                {
+                    DataProcessingRegistrationUuids = (dataProcessingRegistrationUuids ?? new List<Guid>()).FromNullable()
+                })
+                .Select(_responseMapper.MapContractDTO)
+                .Match(Ok, FromOperationError);
         }
 
         /// <summary>

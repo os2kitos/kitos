@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -453,6 +454,135 @@ namespace Tests.Unit.Core.Model
             //Assert
             Assert.True(result.IsNone);
             Assert.Empty(sut.AssociatedSystemUsages);
+        }
+
+        [Fact]
+        public void Can_AssignDataProcessingRegistration()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var sut = new ItContract
+            {
+                OrganizationId = orgId
+            };
+            var dpr = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                OrganizationId = orgId
+            };
+
+            //Act
+            var result = sut.AssignDataProcessingRegistration(dpr);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Equal(dpr.Id, result.Value.Id);
+            var assignedDpr = Assert.Single(sut.DataProcessingRegistrations);
+            Assert.Equal(dpr.Id, assignedDpr.Id);
+        }
+
+        [Fact]
+        public void Cannot_AssignDataProcessingRegistration_If_Not_In_Same_Org()
+        {
+            //Arrange
+            var sut = new ItContract
+            {
+                OrganizationId = A<int>()
+            };
+            var dpr = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                OrganizationId = A<int>()
+            };
+
+            //Act
+            var result = sut.AssignDataProcessingRegistration(dpr);
+
+            //Assert
+            Assert.True(result.Failed); 
+            Assert.Contains("Cannot assign Data Processing Registration to Contract within different Organization", result.Error.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
+        }
+
+
+
+        [Fact]
+        public void Cannot_AssignDataProcessingRegistration_If_Already_Assigned()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var dpr = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                OrganizationId = orgId
+            };
+            var sut = new ItContract
+            {
+                OrganizationId = orgId,
+                DataProcessingRegistrations = new List<DataProcessingRegistration>()
+                {
+                    dpr
+                }
+            };
+
+            //Act
+            var result = sut.AssignDataProcessingRegistration(dpr);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Contains("Data processing registration is already assigned", result.Error.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.Conflict, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void Can_RemoveDataProcessingRegistration()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var dpr = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                OrganizationId = orgId
+            };
+            var sut = new ItContract
+            {
+                OrganizationId = orgId,
+                DataProcessingRegistrations = new List<DataProcessingRegistration>()
+                {
+                    dpr
+                }
+            };
+
+            //Act
+            var result = sut.RemoveDataProcessingRegistration(dpr);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.Empty(sut.DataProcessingRegistrations);
+        }
+
+        [Fact]
+        public void Cannot_RemoveDataProcessingRegistration_If_Not_Assigned()
+        {
+            //Arrange
+            var orgId = A<int>();
+            var dpr = new DataProcessingRegistration
+            {
+                Id = A<int>(),
+                OrganizationId = orgId
+            };
+            var sut = new ItContract
+            {
+                OrganizationId = orgId
+            };
+
+            //Act
+            var result = sut.RemoveDataProcessingRegistration(dpr);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Contains("Data processing registration not assigned", result.Error.Message.GetValueOrEmptyString());
+            Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
@@ -11,6 +12,7 @@ using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Shared;
@@ -30,6 +32,7 @@ namespace Core.ApplicationServices.GDPR.Write
         private readonly IDomainEvents _domainEvents;
         private readonly ITransactionManager _transactionManager;
         private readonly IDatabaseControl _databaseControl;
+        private readonly IAssignmentUpdateService _assignmentUpdateService;
 
         public DataProcessingRegistrationWriteService(
             IDataProcessingRegistrationApplicationService applicationService,
@@ -38,7 +41,8 @@ namespace Core.ApplicationServices.GDPR.Write
             ILogger logger,
             IDomainEvents domainEvents,
             ITransactionManager transactionManager,
-            IDatabaseControl databaseControl)
+            IDatabaseControl databaseControl, 
+            IAssignmentUpdateService assignmentUpdateService)
         {
             _applicationService = applicationService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -47,6 +51,7 @@ namespace Core.ApplicationServices.GDPR.Write
             _domainEvents = domainEvents;
             _transactionManager = transactionManager;
             _databaseControl = databaseControl;
+            _assignmentUpdateService = assignmentUpdateService;
         }
 
         public Result<DataProcessingRegistration, OperationError> Create(Guid organizationUuid, DataProcessingRegistrationModificationParameters parameters)
@@ -220,14 +225,15 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Maybe<OperationError> UpdateOversightOptions(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> oversightOptionUuids)
         {
-            return UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "oversight options",
                 dpr,
                 oversightOptionUuids,
-                registration => registration.OversightOptions,
-                (registration, id) => _applicationService.AssignOversightOption(registration.Id, id),
-                (registration, id) => _applicationService.RemoveOversightOption(registration.Id, id)
+                oversightUuid => _entityIdentityResolver.ResolveDbId<DataProcessingOversightOption>(oversightUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {oversightUuid}", OperationFailure.BadInput)),
+                registration => registration.OversightOptions.ToList(),
+                (registration, oversightOptionId) => _applicationService.AssignOversightOption(registration.Id, oversightOptionId).MatchFailure(),
+                (registration, oversightOption) => _applicationService.RemoveOversightOption(registration.Id, oversightOption.Id).MatchFailure()
             );
         }
 
@@ -249,53 +255,57 @@ namespace Core.ApplicationServices.GDPR.Write
 
         private Result<DataProcessingRegistration, OperationError> UpdateSystemAssignments(DataProcessingRegistration dpr, IEnumerable<Guid> systemUsageUuids)
         {
-            return UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "system usage",
                 dpr,
                 systemUsageUuids.FromNullable(),
-                registration => registration.SystemUsages,
-                (registration, id) => _applicationService.AssignSystem(registration.Id, id),
-                (registration, id) => _applicationService.RemoveSystem(registration.Id, id)
+                usageUuid => _entityIdentityResolver.ResolveDbId<ItSystemUsage>(usageUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {usageUuid}", OperationFailure.BadInput)),
+                registration => registration.SystemUsages.ToList(),
+                (registration, usageId) => _applicationService.AssignSystem(registration.Id, usageId).MatchFailure(),
+                (registration, usage) => _applicationService.RemoveSystem(registration.Id, usage.Id).MatchFailure()
             ).Match<Result<DataProcessingRegistration, OperationError>>(error => error, () => dpr);
         }
 
         private Maybe<OperationError> UpdateSubDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
-            return UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "sub data processor",
                 dpr,
                 organizationUuids,
-                registration => registration.SubDataProcessors,
-                (registration, id) => _applicationService.AssignSubDataProcessor(registration.Id, id),
-                (registration, id) => _applicationService.RemoveSubDataProcessor(registration.Id, id)
+                subDataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(subDataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {subDataProcessorUuid}", OperationFailure.BadInput)),
+                registration => registration.SubDataProcessors.ToList(),
+                (registration, subDataProcessorId) => _applicationService.AssignSubDataProcessor(registration.Id, subDataProcessorId).MatchFailure(),
+                (registration, subDataProcessor) => _applicationService.RemoveSubDataProcessor(registration.Id, subDataProcessor.Id).MatchFailure()
                 );
         }
 
         private Maybe<OperationError> UpdateDataProcessors(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> organizationUuids)
         {
-            return UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "data processor",
                 dpr,
                 organizationUuids,
-                registration => registration.DataProcessors,
-                (registration, id) => _applicationService.AssignDataProcessor(registration.Id, id),
-                (registration, id) => _applicationService.RemoveDataProcessor(registration.Id, id)
+                dataProcessorUuid => _entityIdentityResolver.ResolveDbId<Organization>(dataProcessorUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {dataProcessorUuid}", OperationFailure.BadInput)),
+                registration => registration.DataProcessors.ToList(),
+                (registration, dataProcessorId) => _applicationService.AssignDataProcessor(registration.Id, dataProcessorId).MatchFailure(),
+                (registration, dataProcessor) => _applicationService.RemoveDataProcessor(registration.Id, dataProcessor.Id).MatchFailure()
             );
         }
 
         private Maybe<OperationError> UpdateInsecureCountriesSubjectToDataTransfer(DataProcessingRegistration dpr, Maybe<IEnumerable<Guid>> countryOptionUuids)
         {
-            return UpdateMultiAssignment
+            return _assignmentUpdateService.UpdateUniqueMultiAssignment
             (
                 "insecure third country",
                 dpr,
                 countryOptionUuids,
-                registration => registration.InsecureCountriesSubjectToDataTransfer,
-                (registration, id) => _applicationService.AssignInsecureThirdCountry(registration.Id, id),
-                (registration, id) => _applicationService.RemoveInsecureThirdCountry(registration.Id, id)
+                optionUuid => _entityIdentityResolver.ResolveDbId<DataProcessingCountryOption>(optionUuid).Match<Result<int, OperationError>>(optionId => optionId, () => new OperationError($"Failed to resolve Id for Uuid {optionUuid}", OperationFailure.BadInput)),
+                registration => registration.InsecureCountriesSubjectToDataTransfer.ToList(),
+                (registration, countryOptionId) => _applicationService.AssignInsecureThirdCountry(registration.Id, countryOptionId).MatchFailure(),
+                (registration, countryOption) => _applicationService.RemoveInsecureThirdCountry(registration.Id, countryOption.Id).MatchFailure()
             );
         }
 
@@ -316,7 +326,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
             return _applicationService
                 .AssignBasisForTransfer(dpr.Id, dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Maybe<OperationError> UpdateDataResponsible(DataProcessingRegistration dpr, Guid? dataResponsibleUuid)
@@ -336,7 +346,7 @@ namespace Core.ApplicationServices.GDPR.Write
 
             return _applicationService
                 .AssignDataResponsible(dpr.Id, dbId.Value)
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         public Maybe<OperationError> Delete(Guid dataProcessingRegistrationUuid)
@@ -349,53 +359,6 @@ namespace Core.ApplicationServices.GDPR.Write
             return _applicationService
                 .Delete(dbId.Value)
                 .Match(_ => Maybe<OperationError>.None, error => error);
-        }
-
-        private Maybe<OperationError> UpdateMultiAssignment<TAssignment>(
-           string subject,
-           DataProcessingRegistration dpr,
-           Maybe<IEnumerable<Guid>> assignedItemUuid,
-           Func<DataProcessingRegistration, IEnumerable<TAssignment>> getExistingState,
-           Func<DataProcessingRegistration, int, Result<TAssignment, OperationError>> assign,
-           Func<DataProcessingRegistration, int, Result<TAssignment, OperationError>> unAssign)
-           where TAssignment : class, IHasId, IHasUuid
-        {
-            var newUuids = assignedItemUuid.Match(uuids => uuids.ToList(), () => new List<Guid>());
-            if (newUuids.Distinct().Count() != newUuids.Count)
-            {
-                return new OperationError($"Duplicates of '{subject}' are not allowed", OperationFailure.BadInput);
-            }
-            var existingAssignments = getExistingState(dpr).ToDictionary(x => x.Uuid);
-            var existingUuids = existingAssignments.Values.Select(x => x.Uuid).ToList();
-
-            var changes = existingUuids.ComputeDelta(newUuids, uuid => uuid).ToList();
-            foreach (var (delta, uuid) in changes)
-            {
-                switch (delta)
-                {
-                    case EnumerableExtensions.EnumerableDelta.Added:
-                        var dbId = _entityIdentityResolver.ResolveDbId<TAssignment>(uuid);
-
-                        if (dbId.IsNone)
-                            return new OperationError($"New '{subject}' uuid does not match a KITOS {typeof(TAssignment).Name}: {uuid}", OperationFailure.BadInput);
-                        var addResult = assign(dpr, dbId.Value);
-
-                        if (addResult.Failed)
-                            return addResult.Error;
-
-                        break;
-                    case EnumerableExtensions.EnumerableDelta.Removed:
-                        var removeResult = unAssign(dpr, existingAssignments[uuid].Id);
-                        if (removeResult.Failed)
-                            return removeResult.Error;
-
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-
-            return Maybe<OperationError>.None;
         }
     }
 }
