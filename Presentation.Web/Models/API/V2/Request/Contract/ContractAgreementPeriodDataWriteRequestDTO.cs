@@ -37,7 +37,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// Determines how many of the agreement available extension options that have been used
         /// </summary>
         [Range(0,int.MaxValue)]
-        public int? ExtensionOptionsUsed { get; set; }
+        public int ExtensionOptionsUsed { get; set; }
         /// <summary>
         /// The agreement cannot be revoked before this date
         /// </summary>

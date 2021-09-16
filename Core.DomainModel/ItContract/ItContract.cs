@@ -682,8 +682,8 @@ namespace Core.DomainModel.ItContract
 
             if (systemUsage.OrganizationId != OrganizationId)
                 return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
-            
-            if(AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
+
+            if (AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
                 return new OperationError($"It System Usage with Id: {systemUsage.Id}, already assigned to Contract", OperationFailure.Conflict);
 
             var newAssign = new ItContractItSystemUsage
@@ -706,10 +706,10 @@ namespace Core.DomainModel.ItContract
             foreach (var contractUsageToRemove in toBeRemoved)
             {
                 var removeSucceeded = AssociatedSystemUsages.Remove(contractUsageToRemove);
-                if(!removeSucceeded)
+                if (!removeSucceeded)
                     return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
             }
-           
+
             return Maybe<OperationError>.None;
         }
 
@@ -750,6 +750,34 @@ namespace Core.DomainModel.ItContract
                 ItContract = this,
                 HandoverTrialType = trialType
             });
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
+        {
+            if (extendMultiplier < 0)
+                return new OperationError(nameof(extendMultiplier) + "must be above or equal to 0",
+                    OperationFailure.BadInput);
+
+            ExtendMultiplier = extendMultiplier;
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetExtensionOption()
+        {
+            OptionExtend.Track();
+            OptionExtend = null;
+        }
+
+        public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool? ongoing)
+        {
+            if (ongoing == true && (durationMonths.HasValue || durationYears.HasValue))
+                return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadState);
+
+            DurationOngoing = ongoing == true;
+            DurationYears = durationYears;
+            DurationMonths = durationMonths;
+
             return Maybe<OperationError>.None;
         }
     }

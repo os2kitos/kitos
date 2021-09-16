@@ -9,7 +9,7 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public OptionalValueChange<int?> DurationMonths { get; set; } = OptionalValueChange<int?>.None;
         public OptionalValueChange<bool?> IsContinuous { get; set; } = OptionalValueChange<bool?>.None;
         public OptionalValueChange<Guid?> ExtensionOptionsUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public OptionalValueChange<int?> ExtensionOptionsUsed { get; set; } = OptionalValueChange<int?>.None;
+        public OptionalValueChange<int> ExtensionOptionsUsed { get; set; } = OptionalValueChange<int>.None;
         public OptionalValueChange<DateTime?> IrrevocableUntil { get; set; } = OptionalValueChange<DateTime?>.None;
     }
 }
