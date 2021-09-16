@@ -771,7 +771,7 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool ongoing)
         {
             if (ongoing && (durationMonths.HasValue || durationYears.HasValue))
-                return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadState);
+                return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadInput);
 
             if (durationYears.GetValueOrDefault() < 0)
                 return new OperationError($"{nameof(durationYears)} cannot be below 0", OperationFailure.BadInput);

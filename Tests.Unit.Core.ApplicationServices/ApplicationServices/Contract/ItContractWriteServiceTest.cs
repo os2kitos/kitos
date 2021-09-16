@@ -895,7 +895,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         public void Cannot_Create_With_HandoverTrials_If_At_Least_One_Date_Is_Not_Provided()
         {
             //Arrange
-            var handoverTrialUpdates = new[] {new ItContractHandoverTrialUpdate() {HandoverTrialTypeUuid = A<Guid>()}};
+            var handoverTrialUpdates = new[] { new ItContractHandoverTrialUpdate() { HandoverTrialTypeUuid = A<Guid>() } };
 
             var handoverTrialTypes = handoverTrialUpdates
                 .Select(x => new HandoverTrialType
@@ -1064,7 +1064,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
             var operationError = A<OperationError>();
             ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentFreqencyType>(createdContract, paymentModel.PaymentFrequencyUuid.NewValue, operationError);
-            
+
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
@@ -1117,7 +1117,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var milestone = CreatePaymentMilestone(false, false);
             var paymentModel = new ItContractPaymentModelModificationParameters()
             {
-                PaymentMileStones = new List<ItContractPaymentMilestone>{ milestone }
+                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
 
@@ -1147,64 +1147,158 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "Failed adding payment milestone: Error: title cannot be empty", OperationFailure.BadInput, transaction);
         }
 
+        [Theory]
+        [InlineData(true, true, true)]
+        [InlineData(true, true, false)]
+        [InlineData(true, false, true)]
+        [InlineData(false, true, true)]
+        [InlineData(false, false, false)]
+        public void Can_Create_With_AgreementPeriod(bool withExtensionOption, bool continuous, bool hasIrrevocableDate)
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                DurationYears = (continuous ? (int?)null : Math.Abs(A<int>())).AsChangedValue(),
+                DurationMonths = (continuous ? (int?)null : Math.Abs(A<int>()) % 12).AsChangedValue(),
+                IsContinuous = continuous.AsChangedValue(),
+                ExtensionOptionsUuid = (withExtensionOption ? A<Guid>() : (Guid?)null).AsChangedValue(),
+                ExtensionOptionsUsed = Math.Abs(A<int>()).AsChangedValue(),
+                IrrevocableUntil = (hasIrrevocableDate ? A<DateTime>() : (DateTime?)null).AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<OptionExtendType>(createdContract, agreementPeriodInput.ExtensionOptionsUuid.NewValue, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertTransactionCommitted(transaction);
+            Assert.Equal(agreementPeriodInput.DurationMonths.NewValue, result.Value.DurationMonths);
+            Assert.Equal(agreementPeriodInput.DurationYears.NewValue, result.Value.DurationYears);
+            Assert.Equal(agreementPeriodInput.IsContinuous.NewValue, result.Value.DurationOngoing);
+            Assert.Equal(agreementPeriodInput.ExtensionOptionsUsed.NewValue, result.Value.ExtendMultiplier);
+            Assert.Equal(agreementPeriodInput.IrrevocableUntil.NewValue, result.Value.IrrevocableTo);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_AgreementPeriod_If_OptionExtend_Assignment_Fails()
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                ExtensionOptionsUuid = ((Guid?)A<Guid>()).AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+
+            var operationError = A<OperationError>();
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<OptionExtendType>(createdContract, agreementPeriodInput.ExtensionOptionsUuid.NewValue, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, operationError.Message.GetValueOrEmptyString(), operationError.FailureType, transaction);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        public void Cannot_Create_With_AgreementPeriod_If_ContinuousDuration_And_Fixed_Interval_Is_Also_Provided(bool hasDurationYear, bool hasDurationMonth)
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                DurationYears = (!hasDurationYear ? (int?)null : Math.Abs(A<int>())).AsChangedValue(),
+                DurationMonths = (!hasDurationMonth ? (int?)null : Math.Abs(A<int>()) % 12).AsChangedValue(),
+                IsContinuous = true.AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "If duration is ongoing then durationMonths and durationYears must be null", OperationFailure.BadInput, transaction);
+        }
+
+        [Theory]
+        [InlineData(-1)]
+        [InlineData(12)]
+        public void Cannot_Create_With_AgreementPeriod_If_DurationMonth_Is_Invalid(int durationMonth)
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                DurationMonths = ((int?)durationMonth).AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "durationMonths cannot be below 0 or above 11", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_AgreementPeriod_If_DurationYear_Is_Invalid()
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                DurationYears = ((int?)-1).AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, "durationYears cannot be below 0", OperationFailure.BadInput, transaction);
+        }
+
         private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
         {
-            if (hasValues)
-            {
-                Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Value.Date, actual.OperationRemunerationBegun.Value.Date);
-            }
-            else
-            {
-                Assert.Null(actual.OperationRemunerationBegun);
-            }
-
+            Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);
             AssertPaymentMilestones(expected.PaymentMileStones.Value, actual.PaymentMilestones);
         }
 
         private static void AssertPaymentMilestones(IEnumerable<ItContractPaymentMilestone> expected, IEnumerable<PaymentMilestone> actual)
         {
-            var orderedExpected = expected.OrderBy(x => x.Title).ToList(); 
+            var orderedExpected = expected.OrderBy(x => x.Title).ToList();
             var orderedActual = actual.OrderBy(x => x.Title).ToList();
             Assert.Equal(orderedExpected.Count, orderedActual.Count);
 
             for (var i = 0; i < orderedExpected.Count; i++)
             {
                 Assert.Equal(orderedExpected[i].Title, orderedActual[i].Title);
-                if (orderedExpected[i].Expected.HasValue)
-                {
-                    Assert.Equal(orderedExpected[i].Expected.Value.Date, orderedActual[i].Expected.Value.Date);
-                }
-                else
-                {
-                    Assert.Null(orderedActual[i].Expected);
-                }
-
-                if (orderedExpected[i].Approved.HasValue)
-                {
-                    Assert.Equal(orderedExpected[i].Approved.Value.Date, orderedActual[i].Approved.Value.Date);
-                }
-                else
-                {
-                    Assert.Null(orderedActual[i].Approved);
-                }
+                Assert.Equal(orderedExpected[i].Expected?.Date, orderedActual[i].Expected?.Date);
+                Assert.Equal(orderedExpected[i].Approved?.Date, orderedActual[i].Approved?.Date);
             }
         }
 
         private ItContractPaymentModelModificationParameters CreatePaymentModel(ItContractPaymentMilestone milestone, bool withValues)
         {
-            return new ()
+            return new()
             {
                 OperationsRemunerationStartedAt = (withValues ? A<DateTime>().FromNullable() : Maybe<DateTime>.None).AsChangedValue(),
                 PaymentModelUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
                 PaymentFrequencyUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
                 PriceRegulationUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
-                PaymentMileStones = new List<ItContractPaymentMilestone>{ milestone }
+                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }
             };
         }
 
         private ItContractPaymentMilestone CreatePaymentMilestone(bool withExpected, bool withApproved)
         {
-            return new ()
+            return new()
             {
                 Title = A<string>(),
                 Approved = withApproved ? A<DateTime>() : null,
@@ -1306,10 +1400,11 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             IEnumerable<Guid> systemUsageUuids = null,
             IEnumerable<UserRolePair> roleAssignments = null,
             IEnumerable<Guid> dataProcessingRegistrationUuids = null,
-            ItContractPaymentModelModificationParameters paymentModel = null
+            ItContractPaymentModelModificationParameters paymentModel = null,
+            ItContractAgreementPeriodModificationParameters agreementPeriod = null
             )
         {
-            var organization = new Organization()
+            var organization = new Organization
             {
                 Id = A<int>(),
                 Uuid = A<Guid>()
@@ -1326,7 +1421,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 SystemUsageUuids = systemUsageUuids.FromNullable(),
                 Roles = roleAssignments.FromNullable(),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
-                PaymentModel = paymentModel.FromNullable()
+                PaymentModel = paymentModel.FromNullable(),
+                AgreementPeriod = agreementPeriod.FromNullable()
             };
             var createdContract = new ItContract()
             {
