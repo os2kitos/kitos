@@ -122,6 +122,7 @@
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
     <Compile Include="Model\Contracts\Write\ItContractHandoverTrialUpdate.cs" />
     <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />

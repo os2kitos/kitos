@@ -19,5 +19,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<IEnumerable<Guid>> SystemUsageUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
         public Maybe<IEnumerable<UserRolePair>> Roles { get; set; } = Maybe<IEnumerable<UserRolePair>>.None;
         public Maybe<IEnumerable<Guid>> DataProcessingRegistrationUuids { get; set; } = Maybe<IEnumerable<Guid>>.None;
+        public Maybe<ItContractAgreementPeriodModificationParameters> AgreementPeriod { get; set; } = Maybe<ItContractAgreementPeriodModificationParameters>.None;
     }
 }
