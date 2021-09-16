@@ -45,7 +45,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
             var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
-			
+            var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -58,7 +58,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 HandoverTrials = handoverTrials.FromNullable().Select(MapHandOverTrials),
                 ExternalReferences = references.FromNullable().Select(MapReferences),
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
-                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable()
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
+                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel)
             };
         }
 
@@ -76,6 +77,23 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ApprovedAt = x.ApprovedAt,
                 ExpectedAt = x.ExpectedAt
             }).ToList();
+        }
+
+        public ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO dto)
+        {
+            return new()
+            {
+                OperationsRemunerationStartedAt = (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                PaymentFrequencyUuid = dto.PaymentFrequencyUuid.AsChangedValue(),
+                PaymentModelUuid = dto.PaymentModelUuid.AsChangedValue(),
+                PriceRegulationUuid = dto.PriceRegulationUuid.AsChangedValue(),
+                PaymentMileStones = dto.PaymentMileStones?.Select(x => new ItContractPaymentMilestone()
+                {
+                    Title = x.Title,
+                    Approved = x.Approved,
+                    Expected = x.Expected
+                }).ToList()
+            };
         }
 
         public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
