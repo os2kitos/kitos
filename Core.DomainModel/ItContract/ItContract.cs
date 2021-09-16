@@ -755,19 +755,19 @@ namespace Core.DomainModel.ItContract
 
         public void ResetPaymentFrequency()
         {
-            PaymentFreqency?.Track();
+            PaymentFreqency.Track();
             PaymentFreqency = null;
         }
 
         public void ResetPaymentModel()
         {
-            PaymentModel?.Track();
+            PaymentModel.Track();
             PaymentModel = null;
         }
 
         public void ResetPriceRegulation()
         {
-            PriceRegulation?.Track();
+            PriceRegulation.Track();
             PriceRegulation = null;
         }
 

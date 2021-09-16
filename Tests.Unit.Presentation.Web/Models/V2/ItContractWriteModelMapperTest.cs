@@ -631,20 +631,17 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output, bool hasValues)
         {
+            Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
+            Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
+            Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
             if (hasValues)
             {
                 Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue);
-                Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
-                Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
-                Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
                 AssertPaymentMilestones(input.PaymentMileStones, output.PaymentMileStones.Value);
             }
             else
             {
                 Assert.True(output.OperationsRemunerationStartedAt.NewValue.IsNone);
-                Assert.Null(output.PaymentFrequencyUuid.NewValue);
-                Assert.Null(output.PaymentModelUuid.NewValue);
-                Assert.Null(output.PriceRegulationUuid.NewValue);
                 Assert.True(output.PaymentMileStones.IsNone);
             }
         }

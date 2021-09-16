@@ -156,7 +156,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences));
         }
 
@@ -277,7 +277,7 @@ namespace Core.ApplicationServices.Contract.Write
         private Result<ItContract, OperationError> UpdatePaymentModelParameters(ItContract contract, ItContractPaymentModelModificationParameters parameters)
         {
             return contract
-                .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.HasValue ? newValue.Value : null)
+                .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.Match(val => val, () => (DateTime?)null))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentFrequencyUuid, UpdatePaymentFrequency))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentModelUuid, UpdatePaymentModel))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PriceRegulationUuid, UpdatePriceRegulation))
@@ -286,10 +286,10 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
         {
-            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            //Replace existing milestones (duplicates are allowed so we cannot derive any meaningful unique identity)
             var paymentMilestones = contract.PaymentMilestones.ToList();
-            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
             contract.ResetPaymentMilestones();
+            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
 
             foreach (var newMilestone in milestones)
             {
