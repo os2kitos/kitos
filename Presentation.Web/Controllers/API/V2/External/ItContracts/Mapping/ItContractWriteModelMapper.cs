@@ -7,6 +7,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.DomainModel.ItContract;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -54,6 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
             var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
             var payments = WithResetDataIfPropertyIsDefined(dto.Payments, nameof(ContractWriteRequestDTO.Payments));
+            var termination = WithResetDataIfPropertyIsDefined(dto.Termination, nameof(ContractWriteRequestDTO.Termination));
 
             return new ItContractModificationParameters
             {
@@ -70,7 +72,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
                 AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod),
-                Payments = payments.FromNullable().Select(MapPayments)
+                Payments = payments.FromNullable().Select(MapPayments),
+				Termination = termination.FromNullable().Select(MapTermination)
             };
         }
 
@@ -155,6 +158,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     Approved = x.Approved,
                     Expected = x.Expected
                 }).ToList()
+            };
+        }
+
+        public ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
+        {
+            return new ()
+            {
+                TerminatedAt = (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                NoticePeriodMonthsUuid = dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue(),
+                NoticePeriodExtendsCurrent = (dto.Terms?.NoticePeriodExtendsCurrent?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue(),
+                NoticeByEndOf = (dto.Terms?.NoticeByEndOf?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue()
             };
         }
 

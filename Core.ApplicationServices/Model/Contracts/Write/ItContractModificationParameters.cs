@@ -22,5 +22,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public Maybe<ItContractAgreementPeriodModificationParameters> AgreementPeriod { get; set; } = Maybe<ItContractAgreementPeriodModificationParameters>.None;
         public Maybe<ItContractPaymentModelModificationParameters> PaymentModel { get; set; } = Maybe<ItContractPaymentModelModificationParameters>.None;
         public Maybe<ItContractPaymentDataModificationParameters> Payments { get; set; } = Maybe<ItContractPaymentDataModificationParameters>.None;
+        public Maybe<ItContractTerminationParameters> Termination { get; set; } = Maybe<ItContractTerminationParameters>.None;
     }
 }

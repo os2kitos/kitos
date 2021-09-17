@@ -21,5 +21,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         ItContractAgreementPeriodModificationParameters MapAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO dto);
         ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO request);
         ItContractPaymentDataModificationParameters MapPayments(ContractPaymentsDataWriteRequestDTO dto);
+        ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO request);
     }
 }

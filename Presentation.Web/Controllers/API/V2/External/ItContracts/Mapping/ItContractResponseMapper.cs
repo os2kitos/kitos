@@ -69,8 +69,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return new ()
             {
                 NoticePeriodMonths = contract.TerminationDeadline?.MapIdentityNamePairDTO(),
-                NoticeByEndOf = contract.Running?.ToYearSegmentChoice(), 
-                NoticePeriodExtendsCurrent = contract.ByEnding?.ToYearSegmentChoice()
+                NoticeByEndOf = contract.ByEnding?.ToYearSegmentChoice(), 
+                NoticePeriodExtendsCurrent = contract.Running?.ToYearSegmentChoice()
             };
         }
 

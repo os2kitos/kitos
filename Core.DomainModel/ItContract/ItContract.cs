@@ -877,5 +877,11 @@ namespace Core.DomainModel.ItContract
         {
             ExternEconomyStreams.Clear();
         }
+		
+        public void ResetNoticePeriod()
+        {
+            TerminationDeadline.Track();
+            TerminationDeadline = null;
+        }
     }
 }

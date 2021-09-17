@@ -164,6 +164,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Payments, UpdatePayments));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Termination, UpdateTermination));
         }
 
         private Result<ItContract, OperationError> UpdatePayments(ItContract contract, ItContractPaymentDataModificationParameters parameters)
@@ -251,6 +252,27 @@ namespace Core.ApplicationServices.Contract.Write
             return _roleAssignmentService
                 .BatchUpdateRoles(contract, roleAssignments)
                 .Select(error => new OperationError($"Failed while updating role assignments:{error.Message.GetValueOrEmptyString()}", error.FailureType));
+        }
+
+        private Result<ItContract, OperationError> UpdateTermination(ItContract contract, ItContractTerminationParameters termination)
+        {
+            return contract
+                .WithOptionalUpdate(termination.TerminatedAt, (c, newValue) => c.Terminated = newValue.HasValue ? newValue.Value : null)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(termination.NoticePeriodMonthsUuid, UpdateNoticePeriodMonthsUuid))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(termination.NoticePeriodExtendsCurrent, (c, newValue) => c.Running = newValue.HasValue ? newValue.Value : null))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(termination.NoticeByEndOf, (c, newValue) => c.ByEnding = newValue.HasValue ? newValue.Value : null));
+        }
+
+        private Maybe<OperationError> UpdateNoticePeriodMonthsUuid(ItContract contract, Guid? optionUuid)
+        {
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                optionUuid,
+                itContract  => itContract.ResetNoticePeriod(),
+                itContract => itContract.TerminationDeadline,
+                (itContract, newValue) => itContract.TerminationDeadline = newValue
+            );
         }
 
         private Maybe<OperationError> UpdateExternalReferences(ItContract contract, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)

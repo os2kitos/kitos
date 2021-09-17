@@ -1264,6 +1264,57 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, "durationYears cannot be below 0", OperationFailure.BadInput, transaction);
         }
 
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(false, false)]
+        public void Can_Create_With_Termination(bool withNoticePeriod, bool withOptionalData)
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var terminationInput = new ItContractTerminationParameters()
+            {
+                TerminatedAt = (withOptionalData ? A<DateTime>().FromNullable() : Maybe<DateTime>.None).AsChangedValue(),
+                NoticePeriodMonthsUuid = (withNoticePeriod ? A<Guid>() : (Guid?)null).AsChangedValue(),
+                NoticePeriodExtendsCurrent = (withOptionalData ? A<YearSegmentOption>().FromNullable() : Maybe<YearSegmentOption>.None).AsChangedValue(),
+                NoticeByEndOf = (withOptionalData ? A<YearSegmentOption>().FromNullable() : Maybe<YearSegmentOption>.None).AsChangedValue()
+            };
+            parameters.Termination = terminationInput;
+
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<TerminationDeadlineType>(createdContract, terminationInput.NoticePeriodMonthsUuid.NewValue, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertTransactionCommitted(transaction);
+            Assert.Equal(terminationInput.TerminatedAt.NewValue.Match(val => val, () => (DateTime?)null), result.Value.Terminated);
+            Assert.Equal(terminationInput.NoticePeriodExtendsCurrent.NewValue.Match(val => val, () => (YearSegmentOption?)null), result.Value.Running);
+            Assert.Equal(terminationInput.NoticeByEndOf.NewValue.Match(val => val, () => (YearSegmentOption?)null), result.Value.ByEnding);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Termination_If_NoticePeriodMonths_Assignment_Fails()
+        {
+            //Arrange
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites();
+            var terminationInput = new ItContractTerminationParameters
+            {
+                NoticePeriodMonthsUuid = ((Guid?)A<Guid>()).AsChangedValue()
+            };
+            parameters.Termination = terminationInput;
+
+            var operationError = A<OperationError>();
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<TerminationDeadlineType>(createdContract, terminationInput.NoticePeriodMonthsUuid.NewValue, operationError);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, operationError.Message.GetValueOrEmptyString(), operationError.FailureType, transaction);
+        }
+
         private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);

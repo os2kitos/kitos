@@ -62,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(14);
+            return CreateGetUndefinedSectionsInput(15);
         }
 
         [Theory]
@@ -81,7 +81,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noRoles,
             bool noPaymentModel,
             bool noAgreementPeriod,
-            bool noPayments)
+            bool noPayments,
+            bool noTermination)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -100,6 +101,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
             if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
             if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
+            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -120,6 +122,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noPaymentModel, output.PaymentModel.IsNone);
             Assert.Equal(noAgreementPeriod, output.AgreementPeriod.IsNone);
             Assert.Equal(noPayments, output.Payments.IsNone);
+            Assert.Equal(noTermination, output.Termination.IsNone);
         }
 
         [Fact]
@@ -704,31 +707,52 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertPayments(input, output);
         }
-
-        private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ItContractPaymentDataModificationParameters output)
+		
+		[Fact]
+        public void Can_Map_Termination()
         {
-            AssertPaymentCollection(input.Internal, AssertPropertyContainsDataChange(output.InternalPayments));
-            AssertPaymentCollection(input.External, AssertPropertyContainsDataChange(output.ExternalPayments));
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapTermination(input);
+
+            //Assert
+            AssertTermination(input, output);
         }
 
-        private static void AssertPaymentCollection(IEnumerable<PaymentRequestDTO> expectedPayments, IEnumerable<ItContractPayment> outputPayments)
+        [Fact]
+        public void Can_Map_Termination_FromPUT()
         {
-            var expected = expectedPayments.ToList();
-            var actual = outputPayments.ToList();
-            Assert.Equal(expected.Count, actual.Count);
-            for (var i = 0; i < expected.Count; i++)
-            {
-                var exp = expected[i];
-                var act = actual[i];
-                Assert.Equal(exp.Note, act.Note);
-                Assert.Equal(exp.AccountingEntry, act.AccountingEntry);
-                Assert.Equal(exp.Acquisition, act.Acquisition);
-                Assert.Equal(exp.AuditDate, act.AuditDate);
-                Assert.Equal(exp.AuditStatus.ToTrafficLight(), act.AuditStatus);
-                Assert.Equal(exp.Operation, act.Operation);
-                Assert.Equal(exp.OrganizationUnitUuid, act.OrganizationUnitUuid);
-                Assert.Equal(exp.Other, act.Other);
-            }
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO() { Termination = input });
+
+            //Assert
+            AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
+        }
+
+        [Fact]
+        public void Can_Map_Termination_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Termination = input });
+
+            //Assert
+            AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
+        }
+
+        private static void AssertTermination(ContractTerminationDataWriteRequestDTO input, ItContractTerminationParameters output)
+        {
+            Assert.Equal(input.TerminatedAt, AssertPropertyContainsDataChange(output.TerminatedAt));
+            Assert.Equal(input.Terms.NoticePeriodMonthsUuid, AssertPropertyContainsDataChange(output.NoticePeriodMonthsUuid));
+            Assert.Equal(input.Terms.NoticePeriodExtendsCurrent?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticePeriodExtendsCurrent));
+            Assert.Equal(input.Terms.NoticeByEndOf?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticeByEndOf));
         }
 
         private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
@@ -840,6 +864,32 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         private static HashSet<string> GetRootProperties()
         {
             return typeof(CreateNewContractRequestDTO).GetProperties().Select(x => x.Name).ToHashSet();
+        }
+		
+		private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ItContractPaymentDataModificationParameters output)
+        {
+            AssertPaymentCollection(input.Internal, AssertPropertyContainsDataChange(output.InternalPayments));
+            AssertPaymentCollection(input.External, AssertPropertyContainsDataChange(output.ExternalPayments));
+        }
+
+        private static void AssertPaymentCollection(IEnumerable<PaymentRequestDTO> expectedPayments, IEnumerable<ItContractPayment> outputPayments)
+        {
+            var expected = expectedPayments.ToList();
+            var actual = outputPayments.ToList();
+            Assert.Equal(expected.Count, actual.Count);
+            for (var i = 0; i < expected.Count; i++)
+            {
+                var exp = expected[i];
+                var act = actual[i];
+                Assert.Equal(exp.Note, act.Note);
+                Assert.Equal(exp.AccountingEntry, act.AccountingEntry);
+                Assert.Equal(exp.Acquisition, act.Acquisition);
+                Assert.Equal(exp.AuditDate, act.AuditDate);
+                Assert.Equal(exp.AuditStatus.ToTrafficLight(), act.AuditStatus);
+                Assert.Equal(exp.Operation, act.Operation);
+                Assert.Equal(exp.OrganizationUnitUuid, act.OrganizationUnitUuid);
+                Assert.Equal(exp.Other, act.Other);
+            }
         }
     }
 }
