@@ -163,7 +163,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Payments, UpdatePayments));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Payments, UpdatePayments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Termination, UpdateTermination));
         }
 
