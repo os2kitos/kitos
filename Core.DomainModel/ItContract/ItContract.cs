@@ -830,6 +830,54 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
+        public void ResetInternalEconomyStreams()
+        {
+            InternEconomyStreams.Clear();
+        }
+
+        public Maybe<OperationError> AddInternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            return AddEconomyStream(optionalOrganizationUnitUuid, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note, true);
+        }
+
+        public Maybe<OperationError> AddExternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            return AddEconomyStream(optionalOrganizationUnitUuid, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note, false);
+        }
+
+        private Maybe<OperationError> AddEconomyStream(
+            Guid? optionalOrganizationUnitUuid,
+            int acquisition,
+            int operation,
+            int other,
+            string accountingEntry,
+            TrafficLight auditStatus,
+            DateTime? auditDate,
+            string note,
+            bool internalStream)
+        {
+            var organizationUnit = Maybe<OrganizationUnit>.None;
+            if (optionalOrganizationUnitUuid.HasValue)
+            {
+                organizationUnit = Organization.GetOrganizationUnit(optionalOrganizationUnitUuid.Value);
+                if (organizationUnit.IsNone)
+                    return new OperationError($"Organization unit with uuid:{optionalOrganizationUnitUuid.Value} is not part of the contract's organization", OperationFailure.BadInput);
+            }
+
+            var economyStream = internalStream ?
+                EconomyStream.CreateInternalEconomyStream(this, organizationUnit.GetValueOrDefault(), acquisition, operation, other, accountingEntry, auditStatus, auditDate, note) :
+                EconomyStream.CreateExternalEconomyStream(this, organizationUnit.GetValueOrDefault(), acquisition, operation, other, accountingEntry, auditStatus, auditDate, note);
+
+            (internalStream ? InternEconomyStreams : ExternEconomyStreams).Add(economyStream);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetExternalEconomyStreams()
+        {
+            ExternEconomyStreams.Clear();
+        }
+		
         public void ResetNoticePeriod()
         {
             TerminationDeadline.Track();

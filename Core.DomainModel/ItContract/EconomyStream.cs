@@ -103,6 +103,42 @@ namespace Core.DomainModel.ItContract
             AccessModifier = AccessModifier.Local;
         }
 
+        public static EconomyStream CreateInternalEconomyStream(ItContract contract, OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            if (contract == null)
+                throw new ArgumentNullException(nameof(contract));
+
+            var economyStream = CreateEconomyStreamWithoutDirection(optionalOrganizationUnit, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note);
+            economyStream.InternPaymentFor = contract;
+            return economyStream;
+        }
+
+        public static EconomyStream CreateExternalEconomyStream(ItContract contract, OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            if (contract == null)
+                throw new ArgumentNullException(nameof(contract));
+
+            var economyStream = CreateEconomyStreamWithoutDirection(optionalOrganizationUnit, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note);
+            economyStream.ExternPaymentFor = contract;
+            return economyStream;
+        }
+
+        private static EconomyStream CreateEconomyStreamWithoutDirection(OrganizationUnit optionalOrganizationUnit, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            return new EconomyStream
+            {
+                OrganizationUnit = optionalOrganizationUnit,
+                Acquisition = acquisition,
+                Note = note,
+                AuditDate = auditDate?.Date,
+                AccessModifier = AccessModifier.Local,
+                AuditStatus = auditStatus,
+                Operation = operation,
+                Other = other,
+                AccountingEntry = accountingEntry
+            };
+        }
+
         /// <summary>
         /// Determines whether a user has write access to this instance.
         /// </summary>
