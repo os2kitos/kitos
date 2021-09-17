@@ -185,6 +185,7 @@ namespace Core.ApplicationServices.Contract.Write
         }
 
         private delegate Maybe<OperationError> AddPaymentFunc(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note);
+
         private Maybe<OperationError> ReplacePayments(
             bool internalPayment,
             IEnumerable<EconomyStream> currentState,
