@@ -65,7 +65,7 @@
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
-            private userAccessRights : Models.Api.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -221,7 +221,20 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Parent,ResponsibleOrganizationUnit,Rights($expand=User,Role),Supplier,ContractTemplate,ContractType,PurchaseForm,OptionExtend,TerminationDeadline,ProcurementStrategy,AssociatedSystemUsages,AssociatedSystemRelations,Reference`;
+                                    "?$expand=" +
+                                    "Parent($select=Id,Name)," +
+                                    "ResponsibleOrganizationUnit($select=Name)," +
+                                    "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
+                                    "Supplier($select=Name)," +
+                                    "ContractTemplate($select=Name)," +
+                                    "ContractType($select=Name)," +
+                                    "PurchaseForm($select=Name)," +
+                                    "OptionExtend($select=Name)," +
+                                    "TerminationDeadline($select=Name)," +
+                                    "ProcurementStrategy($select=Name)," +
+                                    "AssociatedSystemUsages($select=ItSystemUsageId)," +    //Only using the length, so select 1 field
+                                    "AssociatedSystemRelations($select=Id)," +              //Only using the length, so select 1 field
+                                    "Reference($select=URL,Title,ExternalReferenceId)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -279,7 +292,7 @@
                                 IrrevocableTo: { type: "date" },
                                 Terminated: { type: "date" },
                                 Duration: { type: "string" },
-                                IsActive: {type: "boolean"}
+                                IsActive: { type: "boolean" }
                             }
                         },
                         parse: response => {
@@ -322,25 +335,25 @@
                         name: "clearFilter",
                         text: "Gendan kolonneopsætning",
                         template:
-                        "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
+                            "<button type='button' data-element-type='resetFilterButton' class='k-button k-button-icontext' title='Nulstil sortering, filtering og kolonnevisning, -bredde og –rækkefølge' data-ng-click='contractOverviewPlanVm.clearOptions()'>#: text #</button>"
                     },
                     {
                         name: "saveFilter",
                         text: "Gem filter",
                         template:
-                        "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewPlanVm.saveGridProfile()'>#: text #</button>"
+                            "<button type='button' data-element-type='saveFilterButton' class='k-button k-button-icontext' title='Gem filtre og sortering' data-ng-click='contractOverviewPlanVm.saveGridProfile()'>#: text #</button>"
                     },
                     {
                         name: "useFilter",
                         text: "Anvend filter",
                         template:
-                        "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewPlanVm.loadGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='useFilterButton' class='k-button k-button-icontext' title='Anvend gemte filtre og sortering' data-ng-click='contractOverviewPlanVm.loadGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         name: "deleteFilter",
                         text: "Slet filter",
                         template:
-                        "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
+                            "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
                         template: kendo.template(this.$("#role-selector").html())
@@ -425,8 +438,7 @@
                         width: 150,
                         persistId: "parentname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem.Parent
-                            ? `<a data-ui-sref="it-contract.edit.main({id:${dataItem.Parent.Id}})">${
-                            dataItem.Parent.Name}</a>`
+                            ? `<a data-ui-sref="it-contract.edit.main({id:${dataItem.Parent.Id}})">${dataItem.Parent.Name}</a>`
                             : "",
                         excelTemplate: dataItem => dataItem && dataItem.Parent && dataItem.Parent.Name || "",
                         hidden: true,
@@ -444,8 +456,7 @@
                         title: "IT Kontrakt",
                         width: 265,
                         persistId: "name", // DON'T YOU DARE RENAME!
-                        template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${
-                            dataItem.Name}</a>`,
+                        template: dataItem => `<a data-ui-sref='it-contract.edit.main({id: ${dataItem.Id}})'>${dataItem.Name}</a>`,
                         attributes: {
                             "data-element-type": "contractNameObject"
                         },
@@ -1008,12 +1019,12 @@
                     user: ["userService", userService => userService.getUser()],
                     itContractRoles: [
                         "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
-                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
+                            localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ItContractRoles).getAll()
                     ],
                     userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
                         authorizationServiceFactory
-                        .createContractAuthorization()
-                        .getOverviewAuthorization()
+                            .createContractAuthorization()
+                            .getOverviewAuthorization()
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
