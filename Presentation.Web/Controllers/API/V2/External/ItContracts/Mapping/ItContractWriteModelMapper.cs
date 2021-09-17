@@ -7,6 +7,7 @@ using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Core.DomainModel.ItContract;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -46,6 +47,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
+            var termination = WithResetDataIfPropertyIsDefined(dto.Termination, nameof(ContractWriteRequestDTO.Termination));
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -59,7 +61,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ExternalReferences = references.FromNullable().Select(MapReferences),
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
-                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel)
+                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
+                Termination = termination.FromNullable().Select(MapTermination)
             };
         }
 
@@ -93,6 +96,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     Approved = x.Approved,
                     Expected = x.Expected
                 }).ToList()
+            };
+        }
+
+        public ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
+        {
+            return new ()
+            {
+                TerminatedAt = (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
+                NoticePeriodMonthsUuid = dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue(),
+                NoticePeriodExtendsCurrent = (dto.Terms?.NoticePeriodExtendsCurrent?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue(),
+                NoticeByEndOf = (dto.Terms?.NoticeByEndOf?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue()
             };
         }
 

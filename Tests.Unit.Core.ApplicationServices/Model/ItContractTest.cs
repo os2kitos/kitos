@@ -701,5 +701,21 @@ namespace Tests.Unit.Core.Model
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
             Assert.Empty(sut.PaymentMilestones);
         }
+
+        [Fact]
+        public void Can_ResetNoticePeriod()
+        {
+            //Arrange
+            var sut = new ItContract
+            {
+                TerminationDeadline = new TerminationDeadlineType()
+            };
+
+            //Act
+            sut.ResetNoticePeriod();
+
+            //Assert
+            Assert.Null(sut.TerminationDeadline);
+        }
     }
 }

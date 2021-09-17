@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
-using Core.DomainModel.ItContract;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;

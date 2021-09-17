@@ -793,5 +793,11 @@ namespace Core.DomainModel.ItContract
             });
             return Maybe<OperationError>.None;
         }
+
+        public void ResetNoticePeriod()
+        {
+            TerminationDeadline.Track();
+            TerminationDeadline = null;
+        }
     }
 }

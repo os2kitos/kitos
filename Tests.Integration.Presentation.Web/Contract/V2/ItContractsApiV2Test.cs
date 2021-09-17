@@ -1590,6 +1590,107 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPaymentModel(paymentModelRequest6, null, null, null, contractDTO6.PaymentModel);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Can_POST_With_Termination(bool withNoticePeriodMonth)
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var (terminationRequest, noticePeriodMonthsType) = await CreateTerminationRequest(organization.Uuid, withNoticePeriodMonth);
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Termination = terminationRequest
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            AssertTermination(terminationRequest, noticePeriodMonthsType, contractDTO.Termination);
+        }
+
+        [Fact]
+        public async Task Can_PUT_With_Termination()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            var (terminationRequest1, noticePeriodMonthsType1) = await CreateTerminationRequest(organization.Uuid, true);
+
+            //Act
+            using var response1 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest1);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+
+            //Assert
+            var contractDTO1 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertTermination(terminationRequest1, noticePeriodMonthsType1, contractDTO1.Termination);
+
+            //Act
+            var (terminationRequest2, noticePeriodMonthsType2) = await CreateTerminationRequest(organization.Uuid, true);
+            using var response2 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest2);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            var contractDTO2 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertTermination(terminationRequest2, noticePeriodMonthsType2, contractDTO2.Termination);
+
+            //Act
+            var (terminationRequest3, noticePeriodMonthsType3) = await CreateTerminationRequest(organization.Uuid, false);
+            using var response3 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest3);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            var contractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertTermination(terminationRequest3, noticePeriodMonthsType3, contractDTO3.Termination);
+
+            //Act
+            var terminationRequest4 = new ContractTerminationDataWriteRequestDTO();
+            using var response4 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest4);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
+
+            //Assert
+            var contractDTO4 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+            AssertTermination(terminationRequest4, null, contractDTO4.Termination);
+        }
+
+        private static void AssertTermination(ContractTerminationDataWriteRequestDTO expected, IdentityNamePairResponseDTO noticePeriodMonthsType, ContractTerminationDataResponseDTO actual)
+        {
+            Assert.Equal(expected.TerminatedAt, actual.TerminatedAt);
+            Assert.Equal(expected.Terms?.NoticePeriodExtendsCurrent, actual.Terms.NoticePeriodExtendsCurrent);
+            Assert.Equal(expected.Terms?.NoticeByEndOf, actual.Terms.NoticeByEndOf);
+            AssertCrossReference(noticePeriodMonthsType, actual.Terms.NoticePeriodMonths);
+        }
+
+        private async Task<(ContractTerminationDataWriteRequestDTO terminationRequest, IdentityNamePairResponseDTO noticePeriodMonthsType)> CreateTerminationRequest(Guid organizationUuid, bool withNoticePeriodMonth)
+        {
+            var noticePeriodMonths = withNoticePeriodMonth
+                ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractNoticePeriodMonthTypes,
+                    organizationUuid, 10, 0)).RandomItem()
+                : null;
+
+            var terminationRequest = new ContractTerminationDataWriteRequestDTO()
+            {
+                TerminatedAt = A<DateTime>(),
+                Terms = new ContractTerminationTermsRequestDTO()
+                {
+                    NoticePeriodMonthsUuid = noticePeriodMonths?.Uuid,
+                    NoticePeriodExtendsCurrent = A<YearSegmentChoice>(),
+                    NoticeByEndOf = A<YearSegmentChoice>()
+                }
+            };
+
+            return (terminationRequest, noticePeriodMonths);
+        }
+
         private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO expected, IdentityNamePairResponseDTO paymentFrequencyType, IdentityNamePairResponseDTO paymentModelType, IdentityNamePairResponseDTO priceRegulationType, ContractPaymentModelDataResponseDTO actual)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);

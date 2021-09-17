@@ -19,5 +19,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos);
         IEnumerable<UserRolePair> MapRoles(IEnumerable<RoleAssignmentRequestDTO> dtos);
         ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO request);
+        ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO request);
     }
 }
