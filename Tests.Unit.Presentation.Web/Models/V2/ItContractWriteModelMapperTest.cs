@@ -720,7 +720,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPOST(new CreateNewContractRequestDTO() { PaymentModel = input });
 
             //Assert
-            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
         [Theory]
@@ -743,7 +743,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPUT(new UpdateContractRequestDTO { PaymentModel = input });
 
             //Assert
-            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
         [Theory]
@@ -766,7 +766,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPATCH(new UpdateContractRequestDTO { PaymentModel = input });
 
             //Assert
-            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
         [Fact]
@@ -905,7 +905,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.IsContinuous, AssertPropertyContainsDataChange(output.IsContinuous));
         }
 
-        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output, bool hasValues)
+        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output)
         {
             Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
             Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
