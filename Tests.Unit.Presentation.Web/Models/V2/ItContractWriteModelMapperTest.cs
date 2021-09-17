@@ -62,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(13);
+            return CreateGetUndefinedSectionsInput(14);
         }
 
         [Theory]
@@ -80,7 +80,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noDataProcessingRegistrations,
             bool noRoles,
             bool noPaymentModel,
-            bool noAgreementPeriod)
+            bool noAgreementPeriod,
+            bool noPayments)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -98,6 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
             if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
             if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
+            if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -117,6 +119,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
             Assert.Equal(noPaymentModel, output.PaymentModel.IsNone);
             Assert.Equal(noAgreementPeriod, output.AgreementPeriod.IsNone);
+            Assert.Equal(noPayments, output.Payments.IsNone);
         }
 
         [Fact]
@@ -657,10 +660,75 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { AgreementPeriod = input });
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { AgreementPeriod = input });
 
             //Assert
             AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
+        }
+
+        [Fact]
+        public void Can_Map_Payments()
+        {
+            //Arrange
+            var input = A<ContractPaymentsDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapPayments(input);
+
+            //Assert
+            AssertPayments(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Payments_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractPaymentsDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO { Payments = input }).Payments.Value;
+
+            //Assert
+            AssertPayments(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Payments_FromPUT()
+        {
+            //Arrange
+            var input = A<ContractPaymentsDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO { Payments = input }).Payments.Value;
+
+            //Assert
+            AssertPayments(input, output);
+        }
+
+        private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ItContractPaymentDataModificationParameters output)
+        {
+            AssertPaymentCollection(input.Internal, AssertPropertyContainsDataChange(output.InternalPayments));
+            AssertPaymentCollection(input.External, AssertPropertyContainsDataChange(output.ExternalPayments));
+        }
+
+        private static void AssertPaymentCollection(IEnumerable<PaymentRequestDTO> expectedPayments, IEnumerable<ItContractPayment> outputPayments)
+        {
+            var expected = expectedPayments.ToList();
+            var actual = outputPayments.ToList();
+            Assert.Equal(expected.Count, actual.Count);
+            for (var i = 0; i < expected.Count; i++)
+            {
+                var exp = expected[i];
+                var act = actual[i];
+                Assert.Equal(exp.Note, act.Note);
+                Assert.Equal(exp.AccountingEntry, act.AccountingEntry);
+                Assert.Equal(exp.Acquisition, act.Acquisition);
+                Assert.Equal(exp.AuditDate, act.AuditDate);
+                Assert.Equal(exp.AuditStatus.ToTrafficLight(), act.AuditStatus);
+                Assert.Equal(exp.Operation, act.Operation);
+                Assert.Equal(exp.OrganizationUnitUuid, act.OrganizationUnitUuid);
+                Assert.Equal(exp.Other, act.Other);
+            }
         }
 
         private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
