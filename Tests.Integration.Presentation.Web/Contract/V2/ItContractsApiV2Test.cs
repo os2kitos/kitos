@@ -2016,7 +2016,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);
         }
 
-        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        private static void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
             var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
@@ -2309,13 +2309,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return handoverTrials;
         }
 
-        private void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ContractPaymentsDataResponseDTO freshDto)
+        private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ContractPaymentsDataResponseDTO freshDto)
         {
             AssertPaymentStream(input.Internal, freshDto.Internal);
             AssertPaymentStream(input.External, freshDto.External);
         }
 
-        private void AssertPaymentStream(IEnumerable<PaymentRequestDTO> inputExternal, IEnumerable<PaymentResponseDTO> outputPayments)
+        private static void AssertPaymentStream(IEnumerable<PaymentRequestDTO> inputExternal, IEnumerable<PaymentResponseDTO> outputPayments)
         {
             var expectedPayments = (inputExternal?.ToList() ?? new List<PaymentRequestDTO>()).OrderBy(x => x.AccountingEntry).ToList();
             var actualPayments = (outputPayments?.ToList() ?? new List<PaymentResponseDTO>()).OrderBy(x => x.AccountingEntry).ToList();
@@ -2328,7 +2328,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Assert.Equal(expected.Acquisition, actual.Acquisition);
                 Assert.Equal(expected.Note, actual.Note);
                 Assert.Equal(expected.Other, actual.Other);
-                Assert.Equal(expected.AuditDate, actual.AuditDate);
+                Assert.Equal(expected.AuditDate?.Date, actual.AuditDate);
                 Assert.Equal(expected.AuditStatus, actual.AuditStatus);
                 Assert.Equal(expected.Operation, actual.Operation);
                 Assert.Equal(expected.OrganizationUnitUuid, actual.OrganizationUnit?.Uuid);
@@ -2399,13 +2399,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
         {
-            var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
+            var actualRoles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
             var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
             Assert.Equal(expectedRoles.Count, expectedRoles.Count);
-            for (var i = 0; i < actualroles.Count; i++)
+            for (var i = 0; i < actualRoles.Count; i++)
             {
                 var expected = expectedRoles[i];
-                var actual = actualroles[i];
+                var actual = actualRoles[i];
                 AssertRoleAssignment(expected, actual);
             }
         }

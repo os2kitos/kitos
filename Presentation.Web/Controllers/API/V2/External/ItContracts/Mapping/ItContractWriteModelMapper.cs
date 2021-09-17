@@ -73,7 +73,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
                 AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod),
                 Payments = payments.FromNullable().Select(MapPayments),
-				Termination = termination.FromNullable().Select(MapTermination)
+                Termination = termination.FromNullable().Select(MapTermination)
             };
         }
 
@@ -163,7 +163,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
         {
-            return new ()
+            return new()
             {
                 TerminatedAt = (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
                 NoticePeriodMonthsUuid = (dto.Terms?.NoticePeriodMonthsUuid).AsChangedValue(),

@@ -130,7 +130,7 @@ namespace Core.DomainModel.ItContract
                 OrganizationUnit = optionalOrganizationUnit,
                 Acquisition = acquisition,
                 Note = note,
-                AuditDate = auditDate,
+                AuditDate = auditDate?.Date,
                 AccessModifier = AccessModifier.Local,
                 AuditStatus = auditStatus,
                 Operation = operation,
