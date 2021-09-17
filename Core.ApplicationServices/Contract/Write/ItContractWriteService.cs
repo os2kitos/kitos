@@ -56,10 +56,10 @@ namespace Core.ApplicationServices.Contract.Write
             IOrganizationService organizationService,
             IGenericRepository<HandoverTrial> handoverTrialRepository,
             IReferenceService referenceService,
-            IAssignmentUpdateService assignmentUpdateService, 
-            IItSystemUsageService usageService, 
-			IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
-            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService, 
+            IAssignmentUpdateService assignmentUpdateService,
+            IItSystemUsageService usageService,
+            IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
             IGenericRepository<PaymentMilestone> paymentMilestoneRepository)
         {
             _contractService = contractService;
@@ -153,12 +153,48 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Responsible, UpdateResponsibleData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Supplier, UpdateSupplierData))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Termination, UpdateTermination));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Termination, UpdateTermination))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod));
+        }
+
+        private Result<ItContract, OperationError> UpdateAgreementPeriod(ItContract contract, ItContractAgreementPeriodModificationParameters parameters)
+        {
+            return contract
+                .WithOptionalUpdate(parameters.IrrevocableUntil, (itContract, newValue) => itContract.IrrevocableTo = newValue)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ExtensionOptionsUuid, UpdateExtensionOption))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ExtensionOptionsUsed, (itContract, newValue) => itContract.UpdateExtendMultiplier(newValue)))
+                .Bind(updatedContract => UpdateDuration(updatedContract, parameters));
+        }
+
+        private static Result<ItContract, OperationError> UpdateDuration(ItContract contract, ItContractAgreementPeriodModificationParameters parameters)
+        {
+            if (parameters.DurationMonths.IsUnchanged && parameters.DurationYears.IsUnchanged && parameters.IsContinuous.IsUnchanged)
+                return contract;
+
+            var durationMonths = parameters.DurationMonths.MapOptionalChangeWithFallback(contract.DurationMonths);
+            var durationYears = parameters.DurationYears.MapOptionalChangeWithFallback(contract.DurationYears);
+            var continuous = parameters.IsContinuous.MapOptionalChangeWithFallback(contract.DurationOngoing);
+
+            return contract
+                .UpdateDuration(durationMonths, durationYears, continuous)
+                .Match<Result<ItContract, OperationError>>(error => error, () => contract);
+        }
+
+        private Maybe<OperationError> UpdateExtensionOption(ItContract contract, Guid? extensionOptionUuid)
+        {
+            return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
+            (
+                contract,
+                extensionOptionUuid,
+                itContract => itContract.ResetExtensionOption(),
+                itContract => itContract.OptionExtend,
+                (itContract, newOption) => itContract.OptionExtend = newOption
+            );
         }
 
         private Maybe<OperationError> UpdateRoles(ItContract contract, IEnumerable<UserRolePair> input)
@@ -299,7 +335,7 @@ namespace Core.ApplicationServices.Contract.Write
         private Result<ItContract, OperationError> UpdatePaymentModelParameters(ItContract contract, ItContractPaymentModelModificationParameters parameters)
         {
             return contract
-                .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.HasValue ? newValue.Value : null)
+                .WithOptionalUpdate(parameters.OperationsRemunerationStartedAt, (c, newValue) => c.OperationRemunerationBegun = newValue.Match(val => val, () => (DateTime?)null))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentFrequencyUuid, UpdatePaymentFrequency))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentModelUuid, UpdatePaymentModel))
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PriceRegulationUuid, UpdatePriceRegulation))
@@ -308,10 +344,10 @@ namespace Core.ApplicationServices.Contract.Write
 
         private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
         {
-            //Replace existing trials (duplicates are allowed so we cannot derive any meaningful unique identity)
+            //Replace existing milestones (duplicates are allowed so we cannot derive any meaningful unique identity)
             var paymentMilestones = contract.PaymentMilestones.ToList();
-            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
             contract.ResetPaymentMilestones();
+            paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
 
             foreach (var newMilestone in milestones)
             {
@@ -358,7 +394,7 @@ namespace Core.ApplicationServices.Contract.Write
                 (c, newValue) => c.PaymentFreqency = newValue
             );
         }
-        
+
         private Maybe<OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment
@@ -469,7 +505,6 @@ namespace Core.ApplicationServices.Contract.Write
             return contract
                 .UpdateProcurementPlan(plan.Value)
                 .Select(error => new OperationError($"Failed to update procurement plan with error message: {error.Message.GetValueOrEmptyString()}", error.FailureType));
-
         }
 
         private Maybe<OperationError> UpdatePurchaseType(ItContract contract, Guid? purchaseTypeUuid)

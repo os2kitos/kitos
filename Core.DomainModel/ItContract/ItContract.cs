@@ -682,8 +682,8 @@ namespace Core.DomainModel.ItContract
 
             if (systemUsage.OrganizationId != OrganizationId)
                 return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
-            
-            if(AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
+
+            if (AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
                 return new OperationError($"It System Usage with Id: {systemUsage.Id}, already assigned to Contract", OperationFailure.Conflict);
 
             var newAssign = new ItContractItSystemUsage
@@ -706,10 +706,10 @@ namespace Core.DomainModel.ItContract
             foreach (var contractUsageToRemove in toBeRemoved)
             {
                 var removeSucceeded = AssociatedSystemUsages.Remove(contractUsageToRemove);
-                if(!removeSucceeded)
+                if (!removeSucceeded)
                     return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
             }
-           
+
             return Maybe<OperationError>.None;
         }
 
@@ -753,21 +753,56 @@ namespace Core.DomainModel.ItContract
             return Maybe<OperationError>.None;
         }
 
+        public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
+        {
+            if (extendMultiplier < 0)
+                return new OperationError($"{nameof(extendMultiplier)} must be above or equal to 0", OperationFailure.BadInput);
+
+            ExtendMultiplier = extendMultiplier;
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetExtensionOption()
+        {
+            OptionExtend.Track();
+            OptionExtend = null;
+        }
+
+        public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool ongoing)
+        {
+            if (ongoing && (durationMonths.HasValue || durationYears.HasValue))
+                return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadInput);
+
+            if (durationYears.GetValueOrDefault() < 0)
+                return new OperationError($"{nameof(durationYears)} cannot be below 0", OperationFailure.BadInput);
+
+            var months = durationMonths.GetValueOrDefault();
+
+            if (months is < 0 or > 11)
+                return new OperationError($"{nameof(durationMonths)} cannot be below 0 or above 11", OperationFailure.BadInput);
+
+            DurationOngoing = ongoing;
+            DurationYears = durationYears;
+            DurationMonths = durationMonths;
+
+            return Maybe<OperationError>.None;
+        }
+
         public void ResetPaymentFrequency()
         {
-            PaymentFreqency?.Track();
+            PaymentFreqency.Track();
             PaymentFreqency = null;
         }
 
         public void ResetPaymentModel()
         {
-            PaymentModel?.Track();
+            PaymentModel.Track();
             PaymentModel = null;
         }
 
         public void ResetPriceRegulation()
         {
-            PriceRegulation?.Track();
+            PriceRegulation.Track();
             PriceRegulation = null;
         }
 
@@ -779,7 +814,7 @@ namespace Core.DomainModel.ItContract
 
         public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
         {
-            if(string.IsNullOrEmpty(title))
+            if (string.IsNullOrEmpty(title))
                 return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
 
             if (expected.HasValue == false && approved.HasValue == false)
@@ -791,6 +826,7 @@ namespace Core.DomainModel.ItContract
                 Expected = expected?.Date,
                 Approved = approved?.Date
             });
+
             return Maybe<OperationError>.None;
         }
 

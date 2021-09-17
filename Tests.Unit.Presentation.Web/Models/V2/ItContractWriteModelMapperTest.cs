@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
@@ -59,34 +60,27 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
         }
 
+        public static IEnumerable<object[]> GetUndefinedSectionsInput()
+        {
+            return CreateGetUndefinedSectionsInput(13);
+        }
+
         [Theory]
-        [InlineData(false, false, false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, false, false, false, true)]
-        [InlineData(false, false, false, false, false, false, false, false, false, false, true, false)]
-        [InlineData(false, false, false, false, false, false, false, false, false, true, false, false)]
-        [InlineData(false, false, false, false, false, false, false, false, true, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false, true, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, true, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, true, false, false, false, false, false, false, false)]
-        [InlineData(false, false, false, true, false, false, false, false, false, false, false, false)]
-        [InlineData(false, false, true, false, false, false, false, false, false, false, false, false)]
-        [InlineData(false, true, false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false, false, false, false, false, false)]
-        [InlineData(true, true, true, true, true, true, true, true, true, true, true, true)]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPUT_Ignores_Undefined_Root_Sections(
-            bool noName, 
-            bool noGeneralData, 
-            bool noParent, 
-            bool noResponsible, 
-            bool noProcurement, 
-            bool noSupplier, 
-            bool noHandoverTrials, 
-            bool noSystemUsages, 
-            bool noExternalReferences, 
+            bool noName,
+            bool noGeneralData,
+            bool noParent,
+            bool noResponsible,
+            bool noProcurement,
+            bool noSupplier,
+            bool noHandoverTrials,
+            bool noSystemUsages,
+            bool noExternalReferences,
             bool noDataProcessingRegistrations,
             bool noRoles,
-            bool noPaymentModel)
+            bool noPaymentModel,
+            bool noAgreementPeriod)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -103,6 +97,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
             if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
             if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
+            if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -121,6 +116,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noSystemUsages, output.SystemUsageUuids.IsNone);
             Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
             Assert.Equal(noPaymentModel, output.PaymentModel.IsNone);
+            Assert.Equal(noAgreementPeriod, output.AgreementPeriod.IsNone);
         }
 
         [Fact]
@@ -509,7 +505,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
         }
-		
+
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -545,8 +541,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
             AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
         }
-		
-		private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
+
+        private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
         {
             Assert.Equal(roles.Count, rolePairs.Count);
             for (var i = 0; i < rolePairs.Count; i++)
@@ -556,7 +552,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.RoleUuid, actual.RoleUuid);
                 Assert.Equal(expected.UserUuid, actual.UserUuid);
             }
-		}
+        }
 
 
         [Theory]
@@ -628,24 +624,65 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
         }
 
+        [Fact]
+        public void Can_Map_Agreement_Period()
+        {
+            //Arrange
+            var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapAgreementPeriod(input);
+
+            //Assert
+            AssertAgreementPeriod(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Agreement_Period_FromPUT()
+        {
+            //Arrange
+            var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO() { AgreementPeriod = input });
+
+            //Assert
+            AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
+        }
+
+        [Fact]
+        public void Can_Map_Agreement_Period_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { AgreementPeriod = input });
+
+            //Assert
+            AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
+        }
+
+        private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
+            ItContractAgreementPeriodModificationParameters output)
+        {
+            Assert.Equal(input.DurationMonths, AssertPropertyContainsDataChange(output.DurationMonths));
+            Assert.Equal(input.DurationYears, AssertPropertyContainsDataChange(output.DurationYears));
+            Assert.Equal(input.ExtensionOptionsUsed, AssertPropertyContainsDataChange(output.ExtensionOptionsUsed));
+            Assert.Equal(input.ExtensionOptionsUuid, AssertPropertyContainsDataChange(output.ExtensionOptionsUuid));
+            Assert.Equal(input.IrrevocableUntil, AssertPropertyContainsDataChange(output.IrrevocableUntil));
+            Assert.Equal(input.IsContinuous, AssertPropertyContainsDataChange(output.IsContinuous));
+        }
+
         private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output, bool hasValues)
         {
-            if (hasValues)
-            {
-                Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue);
-                Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
-                Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
-                Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
-                AssertPaymentMilestones(input.PaymentMileStones, output.PaymentMileStones.Value);
-            }
-            else
-            {
-                Assert.True(output.OperationsRemunerationStartedAt.NewValue.IsNone);
-                Assert.Null(output.PaymentFrequencyUuid.NewValue);
-                Assert.Null(output.PaymentModelUuid.NewValue);
-                Assert.Null(output.PriceRegulationUuid.NewValue);
-                Assert.True(output.PaymentMileStones.IsNone);
-            }
+            Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
+            Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
+            Assert.Equal(input.PriceRegulationUuid, output.PriceRegulationUuid.NewValue);
+            Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue.Match(val => val, () => (DateTime?)null));
+            AssertPaymentMilestones(
+                input.PaymentMileStones.FromNullable().Match(val => val, () => new List<PaymentMileStoneDTO>()),
+                output.PaymentMileStones.Match(val => val, () => new List<ItContractPaymentMilestone>()));
         }
 
         private static void AssertPaymentMilestones(IEnumerable<PaymentMileStoneDTO> input, IEnumerable<ItContractPaymentMilestone> output)
