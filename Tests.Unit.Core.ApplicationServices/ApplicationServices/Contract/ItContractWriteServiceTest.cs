@@ -1398,6 +1398,28 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, $"Failed to add internal payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization", OperationFailure.BadInput, transaction);
         }
 
+        [Fact]
+        public void Can_Update_With_All()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
+
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(payments: A<ItContractPaymentDataModificationParameters>());
+            
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+
+            AssertPayments(parameters.Payments.Value, result.Value);
+        }
+
         private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
         {
             AssertPaymentStream(input.ExternalPayments.NewValue.ToList(), updatedContract.ExternEconomyStreams.ToList());
