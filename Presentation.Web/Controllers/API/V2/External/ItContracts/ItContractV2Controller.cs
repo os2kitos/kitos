@@ -17,10 +17,7 @@ using Core.ApplicationServices.Contract.Write;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Core.Abstractions.Extensions;
-using Core.ApplicationServices.Model.Contracts.Write;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {

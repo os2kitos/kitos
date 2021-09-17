@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
@@ -13,10 +12,8 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
-
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
@@ -53,6 +50,13 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
         {
             var requestMessage = CreatePutMessage(url, body);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            return StatelessHttpClient.SendAsync(requestMessage);
+        }
+
+        public static Task<HttpResponseMessage> PatchWithTokenAsync(Uri url, string token, object body = null)
+        {
+            var requestMessage = CreatePatchMessage(url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
@@ -172,6 +176,11 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static HttpRequestMessage CreatePutMessage(Uri url, object body)
         {
             return CreateMessageWithContent(HttpMethod.Put, url, body);
+        }
+
+        private static HttpRequestMessage CreatePatchMessage(Uri url, object body)
+        {
+            return CreateMessageWithContent(new HttpMethod("PATCH"), url, body);
         }
 
         private static HttpRequestMessage CreateMessageWithContent(HttpMethod method, Uri url, object body)
