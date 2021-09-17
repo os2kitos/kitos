@@ -398,8 +398,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.Equal(contract.Terminated, dto.Termination.TerminatedAt);
             AssertOptionalIdentity(contract.TerminationDeadline, dto.Termination.Terms.NoticePeriodMonths);
-            AssertYearSegment(contract.Running, dto.Termination.Terms.NoticeByEndOf);
-            AssertYearSegment(contract.ByEnding, dto.Termination.Terms.NoticePeriodExtendsCurrent);
+            AssertYearSegment(contract.Running, dto.Termination.Terms.NoticePeriodExtendsCurrent);
+            AssertYearSegment(contract.ByEnding, dto.Termination.Terms.NoticeByEndOf);
         }
 
         [Theory]
