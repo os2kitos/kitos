@@ -152,12 +152,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 PaymentFrequencyUuid = dto.PaymentFrequencyUuid.AsChangedValue(),
                 PaymentModelUuid = dto.PaymentModelUuid.AsChangedValue(),
                 PriceRegulationUuid = dto.PriceRegulationUuid.AsChangedValue(),
-                PaymentMileStones = dto.PaymentMileStones?.Select(x => new ItContractPaymentMilestone()
+                PaymentMileStones = (dto.PaymentMileStones?.Select(x => new ItContractPaymentMilestone()
                 {
                     Title = x.Title,
                     Approved = x.Approved,
                     Expected = x.Expected
-                }).ToList()
+                }).ToList() ?? new List<ItContractPaymentMilestone>()).AsChangedValue<IEnumerable<ItContractPaymentMilestone>>()
             };
         }
 
@@ -166,7 +166,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return new ()
             {
                 TerminatedAt = (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
-                NoticePeriodMonthsUuid = dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue(),
+                NoticePeriodMonthsUuid = (dto.Terms?.NoticePeriodMonthsUuid).AsChangedValue(),
                 NoticePeriodExtendsCurrent = (dto.Terms?.NoticePeriodExtendsCurrent?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue(),
                 NoticeByEndOf = (dto.Terms?.NoticeByEndOf?.ToYearSegmentOption() ?? Maybe<YearSegmentOption>.None).AsChangedValue()
             };
