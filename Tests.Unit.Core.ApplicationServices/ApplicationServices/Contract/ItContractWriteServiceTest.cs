@@ -73,7 +73,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _roleAssignmentService = new Mock<IRoleAssignmentService<ItContractRight, ItContractRole, ItContract>>();
             _dprServiceMock = new Mock<IDataProcessingRegistrationApplicationService>();
             _paymentMilestoneRepository = new Mock<IGenericRepository<PaymentMilestone>>();
-            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, _paymentMilestoneRepository.Object);
+            _sut = new ItContractWriteService(_itContractServiceMock.Object, _identityResolverMock.Object, _optionResolverMock.Object, _transactionManagerMock.Object, _domainEventsMock.Object, _databaseControlMock.Object, _agreementElementTypeRepository.Object, _authContext.Object, _organizationServiceMock.Object, _handoverTrialRepository.Object, _referenceServiceMock.Object, _assignmentUpdateServiceMock.Object, _usageServiceMock.Object, _roleAssignmentService.Object, _dprServiceMock.Object, _paymentMilestoneRepository.Object, Mock.Of<IGenericRepository<EconomyStream>>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -1315,6 +1315,113 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result, operationError.Message.GetValueOrEmptyString(), operationError.FailureType, transaction);
         }
 
+        [Fact]
+        public void Can_Create_With_Payments()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
+            var paymentParameters = new ItContractPaymentDataModificationParameters()
+            {
+                ExternalPayments = Many<ItContractPayment>().ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+                InternalPayments = Many<ItContractPayment>().ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(payments: paymentParameters);
+
+            var organizationUnits = paymentParameters
+                .InternalPayments
+                .NewValue.Concat(paymentParameters.ExternalPayments.NewValue)
+                .Select(x => x.OrganizationUnitUuid.GetValueOrDefault()).Distinct()
+                .ToDictionary(uuid => uuid, uuid => new OrganizationUnit() { Uuid = uuid });
+
+            createdContract.Organization.OrgUnits = organizationUnits.Values.ToList();
+
+            //add some existing streams to ensure they are removed during the update
+            createdContract.ExternEconomyStreams.Add(new EconomyStream());
+            createdContract.InternEconomyStreams.Add(new EconomyStream());
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertPayments(paymentParameters, result.Value);
+            AssertTransactionCommitted(transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Payments_If_OrganizationUnit_Not_In_Organization_Of_External_Payment()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
+            var paymentParameters = new ItContractPaymentDataModificationParameters()
+            {
+                ExternalPayments = Many<ItContractPayment>().ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(payments: paymentParameters);
+
+            var organizationUnits = paymentParameters.ExternalPayments.NewValue
+                .Select(x => x.OrganizationUnitUuid.GetValueOrDefault()).Distinct()
+                .ToDictionary(uuid => uuid, uuid => new OrganizationUnit() { Uuid = uuid });
+
+            var invalidOrgUnit = organizationUnits.Values.RandomItem();
+            createdContract.Organization.OrgUnits = organizationUnits.Values.Except(invalidOrgUnit.WrapAsEnumerable()).ToList();
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result,$"Failed to add external payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization",OperationFailure.BadInput,transaction);
+        }
+
+        [Fact]
+        public void Cannot_Create_With_Payments_If_OrganizationUnit_Not_In_Organization_Of_Internal_Payment()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
+            var paymentParameters = new ItContractPaymentDataModificationParameters()
+            {
+                InternalPayments = Many<ItContractPayment>().ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+            };
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(payments: paymentParameters);
+
+            var organizationUnits = paymentParameters.InternalPayments.NewValue
+                .Select(x => x.OrganizationUnitUuid.GetValueOrDefault()).Distinct()
+                .ToDictionary(uuid => uuid, uuid => new OrganizationUnit() { Uuid = uuid });
+
+            var invalidOrgUnit = organizationUnits.Values.RandomItem();
+            createdContract.Organization.OrgUnits = organizationUnits.Values.Except(invalidOrgUnit.WrapAsEnumerable()).ToList();
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            AssertFailureWithKnownErrorDetails(result, $"Failed to add internal payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization", OperationFailure.BadInput, transaction);
+        }
+
+        private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
+        {
+            AssertPaymentStream(input.ExternalPayments.NewValue.ToList(), updatedContract.ExternEconomyStreams.ToList());
+            AssertPaymentStream(input.InternalPayments.NewValue.ToList(), updatedContract.InternEconomyStreams.ToList());
+        }
+
+        private static void AssertPaymentStream(List<ItContractPayment> expectedPayments, List<EconomyStream> actualEconomyStreams)
+        {
+            Assert.Equal(expectedPayments.Count, actualEconomyStreams.Count);
+            for (var i = 0; i < expectedPayments.Count; i++)
+            {
+                var expected = expectedPayments[i];
+                var actual = actualEconomyStreams[i];
+                Assert.Equal(expected.Note, actual.Note);
+                Assert.Equal(expected.Other, actual.Other);
+                Assert.Equal(expected.Acquisition, actual.Acquisition);
+                Assert.Equal(expected.Operation, actual.Operation);
+                Assert.Equal(expected.AccountingEntry, actual.AccountingEntry);
+                Assert.Equal(expected.OrganizationUnitUuid, actual.OrganizationUnit?.Uuid);
+                Assert.Equal(expected.AuditStatus, actual.AuditStatus);
+                Assert.Equal(expected.AuditDate?.Date, actual.AuditDate?.Date);
+            }
+        }
+
         private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);
@@ -1452,7 +1559,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             IEnumerable<UserRolePair> roleAssignments = null,
             IEnumerable<Guid> dataProcessingRegistrationUuids = null,
             ItContractPaymentModelModificationParameters paymentModel = null,
-            ItContractAgreementPeriodModificationParameters agreementPeriod = null
+            ItContractAgreementPeriodModificationParameters agreementPeriod = null,
+            ItContractPaymentDataModificationParameters payments = null
             )
         {
             var organization = new Organization
@@ -1473,9 +1581,10 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 Roles = roleAssignments.FromNullable(),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable(),
-                AgreementPeriod = agreementPeriod.FromNullable()
+                AgreementPeriod = agreementPeriod.FromNullable(),
+                Payments = payments.FromNullable()
             };
-            var createdContract = new ItContract()
+            var createdContract = new ItContract
             {
                 Id = A<int>(),
                 Uuid = A<Guid>(),

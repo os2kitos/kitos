@@ -9,6 +9,7 @@ using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
+using Core.ApplicationServices.Model.Contracts.Write;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
@@ -21,6 +22,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
+using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -1541,54 +1543,94 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).AgreementPeriod;
             AssertAgreementPeriod(input3, freshDTO);
         }
-        private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
-            ContractAgreementPeriodDataResponseDTO freshDTO)
-        {
-            Assert.Equal(input.DurationMonths, freshDTO.DurationMonths);
-            Assert.Equal(input.DurationYears, freshDTO.DurationYears);
-            Assert.Equal(input.IsContinuous, freshDTO.IsContinuous);
-            Assert.Equal(input.ExtensionOptionsUsed, freshDTO.ExtensionOptionsUsed);
-            Assert.Equal(input.ExtensionOptionsUuid, freshDTO.ExtensionOptions?.Uuid);
-            Assert.Equal(input.IrrevocableUntil, freshDTO.IrrevocableUntil);
-        }
 
-        private async Task<ContractAgreementPeriodDataWriteRequestDTO> CreateAgreementPeriodInput(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate,
-            Organization organization)
+        [Fact]
+        public async Task Can_POST_With_Payments()
         {
-            var extensionOption = hasExtensionOption
-                ? (await OptionV2ApiHelper.GetOptionsAsync(
-                    OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes, organization.Uuid, 10, 0))
-                .RandomItem()
-                : null;
-            var input = new ContractAgreementPeriodDataWriteRequestDTO
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var input = await CreatePaymentsInput(token, organization, true, true);
+            var request = new CreateNewContractRequestDTO
             {
-                DurationMonths = isContinuous ? null : A<int>() % 12,
-                DurationYears = isContinuous ? null : Math.Abs(A<int>()),
-                IsContinuous = isContinuous,
-                ExtensionOptionsUsed = Math.Abs(A<int>()),
-                IrrevocableUntil = hasIrrevocableDate ? A<DateTime>() : null,
-                ExtensionOptionsUuid = extensionOption?.Uuid
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                Payments = input
             };
-            return input;
+
+            //Act
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
+
+            //Assert
+            var freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input, freshDTO);
         }
 
-        private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
+        [Fact]
+        public async Task Can_PUT_Payments()
         {
-            var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
-            var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
-            Assert.Equal(expectedRoles.Count, expectedRoles.Count);
-            for (var i = 0; i < actualroles.Count; i++)
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var input1 = await CreatePaymentsInput(token, organization, true, true);
+            var input2 = await CreatePaymentsInput(token, organization, true, true);
+            var input3 = await CreatePaymentsInput(token, organization, true, false);
+            var input4 = await CreatePaymentsInput(token, organization, false, true);
+            var input5 = await CreatePaymentsInput(token, organization, false, false);
+            var input6 = new ContractPaymentsDataWriteRequestDTO();
+
+            var request = new CreateNewContractRequestDTO
             {
-                var expected = expectedRoles[i];
-                var actual = actualroles[i];
-                AssertRoleAssignment(expected, actual);
-            }
-        }
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+            };
+            var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
-        private static void AssertRoleAssignment(RoleAssignmentRequestDTO expected, RoleAssignmentResponseDTO actual)
-        {
-            Assert.Equal(expected.RoleUuid, actual.Role?.Uuid);
-            Assert.Equal(expected.UserUuid, actual.User?.Uuid);
+            //Act
+            using var response1 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input1);
+            Assert.Equal(HttpStatusCode.OK,response1.StatusCode);
+
+            //Assert
+            var freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input1, freshDTO);
+
+            //Act
+            using var response2 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input2);
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+
+            //Assert
+            freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input2, freshDTO);
+
+            //Act
+            using var response3 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input3);
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+
+            //Assert
+            freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input3, freshDTO);
+
+            //Act
+            using var response4 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input4);
+            Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
+
+            //Assert
+            freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input4, freshDTO);
+            
+            //Act
+            using var response5 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input5);
+            Assert.Equal(HttpStatusCode.OK, response5.StatusCode);
+
+            //Assert
+            freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input5, freshDTO);
+            
+            //Act
+            using var response6 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input6);
+            Assert.Equal(HttpStatusCode.OK, response6.StatusCode);
+
+            //Assert
+            freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
+            AssertPayments(input6, freshDTO);
         }
 
         [Theory]
@@ -1814,10 +1856,10 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         private async Task<(
-            ContractPaymentModelDataWriteRequestDTO paymentModelRequest, 
-            IdentityNamePairResponseDTO paymentFrequencyType, 
-            IdentityNamePairResponseDTO paymentModelType, 
-            IdentityNamePairResponseDTO priceRegulationType)> 
+            ContractPaymentModelDataWriteRequestDTO paymentModelRequest,
+            IdentityNamePairResponseDTO paymentFrequencyType,
+            IdentityNamePairResponseDTO paymentModelType,
+            IdentityNamePairResponseDTO priceRegulationType)>
             CreatePaymentModelRequestAsync(Guid organizationUuid, bool withPaymentFrequencyType, bool withPaymentModelType, bool withPriceRegulationType, bool withMilestones)
         {
             var paymentFrequencyType = withPaymentFrequencyType
@@ -2036,6 +2078,113 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 OrganizationUnitUuid = organizationUnit?.Uuid
             };
             return contractResponsibleDataWriteRequestDto;
+        }
+
+        private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ContractPaymentsDataResponseDTO freshDto)
+        {
+            AssertPaymentStream(input.Internal, freshDto.Internal);
+            AssertPaymentStream(input.External, freshDto.External);
+        }
+
+        private static void AssertPaymentStream(IEnumerable<PaymentRequestDTO> inputExternal, IEnumerable<PaymentResponseDTO> outputPayments)
+        {
+            var expectedPayments = (inputExternal?.ToList() ?? new List<PaymentRequestDTO>()).OrderBy(x => x.AccountingEntry).ToList();
+            var actualPayments = (outputPayments?.ToList() ?? new List<PaymentResponseDTO>()).OrderBy(x => x.AccountingEntry).ToList();
+            Assert.Equal(expectedPayments.Count, actualPayments.Count);
+            for (var i = 0; i < expectedPayments.Count; i++)
+            {
+                var expected = expectedPayments[i];
+                var actual = actualPayments[i];
+                Assert.Equal(expected.AccountingEntry, actual.AccountingEntry);
+                Assert.Equal(expected.Acquisition, actual.Acquisition);
+                Assert.Equal(expected.Note, actual.Note);
+                Assert.Equal(expected.Other, actual.Other);
+                Assert.Equal(expected.AuditDate?.Date, actual.AuditDate?.Date);
+                Assert.Equal(expected.AuditStatus, actual.AuditStatus);
+                Assert.Equal(expected.Operation, actual.Operation);
+                Assert.Equal(expected.OrganizationUnitUuid, actual.OrganizationUnit?.Uuid);
+            }
+        }
+
+        private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, Organization organization, bool withExternal, bool withInternal)
+        {
+            List<PaymentRequestDTO> internalPayments = null;
+            List<PaymentRequestDTO> externalPayments = null;
+            var organizationUnits = (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).ToList();
+
+            if (withInternal)
+            {
+                internalPayments = Many<PaymentRequestDTO>(5).Select(x => WithOrganizationUnit(x, organizationUnits.RandomItem())).ToList();
+                internalPayments.Skip(2).First().OrganizationUnitUuid = null;
+            }
+            if (withExternal)
+            {
+                externalPayments = Many<PaymentRequestDTO>(5).Select(x => WithOrganizationUnit(x, organizationUnits.RandomItem())).ToList();
+                externalPayments.Skip(2).First().OrganizationUnitUuid = null;
+            }
+
+            var input = new ContractPaymentsDataWriteRequestDTO
+            {
+                Internal = internalPayments,
+                External = externalPayments
+            };
+            return input;
+        }
+
+        private static PaymentRequestDTO WithOrganizationUnit(PaymentRequestDTO itContractPayment, OrganizationUnitResponseDTO organizationUnit)
+        {
+            itContractPayment.OrganizationUnitUuid = organizationUnit.Uuid;
+            return itContractPayment;
+        }
+
+        private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
+            ContractAgreementPeriodDataResponseDTO freshDTO)
+        {
+            Assert.Equal(input.DurationMonths, freshDTO.DurationMonths);
+            Assert.Equal(input.DurationYears, freshDTO.DurationYears);
+            Assert.Equal(input.IsContinuous, freshDTO.IsContinuous);
+            Assert.Equal(input.ExtensionOptionsUsed, freshDTO.ExtensionOptionsUsed);
+            Assert.Equal(input.ExtensionOptionsUuid, freshDTO.ExtensionOptions?.Uuid);
+            Assert.Equal(input.IrrevocableUntil, freshDTO.IrrevocableUntil);
+        }
+
+        private async Task<ContractAgreementPeriodDataWriteRequestDTO> CreateAgreementPeriodInput(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate,
+            Organization organization)
+        {
+            var extensionOption = hasExtensionOption
+                ? (await OptionV2ApiHelper.GetOptionsAsync(
+                    OptionV2ApiHelper.ResourceName.ItContractAgreementExtensionOptionTypes, organization.Uuid, 10, 0))
+                .RandomItem()
+                : null;
+            var input = new ContractAgreementPeriodDataWriteRequestDTO
+            {
+                DurationMonths = isContinuous ? null : A<int>() % 12,
+                DurationYears = isContinuous ? null : Math.Abs(A<int>()),
+                IsContinuous = isContinuous,
+                ExtensionOptionsUsed = Math.Abs(A<int>()),
+                IrrevocableUntil = hasIrrevocableDate ? A<DateTime>() : null,
+                ExtensionOptionsUuid = extensionOption?.Uuid
+            };
+            return input;
+        }
+
+        private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
+        {
+            var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
+            var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
+            Assert.Equal(expectedRoles.Count, expectedRoles.Count);
+            for (var i = 0; i < actualroles.Count; i++)
+            {
+                var expected = expectedRoles[i];
+                var actual = actualroles[i];
+                AssertRoleAssignment(expected, actual);
+            }
+        }
+
+        private static void AssertRoleAssignment(RoleAssignmentRequestDTO expected, RoleAssignmentResponseDTO actual)
+        {
+            Assert.Equal(expected.RoleUuid, actual.Role?.Uuid);
+            Assert.Equal(expected.UserUuid, actual.User?.Uuid);
         }
     }
 }

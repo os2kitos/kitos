@@ -54,7 +54,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
             var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
+            var payments = WithResetDataIfPropertyIsDefined(dto.Payments, nameof(ContractWriteRequestDTO.Payments));
             var termination = WithResetDataIfPropertyIsDefined(dto.Termination, nameof(ContractWriteRequestDTO.Termination));
+
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -70,7 +72,37 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
                 AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod),
+                Payments = payments.FromNullable().Select(MapPayments),
                 Termination = termination.FromNullable().Select(MapTermination)
+            };
+        }
+
+        public ItContractPaymentDataModificationParameters MapPayments(ContractPaymentsDataWriteRequestDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            dto.External ??= new List<PaymentRequestDTO>();
+            dto.Internal ??= new List<PaymentRequestDTO>();
+            return new ItContractPaymentDataModificationParameters()
+            {
+                ExternalPayments = dto.External.Select(MapPayment).ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+                InternalPayments = dto.Internal.Select(MapPayment).ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+            };
+        }
+
+        private static ItContractPayment MapPayment(PaymentRequestDTO dto)
+        {
+            return new ItContractPayment()
+            {
+                Note = dto.Note,
+                AccountingEntry = dto.AccountingEntry,
+                Acquisition = dto.Acquisition,
+                Operation = dto.Operation,
+                Other = dto.Other,
+                AuditDate = dto.AuditDate,
+                AuditStatus = dto.AuditStatus.ToTrafficLight(),
+                OrganizationUnitUuid = dto.OrganizationUnitUuid
             };
         }
 
@@ -131,7 +163,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
         {
-            return new ()
+            return new()
             {
                 TerminatedAt = (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
                 NoticePeriodMonthsUuid = dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue(),
