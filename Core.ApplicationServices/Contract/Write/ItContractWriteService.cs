@@ -14,6 +14,7 @@ using Core.ApplicationServices.OptionTypes;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
@@ -43,6 +44,7 @@ namespace Core.ApplicationServices.Contract.Write
         private readonly IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> _roleAssignmentService;
         private readonly IDataProcessingRegistrationApplicationService _dataProcessingRegistrationApplicationService;
         private readonly IGenericRepository<PaymentMilestone> _paymentMilestoneRepository;
+        private readonly IGenericRepository<EconomyStream> _economyStreamRepository;
 
         public ItContractWriteService(
             IItContractService contractService,
@@ -60,7 +62,8 @@ namespace Core.ApplicationServices.Contract.Write
             IItSystemUsageService usageService,
             IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
             IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
-            IGenericRepository<PaymentMilestone> paymentMilestoneRepository)
+            IGenericRepository<PaymentMilestone> paymentMilestoneRepository,
+            IGenericRepository<EconomyStream> economyStreamRepository)
         {
             _contractService = contractService;
             _entityIdentityResolver = entityIdentityResolver;
@@ -78,6 +81,7 @@ namespace Core.ApplicationServices.Contract.Write
             _roleAssignmentService = roleAssignmentService;
             _dataProcessingRegistrationApplicationService = dataProcessingRegistrationApplicationService;
             _paymentMilestoneRepository = paymentMilestoneRepository;
+            _economyStreamRepository = economyStreamRepository;
         }
 
         public Result<ItContract, OperationError> Create(Guid organizationUuid, ItContractModificationParameters parameters)
@@ -158,8 +162,50 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
-                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod));
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Payments, UpdatePayments));
         }
+
+        private Result<ItContract, OperationError> UpdatePayments(ItContract contract, ItContractPaymentDataModificationParameters parameters)
+        {
+            return contract
+                .WithOptionalUpdate(parameters.ExternalPayments, UpdateExternalPayments)
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.InternalPayments, UpdateInternalPayments));
+        }
+
+        private Maybe<OperationError> UpdateInternalPayments(ItContract contract, IEnumerable<ItContractPayment> newPaymentState)
+        {
+            return ReplacePayments(true, contract.InternEconomyStreams.ToList(), newPaymentState, contract.ResetInternalEconomyStreams, contract.AddInternalEconomyStream);
+        }
+
+        private Maybe<OperationError> UpdateExternalPayments(ItContract contract, IEnumerable<ItContractPayment> newPaymentState)
+        {
+            return ReplacePayments(false, contract.ExternEconomyStreams.ToList(), newPaymentState, contract.ResetExternalEconomyStreams, contract.AddExternalEconomyStream);
+        }
+
+        private delegate Maybe<OperationError> AddPaymentFunc(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note);
+        private Maybe<OperationError> ReplacePayments(
+            bool internalPayment,
+            IEnumerable<EconomyStream> currentState,
+            IEnumerable<ItContractPayment> newPaymentState,
+            Action resetCurrentState,
+            AddPaymentFunc addPayment)
+        {
+            var subject = internalPayment ? "internal" : "external";
+            var economyStreams = currentState.ToList();
+            resetCurrentState();
+            economyStreams.ForEach(_economyStreamRepository.Delete);
+
+            foreach (var itContractPayment in newPaymentState.ToList())
+            {
+                var error = addPayment(itContractPayment.OrganizationUnitUuid, itContractPayment.Acquisition, itContractPayment.Operation, itContractPayment.Other, itContractPayment.AccountingEntry, itContractPayment.AuditStatus, itContractPayment.AuditDate, itContractPayment.Note);
+                if (error.HasValue)
+                    return new OperationError($"Failed to add {subject} payment:{error.Value.Message.GetValueOrEmptyString()}", error.Value.FailureType);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
 
         private Result<ItContract, OperationError> UpdateAgreementPeriod(ItContract contract, ItContractAgreementPeriodModificationParameters parameters)
         {
