@@ -53,6 +53,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
             var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
             var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
+            var payments = WithResetDataIfPropertyIsDefined(dto.Payments, nameof(ContractWriteRequestDTO.Payments));
 
             return new ItContractModificationParameters
             {
@@ -68,7 +69,37 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
                 PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
-                AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod)
+                AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod),
+                Payments = payments.FromNullable().Select(MapPayments)
+            };
+        }
+
+        public ItContractPaymentDataModificationParameters MapPayments(ContractPaymentsDataWriteRequestDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            dto.External ??= new List<PaymentRequestDTO>();
+            dto.Internal ??= new List<PaymentRequestDTO>();
+            return new ItContractPaymentDataModificationParameters()
+            {
+                ExternalPayments = dto.External.Select(MapPayment).ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+                InternalPayments = dto.Internal.Select(MapPayment).ToList().AsChangedValue<IEnumerable<ItContractPayment>>(),
+            };
+        }
+
+        private static ItContractPayment MapPayment(PaymentRequestDTO dto)
+        {
+            return new ItContractPayment()
+            {
+                Note = dto.Note,
+                AccountingEntry = dto.AccountingEntry,
+                Acquisition = dto.Acquisition,
+                Operation = dto.Operation,
+                Other = dto.Other,
+                AuditDate = dto.AuditDate,
+                AuditStatus = dto.AuditStatus.ToTrafficLight(),
+                OrganizationUnitUuid = dto.OrganizationUnitUuid
             };
         }
 
