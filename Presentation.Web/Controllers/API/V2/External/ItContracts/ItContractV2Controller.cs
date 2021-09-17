@@ -533,7 +533,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult DeleteItContract([NonEmptyGuid] Guid contractUuid, [FromBody] ContractWriteRequestDTO request)
+        public IHttpActionResult DeleteItContract([NonEmptyGuid] Guid contractUuid)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

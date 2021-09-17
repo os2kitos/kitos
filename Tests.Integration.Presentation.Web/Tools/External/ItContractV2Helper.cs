@@ -147,5 +147,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/termination"), token, dto);
         }
+
+        public static async Task<HttpResponseMessage> SendDeleteContractAsync(string token, Guid contractUuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token);
+        }
     }
 }
