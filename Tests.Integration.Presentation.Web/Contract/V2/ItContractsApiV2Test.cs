@@ -660,47 +660,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Null(updatedContractDTO3.Procurement.ProcurementPlan);
         }
 
-        private static void AssertProcurement(ContractProcurementDataWriteRequestDTO expected, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType, ContractProcurementDataResponseDTO actual)
-        {
-            AssertCrossReference(procurementStrategy, actual.ProcurementStrategy);
-            AssertCrossReference(purchaseType, actual.PurchaseType);
-            if (expected.ProcurementPlan == null)
-            {
-                Assert.Null(actual.ProcurementPlan);
-            }
-            else
-            {
-                Assert.Equal(expected.ProcurementPlan.HalfOfYear, actual.ProcurementPlan.HalfOfYear);
-                Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
-            }
-        }
-
-        private async Task<(ContractProcurementDataWriteRequestDTO request, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType)> CreateProcurementRequestAsync(Guid organizationUuid)
-        {
-            var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
-            var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
-            var request = new ContractProcurementDataWriteRequestDTO()
-            {
-                ProcurementStrategyUuid = procurementStrategy.Uuid,
-                PurchaseTypeUuid = purchaseType.Uuid,
-                ProcurementPlan = new ProcurementPlanDTO()
-                {
-                    HalfOfYear = Convert.ToByte((A<int>() % 1) + 1),
-                    Year = A<int>()
-                }
-            };
-            return (request, procurementStrategy, purchaseType);
-        }
-
-        private CreateNewContractRequestDTO CreateNewSimpleRequest(Guid organizationUuid)
-        {
-            return new CreateNewContractRequestDTO()
-            {
-                Name = CreateName(),
-                OrganizationUuid = organizationUuid
-            };
-        }
-
         [Theory]
         [InlineData(true, true, true)]
         [InlineData(true, true, false)]
@@ -1005,67 +964,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertHandoverTrials(handoverTrials, responseDto);
         }
 
-        private static void AssertHandoverTrials(IEnumerable<HandoverTrialRequestDTO> request, ItContractResponseDTO responseDto)
-        {
-            var expectedHandoverTrials = request
-                .OrderBy(x => x.HandoverTrialTypeUuid)
-                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
-                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
-                .ToList();
-            var actualHandoverTrials = responseDto.HandoverTrials
-                .OrderBy(x => x.HandoverTrialType.Uuid)
-                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
-                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
-                .ToList();
-
-            Assert.Equal(expectedHandoverTrials.Count, actualHandoverTrials.Count);
-            for (var i = 0; i < actualHandoverTrials.Count; i++)
-            {
-                var expected = expectedHandoverTrials[i];
-                var actual = actualHandoverTrials[i];
-                Assert.Equal(expected.HandoverTrialTypeUuid, actual.HandoverTrialType.Uuid);
-                Assert.Equal(expected.ExpectedAt?.Date, actual.ExpectedAt);
-                Assert.Equal(expected.ApprovedAt?.Date, actual.ApprovedAt);
-            }
-        }
-
-        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(Organization organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
-        {
-            var handoverTrialTypes = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes, organization.Uuid, 10, 0)).ToList();
-            var handoverTrials = new List<HandoverTrialRequestDTO>();
-
-            //Add three valid combinations
-            if (oneWithBothExpectedAndApproved)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ExpectedAt = A<DateTime>(),
-                    ApprovedAt = A<DateTime>()
-                }));
-            }
-
-            if (oneWithExpectedOnly)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ExpectedAt = A<DateTime>(),
-                }));
-            }
-
-            if (oneWithApprovedOnly)
-            {
-                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO()
-                {
-                    HandoverTrialTypeUuid = type.Uuid,
-                    ApprovedAt = A<DateTime>()
-                }));
-            }
-
-            return handoverTrials;
-        }
-
         [Fact]
         public async Task Can_POST_With_ExternalReferences()
         {
@@ -1086,7 +984,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
-            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
             AssertExternalReferenceResults(inputs, dto);
         }
 
@@ -1127,15 +1024,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
-            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
-            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+            var systemUsageUuids = await CreateSystemUsageUuids(token, organization);
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
-                SystemUsageUuids = new[] { system1Usage.Uuid, system2Usage.Uuid }
+                SystemUsageUuids = systemUsageUuids
             };
 
             //Act
@@ -1143,7 +1037,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertMultiAssignment(request.SystemUsageUuids, freshDTO.SystemUsages);
+            AssertMultiAssignment(systemUsageUuids, freshDTO.SystemUsages);
         }
 
         [Fact]
@@ -1227,24 +1121,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var user1 = await CreateApiUserAsync(organization);
-            var user2 = await CreateApiUserAsync(organization);
-            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
-            var role1 = contractRoles.First();
-            var role2 = contractRoles.Last();
-            var roles = new List<RoleAssignmentRequestDTO>
-            {
-                new()
-                {
-                    RoleUuid = role1.Uuid,
-                    UserUuid = user1.user.Uuid
-                },
-                new()
-                {
-                    RoleUuid = role2.Uuid,
-                    UserUuid = user2.user.Uuid
-                }
-            };
+            var roles = await CreateRoles(organization);
 
             //Act
             var createdDTO = await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO()
@@ -1264,50 +1141,19 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var user1 = await CreateApiUserAsync(organization);
-            var user2 = await CreateApiUserAsync(organization);
-            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
-            var role1 = contractRoles.First();
-            var role2 = contractRoles.Last();
+            var roles = await CreateRoles(organization);
 
             //initial roles
-            var roles1 = new List<RoleAssignmentRequestDTO>
-            {
-                new()
-                {
-                    RoleUuid = role1.Uuid,
-                    UserUuid = user1.user.Uuid
-                },
-                new()
-                {
-                    RoleUuid = role2.Uuid,
-                    UserUuid = user2.user.Uuid
-                }
-            };
+            var roles1 = roles.ToList();
 
             //Switched roles
-            var roles2 = new List<RoleAssignmentRequestDTO>
-            {
-                new()
-                {
-                    RoleUuid = role2.Uuid,
-                    UserUuid = user1.user.Uuid
-                },
-                new()
-                {
-                    RoleUuid = role1.Uuid,
-                    UserUuid = user2.user.Uuid
-                }
-            };
+            var roles2 = roles.ToList();
+            roles2.Reverse();
 
             //reduced roles
             var roles3 = new List<RoleAssignmentRequestDTO>
             {
-                new()
-                {
-                    RoleUuid = role2.Uuid,
-                    UserUuid = user1.user.Uuid
-                }
+                roles[0]
             };
 
             //Empty roles
@@ -1357,22 +1203,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
-            {
-                Name = CreateName(),
-                OrganizationUuid = organization.Uuid
-            });
-            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
-            {
-                Name = CreateName(),
-                OrganizationUuid = organization.Uuid
-            });
+            var dataProcessingRegistrationUuids = await CreateDataProcessingRegistrationUuids(token, organization);
 
             var request = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
                 Name = CreateName(),
-                DataProcessingRegistrationUuids = new[] { dpr1.Uuid, dpr2.Uuid }
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids
             };
 
             //Act
@@ -1380,7 +1217,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
-            AssertMultiAssignment(request.DataProcessingRegistrationUuids, freshDTO.DataProcessingRegistrations);
+            AssertMultiAssignment(dataProcessingRegistrationUuids, freshDTO.DataProcessingRegistrations);
         }
 
         [Fact]
@@ -1796,11 +1633,297 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertTermination(terminationRequest4, null, contractDTO4.Termination);
         }
 
+        [Fact]
+        public async Task Can_POST_Full_Contract()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var parent = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
+            var (procurementRequest, procurementStrategy, purchaseType) = await CreateProcurementRequestAsync(organization.Uuid);
+            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequest) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var contractResponsibleDataWriteRequest = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
+            var supplierRequest = await CreateContractSupplierDataRequestDTO(true, true, true);
+            var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
+            var externalReferences = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var systemUsageUuids = await CreateSystemUsageUuids(token, organization);
+            var roles = await CreateRoles(organization);
+            var dataProcessingRegistrationUuids = await CreateDataProcessingRegistrationUuids(token, organization);
+            var agreementPeriodRequest = await CreateAgreementPeriodInput(true, true, true, organization);
+            var paymentsRequest = await CreatePaymentsInput(token, organization, true, true);
+            var (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, true);
+            var (terminationRequest, noticePeriodMonthsType) = await CreateTerminationRequest(organization.Uuid, true);
+            
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName(),
+                ParentContractUuid = parent.Uuid,
+                Procurement = procurementRequest,
+                General = generalDataWriteRequest,
+                Responsible = contractResponsibleDataWriteRequest,
+                Supplier = supplierRequest,
+                HandoverTrials = handoverTrials,
+                ExternalReferences = externalReferences,
+                SystemUsageUuids = systemUsageUuids,
+                Roles = roles,
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids,
+                AgreementPeriod = agreementPeriodRequest,
+                Payments = paymentsRequest,
+                PaymentModel = paymentModelRequest,
+                Termination = terminationRequest
+            };
+
+            //Act
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Assert
+            Assert.Equal(organization.Name, contractDTO.OrganizationContext.Name);
+            Assert.Equal(organization.Cvr, contractDTO.OrganizationContext.Cvr);
+            Assert.Equal(organization.Uuid, contractDTO.OrganizationContext.Uuid);
+
+            AssertCrossReference(parent, contractDTO.ParentContract);
+            AssertProcurement(procurementRequest, procurementStrategy, purchaseType, contractDTO.Procurement);
+            AssertGeneralDataSection(generalDataWriteRequest, contractType, contractTemplateType, agreementElements, contractDTO);
+            AssertResponsible(contractResponsibleDataWriteRequest, contractDTO);
+            AssertSupplier(supplierRequest, contractDTO);
+            AssertHandoverTrials(handoverTrials, contractDTO);
+            AssertExternalReferenceResults(externalReferences, contractDTO);
+            AssertMultiAssignment(systemUsageUuids, contractDTO.SystemUsages);
+            AssertRoleAssignments(roles, contractDTO);
+            AssertMultiAssignment(dataProcessingRegistrationUuids, contractDTO.DataProcessingRegistrations);
+            AssertAgreementPeriod(agreementPeriodRequest, contractDTO.AgreementPeriod);
+            AssertPayments(paymentsRequest, contractDTO.Payments);
+            AssertPaymentModel(paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType, contractDTO.PaymentModel);
+            AssertTermination(terminationRequest, noticePeriodMonthsType, contractDTO.Termination);
+        }
+
+        [Fact]
+        public async Task Can_PUT_All()
+        {
+            //Arrange
+            Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
+
+            var parent1 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
+            var (procurementRequest1, procurementStrategy1, purchaseType1) = await CreateProcurementRequestAsync(organization.Uuid);
+            var (contractType1, contractTemplateType1, agreementElements1, generalDataWriteRequest1) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var contractResponsibleDataWriteRequest1 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
+            var supplierRequest1 = await CreateContractSupplierDataRequestDTO(true, true, true);
+            var handoverTrials1 = await CreateHandoverTrials(organization, true, true, true);
+            var externalReferences1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var systemUsageUuids1 = await CreateSystemUsageUuids(token, organization);
+            var roles1 = await CreateRoles(organization);
+            var dataProcessingRegistrationUuids1 = await CreateDataProcessingRegistrationUuids(token, organization);
+            var agreementPeriodRequest1 = await CreateAgreementPeriodInput(true, true, true, organization);
+            var paymentsRequest1 = await CreatePaymentsInput(token, organization, true, true);
+            var (paymentModelRequest1, paymentFrequencyType1, paymentModelType1, priceRegulationType1) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, true);
+            var (terminationRequest1, noticePeriodMonthsType1) = await CreateTerminationRequest(organization.Uuid, true);
+            var requestDto1 = new UpdateContractRequestDTO()
+            {
+                Name = CreateName(),
+                ParentContractUuid = parent1.Uuid,
+                Procurement = procurementRequest1,
+                General = generalDataWriteRequest1,
+                Responsible = contractResponsibleDataWriteRequest1,
+                Supplier = supplierRequest1,
+                HandoverTrials = handoverTrials1,
+                ExternalReferences = externalReferences1,
+                SystemUsageUuids = systemUsageUuids1,
+                Roles = roles1,
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids1,
+                AgreementPeriod = agreementPeriodRequest1,
+                Payments = paymentsRequest1,
+                PaymentModel = paymentModelRequest1,
+                Termination = terminationRequest1
+            };
+
+            //Act - Put on empty
+            using var response1 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, requestDto1);
+
+            //Assert - Put on empty
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
+            var contractDTO1 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+
+            Assert.Equal(requestDto1.Name, contractDTO1.Name);
+            AssertCrossReference(parent1, contractDTO1.ParentContract);
+            AssertProcurement(procurementRequest1, procurementStrategy1, purchaseType1, contractDTO1.Procurement);
+            AssertGeneralDataSection(generalDataWriteRequest1, contractType1, contractTemplateType1, agreementElements1, contractDTO1);
+            AssertResponsible(contractResponsibleDataWriteRequest1, contractDTO1);
+            AssertSupplier(supplierRequest1, contractDTO1);
+            AssertHandoverTrials(handoverTrials1, contractDTO1);
+            AssertExternalReferenceResults(externalReferences1, contractDTO1);
+            AssertMultiAssignment(systemUsageUuids1, contractDTO1.SystemUsages);
+            AssertRoleAssignments(roles1, contractDTO1);
+            AssertMultiAssignment(dataProcessingRegistrationUuids1, contractDTO1.DataProcessingRegistrations);
+            AssertAgreementPeriod(agreementPeriodRequest1, contractDTO1.AgreementPeriod);
+            AssertPayments(paymentsRequest1, contractDTO1.Payments);
+            AssertPaymentModel(paymentModelRequest1, paymentFrequencyType1, paymentModelType1, priceRegulationType1, contractDTO1.PaymentModel);
+            AssertTermination(terminationRequest1, noticePeriodMonthsType1, contractDTO1.Termination);
+
+            //Arrange - Put on filled
+            var parent2 = await ItContractV2Helper.PostContractAsync(token, CreateNewSimpleRequest(organization.Uuid));
+            var (procurementRequest2, procurementStrategy2, purchaseType2) = await CreateProcurementRequestAsync(organization.Uuid);
+            var (contractType2, contractTemplateType2, agreementElements2, generalDataWriteRequest2) = await CreateGeneralDataRequestDTO(organization, true, true, true);
+            var contractResponsibleDataWriteRequest2 = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
+            var supplierRequest2 = await CreateContractSupplierDataRequestDTO(true, true, true);
+            var handoverTrials2 = await CreateHandoverTrials(organization, true, true, true);
+            var externalReferences2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
+            var systemUsageUuids2 = await CreateSystemUsageUuids(token, organization);
+            var roles2 = await CreateRoles(organization);
+            var dataProcessingRegistrationUuids2 = await CreateDataProcessingRegistrationUuids(token, organization);
+            var agreementPeriodRequest2 = await CreateAgreementPeriodInput(true, true, true, organization);
+            var paymentsRequest2 = await CreatePaymentsInput(token, organization, true, true);
+            var (paymentModelRequest2, paymentFrequencyType2, paymentModelType2, priceRegulationType2) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, true);
+            var (terminationRequest2, noticePeriodMonthsType2) = await CreateTerminationRequest(organization.Uuid, true);
+            var requestDto2 = new UpdateContractRequestDTO()
+            {
+                Name = CreateName(),
+                ParentContractUuid = parent2.Uuid,
+                Procurement = procurementRequest2,
+                General = generalDataWriteRequest2,
+                Responsible = contractResponsibleDataWriteRequest2,
+                Supplier = supplierRequest2,
+                HandoverTrials = handoverTrials2,
+                ExternalReferences = externalReferences2,
+                SystemUsageUuids = systemUsageUuids2,
+                Roles = roles2,
+                DataProcessingRegistrationUuids = dataProcessingRegistrationUuids2,
+                AgreementPeriod = agreementPeriodRequest2,
+                Payments = paymentsRequest2,
+                PaymentModel = paymentModelRequest2,
+                Termination = terminationRequest2
+            };
+
+            //Act - Put on filled
+            using var response2 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, requestDto2);
+
+            //Assert - Put on filled
+            Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
+            var contractDTO2 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+
+            Assert.Equal(requestDto2.Name, contractDTO2.Name);
+            AssertCrossReference(parent2, contractDTO2.ParentContract);
+            AssertProcurement(procurementRequest2, procurementStrategy2, purchaseType2, contractDTO2.Procurement);
+            AssertGeneralDataSection(generalDataWriteRequest2, contractType2, contractTemplateType2, agreementElements2, contractDTO2);
+            AssertResponsible(contractResponsibleDataWriteRequest2, contractDTO2);
+            AssertSupplier(supplierRequest2, contractDTO2);
+            AssertHandoverTrials(handoverTrials2, contractDTO2);
+            AssertExternalReferenceResults(externalReferences2, contractDTO2);
+            AssertMultiAssignment(systemUsageUuids2, contractDTO2.SystemUsages);
+            AssertRoleAssignments(roles2, contractDTO2);
+            AssertMultiAssignment(dataProcessingRegistrationUuids2, contractDTO2.DataProcessingRegistrations);
+            AssertAgreementPeriod(agreementPeriodRequest2, contractDTO2.AgreementPeriod);
+            AssertPayments(paymentsRequest2, contractDTO2.Payments);
+            AssertPaymentModel(paymentModelRequest2, paymentFrequencyType2, paymentModelType2, priceRegulationType2, contractDTO2.PaymentModel);
+            AssertTermination(terminationRequest2, noticePeriodMonthsType2, contractDTO2.Termination);
+
+            //Arrange - Put to reset
+            var requestDto3 = new UpdateContractRequestDTO()
+            {
+                Name = CreateName()
+            };
+
+            //Act - Put to reset
+            using var response3 = await ItContractV2Helper.SendPutContractAsync(token, contractDTO.Uuid, requestDto3);
+
+            //Assert - Put to reset
+            Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
+            var contractDTO3 = await ItContractV2Helper.GetItContractAsync(token, contractDTO.Uuid);
+
+            Assert.Equal(requestDto3.Name, contractDTO3.Name);
+            AssertCrossReference((ItContractResponseDTO)null, contractDTO3.ParentContract);
+            AssertProcurement(requestDto3.Procurement, null, null, contractDTO3.Procurement);
+            AssertGeneralDataSection(requestDto3.General, null, null, null, contractDTO3);
+
+            var responsibleResponse = contractDTO3.Responsible;
+            Assert.Null(responsibleResponse.OrganizationUnit);
+            Assert.Null(responsibleResponse.SignedAt);
+            Assert.Null(responsibleResponse.SignedBy);
+            Assert.False(responsibleResponse.Signed);
+
+            var supplierResponse = contractDTO3.Supplier;
+            Assert.Null(supplierResponse.Organization);
+            Assert.Null(supplierResponse.SignedAt);
+            Assert.Null(supplierResponse.SignedBy);
+            Assert.False(supplierResponse.Signed);
+
+            Assert.Empty(contractDTO3.HandoverTrials);
+            Assert.Empty(contractDTO3.ExternalReferences);
+            Assert.Empty(contractDTO3.SystemUsages);
+            Assert.Empty(contractDTO3.Roles);
+            Assert.Empty(contractDTO3.DataProcessingRegistrations);
+            Assert.Empty(contractDTO3.Payments.External);
+            Assert.Empty(contractDTO3.Payments.Internal);
+
+            var agreementPeriod = contractDTO3.AgreementPeriod;
+            Assert.Null(agreementPeriod.DurationMonths);
+            Assert.Null(agreementPeriod.DurationYears);
+            Assert.Null(agreementPeriod.ExtensionOptions);
+            Assert.Null(agreementPeriod.IrrevocableUntil);
+            Assert.False(agreementPeriod.IsContinuous);
+            Assert.Equal(0, agreementPeriod.ExtensionOptionsUsed);
+            
+            AssertPaymentModel(requestDto3.PaymentModel, null, null, null, contractDTO3.PaymentModel);
+            AssertTermination(requestDto3.Termination, null, contractDTO3.Termination);
+        }
+
+        private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, Organization organization)
+        {
+            var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
+            {
+                Name = CreateName(),
+                OrganizationUuid = organization.Uuid
+            });
+            return new List<Guid> { dpr1.Uuid, dpr2.Uuid };
+        }
+
+        private async Task<List<RoleAssignmentRequestDTO>> CreateRoles(Organization organization)
+        {
+            var user1 = await CreateApiUserAsync(organization);
+            var user2 = await CreateApiUserAsync(organization);
+            var contractRoles = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractRoles, organization.Uuid, 10, 0)).RandomItems(2).ToList();
+            var role1 = contractRoles.First();
+            var role2 = contractRoles.Last();
+            var roles = new List<RoleAssignmentRequestDTO>
+            {
+                new()
+                {
+                    RoleUuid = role1.Uuid,
+                    UserUuid = user1.user.Uuid
+                },
+                new()
+                {
+                    RoleUuid = role2.Uuid,
+                    UserUuid = user2.user.Uuid
+                }
+            };
+            return roles;
+        }
+
+        private async Task<List<Guid>> CreateSystemUsageUuids(string token, Organization organization)
+        {
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
+            var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
+
+            return new List<Guid> {system1Usage.Uuid, system2Usage.Uuid};
+        }
+
         private static void AssertTermination(ContractTerminationDataWriteRequestDTO expected, IdentityNamePairResponseDTO noticePeriodMonthsType, ContractTerminationDataResponseDTO actual)
         {
-            Assert.Equal(expected.TerminatedAt, actual.TerminatedAt);
-            Assert.Equal(expected.Terms?.NoticePeriodExtendsCurrent, actual.Terms.NoticePeriodExtendsCurrent);
-            Assert.Equal(expected.Terms?.NoticeByEndOf, actual.Terms.NoticeByEndOf);
+            Assert.Equal(expected?.TerminatedAt, actual.TerminatedAt);
+            Assert.Equal(expected?.Terms?.NoticePeriodExtendsCurrent, actual.Terms.NoticePeriodExtendsCurrent);
+            Assert.Equal(expected?.Terms?.NoticeByEndOf, actual.Terms.NoticeByEndOf);
             AssertCrossReference(noticePeriodMonthsType, actual.Terms.NoticePeriodMonths);
         }
 
@@ -1827,12 +1950,12 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO expected, IdentityNamePairResponseDTO paymentFrequencyType, IdentityNamePairResponseDTO paymentModelType, IdentityNamePairResponseDTO priceRegulationType, ContractPaymentModelDataResponseDTO actual)
         {
-            Assert.Equal(expected.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
+            Assert.Equal(expected?.OperationsRemunerationStartedAt, actual.OperationsRemunerationStartedAt);
             AssertCrossReference(paymentFrequencyType, actual.PaymentFrequency);
             AssertCrossReference(paymentModelType, actual.PaymentModel);
             AssertCrossReference(priceRegulationType, actual.PriceRegulation);
 
-            if (expected.PaymentMileStones == null)
+            if (expected?.PaymentMileStones == null)
             {
                 Assert.Empty(actual.PaymentMileStones);
             }
@@ -1885,7 +2008,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType);
         }
 
-        private void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
+        private static void AssertMultiAssignment(IEnumerable<Guid> expected, IEnumerable<IdentityNamePairResponseDTO> actual)
         {
             var expectedUuids = (expected ?? Array.Empty<Guid>()).OrderBy(x => x).ToList();
             var actualUuids = actual.Select(x => x.Uuid).OrderBy(x => x).ToList();
@@ -1947,13 +2070,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             List<IdentityNamePairResponseDTO> expectedAgreementElements,
             ItContractResponseDTO freshDTO)
         {
-            Assert.Equal(request.Notes, freshDTO.General.Notes);
-            Assert.Equal(request.ContractId, freshDTO.General.ContractId);
+            Assert.Equal(request?.Notes, freshDTO.General.Notes);
+            Assert.Equal(request?.ContractId, freshDTO.General.ContractId);
             AssertCrossReference(expectedContractType, freshDTO.General.ContractType);
             AssertCrossReference(expectedContractTemplateType, freshDTO.General.ContractTemplate);
-            Assert.Equal(request.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
-            Assert.Equal(request.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
-            Assert.Equal(request.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
+            Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
+            Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
+            Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);
@@ -2040,6 +2163,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
         {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
                 .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
         }
@@ -2076,6 +2200,108 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
+        private static void AssertProcurement(ContractProcurementDataWriteRequestDTO expected, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType, ContractProcurementDataResponseDTO actual)
+        {
+            AssertCrossReference(procurementStrategy, actual.ProcurementStrategy);
+            AssertCrossReference(purchaseType, actual.PurchaseType);
+            if (expected?.ProcurementPlan == null)
+            {
+                Assert.Null(actual.ProcurementPlan);
+            }
+            else
+            {
+                Assert.Equal(expected.ProcurementPlan.HalfOfYear, actual.ProcurementPlan.HalfOfYear);
+                Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
+            }
+        }
+
+        private async Task<(ContractProcurementDataWriteRequestDTO request, IdentityNamePairResponseDTO procurementStrategy, IdentityNamePairResponseDTO purchaseType)> CreateProcurementRequestAsync(Guid organizationUuid)
+        {
+            var procurementStrategy = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractProcurementStrategyTypes, organizationUuid, 10, 0)).RandomItem();
+            var purchaseType = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractPurchaseTypes, organizationUuid, 10, 0)).RandomItem();
+            var request = new ContractProcurementDataWriteRequestDTO()
+            {
+                ProcurementStrategyUuid = procurementStrategy.Uuid,
+                PurchaseTypeUuid = purchaseType.Uuid,
+                ProcurementPlan = new ProcurementPlanDTO()
+                {
+                    HalfOfYear = Convert.ToByte((A<int>() % 1) + 1),
+                    Year = A<int>()
+                }
+            };
+            return (request, procurementStrategy, purchaseType);
+        }
+
+        private CreateNewContractRequestDTO CreateNewSimpleRequest(Guid organizationUuid)
+        {
+            return new CreateNewContractRequestDTO()
+            {
+                Name = CreateName(),
+                OrganizationUuid = organizationUuid
+            };
+        }
+
+        private static void AssertHandoverTrials(IEnumerable<HandoverTrialRequestDTO> request, ItContractResponseDTO responseDto)
+        {
+            var expectedHandoverTrials = request
+                .OrderBy(x => x.HandoverTrialTypeUuid)
+                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
+                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
+                .ToList();
+            var actualHandoverTrials = responseDto.HandoverTrials
+                .OrderBy(x => x.HandoverTrialType.Uuid)
+                .ThenBy(x => x.ExpectedAt ?? DateTime.MinValue)
+                .ThenBy(x => x.ApprovedAt ?? DateTime.MinValue)
+                .ToList();
+
+            Assert.Equal(expectedHandoverTrials.Count, actualHandoverTrials.Count);
+            for (var i = 0; i < actualHandoverTrials.Count; i++)
+            {
+                var expected = expectedHandoverTrials[i];
+                var actual = actualHandoverTrials[i];
+                Assert.Equal(expected.HandoverTrialTypeUuid, actual.HandoverTrialType.Uuid);
+                Assert.Equal(expected.ExpectedAt?.Date, actual.ExpectedAt);
+                Assert.Equal(expected.ApprovedAt?.Date, actual.ApprovedAt);
+            }
+        }
+
+        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(Organization organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
+        {
+            var handoverTrialTypes = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes, organization.Uuid, 10, 0)).ToList();
+            var handoverTrials = new List<HandoverTrialRequestDTO>();
+
+            //Add three valid combinations
+            if (oneWithBothExpectedAndApproved)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ExpectedAt = A<DateTime>(),
+                    ApprovedAt = A<DateTime>()
+                }));
+            }
+
+            if (oneWithExpectedOnly)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ExpectedAt = A<DateTime>(),
+                }));
+            }
+
+            if (oneWithApprovedOnly)
+            {
+                handoverTrials.Add(handoverTrialTypes.RandomItem().Transform(type => new HandoverTrialRequestDTO()
+                {
+                    HandoverTrialTypeUuid = type.Uuid,
+                    ApprovedAt = A<DateTime>()
+                }));
+            }
+
+            return handoverTrials;
+        }
+
         private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ContractPaymentsDataResponseDTO freshDto)
         {
             AssertPaymentStream(input.Internal, freshDto.Internal);
@@ -2095,7 +2321,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 Assert.Equal(expected.Acquisition, actual.Acquisition);
                 Assert.Equal(expected.Note, actual.Note);
                 Assert.Equal(expected.Other, actual.Other);
-                Assert.Equal(expected.AuditDate?.Date, actual.AuditDate?.Date);
+                Assert.Equal(expected.AuditDate?.Date, actual.AuditDate);
                 Assert.Equal(expected.AuditStatus, actual.AuditStatus);
                 Assert.Equal(expected.Operation, actual.Operation);
                 Assert.Equal(expected.OrganizationUnitUuid, actual.OrganizationUnit?.Uuid);
@@ -2166,13 +2392,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertRoleAssignments(IEnumerable<RoleAssignmentRequestDTO> input, ItContractResponseDTO output)
         {
-            var actualroles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
+            var actualRoles = output.Roles.OrderBy(x => x.Role.Uuid).ThenBy(x => x.User.Uuid).ToList();
             var expectedRoles = input.OrderBy(x => x.RoleUuid).ThenBy(x => x.UserUuid).ToList();
             Assert.Equal(expectedRoles.Count, expectedRoles.Count);
-            for (var i = 0; i < actualroles.Count; i++)
+            for (var i = 0; i < actualRoles.Count; i++)
             {
                 var expected = expectedRoles[i];
-                var actual = actualroles[i];
+                var actual = actualRoles[i];
                 AssertRoleAssignment(expected, actual);
             }
         }

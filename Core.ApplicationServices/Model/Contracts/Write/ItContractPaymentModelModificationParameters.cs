@@ -11,6 +11,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public OptionalValueChange<Guid?> PaymentFrequencyUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<Guid?> PaymentModelUuid { get; set; } = OptionalValueChange<Guid?>.None;
         public OptionalValueChange<Guid?> PriceRegulationUuid { get; set; } = OptionalValueChange<Guid?>.None;
-        public Maybe<IEnumerable<ItContractPaymentMilestone>> PaymentMileStones { get; set; } = Maybe<IEnumerable<ItContractPaymentMilestone>>.None;
+        public OptionalValueChange<IEnumerable<ItContractPaymentMilestone>> PaymentMileStones { get; set; } = OptionalValueChange<IEnumerable<ItContractPaymentMilestone>>.None;
     }
 }
