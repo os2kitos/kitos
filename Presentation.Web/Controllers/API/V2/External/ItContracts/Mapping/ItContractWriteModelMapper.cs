@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractPaymentDataModificationParameters MapPayments(ContractPaymentsDataWriteRequestDTO dto)
+        private static ItContractPaymentDataModificationParameters MapPayments(ContractPaymentsDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -101,7 +101,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ItContractPayment MapPayment(PaymentRequestDTO dto)
         {
-            return new ItContractPayment()
+            return new ItContractPayment
             {
                 Note = dto.Note,
                 AccountingEntry = dto.AccountingEntry,
@@ -114,7 +114,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractAgreementPeriodModificationParameters MapAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO dto)
+        private static ItContractAgreementPeriodModificationParameters MapAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -130,7 +130,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public IEnumerable<UserRolePair> MapRoles(IEnumerable<RoleAssignmentRequestDTO> dtos)
+        private static IEnumerable<UserRolePair> MapRoles(IEnumerable<RoleAssignmentRequestDTO> dtos)
         {
             if (dtos == null)
                 throw new ArgumentNullException(nameof(dtos));
@@ -152,7 +152,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             }).ToList();
         }
 
-        public ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO dto)
+        private static ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO dto)
         {
             return new()
             {
@@ -169,7 +169,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
+        private static ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto)
         {
             return new()
             {
@@ -180,7 +180,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
+        private static ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -194,7 +194,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto)
+        private ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -208,7 +208,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO dto)
+        private static ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -226,7 +226,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO dto)
+        private static ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -239,7 +239,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
         {
             if (dtos == null)
                 throw new ArgumentNullException(nameof(dtos));
