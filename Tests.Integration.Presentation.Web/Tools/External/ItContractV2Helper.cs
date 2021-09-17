@@ -141,5 +141,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/payment-model"), token, dto);
         }
+
+        public static async Task<HttpResponseMessage> SendPutTerminationAsync(string token, Guid contractUuid, ContractTerminationDataWriteRequestDTO dto)
+        {
+
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}/termination"), token, dto);
+        }
     }
 }

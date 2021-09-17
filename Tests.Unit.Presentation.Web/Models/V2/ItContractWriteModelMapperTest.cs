@@ -62,7 +62,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
-            return CreateGetUndefinedSectionsInput(13);
+            return CreateGetUndefinedSectionsInput(14);
         }
 
         [Theory]
@@ -80,7 +80,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noDataProcessingRegistrations,
             bool noRoles,
             bool noPaymentModel,
-            bool noAgreementPeriod)
+            bool noAgreementPeriod,
+            bool noTermination)
         {
             //Arrange
             var rootProperties = GetRootProperties();
@@ -98,6 +99,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
             if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
             if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
+            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
 
@@ -117,6 +119,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noDataProcessingRegistrations, output.DataProcessingRegistrationUuids.IsNone);
             Assert.Equal(noPaymentModel, output.PaymentModel.IsNone);
             Assert.Equal(noAgreementPeriod, output.AgreementPeriod.IsNone);
+            Assert.Equal(noTermination, output.Termination.IsNone);
         }
 
         [Fact]
@@ -661,6 +664,53 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
+        }
+
+        [Fact]
+        public void Can_Map_Termination()
+        {
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.MapTermination(input);
+
+            //Assert
+            AssertTermination(input, output);
+        }
+
+        [Fact]
+        public void Can_Map_Termination_FromPUT()
+        {
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPUT(new UpdateContractRequestDTO() { Termination = input });
+
+            //Assert
+            AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
+        }
+
+        [Fact]
+        public void Can_Map_Termination_FromPOST()
+        {
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPOST(new CreateNewContractRequestDTO() { Termination = input });
+
+            //Assert
+            AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
+        }
+
+        private static void AssertTermination(ContractTerminationDataWriteRequestDTO input, ItContractTerminationParameters output)
+        {
+            Assert.Equal(input.TerminatedAt, AssertPropertyContainsDataChange(output.TerminatedAt));
+            Assert.Equal(input.Terms.NoticePeriodMonthsUuid, AssertPropertyContainsDataChange(output.NoticePeriodMonthsUuid));
+            Assert.Equal(input.Terms.NoticePeriodExtendsCurrent?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticePeriodExtendsCurrent));
+            Assert.Equal(input.Terms.NoticeByEndOf?.ToYearSegmentOption(), AssertPropertyContainsDataChange(output.NoticeByEndOf));
         }
 
         private static void AssertAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO input,
