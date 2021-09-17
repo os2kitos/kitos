@@ -647,61 +647,6 @@ namespace Tests.Unit.Core.Model
             Assert.Empty(sut.PaymentMilestones);
         }
 
-        [Theory]
-        [InlineData(true, true)]
-        [InlineData(true, false)]
-        [InlineData(false, true)]
-        public void Can_AddPaymentMilestone(bool withExpected, bool withApproved)
-        {
-            //Arrange
-            var sut = new ItContract();
-            var title = A<string>();
-            var expected = withExpected ? A<DateTime>().Date : (DateTime?)null;
-            var approved = withApproved ? A<DateTime>().Date : (DateTime?)null;
-
-            //Act
-            var result = sut.AddPaymentMilestone(title, expected, approved);
-
-            //Assert
-            Assert.True(result.IsNone);
-            var milestone = Assert.Single(sut.PaymentMilestones);
-            Assert.Equal(title, milestone.Title);
-            Assert.Equal(expected, milestone.Expected);
-            Assert.Equal(approved, milestone.Approved);
-        }
-
-        [Fact]
-        public void Cannot_AddPaymentMilestone_If_Empty_Title()
-        {
-            //Arrange
-            var sut = new ItContract();
-
-            //Act
-            var result = sut.AddPaymentMilestone(string.Empty, A<DateTime>(), A<DateTime>());
-
-            //Assert
-            Assert.True(result.HasValue);
-            Assert.Contains("Error: title cannot be empty", result.Value.Message.GetValueOrEmptyString());
-            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
-            Assert.Empty(sut.PaymentMilestones);
-        }
-
-        [Fact]
-        public void Cannot_AddPaymentMilestone_If_Neither_Dates_Are_Set()
-        {
-            //Arrange
-            var sut = new ItContract();
-
-            //Act
-            var result = sut.AddPaymentMilestone(A<string>(), null, null);
-
-            //Assert
-            Assert.True(result.HasValue);
-            Assert.Contains("Error: expected and approved cannot both be null", result.Value.Message.GetValueOrEmptyString());
-            Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
-            Assert.Empty(sut.PaymentMilestones);
-        }
-
         [Fact]
         public void Can_ResetNoticePeriod()
         {
