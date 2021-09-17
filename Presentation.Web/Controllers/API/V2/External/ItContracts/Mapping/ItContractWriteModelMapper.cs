@@ -33,7 +33,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return Map(dto);
         }
 
-        public ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto)
+        public ItContractModificationParameters FromPATCH(UpdateContractRequestDTO dto)
         {
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
@@ -41,26 +41,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return Map(dto);
         }
 
-        private ItContractModificationParameters Map<T>(T dto) where T : ContractWriteRequestDTO, IHasNameExternal
+        public ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto)
         {
-            var generalData = WithResetDataIfPropertyIsDefined(dto.General, nameof(ContractWriteRequestDTO.General));
-            var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible));
-            var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement));
-            var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier));
-            var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>());
-            var references = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(ContractWriteRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>());
-            var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
-            var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
-            var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
-            var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
-            var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
-            var payments = WithResetDataIfPropertyIsDefined(dto.Payments, nameof(ContractWriteRequestDTO.Payments));
-            var termination = WithResetDataIfPropertyIsDefined(dto.Termination, nameof(ContractWriteRequestDTO.Termination));
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            return Map(dto,true);
+        }
+
+        private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided = false) where T : ContractWriteRequestDTO, IHasNameExternal
+        {
+            var generalData = WithResetDataIfPropertyIsDefined(dto.General, nameof(ContractWriteRequestDTO.General), enforceFallbackIfNotProvided);
+            var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible),enforceFallbackIfNotProvided);
+            var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement), enforceFallbackIfNotProvided);
+            var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier), enforceFallbackIfNotProvided);
+            var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>(), enforceFallbackIfNotProvided);
+            var references = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(ContractWriteRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>(), enforceFallbackIfNotProvided);
+            var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>(), enforceFallbackIfNotProvided);
+            var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>(), enforceFallbackIfNotProvided);
+            var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>(), enforceFallbackIfNotProvided);
+            var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod), enforceFallbackIfNotProvided);
+            var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel), enforceFallbackIfNotProvided);
+            var payments = WithResetDataIfPropertyIsDefined(dto.Payments, nameof(ContractWriteRequestDTO.Payments), enforceFallbackIfNotProvided);
+            var termination = WithResetDataIfPropertyIsDefined(dto.Termination, nameof(ContractWriteRequestDTO.Termination), enforceFallbackIfNotProvided);
 
             return new ItContractModificationParameters
             {
-                Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
-                ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
+                Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) || enforceFallbackIfNotProvided ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
+                ParentContractUuid = ClientRequestsChangeTo(nameof(ContractWriteRequestDTO.ParentContractUuid)) || enforceFallbackIfNotProvided ? dto.ParentContractUuid.AsChangedValue() : OptionalValueChange<Guid?>.None,
                 General = generalData.FromNullable().Select(MapGeneralData),
                 Procurement = procurement.FromNullable().Select(MapProcurement),
                 SystemUsageUuids = systemUsageUuids.FromNullable(),

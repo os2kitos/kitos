@@ -67,7 +67,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
-        public void FromPUT_Ignores_Undefined_Root_Sections(
+        public void FromPATCH_Ignores_Undefined_Root_Sections(
             bool noName,
             bool noGeneralData,
             bool noParent,
@@ -85,28 +85,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noTermination)
         {
             //Arrange
-            var rootProperties = GetRootProperties();
-
-            if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
-            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
-            if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
-            if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
-            if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
-            if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
-            if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
-            if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
-            if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
-            if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
-            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
-            if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
-            if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
-            if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
-            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
-            var emptyInput = new UpdateContractRequestDTO();
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
 
             //Act
-            var output = _sut.FromPUT(emptyInput);
+            var output = _sut.FromPATCH(emptyInput);
 
             //Assert
             Assert.Equal(noName, output.Name.IsUnchanged);
@@ -123,6 +105,48 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noAgreementPeriod, output.AgreementPeriod.IsNone);
             Assert.Equal(noPayments, output.Payments.IsNone);
             Assert.Equal(noTermination, output.Termination.IsNone);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPUT_Enforces_Undefined_Root_Sections(
+            bool noName,
+            bool noGeneralData,
+            bool noParent,
+            bool noResponsible,
+            bool noProcurement,
+            bool noSupplier,
+            bool noHandoverTrials,
+            bool noSystemUsages,
+            bool noExternalReferences,
+            bool noDataProcessingRegistrations,
+            bool noRoles,
+            bool noPaymentModel,
+            bool noAgreementPeriod,
+            bool noPayments,
+            bool noTermination)
+        {
+            //Arrange
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
+
+            //Act
+            var output = _sut.FromPUT(emptyInput);
+
+            //Assert
+            Assert.False(output.Name.IsUnchanged);
+            Assert.False(output.ParentContractUuid.IsUnchanged);
+            Assert.False(output.General.IsNone);
+            Assert.False(output.Responsible.IsNone);
+            Assert.False(output.Procurement.IsNone);
+            Assert.False(output.Supplier.IsNone);
+            Assert.False(output.HandoverTrials.IsNone);
+            Assert.False(output.ExternalReferences.IsNone);
+            Assert.False(output.SystemUsageUuids.IsNone);
+            Assert.False(output.DataProcessingRegistrationUuids.IsNone);
+            Assert.False(output.PaymentModel.IsNone);
+            Assert.False(output.AgreementPeriod.IsNone);
+            Assert.False(output.Payments.IsNone);
+            Assert.False(output.Termination.IsNone);
         }
 
         [Fact]
@@ -319,6 +343,33 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertHandoverTrials(input, output.HandoverTrials.Value);
         }
 
+        private UpdateContractRequestDTO ConfigureRequestInput(bool noName, bool noGeneralData, bool noParent,
+           bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages,
+           bool noExternalReferences, bool noDataProcessingRegistrations, bool noRoles, bool noPaymentModel,
+           bool noAgreementPeriod, bool noPayments, bool noTermination)
+        {
+            var rootProperties = GetRootProperties();
+
+            if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
+            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
+            if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
+            if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
+            if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
+            if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
+            if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
+            if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
+            if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
+            if (noDataProcessingRegistrations)
+                rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
+            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
+            if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
+            if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
+            if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
+            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
+            var emptyInput = new UpdateContractRequestDTO();
+            return emptyInput;
+        }
         private static void AssertHandoverTrials(List<HandoverTrialRequestDTO> input, IEnumerable<ItContractHandoverTrialUpdate> output)
         {
             var expected = input.OrderBy(x => x.HandoverTrialTypeUuid).ToList();

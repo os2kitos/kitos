@@ -10,6 +10,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
     public interface IItContractWriteModelMapper
     {
         ItContractModificationParameters FromPOST(CreateNewContractRequestDTO dto);
+        ItContractModificationParameters FromPATCH(UpdateContractRequestDTO dto);
         ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto);
         ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO generalDataDto);
         ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO dto);
