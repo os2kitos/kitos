@@ -26,11 +26,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractModificationParameters FromPOST(CreateNewContractRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return Map(dto);
         }
 
         public ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return Map(dto);
         }
 
@@ -45,7 +51,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             var systemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(ContractWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
             var roleAssignments = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(ContractWriteRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>());
             var dataProcessingRegistrationUuids = WithResetDataIfPropertyIsDefined(dto.DataProcessingRegistrationUuids, nameof(ContractWriteRequestDTO.DataProcessingRegistrationUuids), () => new List<Guid>());
+            var agreementPeriod = WithResetDataIfPropertyIsDefined(dto.AgreementPeriod, nameof(ContractWriteRequestDTO.AgreementPeriod));
             var paymentModel = WithResetDataIfPropertyIsDefined(dto.PaymentModel, nameof(ContractWriteRequestDTO.PaymentModel));
+
             return new ItContractModificationParameters
             {
                 Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
@@ -59,18 +67,41 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ExternalReferences = references.FromNullable().Select(MapReferences),
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
-                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel)
+                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
+                AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod)
+            };
+        }
+
+        public ItContractAgreementPeriodModificationParameters MapAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO dto)
+        {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
+            return new()
+            {
+                DurationMonths = dto.DurationMonths.AsChangedValue(),
+                DurationYears = dto.DurationYears.AsChangedValue(),
+                ExtensionOptionsUsed = dto.ExtensionOptionsUsed.AsChangedValue(),
+                ExtensionOptionsUuid = dto.ExtensionOptionsUuid.AsChangedValue(),
+                IrrevocableUntil = dto.IrrevocableUntil.AsChangedValue(),
+                IsContinuous = dto.IsContinuous.AsChangedValue()
             };
         }
 
         public IEnumerable<UserRolePair> MapRoles(IEnumerable<RoleAssignmentRequestDTO> dtos)
         {
+            if (dtos == null)
+                throw new ArgumentNullException(nameof(dtos));
+
             return BaseMapRoleAssignments(dtos.ToList()).Value
                 .Match(assignments => assignments, Array.Empty<UserRolePair>);
         }
 
         public IEnumerable<ItContractHandoverTrialUpdate> MapHandOverTrials(IEnumerable<HandoverTrialRequestDTO> dtos)
         {
+            if (dtos == null)
+                throw new ArgumentNullException(nameof(dtos));
+
             return dtos.Select(x => new ItContractHandoverTrialUpdate()
             {
                 HandoverTrialTypeUuid = x.HandoverTrialTypeUuid,
@@ -98,6 +129,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return new()
             {
                 OrganizationUuid = dto.OrganizationUuid.AsChangedValue(),
@@ -109,6 +143,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return new()
             {
                 OrganizationUnitUuid = dto.OrganizationUnitUuid.AsChangedValue(),
@@ -120,6 +157,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         public ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return new()
             {
                 ContractId = dto.ContractId.AsChangedValue(),
@@ -133,18 +173,24 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        public ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO request)
+        public ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO dto)
         {
+            if (dto == null)
+                throw new ArgumentNullException(nameof(dto));
+
             return new()
             {
-                ProcurementStrategyUuid = request.ProcurementStrategyUuid.AsChangedValue(),
-                PurchaseTypeUuid = request.PurchaseTypeUuid.AsChangedValue(),
-                ProcurementPlan = MapProcurementPlan(request.ProcurementPlan).AsChangedValue()
+                ProcurementStrategyUuid = dto.ProcurementStrategyUuid.AsChangedValue(),
+                PurchaseTypeUuid = dto.PurchaseTypeUuid.AsChangedValue(),
+                ProcurementPlan = MapProcurementPlan(dto.ProcurementPlan).AsChangedValue()
             };
         }
 
         public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> dtos)
         {
+            if (dtos == null)
+                throw new ArgumentNullException(nameof(dtos));
+
             return BaseMapReferences(dtos);
         }
 
