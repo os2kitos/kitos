@@ -988,7 +988,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Assert
             var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
-            Assert.Equal(inputs.Count, dto.ExternalReferences.Count());
             AssertExternalReferenceResults(inputs, dto);
         }
 
@@ -1694,7 +1693,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertResponsible(contractResponsibleDataWriteRequest, contractDTO);
             AssertSupplier(supplierRequest, contractDTO);
             AssertHandoverTrials(handoverTrials, contractDTO);
-            Assert.Equal(externalReferences.Count, contractDTO.ExternalReferences.Count());
             AssertExternalReferenceResults(externalReferences, contractDTO);
             AssertMultiAssignment(systemUsageUuids, contractDTO.SystemUsages);
             AssertRoleAssignments(roles, contractDTO);
@@ -1761,7 +1759,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertResponsible(contractResponsibleDataWriteRequest1, contractDTO1);
             AssertSupplier(supplierRequest1, contractDTO1);
             AssertHandoverTrials(handoverTrials1, contractDTO1);
-            Assert.Equal(externalReferences1.Count, contractDTO1.ExternalReferences.Count());
             AssertExternalReferenceResults(externalReferences1, contractDTO1);
             AssertMultiAssignment(systemUsageUuids1, contractDTO1.SystemUsages);
             AssertRoleAssignments(roles1, contractDTO1);
@@ -1819,7 +1816,6 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertResponsible(contractResponsibleDataWriteRequest2, contractDTO2);
             AssertSupplier(supplierRequest2, contractDTO2);
             AssertHandoverTrials(handoverTrials2, contractDTO2);
-            Assert.Equal(externalReferences2.Count, contractDTO2.ExternalReferences.Count());
             AssertExternalReferenceResults(externalReferences2, contractDTO2);
             AssertMultiAssignment(systemUsageUuids2, contractDTO2.SystemUsages);
             AssertRoleAssignments(roles2, contractDTO2);
@@ -2171,6 +2167,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
         private static void AssertExternalReferenceResults(List<ExternalReferenceDataDTO> expected, ItContractResponseDTO actual)
         {
+            Assert.Equal(expected.Count, actual.ExternalReferences.Count());
             expected.OrderBy(x => x.DocumentId).ToList().ToExpectedObject()
                 .ShouldMatch(actual.ExternalReferences.OrderBy(x => x.DocumentId).ToList());
         }
