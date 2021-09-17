@@ -832,7 +832,7 @@ namespace Core.DomainModel.ItContract
 
         public void ResetInternalEconomyStreams()
         {
-            ExternalReferences.Clear();
+            InternEconomyStreams.Clear();
         }
 
         public Maybe<OperationError> AddInternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
