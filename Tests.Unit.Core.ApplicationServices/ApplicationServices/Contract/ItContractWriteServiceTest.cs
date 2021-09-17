@@ -1117,7 +1117,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var milestone = CreatePaymentMilestone(false, false);
             var paymentModel = new ItContractPaymentModelModificationParameters()
             {
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }
+                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsChangedValue<IEnumerable<ItContractPaymentMilestone>>()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
 
@@ -1136,7 +1136,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             milestone.Title = string.Empty;
             var paymentModel = new ItContractPaymentModelModificationParameters()
             {
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }
+                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsChangedValue<IEnumerable<ItContractPaymentMilestone>>()
             };
             var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(paymentModel: paymentModel);
 
@@ -1425,7 +1425,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         private static void AssertPaymentModel(ItContractPaymentModelModificationParameters expected, ItContract actual, bool hasValues)
         {
             Assert.Equal(expected.OperationsRemunerationStartedAt.NewValue.Match<DateTime?>(date => date.Date, () => null), actual.OperationRemunerationBegun?.Date);
-            AssertPaymentMilestones(expected.PaymentMileStones.Value, actual.PaymentMilestones);
+            AssertPaymentMilestones(expected.PaymentMileStones.NewValue, actual.PaymentMilestones);
         }
 
         private static void AssertPaymentMilestones(IEnumerable<ItContractPaymentMilestone> expected, IEnumerable<PaymentMilestone> actual)
@@ -1450,7 +1450,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
                 PaymentModelUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
                 PaymentFrequencyUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
                 PriceRegulationUuid = (withValues ? A<Guid>() : (Guid?)null).AsChangedValue(),
-                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }
+                PaymentMileStones = new List<ItContractPaymentMilestone> { milestone }.AsChangedValue<IEnumerable<ItContractPaymentMilestone>>()
             };
         }
 
