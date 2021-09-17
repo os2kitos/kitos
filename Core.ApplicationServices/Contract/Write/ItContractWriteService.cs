@@ -269,7 +269,7 @@ namespace Core.ApplicationServices.Contract.Write
             (
                 contract,
                 optionUuid,
-                itContract  => itContract.ResetNoticePeriod(),
+                itContract => itContract.ResetNoticePeriod(),
                 itContract => itContract.TerminationDeadline,
                 (itContract, newValue) => itContract.TerminationDeadline = newValue
             );
