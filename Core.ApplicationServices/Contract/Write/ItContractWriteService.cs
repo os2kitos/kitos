@@ -56,10 +56,10 @@ namespace Core.ApplicationServices.Contract.Write
             IOrganizationService organizationService,
             IGenericRepository<HandoverTrial> handoverTrialRepository,
             IReferenceService referenceService,
-            IAssignmentUpdateService assignmentUpdateService, 
-            IItSystemUsageService usageService, 
-			IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
-            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService, 
+            IAssignmentUpdateService assignmentUpdateService,
+            IItSystemUsageService usageService,
+            IRoleAssignmentService<ItContractRight, ItContractRole, ItContract> roleAssignmentService,
+            IDataProcessingRegistrationApplicationService dataProcessingRegistrationApplicationService,
             IGenericRepository<PaymentMilestone> paymentMilestoneRepository)
         {
             _contractService = contractService;
@@ -155,7 +155,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.DataProcessingRegistrationUuids, UpdateDataProcessingRegistrations))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.SystemUsageUuids, UpdateSystemAssignments))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.HandoverTrials, UpdateHandOverTrials))
-				.Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
+                .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.PaymentModel, UpdatePaymentModelParameters))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.ExternalReferences, UpdateExternalReferences))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.Roles, UpdateRoles))
                 .Bind(updateContract => updateContract.WithOptionalUpdate(parameters.AgreementPeriod, UpdateAgreementPeriod));
@@ -165,7 +165,7 @@ namespace Core.ApplicationServices.Contract.Write
         {
             return contract
                 .WithOptionalUpdate(parameters.IrrevocableUntil, (itContract, newValue) => itContract.IrrevocableTo = newValue)
-                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ExtensionOptionsUuid, UpdatedExtensionOption))
+                .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ExtensionOptionsUuid, UpdateExtensionOption))
                 .Bind(updatedContract => updatedContract.WithOptionalUpdate(parameters.ExtensionOptionsUsed, (itContract, newValue) => itContract.UpdateExtendMultiplier(newValue)))
                 .Bind(updatedContract => UpdateDuration(updatedContract, parameters));
         }
@@ -184,7 +184,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Match<Result<ItContract, OperationError>>(error => error, () => contract);
         }
 
-        private Maybe<OperationError> UpdatedExtensionOption(ItContract contract, Guid? extensionOptionUuid)
+        private Maybe<OperationError> UpdateExtensionOption(ItContract contract, Guid? extensionOptionUuid)
         {
             return _assignmentUpdateService.UpdateIndependentOptionTypeAssignment
             (
@@ -372,7 +372,7 @@ namespace Core.ApplicationServices.Contract.Write
                 (c, newValue) => c.PaymentFreqency = newValue
             );
         }
-        
+
         private Maybe<OperationError> UpdateSystemAssignments(ItContract contract, IEnumerable<Guid> systemUsageUuids)
         {
             return _assignmentUpdateService.UpdateUniqueMultiAssignment

@@ -67,7 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                 ExternalReferences = references.FromNullable().Select(MapReferences),
                 Roles = roleAssignments.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dataProcessingRegistrationUuids.FromNullable(),
-				PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
+                PaymentModel = paymentModel.FromNullable().Select(MapPaymentModel),
                 AgreementPeriod = agreementPeriod.FromNullable().Select(MapAgreementPeriod)
             };
         }
