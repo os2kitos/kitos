@@ -218,7 +218,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<GeneralDataUpdateRequestDTO>();
 
             //Act
-            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPUT(new UpdateItSystemUsageRequestDTO() { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
