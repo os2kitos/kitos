@@ -38,12 +38,15 @@ describe("Getting the correct message when there is a conflict deleting a system
                 loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
-                    .then(() => console.log("Expecting system with name " + systemName))
+                    .then(() => console.log(`Expecting system with name ${systemName}`))
                     .then(() => expectSystemWithName(systemName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(systemName))
                     .then(() => itSystemFrontPage.getDeleteButton().click())
-                    .then(() => testFixture.disableAutoBrowserWaits())
-                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => browser.wait(EC.alertIsPresent(), waitTimer.tenSeconds))
+                    .then(() => browser.switchTo().alert().then(alert => {
+                        testFixture.disableAutoBrowserWaits();
+                        alert.accept();
+                    }))
                     .then(() => console.log("Waiting for toast message"))
                     .then(() => waitForToastMessageToAppear("IT System er slettet!"));
             });
@@ -59,8 +62,11 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => toggleSystemInUse(systemName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(systemName))
                     .then(() => itSystemFrontPage.getDeleteButton().click())
-                    .then(() => testFixture.disableAutoBrowserWaits())
-                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => browser.wait(EC.alertIsPresent(), waitTimer.tenSeconds))
+                    .then(() => browser.switchTo().alert().then(alert => {
+                        testFixture.disableAutoBrowserWaits();
+                        alert.accept();
+                    }))
                     .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da Systemet er i anvendelse i en eller flere organisationer"));
             });
 
@@ -77,8 +83,11 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => InterfaceHelper.bindInterfaceToSystem(systemName, interfaceName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(systemName))
                     .then(() => itSystemFrontPage.getDeleteButton().click())
-                    .then(() => testFixture.disableAutoBrowserWaits())
-                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => browser.wait(EC.alertIsPresent(), waitTimer.tenSeconds))
+                    .then(() => browser.switchTo().alert().then(alert => {
+                        testFixture.disableAutoBrowserWaits();
+                        alert.accept();
+                    }))
                     .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da en det er markeret som udstillersystem for en eller flere snitflader"));
             });
 
@@ -99,8 +108,11 @@ describe("Getting the correct message when there is a conflict deleting a system
                     .then(() => CatalogHelper.setMainSystem(mainSystemName, childSystemName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(mainSystemName))
                     .then(() => itSystemFrontPage.getDeleteButton().click())
-                    .then(() => testFixture.disableAutoBrowserWaits())
-                    .then(() => browser.switchTo().alert().accept())
+                    .then(() => browser.wait(EC.alertIsPresent(), waitTimer.tenSeconds))
+                    .then(() => browser.switchTo().alert().then(alert => {
+                        testFixture.disableAutoBrowserWaits();
+                        alert.accept();
+                    }))
                     .then(() => console.log("Waiting for toast message"))
                     .then(() => waitForToastMessageToAppear("Systemet kan ikke slettes! Da det er markeret som overordnet system for en eller flere systemer"));
             });
