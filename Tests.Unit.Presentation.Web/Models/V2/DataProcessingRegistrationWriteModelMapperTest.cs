@@ -35,10 +35,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapGeneral(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { General = input });
 
             //Assert
-            AssertGeneralData(input, output);
+            AssertGeneralData(input, AssertPropertyContainsDataChange(output.General));
         }
 
         [Fact]
@@ -49,10 +49,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.InsecureCountriesSubjectToDataTransferUuids = null;
 
             //Act
-            var output = _sut.MapGeneral(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { General = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.InsecureCountriesSubjectToDataTransferUuids);
+            AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.General).InsecureCountriesSubjectToDataTransferUuids);
         }
 
         [Fact]
@@ -63,10 +63,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.DataProcessorUuids = null;
 
             //Act
-            var output = _sut.MapGeneral(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){General = input});
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.DataProcessorUuids);
+            AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.General).DataProcessorUuids);
         }
 
         [Fact]
@@ -77,10 +77,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.SubDataProcessorUuids = null;
 
             //Act
-            var output = _sut.MapGeneral(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){General = input});
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.SubDataProcessorUuids);
+            AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.General).SubDataProcessorUuids);
         }
 
         [Fact]
@@ -248,10 +248,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<DataProcessingRegistrationOversightWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapOversight(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
 
             //Assert
-            AssertOversight(input, output);
+            AssertOversight(input, AssertPropertyContainsDataChange(output.Oversight));
         }
 
         [Fact]
@@ -262,10 +262,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.OversightOptionUuids = null;
 
             //Act
-            var output = _sut.MapOversight(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.OversightOptionUuids);
+            AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.Oversight).OversightOptionUuids);
         }
 
         [Fact]
@@ -276,10 +276,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.OversightDates = null;
 
             //Act
-            var output = _sut.MapOversight(input);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.OversightDates);
+            AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.Oversight).OversightDates);
         }
 
         [Fact]
@@ -289,10 +289,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
 
             //Act
-            var dprRoles = _sut.MapRoles(roles);
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Roles = roles});
 
             //Assert
-            AssertRoles(roles, dprRoles);
+            AssertRoles(roles, AssertPropertyContainsDataChange(output.Roles));
         }
 
         [Fact]
@@ -302,10 +302,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
-            var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){ExternalReferences = references});
 
             //Assert
-            AssertReferences(references, mappedReferences);
+            AssertReferences(references,AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
         }
 
         private static void AssertReferences(IReadOnlyList<ExternalReferenceDataDTO> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences)

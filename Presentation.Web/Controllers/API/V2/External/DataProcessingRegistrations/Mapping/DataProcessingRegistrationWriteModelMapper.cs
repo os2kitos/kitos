@@ -56,12 +56,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
             return BaseMapReferences(references); ;
         }
 
-        public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
+        private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
         {
             return new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
@@ -79,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        public UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
+        private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
         {
             return new UpdatedDataProcessingRegistrationOversightDataParameters
             {
@@ -100,7 +100,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        public UpdatedDataProcessingRegistrationRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
+        private UpdatedDataProcessingRegistrationRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
         {
             var roleAssignmentResponseDtos = roles.ToList();
 
