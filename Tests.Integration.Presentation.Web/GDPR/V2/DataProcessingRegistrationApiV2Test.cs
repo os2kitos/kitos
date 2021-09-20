@@ -357,7 +357,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Name_Change()
+        public async Task Can_PATCH_With_Name_Change()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -371,14 +371,14 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
             //Act
-            var changedDTO = await DataProcessingRegistrationV2Helper.PutAsync(token, dto.Uuid, new UpdateDataProcessingRegistrationRequestDTO() { Name = name2 });
+            var changedDTO = await DataProcessingRegistrationV2Helper.PatchNameAsync(token, dto.Uuid, name2);
 
             //Assert
             Assert.Equal(name2, changedDTO.Name);
         }
 
         [Fact]
-        public async Task Cannot_PUT_Duplicated_Name()
+        public async Task Cannot_PATCH_Duplicated_Name()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -390,7 +390,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest2);
 
             //Act - try to change name of dpr2 to that of dpr1
-            using var response = await DataProcessingRegistrationV2Helper.SendPutAsync(token, dpr2.Uuid, new UpdateDataProcessingRegistrationRequestDTO() { Name = name1 });
+            using var response = await DataProcessingRegistrationV2Helper.SendPatchName(token, dpr2.Uuid, name1);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -708,8 +708,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem() : default;
 
             var input = CreateOversightRequest(
-                withOversightOptions ? new[] { oversightOption.Uuid } : Array.Empty<Guid>(), 
-                withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(), 
+                withOversightOptions ? new[] { oversightOption.Uuid } : Array.Empty<Guid>(),
+                withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 withOversightDates ? new[] { oversightDate1, oversightDate2 } : Array.Empty<OversightDateDTO>());
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -963,7 +963,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferenceInputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var oversightInput = CreateOversightRequest(new[] {oversightOption.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1, oversightDate2});
+            var oversightInput = CreateOversightRequest(new[] { oversightOption.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate1, oversightDate2 });
 
             var request = new CreateDataProcessingRegistrationRequestDTO()
             {
@@ -1004,16 +1004,16 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest);
 
             var (dataResponsible1, basisForTransfer1, generalRequest1) = await CreateGeneralDataInput(true, true, true, true, true, organization);
-            
+
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
 
-            var systemUsagesRequest1 = new List<Guid>() {system1Usage.Uuid};
+            var systemUsagesRequest1 = new List<Guid>() { system1Usage.Uuid };
 
             var oversightDate1 = CreateOversightDate();
             var oversightOption1 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 0)).OrderBy(x => A<int>()).First();
 
-            var oversightRequest1 = CreateOversightRequest(new[] {oversightOption1.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1});
+            var oversightRequest1 = CreateOversightRequest(new[] { oversightOption1.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate1 });
 
             var user1 = await CreateUser(organization);
             var role1 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
@@ -1087,8 +1087,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - Put to reset
             var generalRequest3 = new DataProcessingRegistrationGeneralDataWriteRequestDTO();
-            var systemUsagesRequest3 = Array.Empty<Guid>(); 
-            
+            var systemUsagesRequest3 = Array.Empty<Guid>();
+
             var referencesRequest3 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
 
             var modifyRequest3 = new UpdateDataProcessingRegistrationRequestDTO()

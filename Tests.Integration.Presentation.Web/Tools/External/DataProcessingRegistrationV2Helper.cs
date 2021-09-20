@@ -158,5 +158,17 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             };
             return payload;
         }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PatchNameAsync(string token, Guid uuid, string name)
+        {
+            using var response = await SendPatchName(token, uuid, name);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchName(string token, Guid uuid, string name)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
+        }
     }
 }
