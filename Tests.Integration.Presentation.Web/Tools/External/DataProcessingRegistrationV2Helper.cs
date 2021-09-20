@@ -91,14 +91,14 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, payload);
         }
 
-        public static async Task<HttpResponseMessage> SendPutGeneralDataAsync(string token, Guid uuid, DataProcessingRegistrationGeneralDataWriteRequestDTO payload)
+        public static async Task<HttpResponseMessage> SendPatchGeneralDataAsync(string token, Guid uuid, DataProcessingRegistrationGeneralDataWriteRequestDTO payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/general"), token, payload);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.General), payload));
         }
 
-        public static async Task<HttpResponseMessage> SendPutSystemsAsync(string token, Guid uuid, IEnumerable<Guid> payload)
+        public static async Task<HttpResponseMessage> SendPatchSystemsAsync(string token, Guid uuid, IEnumerable<Guid> payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/system-usages"), token, payload?.ToList());
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), payload));
         }
 
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
@@ -106,26 +106,26 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token);
         }
 
-        public static async Task<DataProcessingRegistrationResponseDTO> PutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
+        public static async Task<DataProcessingRegistrationResponseDTO> PatchOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
         {
-            using var response = await SendPutOversightAsync(token, uuid, payload);
+            using var response = await SendPatchOversightAsync(token, uuid, payload);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendPutOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
+        public static async Task<HttpResponseMessage> SendPatchOversightAsync(string token, Guid uuid, DataProcessingRegistrationOversightWriteRequestDTO payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/oversight"), token, payload);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight), payload));
         }
 
-        public static async Task<HttpResponseMessage> SendPutRolesAsync(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> payload)
+        public static async Task<HttpResponseMessage> SendPatchRolesAsync(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/roles"), token, payload);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.Roles), payload));
         }
 
-        public static async Task<HttpResponseMessage> SendPutExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
+        public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}/external-references"), token, payload?.ToList() ?? new List<ExternalReferenceDataDTO>());
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences), payload));
         }
 
         public static async Task<IEnumerable<RoleOptionResponseDTO>> GetRolesAsync(string token, Guid organizationUuid, int page = 0, int pageSize = 10)
@@ -142,12 +142,33 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 new("page", page.ToString("D")),
                 new("pageSize", pageSize.ToString("D")),
             };
-            
+
             queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.ToString("D")));
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registration-role-types?{query}"), token);
+        }
+
+        private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
+        {
+            var payload = new Dictionary<string, object>
+            {
+                {propertyName,dto}
+            };
+            return payload;
+        }
+
+        public static async Task<DataProcessingRegistrationResponseDTO> PatchNameAsync(string token, Guid uuid, string name)
+        {
+            using var response = await SendPatchName(token, uuid, name);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsAsync<DataProcessingRegistrationResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchName(string token, Guid uuid, string name)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(UpdateDataProcessingRegistrationRequestDTO.Name), name));
         }
     }
 }

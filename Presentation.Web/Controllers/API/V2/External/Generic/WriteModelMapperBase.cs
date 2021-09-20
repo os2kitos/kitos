@@ -20,6 +20,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             _currentRequestRootProperties = new Lazy<ISet<string>>(currentHttpRequest.GetDefinedJsonRootProperties);
         }
 
+        /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
@@ -30,7 +31,8 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 
             return response;
         }
-
+        
+        /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;

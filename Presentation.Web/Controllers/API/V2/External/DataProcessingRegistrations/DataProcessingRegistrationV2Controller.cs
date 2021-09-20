@@ -14,12 +14,9 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.GDPR.Write;
-using Core.ApplicationServices.Model.GDPR.Write;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.DataProcessing;
-using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations
 {
@@ -152,8 +149,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         /// <summary>
         /// Perform a full update of an existing data processing registration.
-        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
-        /// If the section is not provided in the json, the omitted section will remain unchanged. 
+        /// Note: PUT expects a full version of the updated registration. For partial updates, please use PATCH.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
         /// <param name="request"></param>
@@ -178,6 +174,34 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         }
 
         /// <summary>
+        /// Allows partial updates of an existing data processing registration
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged.
+        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] UpdateDataProcessingRegistrationRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .Update(uuid, _writeModelMapper.FromPATCH(request))
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
         /// Removes an existing data processing registration.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
@@ -197,151 +221,6 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             return _writeService
                 .Delete(uuid)
                 .Match(FromOperationError, () => StatusCode(HttpStatusCode.NoContent));
-        }
-
-        /// <summary>
-        /// Perform a full update of the "General data" section of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
-        /// </summary>
-        /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{uuid}/general")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationGeneralData([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationGeneralDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(uuid, new DataProcessingRegistrationModificationParameters
-                {
-                    General = _writeModelMapper.MapGeneral(request)
-                })
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Perform a full update of the "SystemUsages" section of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
-        /// </summary>
-        /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="systemUsageUuids"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{uuid}/system-usages")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationSystemsData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<Guid> systemUsageUuids)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(uuid, new DataProcessingRegistrationModificationParameters
-                {
-                    SystemUsageUuids = systemUsageUuids.FromNullable()
-                })
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Perform a full update of the "Oversight" section of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
-        /// </summary>
-        /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{uuid}/oversight")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationOversightData([NonEmptyGuid] Guid uuid, [FromBody] DataProcessingRegistrationOversightWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(uuid, new DataProcessingRegistrationModificationParameters
-                {
-                    Oversight = _writeModelMapper.MapOversight(request)
-                })
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Perform a full update of the "Roles" section of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
-        /// </summary>
-        /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{uuid}/roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationRolesData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(uuid, new DataProcessingRegistrationModificationParameters
-                {
-                    Roles = _writeModelMapper.MapRoles(request)
-                })
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Perform a full update of the "External references" section of an existing data processing registration.
-        /// Absent/nulled fields will result in a data reset in the targeted registration.
-        /// </summary>
-        /// <param name="uuid">UUID of the data processing registration</param>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{uuid}/external-references")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Conflict)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutDataProcessingRegistrationExternalReferencesData([NonEmptyGuid] Guid uuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(uuid, new DataProcessingRegistrationModificationParameters
-                {
-                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
-                })
-                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
-                .Match(Ok, FromOperationError);
         }
 
         private CreatedNegotiatedContentResult<DataProcessingRegistrationResponseDTO> MapCreatedResponse(DataProcessingRegistrationResponseDTO dto)
