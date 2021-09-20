@@ -30,7 +30,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return Map(dto);
+            return Map(dto, false);
         }
 
         public ItContractModificationParameters FromPATCH(UpdateContractRequestDTO dto)
@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return Map(dto);
+            return Map(dto, false);
         }
 
         public ItContractModificationParameters FromPUT(UpdateContractRequestDTO dto)
@@ -46,13 +46,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return Map(dto,true);
+            return Map(dto, true);
         }
 
-        private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided = false) where T : ContractWriteRequestDTO, IHasNameExternal
+        private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : ContractWriteRequestDTO, IHasNameExternal
         {
             var generalData = WithResetDataIfPropertyIsDefined(dto.General, nameof(ContractWriteRequestDTO.General), enforceFallbackIfNotProvided);
-            var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible),enforceFallbackIfNotProvided);
+            var responsibleData = WithResetDataIfPropertyIsDefined(dto.Responsible, nameof(ContractWriteRequestDTO.Responsible), enforceFallbackIfNotProvided);
             var procurement = WithResetDataIfPropertyIsDefined(dto.Procurement, nameof(ContractWriteRequestDTO.Procurement), enforceFallbackIfNotProvided);
             var supplier = WithResetDataIfPropertyIsDefined(dto.Supplier, nameof(ContractWriteRequestDTO.Supplier), enforceFallbackIfNotProvided);
             var handoverTrials = WithResetDataIfPropertyIsDefined(dto.HandoverTrials, nameof(ContractWriteRequestDTO.HandoverTrials), () => new List<HandoverTrialRequestDTO>(), enforceFallbackIfNotProvided);

@@ -72,7 +72,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapUpdate(request, false);
         }
 
-        private UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
+        private static UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
         {
             return new UpdatedSystemUsageGDPRProperties
             {
@@ -103,7 +103,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
+        private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
@@ -121,7 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         }
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
         {
-            return new SystemUsageJournalPeriod()
+            return new SystemUsageJournalPeriod
             {
                 Approved = journalPeriod.Approved,
                 ArchiveId = journalPeriod.ArchiveId,
