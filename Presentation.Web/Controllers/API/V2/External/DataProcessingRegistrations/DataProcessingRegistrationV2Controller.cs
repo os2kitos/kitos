@@ -152,8 +152,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         /// <summary>
         /// Perform a full update of an existing data processing registration.
-        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
-        /// If the section is not provided in the json, the omitted section will remain unchanged. 
+        /// Note: PUT expects a full version of the updated registration. For partial updates, please use PATCH.
         /// </summary>
         /// <param name="uuid">UUID of the data processing registration</param>
         /// <param name="request"></param>
@@ -173,6 +172,34 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
             return _writeService
                 .Update(uuid, _writeModelMapper.FromPUT(request))
+                .Select(_responseMapper.MapDataProcessingRegistrationDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Allows partial updates of an existing data processing registration
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged.
+        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
+        /// </summary>
+        /// <param name="uuid">UUID of the data processing registration</param>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(DataProcessingRegistrationResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        public IHttpActionResult PatchDataProcessingRegistration([NonEmptyGuid] Guid uuid, [FromBody] UpdateDataProcessingRegistrationRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _writeService
+                .Update(uuid, _writeModelMapper.FromPATCH(request))
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)
                 .Match(Ok, FromOperationError);
         }

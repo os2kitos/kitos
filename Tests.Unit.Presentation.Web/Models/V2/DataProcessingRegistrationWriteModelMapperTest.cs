@@ -4,6 +4,7 @@ using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
@@ -18,7 +19,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
     public class DataProcessingRegistrationWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly DataProcessingRegistrationWriteModelMapper _sut;
-        private Mock<ICurrentHttpRequest> _currentHttpRequestMock;
+        private readonly Mock<ICurrentHttpRequest> _currentHttpRequestMock;
 
         public DataProcessingRegistrationWriteModelMapperTest()
         {
@@ -92,7 +93,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPOST(input);
 
             //Assert
+            Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             AssertGeneralData(input.General, output.General.Value);
+            AssertOversight(input.Oversight, AssertPropertyContainsDataChange(output.Oversight));
+            AssertReferences(input.ExternalReferences.ToList(), AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
+            AssertRoles(input.Roles.ToList(), AssertPropertyContainsDataChange(output.Roles));
             Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
         }
 
@@ -106,7 +111,29 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPUT(input);
 
             //Assert
+            Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
             AssertGeneralData(input.General, output.General.Value);
+            AssertOversight(input.Oversight, AssertPropertyContainsDataChange(output.Oversight));
+            AssertReferences(input.ExternalReferences.ToList(), AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
+            AssertRoles(input.Roles.ToList(), AssertPropertyContainsDataChange(output.Roles));
+            Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
+        }
+
+        [Fact]
+        public void FromPATCH_Maps_All_Sections()
+        {
+            //Arrange
+            var input = A<UpdateDataProcessingRegistrationRequestDTO>();
+
+            //Act
+            var output = _sut.FromPATCH(input);
+
+            //Assert
+            Assert.Equal(input.Name, AssertPropertyContainsDataChange(output.Name));
+            AssertGeneralData(input.General, output.General.Value);
+            AssertOversight(input.Oversight, AssertPropertyContainsDataChange(output.Oversight));
+            AssertReferences(input.ExternalReferences.ToList(), AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
+            AssertRoles(input.Roles.ToList(), AssertPropertyContainsDataChange(output.Roles));
             Assert.Equal(input.SystemUsageUuids, output.SystemUsageUuids.Value);
         }
 
@@ -117,7 +144,40 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
-        public void FromPUT_Ignores_Undefined_Sections(
+        public void FromPATCH_Ignores_Undefined_Sections(
+            bool noName,
+            bool noGeneralData,
+            bool noSystems,
+            bool noOversight,
+            bool noRoles,
+            bool noReferences)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
+            var properties = GetAllRootProperties();
+            if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
+            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
+            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
+            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
+            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
+            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
+
+            //Act
+            var output = _sut.FromPATCH(input);
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noName, output.Name.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noOversight, output.Oversight.IsNone);
+            Assert.Equal(noRoles, output.Roles.IsNone);
+            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPUT_Enforces_Undefined_Sections(
             bool noName,
             bool noGeneralData,
             bool noSystems,
@@ -140,12 +200,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPUT(input);
 
             //Assert that method patched empty values before mapping
-            Assert.Equal(noName, output.Name.IsUnchanged);
-            Assert.Equal(noGeneralData, output.General.IsNone);
-            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
-            Assert.Equal(noOversight, output.Oversight.IsNone);
-            Assert.Equal(noRoles, output.Roles.IsNone);
-            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
+            Assert.True(output.Name.HasChange);
+            Assert.True(output.General.HasValue);
+            Assert.True(output.SystemUsageUuids.HasValue);
+            Assert.True(output.Oversight.HasValue);
+            Assert.True(output.Roles.HasValue);
+            Assert.True(output.ExternalReferences.HasValue);
         }
 
         [Theory]
@@ -191,13 +251,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.MapOversight(input);
 
             //Assert
-            Assert.Equal(input.OversightOptionUuids, AssertPropertyContainsDataChange(output.OversightOptionUuids));
-            Assert.Equal(input.OversightOptionsRemark, AssertPropertyContainsDataChange(output.OversightOptionsRemark));
-            Assert.Equal(input.OversightInterval?.ToIntervalOption(), AssertPropertyContainsDataChange(output.OversightInterval));
-            Assert.Equal(input.OversightIntervalRemark, AssertPropertyContainsDataChange(output.OversightIntervalRemark));
-            Assert.Equal(input.IsOversightCompleted?.ToYesNoUndecidedOption(), AssertPropertyContainsDataChange(output.IsOversightCompleted));
-            Assert.Equal(input.OversightCompletedRemark, AssertPropertyContainsDataChange(output.OversightCompletedRemark));
-            AssertOversightDates(input.OversightDates, AssertPropertyContainsDataChange(output.OversightDates));
+            AssertOversight(input, output);
         }
 
         [Fact]
@@ -238,15 +292,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var dprRoles = _sut.MapRoles(roles);
 
             //Assert
-            var userRolePairs = AssertPropertyContainsDataChange(dprRoles.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
-            Assert.Equal(roles.Count, userRolePairs.Count);
-            for (var i = 0; i < userRolePairs.Count; i++)
-            {
-                var expected = roles[i];
-                var actual = userRolePairs[i];
-                Assert.Equal(expected.RoleUuid, actual.RoleUuid);
-                Assert.Equal(expected.UserUuid, actual.UserUuid);
-            }
+            AssertRoles(roles, dprRoles);
         }
 
         [Fact]
@@ -259,6 +305,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
 
             //Assert
+            AssertReferences(references, mappedReferences);
+        }
+
+        private static void AssertReferences(IReadOnlyList<ExternalReferenceDataDTO> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences)
+        {
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
             for (var i = 0; i < mappedReferences.Count; i++)
             {
@@ -295,7 +346,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                     AssertPropertyContainsDataChange(actualCollection));
         }
 
-        private void AssertOversightDates(IEnumerable<OversightDateDTO> expected, IEnumerable<UpdatedDataProcessingRegistrationOversightDate> actual)
+        private static void AssertOversightDates(IEnumerable<OversightDateDTO> expected, IEnumerable<UpdatedDataProcessingRegistrationOversightDate> actual)
         {
             var orderedExpected = expected.OrderBy(x => x.CompletedAt).ToList();
             var orderedActual = actual.OrderBy(x => x.CompletedAt).ToList();
@@ -312,6 +363,34 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             return typeof(UpdateDataProcessingRegistrationRequestDTO).GetProperties().Select(x => x.Name)
                 .ToHashSet();
+        }
+
+        private static void AssertOversight(DataProcessingRegistrationOversightWriteRequestDTO input,
+            UpdatedDataProcessingRegistrationOversightDataParameters output)
+        {
+            Assert.Equal(input.OversightOptionUuids, AssertPropertyContainsDataChange(output.OversightOptionUuids));
+            Assert.Equal(input.OversightOptionsRemark, AssertPropertyContainsDataChange(output.OversightOptionsRemark));
+            Assert.Equal(input.OversightInterval?.ToIntervalOption(),
+                AssertPropertyContainsDataChange(output.OversightInterval));
+            Assert.Equal(input.OversightIntervalRemark, AssertPropertyContainsDataChange(output.OversightIntervalRemark));
+            Assert.Equal(input.IsOversightCompleted?.ToYesNoUndecidedOption(),
+                AssertPropertyContainsDataChange(output.IsOversightCompleted));
+            Assert.Equal(input.OversightCompletedRemark, AssertPropertyContainsDataChange(output.OversightCompletedRemark));
+            AssertOversightDates(input.OversightDates, AssertPropertyContainsDataChange(output.OversightDates));
+        }
+
+        private static void AssertRoles(IReadOnlyList<RoleAssignmentRequestDTO> expectedRoles, UpdatedDataProcessingRegistrationRoles actualRoles)
+        {
+            var inputRoles = expectedRoles.OrderBy(x => x.RoleUuid).ToList();
+            var mappedRoles = AssertPropertyContainsDataChange(actualRoles.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
+            Assert.Equal(expectedRoles.Count, mappedRoles.Count);
+            for (var i = 0; i < mappedRoles.Count; i++)
+            {
+                var expected = inputRoles[i];
+                var actual = mappedRoles[i];
+                Assert.Equal(expected.RoleUuid, actual.RoleUuid);
+                Assert.Equal(expected.UserUuid, actual.UserUuid);
+            }
         }
     }
 }

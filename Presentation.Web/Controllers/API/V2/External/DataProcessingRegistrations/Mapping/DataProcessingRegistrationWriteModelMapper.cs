@@ -24,24 +24,30 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         public DataProcessingRegistrationModificationParameters FromPOST(CreateDataProcessingRegistrationRequestDTO dto)
         {
-            return Map(dto);
+            return Map(dto, false);
         }
 
         public DataProcessingRegistrationModificationParameters FromPUT(UpdateDataProcessingRegistrationRequestDTO dto)
         {
-            return Map(dto);
+            return Map(dto, true);
         }
-        private DataProcessingRegistrationModificationParameters Map<T>(T dto) where T : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal
+
+        public DataProcessingRegistrationModificationParameters FromPATCH(UpdateDataProcessingRegistrationRequestDTO dto)
         {
-            dto.General = WithResetDataIfPropertyIsDefined(dto.General, nameof(DataProcessingRegistrationWriteRequestDTO.General));
-            dto.SystemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), () => new List<Guid>());
-            dto.Oversight = WithResetDataIfPropertyIsDefined(dto.Oversight, nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
-            dto.Roles = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(DataProcessingRegistrationWriteRequestDTO.Roles), Array.Empty<RoleAssignmentRequestDTO>);
-            dto.ExternalReferences = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences), Array.Empty<ExternalReferenceDataDTO>);
+            return Map(dto, false);
+        }
+
+        private DataProcessingRegistrationModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal
+        {
+            dto.General = WithResetDataIfPropertyIsDefined(dto.General, nameof(DataProcessingRegistrationWriteRequestDTO.General), enforceFallbackIfNotProvided);
+            dto.SystemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), () => new List<Guid>(), enforceFallbackIfNotProvided);
+            dto.Oversight = WithResetDataIfPropertyIsDefined(dto.Oversight, nameof(DataProcessingRegistrationWriteRequestDTO.Oversight), enforceFallbackIfNotProvided);
+            dto.Roles = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(DataProcessingRegistrationWriteRequestDTO.Roles), Array.Empty<RoleAssignmentRequestDTO>, enforceFallbackIfNotProvided);
+            dto.ExternalReferences = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences), Array.Empty<ExternalReferenceDataDTO>, enforceFallbackIfNotProvided);
 
             return new DataProcessingRegistrationModificationParameters
             {
-                Name = ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
+                Name = (ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
                 General = dto.General.FromNullable().Select(MapGeneral),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(MapOversight),
