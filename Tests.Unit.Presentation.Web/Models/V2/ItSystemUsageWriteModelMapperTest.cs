@@ -168,11 +168,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Map_General_Data_Properties_Resets_Validity_If_SourceValue_Not_Defined()
         {
             //Arrange
-            var input = A<GeneralDataWriteRequestDTO>();
+            var input = A<GeneralDataUpdateRequestDTO>();
             input.Validity = null;
 
             //Act
-            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
@@ -185,11 +185,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Map_General_Data_Properties_Resets_NumberOfExpectedUsers_If_SourceValue_Not_Defined()
         {
             //Arrange
-            var input = A<GeneralDataWriteRequestDTO>();
+            var input = A<GeneralDataUpdateRequestDTO>();
             input.NumberOfExpectedUsers = null;
 
             //Act
-            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
@@ -200,11 +200,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Map_General_Data_Properties_Resets_AssociatedProjects_If_SourceValue_Not_Defined()
         {
             //Arrange
-            var input = A<GeneralDataWriteRequestDTO>();
+            var input = A<GeneralDataUpdateRequestDTO>();
             input.AssociatedProjectUuids = null;
 
             //Act
-            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { General = input });
 
             //Assert
             var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
