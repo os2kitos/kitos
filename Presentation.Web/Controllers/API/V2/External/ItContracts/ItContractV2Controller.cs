@@ -17,10 +17,7 @@ using Core.ApplicationServices.Contract.Write;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Core.Abstractions.Extensions;
-using Core.ApplicationServices.Model.Contracts.Write;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 {
@@ -153,8 +150,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
 
         /// <summary>
         /// Updates an existing it-contract
-        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
-        /// If the section is not provided in the json, the omitted section will remain unchanged. 
+        /// Note: PUT expects a full version of the updated contract. For partial updates, please use PATCH.
         /// </summary>
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
         /// <param name="request">Full update of the contract</param>
@@ -181,348 +177,31 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         }
 
         /// <summary>
-        /// Updates an existing it-contract's general data section
+        /// Allows partial updates of an existing it-contract
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged.
+        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
         /// </summary>
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
+        /// <param name="request">Full update of the contract</param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/general")]
+        [HttpPatch]
+        [Route("{contractUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.Conflict)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractGeneralData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractGeneralDataWriteRequestDTO request)
+        public IHttpActionResult PatchItContract([NonEmptyGuid] Guid contractUuid, [FromBody] UpdateContractRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var parameters = new ItContractModificationParameters()
-            {
-                General = _writeModelMapper.MapGeneralData(request)
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's procurement data section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/procurement")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractProcurementData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractProcurementDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var parameters = _writeModelMapper.FromPATCH(request);
 
             return _writeService
-                .Update(contractUuid, new ItContractModificationParameters()
-                {
-                    Procurement = _writeModelMapper.MapProcurement(request)
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's supplier data section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/supplier")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractSupplierData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractSupplierDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(contractUuid, new ItContractModificationParameters()
-                {
-                    Supplier = _writeModelMapper.MapSupplier(request)
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's responsible data section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/responsible")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractResponsibleData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractResponsibleDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                Responsible = _writeModelMapper.MapResponsible(request)
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's system usages
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <param name="systemUsageUuids">Uuids of the system usages</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/system-usages")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractSystemUsages([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<Guid> systemUsageUuids)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(contractUuid, new ItContractModificationParameters
-                {
-                    SystemUsageUuids = (systemUsageUuids ?? new List<Guid>()).FromNullable()
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's data processing registrations
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <param name="dataProcessingRegistrationUuids">UUIDs of the data processing registrations</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/data-processing-registrations")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractDataProcessingRegistrations([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<Guid> dataProcessingRegistrationUuids)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(contractUuid, new ItContractModificationParameters
-                {
-                    DataProcessingRegistrationUuids = (dataProcessingRegistrationUuids ?? new List<Guid>()).FromNullable()
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's handover trial registrations
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/handover-trials")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractHandoverData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<HandoverTrialRequestDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                HandoverTrials = _writeModelMapper.MapHandOverTrials(request ?? new List<HandoverTrialRequestDTO>()).FromNullable()
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's payment model data section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/payment-model")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractPaymentModelData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractPaymentModelDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(contractUuid, new ItContractModificationParameters
-                {
-                    PaymentModel = _writeModelMapper.MapPaymentModel(request)
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's agreement period data section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/agreement-period")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractAgreementPeriodData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractAgreementPeriodDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                AgreementPeriod = _writeModelMapper.MapAgreementPeriod(request).FromNullable()
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's Termination section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/termination")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractTerminationData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractTerminationDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(contractUuid, new ItContractModificationParameters
-                {
-                    Termination = _writeModelMapper.MapTermination(request)
-                })
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's payments section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/payments")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractPaymentData([NonEmptyGuid] Guid contractUuid, [FromBody] ContractPaymentsDataWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                Payments = _writeModelMapper.MapPayments(request).FromNullable()
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's payments section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractRoleAssignmentData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                Roles = _writeModelMapper.MapRoles(request ?? new List<RoleAssignmentRequestDTO>()).FromNullable()
-            };
-
-            return _writeService.Update(contractUuid, parameters)
-                .Select(_responseMapper.MapContractDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates an existing it-contract's references section
-        /// </summary>
-        /// <param name="contractUuid">UUID of the contract in KITOS</param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{contractUuid}/external-references")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItContractResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PutItContractExternalReferencesData([NonEmptyGuid] Guid contractUuid, [FromBody] IEnumerable<ExternalReferenceDataDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            var parameters = new ItContractModificationParameters
-            {
-                ExternalReferences = _writeModelMapper.MapReferences(request ?? new List<ExternalReferenceDataDTO>()).FromNullable()
-            };
-
-            return _writeService.Update(contractUuid, parameters)
+                .Update(contractUuid, parameters)
                 .Select(_responseMapper.MapContractDTO)
                 .Match(Ok, FromOperationError);
         }
