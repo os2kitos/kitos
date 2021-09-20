@@ -1871,6 +1871,60 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertTermination(requestDto3.Termination, null, contractDTO3.Termination);
         }
 
+        [Fact]
+        public async Task Can_DELETE_Contract()
+        {
+            //Arrange
+            var (token, _, organization) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization.Uuid,
+                Name = CreateName()
+            };
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
+
+            //Act
+            using var response = await ItContractV2Helper.SendDeleteContractAsync(token, contractDTO.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+            using var getResponse = await ItContractV2Helper.SendGetItContractAsync(token, contractDTO.Uuid);
+            Assert.Equal(HttpStatusCode.NotFound,  getResponse.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_Contract_If_Not_Allowed()
+        {
+            //Arrange
+            var (token1, _, organization1) = await CreatePrerequisitesAsync();
+            var requestDto = new CreateNewContractRequestDTO()
+            {
+                OrganizationUuid = organization1.Uuid,
+                Name = CreateName()
+            };
+            var contractDTO = await ItContractV2Helper.PostContractAsync(token1, requestDto);
+            var (token2, _, _) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var response = await ItContractV2Helper.SendDeleteContractAsync(token2, contractDTO.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Cannot_DELETE_Contract_If_Not_Exists()
+        {
+            //Arrange
+            var (token, _, _) = await CreatePrerequisitesAsync();
+
+            //Act
+            using var response = await ItContractV2Helper.SendDeleteContractAsync(token, A<Guid>());
+
+            //Assert
+            Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+        }
+
         private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, Organization organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
@@ -1916,7 +1970,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
             var system2Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system2.Uuid });
 
-            return new List<Guid> {system1Usage.Uuid, system2Usage.Uuid};
+            return new List<Guid> { system1Usage.Uuid, system2Usage.Uuid };
         }
 
         private static void AssertTermination(ContractTerminationDataWriteRequestDTO expected, IdentityNamePairResponseDTO noticePeriodMonthsType, ContractTerminationDataResponseDTO actual)
