@@ -155,11 +155,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
         private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
         {
-            var payload = new Dictionary<string, object>
-            {
-                {propertyName,dto}
-            };
-            return payload;
+            return dto.AsPatchPayloadOfProperty(propertyName);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteContractAsync(string token, Guid contractUuid)
