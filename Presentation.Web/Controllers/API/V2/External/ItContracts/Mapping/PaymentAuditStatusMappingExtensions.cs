@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Presentation.Web.Models.API.V2.Types.Contract;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping

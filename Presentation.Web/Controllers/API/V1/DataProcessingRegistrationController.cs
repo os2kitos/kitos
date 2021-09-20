@@ -5,14 +5,15 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Model.GDPR;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model.Options;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;

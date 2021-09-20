@@ -4,13 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
-using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.SystemRelations;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -23,8 +23,6 @@ using Presentation.Web.Models.API.V2.Types.Shared;
 using Presentation.Web.Models.API.V2.Types.SystemUsage;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
-using Tests.Integration.Presentation.Web.Tools.XUnit;
-using Tests.Integration.Presentation.Web.Tools.Model;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -333,7 +331,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act
             await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var newUsage = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
+            using var newUsage = await ItSystemUsageV2Helper.SendPostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, newUsage.StatusCode);
@@ -400,7 +398,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_MainContract()
+        public async Task Can_PATCH_MainContract()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -412,7 +410,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await ItContractHelper.AddItSystemUsage(contract2.Id, usageId, organization.Id);
 
             //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract1.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -420,7 +418,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(contract1.Name, freshReadDTO.General.MainContract.Name);
 
             //Act - set to another contract
-            using var response2 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response2 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract2.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -429,7 +427,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Reset_MainContract()
+        public async Task Can_PATCH_Reset_MainContract()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -439,8 +437,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await ItContractHelper.AddItSystemUsage(contract.Id, usageId, organization.Id);
 
             //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
-            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK); //Reset main contract
+            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { MainContractUuid = contract.Uuid }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var resetResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK); //Reset main contract
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -448,7 +446,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Modify_Projects()
+        public async Task Can_PATCH_Modify_Projects()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -457,8 +455,8 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
 
             //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK);
-            using var modifyResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK); //Remove one project
+            using var response1 = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid, project2.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var modifyResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO { AssociatedProjectUuids = new[] { project1.Uuid } }).WithExpectedResponseCode(HttpStatusCode.OK); //Remove one project
 
             //Assert
             var freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -466,7 +464,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(project1.Uuid, project.Uuid);
 
             //Act - reset
-            using var resetResponse = await ItSystemUsageV2Helper.SendPutGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var resetResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, newUsage.Uuid, new GeneralDataUpdateRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             freshReadDTO = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -499,7 +497,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Modify_OrganizationalUsage()
+        public async Task Can_PATCH_Modify_OrganizationalUsage()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -510,7 +508,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
-            using var modificationResponse1 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+            using var modificationResponse1 = await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(token,
                 newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
                 {
                     UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid },
@@ -521,7 +519,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit2 }, unit2);
 
             //Act - swap one unit as well as responsible
-            using var modificationResponse2 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+            using var modificationResponse2 = await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(token,
                 newUsage.Uuid, new OrganizationUsageWriteRequestDTO
                 {
                     UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit3.Uuid },
@@ -532,14 +530,14 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             await AssertOrganizationalUsage(token, newUsage.Uuid, new[] { unit1, unit3 }, unit3);
 
             //Act - reset all
-            using var modificationResponse3 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+            using var modificationResponse3 = await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(token,
                 newUsage.Uuid, new OrganizationUsageWriteRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             await AssertOrganizationalUsage(token, newUsage.Uuid, Enumerable.Empty<OrgUnitDTO>(), null);
 
             //Act - set using orgs but no responsible
-            using var modificationResponse4 = await ItSystemUsageV2Helper.SendPutOrganizationalUsage(token,
+            using var modificationResponse4 = await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(token,
                 newUsage.Uuid, new OrganizationUsageWriteRequestDTO
                 {
                     UsingOrganizationUnitUuids = new[] { unit1.Uuid, unit2.Uuid }
@@ -588,7 +586,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_KLE()
+        public async Task Can_PATCH_KLE()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -608,7 +606,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var newUsage = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act - add one addition
-            using var put1 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs.Take(1) }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var put1 = await ItSystemUsageV2Helper.SendPatchKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs.Take(1) }).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -616,7 +614,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
 
             //Act - add another one
-            using var put2 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var put2 = await ItSystemUsageV2Helper.SendPatchKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs }).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -624,7 +622,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(false, null, dto.LocalKLEDeviations.RemovedKLE);
 
             //Act - remove some
-            using var put3 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals }).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var put3 = await ItSystemUsageV2Helper.SendPatchKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO() { AddedKLEUuids = additionalTaskRefs, RemovedKLEUuids = potentialRemovals }).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -632,7 +630,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertKLEDeviation(true, potentialRemovals, dto.LocalKLEDeviations.RemovedKLE);
 
             //Act - reset
-            using var put4 = await ItSystemUsageV2Helper.SendPutKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var put4 = await ItSystemUsageV2Helper.SendPatchKle(token, newUsage.Uuid, new LocalKLEDeviationsRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -660,7 +658,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_ExternalReferences()
+        public async Task Can_PATCH_ExternalReferences()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -671,7 +669,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
             //Act
-            using var response1 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response1 = await ItSystemUsageV2Helper.SendPatchExternalReferences(token, newUsage.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -679,7 +677,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act - reset
             var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
-            using var response2 = await ItSystemUsageV2Helper.SendPutExternalReferences(token, newUsage.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response2 = await ItSystemUsageV2Helper.SendPatchExternalReferences(token, newUsage.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await ItSystemUsageV2Helper.GetSingleAsync(token, newUsage.Uuid);
@@ -723,7 +721,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Modify_Roles()
+        public async Task Can_PATCH_Modify_Roles()
         {
             //Arrange
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
@@ -741,21 +739,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var modifyRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user2.Uuid } };
 
             //Act - Add role
-            using var addInitialRolesRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, initialRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var addInitialRolesRequest = await ItSystemUsageV2Helper.SendPatchRoles(token, createdDTO.Uuid, initialRoles).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var initialRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
             AssertSingleRight(role, user1, initialRoleResponse.Roles);
 
             //Act - Modify role
-            using var modifiedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, modifyRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var modifiedRequest = await ItSystemUsageV2Helper.SendPatchRoles(token, createdDTO.Uuid, modifyRoles).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var modifiedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
             AssertSingleRight(role, user2, modifiedRoleResponse.Roles);
 
             //Act - Remove role
-            using var removedRequest = await ItSystemUsageV2Helper.SendPutRoles(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>()).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var removedRequest = await ItSystemUsageV2Helper.SendPatchRoles(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var removedRoleResponse = await ItSystemUsageV2Helper.GetSingleAsync(token, createdDTO.Uuid);
@@ -787,7 +785,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_GDPR()
+        public async Task Can_PATCH_GDPR()
         {
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
@@ -802,7 +800,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
 
             //Act
-            await ItSystemUsageV2Helper.SendPutGDPR(token, usageDTO.Uuid, gdprVersion1)
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, usageDTO.Uuid, gdprVersion1)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
@@ -812,7 +810,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertGDPR(gdprVersion1, gdprResponse);
 
             //Act
-            await ItSystemUsageV2Helper.SendPutGDPR(token, usageDTO.Uuid, gdprVersion2)
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, usageDTO.Uuid, gdprVersion2)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
@@ -822,7 +820,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertGDPR(gdprVersion2, gdprResponse);
 
             //Act - reset
-            await ItSystemUsageV2Helper.SendPutGDPR(token, usageDTO.Uuid, gdprVersion3)
+            await ItSystemUsageV2Helper.SendPatchGDPR(token, usageDTO.Uuid, gdprVersion3)
                 .WithExpectedResponseCode(HttpStatusCode.OK)
                 .DisposeAsync();
 
@@ -857,7 +855,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Archiving()
+        public async Task Can_PATCH_With_Archiving()
         {
             //Arrange
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
@@ -876,7 +874,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var inputs = CreateArchivingWriteRequestDTO(archiveType.Uuid, archiveLocation.Uuid, archiveTestLocation.Uuid, organization.Uuid);
 
             //Act - Add archiving data
-            var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, inputs);
+            using var addedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, inputs);
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, addedArchivingDataUsage.StatusCode);
@@ -889,7 +887,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var updatedArchiveTestLocation = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageArchiveTestLocations, organization.Uuid, 1, 1)).First();
             var updatedInputs = CreateArchivingWriteRequestDTO(updatedArchiveType.Uuid, updatedArchiveLocation.Uuid, updatedArchiveTestLocation.Uuid, organization2.Uuid);
 
-            var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, updatedInputs);
+            using var updatedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, updatedInputs);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, updatedArchivingDataUsage.StatusCode);
@@ -897,7 +895,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             AssertArchivingParametersSet(updatedInputs, updatedDTO.Archiving);
 
             //Act - Remove archiving data
-            var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPutArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
+            using var removedArchivingDataUsage = await ItSystemUsageV2Helper.SendPatchArchiving(token, newUsage.Uuid, new ArchivingWriteRequestDTO() { JournalPeriods = new List<JournalPeriodDTO>() });
 
             //Assert 
             Assert.Equal(HttpStatusCode.OK, removedArchivingDataUsage.StatusCode);
@@ -911,15 +909,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             //Arrange
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system.Uuid));
-            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            using var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, usageDTO.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, usageDTO.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, deleteResult.StatusCode);
-            var notGetResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
+            using var notGetResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.NotFound, notGetResult.StatusCode);
         }
 
@@ -930,7 +928,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token, user, organization, system) = await CreatePrerequisitesAsync();
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, A<Guid>());
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token, A<Guid>());
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, deleteResult.StatusCode);
@@ -944,15 +942,15 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var (token2, user2, organization2, system2) = await CreatePrerequisitesAsync();
 
             var usageDTO = await ItSystemUsageV2Helper.PostAsync(token1, CreatePostRequest(organization1.Uuid, system1.Uuid));
-            var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            using var getResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getResult.StatusCode);
 
             //Act
-            var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token2, usageDTO.Uuid);
+            using var deleteResult = await ItSystemUsageV2Helper.SendDeleteAsync(token2, usageDTO.Uuid);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, deleteResult.StatusCode);
-            var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
+            using var getStillExistsResult = await ItSystemUsageV2Helper.SendGetSingleAsync(token1, usageDTO.Uuid);
             Assert.Equal(HttpStatusCode.OK, getStillExistsResult.StatusCode);
         }
 

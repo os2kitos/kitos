@@ -5,8 +5,9 @@ using System.Net.Http.Headers;
 using System.Web.Helpers;
 using System.Web.Http.Controllers;
 using System.Web.Mvc;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Serilog;

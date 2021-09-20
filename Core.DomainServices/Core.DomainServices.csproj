@@ -81,6 +81,7 @@
     <Compile Include="GDPR\IDataProcessingRegistrationOversightOptionsAssignmentService.cs" />
     <Compile Include="GDPR\IDataProcessingRegistrationSystemAssignmentService.cs" />
     <Compile Include="Generic\IEntityIdentityResolver.cs" />
+    <Compile Include="Generic\IEntityResolver.cs" />
     <Compile Include="IOrganizationRoleService.cs" />
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
@@ -236,6 +237,10 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
       <Name>Core.DomainModel</Name>

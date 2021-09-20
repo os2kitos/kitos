@@ -12,6 +12,7 @@ using Core.DomainModel.Organization;
 using Core.DomainModel.Reports;
 using Infrastructure.Services.Types;
 
+
 namespace Core.ApplicationServices.Authorization.Policies
 {
     public class ModuleModificationPolicy :

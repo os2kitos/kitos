@@ -1,6 +1,7 @@
 ﻿using Core.DomainModel;
-using Infrastructure.Services.Types;
+
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.KendoConfig;
 
 namespace Core.DomainServices.Repositories.Kendo

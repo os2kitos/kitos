@@ -1,11 +1,12 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Advice
 {

@@ -258,6 +258,7 @@
     <Compile Include="Models\V2\DataProcessingRegistrationWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\DataProcessingRegistrationResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItContractResponseMapperTest.cs" />
+    <Compile Include="Models\V2\ItContractWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageResponseMapperTest.cs" />
     <Compile Include="Models\V2\ItSystemUsageWriteModelMapperTest.cs" />
     <Compile Include="Models\V2\WriteModelMapperTestBase.cs" />
@@ -287,6 +288,10 @@
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

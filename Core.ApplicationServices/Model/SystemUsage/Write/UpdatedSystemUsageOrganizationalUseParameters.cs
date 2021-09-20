@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Model.SystemUsage.Write
 {

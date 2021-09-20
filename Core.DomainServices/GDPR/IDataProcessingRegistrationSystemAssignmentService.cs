@@ -1,8 +1,8 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
 
 namespace Core.DomainServices.GDPR
 {

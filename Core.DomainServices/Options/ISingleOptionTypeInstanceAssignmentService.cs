@@ -1,5 +1,5 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Result;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel;
 
 namespace Core.DomainServices.Options
 {

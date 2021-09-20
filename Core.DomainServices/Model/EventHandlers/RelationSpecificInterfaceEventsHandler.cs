@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.DomainServices.Model.EventHandlers

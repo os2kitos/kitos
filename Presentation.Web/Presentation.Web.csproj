@@ -362,6 +362,7 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />
@@ -379,6 +380,8 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractResponseMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\YearSegmentMappingExtension.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
@@ -407,6 +410,8 @@
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Infrastructure\Model\Request\CurrentAspNetRequest.cs" />
+    <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
@@ -420,6 +425,8 @@
     <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
@@ -1674,6 +1681,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

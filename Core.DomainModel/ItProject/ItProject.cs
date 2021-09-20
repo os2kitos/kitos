@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Extensions;
+
 
 // ReSharper disable VirtualMemberCallInConstructor
 

@@ -6,10 +6,10 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
     public class ContractSupplierDataWriteRequestDTO
     {
         /// <summary>
-        /// Optional reference to the supplier
+        /// Optional reference to the supplier organization
         /// </summary>
         [NonEmptyGuid]
-        public Guid? SupplierOrganizationUuid { get; set; }
+        public Guid? OrganizationUuid { get; set; }
         /// <summary>
         /// Determines if the contract has been signed by the supplier
         /// </summary>

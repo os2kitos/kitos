@@ -1,6 +1,6 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
-using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.SystemUsage.ReadModels
 {

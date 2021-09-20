@@ -1,7 +1,7 @@
 ﻿using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
-using Infrastructure.Services.Types;
 using System;
+using Core.Abstractions.Types;
 
 namespace Core.DomainModel.Notification
 {

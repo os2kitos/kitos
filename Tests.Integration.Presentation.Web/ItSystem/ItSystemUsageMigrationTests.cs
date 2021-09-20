@@ -758,7 +758,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 FrequencyTypeId = frequencyTypeId,
                 ContractId = contractId
             };
-            var response = await SystemRelationHelper.SendPostRelationRequestAsync(relationDTO);
+            using var response = await SystemRelationHelper.SendPostRelationRequestAsync(relationDTO);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<SystemRelationDTO>();
         }

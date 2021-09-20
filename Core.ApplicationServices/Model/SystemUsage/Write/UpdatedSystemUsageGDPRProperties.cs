@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Core.DomainModel.ItSystem.DataTypes;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Model.SystemUsage.Write
 {

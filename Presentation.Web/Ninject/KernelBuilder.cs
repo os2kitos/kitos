@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.Security;
 using AutoMapper;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
+using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
 using Core.ApplicationServices.Interface;
@@ -68,10 +71,9 @@ using Infrastructure.Services.Caching;
 using Infrastructure.Services.Configuration;
 using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
-using Infrastructure.Services.Types;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
@@ -101,10 +103,13 @@ using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Role;
+using Infrastructure.Ninject.ApplicationServices;
 using Infrastructure.Ninject.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
+using Presentation.Web.Infrastructure.Model.Request;
+using Core.ApplicationServices.Generic.Write;
 
 namespace Presentation.Web.Ninject
 {
@@ -132,6 +137,7 @@ namespace Presentation.Web.Ninject
 
             _builderActions.Add(kernel => kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel));
             _builderActions.Add(kernel => kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>());
+            _builderActions.Add(kernel => kernel.Bind<ICurrentHttpRequest>().To<CurrentAspNetRequest>());
 
             //Register automapper
             _builderActions.Add(kernel => kernel.Bind<IMapper>().ToConstant(MappingConfig.CreateMapper()).InSingletonScope());
@@ -194,6 +200,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IItSystemUsageWriteService>().To<ItSystemUsageWriteService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceService>().To<ItInterfaceService>().InCommandScope(Mode);
             kernel.Bind<IItContractService>().To<ItContractService>().InCommandScope(Mode);
+            kernel.Bind<IItContractWriteService>().To<ItContractWriteService>().InCommandScope(Mode);
             kernel.Bind<IUserRepositoryFactory>().To<UserRepositoryFactory>().InSingletonScope();
             kernel.Bind<IExcelService>().To<ExcelService>().InCommandScope(Mode);
             kernel.Bind<IExcelHandler>().To<ExcelHandler>().InCommandScope(Mode).Intercept().With(new LogInterceptor());
@@ -226,10 +233,14 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IUserNotificationApplicationService>().To<UserNotificationApplicationService>().InCommandScope(Mode);
             kernel.Bind<IGlobalAdminNotificationService>().To<GlobalAdminNotificationService>().InCommandScope(Mode);
             kernel.Bind<IEntityIdentityResolver>().To<NinjectEntityIdentityResolver>().InCommandScope(Mode);
+            kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
+            kernel.Bind<IAssignmentUpdateService>().To<AssignmentUpdateService>().InCommandScope(Mode);
+            kernel.Bind<IEntityResolver>().To<NinjectEntityResolver>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
             RegisterRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(kernel);
+            RegisterRoleAssignmentService<ItContractRight, ItContractRole, ItContract>(kernel);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -263,7 +274,8 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IDataProcessingRegistrationWriteModelMapper>().To<DataProcessingRegistrationWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IDataProcessingRegistrationResponseMapper>().To<DataProcessingRegistrationResponseMapper>().InCommandScope(Mode);
 
-            //Contract
+            //Contracts
+            kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IItContractResponseMapper>().To<ItContractResponseMapper>().InCommandScope(Mode);
 
         }

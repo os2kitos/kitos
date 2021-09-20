@@ -1,8 +1,8 @@
 ﻿using System;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 
 // ReSharper disable VirtualMemberCallInConstructor
 

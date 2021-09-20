@@ -1,6 +1,4 @@
-﻿using Infrastructure.Services.DomainEvents;
-
-namespace Core.DomainModel.Events
+﻿namespace Core.DomainModel.Events
 {
     public class EnabledStatusChanged<TEntity> : EntityUpdatedEvent<TEntity> where TEntity: IEntityWithEnabledStatus
     {

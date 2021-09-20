@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -7,7 +8,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Reference
 {

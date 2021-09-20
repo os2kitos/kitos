@@ -1,7 +1,7 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.ItSystemUsage.Read;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SystemUsage;

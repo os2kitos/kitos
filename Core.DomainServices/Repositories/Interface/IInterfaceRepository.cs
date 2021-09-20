@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystem;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Interface
 {

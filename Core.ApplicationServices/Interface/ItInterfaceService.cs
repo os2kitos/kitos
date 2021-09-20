@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
@@ -8,7 +10,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -18,8 +19,7 @@ using Core.DomainServices.Repositories.Interface;
 using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using DataRow = Core.DomainModel.ItSystem.DataRow;
 
 namespace Core.ApplicationServices.Interface

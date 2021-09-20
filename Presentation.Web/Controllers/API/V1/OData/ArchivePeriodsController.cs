@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using System.Web.Http;
 using Core.ApplicationServices.SystemUsage;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
-using Infrastructure.Services.DomainEvents;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Presentation.Web.Infrastructure.Attributes;

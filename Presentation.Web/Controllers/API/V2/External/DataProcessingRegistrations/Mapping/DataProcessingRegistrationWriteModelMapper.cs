@@ -1,37 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.GDPR.Write;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
-using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping
 {
-    public class DataProcessingRegistrationWriteModelMapper : IDataProcessingRegistrationWriteModelMapper
+    public class DataProcessingRegistrationWriteModelMapper : WriteModelMapperBase, IDataProcessingRegistrationWriteModelMapper
     {
-        public DataProcessingRegistrationModificationParameters FromPOST(DataProcessingRegistrationWriteRequestDTO dto)
+        public DataProcessingRegistrationWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
+            : base(currentHttpRequest)
         {
-            return Map(dto);
         }
 
-        public DataProcessingRegistrationModificationParameters FromPUT(DataProcessingRegistrationWriteRequestDTO dto)
+        public DataProcessingRegistrationModificationParameters FromPOST(CreateDataProcessingRegistrationRequestDTO dto)
         {
-            dto.General ??= new DataProcessingRegistrationGeneralDataWriteRequestDTO();
-            dto.SystemUsageUuids ??= Array.Empty<Guid>();
-            dto.Oversight ??= new DataProcessingRegistrationOversightWriteRequestDTO();
-            dto.Roles ??= Array.Empty<RoleAssignmentRequestDTO>();
-            dto.ExternalReferences ??= Array.Empty<ExternalReferenceDataDTO>();
-            return Map(dto);
+            return Map(dto, false);
         }
-        private DataProcessingRegistrationModificationParameters Map(DataProcessingRegistrationWriteRequestDTO dto)
+
+        public DataProcessingRegistrationModificationParameters FromPUT(UpdateDataProcessingRegistrationRequestDTO dto)
         {
+            return Map(dto, true);
+        }
+
+        public DataProcessingRegistrationModificationParameters FromPATCH(UpdateDataProcessingRegistrationRequestDTO dto)
+        {
+            return Map(dto, false);
+        }
+
+        private DataProcessingRegistrationModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : DataProcessingRegistrationWriteRequestDTO, IHasNameExternal
+        {
+            dto.General = WithResetDataIfPropertyIsDefined(dto.General, nameof(DataProcessingRegistrationWriteRequestDTO.General), enforceFallbackIfNotProvided);
+            dto.SystemUsageUuids = WithResetDataIfPropertyIsDefined(dto.SystemUsageUuids, nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), () => new List<Guid>(), enforceFallbackIfNotProvided);
+            dto.Oversight = WithResetDataIfPropertyIsDefined(dto.Oversight, nameof(DataProcessingRegistrationWriteRequestDTO.Oversight), enforceFallbackIfNotProvided);
+            dto.Roles = WithResetDataIfPropertyIsDefined(dto.Roles, nameof(DataProcessingRegistrationWriteRequestDTO.Roles), Array.Empty<RoleAssignmentRequestDTO>, enforceFallbackIfNotProvided);
+            dto.ExternalReferences = WithResetDataIfPropertyIsDefined(dto.ExternalReferences, nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences), Array.Empty<ExternalReferenceDataDTO>, enforceFallbackIfNotProvided);
+
             return new DataProcessingRegistrationModificationParameters
             {
-                Name = dto.Name.AsChangedValue(),
+                Name = (ClientRequestsChangeTo(nameof(IHasNameExternal.Name)) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
                 General = dto.General.FromNullable().Select(MapGeneral),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
                 Oversight = dto.Oversight.FromNullable().Select(MapOversight),
@@ -40,18 +56,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
-            return references.Select(x => new UpdatedExternalReferenceProperties
-            {
-                Title = x.Title,
-                DocumentId = x.DocumentId,
-                Url = x.Url,
-                MasterReference = x.MasterReference
-            }).ToList();
+            return BaseMapReferences(references); ;
         }
 
-        public UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
+        private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto)
         {
             return new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
@@ -69,7 +79,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             };
         }
 
-        public UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
+        private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto)
         {
             return new UpdatedDataProcessingRegistrationOversightDataParameters
             {
@@ -83,26 +93,20 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
                     .FromNullable()
                     .Select(x => x
                         .Select(y => new UpdatedDataProcessingRegistrationOversightDate()
-                            {
-                                CompletedAt = y.CompletedAt,
-                                Remark = y.Remark
-                            })).AsChangedValue()
+                        {
+                            CompletedAt = y.CompletedAt,
+                            Remark = y.Remark
+                        })).AsChangedValue()
             };
         }
 
-        public UpdatedDataProcessingRegistrationRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
+        private UpdatedDataProcessingRegistrationRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
         {
             var roleAssignmentResponseDtos = roles.ToList();
 
             return new UpdatedDataProcessingRegistrationRoles
             {
-                UserRolePairs = roleAssignmentResponseDtos.Any() ?
-                    roleAssignmentResponseDtos.Select(x => new UserRolePair
-                    {
-                        RoleUuid = x.RoleUuid,
-                        UserUuid = x.UserUuid
-                    }).FromNullable().AsChangedValue() :
-                    Maybe<IEnumerable<UserRolePair>>.None
+                UserRolePairs = BaseMapRoleAssignments(roleAssignmentResponseDtos)
             };
         }
     }

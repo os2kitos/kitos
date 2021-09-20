@@ -1,7 +1,7 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.LocalOptions;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Options;

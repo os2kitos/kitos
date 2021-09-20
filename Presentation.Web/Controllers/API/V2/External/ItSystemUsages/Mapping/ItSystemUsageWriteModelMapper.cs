@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.DomainModel.ItSystem.DataTypes;
-using Infrastructure.Services.Types;
+using Presentation.Web.Controllers.API.V2.External.Generic;
+using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -14,11 +17,16 @@ using Presentation.Web.Models.API.V2.Types.SystemUsage;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 {
-    public class ItSystemUsageWriteModelMapper : IItSystemUsageWriteModelMapper
+    public class ItSystemUsageWriteModelMapper : WriteModelMapperBase, IItSystemUsageWriteModelMapper
     {
+        public ItSystemUsageWriteModelMapper(ICurrentHttpRequest currentHttpRequest)
+            : base(currentHttpRequest)
+        {
+        }
+
         public SystemUsageUpdateParameters FromPOST(CreateItSystemUsageRequestDTO request)
         {
-            return new SystemUsageUpdateParameters
+            var parameters = new SystemUsageUpdateParameters
             {
                 GeneralProperties = request.General.FromNullable().Select(MapGeneralData),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
@@ -28,17 +36,25 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 GDPR = request.GDPR.FromNullable().Select(MapGDPR),
                 Archiving = request.Archiving.FromNullable().Select(MapArchiving)
             };
+
+            return parameters;
         }
 
         public SystemUsageUpdateParameters FromPUT(UpdateItSystemUsageRequestDTO request)
         {
-            var generalDataInput = request.General ?? new GeneralDataUpdateRequestDTO();
-            var orgUsageInput = request.OrganizationUsage ?? new OrganizationUsageWriteRequestDTO();
-            var kleInput = request.LocalKleDeviations ?? new LocalKLEDeviationsRequestDTO();
-            var roles = request.Roles ?? new List<RoleAssignmentRequestDTO>();
-            var externalReferenceDataDtos = request.ExternalReferences ?? new List<ExternalReferenceDataDTO>();
-            var gdpr = request.GDPR ?? new GDPRWriteRequestDTO();
-            var archiving = request.Archiving ?? new ArchivingWriteRequestDTO();
+            return MapUpdate(request, true);
+        }
+
+        private SystemUsageUpdateParameters MapUpdate(UpdateItSystemUsageRequestDTO request, bool enforceFallbackOnUndefinedProperties)
+        {
+            var generalDataInput = WithResetDataIfPropertyIsDefined(request.General, nameof(UpdateItSystemUsageRequestDTO.General), enforceFallbackOnUndefinedProperties);
+            var orgUsageInput = WithResetDataIfPropertyIsDefined(request.OrganizationUsage, nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage), enforceFallbackOnUndefinedProperties);
+            var kleInput = WithResetDataIfPropertyIsDefined(request.LocalKleDeviations, nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations), enforceFallbackOnUndefinedProperties);
+            var roles = WithResetDataIfPropertyIsDefined(request.Roles, nameof(UpdateItSystemUsageRequestDTO.Roles), () => new List<RoleAssignmentRequestDTO>(), enforceFallbackOnUndefinedProperties);
+            var externalReferenceDataDtos = WithResetDataIfPropertyIsDefined(request.ExternalReferences, nameof(UpdateItSystemUsageRequestDTO.ExternalReferences), () => new List<ExternalReferenceDataDTO>(), enforceFallbackOnUndefinedProperties);
+            var gdpr = WithResetDataIfPropertyIsDefined(request.GDPR, nameof(UpdateItSystemUsageRequestDTO.GDPR), enforceFallbackOnUndefinedProperties);
+            var archiving = WithResetDataIfPropertyIsDefined(request.Archiving, nameof(UpdateItSystemUsageRequestDTO.Archiving), enforceFallbackOnUndefinedProperties);
+
             return new SystemUsageUpdateParameters
             {
                 GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralDataUpdate),
@@ -51,7 +67,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        public UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
+        public SystemUsageUpdateParameters FromPATCH(UpdateItSystemUsageRequestDTO request)
+        {
+            return MapUpdate(request, false);
+        }
+
+        private static UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
         {
             return new UpdatedSystemUsageGDPRProperties
             {
@@ -81,7 +102,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 DataRetentionEvaluationFrequencyInMonths = request.DataRetentionEvaluationFrequencyInMonths.AsChangedValue()
             };
         }
-        public UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
+
+        private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
         {
             return new UpdatedSystemUsageArchivingParameters()
             {
@@ -99,7 +121,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         }
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
         {
-            return new SystemUsageJournalPeriod()
+            return new SystemUsageJournalPeriod
             {
                 Approved = journalPeriod.Approved,
                 ArchiveId = journalPeriod.ArchiveId,
@@ -107,17 +129,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                 StartDate = journalPeriod.StartDate
             };
         }
-        public IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
+
+        private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
-            return references.Select(x => new UpdatedExternalReferenceProperties
-            {
-                Title = x.Title,
-                DocumentId = x.DocumentId,
-                Url = x.Url,
-                MasterReference = x.MasterReference
-            });
+            return BaseMapReferences(references);
         }
-        public UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
+
+        private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
         {
             return new UpdatedSystemUsageKLEDeviationParameters
             {
@@ -131,14 +149,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         /// </summary>
         /// <param name="generalData"></param>
         /// <returns></returns>
-        public UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO generalData)
+        private static UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO generalData)
         {
             var generalProperties = MapGeneralData(generalData);
             generalProperties.MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue();
             return generalProperties;
         }
 
-        public UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input)
+        private static UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input)
         {
             return new UpdatedSystemUsageOrganizationalUseParameters
             {
@@ -147,23 +165,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        public UpdatedSystemUsageRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
+        private static UpdatedSystemUsageRoles MapRoles(IEnumerable<RoleAssignmentRequestDTO> roles)
         {
             var roleAssignmentResponseDtos = roles.ToList();
 
             return new UpdatedSystemUsageRoles
             {
-                UserRolePairs = (roleAssignmentResponseDtos.Any() ?
-                    Maybe<IEnumerable<UserRolePair>>.Some(roleAssignmentResponseDtos.Select(x => new UserRolePair
-                    {
-                        RoleUuid = x.RoleUuid,
-                        UserUuid = x.UserUuid
-                    })) :
-                    Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue()
+                UserRolePairs = BaseMapRoleAssignments(roleAssignmentResponseDtos)
             };
         }
 
-        public UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData)
+        private static UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData)
         {
             return new UpdatedSystemUsageGeneralProperties
             {

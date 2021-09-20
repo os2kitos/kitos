@@ -1,9 +1,9 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices;
-using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

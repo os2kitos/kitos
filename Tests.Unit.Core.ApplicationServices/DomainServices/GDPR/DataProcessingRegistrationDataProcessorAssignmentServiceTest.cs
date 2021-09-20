@@ -1,11 +1,11 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.Organization;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

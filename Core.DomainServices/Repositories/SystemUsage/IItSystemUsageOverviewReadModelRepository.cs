@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.SystemUsage
 {

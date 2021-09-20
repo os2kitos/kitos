@@ -1,11 +1,11 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Organization;
-using Infrastructure.Services.Types;
+
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices.RightsHolders
 {

@@ -1,11 +1,11 @@
 ﻿using Core.DomainModel.BackgroundJobs;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.SystemUsage;
 using Core.DomainServices.SystemUsage;
-using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

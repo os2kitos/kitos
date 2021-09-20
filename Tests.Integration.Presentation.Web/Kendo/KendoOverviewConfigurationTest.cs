@@ -4,7 +4,6 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
@@ -75,7 +74,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             var overviewType = A<OverviewType>();
             var columns = CreateColumnConfigurations();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
+            using var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, columns);
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
@@ -98,7 +97,7 @@ namespace Tests.Integration.Presentation.Web.Kendo
             //Arrange
             var overviewType = A<OverviewType>();
 
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
+            using var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             //Act
@@ -158,13 +157,13 @@ namespace Tests.Integration.Presentation.Web.Kendo
         {
             //Arrange
             var overviewType = A<OverviewType>();
-            var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
+            using var saveResponse = await KendoOverviewConfigurationHelper.SendSaveConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, CreateColumnConfigurations());
             Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
             var cookie = await HttpApi.GetCookieAsync(orgRole);
 
             //Act
-            var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, cookie);
+            using var response = await KendoOverviewConfigurationHelper.SendDeleteConfigurationRequestAsync(TestEnvironment.DefaultOrganizationId, overviewType, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

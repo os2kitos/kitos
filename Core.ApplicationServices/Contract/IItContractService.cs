@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Contract
 {
     public interface IItContractService
     {
+        Result<ItContract, OperationError> Create(int organizationId, string name);
         IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null);
         Result<ItContract, OperationFailure> Delete(int id);
 

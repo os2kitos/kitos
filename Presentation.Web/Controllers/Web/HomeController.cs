@@ -1,9 +1,10 @@
 ﻿using System.Web.Mvc;
 using System.Web.SessionState;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.SSO.Model;
 using Core.DomainServices;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models.Application.FeatureToggle;
 using Presentation.Web.Properties;
 

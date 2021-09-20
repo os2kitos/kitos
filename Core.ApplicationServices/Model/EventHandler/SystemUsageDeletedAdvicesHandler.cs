@@ -1,8 +1,8 @@
 ﻿using System.Linq;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Advice;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {

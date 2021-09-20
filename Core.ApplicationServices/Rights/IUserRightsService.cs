@@ -1,5 +1,5 @@
-﻿using Core.DomainModel.Result;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.DomainModel.Organization;
 

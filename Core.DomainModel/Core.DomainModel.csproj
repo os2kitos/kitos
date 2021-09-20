@@ -53,6 +53,15 @@
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
+    <Compile Include="Events\EntityCreatedEvent.cs" />
+    <Compile Include="Events\EntityDeletedEvent.cs" />
+    <Compile Include="Events\EntityLifeCycleEvent.cs" />
+    <Compile Include="Events\EntityUpdatedEvent.cs" />
+    <Compile Include="Events\IDomainEvent.cs" />
+    <Compile Include="Events\IDomainEventHandler.cs" />
+    <Compile Include="Events\IDomainEvents.cs" />
+    <Compile Include="Events\NamedEntityChangedNameEvent.cs" />
+    <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
@@ -260,10 +269,6 @@
     <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
-    <Compile Include="Result\DictionaryExtensions.cs" />
-    <Compile Include="Result\OperationError.cs" />
-    <Compile Include="Result\OperationFailure.cs" />
-    <Compile Include="Result\Result.cs" />
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
@@ -280,9 +285,9 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
-      <Name>Infrastructure.Services</Name>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
+      <Name>Core.Abstractions</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

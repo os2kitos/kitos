@@ -10,7 +10,6 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
@@ -22,6 +21,7 @@ using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Infrastructure.Authorization.Controller.General;
 using Presentation.Web.Models.API.V1;
 using System.Web.Http.ModelBinding;
+using Core.Abstractions.Types;
 
 namespace Presentation.Web.Controllers.API.V1
 {

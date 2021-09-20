@@ -1,6 +1,8 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Model.Shared
 {

@@ -6,8 +6,8 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Organization;
@@ -357,7 +357,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Name_Change()
+        public async Task Can_PATCH_With_Name_Change()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -371,14 +371,14 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dto = await DataProcessingRegistrationV2Helper.PostAsync(token, request);
 
             //Act
-            var changedDTO = await DataProcessingRegistrationV2Helper.PutAsync(token, dto.Uuid, new DataProcessingRegistrationWriteRequestDTO() { Name = name2 });
+            var changedDTO = await DataProcessingRegistrationV2Helper.PatchNameAsync(token, dto.Uuid, name2);
 
             //Assert
             Assert.Equal(name2, changedDTO.Name);
         }
 
         [Fact]
-        public async Task Cannot_PUT_Duplicated_Name()
+        public async Task Cannot_PATCH_Duplicated_Name()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -390,7 +390,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var dpr2 = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest2);
 
             //Act - try to change name of dpr2 to that of dpr1
-            using var response = await DataProcessingRegistrationV2Helper.SendPutAsync(token, dpr2.Uuid, new DataProcessingRegistrationWriteRequestDTO() { Name = name1 });
+            using var response = await DataProcessingRegistrationV2Helper.SendPatchName(token, dpr2.Uuid, name1);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -487,7 +487,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_Put_General_Data()
+        public async Task Can_PATCH_General_Data()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -501,7 +501,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - change all properties
             var (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, true, true, true, true, organization);
-            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
@@ -509,7 +509,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - change all properties
             (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(true, false, true, false, true, organization);
-            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
@@ -517,7 +517,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - change all properties
             (dataResponsible, basisForTransfer, inputDto) = await CreateGeneralDataInput(false, true, false, true, false, organization);
-            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
@@ -525,7 +525,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - reset all properties by providing an empty input
             (dataResponsible, basisForTransfer, inputDto) = (null, null, new DataProcessingRegistrationGeneralDataWriteRequestDTO());
-            await DataProcessingRegistrationV2Helper.SendPutGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchGeneralDataAsync(token, createdDpr.Uuid, inputDto).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDpr.Uuid);
@@ -588,7 +588,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Update_Systems()
+        public async Task Can_PATCH_Update_Systems()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -609,28 +609,28 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var assignment4 = Array.Empty<Guid>();
 
             //Act
-            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchSystemsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             var freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment1, freshDTO.SystemUsages);
 
             //Act
-            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchSystemsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment2, freshDTO.SystemUsages);
 
             //Act
-            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchSystemsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment3, freshDTO.SystemUsages);
 
             //Act
-            await DataProcessingRegistrationV2Helper.SendPutSystemsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationV2Helper.SendPatchSystemsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dto.Uuid);
@@ -708,8 +708,8 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var oversightOption = withOversightOptions ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 10, 0)).RandomItem() : default;
 
             var input = CreateOversightRequest(
-                withOversightOptions ? new[] { oversightOption.Uuid } : Array.Empty<Guid>(), 
-                withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(), 
+                withOversightOptions ? new[] { oversightOption.Uuid } : Array.Empty<Guid>(),
+                withOversightDates ? YesNoUndecidedChoice.Yes : EnumRange.AllExcept(YesNoUndecidedChoice.Yes).RandomItem(),
                 withOversightDates ? new[] { oversightDate1, oversightDate2 } : Array.Empty<OversightDateDTO>());
 
             var request = new CreateDataProcessingRegistrationRequestDTO
@@ -759,7 +759,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_OversightData()
+        public async Task Can_PATCH_With_OversightData()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -780,7 +780,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
 
             //Act - Update empty DPR
-            var updatedDPR1 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input1);
+            var updatedDPR1 = await DataProcessingRegistrationV2Helper.PatchOversightAsync(token, newDPR.Uuid, input1);
 
             //Assert - Update empty DPR
             AssertOversight(input1, updatedDPR1.Oversight);
@@ -792,7 +792,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var input2 = CreateOversightRequest(new[] { oversightOption2.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate3, oversightDate4 });
 
-            var updatedDPR2 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input2);
+            var updatedDPR2 = await DataProcessingRegistrationV2Helper.PatchOversightAsync(token, newDPR.Uuid, input2);
 
             //Assert - Update filled DPR
             AssertOversight(input2, updatedDPR2.Oversight);
@@ -800,7 +800,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             //Act - Reset filled DPR
             var input3 = new DataProcessingRegistrationOversightWriteRequestDTO();
 
-            var updatedDPR3 = await DataProcessingRegistrationV2Helper.PutOversightAsync(token, newDPR.Uuid, input3);
+            var updatedDPR3 = await DataProcessingRegistrationV2Helper.PatchOversightAsync(token, newDPR.Uuid, input3);
 
             //Assert - Reset filled DPR
             AssertEmptiedOversight(updatedDPR3.Oversight);
@@ -854,7 +854,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Roles()
+        public async Task Can_PATCH_With_Roles()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -869,21 +869,21 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var modifyRoles = new List<RoleAssignmentRequestDTO> { new() { RoleUuid = role.Uuid, UserUuid = user2.Uuid } };
 
             //Act - Add role
-            using var addInitialRolesRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, initialRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var addInitialRolesRequest = await DataProcessingRegistrationV2Helper.SendPatchRolesAsync(token, createdDTO.Uuid, initialRoles).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var initialRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
             AssertSingleRight(role, user1, initialRoleResponse.Roles);
 
             //Act - Modify role
-            using var modifiedRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, modifyRoles).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var modifiedRequest = await DataProcessingRegistrationV2Helper.SendPatchRolesAsync(token, createdDTO.Uuid, modifyRoles).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var modifiedRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
             AssertSingleRight(role, user2, modifiedRoleResponse.Roles);
 
             //Act - Remove role
-            using var removedRequest = await DataProcessingRegistrationV2Helper.SendPutRolesAsync(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>()).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var removedRequest = await DataProcessingRegistrationV2Helper.SendPatchRolesAsync(token, createdDTO.Uuid, new List<RoleAssignmentRequestDTO>()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var removedRoleResponse = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, createdDTO.Uuid);
@@ -915,7 +915,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
-        public async Task Can_PUT_ExternalReferences()
+        public async Task Can_PATCH_ExternalReferences()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -931,7 +931,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
             //Act
-            using var response1 = await DataProcessingRegistrationV2Helper.SendPutExternalReferences(token, newRegistration.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response1 = await DataProcessingRegistrationV2Helper.SendPatchExternalReferences(token, newRegistration.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
@@ -939,7 +939,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - reset
             var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
-            using var response2 = await DataProcessingRegistrationV2Helper.SendPutExternalReferences(token, newRegistration.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response2 = await DataProcessingRegistrationV2Helper.SendPatchExternalReferences(token, newRegistration.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, newRegistration.Uuid);
@@ -963,7 +963,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Configure(f => f.Inject(false)); //Make sure no master is added when faking the inputs
             var externalReferenceInputs = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var oversightInput = CreateOversightRequest(new[] {oversightOption.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1, oversightDate2});
+            var oversightInput = CreateOversightRequest(new[] { oversightOption.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate1, oversightDate2 });
 
             var request = new CreateDataProcessingRegistrationRequestDTO()
             {
@@ -1004,16 +1004,16 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             var newRegistration = await DataProcessingRegistrationV2Helper.PostAsync(token, createRequest);
 
             var (dataResponsible1, basisForTransfer1, generalRequest1) = await CreateGeneralDataInput(true, true, true, true, true, organization);
-            
+
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system1Usage = await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = system1.Uuid });
 
-            var systemUsagesRequest1 = new List<Guid>() {system1Usage.Uuid};
+            var systemUsagesRequest1 = new List<Guid>() { system1Usage.Uuid };
 
             var oversightDate1 = CreateOversightDate();
             var oversightOption1 = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.DataProcessingRegistrationOversight, organization.Uuid, 1, 0)).OrderBy(x => A<int>()).First();
 
-            var oversightRequest1 = CreateOversightRequest(new[] {oversightOption1.Uuid}, YesNoUndecidedChoice.Yes, new[] {oversightDate1});
+            var oversightRequest1 = CreateOversightRequest(new[] { oversightOption1.Uuid }, YesNoUndecidedChoice.Yes, new[] { oversightDate1 });
 
             var user1 = await CreateUser(organization);
             var role1 = (await DataProcessingRegistrationV2Helper.GetRolesAsync(token, organization.Uuid, 0, 1)).First();
@@ -1022,7 +1022,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var referencesRequest1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var modifyRequest1 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest1 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest1,
@@ -1064,7 +1064,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             var referencesRequest2 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
-            var modifyRequest2 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest2 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest2,
@@ -1087,11 +1087,11 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
 
             //Act - Put to reset
             var generalRequest3 = new DataProcessingRegistrationGeneralDataWriteRequestDTO();
-            var systemUsagesRequest3 = Array.Empty<Guid>(); 
-            
+            var systemUsagesRequest3 = Array.Empty<Guid>();
+
             var referencesRequest3 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
 
-            var modifyRequest3 = new DataProcessingRegistrationWriteRequestDTO()
+            var modifyRequest3 = new UpdateDataProcessingRegistrationRequestDTO()
             {
                 Name = CreateName(),
                 General = generalRequest3,

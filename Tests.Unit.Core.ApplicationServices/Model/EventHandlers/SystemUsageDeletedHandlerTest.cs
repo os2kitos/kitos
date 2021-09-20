@@ -1,9 +1,9 @@
 ﻿using System.Data;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Model.EventHandlers;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;

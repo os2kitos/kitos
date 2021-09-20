@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Authorization.Policies;
 using Core.DomainModel;
@@ -9,7 +10,7 @@ using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Authorization
 {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
@@ -15,7 +16,7 @@ using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Options;
 using Core.DomainServices.SystemUsage;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

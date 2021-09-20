@@ -786,7 +786,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Config = Config.Default(objectOwner),
                 TypeId = organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
-                LastChangedByUserId = objectOwner?.Id
+                LastChangedByUserId = objectOwner?.Id,
+                AccessModifier = AccessModifier.Public
             };
 
             org.OrgUnits.Add(new OrganizationUnit

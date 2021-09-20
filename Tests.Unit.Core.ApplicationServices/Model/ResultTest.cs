@@ -1,5 +1,6 @@
 ﻿using System;
-using Core.DomainModel.Result;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Xunit;
 
 namespace Tests.Unit.Core.Model
@@ -28,6 +29,29 @@ namespace Tests.Unit.Core.Model
             Assert.False(result.Ok);
             Assert.Equal(value, result.Error);
             Assert.Throws<InvalidOperationException>(() => result.Value);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MatchFailure_Returns_Maybe_Error(bool hasError)
+        {
+            //Arrange
+            var value = Guid.NewGuid();
+
+            //Act
+            var result = (hasError ? Result<Guid, Guid>.Failure(value) : Result<Guid, Guid>.Success(value)).MatchFailure();
+
+            //Assert
+            if (hasError)
+            {
+                Assert.True(result.HasValue);
+                Assert.Equal(value, result.Value);
+            }
+            else
+            {
+                Assert.True(result.IsNone);
+            }
         }
     }
 }

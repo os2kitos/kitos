@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 
 namespace Core.ApplicationServices

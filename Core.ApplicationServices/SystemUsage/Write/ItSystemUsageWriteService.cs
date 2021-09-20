@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
@@ -14,6 +15,7 @@ using Core.ApplicationServices.References;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -21,16 +23,12 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
-using Newtonsoft.Json;
 using Serilog;
 
 namespace Core.ApplicationServices.SystemUsage.Write
@@ -261,14 +259,14 @@ namespace Core.ApplicationServices.SystemUsage.Write
         {
             return _registerTypeAssignmentService
                 .UpdateAssignedOptions(systemUsage, registerTypeUuids.GetValueOrFallback(new List<Guid>()))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Maybe<OperationError> UpdateSensitivePersonDataIds(ItSystemUsage systemUsage, Maybe<IEnumerable<Guid>> sensitiveDataTypeUuids)
         {
             return _sensitivePersonDataAssignmentService
                 .UpdateAssignedOptions(systemUsage, sensitiveDataTypeUuids.GetValueOrFallback(new List<Guid>()))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Result<ItSystemUsage, OperationError> PerformReferencesUpdate(ItSystemUsage systemUsage, IEnumerable<UpdatedExternalReferenceProperties> externalReferences)
@@ -589,30 +587,13 @@ namespace Core.ApplicationServices.SystemUsage.Write
 
         private Result<ItSystemUsage, OperationError> UpdateRoles(ItSystemUsage systemUsage, Maybe<IEnumerable<UserRolePair>> userRolePairs)
         {
-            // Compare lists to find which needs to be remove and which need to be added
-            var rightsKeys = systemUsage.Rights.Select(x => new UserRolePair { RoleUuid = x.Role.Uuid, UserUuid = x.User.Uuid }).ToList();
-            var userRoleKeys = userRolePairs.GetValueOrFallback(new List<UserRolePair>()).ToList();
+            var roleAssignments = userRolePairs
+                .Select(x => x.Select(pair => (pair.RoleUuid, pair.UserUuid)))
+                .GetValueOrFallback(new List<(Guid RoleUuid, Guid UserUuid)>());
 
-            var toRemove = rightsKeys.Except(userRoleKeys);
-            var toAdd = userRoleKeys.Except(rightsKeys);
-
-            foreach (var userRolePair in toRemove)
-            {
-                var removeResult = _roleAssignmentService.RemoveRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
-
-                if (removeResult.Failed)
-                    return new OperationError($"Failed to remove role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
-            }
-
-            foreach (var userRolePair in toAdd)
-            {
-                var assignmentResult = _roleAssignmentService.AssignRole(systemUsage, userRolePair.RoleUuid, userRolePair.UserUuid);
-
-                if (assignmentResult.Failed)
-                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.RoleUuid} from user with Uuid: {userRolePair.UserUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
-            }
-
-            return systemUsage;
+            return _roleAssignmentService
+                .BatchUpdateRoles(systemUsage, roleAssignments)
+                .Match<Result<ItSystemUsage, OperationError>>(error => error, () => systemUsage);
         }
 
         private Result<ItSystemUsage, OperationError> WithWriteAccess(ItSystemUsage systemUsage)
@@ -685,7 +666,7 @@ namespace Core.ApplicationServices.SystemUsage.Write
                     return (usage.Id, usageRelation.Value);
                 })
                 .Bind(usageAndRelation => _systemUsageRelationsService.RemoveRelation(usageAndRelation.usageId, usageAndRelation.relationId))
-                .Match(_ => Maybe<OperationError>.None, error => error);
+                .MatchFailure();
         }
 
         private Result<int, OperationError> ResolveRequiredId<T>(Guid requiredId) where T : class, IHasUuid, IHasId

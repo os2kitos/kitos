@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Web.Http;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.References;
 using Core.DomainServices;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;

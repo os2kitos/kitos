@@ -1,5 +1,5 @@
 ﻿using System;
-using Infrastructure.Services.DomainEvents;
+using Core.DomainModel.Events;
 
 namespace Core.DomainModel.ItContract.DomainEvents
 {

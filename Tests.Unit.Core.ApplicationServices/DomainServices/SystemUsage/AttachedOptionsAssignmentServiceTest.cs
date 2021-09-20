@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.SystemUsage;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

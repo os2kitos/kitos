@@ -6,11 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Qa.References;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models.API.V1.Qa;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.XUnit;

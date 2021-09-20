@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Notification;
@@ -12,7 +13,7 @@ using Core.DomainServices.Repositories.Project;
 using Core.DomainServices.Repositories.SystemUsage;
 using Hangfire.Common;
 using Hangfire.States;
-using Infrastructure.Services.Types;
+
 using Microsoft.Extensions.DependencyInjection;
 using Ninject;
 using Presentation;

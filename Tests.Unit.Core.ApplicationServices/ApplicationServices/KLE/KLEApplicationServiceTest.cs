@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.TaskRefs;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

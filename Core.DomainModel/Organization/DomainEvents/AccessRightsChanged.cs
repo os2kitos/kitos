@@ -1,4 +1,4 @@
-﻿using Infrastructure.Services.DomainEvents;
+﻿using Core.DomainModel.Events;
 
 namespace Core.DomainModel.Organization.DomainEvents
 {

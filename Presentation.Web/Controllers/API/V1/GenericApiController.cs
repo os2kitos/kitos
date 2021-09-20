@@ -4,14 +4,16 @@ using System.Linq;
 using System.Net.Http;
 using System.Security;
 using System.Web.Http;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Models;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Ninject;
 using Presentation.Web.Exceptions;
 using Presentation.Web.Infrastructure.Extensions;

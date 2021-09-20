@@ -1,10 +1,10 @@
-﻿using Core.ApplicationServices.Authorization;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Qa.References;
-using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.Qa;
 using Infrastructure.Services.BackgroundJobs;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Qa
 {

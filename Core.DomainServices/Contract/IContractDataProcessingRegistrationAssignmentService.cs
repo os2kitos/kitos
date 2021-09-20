@@ -1,9 +1,9 @@
 ﻿
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.Result;
 
 namespace Core.DomainServices.Contract
 {

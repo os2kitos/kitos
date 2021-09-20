@@ -1,6 +1,7 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Generic
 {

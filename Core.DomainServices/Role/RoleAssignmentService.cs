@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Options;
-using Infrastructure.Services.Types;
+using Infrastructure.Services.DataAccess;
+
 
 namespace Core.DomainServices.Role
 {
@@ -17,15 +19,18 @@ namespace Core.DomainServices.Role
         private readonly IOptionsService<TRight, TRole> _localRoleOptionsService;
         private readonly IUserRepository _userRepository;
         private readonly IGenericRepository<TRight> _rightsRepository;
+        private readonly ITransactionManager _transactionManager;
 
         public RoleAssignmentService(
             IOptionsService<TRight, TRole> localRoleOptionsService,
             IUserRepository userRepository,
-            IGenericRepository<TRight> rightsRepository)
+            IGenericRepository<TRight> rightsRepository,
+            ITransactionManager transactionManager)
         {
             _localRoleOptionsService = localRoleOptionsService;
             _userRepository = userRepository;
             _rightsRepository = rightsRepository;
+            _transactionManager = transactionManager;
         }
 
         public IEnumerable<TRole> GetApplicableRoles(TModel model)
@@ -93,7 +98,7 @@ namespace Core.DomainServices.Role
             if (roleId.Failed)
                 return roleId.Error;
 
-            return AssignRole(model, roleId.Value, userId.Value);
+            return AssignRole(model, roleId.Value.Id, userId.Value.Id);
         }
 
         public Result<TRight, OperationError> RemoveRole(TModel model, int roleId, int userId)
@@ -109,7 +114,12 @@ namespace Core.DomainServices.Role
             if (role.IsNone)
                 return new OperationError($"Role Id {roleId} is invalid'", OperationFailure.BadInput);
 
-            var removeResult = model.RemoveRole(role.Value.option, user.Value);
+            return RemoveRole(model, role.Value.option, user.Value);
+        }
+
+        private Result<TRight, OperationError> RemoveRole(TModel model, TRole role, User user)
+        {
+            var removeResult = model.RemoveRole(role, user);
             if (removeResult.Failed)
                 return removeResult.Error;
 
@@ -133,7 +143,42 @@ namespace Core.DomainServices.Role
             return RemoveRole(model, roleId.Value, userId.Value);
         }
 
-        private Result<int, OperationError> GetUserByUuid(Guid userUuid)
+        public Maybe<OperationError> BatchUpdateRoles(TModel model, IEnumerable<(Guid roleUuid, Guid userUuid)> roleAssignments)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            if (model == null) throw new ArgumentNullException(nameof(model));
+            if (roleAssignments == null) throw new ArgumentNullException(nameof(roleAssignments));
+
+            var existingRights = model.Rights.ToDictionary(x => (x.Role.Uuid, x.User.Uuid));
+            List<(Guid roleUuid, Guid userUuid)> existingKeys = model.Rights.Select(x => (x.Role.Uuid, x.User.Uuid)).ToList();
+            var nextStateKeys = roleAssignments.ToList();
+
+            var toRemove = existingKeys.Except(nextStateKeys).ToList();
+            var toAdd = nextStateKeys.Except(existingKeys).ToList();
+
+            foreach (var ruleUserPair in toRemove)
+            {
+                var existingRight = existingRights[ruleUserPair];
+                var removeResult = RemoveRole(model, existingRight.Role, existingRight.User);
+
+                if (removeResult.Failed)
+                    return new OperationError($"Failed to remove role with Uuid: {ruleUserPair.roleUuid} from user with Uuid: {ruleUserPair.userUuid}, with following error message: {removeResult.Error.Message.GetValueOrEmptyString()}", removeResult.Error.FailureType);
+            }
+
+            foreach (var userRolePair in toAdd)
+            {
+                var assignmentResult = AssignRole(model, userRolePair.roleUuid, userRolePair.userUuid);
+
+                if (assignmentResult.Failed)
+                    return new OperationError($"Failed to assign role with Uuid: {userRolePair.roleUuid} from user with Uuid: {userRolePair.userUuid}, with following error message: {assignmentResult.Error.Message.GetValueOrEmptyString()}", assignmentResult.Error.FailureType);
+            }
+
+            transaction.Commit();
+            return Maybe<OperationError>.None;
+        }
+
+        private Result<User, OperationError> GetUserByUuid(Guid userUuid)
         {
             var user = _userRepository.GetByUuid(userUuid);
             if (user.IsNone)
@@ -141,10 +186,10 @@ namespace Core.DomainServices.Role
                 return new OperationError($"Could not find user with Uuid: {userUuid}", OperationFailure.BadInput);
             }
 
-            return user.Value.Id;
+            return user.Value;
         }
 
-        private Result<int, OperationError> GetRoleByUuid(int organizationId, Guid roleUuid)
+        private Result<TRole, OperationError> GetRoleByUuid(int organizationId, Guid roleUuid)
         {
             var roleResult = _localRoleOptionsService.GetOptionByUuid(organizationId, roleUuid);
             if (roleResult.IsNone)
@@ -152,7 +197,7 @@ namespace Core.DomainServices.Role
                 return new OperationError($"Could not find role with Uuid: {roleUuid}", OperationFailure.BadInput);
             }
 
-            return roleResult.Value.option.Id;
+            return roleResult.Value.option;
         }
     }
 }

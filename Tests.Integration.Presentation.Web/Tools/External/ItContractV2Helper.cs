@@ -1,10 +1,14 @@
 ﻿using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V2.Request.Contract;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools.External
@@ -27,10 +31,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 new("pageSize", pageSize.ToString("D")),
             };
 
-            if(organizationUuid.HasValue)
+            if (organizationUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("organizationUuid", organizationUuid.Value.ToString("D")));
 
-            if(systemUuid.HasValue)
+            if (systemUuid.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("systemUuid", systemUuid.Value.ToString("D")));
 
             if (systemUsageUuid.HasValue)
@@ -64,6 +68,99 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         public static async Task<HttpResponseMessage> SendGetItContractAsync(string token, Guid uuid)
         {
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{uuid:D}"), token);
+        }
+
+        public static async Task<HttpResponseMessage> SendPostContractAsync(string token, CreateNewContractRequestDTO dto)
+        {
+            return await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
+        }
+
+        public static async Task<ItContractResponseDTO> PostContractAsync(string token, CreateNewContractRequestDTO dto)
+        {
+            using var result = await HttpApi.PostWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts"), dto, token);
+            Assert.Equal(HttpStatusCode.Created, result.StatusCode);
+            return await result.ReadResponseBodyAsAsync<ItContractResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPutContractAsync(string token, Guid contractUuid, UpdateContractRequestDTO dto)
+        {
+            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, dto);
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchContractGeneralDataAsync(string token, Guid contractUuid, ContractGeneralDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.General), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchContractResponsibleAsync(string token, Guid contractUuid, ContractResponsibleDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Responsible), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchProcurementAsync(string token, Guid contractUuid, ContractProcurementDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Procurement), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchContractSupplierAsync(string token, Guid contractUuid, ContractSupplierDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Supplier), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchContractHandOverTrialsAsync(string token, Guid contractUuid, IEnumerable<HandoverTrialRequestDTO> request)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.HandoverTrials), request));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchSystemUsagesAsync(string token, Guid contractUuid, IEnumerable<Guid> dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.SystemUsageUuids), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid contractUuid, List<ExternalReferenceDataDTO> request)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.ExternalReferences), request));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchRoles(string token, Guid contractUuid, List<RoleAssignmentRequestDTO> request)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Roles), request));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchDataProcessingRegistrationsAsync(string token, Guid contractUuid, IEnumerable<Guid> dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids), dto));
+        }
+
+
+        public static async Task<HttpResponseMessage> SendPatchAgreementPeriodAsync(string token, Guid contractUuid, ContractAgreementPeriodDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.AgreementPeriod), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchPaymentModelAsync(string token, Guid contractUuid, ContractPaymentModelDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.PaymentModel), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchPayments(string token, Guid contractUuid, ContractPaymentsDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Payments), dto));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchTerminationAsync(string token, Guid contractUuid, ContractTerminationDataWriteRequestDTO dto)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token, CreatePatchPayload(nameof(UpdateContractRequestDTO.Termination), dto));
+        }
+
+        private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
+        {
+            return dto.AsPatchPayloadOfProperty(propertyName);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteContractAsync(string token, Guid contractUuid)
+        {
+            return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-contracts/{contractUuid}"), token);
         }
     }
 }

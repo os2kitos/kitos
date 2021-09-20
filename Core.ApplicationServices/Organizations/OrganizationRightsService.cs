@@ -1,11 +1,11 @@
 ﻿using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Organization.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.ApplicationServices.Organizations
 {
