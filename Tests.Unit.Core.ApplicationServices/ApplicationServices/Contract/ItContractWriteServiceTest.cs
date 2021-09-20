@@ -802,6 +802,28 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertTransactionCommitted(transaction);
         }
 
+        [Fact]
+        public void Can_Update_With_DataProcessingRegistrations_To_Remove_Usage()
+        {
+            //Arrange
+            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
+            var dprUuids = new List<Guid>();
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
+            createdContract.DataProcessingRegistrations.Add(dpr);
+
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         [Theory]
         [InlineData(true, true, true)]
         [InlineData(true, true, false)]
@@ -919,28 +941,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             AssertFailureWithKnownErrorDetails(result,
                 "Failed adding handover trial:Error: expected and approved cannot both be null",
                 OperationFailure.BadInput, transaction);
-        }
-
-        [Fact]
-        public void Can_Update_With_DataProcessingRegistrations_To_Remove_Usage()
-        {
-            //Arrange
-            var dpr = new DataProcessingRegistration() { Id = A<int>(), Uuid = A<Guid>() };
-            var dprUuids = new List<Guid>();
-            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(dataProcessingRegistrationUuids: dprUuids);
-            createdContract.DataProcessingRegistrations.Add(dpr);
-
-            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, dprUuids, Maybe<OperationError>.None);
-            ExpectGetReturns(createdContract.Uuid, createdContract);
-            ExpectAllowModifySuccess(createdContract);
-            parameters.Name = OptionalValueChange<string>.None;
-
-            //Act
-            var result = _sut.Update(createdContract.Uuid, parameters);
-
-            //Assert
-            Assert.True(result.Ok);
-            AssertTransactionCommitted(transaction);
         }
 
         [Fact]
@@ -1396,6 +1396,178 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
             //Assert
             AssertFailureWithKnownErrorDetails(result, $"Failed to add internal payment:Organization unit with uuid:{invalidOrgUnit.Uuid} is not part of the contract's organization", OperationFailure.BadInput, transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_All()
+        {
+            //Arrange
+            Configure(f => f.Register<Guid?>(() => Guid.NewGuid()));
+            Configure(f => f.Register<bool>(() => false));
+
+            var (organizationUuid, parameters, createdContract, transaction) = SetupCreateScenarioPrerequisites(
+                parentUuid: A<Guid>(),  
+                responsible: A<ItContractResponsibleDataModificationParameters>(), 
+                supplier: A<ItContractSupplierModificationParameters>(),
+                systemUsageUuids: Many<Guid>().ToList(),
+                dataProcessingRegistrationUuids: Many<Guid>().ToList(),
+                roleAssignments: Many<UserRolePair>().ToList(),
+                payments: A<ItContractPaymentDataModificationParameters>());
+
+            //Parent setup
+            var parent = new ItContract() { Id = A<int>(), Uuid = parameters.ParentContractUuid.NewValue.Value, OrganizationId = createdContract.OrganizationId };
+            ExpectGetReturns(parent.Uuid, parent);
+
+            //General setup
+            var (contractId,
+                contractTypeUuid,
+                contractTemplateUuid,
+                enforceValid,
+                validFrom,
+                validTo,
+                agreementElementUuids,
+                agreementElementTypes,
+                generalData) = SetupGeneralSectionInput(true, true, true, true, true, createdContract, organizationUuid);
+
+            parameters.General = generalData;
+
+            //Procurement setup
+            var (procurementStrategyUuid, purchaseTypeUuid, procurement) = CreateProcurementParameters(true, true, true);
+            parameters.Procurement = procurement;
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<ProcurementStrategyType>(createdContract, procurement.ProcurementStrategyUuid.NewValue, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PurchaseFormType>(createdContract, procurement.PurchaseTypeUuid.NewValue, Maybe<OperationError>.None);
+
+            //Responsible setup
+            var correctOrganizationUnit = new OrganizationUnit() { Uuid = parameters.Responsible.Value.OrganizationUnitUuid.NewValue.GetValueOrDefault() };
+            createdContract.Organization.OrgUnits.Add(correctOrganizationUnit);
+
+            //Supplier
+            var organization = new Organization() { Uuid = parameters.Supplier.Value.OrganizationUuid.NewValue.GetValueOrDefault() };
+            _organizationServiceMock.Setup(x => x.GetOrganization(organization.Uuid, null)).Returns(organization);
+
+            //System usage setup
+            ExpectUpdateMultiAssignmentReturns<ItSystemUsage, ItSystemUsage>(createdContract, parameters.SystemUsageUuids, Maybe<OperationError>.None);
+
+            //Data processing registration setup
+            ExpectUpdateMultiAssignmentReturns<DataProcessingRegistration, DataProcessingRegistration>(createdContract, parameters.DataProcessingRegistrationUuids, Maybe<OperationError>.None);
+
+            //Handover trials
+            var handoverTrialUpdates = CreateHandoverTrialUpdates(true, true, true);
+
+            var handoverTrialTypes = handoverTrialUpdates
+                .Select(x => new HandoverTrialType
+                {
+                    Uuid = x.HandoverTrialTypeUuid
+                }).ToDictionary(x => x.Uuid);
+            parameters.HandoverTrials = handoverTrialUpdates;
+
+            foreach (var handoverTrialType in handoverTrialTypes)
+                ExpectGetOptionTypeReturnsIfInputIdIsDefined<HandoverTrial, HandoverTrialType>(organizationUuid, handoverTrialType.Key, (handoverTrialType.Value, true));
+
+            //External references setup
+            var externalReferences = Many<UpdatedExternalReferenceProperties>().ToList();
+            parameters.ExternalReferences = externalReferences.FromNullable<IEnumerable<UpdatedExternalReferenceProperties>>();
+            ExpectBatchUpdateExternalReferencesReturns(createdContract, externalReferences, Maybe<OperationError>.None);
+
+            //Roles setup
+            ExpectBatchUpdateRoleAssignmentsReturn(createdContract, parameters.Roles.Value.ToList(), Maybe<OperationError>.None);
+            
+            //Payment model setup
+            var milestone = CreatePaymentMilestone(true, true);
+            var paymentModel = CreatePaymentModel(milestone, true);
+            parameters.PaymentModel = paymentModel;
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentFreqencyType>(createdContract, paymentModel.PaymentFrequencyUuid.NewValue, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PaymentModelType>(createdContract, paymentModel.PaymentModelUuid.NewValue, Maybe<OperationError>.None);
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<PriceRegulationType>(createdContract, paymentModel.PriceRegulationUuid.NewValue, Maybe<OperationError>.None);
+
+            //Agreement period setup
+            var agreementPeriodInput = new ItContractAgreementPeriodModificationParameters
+            {
+                DurationYears = ((int?)null).AsChangedValue(),
+                DurationMonths = ((int?)null).AsChangedValue(),
+                IsContinuous = true.AsChangedValue(),
+                ExtensionOptionsUuid = A<Guid?>().AsChangedValue(),
+                ExtensionOptionsUsed = Math.Abs(A<int>()).AsChangedValue(),
+                IrrevocableUntil = A<DateTime?>().AsChangedValue()
+            };
+            parameters.AgreementPeriod = agreementPeriodInput;
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<OptionExtendType>(createdContract, agreementPeriodInput.ExtensionOptionsUuid.NewValue, Maybe<OperationError>.None);
+
+            //Termination setup
+            var terminationInput = new ItContractTerminationParameters()
+            {
+                TerminatedAt = A<DateTime>().FromNullable().AsChangedValue(),
+                NoticePeriodMonthsUuid = A<Guid?>().AsChangedValue(),
+                NoticePeriodExtendsCurrent = A<YearSegmentOption>().FromNullable().AsChangedValue(),
+                NoticeByEndOf = A<YearSegmentOption>().FromNullable().AsChangedValue()
+            };
+            parameters.Termination = terminationInput;
+            ExpectUpdateIndependentOptionTypeAssignmentReturns<TerminationDeadlineType>(createdContract, terminationInput.NoticePeriodMonthsUuid.NewValue, Maybe<OperationError>.None);
+
+            //Payments setup
+            var organizationUnits = parameters
+                .Payments
+                .Value
+                .InternalPayments
+                .NewValue.Concat(parameters.Payments.Value.ExternalPayments.NewValue)
+                .Select(x => x.OrganizationUnitUuid.GetValueOrDefault()).Distinct()
+                .ToDictionary(uuid => uuid, uuid => new OrganizationUnit() { Uuid = uuid });
+
+            foreach (var orgUnit in organizationUnits.Values.ToList())
+            {
+                createdContract.Organization.OrgUnits.Add(orgUnit);
+            }
+
+            //Update setup
+            ExpectGetReturns(createdContract.Uuid, createdContract);
+            ExpectAllowModifySuccess(createdContract);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(createdContract.Uuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+            var contract = result.Value;
+
+            Assert.Equal(parent, contract.Parent);
+
+            AssertGeneralSection(contractId, contractTypeUuid, contractTemplateUuid, validFrom, validTo, enforceValid, agreementElementTypes, agreementElementUuids, contract);
+
+            AssertProcurement(parameters.Procurement.Value, contract);
+
+            //Responsible
+            Assert.Equal(parameters.Responsible.Value.OrganizationUnitUuid.NewValue, contract.ResponsibleOrganizationUnit?.Uuid);
+            Assert.Equal(parameters.Responsible.Value.Signed.NewValue, contract.IsSigned);
+            Assert.Equal(parameters.Responsible.Value.SignedAt.NewValue?.Date, contract.SignedDate);
+            Assert.Equal(parameters.Responsible.Value.SignedBy.NewValue, contract.ContractSigner);
+
+            //Supplier
+            Assert.Equal(parameters.Supplier.Value.OrganizationUuid.NewValue, contract.Supplier?.Uuid);
+            Assert.Equal(parameters.Supplier.Value.Signed.NewValue, contract.HasSupplierSigned);
+            Assert.Equal(parameters.Supplier.Value.SignedAt.NewValue?.Date, contract.SupplierSignedDate);
+            Assert.Equal(parameters.Supplier.Value.SignedBy.NewValue, contract.SupplierContractSigner);
+
+            //Handover trials
+            Assert.Equal(handoverTrialTypes.Count, contract.HandoverTrials.Count);
+            Assert.All(contract.HandoverTrials, trial => Assert.True(handoverTrialTypes.ContainsKey(trial.HandoverTrialType.Uuid)));
+
+            AssertPaymentModel(paymentModel, contract, true);
+
+            //Agreement period
+            Assert.Equal(agreementPeriodInput.DurationMonths.NewValue, contract.DurationMonths);
+            Assert.Equal(agreementPeriodInput.DurationYears.NewValue, contract.DurationYears);
+            Assert.Equal(agreementPeriodInput.IsContinuous.NewValue, contract.DurationOngoing);
+            Assert.Equal(agreementPeriodInput.ExtensionOptionsUsed.NewValue, contract.ExtendMultiplier);
+            Assert.Equal(agreementPeriodInput.IrrevocableUntil.NewValue, contract.IrrevocableTo);
+
+            //Termination
+            Assert.Equal(terminationInput.TerminatedAt.NewValue.Match(val => val, () => (DateTime?)null), contract.Terminated);
+            Assert.Equal(terminationInput.NoticePeriodExtendsCurrent.NewValue.Match(val => val, () => (YearSegmentOption?)null), contract.Running);
+            Assert.Equal(terminationInput.NoticeByEndOf.NewValue.Match(val => val, () => (YearSegmentOption?)null), contract.ByEnding);
+
+            AssertPayments(parameters.Payments.Value, contract);
         }
 
         private static void AssertPayments(ItContractPaymentDataModificationParameters input, ItContract updatedContract)
