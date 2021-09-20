@@ -3,15 +3,11 @@ using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V2.Response.Contract;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoFixture;
 using Core.Abstractions.Extensions;
-using Core.ApplicationServices.Model.Contracts.Write;
-using Core.DomainModel.ItContract;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
 using Presentation.Web.Models.API.V1;
@@ -485,7 +481,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Parent()
+        public async Task Can_PATCH_With_Parent()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -624,7 +620,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Procurement()
+        public async Task Can_PATCH_With_Procurement()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -634,7 +630,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (procurementRequest1, procurementStrategy1, purchaseType1) = await CreateProcurementRequestAsync(organization.Uuid);
 
             //Act - Update from empty
-            using var updatedResponse1 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest1);
+            using var updatedResponse1 = await ItContractV2Helper.SendPatchProcurementAsync(token, newContract.Uuid, procurementRequest1);
 
             //Assert - Update from empty
             Assert.Equal(HttpStatusCode.OK, updatedResponse1.StatusCode);
@@ -644,7 +640,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Act - Update from filled
             var (procurementRequest2, procurementStrategy2, purchaseType2) = await CreateProcurementRequestAsync(organization.Uuid);
 
-            using var updatedResponse2 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest2);
+            using var updatedResponse2 = await ItContractV2Helper.SendPatchProcurementAsync(token, newContract.Uuid, procurementRequest2);
 
             //Assert - Update from filled
             Assert.Equal(HttpStatusCode.OK, updatedResponse2.StatusCode);
@@ -654,7 +650,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Act - Update to empty
             var procurementRequest3 = new ContractProcurementDataWriteRequestDTO();
 
-            using var updatedResponse3 = await ItContractV2Helper.SendPutProcurementAsync(token, newContract.Uuid, procurementRequest3);
+            using var updatedResponse3 = await ItContractV2Helper.SendPatchProcurementAsync(token, newContract.Uuid, procurementRequest3);
 
             //Assert - Update to empty
             Assert.Equal(HttpStatusCode.OK, updatedResponse3.StatusCode);
@@ -691,7 +687,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_GeneralData()
+        public async Task Can_PATCH_With_GeneralData()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -704,7 +700,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, true, true, true);
-            using var response1 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
+            using var response1 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
 
@@ -714,7 +710,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - new values
             (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, false, true, false);
-            using var response2 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
+            using var response2 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, generalDataWriteRequestDto);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
 
@@ -724,7 +720,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - reset
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
-            using var response3 = await ItContractV2Helper.SendPutContractGeneralDataAsync(token, dto.Uuid, resetRequest);
+            using var response3 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, resetRequest);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
 
@@ -762,7 +758,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Responsible()
+        public async Task Can_PATCH_With_Responsible()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -776,7 +772,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractResponsibleDataRequestDTO(token, organization, false, false, false);
-            using var response1 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPatchContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -785,7 +781,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            using var response2 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPatchContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -794,7 +790,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractResponsibleDataRequestDTO(token, organization, true, true, true);
-            using var response3 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPatchContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -803,7 +799,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractResponsibleDataWriteRequestDTO();
-            using var response4 = await ItContractV2Helper.SendPutContractResponsibleAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPatchContractResponsibleAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -840,7 +836,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Supplier()
+        public async Task Can_PATCH_With_Supplier()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -854,7 +850,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var changes = await CreateContractSupplierDataRequestDTO(false, false, false);
-            using var response1 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response1 = await ItContractV2Helper.SendPatchContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -863,7 +859,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            using var response2 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response2 = await ItContractV2Helper.SendPatchContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -872,7 +868,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - change all again
             changes = await CreateContractSupplierDataRequestDTO(true, true, true);
-            using var response3 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response3 = await ItContractV2Helper.SendPatchContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -881,7 +877,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - full reset
             changes = new ContractSupplierDataWriteRequestDTO();
-            using var response4 = await ItContractV2Helper.SendPutContractSupplierAsync(token, dto.Uuid, changes);
+            using var response4 = await ItContractV2Helper.SendPatchContractSupplierAsync(token, dto.Uuid, changes);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -918,7 +914,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_HandoverTrials()
+        public async Task Can_PATCH_HandoverTrials()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -933,7 +929,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var handoverTrials = await CreateHandoverTrials(organization, true, true, true);
-            using var response1 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            using var response1 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -942,7 +938,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act 
             handoverTrials = await CreateHandoverTrials(organization, true, true, false);
-            using var response2 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            using var response2 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -951,7 +947,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act 
             handoverTrials = await CreateHandoverTrials(organization, true, false, false);
-            using var response3 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            using var response3 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -960,7 +956,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act 
             handoverTrials = new List<HandoverTrialRequestDTO>();
-            using var response4 = await ItContractV2Helper.SendPutContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
+            using var response4 = await ItContractV2Helper.SendPatchContractHandOverTrialsAsync(token, dto.Uuid, handoverTrials);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -992,7 +988,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_ExternalReferences()
+        public async Task Can_PATCH_ExternalReferences()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -1008,7 +1004,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var inputs1 = Many<ExternalReferenceDataDTO>().Transform(WithRandomMaster).ToList();
 
             //Act
-            using var response1 = await ItContractV2Helper.SendPutExternalReferences(token, newContract.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response1 = await ItContractV2Helper.SendPatchExternalReferences(token, newContract.Uuid, inputs1).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             var dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
@@ -1016,7 +1012,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - reset
             var inputs2 = Enumerable.Empty<ExternalReferenceDataDTO>().ToList();
-            using var response2 = await ItContractV2Helper.SendPutExternalReferences(token, newContract.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
+            using var response2 = await ItContractV2Helper.SendPatchExternalReferences(token, newContract.Uuid, inputs2).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             dto = await ItContractV2Helper.GetItContractAsync(token, newContract.Uuid);
@@ -1071,7 +1067,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_SystemUsages()
+        public async Task Can_PATCH_With_SystemUsages()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1092,28 +1088,28 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var assignment4 = Array.Empty<Guid>();
 
             //Act
-            await ItContractV2Helper.SendPutSystemUsagesAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment1, freshDTO.SystemUsages);
 
             //Act
-            await ItContractV2Helper.SendPutSystemUsagesAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment2, freshDTO.SystemUsages);
 
             //Act
-            await ItContractV2Helper.SendPutSystemUsagesAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment3, freshDTO.SystemUsages);
 
             //Act
-            await ItContractV2Helper.SendPutSystemUsagesAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchSystemUsagesAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
@@ -1141,7 +1137,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Modify_Roles()
+        public async Task Can_PATCH_Modify_Roles()
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
@@ -1170,7 +1166,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             });
 
             //Act
-            using var put1 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles1);
+            using var put1 = await ItContractV2Helper.SendPatchRoles(token, createdDTO.Uuid, roles1);
             Assert.Equal(HttpStatusCode.OK, put1.StatusCode);
 
             //Assert
@@ -1178,7 +1174,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertRoleAssignments(roles1, freshReadDTO);
 
             //Act - switch roles
-            using var put2 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles2);
+            using var put2 = await ItContractV2Helper.SendPatchRoles(token, createdDTO.Uuid, roles2);
             Assert.Equal(HttpStatusCode.OK, put2.StatusCode);
 
             //Assert
@@ -1186,7 +1182,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertRoleAssignments(roles2, freshReadDTO);
 
             //Act - reduce roles
-            using var put3 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles3);
+            using var put3 = await ItContractV2Helper.SendPatchRoles(token, createdDTO.Uuid, roles3);
             Assert.Equal(HttpStatusCode.OK, put3.StatusCode);
 
             //Assert
@@ -1194,7 +1190,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertRoleAssignments(roles3, freshReadDTO);
 
             //Act - clear
-            using var put4 = await ItContractV2Helper.SendPutRoles(token, createdDTO.Uuid, roles4);
+            using var put4 = await ItContractV2Helper.SendPatchRoles(token, createdDTO.Uuid, roles4);
             Assert.Equal(HttpStatusCode.OK, put4.StatusCode);
 
             //Assert
@@ -1257,7 +1253,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_DataProcessingRegistrations()
+        public async Task Can_PATCH_With_DataProcessingRegistrations()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1287,28 +1283,28 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var assignment4 = Array.Empty<Guid>();
 
             //Act
-            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(token, dto.Uuid, assignment1).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             var freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment1, freshDTO.DataProcessingRegistrations);
 
             //Act
-            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(token, dto.Uuid, assignment2).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment2, freshDTO.DataProcessingRegistrations);
 
             //Act
-            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(token, dto.Uuid, assignment3).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertMultiAssignment(assignment3, freshDTO.DataProcessingRegistrations);
 
             //Act
-            await ItContractV2Helper.SendPutDataProcessingRegistrationsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractV2Helper.SendPatchDataProcessingRegistrationsAsync(token, dto.Uuid, assignment4).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
@@ -1341,7 +1337,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_AgreementPeriod()
+        public async Task Can_PATCH_With_AgreementPeriod()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1357,7 +1353,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
             //Act
-            using var response1 = await ItContractV2Helper.SendPutAgreementPeriodAsync(token, dto.Uuid, input1);
+            using var response1 = await ItContractV2Helper.SendPatchAgreementPeriodAsync(token, dto.Uuid, input1);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -1365,7 +1361,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertAgreementPeriod(input1, freshDTO);
 
             //Act - change all again
-            using var response2 = await ItContractV2Helper.SendPutAgreementPeriodAsync(token, dto.Uuid, input2);
+            using var response2 = await ItContractV2Helper.SendPatchAgreementPeriodAsync(token, dto.Uuid, input2);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -1373,7 +1369,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertAgreementPeriod(input2, freshDTO);
 
             //Act - reset all
-            using var response3 = await ItContractV2Helper.SendPutAgreementPeriodAsync(token, dto.Uuid, input3);
+            using var response3 = await ItContractV2Helper.SendPatchAgreementPeriodAsync(token, dto.Uuid, input3);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -1403,7 +1399,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_Payments()
+        public async Task Can_PATCH_Payments()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1422,7 +1418,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var dto = await ItContractV2Helper.PostContractAsync(token, request);
 
             //Act
-            using var response1 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input1);
+            using var response1 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input1);
             Assert.Equal(HttpStatusCode.OK,response1.StatusCode);
 
             //Assert
@@ -1430,7 +1426,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPayments(input1, freshDTO);
 
             //Act
-            using var response2 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input2);
+            using var response2 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input2);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -1438,7 +1434,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPayments(input2, freshDTO);
 
             //Act
-            using var response3 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input3);
+            using var response3 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input3);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -1446,7 +1442,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPayments(input3, freshDTO);
 
             //Act
-            using var response4 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input4);
+            using var response4 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input4);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -1454,7 +1450,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPayments(input4, freshDTO);
             
             //Act
-            using var response5 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input5);
+            using var response5 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input5);
             Assert.Equal(HttpStatusCode.OK, response5.StatusCode);
 
             //Assert
@@ -1462,7 +1458,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             AssertPayments(input5, freshDTO);
             
             //Act
-            using var response6 = await ItContractV2Helper.SendPutPayments(token, dto.Uuid, input6);
+            using var response6 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input6);
             Assert.Equal(HttpStatusCode.OK, response6.StatusCode);
 
             //Assert
@@ -1498,7 +1494,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_PaymentModel()
+        public async Task Can_PATCH_With_PaymentModel()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1512,7 +1508,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var contractDTO = await ItContractV2Helper.PostContractAsync(token, requestDto);
 
             //Act
-            using var response1 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest1);
+            using var response1 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest1);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -1521,7 +1517,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (paymentModelRequest2, paymentFrequencyType2, paymentModelType2, priceRegulationType2) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, false);
-            using var response2 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest2);
+            using var response2 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest2);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -1530,7 +1526,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (paymentModelRequest3, paymentFrequencyType3, paymentModelType3, priceRegulationType3) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, false, false);
-            using var response3 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest3);
+            using var response3 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest3);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -1539,7 +1535,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (paymentModelRequest4, paymentFrequencyType4, paymentModelType4, priceRegulationType4) = await CreatePaymentModelRequestAsync(organization.Uuid, true, false, false, false);
-            using var response4 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest4);
+            using var response4 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest4);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert
@@ -1548,7 +1544,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (paymentModelRequest5, paymentFrequencyType5, paymentModelType5, priceRegulationType5) = await CreatePaymentModelRequestAsync(organization.Uuid, false, false, false, false);
-            using var response5 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest5);
+            using var response5 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest5);
             Assert.Equal(HttpStatusCode.OK, response5.StatusCode);
 
             //Assert
@@ -1557,7 +1553,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var paymentModelRequest6 = new ContractPaymentModelDataWriteRequestDTO();
-            using var response6 = await ItContractV2Helper.SendPutPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest6);
+            using var response6 = await ItContractV2Helper.SendPatchPaymentModelAsync(token, contractDTO.Uuid, paymentModelRequest6);
             Assert.Equal(HttpStatusCode.OK, response6.StatusCode);
 
             //Assert
@@ -1588,7 +1584,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
-        public async Task Can_PUT_With_Termination()
+        public async Task Can_PATCH_With_Termination()
         {
             //Arrange
             var (token, _, organization) = await CreatePrerequisitesAsync();
@@ -1602,7 +1598,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var (terminationRequest1, noticePeriodMonthsType1) = await CreateTerminationRequest(organization.Uuid, true);
 
             //Act
-            using var response1 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest1);
+            using var response1 = await ItContractV2Helper.SendPatchTerminationAsync(token, contractDTO.Uuid, terminationRequest1);
             Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
@@ -1611,7 +1607,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (terminationRequest2, noticePeriodMonthsType2) = await CreateTerminationRequest(organization.Uuid, true);
-            using var response2 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest2);
+            using var response2 = await ItContractV2Helper.SendPatchTerminationAsync(token, contractDTO.Uuid, terminationRequest2);
             Assert.Equal(HttpStatusCode.OK, response2.StatusCode);
 
             //Assert
@@ -1620,7 +1616,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var (terminationRequest3, noticePeriodMonthsType3) = await CreateTerminationRequest(organization.Uuid, false);
-            using var response3 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest3);
+            using var response3 = await ItContractV2Helper.SendPatchTerminationAsync(token, contractDTO.Uuid, terminationRequest3);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
 
             //Assert
@@ -1629,7 +1625,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var terminationRequest4 = new ContractTerminationDataWriteRequestDTO();
-            using var response4 = await ItContractV2Helper.SendPutTerminationAsync(token, contractDTO.Uuid, terminationRequest4);
+            using var response4 = await ItContractV2Helper.SendPatchTerminationAsync(token, contractDTO.Uuid, terminationRequest4);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
             //Assert

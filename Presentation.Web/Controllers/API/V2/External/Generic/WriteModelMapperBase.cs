@@ -20,10 +20,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             _currentRequestRootProperties = new Lazy<ISet<string>>(currentHttpRequest.GetDefinedJsonRootProperties);
         }
 
-        protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey) where TSection : new()
+        protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(expectedSectionKey))
+            if (ClientRequestsChangeTo(expectedSectionKey) || enforceFallbackIfNotProvided)
             {
                 response = deserializedValue ?? new TSection();
             }
@@ -31,10 +31,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return response;
         }
 
-        protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory)
+        protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(expectedSectionKey))
+            if (ClientRequestsChangeTo(expectedSectionKey) || enforceFallbackIfNotProvided)
             {
                 response = deserializedValue ?? fallbackFactory();
             }

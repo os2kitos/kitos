@@ -59,6 +59,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
         }
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        [InlineData("test")]
+        public void Can_Map_Name_From_Patch(string name)
+        {
+            //Arrange
+            var requestDto = new UpdateContractRequestDTO { Name = name };
+
+            //Act
+            var modificationParameters = _sut.FromPATCH(requestDto);
+
+            //Assert
+            Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
+        }
+
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
@@ -67,7 +83,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
-        public void FromPUT_Ignores_Undefined_Root_Sections(
+        public void FromPATCH_Ignores_Undefined_Root_Sections(
             bool noName,
             bool noGeneralData,
             bool noParent,
@@ -85,28 +101,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noTermination)
         {
             //Arrange
-            var rootProperties = GetRootProperties();
-
-            if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
-            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
-            if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
-            if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
-            if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
-            if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
-            if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
-            if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
-            if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
-            if (noDataProcessingRegistrations) rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
-            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
-            if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
-            if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
-            if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
-            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
-            var emptyInput = new UpdateContractRequestDTO();
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
 
             //Act
-            var output = _sut.FromPUT(emptyInput);
+            var output = _sut.FromPATCH(emptyInput);
 
             //Assert
             Assert.Equal(noName, output.Name.IsUnchanged);
@@ -125,17 +123,46 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noTermination, output.Termination.IsNone);
         }
 
-        [Fact]
-        public void Can_Map_General()
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPUT_Enforces_Undefined_Root_Sections(
+            bool noName,
+            bool noGeneralData,
+            bool noParent,
+            bool noResponsible,
+            bool noProcurement,
+            bool noSupplier,
+            bool noHandoverTrials,
+            bool noSystemUsages,
+            bool noExternalReferences,
+            bool noDataProcessingRegistrations,
+            bool noRoles,
+            bool noPaymentModel,
+            bool noAgreementPeriod,
+            bool noPayments,
+            bool noTermination)
         {
             //Arrange
-            var input = A<ContractGeneralDataWriteRequestDTO>();
+            var emptyInput = ConfigureRequestInput(noName, noGeneralData, noParent, noResponsible, noProcurement, noSupplier, noHandoverTrials, noSystemUsages, noExternalReferences, noDataProcessingRegistrations, noRoles, noPaymentModel, noAgreementPeriod, noPayments, noTermination);
 
             //Act
-            var output = _sut.MapGeneralData(input);
+            var output = _sut.FromPUT(emptyInput);
 
             //Assert
-            AssertGeneralData(input, output);
+            Assert.False(output.Name.IsUnchanged);
+            Assert.False(output.ParentContractUuid.IsUnchanged);
+            Assert.False(output.General.IsNone);
+            Assert.False(output.Responsible.IsNone);
+            Assert.False(output.Procurement.IsNone);
+            Assert.False(output.Supplier.IsNone);
+            Assert.False(output.HandoverTrials.IsNone);
+            Assert.False(output.ExternalReferences.IsNone);
+            Assert.False(output.SystemUsageUuids.IsNone);
+            Assert.False(output.DataProcessingRegistrationUuids.IsNone);
+            Assert.False(output.PaymentModel.IsNone);
+            Assert.False(output.AgreementPeriod.IsNone);
+            Assert.False(output.Payments.IsNone);
+            Assert.False(output.Termination.IsNone);
         }
 
         [Fact]
@@ -165,6 +192,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var output = _sut.FromPUT(input).General;
+
+            //Assert
+            AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
+        }
+
+        [Fact]
+        public void FromPatch_Maps_General()
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO()
+            {
+                General = A<ContractGeneralDataWriteRequestDTO>()
+            };
+
+            //Act
+            var output = _sut.FromPATCH(input).General;
 
             //Assert
             AssertGeneralData(input.General, AssertPropertyContainsDataChange(output));
@@ -202,17 +245,20 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(requestDto.ParentContractUuid, AssertPropertyContainsDataChange(modificationParameters.ParentContractUuid));
         }
 
-        [Fact]
-        public void Can_Map_Responsible()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_Parent_From_Patch(bool hasParentUuid)
         {
             //Arrange
-            var input = A<ContractResponsibleDataWriteRequestDTO>();
+            var parentUuid = hasParentUuid ? A<Guid?>() : null;
+            var requestDto = new UpdateContractRequestDTO { ParentContractUuid = parentUuid };
 
             //Act
-            var output = _sut.MapResponsible(input);
+            var modificationParameters = _sut.FromPATCH(requestDto);
 
             //Assert
-            AssertResponsible(input, output);
+            Assert.Equal(requestDto.ParentContractUuid, AssertPropertyContainsDataChange(modificationParameters.ParentContractUuid));
         }
 
         [Fact]
@@ -242,16 +288,16 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
-        public void Can_Map_Supplier()
+        public void Can_Map_Responsible_FromPATCH()
         {
             //Arrange
-            var input = A<ContractSupplierDataWriteRequestDTO>();
+            var input = A<ContractResponsibleDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapSupplier(input);
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO { Responsible = input });
 
             //Assert
-            AssertSupplier(input, output);
+            AssertResponsible(input, output.Responsible.Value);
         }
 
         [Fact]
@@ -275,6 +321,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var output = _sut.FromPUT(new UpdateContractRequestDTO { Supplier = input });
+
+            //Assert
+            AssertSupplier(input, output.Supplier.Value);
+        }
+
+        [Fact]
+        public void Can_Map_Supplier_FromPATCH()
+        {
+            //Arrange
+            var input = A<ContractSupplierDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO { Supplier = input });
 
             //Assert
             AssertSupplier(input, output.Supplier.Value);
@@ -319,6 +378,46 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertHandoverTrials(input, output.HandoverTrials.Value);
         }
 
+        [Fact]
+        public void Can_Map_HandoverTrials_FromPATCH()
+        {
+            //Arrange
+            var input = Many<HandoverTrialRequestDTO>().ToList();
+
+            //Act
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO { HandoverTrials = input });
+
+            //Assert
+            AssertHandoverTrials(input, output.HandoverTrials.Value);
+        }
+
+        private UpdateContractRequestDTO ConfigureRequestInput(bool noName, bool noGeneralData, bool noParent,
+           bool noResponsible, bool noProcurement, bool noSupplier, bool noHandoverTrials, bool noSystemUsages,
+           bool noExternalReferences, bool noDataProcessingRegistrations, bool noRoles, bool noPaymentModel,
+           bool noAgreementPeriod, bool noPayments, bool noTermination)
+        {
+            var rootProperties = GetRootProperties();
+
+            if (noName) rootProperties.Remove(nameof(UpdateContractRequestDTO.Name));
+            if (noGeneralData) rootProperties.Remove(nameof(UpdateContractRequestDTO.General));
+            if (noParent) rootProperties.Remove(nameof(UpdateContractRequestDTO.ParentContractUuid));
+            if (noResponsible) rootProperties.Remove(nameof(UpdateContractRequestDTO.Responsible));
+            if (noProcurement) rootProperties.Remove(nameof(UpdateContractRequestDTO.Procurement));
+            if (noSupplier) rootProperties.Remove(nameof(UpdateContractRequestDTO.Supplier));
+            if (noHandoverTrials) rootProperties.Remove(nameof(UpdateContractRequestDTO.HandoverTrials));
+            if (noExternalReferences) rootProperties.Remove(nameof(UpdateContractRequestDTO.ExternalReferences));
+            if (noSystemUsages) rootProperties.Remove(nameof(UpdateContractRequestDTO.SystemUsageUuids));
+            if (noDataProcessingRegistrations)
+                rootProperties.Remove(nameof(UpdateContractRequestDTO.DataProcessingRegistrationUuids));
+            if (noRoles) rootProperties.Remove(nameof(UpdateContractRequestDTO.Roles));
+            if (noPaymentModel) rootProperties.Remove(nameof(UpdateContractRequestDTO.PaymentModel));
+            if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
+            if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
+            if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
+            var emptyInput = new UpdateContractRequestDTO();
+            return emptyInput;
+        }
         private static void AssertHandoverTrials(List<HandoverTrialRequestDTO> input, IEnumerable<ItContractHandoverTrialUpdate> output)
         {
             var expected = input.OrderBy(x => x.HandoverTrialTypeUuid).ToList();
@@ -385,30 +484,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertProcurement(hasValues, procurement, procurementDto);
         }
 
-        [Fact]
-        public void Can_Map_Procurement()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_Procurement_From_Patch(bool hasValues)
         {
             //Arrange
-            var input = A<ContractProcurementDataWriteRequestDTO>();
+            var procurement = CreateProcurementRequest(hasValues);
+            var requestDto = new UpdateContractRequestDTO { Procurement = procurement };
 
             //Act
-            var output = _sut.MapProcurement(input);
+            var modificationParameters = _sut.FromPATCH(requestDto);
 
             //Assert
-            AssertProcurement(true, input, output);
-        }
-
-        [Fact]
-        public void Can_Map_ExternalReferences()
-        {
-            //Arrange
-            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
-
-            //Act
-            var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
-
-            //Assert
-            AssertExternalReferences(mappedReferences, references);
+            Assert.True(modificationParameters.Procurement.HasValue);
+            var procurementDto = modificationParameters.Procurement.Value;
+            AssertProcurement(hasValues, procurement, procurementDto);
         }
 
         [Fact]
@@ -419,6 +510,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var mappedReferences = _sut.FromPUT(new UpdateContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
+
+            //Assert
+            AssertExternalReferences(mappedReferences, references);
+        }
+
+        [Fact]
+        public void Can_Map_ExternalReferences_FromPATCH()
+        {
+            //Arrange
+            var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
+
+            //Act
+            var mappedReferences = _sut.FromPATCH(new UpdateContractRequestDTO { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
 
             //Assert
             AssertExternalReferences(mappedReferences, references);
@@ -473,17 +577,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertUuids(systemUsageUuids, modifiedUuids);
         }
 
-        [Fact]
-        public void Can_Map_Roles()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_SystemUsages_From_Patch(bool hasValues)
         {
             //Arrange
-            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+            var systemUsageUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new UpdateContractRequestDTO { SystemUsageUuids = systemUsageUuids };
 
             //Act
-            var rolePairs = _sut.MapRoles(roles).ToList();
+            var modificationParameters = _sut.FromPATCH(requestDto);
 
             //Assert
-            AssertRoles(roles, rolePairs);
+            Assert.True(modificationParameters.SystemUsageUuids.HasValue);
+            var modifiedUuids = modificationParameters.SystemUsageUuids.Value;
+            AssertUuids(systemUsageUuids, modifiedUuids);
         }
 
         [Fact]
@@ -494,6 +603,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var result = _sut.FromPUT(new UpdateContractRequestDTO() { Roles = roles });
+
+            //Assert
+            AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
+        }
+
+        [Fact]
+        public void Can_Map_Roles_FromPATCH()
+        {
+            //Arrange
+            var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
+
+            //Act
+            var result = _sut.FromPATCH(new UpdateContractRequestDTO() { Roles = roles });
 
             //Assert
             AssertRoles(roles, AssertPropertyContainsDataChange(result.Roles).ToList());
@@ -548,6 +670,24 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_DataProcessingRegistrations_From_Patch(bool hasValues)
+        {
+            //Arrange
+            var dataProcessingRegistrationUuids = hasValues ? new[] { A<Guid>(), A<Guid>() } : new Guid[0];
+            var requestDto = new UpdateContractRequestDTO { DataProcessingRegistrationUuids = dataProcessingRegistrationUuids };
+
+            //Act
+            var modificationParameters = _sut.FromPATCH(requestDto);
+
+            //Assert
+            Assert.True(modificationParameters.DataProcessingRegistrationUuids.HasValue);
+            var modifiedUuids = modificationParameters.DataProcessingRegistrationUuids.Value;
+            AssertUuids(dataProcessingRegistrationUuids, modifiedUuids);
+        }
+
         private static void AssertRoles(List<RoleAssignmentRequestDTO> roles, List<UserRolePair> rolePairs)
         {
             Assert.Equal(roles.Count, rolePairs.Count);
@@ -558,30 +698,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.RoleUuid, actual.RoleUuid);
                 Assert.Equal(expected.UserUuid, actual.UserUuid);
             }
-        }
-
-
-        [Theory]
-        [InlineData(true)]
-        [InlineData(false)]
-        public void Can_Map_PaymentModel(bool hasValues)
-        {
-            //Arrange
-            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
-            var input = new ContractPaymentModelDataWriteRequestDTO()
-            {
-                OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
-                PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
-                PaymentModelUuid = hasValues ? A<Guid>() : null,
-                PriceRegulationUuid = hasValues ? A<Guid>() : null,
-                PaymentMileStones = milestones
-            };
-
-            //Act
-            var output = _sut.MapPaymentModel(input);
-
-            //Assert
-            AssertPaymentModel(input, output, hasValues);
         }
 
         [Theory]
@@ -604,7 +720,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPOST(new CreateNewContractRequestDTO() { PaymentModel = input });
 
             //Assert
-            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
         [Theory]
@@ -627,20 +743,30 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var output = _sut.FromPUT(new UpdateContractRequestDTO { PaymentModel = input });
 
             //Assert
-            AssertPaymentModel(input, output.PaymentModel.Value, hasValues);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
-        [Fact]
-        public void Can_Map_Agreement_Period()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Map_PaymentModel_FromPATCH(bool hasValues)
         {
             //Arrange
-            var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
+            var milestones = hasValues ? Many<PaymentMileStoneDTO>().ToList() : null;
+            var input = new ContractPaymentModelDataWriteRequestDTO()
+            {
+                OperationsRemunerationStartedAt = hasValues ? A<DateTime>() : null,
+                PaymentFrequencyUuid = hasValues ? A<Guid>() : null,
+                PaymentModelUuid = hasValues ? A<Guid>() : null,
+                PriceRegulationUuid = hasValues ? A<Guid>() : null,
+                PaymentMileStones = milestones
+            };
 
             //Act
-            var output = _sut.MapAgreementPeriod(input);
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO { PaymentModel = input });
 
             //Assert
-            AssertAgreementPeriod(input, output);
+            AssertPaymentModel(input, output.PaymentModel.Value);
         }
 
         [Fact]
@@ -657,6 +783,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Fact]
+        public void Can_Map_Agreement_Period_FromPATCH()
+        {
+            //Arrange
+            var input = A<ContractAgreementPeriodDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO() { AgreementPeriod = input });
+
+            //Assert
+            AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
+        }
+
+        [Fact]
         public void Can_Map_Agreement_Period_FromPOST()
         {
             //Arrange
@@ -667,19 +806,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             AssertAgreementPeriod(input, AssertPropertyContainsDataChange(output.AgreementPeriod));
-        }
-
-        [Fact]
-        public void Can_Map_Payments()
-        {
-            //Arrange
-            var input = A<ContractPaymentsDataWriteRequestDTO>();
-
-            //Act
-            var output = _sut.MapPayments(input);
-
-            //Assert
-            AssertPayments(input, output);
         }
 
         [Fact]
@@ -707,18 +833,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             AssertPayments(input, output);
         }
-		
-		[Fact]
-        public void Can_Map_Termination()
+
+        [Fact]
+        public void Can_Map_Payments_FromPATCH()
         {
             //Arrange
-            var input = A<ContractTerminationDataWriteRequestDTO>();
+            var input = A<ContractPaymentsDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapTermination(input);
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO { Payments = input }).Payments.Value;
 
             //Assert
-            AssertTermination(input, output);
+            AssertPayments(input, output);
         }
 
         [Fact]
@@ -729,6 +855,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var output = _sut.FromPUT(new UpdateContractRequestDTO() { Termination = input });
+
+            //Assert
+            AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
+        }
+
+        [Fact]
+        public void Can_Map_Termination_FromPATCH()
+        {
+            //Arrange
+            var input = A<ContractTerminationDataWriteRequestDTO>();
+
+            //Act
+            var output = _sut.FromPATCH(new UpdateContractRequestDTO() { Termination = input });
 
             //Assert
             AssertTermination(input, AssertPropertyContainsDataChange(output.Termination));
@@ -766,7 +905,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.IsContinuous, AssertPropertyContainsDataChange(output.IsContinuous));
         }
 
-        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output, bool hasValues)
+        private static void AssertPaymentModel(ContractPaymentModelDataWriteRequestDTO input, ItContractPaymentModelModificationParameters output)
         {
             Assert.Equal(input.PaymentFrequencyUuid, output.PaymentFrequencyUuid.NewValue);
             Assert.Equal(input.PaymentModelUuid, output.PaymentModelUuid.NewValue);
