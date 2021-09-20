@@ -34,10 +34,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
 
             //Act
-            var systemUsageRoles = _sut.MapRoles(roles);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { Roles = roles });
 
             //Assert
-            var userRolePairs = AssertPropertyContainsDataChange(systemUsageRoles.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
+            var roleSection = AssertPropertyContainsDataChange(output.Roles);
+            var userRolePairs = AssertPropertyContainsDataChange(roleSection.UserRolePairs).OrderBy(x => x.RoleUuid).ToList();
             Assert.Equal(roles.Count, userRolePairs.Count);
             for (var i = 0; i < userRolePairs.Count; i++)
             {
@@ -55,7 +56,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
-            var mappedReferences = _sut.MapReferences(references).OrderBy(x => x.Url).ToList();
+            var mappedReferences = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { ExternalReferences = references }).ExternalReferences.Value.OrderBy(x => x.Url).ToList();
 
             //Assert
             Assert.Equal(mappedReferences.Count, mappedReferences.Count);
@@ -77,11 +78,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<LocalKLEDeviationsRequestDTO>();
 
             //Act
-            var output = _sut.MapKle(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { LocalKleDeviations = input });
 
             //Assert
-            AssertKLE(input.AddedKLEUuids, output.AddedKLEUuids);
-            AssertKLE(input.RemovedKLEUuids, output.RemovedKLEUuids);
+            var mappedKle = AssertPropertyContainsDataChange(output.KLE);
+            AssertKLE(input.AddedKLEUuids, mappedKle.AddedKLEUuids);
+            AssertKLE(input.RemovedKLEUuids, mappedKle.RemovedKLEUuids);
         }
 
         [Theory]
@@ -96,11 +98,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (removedNull) input.RemovedKLEUuids = null;
 
             //Act
-            var output = _sut.MapKle(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { LocalKleDeviations = input });
 
             //Assert that null is translated into a reset value (change to "none")
-            Assert.Equal(addedNull, output.AddedKLEUuids.NewValue.IsNone);
-            Assert.Equal(removedNull, output.RemovedKLEUuids.NewValue.IsNone);
+            var mappedKle = AssertPropertyContainsDataChange(output.KLE);
+            Assert.Equal(addedNull, mappedKle.AddedKLEUuids.NewValue.IsNone);
+            Assert.Equal(removedNull, mappedKle.RemovedKLEUuids.NewValue.IsNone);
         }
 
         [Fact]
@@ -110,11 +113,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<OrganizationUsageWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapOrganizationalUsage(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { OrganizationUsage = input });
 
             //Assert 
-            var responsible = AssertPropertyContainsDataChange(output.ResponsibleOrganizationUnitUuid);
-            var usingOrgUnits = AssertPropertyContainsDataChange(output.UsingOrganizationUnitUuids);
+            var mappedOrgUsage = AssertPropertyContainsDataChange(output.OrganizationalUsage);
+            var responsible = AssertPropertyContainsDataChange(mappedOrgUsage.ResponsibleOrganizationUnitUuid);
+            var usingOrgUnits = AssertPropertyContainsDataChange(mappedOrgUsage.UsingOrganizationUnitUuids);
             Assert.Equal(input.ResponsibleOrganizationUnitUuid, responsible);
             Assert.Equal(input.UsingOrganizationUnitUuids, usingOrgUnits);
         }
@@ -131,17 +135,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (unitsAreNull) input.UsingOrganizationUnitUuids = null;
 
             //Act
-            var output = _sut.MapOrganizationalUsage(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { OrganizationUsage = input });
 
             //Assert 
+            var mappedOrgUsage = AssertPropertyContainsDataChange(output.OrganizationalUsage);
             if (responsibleIsNull)
-                AssertPropertyContainsResetDataChange(output.ResponsibleOrganizationUnitUuid);
+                AssertPropertyContainsResetDataChange(mappedOrgUsage.ResponsibleOrganizationUnitUuid);
             else
-                AssertPropertyContainsDataChange(output.ResponsibleOrganizationUnitUuid);
+                AssertPropertyContainsDataChange(mappedOrgUsage.ResponsibleOrganizationUnitUuid);
             if (unitsAreNull)
-                AssertPropertyContainsResetDataChange(output.UsingOrganizationUnitUuids);
+                AssertPropertyContainsResetDataChange(mappedOrgUsage.UsingOrganizationUnitUuids);
             else
-                AssertPropertyContainsDataChange(output.UsingOrganizationUnitUuids);
+                AssertPropertyContainsDataChange(mappedOrgUsage.UsingOrganizationUnitUuids);
         }
 
         [Fact]
@@ -151,11 +156,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<GeneralDataWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapGeneralData(input);
+            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
 
             //Assert
-            AssertCommonGeneralDataWriteProperties(input, output);
-            Assert.True(output.MainContractUuid.IsUnchanged, "The main contract should be untouched as it is not part of the initial write contract");
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertCommonGeneralDataWriteProperties(input, mappedGeneralSection);
+            Assert.True(mappedGeneralSection.MainContractUuid.IsUnchanged, "The main contract should be untouched as it is not part of the initial write contract");
         }
 
         [Fact]
@@ -166,12 +172,13 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.Validity = null;
 
             //Act
-            var output = _sut.MapGeneralData(input);
+            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.EnforceActive);
-            AssertPropertyContainsResetDataChange(output.ValidFrom);
-            AssertPropertyContainsResetDataChange(output.ValidTo);
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.EnforceActive);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidFrom);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.ValidTo);
         }
 
         [Fact]
@@ -182,10 +189,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.NumberOfExpectedUsers = null;
 
             //Act
-            var output = _sut.MapGeneralData(input);
+            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.NumberOfExpectedUsersInterval);
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.NumberOfExpectedUsersInterval);
         }
 
         [Fact]
@@ -196,10 +204,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.AssociatedProjectUuids = null;
 
             //Act
-            var output = _sut.MapGeneralData(input);
+            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.AssociatedProjectUuids);
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.AssociatedProjectUuids);
         }
 
         [Fact]
@@ -209,11 +218,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<GeneralDataUpdateRequestDTO>();
 
             //Act
-            var output = _sut.MapGeneralDataUpdate(input);
+            var output = _sut.FromPOST(new CreateItSystemUsageRequestDTO() { General = input });
 
             //Assert
-            AssertCommonGeneralDataWriteProperties(input, output);
-            Assert.Equal(input.MainContractUuid, AssertPropertyContainsDataChange(output.MainContractUuid));
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertCommonGeneralDataWriteProperties(input, mappedGeneralSection);
+            Assert.Equal(input.MainContractUuid, AssertPropertyContainsDataChange(mappedGeneralSection.MainContractUuid));
         }
 
         [Fact]
@@ -224,11 +234,12 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.MainContractUuid = null;
 
             //Act
-            var output = _sut.MapGeneralDataUpdate(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO(){General = input});
 
             //Assert
-            AssertCommonGeneralDataWriteProperties(input, output);
-            AssertPropertyContainsResetDataChange(output.MainContractUuid);
+            var mappedGeneralSection = AssertPropertyContainsDataChange(output.GeneralProperties);
+            AssertCommonGeneralDataWriteProperties(input, mappedGeneralSection);
+            AssertPropertyContainsResetDataChange(mappedGeneralSection.MainContractUuid);
         }
 
         [Fact]
@@ -238,32 +249,33 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<GDPRWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO(){GDPR = input});
 
             //Assert
-            Assert.Equal(input.Purpose, AssertPropertyContainsDataChange(output.Purpose));
-            Assert.Equal(input.BusinessCritical, AssertPropertyContainsDataChange(output.BusinessCritical)?.ToYesNoDontKnowChoice());
-            Assert.Equal(input.HostedAt, AssertPropertyContainsDataChange(output.HostedAt)?.ToHostingChoice());
-            AssertLinkMapping(input.DirectoryDocumentation, output.DirectoryDocumentation);
-            Assert.Equal(input.DataSensitivityLevels.ToList(), AssertPropertyContainsDataChange(output.DataSensitivityLevels).Select(x => x.ToDataSensitivityLevelChoice()));
-            Assert.Equal(input.SensitivePersonDataUuids.ToList(), AssertPropertyContainsDataChange(output.SensitivePersonDataUuids));
-            Assert.Equal(input.RegisteredDataCategoryUuids.ToList(), AssertPropertyContainsDataChange(output.RegisteredDataCategoryUuids));
-            Assert.Equal(input.TechnicalPrecautionsInPlace, AssertPropertyContainsDataChange(output.TechnicalPrecautionsInPlace)?.ToYesNoDontKnowChoice());
-            Assert.Equal(input.TechnicalPrecautionsApplied.ToList(), AssertPropertyContainsDataChange(output.TechnicalPrecautionsApplied).Select(x => x.ToTechnicalPrecautionChoice()));
-            AssertLinkMapping(input.TechnicalPrecautionsDocumentation, output.TechnicalPrecautionsDocumentation);
-            Assert.Equal(input.UserSupervision, AssertPropertyContainsDataChange(output.UserSupervision)?.ToYesNoDontKnowChoice());
-            Assert.Equal(input.UserSupervisionDate, AssertPropertyContainsDataChange(output.UserSupervisionDate));
-            AssertLinkMapping(input.UserSupervisionDocumentation, output.UserSupervisionDocumentation);
-            Assert.Equal(input.RiskAssessmentConducted, AssertPropertyContainsDataChange(output.RiskAssessmentConducted)?.ToYesNoDontKnowChoice());
-            Assert.Equal(input.RiskAssessmentNotes, AssertPropertyContainsDataChange(output.RiskAssessmentNotes));
-            Assert.Equal(input.RiskAssessmentConductedDate, AssertPropertyContainsDataChange(output.RiskAssessmentConductedDate));
-            AssertLinkMapping(input.RiskAssessmentDocumentation, output.RiskAssessmentDocumentation);
-            Assert.Equal(input.RiskAssessmentResult, AssertPropertyContainsDataChange(output.RiskAssessmentResult)?.ToRiskLevelChoice());
-            Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(output.DPIAConducted)?.ToYesNoDontKnowChoice());
-            Assert.Equal(input.DPIADate, AssertPropertyContainsDataChange(output.DPIADate));
-            Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(output.NextDataRetentionEvaluationDate));
-            Assert.Equal(input.DataRetentionEvaluationFrequencyInMonths, AssertPropertyContainsDataChange(output.DataRetentionEvaluationFrequencyInMonths));
-            AssertLinkMapping(input.DPIADocumentation, output.DPIADocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            Assert.Equal(input.Purpose, AssertPropertyContainsDataChange(mappedGdpr.Purpose));
+            Assert.Equal(input.BusinessCritical, AssertPropertyContainsDataChange(mappedGdpr.BusinessCritical)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.HostedAt, AssertPropertyContainsDataChange(mappedGdpr.HostedAt)?.ToHostingChoice());
+            AssertLinkMapping(input.DirectoryDocumentation, mappedGdpr.DirectoryDocumentation);
+            Assert.Equal(input.DataSensitivityLevels.ToList(), AssertPropertyContainsDataChange(mappedGdpr.DataSensitivityLevels).Select(x => x.ToDataSensitivityLevelChoice()));
+            Assert.Equal(input.SensitivePersonDataUuids.ToList(), AssertPropertyContainsDataChange(mappedGdpr.SensitivePersonDataUuids));
+            Assert.Equal(input.RegisteredDataCategoryUuids.ToList(), AssertPropertyContainsDataChange(mappedGdpr.RegisteredDataCategoryUuids));
+            Assert.Equal(input.TechnicalPrecautionsInPlace, AssertPropertyContainsDataChange(mappedGdpr.TechnicalPrecautionsInPlace)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.TechnicalPrecautionsApplied.ToList(), AssertPropertyContainsDataChange(mappedGdpr.TechnicalPrecautionsApplied).Select(x => x.ToTechnicalPrecautionChoice()));
+            AssertLinkMapping(input.TechnicalPrecautionsDocumentation, mappedGdpr.TechnicalPrecautionsDocumentation);
+            Assert.Equal(input.UserSupervision, AssertPropertyContainsDataChange(mappedGdpr.UserSupervision)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.UserSupervisionDate, AssertPropertyContainsDataChange(mappedGdpr.UserSupervisionDate));
+            AssertLinkMapping(input.UserSupervisionDocumentation, mappedGdpr.UserSupervisionDocumentation);
+            Assert.Equal(input.RiskAssessmentConducted, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentConducted)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.RiskAssessmentNotes, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentNotes));
+            Assert.Equal(input.RiskAssessmentConductedDate, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentConductedDate));
+            AssertLinkMapping(input.RiskAssessmentDocumentation, mappedGdpr.RiskAssessmentDocumentation);
+            Assert.Equal(input.RiskAssessmentResult, AssertPropertyContainsDataChange(mappedGdpr.RiskAssessmentResult)?.ToRiskLevelChoice());
+            Assert.Equal(input.DPIAConducted, AssertPropertyContainsDataChange(mappedGdpr.DPIAConducted)?.ToYesNoDontKnowChoice());
+            Assert.Equal(input.DPIADate, AssertPropertyContainsDataChange(mappedGdpr.DPIADate));
+            Assert.Equal(input.NextDataRetentionEvaluationDate, AssertPropertyContainsDataChange(mappedGdpr.NextDataRetentionEvaluationDate));
+            Assert.Equal(input.DataRetentionEvaluationFrequencyInMonths, AssertPropertyContainsDataChange(mappedGdpr.DataRetentionEvaluationFrequencyInMonths));
+            AssertLinkMapping(input.DPIADocumentation, mappedGdpr.DPIADocumentation);
         }
 
         [Fact]
@@ -274,10 +286,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.DirectoryDocumentation = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.DirectoryDocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.DirectoryDocumentation);
         }
 
         [Fact]
@@ -288,10 +301,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.DataSensitivityLevels = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.DataSensitivityLevels);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.DataSensitivityLevels);
         }
 
         [Fact]
@@ -302,10 +316,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.SensitivePersonDataUuids = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.SensitivePersonDataUuids);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.SensitivePersonDataUuids);
         }
 
         [Fact]
@@ -316,10 +331,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.RegisteredDataCategoryUuids = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.RegisteredDataCategoryUuids);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.RegisteredDataCategoryUuids);
         }
 
         [Fact]
@@ -330,10 +346,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.TechnicalPrecautionsApplied = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.TechnicalPrecautionsApplied);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.TechnicalPrecautionsApplied);
         }
 
         [Fact]
@@ -344,10 +361,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.TechnicalPrecautionsDocumentation = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.TechnicalPrecautionsDocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.TechnicalPrecautionsDocumentation);
         }
 
         [Fact]
@@ -358,10 +376,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.UserSupervisionDocumentation = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.UserSupervisionDocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.UserSupervisionDocumentation);
         }
 
         [Fact]
@@ -372,10 +391,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.RiskAssessmentDocumentation = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.RiskAssessmentDocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.RiskAssessmentDocumentation);
         }
 
         [Fact]
@@ -386,10 +406,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.DPIADocumentation = null;
 
             //Act
-            var output = _sut.MapGDPR(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { GDPR = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.DPIADocumentation);
+            var mappedGdpr = AssertPropertyContainsDataChange(output.GDPR);
+            AssertPropertyContainsResetDataChange(mappedGdpr.DPIADocumentation);
         }
 
         [Fact]
@@ -399,21 +420,22 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<ArchivingWriteRequestDTO>();
 
             //Act
-            var output = _sut.MapArchiving(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO(){Archiving = input});
 
             //Assert
-            Assert.Equal(input.ArchiveDuty, AssertPropertyContainsDataChange(output.ArchiveDuty)?.ToArchiveDutyChoice());
-            Assert.Equal(input.TypeUuid, AssertPropertyContainsDataChange(output.ArchiveTypeUuid));
-            Assert.Equal(input.LocationUuid, AssertPropertyContainsDataChange(output.ArchiveLocationUuid));
-            Assert.Equal(input.TestLocationUuid, AssertPropertyContainsDataChange(output.ArchiveTestLocationUuid));
-            Assert.Equal(input.SupplierOrganizationUuid, AssertPropertyContainsDataChange(output.ArchiveSupplierOrganizationUuid));
-            Assert.Equal(input.Active, AssertPropertyContainsDataChange(output.ArchiveActive));
-            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(output.ArchiveNotes));
-            Assert.Equal(input.FrequencyInMonths, AssertPropertyContainsDataChange(output.ArchiveFrequencyInMonths));
-            Assert.Equal(input.DocumentBearing, AssertPropertyContainsDataChange(output.ArchiveDocumentBearing));
+            var mappedArchiving = AssertPropertyContainsDataChange(output.Archiving);
+            Assert.Equal(input.ArchiveDuty, AssertPropertyContainsDataChange(mappedArchiving.ArchiveDuty)?.ToArchiveDutyChoice());
+            Assert.Equal(input.TypeUuid, AssertPropertyContainsDataChange(mappedArchiving.ArchiveTypeUuid));
+            Assert.Equal(input.LocationUuid, AssertPropertyContainsDataChange(mappedArchiving.ArchiveLocationUuid));
+            Assert.Equal(input.TestLocationUuid, AssertPropertyContainsDataChange(mappedArchiving.ArchiveTestLocationUuid));
+            Assert.Equal(input.SupplierOrganizationUuid, AssertPropertyContainsDataChange(mappedArchiving.ArchiveSupplierOrganizationUuid));
+            Assert.Equal(input.Active, AssertPropertyContainsDataChange(mappedArchiving.ArchiveActive));
+            Assert.Equal(input.Notes, AssertPropertyContainsDataChange(mappedArchiving.ArchiveNotes));
+            Assert.Equal(input.FrequencyInMonths, AssertPropertyContainsDataChange(mappedArchiving.ArchiveFrequencyInMonths));
+            Assert.Equal(input.DocumentBearing, AssertPropertyContainsDataChange(mappedArchiving.ArchiveDocumentBearing));
 
             var inputPeriods = input.JournalPeriods.OrderBy(_ => _.ArchiveId).ToList();
-            var mappedPeriods = AssertPropertyContainsDataChange(output.ArchiveJournalPeriods).OrderBy(_ => _.ArchiveId).ToList();
+            var mappedPeriods = AssertPropertyContainsDataChange(mappedArchiving.ArchiveJournalPeriods).OrderBy(_ => _.ArchiveId).ToList();
             Assert.Equal(inputPeriods.Count, mappedPeriods.Count);
             for (var i = 0; i < inputPeriods.Count; i++)
             {
@@ -434,10 +456,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.JournalPeriods = null;
 
             //Act
-            var output = _sut.MapArchiving(input);
+            var output = _sut.FromPATCH(new UpdateItSystemUsageRequestDTO() { Archiving = input });
 
             //Assert
-            AssertPropertyContainsResetDataChange(output.ArchiveJournalPeriods);
+            var mappedArchiving = AssertPropertyContainsDataChange(output.Archiving);
+            AssertPropertyContainsResetDataChange(mappedArchiving.ArchiveJournalPeriods);
         }
 
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
@@ -509,7 +532,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Act
             var output = _sut.FromPUT(input);
 
-            //Assert that all sections are mapped as changed - including undefined sections
+            //Assert that all sections are mapped as changed
             Assert.False(output.GeneralProperties.IsNone);
             Assert.False(output.Roles.IsNone);
             Assert.False(output.KLE.IsNone);
@@ -538,15 +561,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         }
 
         [Theory]
-        [InlineData(true, true, true, true, true, true, true)]
-        [InlineData(true, true, true, true, true, true, false)]
-        [InlineData(true, true, true, true, true, false, false)]
-        [InlineData(true, true, true, true, false, false, false)]
-        [InlineData(true, true, true, false, false, false, false)]
-        [InlineData(true, true, false, false, false, false, false)]
-        [InlineData(true, false, false, false, false, false, false)]
-        [InlineData(false, false, false, false, false, false, false)]
-        public void FromPut_Ignores_Root_Level_Sections_Not_Present_In_The_Request(
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPut_Includedes_Root_Level_Sections_Not_Present_In_The_Request(
             bool noGeneralSection,
             bool noRoles,
             bool noKle,
@@ -570,6 +586,43 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Act
             var output = _sut.FromPUT(emptyInput);
+
+            //Assert that all sections are mapped as changed - including undefined sections
+            Assert.False(output.GeneralProperties.IsNone);
+            Assert.False(output.Roles.IsNone);
+            Assert.False(output.KLE.IsNone);
+            Assert.False(output.OrganizationalUsage.IsNone);
+            Assert.False(output.ExternalReferences.IsNone);
+            Assert.False(output.Archiving.IsNone);
+            Assert.False(output.GDPR.IsNone);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPatch_Ignores_Root_Level_Sections_Not_Present_In_The_Request(
+           bool noGeneralSection,
+           bool noRoles,
+           bool noKle,
+           bool noOrgUsage,
+           bool noReferences,
+           bool noArchiving,
+           bool noGdpr)
+        {
+            //Arrange
+            var emptyInput = new UpdateItSystemUsageRequestDTO();
+            var definedProperties = GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>();
+            if (noGeneralSection) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.General));
+            if (noRoles) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Roles));
+            if (noKle) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations));
+            if (noOrgUsage) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage));
+            if (noReferences) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences));
+            if (noArchiving) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Archiving));
+            if (noGdpr) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.GDPR));
+
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+
+            //Act
+            var output = _sut.FromPATCH(emptyInput);
 
             //Assert that all sections are mapped as changed - including undefined sections
             Assert.Equal(output.GeneralProperties.IsNone, noGeneralSection);
