@@ -151,8 +151,6 @@ namespace Core.ApplicationServices.References
                 case ItSystemUsage itSystemUsage:
                     _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
                     break;
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(owner));
             }
         }
 
