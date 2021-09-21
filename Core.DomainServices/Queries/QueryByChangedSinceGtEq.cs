@@ -5,7 +5,7 @@ using Core.DomainModel;
 namespace Core.DomainServices.Queries
 {
     public class QueryByChangedSinceGtEq<T> : IDomainQuery<T>
-        where T : IEntity
+        where T : class, IEntity
     {
         private readonly DateTime _since;
 
