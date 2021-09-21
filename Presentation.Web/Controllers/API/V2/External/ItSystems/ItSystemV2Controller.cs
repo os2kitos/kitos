@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="kleUuid">KLE UUID number filter</param>
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
@@ -126,7 +126,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// </summary>
         /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]

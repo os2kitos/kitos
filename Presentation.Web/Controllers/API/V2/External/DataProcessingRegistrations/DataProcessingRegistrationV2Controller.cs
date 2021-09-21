@@ -52,7 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <param name="dataProcessorUuid">UUID of a data processor in the registration</param>
         /// <param name="subDataProcessorUuid">UUID of a sub data processor in the registration</param>
         /// <param name="agreementConcluded">Filter based on whether or not an agreement has been concluded</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]

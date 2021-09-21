@@ -48,7 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="systemUsageUuid">Associated system usage UUID filter</param>
         /// <param name="dataProcessingRegistrationUuid">Associated data processing registration UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]

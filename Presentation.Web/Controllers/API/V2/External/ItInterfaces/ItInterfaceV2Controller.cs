@@ -74,7 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// </summary>
         /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]
@@ -195,7 +195,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// </summary>
         /// <param name="exposedBySystemUuid">IT-System UUID filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
-        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
