@@ -1,7 +1,6 @@
 ﻿using Presentation.Web.Models.API.V2.SharedProperties;
 using System;
 using System.Collections.Generic;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
