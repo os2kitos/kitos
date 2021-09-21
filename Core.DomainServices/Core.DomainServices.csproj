@@ -228,6 +228,7 @@
     <Compile Include="Repositories\System\IItSystemRepository.cs" />
     <Compile Include="Repositories\System\ItSystemRepository.cs" />
     <Compile Include="Repositories\KLE\KLEUpdateHistoryItemRepository.cs" />
+    <Compile Include="Tracking\MarkEntityAsDirtyOnChangeEventHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

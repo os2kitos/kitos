@@ -110,6 +110,7 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
+using Core.DomainServices.Tracking;
 
 namespace Presentation.Web.Ninject
 {
@@ -358,6 +359,13 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+
+            //Dirty marking
+            RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
