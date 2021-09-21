@@ -1,16 +1,14 @@
 ﻿using System.Linq;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using Presentation.Web.Models;
 using System.Net.Http;
-using Core.DomainModel;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Net;
 using System.Security;
 using System.Web.Http;
-using Core.DomainServices.Authorization;
+using Core.DomainModel.Events;
 using Core.DomainServices.Extensions;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
@@ -53,14 +51,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            IEnumerable<EconomyStream> result = contract.ExternEconomyStreams;
-
-            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(contract.OrganizationId);
-
-            if (organizationDataReadAccessLevel == OrganizationDataReadAccessLevel.Public)
-            {
-                result = result.Where(x => x.AccessModifier == AccessModifier.Public);
-            }
+            IEnumerable<EconomyStream> result = contract.ExternEconomyStreams.ToList();
 
             return Ok(Map(result));
         }
@@ -83,14 +74,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return Forbidden();
             }
 
-            IEnumerable<EconomyStream> result = contract.InternEconomyStreams;
-
-            var organizationDataReadAccessLevel = GetOrganizationReadAccessLevel(contract.OrganizationId);
-
-            if (organizationDataReadAccessLevel == OrganizationDataReadAccessLevel.Public)
-            {
-                result = result.Where(x => x.AccessModifier == AccessModifier.Public);
-            }
+            IEnumerable<EconomyStream> result = contract.InternEconomyStreams.ToList();
 
             return Ok(Map(result));
         }
@@ -122,7 +106,26 @@ namespace Presentation.Web.Controllers.API.V1
 
             var savedItem = PostQuery(stream);
 
+            DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
+
             return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
+        }
+
+        protected override void RaiseUpdated(EconomyStream item)
+        {
+            RaiseContractUpdated(item);
+        }
+
+        protected override void RaiseDeleted(EconomyStream entity)
+        {
+            RaiseContractUpdated(entity);
+        }
+
+        private void RaiseContractUpdated(EconomyStream item)
+        {
+            var contract = item.InternPaymentFor ?? item.ExternPaymentFor;
+            if (contract != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(contract));
         }
 
         protected override EconomyStream PatchQuery(EconomyStream item, JObject obj)

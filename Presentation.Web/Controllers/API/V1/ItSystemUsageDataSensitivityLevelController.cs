@@ -11,7 +11,6 @@ namespace Presentation.Web.Controllers.API.V1
     [RoutePrefix("api/v1/itsystemusage")]
     public class ItSystemUsageDataSensitivityLevelController : BaseApiController
     {
-
         private readonly IItSystemUsageService _usageService;
 
         public ItSystemUsageDataSensitivityLevelController(IItSystemUsageService usageService)
