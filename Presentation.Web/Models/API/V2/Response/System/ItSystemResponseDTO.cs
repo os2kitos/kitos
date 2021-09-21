@@ -14,7 +14,7 @@ namespace Presentation.Web.Models.API.V2.Response.System
         public IEnumerable<ShallowOrganizationResponseDTO> UsingOrganizations { get; set; }
 
         /// <summary>
-        /// Time of last modification
+        /// UTC timestamp of latest modification
         /// </summary>
         public DateTime LastModified { get; set; }
 

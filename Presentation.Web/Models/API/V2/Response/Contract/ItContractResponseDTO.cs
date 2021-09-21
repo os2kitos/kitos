@@ -22,6 +22,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Organization in which the contract was created
         /// </summary>
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
+        /// <summary>
+        /// UTC timestamp of latest modification
+        /// </summary>
         public DateTime LastModified { get; set; }
         /// <summary>
         /// Reference to the user who last modified the contract

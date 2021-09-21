@@ -336,6 +336,29 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Contains(systems, dto => dto.Uuid == includedLowerBound.uuid);
             Assert.Contains(systems, dto => dto.Uuid == includedAboveLowerBound.uuid);
         }
+        
+        [Fact]
+        public async Task GET_Many_As_StakeHolder_With_ChangesSince_Filter()
+        {
+            //Arrange
+            var (token, organization) = await CreateStakeHolderUserInNewOrganizationAsync();
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+
+            await ItSystemHelper.SetNameRequestAsync(system2.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameRequestAsync(system3.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameRequestAsync(system1.Id, CreateName(), organization.Id);
+            var system3DTO = await ItSystemV2Helper.GetSingleAsync(token, system3.Uuid); //system 3 was changed as the second one and system 1 the last
+
+
+            //Act
+            var dtos = (await ItSystemV2Helper.GetManyAsync(token, changedSinceGtEq: system3DTO.LastModified, page: 0, pageSize: 10)).ToList();
+
+            //Assert
+            Assert.Equal(2, dtos.Count);
+            Assert.Equal(new[] { system3.Uuid, system1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
+        }
 
         [Theory]
         [InlineData(AccessModifier.Local)]
@@ -471,6 +494,28 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             //Assert
             Assert.Equal(new[] { system1.uuid, system2.uuid }, page1.Select(x => x.Uuid));
             Assert.Equal(new[] { system3.uuid }, page2.Select(x => x.Uuid));
+        }
+
+        [Fact]
+        public async Task GET_Many_As_RightsHolder_With_ChangesSince_Filter()
+        {
+            //Arrange
+            var (token, organization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+            var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
+
+            await ItSystemHelper.SetNameRequestAsync(system2.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameRequestAsync(system3.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameRequestAsync(system1.Id, CreateName(), organization.Id);
+            var system3DTO = await ItSystemHelper.GetSystemAsync(system3.Id);
+
+            //Act
+            var dtos = (await ItSystemV2Helper.GetManyRightsHolderSystemsAsync(token, changedSinceGtEq: system3DTO.LastChanged, page: 0, pageSize: 10)).ToList();
+
+            //Assert that the correct systems are returned in the correct order
+            Assert.Equal(2, dtos.Count);
+            Assert.Equal(new[] { system3.Uuid, system1.Uuid }, dtos.Select(x => x.Uuid).ToArray());
         }
 
         [Theory]

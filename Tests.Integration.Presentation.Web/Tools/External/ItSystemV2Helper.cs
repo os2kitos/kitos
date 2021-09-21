@@ -78,10 +78,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? businessTypeId = null,
             string kleKey = null,
             Guid? kleUuid = null,
-            int? numberOfUsers = null, 
-            bool? includeDeactivated = null)
+            int? numberOfUsers = null,
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null
+            )
         {
-            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated);
+            using var response = await SendGetManyAsync(token, page, pageSize, rightsHolderId, businessTypeId, kleKey, kleUuid, numberOfUsers, includeDeactivated, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -95,8 +97,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? businessTypeId = null,
             string kleKey = null,
             Guid? kleUuid = null,
-            int? numberOfUsers = null, 
-            bool? includeDeactivated = null)
+            int? numberOfUsers = null,
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null
+            )
         {
             var path = "api/v2/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -125,6 +129,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             if (includeDeactivated.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("includeDeactivated", includeDeactivated.Value.ToString()));
 
+            if (changedSinceGtEq.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
+
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";
 
@@ -136,9 +143,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? page = null,
             int? pageSize = null,
             Guid? rightsHolderUuid = null,
-            bool? includeDeactivated = null)
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null)
         {
-            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize, rightsHolderUuid, includeDeactivated);
+            using var response = await SendGetManyRightsHolderSystemsAsync(token, page, pageSize, rightsHolderUuid, includeDeactivated, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<ItSystemResponseDTO>>();
@@ -149,7 +157,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? page = null,
             int? pageSize = null,
             Guid? rightsHolderUuid = null,
-            bool? includeDeactivated = null)
+            bool? includeDeactivated = null, 
+            DateTime? changedSinceGtEq = null)
         {
             var path = "api/v2/rightsholder/it-systems";
             var queryParameters = new List<KeyValuePair<string, string>>();
@@ -165,6 +174,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (includeDeactivated.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("includeDeactivated", includeDeactivated.Value.ToString()));
+
+            if (changedSinceGtEq.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
             if (queryParameters.Any())
                 path += $"?{string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"))}";

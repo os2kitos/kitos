@@ -14,7 +14,7 @@ namespace Tests.Unit.Presentation.Web.DomainServices
         public void Apply_Includes_Results_With_LastChanged_EqualToOrGreaterThan()
         {
             //Arrange
-            var referenceTime = A<DateTime>();
+            var referenceTime = A<DateTime>().ToUniversalTime();
             var sut = new QueryByChangedSinceGtEq<Entity>(referenceTime);
 
             var tooOld = CreateEntity(referenceTime.AddTicks(-1));

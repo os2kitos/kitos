@@ -11,7 +11,7 @@ namespace Core.DomainServices.Queries
 
         public QueryByChangedSinceGtEq(DateTime since)
         {
-            _since = since;
+            _since = since.ToUniversalTime();
         }
 
         public IQueryable<T> Apply(IQueryable<T> source)

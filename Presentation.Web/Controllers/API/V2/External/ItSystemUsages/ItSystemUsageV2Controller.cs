@@ -55,7 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
-        /// <param name="changedSinceGtEq">Include only changes which were LastModified is equal to or greater than the provided value</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
