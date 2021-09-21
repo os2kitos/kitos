@@ -134,29 +134,35 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var url = TestEnvironment.CreateUrl("api/authorize/antiforgery");
             var csrfRequest = new HttpRequestMessage(HttpMethod.Get, url);
-            HttpResponseMessage csrfResponse;
+            HttpResponseMessage csrfResponse = null;
+            try
+            {
+                if (authCookie == null)
+                {
+                    using var client = new HttpClient();
+                    csrfResponse = await client.SendAsync(csrfRequest);
+                }
+                else
+                {
+                    var cookieContainer = new CookieContainer();
+                    cookieContainer.Add(authCookie);
+                    using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
+                    csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                }
 
-            if (authCookie == null)
-            {
-                using var client = new HttpClient();
-                csrfResponse = await client.SendAsync(csrfRequest);
+                Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
+                var cookieParts = csrfResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
+                var cookie = new Cookie(Constants.CSRFValues.CookieName, cookieParts[1].Split(';')[0], "/", url.Host);
+                return new CSRFTokenDTO
+                {
+                    CookieToken = cookie,
+                    FormToken = await csrfResponse.ReadResponseBodyAsAsync<string>()
+                };
             }
-            else
+            finally
             {
-                var cookieContainer = new CookieContainer();
-                cookieContainer.Add(authCookie);
-                using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
-                csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                csrfResponse?.Dispose();
             }
-
-            Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
-            var cookieParts = csrfResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
-            var cookie = new Cookie(Constants.CSRFValues.CookieName, cookieParts[1].Split(';')[0], "/", url.Host);
-            return new CSRFTokenDTO
-            {
-                CookieToken = cookie,
-                FormToken = await csrfResponse.ReadResponseBodyAsAsync<string>()
-            };
         }
 
         public static Task<HttpResponseMessage> PostAsync(Uri url, object body)
@@ -280,7 +286,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             var request = CreatePostMessage(url, loginDto);
 
-            var cookieResponse = await SendWithCSRFToken(request);
+            using var cookieResponse = await SendWithCSRFToken(request);
 
             Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
             var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
