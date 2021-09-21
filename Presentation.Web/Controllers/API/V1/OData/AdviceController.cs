@@ -15,6 +15,7 @@ using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Time;
+using Infrastructure.Services.DataAccess;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Results;
 using Microsoft.AspNet.OData.Routing;
@@ -29,6 +30,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         private readonly IAdviceService _adviceService;
         private readonly IAdviceRootResolution _adviceRootResolution;
         private readonly IOperationClock _operationClock;
+        private readonly ITransactionManager _transactionManager;
 
         private readonly Regex _emailValidationRegex = new Regex("([a-zA-Z\\-0-9\\._]+@)([a-zA-Z\\-0-9\\.]+)\\.([a-zA-Z\\-0-9\\.]+)");
 
@@ -36,13 +38,15 @@ namespace Presentation.Web.Controllers.API.V1.OData
             IAdviceService adviceService,
             IGenericRepository<Advice> repository,
             IAdviceRootResolution adviceRootResolution,
-            IOperationClock operationClock
+            IOperationClock operationClock,
+            ITransactionManager transactionManager
             )
             : base(repository)
         {
             _adviceService = adviceService;
             _adviceRootResolution = adviceRootResolution;
             _operationClock = operationClock;
+            _transactionManager = transactionManager;
         }
 
         [EnableQuery]
@@ -143,6 +147,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 advice.AlarmDate = null;
             }
 
+            using var transaction = _transactionManager.Begin();
+
             var response = base.Post(organizationId, advice);
 
             if (response.GetType() == typeof(CreatedODataResult<Advice>))
@@ -164,6 +170,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     return StatusCode(HttpStatusCode.InternalServerError);
                 }
             }
+            transaction.Commit();
             return response;
         }
 
@@ -211,6 +218,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     }
                 }
 
+                using var transaction = _transactionManager.Begin();
                 var response = base.Patch(key, delta);
 
                 if (response is UpdatedODataResult<Advice>)
@@ -218,7 +226,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     var updatedAdvice = Repository.GetByKey(key); //Re-load
                     _adviceService.UpdateSchedule(updatedAdvice);
                 }
-
+                transaction.Commit();
                 return response;
             }
             catch (Exception e)
@@ -245,6 +253,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [EnableQuery]
         public override IHttpActionResult Delete(int key)
         {
+            using var transaction = _transactionManager.Begin();
             var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
             if (entity == null)
             {
@@ -268,7 +277,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 Logger.ErrorException("Failed to delete advice", e);
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
-
+            transaction.Commit();
             return StatusCode(HttpStatusCode.NoContent);
         }
 
