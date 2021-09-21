@@ -7,7 +7,6 @@ using Core.DomainServices;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Core.ApplicationServices.Authorization;
-using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {
@@ -42,6 +41,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
         public virtual IHttpActionResult Get(int key)
         {
             var entity = Repository.GetByKey(key);
+            if (entity == null)
+                return NotFound();
+
             return Ok(entity);
         }
 

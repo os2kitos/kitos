@@ -8,7 +8,6 @@ using Core.DomainServices;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
-using Core.DomainServices.Repositories.Organization;
 using Presentation.Web.Infrastructure.Attributes;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
@@ -19,16 +18,11 @@ namespace Presentation.Web.Controllers.API.V1.OData
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
         private readonly IGenericRepository<AccessType> _accessTypeRepository;
-        private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
-        public ItSystemUsagesController(
-            IGenericRepository<ItSystemUsage> repository,
-            IGenericRepository<AccessType> accessTypeRepository,
-            IOrganizationUnitRepository organizationUnitRepository)
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<AccessType> accessTypeRepository)
             : base(repository)
         {
             _accessTypeRepository = accessTypeRepository;
-            _organizationUnitRepository = organizationUnitRepository;
         }
 
         /// <summary>
@@ -80,6 +74,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
             itSystemUsage.AccessTypes.Add(accessType);
 
+            RaiseUpdatedDomainEvent(itSystemUsage);
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);
@@ -109,6 +104,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
             itSystemUsage.AccessTypes.Remove(accessType);
 
+            RaiseUpdatedDomainEvent(itSystemUsage);
             Repository.Save();
 
             return StatusCode(HttpStatusCode.NoContent);

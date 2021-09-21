@@ -1,5 +1,4 @@
-﻿using System.Net;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Microsoft.AspNet.OData;
@@ -17,7 +16,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected IHttpActionResult FromOperationError(OperationError failure)
         {
-            HttpStatusCode statusCode = failure.FailureType.ToHttpStatusCode();
+            var statusCode = failure.FailureType.ToHttpStatusCode();
 
             return ResponseMessage(new HttpResponseMessage(statusCode) {Content = new StringContent(failure.Message.GetValueOrFallback(statusCode.ToString("G")))});
         }

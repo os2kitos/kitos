@@ -9,7 +9,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
-using System;
 using System.Net;
 using Core.DomainModel.Events;
 

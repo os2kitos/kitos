@@ -45,7 +45,8 @@ namespace Presentation.Web.Controllers.API.V1
             return _userNotificationApplicationService
                 .GetNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Select(x => x.OrderBy(y => y.Created))
-                .Match(value => Ok(ToDTOs(value)), FromOperationError);
+                .Select(ToDTOs)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpGet]
@@ -57,15 +58,15 @@ namespace Presentation.Web.Controllers.API.V1
             return _userNotificationApplicationService
                 .GetNotificationsForUser(organizationId, userId, relatedEntityType)
                 .Select(x => x.Count())
-                .Match(value => Ok(value), FromOperationError);
+                .Match(Ok, FromOperationError);
         }
 
-        private List<UserNotificationDTO> ToDTOs(IEnumerable<UserNotification> value)
+        private static List<UserNotificationDTO> ToDTOs(IEnumerable<UserNotification> value)
         {
-            return value.Select(x => ToDTO(x)).ToList();
+            return value.Select(ToDTO).ToList();
         }
 
-        private UserNotificationDTO ToDTO(UserNotification x)
+        private static UserNotificationDTO ToDTO(UserNotification x)
         {
             return new UserNotificationDTO
             {
