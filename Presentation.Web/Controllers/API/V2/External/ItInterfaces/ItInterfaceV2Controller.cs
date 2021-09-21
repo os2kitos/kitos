@@ -11,7 +11,6 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
-
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -75,6 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// </summary>
         /// <param name="rightsHolderUuid">Uuid of the organization you want interfaces from. If not provided all available interfaces (based on access rights) will be returned</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
+        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]
@@ -85,7 +85,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfacesAsRightsHolder(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
-            bool includeDeactivated = false,
+            bool? includeDeactivated = false,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -93,14 +94,17 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             var refinements = new List<IDomainQuery<ItInterface>>();
 
-            if (includeDeactivated == false)
+            if (includeDeactivated != true)
                 refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
+
+            if (changedSinceGtEq.HasValue)
+                refinements.Add(new QueryByChangedSinceGtEq<ItInterface>(changedSinceGtEq.Value));
 
             return _rightsHolderService
                 .GetInterfacesWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Match(
                     success => success
-                        .OrderBy(y => y.Id)
+                        .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                         .Page(pagination)
                         .ToList()
                         .Select(ToRightsHolderItInterfaceResponseDTO)
@@ -191,6 +195,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// </summary>
         /// <param name="exposedBySystemUuid">IT-System UUID filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
+        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-interfaces")]
@@ -200,7 +205,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfaces(
             [NonEmptyGuid] Guid? exposedBySystemUuid = null,
-            bool includeDeactivated = false,
+            bool? includeDeactivated = false,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
             if (!ModelState.IsValid)
@@ -211,12 +217,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (exposedBySystemUuid.HasValue)
                 refinements.Add(new QueryByExposingSystem(exposedBySystemUuid.Value));
 
-            if (includeDeactivated == false)
+            if (includeDeactivated != true)
                 refinements.Add(new QueryByEnabledEntitiesOnly<ItInterface>());
+
+            if (changedSinceGtEq.HasValue)
+                refinements.Add(new QueryByChangedSinceGtEq<ItInterface>(changedSinceGtEq.Value));
 
             return _itInterfaceService
                 .GetAvailableInterfaces(refinements.ToArray())
-                .OrderBy(y => y.Id)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(pagination)
                 .ToList()
                 .Select(ToStakeHolderItInterfaceResponseDTO)

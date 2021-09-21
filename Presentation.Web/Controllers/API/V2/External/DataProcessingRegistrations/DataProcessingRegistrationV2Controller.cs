@@ -52,6 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
         /// <param name="dataProcessorUuid">UUID of a data processor in the registration</param>
         /// <param name="subDataProcessorUuid">UUID of a sub data processor in the registration</param>
         /// <param name="agreementConcluded">Filter based on whether or not an agreement has been concluded</param>
+        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -66,6 +67,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             [NonEmptyGuid] Guid? dataProcessorUuid = null,
             [NonEmptyGuid] Guid? subDataProcessorUuid = null,
             bool? agreementConcluded = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -91,9 +93,12 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
             if (agreementConcluded.HasValue)
                 conditions.Add(new QueryByAgreementConcluded(agreementConcluded.Value));
 
+            if (changedSinceGtEq.HasValue)
+                conditions.Add(new QueryByChangedSinceGtEq<DataProcessingRegistration>(changedSinceGtEq.Value));
+
             return _dataProcessingRegistrationService
                 .Query(conditions.ToArray())
-                .OrderBy(dpr => dpr.Id)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapDataProcessingRegistrationDTO)

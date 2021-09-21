@@ -55,6 +55,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
         /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
+        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -68,6 +69,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             [NonEmptyGuid] Guid? relatedToContractUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -90,12 +92,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             if (systemUuid.HasValue)
                 conditions.Add(new QueryBySystemUuid(systemUuid.Value));
 
+            if (changedSinceGtEq.HasValue)
+                conditions.Add(new QueryByChangedSinceGtEq<ItSystemUsage>(changedSinceGtEq.Value));
+
             if (!string.IsNullOrWhiteSpace(systemNameContent))
                 conditions.Add(new QueryBySystemNameContent(systemNameContent));
 
             return _itSystemUsageService
                 .Query(conditions.ToArray())
-                .OrderBy(itSystemUsage => itSystemUsage.Id)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(paginationQuery).AsEnumerable()
                 .Select(_responseMapper.MapSystemUsageDTO).ToList()
                 .Transform(Ok);

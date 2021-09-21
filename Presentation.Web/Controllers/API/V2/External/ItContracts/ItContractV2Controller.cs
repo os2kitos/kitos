@@ -48,6 +48,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         /// <param name="systemUsageUuid">Associated system usage UUID filter</param>
         /// <param name="dataProcessingRegistrationUuid">Associated data processing registration UUID filter</param>
         /// <param name="nameContent">Name content filter</param>
+        /// <param name="changedSinceGtEq">Include only changes which were modified at or following the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route]
@@ -63,6 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             [NonEmptyGuid] Guid? responsibleOrgUnitUuid = null,
             [NonEmptyGuid] Guid? supplierUuid = null,
             string nameContent = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -91,9 +93,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
             if (!string.IsNullOrWhiteSpace(nameContent))
                 conditions.Add(new QueryByPartOfName<ItContract>(nameContent));
 
+            if (changedSinceGtEq.HasValue)
+                conditions.Add(new QueryByChangedSinceGtEq<ItContract>(changedSinceGtEq.Value));
+
             return _itContractService
                 .Query(conditions.ToArray())
-                .OrderBy(contract => contract.Id)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(_responseMapper.MapContractDTO)

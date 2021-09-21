@@ -113,6 +113,7 @@
     <Compile Include="Queries\KLE\QueryByParentUuid.cs" />
     <Compile Include="Queries\Organization\QueryByCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryOrganizationByIdsOrSharedAccess.cs" />
+    <Compile Include="Queries\QueryByChangedSinceGtEq.cs" />
     <Compile Include="Queries\QueryByEnabledEntitiesOnly.cs" />
     <Compile Include="Queries\QueryByOrganizationUuid.cs" />
     <Compile Include="Queries\QueryByUuid.cs" />
