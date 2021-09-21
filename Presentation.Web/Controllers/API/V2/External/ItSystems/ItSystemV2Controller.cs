@@ -63,7 +63,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             string kleNumber = null,
             [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
-            bool? includeDeactivated = false,
+            bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
-            bool? includeDeactivated = false,
+            bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {

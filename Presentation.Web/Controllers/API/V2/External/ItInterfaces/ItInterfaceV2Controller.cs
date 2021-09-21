@@ -85,7 +85,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfacesAsRightsHolder(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
-            bool? includeDeactivated = false,
+            bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
@@ -205,7 +205,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItInterfaces(
             [NonEmptyGuid] Guid? exposedBySystemUuid = null,
-            bool? includeDeactivated = false,
+            bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery pagination = null)
         {
