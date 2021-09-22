@@ -1,7 +1,7 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Extensions
 {
@@ -44,6 +44,19 @@ namespace Core.ApplicationServices.Extensions
             return optionalUpdate
                 .Select(changedValue => updateCommand(target, changedValue))
                 .Match(updateResult => updateResult, () => target);
+        }
+
+        public static Result<TTarget, OperationError> WithOptionalUpdate<TTarget, TValue>(
+            this TTarget target,
+            Maybe<TValue> optionalUpdate,
+            Func<TTarget, TValue, Maybe<OperationError>> updateCommand)
+        {
+            return optionalUpdate
+                .Match
+                (
+                    changedValue => updateCommand(target, changedValue).Match<Result<TTarget, OperationError>>(error => error, () => target),
+                    () => target
+                );
         }
 
         public static Result<TTarget, OperationError> WithOptionalUpdate<TTarget, TValue>(

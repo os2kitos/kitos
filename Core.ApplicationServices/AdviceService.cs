@@ -9,6 +9,7 @@ using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Helpers;
 using Core.ApplicationServices.ScheduledJobs;
@@ -16,7 +17,7 @@ using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Core.DomainModel.Shared;
 using Core.DomainServices.Notifications;
 using Core.DomainModel.Notification;

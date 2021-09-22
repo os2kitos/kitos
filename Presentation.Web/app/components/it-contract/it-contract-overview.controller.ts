@@ -247,7 +247,16 @@
                         read: {
                             url: (options) => {
                                 var urlParameters =
-                                    `?$expand=Reference,Parent,ResponsibleOrganizationUnit,PaymentModel,PaymentFreqency,Rights($expand=User,Role),Supplier,AssociatedSystemUsages($expand=ItSystemUsage($expand=ItSystem)),TerminationDeadline,DataProcessingRegistrations($select=IsAgreementConcluded)`;
+                                    "?$expand=" +
+                                        "Reference($select=URL,Title,ExternalReferenceId)," +
+                                        "Parent($select=Id,Name)," +
+                                        "ResponsibleOrganizationUnit($select=Name)," +
+                                        "PaymentModel($select=Name)," +
+                                        "PaymentFreqency($select=Name)," +
+                                        "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
+                                        "Supplier($select=Name)," +
+                                        "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
+                                        "DataProcessingRegistrations($select=IsAgreementConcluded)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {

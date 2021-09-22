@@ -10,7 +10,7 @@
     <RootNamespace>Infrastructure.OpenXML</RootNamespace>
     <AssemblyName>Infrastructure.OpenXML</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <TargetFrameworkProfile />
@@ -67,10 +67,6 @@
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
-      <Name>Core.DomainModel</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

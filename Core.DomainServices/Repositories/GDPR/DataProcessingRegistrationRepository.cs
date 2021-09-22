@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Events;
+using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Extensions;
-using Infrastructure.Services.Types;
+
+
 
 namespace Core.DomainServices.Repositories.GDPR
 {

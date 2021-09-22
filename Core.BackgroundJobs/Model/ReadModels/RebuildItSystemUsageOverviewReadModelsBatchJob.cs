@@ -4,16 +4,17 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Model;
 using Core.DomainServices.Repositories.BackgroundJobs;
 using Core.DomainServices.Repositories.SystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.BackgroundJobs.Model.ReadModels

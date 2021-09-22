@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Extensions;
+
 
 namespace Core.DomainServices.Queries.ItSystem
 {

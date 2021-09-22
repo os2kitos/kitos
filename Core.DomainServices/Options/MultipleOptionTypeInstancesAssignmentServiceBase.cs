@@ -1,6 +1,6 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel;
-using Core.DomainModel.Result;
 
 namespace Core.DomainServices.Options
 {

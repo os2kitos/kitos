@@ -1,10 +1,10 @@
 ﻿using System.Data;
 using System.Linq;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Qa.References;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
 
 namespace Core.DomainServices.Model.EventHandlers
 {

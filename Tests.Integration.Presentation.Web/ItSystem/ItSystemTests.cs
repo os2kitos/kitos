@@ -172,7 +172,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
             var mainSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
             var childSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login).DisposeAsync();
 
             //Act
             using var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login);
@@ -217,7 +217,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             const int taskRefId = TestEnvironment.DefaultTaskRefId;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
-            await ItSystemHelper.SendSetTaskRefOnSystemRequestAsync(system.Id, taskRefId, organizationId, login);
+            await ItSystemHelper.SendSetTaskRefOnSystemRequestAsync(system.Id, taskRefId, organizationId, login).DisposeAsync();
 
             //Act
             using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
@@ -266,13 +266,13 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 
         private static async Task AssertSystemNotDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
+            using var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
         }
 
         private static async Task AssertSystemDeletedAsync(int systemId)
         {
-            var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
+            using var result = await ItSystemHelper.SendGetSystemRequestAsync(systemId);
             Assert.Equal(HttpStatusCode.NotFound, result.StatusCode);
         }
     }

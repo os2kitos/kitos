@@ -2,24 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.GDPR.Write;
+using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Generic;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Serilog;
 using Tests.Toolkit.Extensions;
@@ -37,6 +39,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IDatabaseControl> _databaseControlMock;
+        private readonly Mock<IAssignmentUpdateService> _assignmentUpdateServiceMock;
 
         public DataProcessingRegistrationWriteServiceTest()
         {
@@ -46,6 +49,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _domainEventsMock = new Mock<IDomainEvents>();
             _transactionManagerMock = new Mock<ITransactionManager>();
             _databaseControlMock = new Mock<IDatabaseControl>();
+            _assignmentUpdateServiceMock = new Mock<IAssignmentUpdateService>();
             _sut = new DataProcessingRegistrationWriteService(
                 _dprServiceMock.Object,
                 _identityResolverMock.Object,
@@ -53,7 +57,8 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
                 Mock.Of<ILogger>(),
                 _domainEventsMock.Object,
                 _transactionManagerMock.Object,
-                _databaseControlMock.Object);
+                _databaseControlMock.Object,
+                _assignmentUpdateServiceMock.Object);
         }
         protected override void OnFixtureCreated(Fixture fixture)
         {
@@ -866,8 +871,31 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _dprServiceMock.Verify(x => x.SetSubDataProcessorsState(It.IsAny<int>(), It.IsAny<YesNoUndecidedOption>()), Times.Never);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_InsecureCountriesSubjectToDataTransfer(bool hasInsecureCountries)
+        {
+            //Arrange
+            var inputUuids = hasInsecureCountries ? Many<Guid>().ToList() : new List<Guid>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                InsecureCountriesSubjectToDataTransferUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingCountryOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         [Fact]
-        public void Can_CreateWith_GeneralData_InsecureCountriesSubjectToDataTransfer()
+        public void Cannot_Create_With_GeneralData_InsecureCountriesSubjectToDataTransfer_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
             var inputUuids = Many<Guid>().ToList();
@@ -877,47 +905,42 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            //Make sure we have som existing countries and add one which is shared with the new state. That one, we don't expect to be removed
-            var existingCountryAssigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
-            var optionMap = inputUuids
-                .Concat(existingCountryAssigmentIds)
-                .Distinct()
-                .ToDictionary(uuid => uuid, uuid => new DataProcessingCountryOption { Uuid = uuid, Id = A<int>() });
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingCountryOption>(createdRegistration, inputUuids, operationError);
 
-            createdRegistration.InsecureCountriesSubjectToDataTransfer = existingCountryAssigmentIds.Select(uuid => optionMap[uuid]).ToList();
-            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingCountryOption>(uuid, optionMap[uuid].Id));
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
 
-            var expectedRemovals = existingCountryAssigmentIds.Except(inputUuids).ToList();
-            var expectedAdditions = inputUuids.Except(existingCountryAssigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals)
-                _dprServiceMock.Setup(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
 
-            foreach (var expectedAddition in expectedAdditions)
-                _dprServiceMock.Setup(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id)).Returns(optionMap[expectedAddition]);
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_DataProcessor(bool hasDataProcessors)
+        {
+            //Arrange
+            var inputUuids = hasDataProcessors ? Many<Guid>().ToList() : new List<Guid>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                DataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-
-            foreach (var expectedRemoval in expectedRemovals)
-            {
-                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Never);
-            }
-
-            foreach (var expectedAddition in expectedAdditions)
-            {
-                _dprServiceMock.Verify(x => x.AssignInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveInsecureThirdCountry(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Never);
-            }
         }
 
         [Fact]
-        public void Can_CreateWith_GeneralData_DataProcessor()
+        public void Cannot_Create_With_GeneralData_DataProcessor_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
             var inputUuids = Many<Guid>().ToList();
@@ -927,47 +950,42 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
-            var assigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
-            var entityMap = inputUuids
-                .Concat(assigmentIds)
-                .Distinct()
-                .ToDictionary(uuid => uuid, uuid => new Organization() { Uuid = uuid, Id = A<int>() });
-
-            createdRegistration.DataProcessors = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
-            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(uuid, entityMap[uuid].Id));
-
-            var expectedRemovals = assigmentIds.Except(inputUuids).ToList();
-            var expectedAdditions = inputUuids.Except(assigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals)
-                _dprServiceMock.Setup(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
-
-            foreach (var expectedAddition in expectedAdditions)
-                _dprServiceMock.Setup(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_GeneralData_SubDataProcessor(bool hasSubDataProcessors)
+        {
+            //Arrange
+            var inputUuids = hasSubDataProcessors ? Many<Guid>().ToList() : new List<Guid>();
+            var generalData = new UpdatedDataProcessingRegistrationGeneralDataParameters
+            {
+                SubDataProcessorUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
+
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+            
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
             Assert.True(result.Ok);
-            Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-
-            foreach (var expectedRemoval in expectedRemovals)
-            {
-                _dprServiceMock.Verify(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
-            }
-
-            foreach (var expectedAddition in expectedAdditions)
-            {
-                _dprServiceMock.Verify(x => x.AssignDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
-            }
         }
 
         [Fact]
-        public void Can_CreateWith_GeneralData_SubDataProcessor()
+        public void Cannot_Create_With_GeneralData_SubDataProcessor_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
             var inputUuids = Many<Guid>().ToList();
@@ -977,165 +995,96 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(generalData: generalData);
 
-            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
-            var assigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
-            var entityMap = inputUuids
-                .Concat(assigmentIds)
-                .Distinct()
-                .ToDictionary(uuid => uuid, uuid => new Organization { Uuid = uuid, Id = A<int>() });
+            var operationError = A<OperationError>(); 
+            ExpectUpdateMultiAssignmentReturns<int, Organization>(createdRegistration, inputUuids, operationError);
 
-            createdRegistration.SubDataProcessors = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
-            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<Organization>(uuid, entityMap[uuid].Id));
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
 
-            var expectedRemovals = assigmentIds.Except(inputUuids).ToList();
-            var expectedAdditions = inputUuids.Except(assigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals)
-                _dprServiceMock.Setup(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
 
-            foreach (var expectedAddition in expectedAdditions)
-                _dprServiceMock.Setup(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_SystemUsages(bool hasUsages)
+        {
+            //Arrange
+            var usageUuids = hasUsages ? Many<Guid>().ToList() : new List<Guid>();
+            var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-
-            foreach (var expectedRemoval in expectedRemovals)
-            {
-                _dprServiceMock.Verify(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
-            }
-
-            foreach (var expectedAddition in expectedAdditions)
-            {
-                _dprServiceMock.Verify(x => x.AssignSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveSubDataProcessor(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
-            }
         }
 
         [Fact]
-        public void Can_CreateWith_SystemUsages()
+        public void Cannot_Create_With_SystemUsages_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
-            var systemUsageUuids = Many<Guid>().ToList();
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsageUuids);
+            var usageUuids = Many<Guid>().ToList();
+            var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
 
-            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
-            var assigmentIds = Many<Guid>().Append(systemUsageUuids.RandomItem()).ToList();
-            var entityMap = systemUsageUuids
-                .Concat(assigmentIds)
-                .Distinct()
-                .ToDictionary(uuid => uuid, uuid => new ItSystemUsage { Uuid = uuid, Id = A<int>() });
-
-            createdRegistration.SystemUsages = assigmentIds.Select(uuid => entityMap[uuid]).ToList();
-            systemUsageUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(uuid, entityMap[uuid].Id));
-
-            var expectedRemovals = assigmentIds.Except(systemUsageUuids).ToList();
-            var expectedAdditions = systemUsageUuids.Except(assigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals)
-                _dprServiceMock.Setup(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedRemoval].Id)).Returns(entityMap[expectedRemoval]);
-
-            foreach (var expectedAddition in expectedAdditions)
-                _dprServiceMock.Setup(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedAddition].Id)).Returns(entityMap[expectedAddition]);
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, operationError);
 
             //Act
             var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
+        }
+
+        [Fact]
+        public void Can_Update_With_SystemUsages_If_Usage_Already_Assigned()
+        {
+            //Arrange
+            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
+            var usageUuids = new List<Guid> { usage.Uuid };
+            var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+            registration.SystemUsages.Add(usage);
+
+            ExpectGetDataProcessingRegistrationReturns(registration.Uuid, registration);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
+            parameters.Name = OptionalValueChange<string>.None;
+
+            //Act
+            var result = _sut.Update(registration.Uuid, parameters);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Same(createdRegistration, result.Value);
             AssertTransactionCommitted(transaction);
-
-            foreach (var expectedRemoval in expectedRemovals)
-            {
-                _dprServiceMock.Verify(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedRemoval].Id), Times.Never);
-            }
-
-            foreach (var expectedAddition in expectedAdditions)
-            {
-                _dprServiceMock.Verify(x => x.AssignSystem(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveSystem(createdRegistration.Id, entityMap[expectedAddition].Id), Times.Never);
-            }
         }
 
         [Fact]
-        public void Cannot_CreateWith_SystemUsages_If_IdentityResolution_Fails()
+        public void Can_Update_With_SystemUsages_To_Remove_Usage()
         {
             //Arrange
-            var systemUsageUuids = Many<Guid>().ToList();
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsageUuids);
+            var usage = new ItSystemUsage() { Id = A<int>(), Uuid = A<Guid>() };
+            var usageUuids = new List<Guid>();
+            var (organizationUuid, parameters, registration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: usageUuids);
+            registration.SystemUsages.Add(usage);
 
-            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
-            var entityMap = systemUsageUuids
-                .ToDictionary(uuid => uuid, uuid => new ItSystemUsage { Uuid = uuid, Id = A<int>() });
-
-            systemUsageUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(uuid, Maybe<int>.None));
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownErrorDetails(result, "uuid does not match a KITOS", OperationFailure.BadInput, transaction);
-
-            foreach (var entity in entityMap.Values)
-            {
-                _dprServiceMock.Verify(x => x.RemoveSystem(createdRegistration.Id, entity.Id), Times.Never);
-                _dprServiceMock.Verify(x => x.AssignSystem(createdRegistration.Id, entity.Id), Times.Never);
-            }
-        }
-
-        [Fact]
-        public void Cannot_CreateWith_SystemUsages_If_AssignSystem_Fails()
-        {
-            //Arrange
-            var systemUsageUuids = Many<Guid>().ToList();
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids: systemUsageUuids);
-
-            //Make sure we have som existing organizations and add one which is shared with the new state. That one, we don't expect to be removed
-            var entityMap = systemUsageUuids
-                .ToDictionary(uuid => uuid, uuid => new ItSystemUsage { Uuid = uuid, Id = A<int>() });
-
-            systemUsageUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(uuid, entityMap[uuid].Id));
-
-            var failingAddition = systemUsageUuids.First();
-            var error = A<OperationError>();
-            _dprServiceMock.Setup(x => x.AssignSystem(createdRegistration.Id, entityMap[failingAddition].Id)).Returns(error);
+            ExpectGetDataProcessingRegistrationReturns(registration.Uuid, registration);
+            ExpectUpdateMultiAssignmentReturns<int, ItSystemUsage>(registration, usageUuids, Maybe<OperationError>.None);
+            parameters.Name = OptionalValueChange<string>.None;
 
             //Act
-            var result = _sut.Create(organizationUuid, parameters);
+            var result = _sut.Update(registration.Uuid, parameters);
 
             //Assert
-            AssertFailureWithKnownError(result, error, transaction);
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
         }
 
-        [Fact]
-        public void Cannot_CreateWith_SystemUsages_If_RemoveSystem_Fails()
-        {
-            //Arrange
-            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(systemUsageUuids:new List<Guid>());
-
-            var existingIds = Many<Guid>().ToList();
-            var entityMap = existingIds
-                .ToDictionary(uuid => uuid, uuid => new ItSystemUsage { Uuid = uuid, Id = A<int>() });
-
-            entityMap.Keys.ToList().ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<ItSystemUsage>(uuid, entityMap[uuid].Id));
-
-            createdRegistration.SystemUsages = existingIds.Select(id => entityMap[id]).ToList();
-
-            var failingRemoval = existingIds.First();
-            var error = A<OperationError>();
-            _dprServiceMock.Setup(x => x.RemoveSystem(createdRegistration.Id, entityMap[failingRemoval].Id)).Returns(error);
-
-            //Act
-            var result = _sut.Create(organizationUuid, parameters);
-
-            //Assert
-            AssertFailureWithKnownError(result, error, transaction);
-        }
 
         [Fact]
         public void Can_Delete()
@@ -1188,8 +1137,31 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
         }
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void Can_Create_With_Oversight_OversightOptions(bool hasOversightOptions)
+        {
+            //Arrange
+            var inputUuids = hasOversightOptions ? Many<Guid>().ToList() : new List<Guid>();
+            var oversightData = new UpdatedDataProcessingRegistrationOversightDataParameters()
+            {
+                OversightOptionUuids = inputUuids.FromNullable<IEnumerable<Guid>>().AsChangedValue()
+            };
+            var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
+
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingOversightOption>(createdRegistration, inputUuids, Maybe<OperationError>.None);
+
+            //Act
+            var result = _sut.Create(organizationUuid, parameters);
+
+            //Assert
+            Assert.True(result.Ok);
+            AssertTransactionCommitted(transaction);
+        }
+
         [Fact]
-        public void Can_Create_With_Oversight_OversightOptions()
+        public void Cannot_Create_With_Oversight_OversightOptions_If_UpdateMultiAssignment_Fails()
         {
             //Arrange
             var inputUuids = Many<Guid>().ToList();
@@ -1199,43 +1171,15 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             };
             var (organizationUuid, parameters, createdRegistration, transaction) = SetupCreateScenarioPrerequisites(oversightData: oversightData);
 
-            //Make sure we have som existing countries and add one which is shared with the new state. That one, we don't expect to be removed
-            var existingOversightOptionsAssigmentIds = Many<Guid>().Append(inputUuids.RandomItem()).ToList();
-            var optionMap = inputUuids
-                .Concat(existingOversightOptionsAssigmentIds)
-                .Distinct()
-                .ToDictionary(uuid => uuid, uuid => new DataProcessingOversightOption() { Uuid = uuid, Id = A<int>() });
+            var operationError = A<OperationError>();
+            ExpectUpdateMultiAssignmentReturns<int, DataProcessingOversightOption>(createdRegistration, inputUuids, operationError);
 
-            createdRegistration.OversightOptions = existingOversightOptionsAssigmentIds.Select(uuid => optionMap[uuid]).ToList();
-            inputUuids.ForEach(uuid => ExpectIfUuidHasValueResolveIdentityDbIdReturnsId<DataProcessingOversightOption>(uuid, optionMap[uuid].Id));
-
-            var expectedRemovals = existingOversightOptionsAssigmentIds.Except(inputUuids).ToList();
-            var expectedAdditions = inputUuids.Except(existingOversightOptionsAssigmentIds).ToList();
-            foreach (var expectedRemoval in expectedRemovals)
-                _dprServiceMock.Setup(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id)).Returns(optionMap[expectedRemoval]);
-
-            foreach (var expectedAddition in expectedAdditions)
-                _dprServiceMock.Setup(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id)).Returns(optionMap[expectedAddition]);
-            
             //Act
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            Assert.True(result.Ok);
-            Assert.Same(createdRegistration, result.Value);
-            AssertTransactionCommitted(transaction);
-
-            foreach (var expectedRemoval in expectedRemovals)
-            {
-                _dprServiceMock.Verify(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedRemoval].Id), Times.Never);
-            }
-
-            foreach (var expectedAddition in expectedAdditions)
-            {
-                _dprServiceMock.Verify(x => x.AssignOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Once);
-                _dprServiceMock.Verify(x => x.RemoveOversightOption(createdRegistration.Id, optionMap[expectedAddition].Id), Times.Never);
-            }
+            Assert.True(result.Failed);
+            AssertFailureWithKnownError(result, operationError, transaction);
         }
 
         [Theory]
@@ -2046,7 +1990,7 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             _databaseControlMock.Verify(x => x.SaveChanges(), Times.AtLeastOnce);
             transactionMock.Verify(x => x.Commit());
         }
-        private void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
+        private static void AssertTransactionNotCommitted(Mock<IDatabaseTransaction> transactionMock)
         {
             transactionMock.Verify(x => x.Commit(), Times.Never);
         }
@@ -2062,6 +2006,21 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         {
             if (uuid.HasValue)
                 _identityResolverMock.Setup(x => x.ResolveDbId<T>(uuid.Value)).Returns(dbId);
+        }
+
+        private void ExpectUpdateMultiAssignmentReturns<TAssignmentInput, TAssignmentState>(DataProcessingRegistration registration, Maybe<IEnumerable<Guid>> assignmentUuids, Maybe<OperationError> result)
+            where TAssignmentState : class, IHasId, IHasUuid
+        {
+            _assignmentUpdateServiceMock
+                .Setup(x => x.UpdateUniqueMultiAssignment(
+                    It.IsAny<string>(),
+                    registration,
+                    assignmentUuids,
+                    It.IsAny<Func<Guid, Result<TAssignmentInput, OperationError>>>(),
+                    It.IsAny<Func<DataProcessingRegistration, IEnumerable<TAssignmentState>>>(),
+                    It.IsAny<Func<DataProcessingRegistration, TAssignmentInput, Maybe<OperationError>>>(),
+                    It.IsAny<Func<DataProcessingRegistration, TAssignmentState, Maybe<OperationError>>>()))
+                .Returns(result);
         }
     }
 }

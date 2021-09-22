@@ -1,5 +1,6 @@
 ﻿using System;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Types;
+
 using Xunit;
 
 namespace Tests.Unit.Core.Model

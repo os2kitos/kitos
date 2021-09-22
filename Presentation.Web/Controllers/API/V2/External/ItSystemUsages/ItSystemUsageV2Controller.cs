@@ -5,22 +5,20 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Results;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.ItSystemUsage;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.SystemUsage;
-using Infrastructure.Services.Types;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Request.SystemUsage;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.SystemUsage;
-using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
@@ -55,10 +53,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="organizationUuid">Query usages within a specific organization</param>
         /// <param name="relatedToSystemUuid">Query by systems with outgoing relations related to another system</param>
         /// <param name="relatedToSystemUsageUuid">Query by system usages with outgoing relations to a specific system usage (more narrow search than using system id)</param>
+        /// <param name="relatedToContractUuid">Query by contracts which are part of a system relation</param>
         /// <param name="systemUuid">Query usages of a specific system</param>
         /// <returns></returns>
         [HttpGet]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<ItSystemUsageResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
@@ -66,6 +65,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
             [NonEmptyGuid] Guid? organizationUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUuid = null,
             [NonEmptyGuid] Guid? relatedToSystemUsageUuid = null,
+            [NonEmptyGuid] Guid? relatedToContractUuid = null,
             [NonEmptyGuid] Guid? systemUuid = null,
             string systemNameContent = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
@@ -83,6 +83,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
 
             if (relatedToSystemUsageUuid.HasValue)
                 conditions.Add(new QueryByRelationToSystemUsage(relatedToSystemUsageUuid.Value));
+
+            if (relatedToContractUuid.HasValue)
+                conditions.Add(new QueryByRelationToContract(relatedToContractUuid.Value));
 
             if (systemUuid.HasValue)
                 conditions.Add(new QueryBySystemUuid(systemUuid.Value));
@@ -150,7 +153,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("")]
+        [Route]
         [SwaggerResponse(HttpStatusCode.Created, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Conflict, description: "Another system usage has already been created for the system within the specified organization")]
@@ -168,7 +171,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Updates the properties of the system usage.
+        /// Perform a full update of an existing system usage.
+        /// Note: PUT expects a full version of the system usage. For partial updates, please use PATCH.
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
@@ -193,183 +197,29 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages
         }
 
         /// <summary>
-        /// Updates the general properties of the system usage.
+        /// Allows partial updates of an existing system usage
+        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
+        /// If the section is not provided in the json, the omitted section will remain unchanged.
+        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety.
         /// </summary>
         /// <param name="systemUsageUuid"></param>
         /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/general")]
+        [HttpPatch]
+        [Route("{systemUsageUuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGeneralProperties([NonEmptyGuid] Guid systemUsageUuid, [FromBody] GeneralDataUpdateRequestDTO request)
+        public IHttpActionResult PatchSystemUsage([NonEmptyGuid] Guid systemUsageUuid, [FromBody] UpdateItSystemUsageRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    GeneralProperties = _writeModelMapper.MapGeneralDataUpdate(request)
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the role assignments of the system usage.
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/roles")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageRoleAssignments([NonEmptyGuid] Guid systemUsageUuid, [FromBody] IEnumerable<RoleAssignmentRequestDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            var updateParameters = _writeModelMapper.FromPATCH(request);
 
             return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    Roles = _writeModelMapper.MapRoles(request)
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the kle deviations of the system usage
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/kle")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageKleDeviations([NonEmptyGuid] Guid systemUsageUuid, [FromBody] LocalKLEDeviationsRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    KLE = _writeModelMapper.MapKle(request)
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the external references of the system usage
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/external-references")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageExternalReferences([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] IEnumerable<ExternalReferenceDataDTO> request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    ExternalReferences = _writeModelMapper.MapReferences(request).FromNullable()
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the archiving registrations of the system usage
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/archiving")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageArchiving([NonEmptyGuid] Guid systemUsageUuid, [FromBody] ArchivingWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    Archiving = _writeModelMapper.MapArchiving(request)
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the GDPR registrations of the system usage
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/gdpr")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageGDPR([NonEmptyGuid] Guid systemUsageUuid, [FromBody][Required] GDPRWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    GDPR = _writeModelMapper.MapGDPR(request)
-                })
-                .Select(_responseMapper.MapSystemUsageDTO)
-                .Match(Ok, FromOperationError);
-        }
-
-        /// <summary>
-        /// Updates the organizational references for the system usage
-        /// </summary>
-        /// <param name="systemUsageUuid"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("{systemUsageUuid}/organization-usage")]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ItSystemUsageResponseDTO))]
-        [SwaggerResponse(HttpStatusCode.BadRequest)]
-        [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        [SwaggerResponse(HttpStatusCode.NotFound)]
-        [SwaggerResponse(HttpStatusCode.Forbidden)]
-        public IHttpActionResult PutSystemUsageOrganizationUsage([NonEmptyGuid] Guid systemUsageUuid, [FromBody] OrganizationUsageWriteRequestDTO request)
-        {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
-            return _writeService
-                .Update(systemUsageUuid, new SystemUsageUpdateParameters
-                {
-                    OrganizationalUsage = _writeModelMapper.MapOrganizationalUsage(request)
-                })
+                .Update(systemUsageUuid, updateParameters)
                 .Select(_responseMapper.MapSystemUsageDTO)
                 .Match(Ok, FromOperationError);
         }

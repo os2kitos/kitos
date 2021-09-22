@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Extensions;
@@ -18,6 +20,7 @@ using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -26,15 +29,13 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.GDPR;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Options;
 using Core.DomainServices.Role;
 using Core.DomainServices.SystemUsage;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Moq.Language.Flow;
 using Serilog;
@@ -1375,18 +1376,15 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var roleUuid = A<Guid>();
-            var userUuid = A<Guid>();
 
-            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                CreateUserRolePair(roleUuid, userUuid)
-            });
+            var userRolePairs = Many<UserRolePair>().ToList();
 
-            var right = CreateRight(itSystemUsage, roleUuid, userUuid);
+            var input = CreateSystemUsageUpdateParametersWithData(userRolePairs);
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, right);
+            _roleAssignmentService
+                .Setup(x => x.BatchUpdateRoles(itSystemUsage, It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments => MatchExpectedAssignments(assignments, userRolePairs))))
+                .Returns(Maybe<OperationError>.None);
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
@@ -1397,81 +1395,26 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
         }
 
         [Fact]
-        public void Can_Create_With_No_Roles()
+        public void Cannot_Create_With_Roles_If_BatchUpdateRoles_Fails()
         {
             //Arrange
             var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
 
-            var input = CreateSystemUsageUpdateParametersWithoutData();
+            var userRolePairs = Many<UserRolePair>().ToList();
+
+            var input = CreateSystemUsageUpdateParametersWithData(userRolePairs);
 
             SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
+            var updateError = A<OperationError>();
+            _roleAssignmentService
+                .Setup(x => x.BatchUpdateRoles(itSystemUsage, It.Is<IEnumerable<(Guid roleUuid, Guid user)>>(assignments => MatchExpectedAssignments(assignments, userRolePairs))))
+                .Returns(updateError);
 
             //Act
             var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
 
             //Assert
-            Assert.True(createResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-        }
-
-        [Fact]
-        public void Cannot_Create_With_Roles_If_Role_Assignment_Fails()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-            var roleUuid = A<Guid>();
-            var userUuid = A<Guid>();
-
-            var input = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                CreateUserRolePair(roleUuid, userUuid)
-            });
-            var error = A<OperationFailure>();
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, roleUuid, userUuid, new OperationError(error));
-
-            //Act
-            var createResult = _sut.Create(new SystemUsageCreationParameters(systemUuid, organizationUuid, input));
-
-            //Assert
-            AssertFailure(createResult, error, transactionMock);
-        }
-
-        [Fact]
-        public void Can_Update_Roles_To_Remove_Them()
-        {
-            //Arrange
-            var (systemUuid, organizationUuid, transactionMock, organization, itSystem, itSystemUsage) = CreateBasicTestVariables();
-
-            var newRight = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var newUserRolePair = CreateUserRolePair(newRight.Role.Uuid, newRight.User.Uuid);
-
-            SetupBasicCreateThenUpdatePrerequisites(organizationUuid, organization, systemUuid, itSystem, itSystemUsage);
-            ExpectRoleAssignmentReturns(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid, newRight);
-
-            var rightToRemove1 = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var rightToKeep = CreateRight(itSystemUsage, A<Guid>(), A<Guid>());
-            var userRolePairToKeep = CreateUserRolePair(rightToKeep.Role.Uuid, rightToKeep.User.Uuid);
-            itSystemUsage.Rights.Add(rightToRemove1);
-            itSystemUsage.Rights.Add(rightToKeep);
-
-            var roleInput = CreateSystemUsageUpdateParametersWithData(new List<UserRolePair>()
-            {
-                newUserRolePair, userRolePairToKeep
-            });
-
-            ExpectRoleRemoveReturns(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid, rightToRemove1);
-            ExpectGetSystemUsageReturns(itSystemUsage.Uuid, itSystemUsage);
-
-            //Act
-            var updateResult = _sut.Update(itSystemUsage.Uuid, roleInput);
-
-            //Assert
-            Assert.True(updateResult.Ok);
-            AssertTransactionCommitted(transactionMock);
-            AssertRemoveRoleCalledOnce(itSystemUsage, rightToRemove1.Role.Uuid, rightToRemove1.User.Uuid);
-            AssertAssignRoleCalledOnce(itSystemUsage, newRight.Role.Uuid, newRight.User.Uuid);
+            AssertFailureWithExpectedOperationError(createResult, updateError, transactionMock);
         }
 
         [Fact]
@@ -2648,26 +2591,6 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             };
         }
 
-        private void AssertAssignRoleCalledOnce(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
-        {
-            _roleAssignmentService.Verify(x => x.AssignRole(itSystemUsage, roleUuid, userUuid), Times.Once);
-        }
-
-        private void AssertRemoveRoleCalledOnce(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid)
-        {
-            _roleAssignmentService.Verify(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid), Times.Once);
-        }
-
-        private void ExpectRoleAssignmentReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
-        {
-            _roleAssignmentService.Setup(x => x.AssignRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
-        }
-
-        private void ExpectRoleRemoveReturns(ItSystemUsage itSystemUsage, Guid roleUuid, Guid userUuid, Result<ItSystemRight, OperationError> result)
-        {
-            _roleAssignmentService.Setup(x => x.RemoveRole(itSystemUsage, roleUuid, userUuid)).Returns(result);
-        }
-
         private (Guid systemUuid, Guid organizationUuid, Mock<IDatabaseTransaction> transactionMock, Organization organization, ItSystem itSystem, ItSystemUsage itSystemUsage) CreateBasicTestVariables()
         {
             var systemUuid = A<Guid>();
@@ -2781,6 +2704,11 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             var trasactionMock = new Mock<IDatabaseTransaction>();
             _transactionManagerMock.Setup(x => x.Begin()).Returns(trasactionMock.Object);
             return trasactionMock;
+        }
+
+        private static bool MatchExpectedAssignments(IEnumerable<(Guid roleUuid, Guid user)> actual, List<UserRolePair> expected)
+        {
+            return actual.SequenceEqual(expected.Select(p => (roleUuid: p.RoleUuid, user: p.UserUuid)));
         }
     }
 }

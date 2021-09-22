@@ -102,6 +102,8 @@
     <Compile Include="Authorization\UnauthenticatedAuthorizationContext.cs" />
     <Compile Include="Authorization\UnauthenticatedUserContext.cs" />
     <Compile Include="Authorization\UserContextFactory.cs" />
+    <Compile Include="Contract\Write\IItContractWriteService.cs" />
+    <Compile Include="Contract\Write\ItContractWriteService.cs" />
     <Compile Include="Extensions\ChangedValueExtensions.cs" />
     <Compile Include="Extensions\IAuthorizationContextExtensions.cs" />
     <Compile Include="Authorization\Policies\GlobalReadAccessPolicy.cs" />
@@ -114,10 +116,24 @@
     <Compile Include="GDPR\IDataProcessingRegistrationApplicationService.cs" />
     <Compile Include="GDPR\Write\DataProcessingRegistrationWriteService.cs" />
     <Compile Include="GDPR\Write\IDataProcessingRegistrationWriteService.cs" />
+    <Compile Include="Generic\Write\IAssignmentUpdateService.cs" />
+    <Compile Include="Generic\Write\AssignmentUpdateService.cs" />
     <Compile Include="Helpers\CronPatternDefaults.cs" />
     <Compile Include="Helpers\CronStringHelper.cs" />
     <Compile Include="IAdviceService.cs" />
     <Compile Include="IUserService.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractAgreementPeriodModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractGeneralDataModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractHandoverTrialUpdate.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPayment.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPaymentDataModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPaymentMilestone.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractPaymentModelModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractResponsibleDataModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractProcurementModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractSupplierModificationParameters.cs" />
+    <Compile Include="Model\Contracts\Write\ItContractTerminationParameters.cs" />
     <Compile Include="Model\GDPR\Write\DataProcessingRegistrationModificationParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationGeneralDataParameters.cs" />
     <Compile Include="Model\GDPR\Write\UpdatedDataProcessingRegistrationOversightDataParameters.cs" />
@@ -147,6 +163,7 @@
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
+    <Compile Include="OptionTypes\IOptionResolver.cs" />
     <Compile Include="OptionTypes\OptionsApplicationService.cs" />
     <Compile Include="OptionTypes\IOptionsApplicationService.cs" />
     <Compile Include="Model\EventHandler\DataProcessingRegistrationDeletedUserNotificationsHandler.cs" />
@@ -246,6 +263,10 @@
     <Compile Include="UserService.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
       <Name>Core.DomainModel</Name>
@@ -257,10 +278,6 @@
     <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Soap\Infrastructure.Soap.csproj">
-      <Project>{a05389ea-25f4-45b5-8534-0775d9671456}</Project>
-      <Name>Infrastructure.Soap</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

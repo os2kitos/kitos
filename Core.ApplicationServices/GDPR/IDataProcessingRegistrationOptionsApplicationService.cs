@@ -1,5 +1,5 @@
-﻿using Core.ApplicationServices.Model.GDPR;
-using Core.DomainModel.Result;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.GDPR;
 
 namespace Core.ApplicationServices.GDPR
 {

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using Core.Abstractions.Types;
 using Core.DomainModel.KLE;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.KLE
 {

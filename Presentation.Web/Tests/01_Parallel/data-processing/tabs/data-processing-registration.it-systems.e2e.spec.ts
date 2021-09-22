@@ -29,7 +29,7 @@ describe("Data processing registration it-systems test", () => {
             .then(() => testFixture.cleanupState())
             .then(() => loginHelper.loginAsLocalAdmin())
             .then(() => dpaHelper.checkAndEnableDpaModule());
-    });
+    }, testFixture.longRunningSetup());
 
     afterAll(() => {
         testFixture.cleanupState();

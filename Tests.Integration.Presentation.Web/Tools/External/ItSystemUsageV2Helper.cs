@@ -35,6 +35,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? systemUuidFilter = null,
             Guid? relationToSystemUuidFilter = null,
             Guid? relationToSystemUsageUuidFilter = null,
+            Guid? relationToContractUuidFilter = null,
             string systemNameContentFilter = null,
             int? page = null,
             int? pageSize = null)
@@ -52,6 +53,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (relationToSystemUsageUuidFilter.HasValue)
                 criteria.Add(new KeyValuePair<string, string>("relatedToSystemUsageUuid", relationToSystemUsageUuidFilter.Value.ToString()));
+
+            if (relationToContractUuidFilter.HasValue)
+                criteria.Add(new KeyValuePair<string, string>("relatedToContractUuid", relationToContractUuidFilter.Value.ToString()));
 
             if (!string.IsNullOrWhiteSpace(systemNameContentFilter))
                 criteria.Add(new KeyValuePair<string, string>("systemNameContent", systemNameContentFilter));
@@ -104,39 +108,39 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto);
         }
 
-        public static async Task<HttpResponseMessage> SendPutGeneral(string token, Guid uuid, GeneralDataUpdateRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchGeneral(string token, Guid uuid, GeneralDataUpdateRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/general"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.General)));
         }
 
-        public static async Task<HttpResponseMessage> SendPutOrganizationalUsage(string token, Guid uuid, OrganizationUsageWriteRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchOrganizationalUsage(string token, Guid uuid, OrganizationUsageWriteRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/organization-usage"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage)));
         }
 
-        public static async Task<HttpResponseMessage> SendPutKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchKle(string token, Guid uuid, LocalKLEDeviationsRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/kle"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations)));
         }
 
-        public static async Task<HttpResponseMessage> SendPutExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
+        public static async Task<HttpResponseMessage> SendPatchExternalReferences(string token, Guid uuid, IEnumerable<ExternalReferenceDataDTO> payload)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/external-references"), token, payload?.ToList() ?? new List<ExternalReferenceDataDTO>());
-		}
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, (payload ?? new List<ExternalReferenceDataDTO>()).AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences)));
+        }
 		
-        public static async Task<HttpResponseMessage> SendPutRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
+        public static async Task<HttpResponseMessage> SendPatchRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/roles"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Roles)));
         }
         
-        public static async Task<HttpResponseMessage> SendPutGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/gdpr"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));
         }
 
-        public static async Task<HttpResponseMessage> SendPutArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
+        public static async Task<HttpResponseMessage> SendPatchArchiving(string token, Guid uuid, ArchivingWriteRequestDTO dto)
         {
-            return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/archiving"), token, dto);
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Archiving)));
         }
 
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)

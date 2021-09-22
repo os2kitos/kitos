@@ -11,7 +11,7 @@ using Swashbuckle.OData;
 using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Net;
-using Infrastructure.Services.DomainEvents;
+using Core.DomainModel.Events;
 
 namespace Presentation.Web.Controllers.API.V1.OData
 {

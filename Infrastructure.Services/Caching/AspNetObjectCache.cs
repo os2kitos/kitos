@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Caching;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Types;
+
 
 namespace Infrastructure.Services.Caching
 {

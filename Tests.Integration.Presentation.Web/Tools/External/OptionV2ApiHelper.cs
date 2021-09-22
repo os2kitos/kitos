@@ -22,7 +22,20 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItSystemUsageArchiveTestLocations = "it-system-usage-archive-test-location-types";
             public const string ItSystemUsageArchiveLocations = "it-system-usage-archive-location-types";
             public const string ItSystemUsageRoles = "it-system-usage-role-types";
+
             public const string ItContractContractTypes = "it-contract-contract-types";
+            public const string ItContractContractTemplateTypes = "it-contract-contract-template-types";
+            public const string ItContractPurchaseTypes = "it-contract-purchase-types";
+            public const string ItContractPaymentModelTypes = "it-contract-payment-model-types";
+            public const string ItContractAgreementElementTypes = "it-contract-agreement-element-types";
+            public const string ItContractPaymentFrequencyTypes = "it-contract-payment-frequency-types";
+            public const string ItContractPriceRegulationTypes = "it-contract-price-regulation-types";
+            public const string ItContractProcurementStrategyTypes = "it-contract-procurement-strategy-types";
+            public const string ItContractAgreementExtensionOptionTypes = "it-contract-agreement-extension-option-types";
+            public const string ItContractNoticePeriodMonthTypes = "it-contract-notice-period-month-types";
+            public const string ItContractHandoverTrialTypes = "it-contract-handover-trial-types";
+            public const string ItContractRoles = "it-contract-role-types";
+
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registration-data-responsible-types";
             public const string DataProcessingRegistrationBasisForTransfer = "data-processing-registration-basis-for-transfer-types";
             public const string DataProcessingRegistrationCountry = "data-processing-registration-country-types";

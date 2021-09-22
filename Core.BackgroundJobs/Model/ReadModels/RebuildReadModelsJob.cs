@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.DomainModel.BackgroundJobs;
-using Core.DomainModel.Result;
 using Core.DomainServices.Repositories.BackgroundJobs;
 
 namespace Core.BackgroundJobs.Model.ReadModels

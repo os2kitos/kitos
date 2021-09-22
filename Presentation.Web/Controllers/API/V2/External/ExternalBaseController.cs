@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 using System.Web.Http;
-using Core.DomainModel.Result;
+using Core.Abstractions.Types;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 

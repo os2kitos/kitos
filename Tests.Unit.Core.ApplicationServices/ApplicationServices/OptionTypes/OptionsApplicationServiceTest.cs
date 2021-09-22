@@ -2,15 +2,15 @@
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Options;
 using Core.DomainServices.Repositories.Organization;
-using Infrastructure.Services.Types;
+
 using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Tests.Toolkit.Patterns;
 using Xunit;
 

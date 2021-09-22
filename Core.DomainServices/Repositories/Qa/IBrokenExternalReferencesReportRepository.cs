@@ -1,5 +1,6 @@
-﻿using Core.DomainModel.Qa.References;
-using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.Qa.References;
+
 
 namespace Core.DomainServices.Repositories.Qa
 {

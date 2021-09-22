@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.SystemUsage
 {

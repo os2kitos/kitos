@@ -113,6 +113,7 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
     <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />
     <Compile Include="Contract\V2\ItContractsApiV2Test.cs" />
@@ -203,6 +204,10 @@
     <Analyzer Include="..\packages\xunit.analyzers.0.10.0\analyzers\dotnet\cs\xunit.analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

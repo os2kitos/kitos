@@ -44,11 +44,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApplicationServices\NinjectIOptionResolver.cs" />
     <Compile Include="DomainServices\NinjectDomainEventsAdapter.cs" />
     <Compile Include="DomainServices\NinjectEntityIdentityResolver.cs" />
+    <Compile Include="DomainServices\NinjectEntityResolver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
+      <Project>{F0986888-8F35-4559-8FBA-428BC9EC9ADD}</Project>
+      <Name>Core.ApplicationServices</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
       <Project>{A76A8E41-74F7-4443-A5F3-059B5414D83B}</Project>
       <Name>Core.DomainModel</Name>
@@ -57,13 +67,10 @@
       <Project>{ADCACC1D-F538-464C-9102-F4C1D6FA35D3}</Project>
       <Name>Core.DomainServices</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.Services\Infrastructure.Services.csproj">
-      <Project>{0326CAE6-87A1-4D66-84AE-EB8CE0340E9F}</Project>
-      <Name>Infrastructure.Services</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

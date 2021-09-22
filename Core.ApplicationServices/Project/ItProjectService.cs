@@ -1,12 +1,14 @@
 using System;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItProject;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
@@ -14,8 +16,7 @@ using Core.DomainServices.Factories;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Project;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.Project
 {

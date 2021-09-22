@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Shared;
-using Infrastructure.Services.Types;
+
 using Microsoft.Owin;
 using Ninject;
 

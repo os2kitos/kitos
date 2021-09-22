@@ -1,5 +1,6 @@
-﻿using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.Events;
+
 
 namespace Core.DomainModel.ItSystem.DomainEvents
 {

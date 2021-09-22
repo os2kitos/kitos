@@ -1,9 +1,9 @@
-﻿using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
+﻿using Core.Abstractions.Types;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Core.DomainServices.GDPR;
 using Core.DomainServices.Options;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

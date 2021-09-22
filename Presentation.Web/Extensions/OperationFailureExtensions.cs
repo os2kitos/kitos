@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using Core.DomainModel.Result;
+using Core.Abstractions.Types;
 
 namespace Presentation.Web.Extensions
 {

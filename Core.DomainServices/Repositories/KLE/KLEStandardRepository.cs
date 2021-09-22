@@ -4,6 +4,8 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
+using Core.Abstractions.Types;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -11,9 +13,8 @@ using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
 using Infrastructure.Services.KLEDataBridge;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.DomainServices.Repositories.KLE

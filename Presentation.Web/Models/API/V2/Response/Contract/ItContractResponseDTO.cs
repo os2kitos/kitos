@@ -1,56 +1,62 @@
 ﻿using Presentation.Web.Models.API.V2.SharedProperties;
 using System;
 using System.Collections.Generic;
+using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
+using Presentation.Web.Models.API.V2.Response.Generic.Roles;
 using Presentation.Web.Models.API.V2.Response.Organization;
+using Presentation.Web.Models.API.V2.Types.Shared;
 
 namespace Presentation.Web.Models.API.V2.Response.Contract
 {
-    public class ItContractResponseDTO : IHasNameExternal, IHasUuidExternal, IHasValidationExternal
+    public class ItContractResponseDTO : IHasNameExternal, IHasUuidExternal, IHasLastModified, IHasEntityCreator
     {
         /// <summary>
         /// UUID for IT-Contract
         /// </summary>
         public Guid Uuid { get; set; }
-
         /// <summary>
         /// Name of IT-Contract
         /// </summary>
         public string Name { get; set; }
-
         /// <summary>
-        /// Contract type of IT-Contract
+        /// Organization in which the contract was created
         /// </summary>
-        public IdentityNamePairResponseDTO ContractType { get; set; }
-
+        public ShallowOrganizationResponseDTO OrganizationContext { get; set; }
+        public DateTime LastModified { get; set; }
         /// <summary>
-        /// Supplier of It-Contract
+        /// Reference to the user who last modified the contract
         /// </summary>
-        public ShallowOrganizationResponseDTO Supplier { get; set; }
-
+        public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
         /// <summary>
-        /// Agreement element option types set on the IT-Contract
+        /// Reference to the user who created the contract
         /// </summary>
-        public IEnumerable<IdentityNamePairResponseDTO> AgreementElements { get; set; }
-
+        public IdentityNamePairResponseDTO CreatedBy { get; set; }
         /// <summary>
-        /// Date when IT-Contract is entered into agreement 
+        /// Optional parent contract
         /// </summary>
-        public DateTime? ValidFrom { get; set; }
-
+        public IdentityNamePairResponseDTO ParentContract { get; set; }
+        public ContractGeneralDataResponseDTO General { get; set; }
+        public ContractProcurementDataResponseDTO Procurement { get; set; }
+        public ContractSupplierDataResponseDTO Supplier { get; set; }
+        public ContractResponsibleDataResponseDTO Responsible { get; set; }
         /// <summary>
-        /// Date when IT-Contract will expire
+        /// Associated IT-System usages
         /// </summary>
-        public DateTime? ValidTo { get; set; }
-
+        public IEnumerable<IdentityNamePairResponseDTO> SystemUsages { get; set; }
         /// <summary>
-        /// Date when IT-Contract is terminated
+        /// Data processing registrations associated with this it-contract
         /// </summary>
-        public DateTime? TerminatedAt { get; set; }
-
+        public IEnumerable<IdentityNamePairResponseDTO> DataProcessingRegistrations { get; set; }
+        public IEnumerable<HandoverTrialResponseDTO> HandoverTrials { get; set; }
+        public ContractPaymentModelDataResponseDTO PaymentModel { get; set; }
+        public ContractAgreementPeriodDataResponseDTO AgreementPeriod { get; set; }
+        public ContractTerminationDataResponseDTO Termination { get; set; }
+        public ContractPaymentsDataResponseDTO Payments { get; set; }
         /// <summary>
-        /// Whether the IT-Contract is active or not
+        /// Role assignments
         /// </summary>
-        public bool IsValid { get; set; }
+        public IEnumerable<RoleAssignmentResponseDTO> Roles { get; set; }
+        public IEnumerable<ExternalReferenceDataDTO> ExternalReferences { get; set; }
     }
 }

@@ -362,8 +362,26 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPriceRegulationTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractProcurementStrategyV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementExtensionOptionsTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractNoticePeriodMonthTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractHandoverTrialTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPurchaseTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTemplateTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractContractTypeV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\PaymentAuditStatusMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractResponseMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\YearSegmentMappingExtension.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
@@ -392,12 +410,45 @@
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
+    <Compile Include="Infrastructure\Model\Request\CurrentAspNetRequest.cs" />
+    <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractPaymentModelDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractPaymentsDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractResponsibleDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractSupplierDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractTerminationDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\CreateNewContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractProcurementDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\HandoverTrialRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
+    <Compile Include="Models\API\V2\Types\Contract\PaymentMileStoneDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
+    <Compile Include="Models\API\V2\Request\Generic\Validity\ValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\CreateDataProcessingRegistrationRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationGeneralDataWriteRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractAgreementPeriodDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractGeneralDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractPaymentModelDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractPaymentsDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractProcurementDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractResponsibleDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractSupplierDataResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Contract\ContractTerminationDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationGeneralDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationOversightResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Types\Contract\YearSegmentChoice.cs" />
     <Compile Include="Models\API\V2\Types\DataProcessing\OversightDateDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\DataProcessingRegistrationOversightWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\ArchivingWriteRequestDTO.cs" />
@@ -407,7 +458,6 @@
     <Compile Include="Models\API\V2\Request\SystemUsage\LocalKLEDeviationsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\OrganizationUsageWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\SystemUsage\SystemRelationWriteRequestDTO.cs" />
-    <Compile Include="Models\API\V2\Request\SystemUsage\ValidityWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\DataProcessing\DataProcessingRegistrationResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GeneralDataResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\OrganizationUsageResponseDTO.cs" />
@@ -436,12 +486,11 @@
     <Compile Include="Models\API\V2\Types\Shared\YesNoUndecidedChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\JournalPeriodDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageResponseDTO.cs" />
-    <Compile Include="Models\API\V2\Response\SystemUsage\ItSystemUsageValidityResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Generic\Validity\ValidityResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\LocalKLEDeviationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\ArchivingRegistrationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Shared\SimpleLinkDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\SystemRelationResponseDTO.cs" />
-    <Compile Include="Models\API\V2\SharedProperties\IHasValidationExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasUuidExternal.cs" />
     <Compile Include="Models\API\V2\SharedProperties\IHasNameExternal.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\ExpectedUsersIntervalDTO.cs" />
@@ -648,6 +697,7 @@
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
@@ -928,7 +978,6 @@
     <Compile Include="Controllers\API\V1\TaskUsageController.cs" />
     <Compile Include="Models\API\V1\CreateGlobalAdminDTO.cs" />
     <Compile Include="Models\API\V1\CreateLocalAdminDTO.cs" />
-    <Compile Include="Controllers\API\V1\GenericOptionApiController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationUnitController.cs" />
     <Compile Include="Controllers\API\V1\GlobalAdminController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationController.cs" />
@@ -1228,8 +1277,6 @@
     <TypeScriptCompile Include="app\shared\showStatus\showStatus.directive.ts" />
     <TypeScriptCompile Include="app\components\it-project\simpleComment.directive.ts" />
     <TypeScriptCompile Include="app\components\it-project\squareTrafficLight.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\suggestNew\suggestNew.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\suggestNewRole\suggestNewRole.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\unique.directive.ts" />
     <TypeScriptCompile Include="app\components\org\uniqueEmail.directive.ts" />
     <TypeScriptCompile Include="app\components\it-system\uniqueItInterfaceIdName.directive.ts" />
@@ -1375,8 +1422,6 @@
     <Content Include="app\components\local-config\local-config-system.view.html" />
     <Content Include="app\components\local-config\local-config-project.view.html" />
     <Content Include="app\components\local-config\local-config-org.view.html" />
-    <Content Include="app\components\local-config\suggestNewRole\suggestNewRole.view.html" />
-    <Content Include="app\components\local-config\suggestNew\suggestNew.view.html" />
     <Content Include="app\components\org\structure\org-structure-modal-edit.view.html" />
     <Content Include="app\components\org\overview\org-overview.view.html" />
     <Content Include="app\components\org\overview\org-overview-modal-comment.view.html" />
@@ -1636,6 +1681,10 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
+      <Project>{BD8C90E7-52C7-4AD0-935D-98A2AA89E449}</Project>
+      <Name>Core.Abstractions</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.ApplicationServices\Core.ApplicationServices.csproj">
       <Project>{f0986888-8f35-4559-8fba-428bc9ec9add}</Project>
       <Name>Core.ApplicationServices</Name>

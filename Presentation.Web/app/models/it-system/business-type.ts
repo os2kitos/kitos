@@ -3,7 +3,6 @@
     export interface IBusinessType extends IEntity {
         Name: string;
         IsActive: boolean;
-        IsSuggestion: boolean;
         Note: string;
         /** The ItSystems that has been marked with this BusinessType */
         References: Array<IItSystem>;

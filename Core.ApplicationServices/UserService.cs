@@ -8,15 +8,16 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Security.Cryptography;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
+using Core.DomainModel.Events;
 using Infrastructure.Services.Cryptography;
-using Infrastructure.Services.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices
 {

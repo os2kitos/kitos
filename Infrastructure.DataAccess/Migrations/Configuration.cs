@@ -734,9 +734,8 @@ namespace Infrastructure.DataAccess.Migrations
         /// <param name="objectOwner">Object owner of the new entity</param>
         /// <param name="note">Description for the entity</param>
         /// <param name="isActive">Is the option active</param>
-        /// <param name="isSuggestion">Is the option an suggestion</param>
         /// <returns></returns>
-        private static T CreateOption<T, TReference>(string name, User objectOwner, string description = "...", bool isActive = true, bool isSuggestion = false, bool isObligatory = true, bool isEnabled = true)
+        private static T CreateOption<T, TReference>(string name, User objectOwner, string description = "...", bool isActive = true, bool isObligatory = true, bool isEnabled = true)
             where T : OptionEntity<TReference>, new()
         {
             return new T()
@@ -744,7 +743,6 @@ namespace Infrastructure.DataAccess.Migrations
                 IsObligatory = isObligatory,
                 IsEnabled = isEnabled,
                 IsLocallyAvailable = isActive,
-                IsSuggestion = isSuggestion,
                 Name = name,
                 Description = description,
                 ObjectOwnerId = objectOwner.Id,
@@ -788,7 +786,8 @@ namespace Infrastructure.DataAccess.Migrations
                 Config = Config.Default(objectOwner),
                 TypeId = organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
-                LastChangedByUserId = objectOwner?.Id
+                LastChangedByUserId = objectOwner?.Id,
+                AccessModifier = AccessModifier.Public
             };
 
             org.OrgUnits.Add(new OrganizationUnit

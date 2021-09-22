@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.DomainModel.ItProject;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.Project
 {

@@ -1,6 +1,6 @@
 ﻿using Core.DomainServices;
 using System.Net.Mail;
-using Infrastructure.Services.Delegates;
+using Core.Abstractions.Types;
 
 namespace Core.ApplicationServices
 {

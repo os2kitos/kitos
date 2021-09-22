@@ -1,11 +1,11 @@
 ﻿using Core.DomainModel.Notification;
-using Core.DomainModel.Result;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 
 namespace Core.DomainServices.Repositories.Notification
 {

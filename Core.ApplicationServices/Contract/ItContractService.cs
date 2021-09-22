@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
+using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItContract.DomainEvents;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -16,8 +18,7 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
-using Infrastructure.Services.DomainEvents;
-using Infrastructure.Services.Types;
+
 using Serilog;
 
 namespace Core.ApplicationServices.Contract
@@ -33,6 +34,7 @@ namespace Core.ApplicationServices.Contract
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
         private readonly IOrganizationService _organizationService;
+        private readonly IOrganizationalUserContext _userContext;
 
         public ItContractService(
             IItContractRepository repository,
@@ -43,7 +45,8 @@ namespace Core.ApplicationServices.Contract
             IAuthorizationContext authorizationContext,
             ILogger logger,
             IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService, 
+            IOrganizationalUserContext userContext)
         {
             _repository = repository;
             _economyStreamRepository = economyStreamRepository;
@@ -54,6 +57,29 @@ namespace Core.ApplicationServices.Contract
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
             _organizationService = organizationService;
+            _userContext = userContext;
+        }
+
+        public Result<ItContract, OperationError> Create(int organizationId, string name)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            if (!_authorizationContext.AllowCreate<ItContract>(organizationId))
+                return new OperationError(OperationFailure.Forbidden);
+            var result = CanCreateNewContractWithName(name, organizationId);
+
+            if (result.Failed)
+                return result.Error;
+
+            if (!result.Value)
+                return new OperationError("Name taken", OperationFailure.Conflict);
+
+            var itContract = new ItContract { OrganizationId = organizationId, Name = name };
+            itContract = _repository.Add(itContract);
+            _domainEvents.Raise(new EntityCreatedEvent<ItContract>(itContract));
+            transaction.Commit();
+
+            return itContract;
         }
 
         public IQueryable<ItContract> GetAllByOrganization(int orgId, string optionalNameSearch = null)
@@ -141,19 +167,21 @@ namespace Core.ApplicationServices.Contract
             );
         }
 
-        public Result<IQueryable<ItContract>, OperationError> GetContractsInOrganization(Guid organizationUuid, params IDomainQuery<ItContract>[] conditions)
+        public IQueryable<ItContract> Query(params IDomainQuery<ItContract>[] conditions)
         {
-            return _organizationService
-                .GetOrganization(organizationUuid, OrganizationDataReadAccessLevel.All)
-                .Bind(organization =>
-                {
-                    var query = new IntersectionQuery<ItContract>(conditions);
+            var baseQuery = _repository.AsQueryable();
+            var subQueries = new List<IDomainQuery<ItContract>>();
 
-                    return _repository
-                        .GetContractsInOrganization(organization.Id)
-                        .Transform(query.Apply)
-                        .Transform(Result<IQueryable<ItContract>, OperationError>.Success);
-                });
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+                subQueries.Add(new QueryByOrganizationIds<ItContract>(_userContext.OrganizationIds));
+
+            subQueries.AddRange(conditions);
+
+            var result = subQueries.Any()
+                ? new IntersectionQuery<ItContract>(subQueries).Apply(baseQuery)
+                : baseQuery;
+
+            return result;
         }
 
         public Result<ItContract, OperationError> GetContract(Guid uuid)

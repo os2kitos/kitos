@@ -4,11 +4,12 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Interface;
 using Core.DomainModel;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices;
-using Infrastructure.Services.Types;
+
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;

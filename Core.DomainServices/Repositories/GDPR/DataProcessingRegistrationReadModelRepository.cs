@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainServices.Extensions;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.GDPR
 {

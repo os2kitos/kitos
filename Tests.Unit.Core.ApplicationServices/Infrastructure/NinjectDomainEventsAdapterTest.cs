@@ -1,5 +1,5 @@
-﻿using Infrastructure.Ninject.DomainServices;
-using Infrastructure.Services.DomainEvents;
+﻿using Core.DomainModel.Events;
+using Infrastructure.Ninject.DomainServices;
 using Ninject;
 using Xunit;
 

@@ -1,4 +1,5 @@
-﻿using Core.DomainModel;
+﻿using Core.Abstractions.Extensions;
+using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
@@ -7,7 +8,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Reference;
-using Infrastructure.Services.Types;
+
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Types;
+
 
 namespace Core.DomainServices.Repositories.Organization
 {

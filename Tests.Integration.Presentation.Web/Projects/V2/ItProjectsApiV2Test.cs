@@ -93,7 +93,7 @@ namespace Tests.Integration.Presentation.Web.Projects.V2
             var regularUserToken = await HttpApi.GetTokenAsync(OrganizationRole.User);
 
             //Act
-            var response = await ItProjectV2Helper.SendGetItProjectsAsync(regularUserToken.Token, Guid.Empty, null, 0, 100);
+            using var response = await ItProjectV2Helper.SendGetItProjectsAsync(regularUserToken.Token, Guid.Empty, null, 0, 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -108,7 +108,7 @@ namespace Tests.Integration.Presentation.Web.Projects.V2
                 A<string>(), string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), A<OrganizationTypeKeys>(), AccessModifier.Public);
 
             //Act
-            var response = await ItProjectV2Helper.SendGetItProjectsAsync(regularUserToken.Token, organization.Uuid, null, 0, 100);
+            using var response = await ItProjectV2Helper.SendGetItProjectsAsync(regularUserToken.Token, organization.Uuid, null, 0, 100);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

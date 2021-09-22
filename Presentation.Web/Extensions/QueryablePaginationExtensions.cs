@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Shared;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Extensions

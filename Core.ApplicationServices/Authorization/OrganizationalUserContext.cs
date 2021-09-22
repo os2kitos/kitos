@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 
 namespace Core.ApplicationServices.Authorization
 {

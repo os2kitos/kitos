@@ -1,7 +1,7 @@
 ﻿using System;
-using Core.DomainModel.Result;
+using Core.Abstractions.Types;
 using Core.DomainModel.SSO;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.SSO
 {

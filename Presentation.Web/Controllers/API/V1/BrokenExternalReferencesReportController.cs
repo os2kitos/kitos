@@ -2,10 +2,10 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Qa;
 using Core.DomainModel.Qa.References;
-using Core.DomainModel.Result;
-using Infrastructure.Services.Types;
+
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1.Qa;
 

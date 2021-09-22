@@ -1,7 +1,7 @@
-﻿using Core.DomainModel.GDPR;
+﻿using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
-using Infrastructure.Services.DomainEvents;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;

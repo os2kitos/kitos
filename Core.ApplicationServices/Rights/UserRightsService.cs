@@ -1,9 +1,9 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
-using Core.DomainModel.Result;
 using Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.DomainModel;
 using Core.DomainModel.Organization;

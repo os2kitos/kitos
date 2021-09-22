@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
-using Core.DomainModel.Result;
 using Core.DomainModel.GDPR;
 using System.Linq;
-using Infrastructure.Services.Types;
+using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
+using Core.DomainModel.Extensions;
+
 using Core.DomainModel.Notification;
-using Infrastructure.Services.Extensions;
+
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -31,6 +33,7 @@ namespace Core.DomainModel.ItContract
             ExternalReferences = new List<ExternalReference>();
             DataProcessingRegistrations = new List<DataProcessingRegistration>();
             UserNotifications = new List<UserNotification>();
+            HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
         }
 
@@ -116,22 +119,6 @@ namespace Core.DomainModel.ItContract
         ///     User defined it contract identifier.
         /// </value>
         public string ItContractId { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a reference to relevant documents in an extern ESDH system.
-        /// </summary>
-        /// <value>
-        ///     Extern reference  to ESDH system.
-        /// </value>
-        public string Esdh { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a path to relevant documents in a folder.
-        /// </summary>
-        /// <value>
-        ///     Path to folder containing relevant documents.
-        /// </value>
-        public string Folder { get; set; }
 
         /// <summary>
         ///     Gets or sets the supplier contract signer.
@@ -344,50 +331,6 @@ namespace Core.DomainModel.ItContract
         #region Deadlines (aftalefrister)
 
         /// <summary>
-        ///     Gets or sets the operation test expected.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> funktionsprøve: forventet"
-        /// </remarks>
-        /// <value>
-        ///     The operation test expected.
-        /// </value>
-        public DateTime? OperationTestExpected { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operation test approved.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> funktionsprøve: godkendt"
-        /// </remarks>
-        /// <value>
-        ///     The operation test approved.
-        /// </value>
-        public DateTime? OperationTestApproved { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operational acceptance test expected.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> driftovertagelsesprøve: forventet"
-        /// </remarks>
-        /// <value>
-        ///     The operational acceptance test expected.
-        /// </value>
-        public DateTime? OperationalAcceptanceTestExpected { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the operational acceptance test approved.
-        /// </summary>
-        /// <remarks>
-        ///     Is called "aftalefrister -> driftovertagelsesprøve: godkendt"
-        /// </remarks>
-        /// <value>
-        ///     The operational acceptance test approved.
-        /// </value>
-        public DateTime? OperationalAcceptanceTestApproved { get; set; }
-
-        /// <summary>
         ///     When the contract began. (indgået)
         /// </summary>
         /// <value>
@@ -483,7 +426,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (løbende)
         /// </value>
-        public string Running { get; set; }
+        public YearSegmentOption? Running { get; set; }
 
         /// <summary>
         ///
@@ -491,7 +434,7 @@ namespace Core.DomainModel.ItContract
         /// <value>
         ///     (indtil udgangen af)
         /// </value>
-        public string ByEnding { get; set; }
+        public YearSegmentOption? ByEnding { get; set; }
 
         #endregion
 
@@ -515,7 +458,7 @@ namespace Core.DomainModel.ItContract
         #endregion
 
         #region Elementtypes
-        
+
         public virtual ICollection<ItContractAgreementElementTypes> AssociatedAgreementElementTypes { get; set; }
         #endregion
 
@@ -562,7 +505,7 @@ namespace Core.DomainModel.ItContract
 
         public void ClearMasterReference()
         {
-            Reference.Track();
+            Reference?.Track();
             Reference = null;
         }
         public Result<ExternalReference, OperationError> SetMasterReference(ExternalReference newReference)
@@ -580,6 +523,9 @@ namespace Core.DomainModel.ItContract
         public Result<DataProcessingRegistration, OperationError> AssignDataProcessingRegistration(DataProcessingRegistration registration)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
+
+            if (registration.OrganizationId != OrganizationId)
+                return new OperationError("Cannot assign Data Processing Registration to Contract within different Organization", OperationFailure.BadInput);
 
             if (GetAssignedDataProcessingRegistration(registration.Id).HasValue)
                 return new OperationError("Data processing registration is already assigned", OperationFailure.Conflict);
@@ -614,6 +560,328 @@ namespace Core.DomainModel.ItContract
                 User = user,
                 Object = this
             };
+        }
+
+        public void ResetContractType()
+        {
+            ContractType?.Track();
+            ContractType = null;
+        }
+
+        public void ResetContractTemplate()
+        {
+            ContractTemplate?.Track();
+            ContractTemplate = null;
+        }
+
+        public Maybe<OperationError> UpdateContractValidityPeriod(DateTime? newValidFrom, DateTime? newValidTo)
+        {
+            var validFromDate = newValidFrom?.Date;
+            var validToDate = newValidTo?.Date;
+
+            if (validFromDate.HasValue && validToDate.HasValue && validFromDate.Value.Date > validToDate.Value.Date)
+            {
+                return new OperationError("ValidTo must equal or proceed ValidFrom", OperationFailure.BadInput);
+            }
+
+            Concluded = validFromDate;
+
+            ExpirationDate = validToDate;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> SetAgreementElements(IEnumerable<AgreementElementType> agreementElementTypes)
+        {
+            var agreementElements = agreementElementTypes.Select(type => new ItContractAgreementElementTypes()
+            {
+                ItContract = this,
+                AgreementElementType = type
+            }).ToList();
+
+            if (agreementElements.Select(x => x.AgreementElementType.Uuid).Distinct().Count() != agreementElements.Count)
+                return new OperationError("agreement elements must not contain duplicates", OperationFailure.BadInput);
+
+            agreementElements.MirrorTo(AssociatedAgreementElementTypes, assignment => assignment.AgreementElementType.Uuid);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ClearParent()
+        {
+            Parent?.Track();
+            Parent = null;
+        }
+
+        public Maybe<OperationError> SetParent(ItContract newParent)
+        {
+            if (OrganizationId == newParent.OrganizationId)
+            {
+                Parent = newParent;
+                return Maybe<OperationError>.None;
+            }
+            return new OperationError("Parent and child contracts must be in same organization", OperationFailure.BadInput);
+        }
+
+        public Maybe<OperationError> SetResponsibleOrganizationUnit(Guid organizationUnitUuid)
+        {
+            if (organizationUnitUuid != ResponsibleOrganizationUnit?.Uuid)
+            {
+                var organizationUnit = Organization.GetOrganizationUnit(organizationUnitUuid);
+                if (organizationUnit.IsNone)
+                {
+                    return new OperationError("UUID of responsible organization unit does not match an organization unit on this contract's organization", OperationFailure.BadInput);
+                }
+
+                ResponsibleOrganizationUnit = organizationUnit.Value;
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetResponsibleOrganizationUnit()
+        {
+            ResponsibleOrganizationUnit?.Track();
+            ResponsibleOrganizationUnit = null;
+        }
+
+        public void ResetProcurementStrategy()
+        {
+            ProcurementStrategy?.Track();
+            ProcurementStrategy = null;
+        }
+
+        public void ResetPurchaseForm()
+        {
+            PurchaseForm?.Track();
+            PurchaseForm = null;
+        }
+
+        public void ResetProcurementPlan()
+        {
+            ProcurementPlanHalf = null;
+            ProcurementPlanYear = null;
+        }
+
+        public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
+        {
+            var (half, year) = plan;
+            if (half is < 1 or > 2)
+            {
+                return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
+            }
+
+            ProcurementPlanHalf = half;
+            ProcurementPlanYear = year;
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> AssignSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
+        {
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
+
+            if (systemUsage.OrganizationId != OrganizationId)
+                return new OperationError("Cannot assign It System Usage to Contract within different Organization", OperationFailure.BadInput);
+
+            if (AssociatedSystemUsages.Any(x => x.ItSystemUsageId == systemUsage.Id))
+                return new OperationError($"It System Usage with Id: {systemUsage.Id}, already assigned to Contract", OperationFailure.Conflict);
+
+            var newAssign = new ItContractItSystemUsage
+            {
+                ItContract = this,
+                ItSystemUsage = systemUsage
+            };
+
+            AssociatedSystemUsages.Add(newAssign);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> RemoveSystemUsage(ItSystemUsage.ItSystemUsage systemUsage)
+        {
+            if (systemUsage == null) throw new ArgumentNullException(nameof(systemUsage));
+
+            var toBeRemoved = AssociatedSystemUsages.Where(x => x.ItSystemUsageId == systemUsage.Id).ToList();
+
+            foreach (var contractUsageToRemove in toBeRemoved)
+            {
+                var removeSucceeded = AssociatedSystemUsages.Remove(contractUsageToRemove);
+                if (!removeSucceeded)
+                    return new OperationError($"Failed to remove AssociatedSystemUsage with Id: {systemUsage.Id}", OperationFailure.BadState);
+            }
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetSupplierOrganization()
+        {
+            Supplier.Track();
+            Supplier = null;
+        }
+
+        public Maybe<OperationError> SetSupplierOrganization(Organization.Organization organization)
+        {
+            if (organization == null)
+                throw new ArgumentNullException(nameof(organization));
+
+            if (Supplier == null || organization.Uuid != Supplier.Uuid)
+                Supplier = organization;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetHandoverTrials()
+        {
+            HandoverTrials.Clear();
+        }
+
+        public Maybe<OperationError> AddHandoverTrial(HandoverTrialType trialType, DateTime? expected, DateTime? approved)
+        {
+            if (trialType == null)
+                throw new ArgumentNullException(nameof(trialType));
+
+            if (expected.HasValue == false && approved.HasValue == false)
+                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
+
+            HandoverTrials.Add(new HandoverTrial()
+            {
+                Approved = approved?.Date,
+                Expected = expected?.Date,
+                ItContract = this,
+                HandoverTrialType = trialType
+            });
+            return Maybe<OperationError>.None;
+        }
+
+        public Maybe<OperationError> UpdateExtendMultiplier(int extendMultiplier)
+        {
+            if (extendMultiplier < 0)
+                return new OperationError($"{nameof(extendMultiplier)} must be above or equal to 0", OperationFailure.BadInput);
+
+            ExtendMultiplier = extendMultiplier;
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetExtensionOption()
+        {
+            OptionExtend.Track();
+            OptionExtend = null;
+        }
+
+        public Maybe<OperationError> UpdateDuration(int? durationMonths, int? durationYears, bool ongoing)
+        {
+            if (ongoing && (durationMonths.HasValue || durationYears.HasValue))
+                return new OperationError($"If duration is ongoing then {nameof(durationMonths)} and {nameof(durationYears)} must be null", OperationFailure.BadInput);
+
+            if (durationYears.GetValueOrDefault() < 0)
+                return new OperationError($"{nameof(durationYears)} cannot be below 0", OperationFailure.BadInput);
+
+            var months = durationMonths.GetValueOrDefault();
+
+            if (months is < 0 or > 11)
+                return new OperationError($"{nameof(durationMonths)} cannot be below 0 or above 11", OperationFailure.BadInput);
+
+            DurationOngoing = ongoing;
+            DurationYears = durationYears;
+            DurationMonths = durationMonths;
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetPaymentFrequency()
+        {
+            PaymentFreqency.Track();
+            PaymentFreqency = null;
+        }
+
+        public void ResetPaymentModel()
+        {
+            PaymentModel.Track();
+            PaymentModel = null;
+        }
+
+        public void ResetPriceRegulation()
+        {
+            PriceRegulation.Track();
+            PriceRegulation = null;
+        }
+
+        public void ResetPaymentMilestones()
+        {
+            PaymentMilestones.Track();
+            PaymentMilestones.Clear();
+        }
+
+        public Maybe<OperationError> AddPaymentMilestone(string title, DateTime? expected, DateTime? approved)
+        {
+            if (string.IsNullOrEmpty(title))
+                return new OperationError("Error: title cannot be empty", OperationFailure.BadInput);
+
+            if (expected.HasValue == false && approved.HasValue == false)
+                return new OperationError("Error: expected and approved cannot both be null", OperationFailure.BadInput);
+
+            PaymentMilestones.Add(new PaymentMilestone()
+            {
+                Title = title,
+                Expected = expected?.Date,
+                Approved = approved?.Date
+            });
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetInternalEconomyStreams()
+        {
+            InternEconomyStreams.Clear();
+        }
+
+        public Maybe<OperationError> AddInternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            return AddEconomyStream(optionalOrganizationUnitUuid, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note, true);
+        }
+
+        public Maybe<OperationError> AddExternalEconomyStream(Guid? optionalOrganizationUnitUuid, int acquisition, int operation, int other, string accountingEntry, TrafficLight auditStatus, DateTime? auditDate, string note)
+        {
+            return AddEconomyStream(optionalOrganizationUnitUuid, acquisition, operation, other, accountingEntry, auditStatus, auditDate, note, false);
+        }
+
+        private Maybe<OperationError> AddEconomyStream(
+            Guid? optionalOrganizationUnitUuid,
+            int acquisition,
+            int operation,
+            int other,
+            string accountingEntry,
+            TrafficLight auditStatus,
+            DateTime? auditDate,
+            string note,
+            bool internalStream)
+        {
+            var organizationUnit = Maybe<OrganizationUnit>.None;
+            if (optionalOrganizationUnitUuid.HasValue)
+            {
+                organizationUnit = Organization.GetOrganizationUnit(optionalOrganizationUnitUuid.Value);
+                if (organizationUnit.IsNone)
+                    return new OperationError($"Organization unit with uuid:{optionalOrganizationUnitUuid.Value} is not part of the contract's organization", OperationFailure.BadInput);
+            }
+
+            var economyStream = internalStream ?
+                EconomyStream.CreateInternalEconomyStream(this, organizationUnit.GetValueOrDefault(), acquisition, operation, other, accountingEntry, auditStatus, auditDate, note) :
+                EconomyStream.CreateExternalEconomyStream(this, organizationUnit.GetValueOrDefault(), acquisition, operation, other, accountingEntry, auditStatus, auditDate, note);
+
+            (internalStream ? InternEconomyStreams : ExternEconomyStreams).Add(economyStream);
+
+            return Maybe<OperationError>.None;
+        }
+
+        public void ResetExternalEconomyStreams()
+        {
+            ExternEconomyStreams.Clear();
+        }
+		
+        public void ResetNoticePeriod()
+        {
+            TerminationDeadline.Track();
+            TerminationDeadline = null;
         }
     }
 }

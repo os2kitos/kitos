@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.GDPR;
 using Core.DomainModel.GDPR;
-using Core.DomainModel.Result;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model.Options;
 using Core.DomainServices.Options;

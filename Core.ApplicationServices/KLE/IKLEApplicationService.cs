@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Core.Abstractions.Types;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Result;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
-using Infrastructure.Services.Types;
+
 
 namespace Core.ApplicationServices.KLE
 {

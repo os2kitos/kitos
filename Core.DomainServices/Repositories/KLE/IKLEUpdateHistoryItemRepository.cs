@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.DomainModel.KLE;
-using Infrastructure.Services.Types;
+
 
 namespace Core.DomainServices.Repositories.KLE
 {
