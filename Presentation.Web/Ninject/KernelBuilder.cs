@@ -366,6 +366,14 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+
+            //Deletion tracking
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystem>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, TrackDeletedEntitiesEventHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
