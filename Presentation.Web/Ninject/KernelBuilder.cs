@@ -110,6 +110,7 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Tracking;
 using Core.DomainServices.Tracking;
 
 namespace Presentation.Web.Ninject
@@ -237,6 +238,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
             kernel.Bind<IAssignmentUpdateService>().To<AssignmentUpdateService>().InCommandScope(Mode);
             kernel.Bind<IEntityResolver>().To<NinjectEntityResolver>().InCommandScope(Mode);
+            kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Tracking;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Tracking;
@@ -21,15 +22,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
     [RoutePrefix("api/v2/delta-feed")]
     public class DeltaFeedV2Controller : ExternalBaseController
     {
-        private readonly IGenericRepository<LifeCycleTrackingEvent> _trackingEventsRepository;
-        private readonly IAuthorizationContext _authorizationContext;
-        private readonly IOrganizationalUserContext _userContext;
+        private readonly ITrackingService _trackingService;
 
-        public DeltaFeedV2Controller(IGenericRepository<LifeCycleTrackingEvent> trackingEventsRepository, IAuthorizationContext authorizationContext, IOrganizationalUserContext userContext)
+        public DeltaFeedV2Controller(ITrackingService trackingService)
         {
-            _trackingEventsRepository = trackingEventsRepository;
-            _authorizationContext = authorizationContext;
-            _userContext = userContext;
+            _trackingService = trackingService;
         }
 
         /// <summary>
@@ -41,57 +38,12 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
         [Route("deleted-entities")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<TrackingEventResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetDeletedObjects(
-            DateTime? deletedSinceUTC = null,
-            [FromUri] BoundedPaginationQuery pagination = null)
+        public IHttpActionResult GetDeletedObjects(DateTime? deletedSinceUTC = null, [FromUri] BoundedPaginationQuery pagination = null)
         {
-            //TODO: Move stuff to a service once finished
-
-            var query = _trackingEventsRepository
-                .AsQueryable()
-                .Where(x => x.EventType == TrackedLifeCycleEventType.Deleted);
-
-            var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
-
-            if (accessLevel < CrossOrganizationDataReadAccessLevel.All)
-            {
-                var organizationIds = _userContext.OrganizationIds.ToList();
-
-                if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
-                {
-                    var rightsHolderAccessOrgIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
-                    query = query
-                        .Where(x =>
-                            (x.OptionalRightsHolderOrganization != null && rightsHolderAccessOrgIds.Contains(x.OptionalRightsHolderOrganization.Id)) ||
-                            (x.OptionalOrganizationReference != null && organizationIds.Contains(x.OptionalOrganizationReference.Id)));
-                }
-                if (accessLevel == CrossOrganizationDataReadAccessLevel.Public)
-                {
-                    query = query.Where(x =>
-                        x.OptionalOrganizationReference == null ||
-                        organizationIds.Contains(x.OptionalOrganizationReference.Id) ||
-                        x.OptionalAccessModifier == AccessModifier.Public);
-                }
-                else
-                {
-                    query = query.Where(x =>
-                        x.OptionalOrganizationReference == null ||
-                        organizationIds.Contains(x.OptionalOrganizationReference.Id)
-                    );
-                }
-            }
-
-            if (deletedSinceUTC.HasValue)
-            {
-                var occurredAt = deletedSinceUTC.Value.ToUniversalTime();
-                query = query.Where(x => x.OccurredAtUtc >= occurredAt);
-            }
-
-            query = query
+            var dtos = _trackingService
+                .QueryLifeCycleEvents(deletedSinceUTC)
                 .OrderBy(x => x.OccurredAtUtc)
-                .Page(pagination);
-
-            var dtos = query
+                .Page(pagination)
                 .AsNoTracking()
                 .AsEnumerable()
                 .Select(ToDTO)
