@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -8,6 +9,7 @@ using Core.DomainModel;
 using Core.DomainModel.Tracking;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Presentation.Web.Controllers.API.V2.External.Deltas.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Tracking;
@@ -29,7 +31,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
             _userContext = userContext;
         }
 
-        //TODO: Move stuff to a service once finished
         /// <summary>
         /// Returns a feed of deleted items, optionally since a specified time (UTC)
         /// </summary>
@@ -41,8 +42,10 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public IHttpActionResult GetDeletedObjects(
             DateTime? deletedSinceUTC = null,
-            [FromUri] UnboundedPaginationQuery pagination = null)
+            [FromUri] BoundedPaginationQuery pagination = null)
         {
+            //TODO: Move stuff to a service once finished
+
             var query = _trackingEventsRepository
                 .AsQueryable()
                 .Where(x => x.EventType == TrackedLifeCycleEventType.Deleted);
@@ -84,7 +87,23 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
                 .OrderBy(x => x.OccurredAtUtc)
                 .Page(pagination);
 
-            return Ok(query.ToList());
+            var dtos = query
+                .AsNoTracking()
+                .AsEnumerable()
+                .Select(ToDTO)
+                .ToList();
+
+            return Ok(dtos);
+        }
+
+        private static TrackingEventResponseDTO ToDTO(LifeCycleTrackingEvent arg)
+        {
+            return new TrackingEventResponseDTO
+            {
+                EntityType = arg.EntityType.ToApiType(),
+                EntityUuid = arg.EntityUuid,
+                OccurredAtUtc = DateTime.SpecifyKind(arg.OccurredAtUtc, DateTimeKind.Utc)
+            };
         }
     }
 }
