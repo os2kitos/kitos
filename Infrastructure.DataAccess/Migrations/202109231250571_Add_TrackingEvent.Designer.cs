@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class Add_Tracking_Events : IMigrationMetadata
+    public sealed partial class Add_TrackingEvent : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_Tracking_Events));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Add_TrackingEvent));
         
         string IMigrationMetadata.Id
         {
-            get { return "202109231018507_Add_Tracking_Events"; }
+            get { return "202109231250571_Add_TrackingEvent"; }
         }
         
         string IMigrationMetadata.Source

@@ -39,22 +39,21 @@ namespace Core.DomainServices.Tracking
 
         private void TrackDeleted<T>(T entity) where T : IHasUuid
         {
-            var trackedEntityType = GetEntityType(entity);
-            var newEvent = new LifeCycleTrackingEvent(entity.Uuid, trackedEntityType, TrackedLifeCycleEventType.Deleted);
+            var newEvent = CreateEvent(entity);
             _trackingEventsRepository.Insert(newEvent);
             _trackingEventsRepository.Save();
         }
 
-        private static TrackedEntityType GetEntityType(object trackedEntity)
+        private static LifeCycleTrackingEvent CreateEvent(object trackedEntity)
         {
             return trackedEntity switch
             {
-                ItContract => TrackedEntityType.ItContract,
-                ItProject => TrackedEntityType.ItProject,
-                ItSystem => TrackedEntityType.ItSystem,
-                ItSystemUsage => TrackedEntityType.ItSystemUsage,
-                DataProcessingRegistration => TrackedEntityType.DataProcessingRegistration,
-                ItInterface => TrackedEntityType.ItInterface,
+                ItContract contract => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, contract.Uuid, TrackedEntityType.ItContract, contract.Organization),
+                ItProject project => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, project.Uuid, TrackedEntityType.ItProject, project.Organization),
+                ItSystem system => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, system.Uuid, TrackedEntityType.ItSystem, system.Organization, system.AccessModifier, system.BelongsTo),
+                ItSystemUsage systemUsage => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, systemUsage.Uuid, TrackedEntityType.ItSystemUsage, systemUsage.Organization),
+                DataProcessingRegistration dpr => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, dpr.Uuid, TrackedEntityType.DataProcessingRegistration, dpr.Organization),
+                ItInterface itInterface => new LifeCycleTrackingEvent(TrackedLifeCycleEventType.Deleted, itInterface.Uuid, TrackedEntityType.ItInterface, itInterface.Organization, itInterface.AccessModifier, itInterface.ExhibitedBy?.ItSystem?.BelongsTo),
                 _ => throw new ArgumentOutOfRangeException(nameof(trackedEntity), "Entity type not mapped to tracked event type")
             };
         }

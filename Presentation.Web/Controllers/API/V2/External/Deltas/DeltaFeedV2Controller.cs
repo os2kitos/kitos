@@ -6,6 +6,7 @@ using System.Net;
 using System.Web.Http;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel;
+using Core.DomainModel.Organization;
 using Core.DomainModel.Tracking;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -58,10 +59,13 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
 
                 if (accessLevel == CrossOrganizationDataReadAccessLevel.RightsHolder)
                 {
-                    //TODO: Organization id's where rightsholder - how to solve that?
-                    throw new NotSupportedException();
+                    var rightsHolderAccessOrgIds = _userContext.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess).ToList();
+                    query = query
+                        .Where(x =>
+                            (x.OptionalRightsHolderOrganization != null && rightsHolderAccessOrgIds.Contains(x.OptionalRightsHolderOrganization.Id)) ||
+                            (x.OptionalOrganizationReference != null && organizationIds.Contains(x.OptionalOrganizationReference.Id)));
                 }
-                else if (accessLevel == CrossOrganizationDataReadAccessLevel.Public)
+                if (accessLevel == CrossOrganizationDataReadAccessLevel.Public)
                 {
                     query = query.Where(x =>
                         x.OptionalOrganizationReference == null ||

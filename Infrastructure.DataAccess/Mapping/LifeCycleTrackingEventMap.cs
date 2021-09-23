@@ -12,6 +12,10 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.LifeCycleTrackingEvents)
                 .HasForeignKey(x => x.OptionalOrganizationReferenceId);
 
+            HasOptional(x => x.OptionalRightsHolderOrganization)
+                .WithMany(x => x.LifeCycleTrackingEventsWhereOrganizationIsRightsHolder)
+                .HasForeignKey(x => x.OptionalRightsHolderOrganizationId);
+
             HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OccurredAtUtc, x.EntityType, x.EventType })
                 .HasName("IX_Org_OccurredAt_EntityType_EventType")
                 .IsUnique(false);
