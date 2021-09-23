@@ -426,7 +426,7 @@ namespace Core.ApplicationServices
                 _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
             }
 
-            //If time has passed the trigger time, Hangfire will not fire until the next trigger data so we must force it.
+            //If time has passed the trigger time, Hangfire will not fire until the next trigger date so we must force it.
             if (adviceAlarmDate.Date.Equals(_operationClock.Now.Date))
             {
                 switch (adviceScheduling)
