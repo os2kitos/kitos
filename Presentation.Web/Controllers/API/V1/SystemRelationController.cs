@@ -6,10 +6,8 @@ using System.Net.Http;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Model.SystemUsage;
-using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel.ItSystemUsage;
-
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;

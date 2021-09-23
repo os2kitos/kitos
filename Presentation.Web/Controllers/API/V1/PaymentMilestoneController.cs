@@ -3,13 +3,13 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Repositories.Contract;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -57,6 +57,28 @@ namespace Presentation.Web.Controllers.API.V1
         protected override IControllerCrudAuthorization GetCrudAuthorization()
         {
             return new ChildEntityCrudAuthorization<PaymentMilestone, ItContract>(x => _contractRepository.GetById(x.ItContractId), base.GetCrudAuthorization());
+        }
+
+        protected override void RaiseUpdated(PaymentMilestone item)
+        {
+            RaiseContractUpdated(item);
+        }
+
+        private void RaiseContractUpdated(PaymentMilestone item)
+        {
+            var itContract = _contractRepository.GetById(item.ItContractId);
+            if(itContract != null)
+                DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(itContract));
+        }
+
+        protected override void RaiseNewObjectCreated(PaymentMilestone savedItem)
+        {
+            RaiseContractUpdated(savedItem);
+        }
+
+        protected override void RaiseDeleted(PaymentMilestone entity)
+        {
+            RaiseContractUpdated(entity);
         }
     }
 }

@@ -150,7 +150,7 @@ namespace Presentation.Web.Controllers.API.V1
                 if (sysUsageResult.Ok)
                 {
                     var sysUsage = sysUsageResult.Value;
-
+                    
                     return Created(Map(sysUsage), new Uri(Request.RequestUri + "?itSystemId=" + dto.ItSystemId + "&organizationId" + dto.OrganizationId));
                 }
 
@@ -209,7 +209,7 @@ namespace Presentation.Web.Controllers.API.V1
                 usage.UsedBy.Add(new ItSystemUsageOrgUnitUsage { ItSystemUsageId = id, OrganizationUnitId = organizationUnit });
 
                 Repository.Save();
-
+                RaiseUpdated(usage);
                 return Created(Map<OrganizationUnit, OrgUnitDTO>(orgUnit));
             }
             catch (Exception e)
@@ -246,7 +246,7 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 usage.UsedBy.Remove(entity);
-
+                RaiseUpdated(usage);
                 Repository.Save();
 
                 return Ok();
@@ -301,6 +301,7 @@ namespace Presentation.Web.Controllers.API.V1
                         usage.TaskRefsOptOut.Remove(task);
                     }
                 }
+                RaiseUpdated(usage);
                 Repository.Save();
                 return Ok();
             }
@@ -363,6 +364,7 @@ namespace Presentation.Web.Controllers.API.V1
                         usage.TaskRefsOptOut.Add(task);
                     }
                 }
+                RaiseUpdated(usage);
                 Repository.Save();
                 return Ok();
             }

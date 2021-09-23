@@ -22,7 +22,8 @@ namespace Core.DomainModel.GDPR
         IEntityWithExternalReferences,
         IEntityWithAdvices,
         IEntityWithUserNotification,
-        IHasUuid
+        IHasUuid,
+        IHasDirtyMarking
     {
         public DataProcessingRegistration()
         {
@@ -36,6 +37,7 @@ namespace Core.DomainModel.GDPR
             OversightDates = new List<DataProcessingRegistrationOversightDate>();
             UserNotifications = new List<UserNotification>();
             Uuid = Guid.NewGuid();
+            MarkAsDirty();
         }
 
         public Guid Uuid { get; set; }
@@ -223,8 +225,8 @@ namespace Core.DomainModel.GDPR
             if (GetAssignedSystemUsage(systemUsage.Id).HasValue)
                 return new OperationError("System usage is already assigned", OperationFailure.Conflict);
 
-            if(OrganizationId != systemUsage.OrganizationId)
-                return new OperationError("System usage must be in the same organization as this data processing registration",OperationFailure.BadInput);
+            if (OrganizationId != systemUsage.OrganizationId)
+                return new OperationError("System usage must be in the same organization as this data processing registration", OperationFailure.BadInput);
 
             SystemUsages.Add(systemUsage);
 
@@ -355,10 +357,11 @@ namespace Core.DomainModel.GDPR
         {
             if (oversightDate == null) throw new ArgumentNullException(nameof(oversightDate));
             if (oversightRemark == null) throw new ArgumentNullException(nameof(oversightRemark));
-            if (!HasOversightDate(oversightId))
+            var existingDate = GetOversightDate(oversightId);
+            if (existingDate.IsNone)
                 return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
 
-            var oversightDateToModify = OversightDates.Where(x => x.Id == oversightId).First();
+            var oversightDateToModify = existingDate.Value;
 
             oversightDateToModify.OversightDate = oversightDate;
             oversightDateToModify.OversightRemark = oversightRemark;
@@ -368,19 +371,23 @@ namespace Core.DomainModel.GDPR
 
         public Result<DataProcessingRegistrationOversightDate, OperationError> RemoveOversightDate(int oversightId)
         {
-            if (!HasOversightDate(oversightId))
+            var oversightDate = GetOversightDate(oversightId);
+            if (oversightDate.IsNone)
                 return new OperationError("Oversight date not assigned", OperationFailure.BadInput);
 
-            var oversightDateToRemove = OversightDates.Where(x => x.Id == oversightId).First();
+            OversightDates.Remove(oversightDate.Value);
 
-            OversightDates.Remove(oversightDateToRemove);
-
-            return oversightDateToRemove;
+            return oversightDate.Value;
         }
 
-        private bool HasOversightDate(int oversightId)
+        private Maybe<DataProcessingRegistrationOversightDate> GetOversightDate(int oversightId)
         {
-            return OversightDates.Where(x => x.Id == oversightId).Any();
+            return OversightDates.FirstOrDefault(x => x.Id == oversightId).FromNullable();
+        }
+
+        public void MarkAsDirty()
+        {
+            LastChanged = DateTime.UtcNow;
         }
     }
 }

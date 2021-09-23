@@ -13,6 +13,9 @@ namespace Presentation.Web.Models.API.V2.Response.DataProcessing
         public string Name { get; set; }
         public Guid Uuid { get; set; }
         public IdentityNamePairResponseDTO CreatedBy { get; set; }
+        /// <summary>
+        /// UTC timestamp of latest modification
+        /// </summary>
         public DateTime LastModified { get; set; }
         public IdentityNamePairResponseDTO LastModifiedBy { get; set; }
         public ShallowOrganizationResponseDTO OrganizationContext { get; set; }

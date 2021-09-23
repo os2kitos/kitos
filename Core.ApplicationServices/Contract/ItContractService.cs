@@ -159,7 +159,7 @@ namespace Core.ApplicationServices.Contract
             return WithReadAccess<IEnumerable<DataProcessingRegistration>>(id, contract =>
                 _contractDataProcessingRegistrationAssignmentService
                     .GetApplicableDataProcessingRegistrations(contract)
-                    .Where(x => x.Name.Contains(nameQuery))
+                    .ByPartOfName(nameQuery)
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.Name)

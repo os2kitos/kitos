@@ -14,7 +14,6 @@ using Core.DomainServices.Authorization;
 using Ninject;
 using Ninject.Extensions.Logging;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;

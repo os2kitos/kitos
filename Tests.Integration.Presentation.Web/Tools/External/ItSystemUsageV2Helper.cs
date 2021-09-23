@@ -37,6 +37,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             Guid? relationToSystemUsageUuidFilter = null,
             Guid? relationToContractUuidFilter = null,
             string systemNameContentFilter = null,
+            DateTime? changedSinceGtEq = null,
             int? page = null,
             int? pageSize = null)
         {
@@ -65,6 +66,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (pageSize.HasValue)
                 criteria.Add(new KeyValuePair<string, string>("pageSize", pageSize.Value.ToString("D")));
+
+            if (changedSinceGtEq.HasValue)
+                criteria.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
             var joinedCriteria = string.Join("&", criteria.Select(x => $"{x.Key}={x.Value}"));
             var queryString = joinedCriteria.Any() ? $"?{joinedCriteria}" : string.Empty;
@@ -127,12 +131,12 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, (payload ?? new List<ExternalReferenceDataDTO>()).AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.ExternalReferences)));
         }
-		
+
         public static async Task<HttpResponseMessage> SendPatchRoles(string token, Guid uuid, IEnumerable<RoleAssignmentRequestDTO> dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.Roles)));
         }
-        
+
         public static async Task<HttpResponseMessage> SendPatchGDPR(string token, Guid uuid, GDPRWriteRequestDTO dto)
         {
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}"), token, dto.AsPatchPayloadOfProperty(nameof(UpdateItSystemUsageRequestDTO.GDPR)));

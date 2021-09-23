@@ -5,10 +5,14 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
+using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices;
-
-using Presentation.Web.Models;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Infrastructure.Authorization.Controller.Crud;
 using Presentation.Web.Models.API.V1;
@@ -39,6 +43,31 @@ namespace Presentation.Web.Controllers.API.V1
             return _referenceService
                 .DeleteByReferenceId(id)
                 .Match(onSuccess: _ => Ok(), onFailure: FromOperationFailure);
+        }
+
+        protected override void RaiseUpdated(ExternalReference item)
+        {
+            var entityWithExternalReferences = item.GetOwner();
+            switch (entityWithExternalReferences)
+            {
+                case DataProcessingRegistration dataProcessingRegistration:
+                    DomainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(dataProcessingRegistration));
+                    break;
+                case ItContract itContract:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItContract>(itContract));
+                    break;
+                case ItProject itProject:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
+                    break;
+                case ItSystem itSystem:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
+                    break;
+                case ItSystemUsage itSystemUsage:
+                    DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(entityWithExternalReferences));
+            }
         }
 
         [NonAction]

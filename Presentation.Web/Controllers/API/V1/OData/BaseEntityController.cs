@@ -10,7 +10,6 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Events;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-
 using Ninject;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;

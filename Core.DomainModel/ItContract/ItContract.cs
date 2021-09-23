@@ -19,7 +19,7 @@ namespace Core.DomainModel.ItContract
     /// <summary>
     ///     Contains info about an it contract
     /// </summary>
-    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid
+    public class ItContract : HasRightsEntity<ItContract, ItContractRight, ItContractRole>, IHasReferences, IHierarchy<ItContract>, IContractModule, IOwnedByOrganization, IHasName, IEntityWithExternalReferences, IEntityWithAdvices, IEntityWithUserNotification, IHasUuid, IHasDirtyMarking
     {
 
         public ItContract()
@@ -35,6 +35,7 @@ namespace Core.DomainModel.ItContract
             UserNotifications = new List<UserNotification>();
             HandoverTrials = new List<HandoverTrial>();
             Uuid = Guid.NewGuid();
+            MarkAsDirty();
         }
 
         public Guid Uuid { get; set; }
@@ -877,11 +878,16 @@ namespace Core.DomainModel.ItContract
         {
             ExternEconomyStreams.Clear();
         }
-		
+
         public void ResetNoticePeriod()
         {
             TerminationDeadline.Track();
             TerminationDeadline = null;
+        }
+
+        public void MarkAsDirty()
+        {
+            LastChanged = DateTime.UtcNow;
         }
     }
 }

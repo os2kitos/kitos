@@ -261,6 +261,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
             try
             {
+                RaiseAsRootModification(entity);
                 _adviceService.Delete(entity);
             }
             catch (Exception e)
@@ -287,6 +288,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                     return Forbidden();
                 }
                 _adviceService.Deactivate(entity);
+                RaiseAsRootModification(entity);
             }
             catch (Exception e)
             {
