@@ -20,12 +20,12 @@ BEGIN
 
     INSERT INTO @RecurringJobsWithData
     SELECT CONVERT(int, SUBSTRING([Key], 23, 28)) AS AdviceId
-    FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+    FROM [kitos_HangfireDB].[HangFire].[Hash]
     WHERE [Key] LIKE '%recurring-job:Advice: %'
 
     INSERT INTO @RecurringJobsWithData
     SELECT CONVERT(int, REVERSE(SUBSTRING(REVERSE(SUBSTRING([Arguments], 3, 8)), 3, 8))) AS AdviceId
-    FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Job]
+    FROM [kitos_HangfireDB].[HangFire].[Job]
     WHERE [Arguments] NOT LIKE '%null%'
 
 
@@ -37,11 +37,11 @@ BEGIN
 
     INSERT INTO @RecurringAdviceJobs
     SELECT CONVERT(int, SUBSTRING([Value], 8, 6)), Id
-    FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Set]
+    FROM [kitos_HangfireDB].[HangFire].[Set]
     WHERE [Key] LIKE 'recurring-jobs' AND [Score] > 0 AND [Value] LIKE 'Advice: %'
 
     DELETE
-    FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Set] 
+    FROM [kitos_HangfireDB].[HangFire].[Set] 
     WHERE Id IN (
         SELECT SetId
         FROM @RecurringAdviceJobs
@@ -60,12 +60,12 @@ BEGIN
 
 	INSERT INTO @HFAdvice
 	SELECT CONVERT(int, SUBSTRING([Key], 23, 28)) AS AdviceId
-	FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	FROM [kitos_HangfireDB].[HangFire].[Hash]
 	WHERE [Key] LIKE '%recurring-job:Advice: %'
 	
 	INSERT INTO @HFAdvice
 	SELECT CONVERT(int, REVERSE(SUBSTRING(REVERSE(SUBSTRING([Arguments], 3, 8)), 3, 8))) AS AdviceId
-	FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Job]
+	FROM [kitos_HangfireDB].[HangFire].[Job]
 	WHERE [Arguments] NOT LIKE '%null%'
 
     
@@ -77,14 +77,14 @@ BEGIN
 
 	INSERT INTO @AdvicesToDisable
 	SELECT [Id]
-	FROM [Kitos_Prod_Nuværende].[dbo].[Advice]
+	FROM [Kitos].[dbo].[Advice]
 	WHERE Scheduling IS NOT NULL AND Scheduling != 0 AND StopDate < GETUTCDATE() AND IsActive = 1
 	AND [Id] NOT IN (
 		SELECT *
 		FROM @HFAdvice
 	)
 	
-	UPDATE [Kitos_Prod_Nuværende].[dbo].[Advice]
+	UPDATE [Kitos].[dbo].[Advice]
 	SET IsActive = 0
 	WHERE Id IN (
 		SELECT [AdviceId]
@@ -102,7 +102,7 @@ BEGIN
 	
 	INSERT INTO @AdvicesToAddToHF
 	SELECT [Id], [AlarmDate], [Scheduling]
-	FROM [Kitos_Prod_Nuværende].[dbo].[Advice]
+	FROM [Kitos].[dbo].[Advice]
 	WHERE Scheduling IS NOT NULL AND Scheduling != 0 AND StopDate >= GETUTCDATE() AND IsActive = 1
 	AND [Id] NOT IN (
 		SELECT *
@@ -120,11 +120,11 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE AdviceId NOT IN(
 		SELECT CONVERT(int, SUBSTRING([Value], 8, 5))
-		FROM [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Set]
+		FROM [kitos_HangfireDB].[HangFire].[Set]
 		WHERE [Key] LIKE 'recurring-jobs' AND [Score] > 0 AND [Value] LIKE 'Advice: %'
 	)
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Set]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Set]
 	(
 		[Key],
 		[Score],
@@ -140,7 +140,7 @@ BEGIN
 	
 
 	/* Part 6: Fill Hash with data regarding the hangfire jobs */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -156,7 +156,7 @@ BEGIN
 
 
 	/* Add advice with scheduling hourly */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -171,7 +171,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 1
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -188,7 +188,7 @@ BEGIN
 
 
 	/* Add advice with scheduling daily */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -203,7 +203,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 2
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -218,7 +218,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 2 AND AlarmDate <= SYSUTCDATETIME()
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -235,7 +235,7 @@ BEGIN
 
 
 	/* Add advice with scheduling weekly */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -250,7 +250,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 3
 	
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -285,7 +285,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 3 AND AlarmDate <= SYSUTCDATETIME()	
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -301,7 +301,7 @@ BEGIN
 	WHERE Scheduling = 3 AND AlarmDate > SYSUTCDATETIME()
 
 	/* Add advice with scheduling monthly */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -316,7 +316,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 4
 	
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -334,7 +334,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 4 AND AlarmDate <= SYSUTCDATETIME()	
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -351,7 +351,7 @@ BEGIN
 	
 
 	/* Add advice with scheduling yearly */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -366,7 +366,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 5
 	
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -388,7 +388,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 	WHERE Scheduling = 5 AND AlarmDate <= SYSUTCDATETIME()	
 
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -405,7 +405,7 @@ BEGIN
 	/* Luckily we don't have any advice with the other more complicated schedulings */
 
 	/* Add timezone */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -420,7 +420,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 
 	/* Add queue */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -435,7 +435,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 
 	/* Add CreatedAt */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
@@ -450,7 +450,7 @@ BEGIN
 	FROM @AdvicesToAddToHF
 
 	/* Add V (pretty sure it's version) */
-	INSERT INTO [kitos_HangfireDB_Prod_Nuværende].[HangFire].[Hash]
+	INSERT INTO [kitos_HangfireDB].[HangFire].[Hash]
 	(
 		[Key],
 		[Field],
