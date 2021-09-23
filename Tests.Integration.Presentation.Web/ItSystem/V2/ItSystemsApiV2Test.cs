@@ -346,9 +346,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
 
-            await ItSystemHelper.SetNameRequestAsync(system2.Id, CreateName(), organization.Id);
-            await ItSystemHelper.SetNameRequestAsync(system3.Id, CreateName(), organization.Id);
-            await ItSystemHelper.SetNameRequestAsync(system1.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system2.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system3.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system1.Id, CreateName(), organization.Id);
             var system3DTO = await ItSystemV2Helper.GetSingleAsync(token, system3.Uuid); //system 3 was changed as the second one and system 1 the last
 
 
@@ -505,9 +505,9 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system3 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
 
-            await ItSystemHelper.SetNameRequestAsync(system2.Id, CreateName(), organization.Id);
-            await ItSystemHelper.SetNameRequestAsync(system3.Id, CreateName(), organization.Id);
-            await ItSystemHelper.SetNameRequestAsync(system1.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system2.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system3.Id, CreateName(), organization.Id);
+            await ItSystemHelper.SetNameAsync(system1.Id, CreateName(), organization.Id);
             var system3DTO = await ItSystemHelper.GetSystemAsync(system3.Id);
 
             //Act

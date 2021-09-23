@@ -132,7 +132,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
-        public static async Task<ItSystemDTO> SetNameRequestAsync(
+        public static async Task<ItSystemDTO> SetNameAsync(
             int systemId,
             string name,
             int organizationId,

@@ -54,7 +54,11 @@ namespace Presentation.Web.Controllers.API.V1.OData.AttachedOptions
         private void RaiseRootUpdated(AttachedOption entity)
         {
             var itSystemUsage = _usageRepository.GetSystemUsage(entity.ObjectId);
-            DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
+            
+            if (itSystemUsage != null)
+            {
+                DomainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
+            }
         }
     }
 }
