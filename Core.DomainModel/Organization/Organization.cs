@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
+using Core.DomainModel.Tracking;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -118,6 +119,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
         public virtual ICollection<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
+        public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

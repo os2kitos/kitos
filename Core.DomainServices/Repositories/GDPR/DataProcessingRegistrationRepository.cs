@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.DomainModel.Events;
 using Core.DomainModel.Extensions;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.Shared;
 using Core.DomainServices.Extensions;
 
 
