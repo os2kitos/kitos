@@ -185,6 +185,24 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
             Assert.Equal(all.Where(x => x.OccurredAtUtc >= filterByDateTime).ToList(), result.ToList());
         }
 
+        public static IEnumerable<object[]> GetTrackedEventTypes() => EnumRange.All<TrackedLifeCycleEventType>().Select(x => new object[] { x });
+
+        [Theory, MemberData(nameof(GetTrackedEventTypes))]
+        public void Can_Query_With_EventTypeFilter(TrackedLifeCycleEventType eventType)
+        {
+            //Arrange
+            const int howMany = 10;
+            var all = Many<LifeCycleTrackingEvent>(howMany).ToList();
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(all.AsQueryable());
+            ExpectCrossLevelOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.QueryLifeCycleEvents(eventType:eventType);
+
+            //Assert
+            Assert.Equal(all.Where(x => x.EventType >= eventType).ToList(), result.ToList());
+        }
+
         private IEnumerable<int> CreateUniqueIds(int toCreate)
         {
             var hashSet = new HashSet<int>();
