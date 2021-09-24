@@ -827,6 +827,10 @@
     <Compile Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.designer.cs">
       <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109240436309_Add_LifeCycleTrackingEvent.cs" />
+    <Compile Include="Migrations\202109240436309_Add_LifeCycleTrackingEvent.designer.cs">
+      <DependentUpon>202109240436309_Add_LifeCycleTrackingEvent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1362,6 +1366,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.resx">
       <DependentUpon>202109080825039_Changed_Running_And_ByEnding_In_Contract_To_Enum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109240436309_Add_LifeCycleTrackingEvent.resx">
+      <DependentUpon>202109240436309_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
