@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AutoFixture;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Tracking;
 using Core.DomainModel;
@@ -10,6 +11,7 @@ using Core.DomainModel.Tracking;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Moq;
+using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -107,7 +109,7 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
         }
 
         [Fact]
-        public void Can_Query_With_No_Refinements_As_No_RightsHolderAccess()
+        public void Can_Query_With_No_Refinements_As_RightsHolderAccess()
         {
             //Arrange
             var uniqueIds = CreateUniqueIds(13).ToList();
@@ -128,7 +130,7 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
             all.Skip(3).Take(1).ToList().ForEach(x => x.OptionalRightsHolderOrganization.Id = rightsHolderOrg);
 
             _organizationUserContextMock.Setup(x => x.OrganizationIds).Returns(orgIds);
-            _organizationUserContextMock.Setup(x=>x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(new []{rightsHolderOrg});
+            _organizationUserContextMock.Setup(x => x.GetOrganizationIdsWhereHasRole(OrganizationRole.RightsHolderAccess)).Returns(new[] { rightsHolderOrg });
             _repositoryMock.Setup(x => x.AsQueryable()).Returns(all);
             ExpectCrossLevelOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.RightsHolder);
 
@@ -139,6 +141,49 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
             Assert.Equal(all.Take(2).Concat(all.Skip(3).Take(1)), result);
         }
 
+
+        public static IEnumerable<object[]> GetTrackedEntityTypes() => EnumRange.All<TrackedEntityType>().Select(x => new object[] { x });
+
+        [Theory, MemberData(nameof(GetTrackedEntityTypes))]
+        public void Can_Query_With_EntityTypeFilter(TrackedEntityType filterBy)
+        {
+            //Arrange
+            var all = EnumRange.All<TrackedEntityType>().Select(eventType =>
+            {
+                var lifeCycleTrackingEvent = A<LifeCycleTrackingEvent>();
+                lifeCycleTrackingEvent.EntityType = eventType;
+                return lifeCycleTrackingEvent;
+            }).ToList().AsQueryable();
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(all);
+            ExpectCrossLevelOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.QueryLifeCycleEvents(trackedEntityType: filterBy);
+
+            //Assert
+            var trackingEvent = Assert.Single(result);
+            Assert.Equal(filterBy, trackingEvent.EntityType);
+        }
+
+        [Fact]
+        public void Can_Query_With_DeletedSinceFilter()
+        {
+            //Arrange
+            const int howMany = 10;
+            var all = Many<LifeCycleTrackingEvent>(howMany).ToList();
+            var referenceDate = A<DateTime>().ToUniversalTime();
+            var changedDates = Enumerable.Range(0, howMany).Select(x => referenceDate.AddMilliseconds(x)).ToList().Transform(changedDates => new Stack<DateTime>(changedDates));
+            all.RandomItems(howMany).ToList().ForEach(trackingEvent => trackingEvent.OccurredAtUtc = changedDates.Pop());
+            var filterByDateTime = all.RandomItem().OccurredAtUtc;
+            _repositoryMock.Setup(x => x.AsQueryable()).Returns(all.AsQueryable());
+            ExpectCrossLevelOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
+
+            //Act
+            var result = _sut.QueryLifeCycleEvents(since: filterByDateTime);
+
+            //Assert
+            Assert.Equal(all.Where(x => x.OccurredAtUtc >= filterByDateTime).ToList(), result.ToList());
+        }
 
         private IEnumerable<int> CreateUniqueIds(int toCreate)
         {
