@@ -358,6 +358,11 @@ namespace Presentation.Web.Controllers.API.V1
             }
         }
 
+        protected override void RaiseDeleted(ItContract entity)
+        {
+            //Delete is handled by the service so prevent duplicate deletion tracking
+        }
+
         protected override void PrepareNewObject(ItContract newContract)
         {
             newContract.Uuid = Guid.NewGuid();

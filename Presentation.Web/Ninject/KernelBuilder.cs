@@ -34,7 +34,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
@@ -73,7 +72,6 @@ using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
@@ -324,14 +322,14 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedSystemRelationsHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedSystemRelationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
 
-            RegisterDomainEvent<ContractDeleted, ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
@@ -354,7 +352,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);

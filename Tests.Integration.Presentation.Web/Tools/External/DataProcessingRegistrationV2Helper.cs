@@ -104,6 +104,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), payload));
         }
 
+        public static async Task DeleteAsync(string token, Guid uuid)
+        {
+            using var response = await SendDeleteAsync(token, uuid);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token);

@@ -1,12 +1,12 @@
 ﻿using System.Linq;
 using Core.DomainModel.Events;
-using Core.DomainModel.ItContract.DomainEvents;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Repositories.Advice;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class ContractDeletedAdvicesHandler : IDomainEventHandler<ContractDeleted>
+    public class ContractDeletedAdvicesHandler : IDomainEventHandler<EntityDeletedEvent<ItContract>>
     {
         private readonly IAdviceRepository _adviceRepository;
         private readonly IAdviceService _adviceService;
@@ -17,9 +17,9 @@ namespace Core.ApplicationServices.Model.EventHandler
             _adviceService = adviceService;
         }
 
-        public void Handle(ContractDeleted domainEvent)
+        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
         {
-            var contractDeleted = domainEvent.DeletedContract;
+            var contractDeleted = domainEvent.Entity;
             var toBeDeleted = _adviceRepository.GetByRelationIdAndType(contractDeleted.Id, RelatedEntityType.itContract).ToList();
             _adviceService.BulkDeleteAdvice(toBeDeleted);
         }

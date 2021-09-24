@@ -104,7 +104,6 @@
     <Compile Include="IHasUuid.cs" />
     <Compile Include="IIsPartOfOrganization.cs" />
     <Compile Include="IReadModel.cs" />
-    <Compile Include="ItContract\DomainEvents\ContractDeleted.cs" />
     <Compile Include="ItContract\IDataProcessingModule.cs" />
     <Compile Include="ItContract\ItContractConstraints.cs" />
     <Compile Include="ItProject\ItProjectConstraints.cs" />
