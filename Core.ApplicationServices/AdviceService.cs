@@ -284,8 +284,8 @@ namespace Core.ApplicationServices
 
         private void RemoveAdviceAndItsRelatedEntities(Advice advice)
         {
-            DeleteJobFromHangfire(advice);
             _adviceRepository.DeleteByKeyWithReferencePreload(advice.Id);
+            DeleteJobFromHangfire(advice);
         }
 
         private void DeleteJobFromHangfire(Advice advice)
@@ -419,11 +419,12 @@ namespace Core.ApplicationServices
                 var jobId = adviceTrigger.PartitionId.Match(partitionId => CreatePartitionJobId(prefix, partitionId), () => prefix);
                 _hangfireApi.AddOrUpdateRecurringJob(jobId, () => SendAdvice(adviceId), adviceTrigger.Cron);
             }
-
+            
             if (advice.StopDate.HasValue)
             {
                 //Schedule deactivation to happen the day after the stop date (stop date is "last day alive" for the advice)
-                _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(advice.StopDate.Value.Date.AddDays(1)));
+                var deactivateAt = advice.StopDate.Value.Date == DateTime.MaxValue.Date ? DateTime.MaxValue.Date : advice.StopDate.Value.Date.AddDays(1);
+                _hangfireApi.Schedule(() => DeactivateById(advice.Id), new DateTimeOffset(deactivateAt));
             }
 
             //If time has passed the trigger time, Hangfire will not fire until the next trigger date so we must force it.

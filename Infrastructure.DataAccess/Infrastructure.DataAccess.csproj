@@ -1437,7 +1437,7 @@
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Running_And_ByEnding.sql" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\SQLScripts\Deactive_Expired_Advice_With_No_Active_HF_Job.sql" />
+    <EmbeddedResource Include="Migrations\SQLScripts\Deactive_Expired_Advice_And_Schedule_Missing_Jobs.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

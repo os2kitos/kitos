@@ -14,6 +14,7 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Advice;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
 using Microsoft.AspNet.OData;
@@ -254,7 +255,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
         public override IHttpActionResult Delete(int key)
         {
             using var transaction = _transactionManager.Begin();
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
+            var entity = Repository.AsQueryable().ById(key);
             if (entity == null)
             {
                 return NotFound();
@@ -286,7 +287,8 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [ODataRoute("DeactivateAdvice")]
         public IHttpActionResult DeactivateAdvice([FromODataUri] int key)
         {
-            var entity = Repository.AsQueryable().SingleOrDefault(m => m.Id == key);
+            var transaction = _transactionManager.Begin();
+            var entity = Repository.AsQueryable().ById(key);
             if (entity == null) return NotFound();
 
             try
@@ -302,6 +304,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 Logger.ErrorException("Failed to delete advice", e);
                 return StatusCode(HttpStatusCode.InternalServerError);
             }
+            transaction.Commit();
             return Updated(entity);
         }
     }
