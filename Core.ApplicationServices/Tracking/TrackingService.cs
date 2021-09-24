@@ -22,24 +22,32 @@ namespace Core.ApplicationServices.Tracking
             _userContext = userContext;
         }
 
-        public IQueryable<LifeCycleTrackingEvent> QueryLifeCycleEvents(DateTime? since = null)
+        public IQueryable<LifeCycleTrackingEvent> QueryLifeCycleEvents(TrackedLifeCycleEventType? eventType = null, TrackedEntityType? trackedEntityType = null, DateTime? since = null)
         {
-            var query = QueryAllAvailable();
+            var query = QueryAllAvailable(eventType);
 
+            if (eventType.HasValue)
+            {
+                var trackedEventType = eventType.Value;
+                query = query.Where(x => x.EventType == trackedEventType);
+            }
             if (since.HasValue)
             {
                 var occurredAt = since.Value.ToUniversalTime();
                 query = query.Where(x => x.OccurredAtUtc >= occurredAt);
             }
+            if (trackedEntityType.HasValue)
+            {
+                var entityType = trackedEntityType.Value;
+                query = query.Where(x => x.EntityType == entityType);
+            }
 
             return query;
         }
 
-        private IQueryable<LifeCycleTrackingEvent> QueryAllAvailable()
+        private IQueryable<LifeCycleTrackingEvent> QueryAllAvailable(TrackedLifeCycleEventType? trackedLifeCycleEventType)
         {
-            var query = _trackingEventsRepository
-                .AsQueryable()
-                .Where(x => x.EventType == TrackedLifeCycleEventType.Deleted);
+            var query = _trackingEventsRepository.AsQueryable();
 
             var accessLevel = _authorizationContext.GetCrossOrganizationReadAccess();
 
@@ -58,8 +66,7 @@ namespace Core.ApplicationServices.Tracking
                             (x.OptionalOrganizationReference != null &&
                              organizationIds.Contains(x.OptionalOrganizationReference.Id)));
                 }
-
-                if (accessLevel == CrossOrganizationDataReadAccessLevel.Public)
+                else if (accessLevel == CrossOrganizationDataReadAccessLevel.Public)
                 {
                     query = query.Where(x =>
                         x.OptionalOrganizationReference == null ||

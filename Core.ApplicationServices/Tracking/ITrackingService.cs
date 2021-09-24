@@ -6,6 +6,6 @@ namespace Core.ApplicationServices.Tracking
 {
     public interface ITrackingService
     {
-        IQueryable<LifeCycleTrackingEvent> QueryLifeCycleEvents(DateTime? since = null);
+        IQueryable<LifeCycleTrackingEvent> QueryLifeCycleEvents(TrackedLifeCycleEventType? eventType = null, TrackedEntityType? trackedEntityType = null, DateTime? since = null);
     }
 }

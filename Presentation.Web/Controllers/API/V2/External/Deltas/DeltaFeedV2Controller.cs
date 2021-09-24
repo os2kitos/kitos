@@ -10,6 +10,7 @@ using Presentation.Web.Controllers.API.V2.External.Deltas.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Tracking;
+using Presentation.Web.Models.API.V2.Types.Shared;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Presentation.Web.Controllers.API.V2.External.Deltas
@@ -27,16 +28,20 @@ namespace Presentation.Web.Controllers.API.V2.External.Deltas
         /// <summary>
         /// Returns a feed of deleted items, optionally since a specified time (UTC)
         /// </summary>
-        /// <param name="deletedSinceUTC">Query by KLE category</param>
+        /// <param name="entityType">Filter results based on tracked entity type.</param>
+        /// <param name="deletedSinceUTC">Results will be returned where 'deletedTimeStamp >= deletedSinceUTC'</param>
         /// <returns></returns>
         [HttpGet]
         [Route("deleted-entities")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(IEnumerable<TrackingEventResponseDTO>))]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
-        public IHttpActionResult GetDeletedObjects(DateTime? deletedSinceUTC = null, [FromUri] BoundedPaginationQuery pagination = null)
+        public IHttpActionResult GetDeletedObjects(
+            TrackedEntityTypeChoice? entityType = null,
+            DateTime? deletedSinceUTC = null,
+            [FromUri] BoundedPaginationQuery pagination = null)
         {
             var dtos = _trackingService
-                .QueryLifeCycleEvents(deletedSinceUTC)
+                .QueryLifeCycleEvents(TrackedLifeCycleEventType.Deleted, entityType?.ToDomainType(), deletedSinceUTC)
                 .OrderBy(x => x.OccurredAtUtc)
                 .Page(pagination)
                 .AsNoTracking()

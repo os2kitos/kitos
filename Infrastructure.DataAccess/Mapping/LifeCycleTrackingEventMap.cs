@@ -16,16 +16,35 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.LifeCycleTrackingEventsWhereOrganizationIsRightsHolder)
                 .HasForeignKey(x => x.OptionalRightsHolderOrganizationId);
 
-            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OccurredAtUtc, x.EntityType, x.EventType })
-                .HasName("IX_Org_OccurredAt_EntityType_EventType")
+            //FK indexes for fast joins (are not created automatically once manual indexes are added where the ids are part of the columns)
+            HasIndex(x => x.OptionalOrganizationReferenceId)
                 .IsUnique(false);
 
-            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OptionalAccessModifier, x.OccurredAtUtc, x.EntityType, x.EventType })
-                .HasName("IX_Org_AccessModifier_OccurredAt_EntityType_EventType")
+            HasIndex(x => x.OptionalRightsHolderOrganizationId)
+                .IsUnique(false);
+
+            //Indexes to match expected query patterns
+            HasIndex(x => new { x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasName("IX_EventType_OccurredAt_EntityType_EventType")
+                .IsUnique(false);
+
+            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasName("IX_Org_EventType_OccurredAt_EntityType")
+                .IsUnique(false);
+
+            HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.OptionalOrganizationReferenceId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasName("IX_RightsHolder_Org_EventType_OccurredAt_EntityType")
+                .IsUnique(false);
+
+            HasIndex(x => new { x.OptionalRightsHolderOrganizationId, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasName("IX_RightsHolder_EventType_OccurredAt_EntityType")
+                .IsUnique(false);
+
+            HasIndex(x => new { x.OptionalOrganizationReferenceId, x.OptionalAccessModifier, x.EventType, x.OccurredAtUtc, x.EntityType })
+                .HasName("IX_Org_AccessModifier_EventType_OccurredAt_EntityType")
                 .IsUnique(false);
 
             HasIndex(x => x.EntityUuid)
-                .HasName("IX_EntityUuid")
                 .IsUnique(false);
         }
     }
