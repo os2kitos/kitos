@@ -36,6 +36,7 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
         {
             var outer = new Fixture();
             fixture.Inject<AccessModifier?>(AccessModifier.Local);
+            fixture.Register(() => new User() { Uuid = outer.Create<Guid>(), Id = outer.Create<int>() });
             fixture.Register(() => new Organization
             {
                 Id = outer.Create<int>(),
@@ -197,7 +198,7 @@ namespace Tests.Unit.Core.ApplicationServices.Deltas
             ExpectCrossLevelOrganizationReadAccess(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
-            var result = _sut.QueryLifeCycleEvents(eventType:eventType);
+            var result = _sut.QueryLifeCycleEvents(eventType: eventType);
 
             //Assert
             Assert.Equal(all.Where(x => x.EventType >= eventType).ToList(), result.ToList());
