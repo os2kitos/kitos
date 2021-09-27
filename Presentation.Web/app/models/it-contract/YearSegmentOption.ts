@@ -24,10 +24,8 @@
                 <any>{});
         }
 
-        static getFromOption(yearSegmentOption: number | string) {
+        static getFromOption(yearSegmentOption: number | string | null | undefined) {
             switch (yearSegmentOption) {
-                case null:
-                    return null;
                 case 0:
                     return this.options.filter(x => x.id === YearSegmentOption.EndOfCalendarYear)[0];
                 case 1:
@@ -40,7 +38,9 @@
                     return this.options.filter(x => x.id === YearSegmentOption.EndOfQuarter)[0];
                 case "2":
                     return this.options.filter(x => x.id === YearSegmentOption.EndOfMonth)[0];
-
+                case undefined:
+                case null:
+                    return null;
                 default:
                     throw new RangeError(`${yearSegmentOption} is not a valid yearSegment Option`);
             }
