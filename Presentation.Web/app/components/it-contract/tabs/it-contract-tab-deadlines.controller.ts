@@ -23,26 +23,26 @@
     app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "paymentMilestones", "handoverTrialTypes", "handoverTrials", "user", "moment", "$q", "contract",
         ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user, moment, $q, contract) => {
             $scope.contract = contract;
-            $scope.autosaveUrl = "api/itcontract/" + $scope.contract.id;
+            $scope.autosaveUrl = "api/itcontract/" + contract.id;
             $scope.optionExtensions = optionExtensions;
             $scope.terminationDeadlines = terminationDeadlines;
             $scope.paymentMilestones = paymentMilestones;
             $scope.handoverTrialTypes = handoverTrialTypes;
             $scope.handoverTrials = handoverTrials;
-            $scope.durationYears = $scope.contract.durationYears;
-            $scope.durationMonths = $scope.contract.durationMonths;
-            $scope.durationOngoing = $scope.contract.durationOngoing;
+            $scope.durationYears = contract.durationYears;
+            $scope.durationMonths = contract.durationMonths;
+            $scope.durationOngoing = contract.durationOngoing;
 
 
-            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.running);
-            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.byEnding);
+            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
+            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
 
             $scope.updateRunning = () => {
-                $scope.contract.running = $scope.running?.id;
+                contract.running = $scope.running?.id || null;
             }
 
             $scope.updateByEnding = () => {
-                $scope.contract.byEnding = $scope.byEnding?.id;
+                contract.byEnding = $scope.byEnding?.id || null;
             }
 
             $scope.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
@@ -58,9 +58,9 @@
                     }
 
                     saveDuration(payload).then(() => {
-                        $scope.contract.durationYears = $scope.durationYears;
+                        contract.durationYears = $scope.durationYears;
                     }, () => {
-                        $scope.durationYears = $scope.contract.durationYears;
+                        $scope.durationYears = contract.durationYears;
                     });
 
                 } else {
@@ -81,9 +81,9 @@
                     }
 
                     saveDuration(payload).then(() => {
-                        $scope.contract.durationMonths = $scope.durationMonths;
+                        contract.durationMonths = $scope.durationMonths;
                     }, () => {
-                        $scope.durationMonths = $scope.contract.durationMonths;
+                        $scope.durationMonths = contract.durationMonths;
                     });
 
                 } else {
@@ -100,16 +100,16 @@
                     "DurationOngoing": $scope.durationOngoing
                 };
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.patch(`odata/itcontracts(${$scope.contract.id})`, payload)
+                $http.patch(`odata/itcontracts(${contract.id})`, payload)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Varigheden blev gemt.");
                         $scope.durationYears = "";
                         $scope.durationMonths = "";
 
                         //it is done this way so '0' doesnt appear in input
-                        $scope.contract.durationOngoing = $scope.durationOngoing;
-                        $scope.contract.durationYears = $scope.durationYears;
-                        $scope.contract.durationMonths = $scope.durationMonths;
+                        contract.durationOngoing = $scope.durationOngoing;
+                        contract.durationYears = $scope.durationYears;
+                        contract.durationMonths = $scope.durationMonths;
 
                     }, function onError(result) {
                         msg.toErrorMessage("Varigheden blev ikke gemt.");
@@ -120,7 +120,7 @@
             function saveDuration(payload) {
                 const deferred = $q.defer();
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.patch(`odata/itcontracts(${$scope.contract.id})`, payload)
+                $http.patch(`odata/itcontracts(${contract.id})`, payload)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Varigheden blev gemt.");
 
@@ -154,7 +154,7 @@
             };
 
             $scope.saveMilestone = paymentMilestone => {
-                paymentMilestone.itContractId = $scope.contract.id;
+                paymentMilestone.itContractId = contract.id;
 
                 const approvedDate = moment(paymentMilestone.approved, Kitos.Constants.DateFormat.DanishDateFormat);
                 const expectedDate = moment(paymentMilestone.expected, Kitos.Constants.DateFormat.DanishDateFormat);
@@ -198,7 +198,7 @@
             };
 
             $scope.saveTrial = function (handoverTrial) {
-                handoverTrial.itContractId = $scope.contract.id;
+                handoverTrial.itContractId = contract.id;
                 handoverTrial.handoverTrialTypeId = $scope.handoverTrialType.id;
                 const approvedDate = moment(handoverTrial.approved, Kitos.Constants.DateFormat.DanishDateFormat);
                 const expectedDate = moment(handoverTrial.expected, Kitos.Constants.DateFormat.DanishDateFormat);
