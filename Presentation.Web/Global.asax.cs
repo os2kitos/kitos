@@ -36,7 +36,7 @@ namespace Presentation.Web
             // Convert all dates to UTC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
 
-            // Convert all dates to UTC
+            // Add merge-patch+json as accepted media type
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/merge-patch+json"));
 
             //Add to MVC pipeline
