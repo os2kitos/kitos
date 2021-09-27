@@ -659,6 +659,7 @@
     <Compile Include="Ninject\NinjectControllerActivator.cs" />
     <Compile Include="Swagger\CustomCachingSwaggerProvider.cs" />
     <Compile Include="Swagger\FilterByApiVersionFilter.cs" />
+    <Compile Include="Swagger\FixContentParameterTypesOnSwaggerSpec.cs" />
     <Compile Include="Swagger\FixNamingOfComplexQueryParametersFilter.cs" />
     <Compile Include="Swagger\RemoveMutatingCallsFilter.cs" />
     <TypeScriptCompile Include="app\components\data-processing\data-processing-registration-edit.controller.ts" />
