@@ -58,6 +58,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var requestMessage = CreatePatchMessage(url, body);
             requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/merge-patch+json");
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 

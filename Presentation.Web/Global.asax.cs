@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using System.Net.Http.Headers;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
@@ -34,6 +35,9 @@ namespace Presentation.Web
 
             // Convert all dates to UTC
             GlobalConfiguration.Configuration.Formatters.JsonFormatter.SerializerSettings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+
+            // Convert all dates to UTC
+            GlobalConfiguration.Configuration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/merge-patch+json"));
 
             //Add to MVC pipeline
             ControllerBuilder.Current.SetControllerFactory(new DefaultControllerFactory(new NinjectControllerActivator()));
