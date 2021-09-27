@@ -1,4 +1,5 @@
 ﻿using System;
+using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
@@ -7,6 +8,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Tracking;
+using Core.DomainServices.Context;
 
 namespace Core.DomainServices.Tracking
 {
@@ -19,10 +21,12 @@ namespace Core.DomainServices.Tracking
         IDomainEventHandler<EntityDeletedEvent<ItProject>>
     {
         private readonly IGenericRepository<LifeCycleTrackingEvent> _trackingEventsRepository;
+        private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
 
-        public TrackDeletedEntitiesEventHandler(IGenericRepository<LifeCycleTrackingEvent> trackingEventsRepository)
+        public TrackDeletedEntitiesEventHandler(IGenericRepository<LifeCycleTrackingEvent> trackingEventsRepository, Factory<Maybe<ActiveUserIdContext>> userContext)
         {
             _trackingEventsRepository = trackingEventsRepository;
+            _userContext = userContext;
         }
 
         public void Handle(EntityDeletedEvent<ItSystem> domainEvent) => TrackDeleted(domainEvent.Entity);
@@ -40,6 +44,7 @@ namespace Core.DomainServices.Tracking
         private void TrackDeleted<T>(T entity) where T : IHasUuid
         {
             var newEvent = CreateEvent(entity);
+            newEvent.UserId = _userContext().Select(x => x.ActiveUserId).Match(id => id, () => (int?)null);
             _trackingEventsRepository.Insert(newEvent);
             _trackingEventsRepository.Save();
         }

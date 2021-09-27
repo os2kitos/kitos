@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202109240436309_Add_LifeCycleTrackingEvent"; }
+            get { return "202109270851074_Add_LifeCycleTrackingEvent"; }
         }
         
         string IMigrationMetadata.Source

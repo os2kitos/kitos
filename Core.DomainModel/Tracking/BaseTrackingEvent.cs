@@ -45,5 +45,11 @@ namespace Core.DomainModel.Tracking
         /// If available, an access modifier of the tracked entity (determines if the tracking event of an organization-bound entity is eligible for sharing)
         /// </summary>
         public virtual Organization.Organization OptionalRightsHolderOrganization { get; set; }
+
+        public int? UserId { get; set; }
+        /// <summary>
+        /// User responsible for the event
+        /// </summary>
+        public virtual User User { get; set; }
     }
 }

@@ -46,6 +46,10 @@ namespace Infrastructure.DataAccess.Mapping
 
             HasIndex(x => x.EntityUuid)
                 .IsUnique(false);
+
+            HasOptional(x => x.User)
+                .WithMany(x => x.LifeCycleTrackingEvents)
+                .HasForeignKey(x => x.UserId);
         }
     }
 }
