@@ -127,6 +127,31 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         [Fact]
+        public async Task Can_GET_All_Contracts_With_LastModifiedFiltering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var contract1 = await CreateContractAsync(organization.Id);
+            var contract2 = await CreateContractAsync(organization.Id);
+            var contract3 = await CreateContractAsync(organization.Id);
+
+            foreach (var contract in new[] { contract2, contract3, contract1 })
+            {
+                using var patchResponse = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, contract.Uuid, new ContractGeneralDataWriteRequestDTO() { Notes = A<string>() });
+                Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            }
+
+            var referenceChange = await ItContractV2Helper.GetItContractAsync(token, contract3.Uuid);
+
+            //Act
+            var dtos = await ItContractV2Helper.GetItContractsAsync(token, changedSinceGtEq: referenceChange.LastModified);
+
+            //Assert that the right contracts are returned in the correct order
+            Assert.Equal(new[] { contract3.Uuid, contract1.Uuid }, dtos.Select(x => x.Uuid));
+
+        }
+
+        [Fact]
         public async Task Can_GET_All_Contracts_With_User_OrganizationFiltering_Implicit()
         {
             //Arrange
@@ -1419,7 +1444,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             using var response1 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input1);
-            Assert.Equal(HttpStatusCode.OK,response1.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response1.StatusCode);
 
             //Assert
             var freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
@@ -1448,7 +1473,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
             AssertPayments(input4, freshDTO);
-            
+
             //Act
             using var response5 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input5);
             Assert.Equal(HttpStatusCode.OK, response5.StatusCode);
@@ -1456,7 +1481,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             freshDTO = (await ItContractV2Helper.GetItContractAsync(token, dto.Uuid)).Payments;
             AssertPayments(input5, freshDTO);
-            
+
             //Act
             using var response6 = await ItContractV2Helper.SendPatchPayments(token, dto.Uuid, input6);
             Assert.Equal(HttpStatusCode.OK, response6.StatusCode);
@@ -1654,7 +1679,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var paymentsRequest = await CreatePaymentsInput(token, organization, true, true);
             var (paymentModelRequest, paymentFrequencyType, paymentModelType, priceRegulationType) = await CreatePaymentModelRequestAsync(organization.Uuid, true, true, true, true);
             var (terminationRequest, noticePeriodMonthsType) = await CreateTerminationRequest(organization.Uuid, true);
-            
+
             var requestDto = new CreateNewContractRequestDTO()
             {
                 OrganizationUuid = organization.Uuid,
@@ -1866,7 +1891,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Null(agreementPeriod.IrrevocableUntil);
             Assert.False(agreementPeriod.IsContinuous);
             Assert.Equal(0, agreementPeriod.ExtensionOptionsUsed);
-            
+
             AssertPaymentModel(requestDto3.PaymentModel, null, null, null, contractDTO3.PaymentModel);
             AssertTermination(requestDto3.Termination, null, contractDTO3.Termination);
         }
@@ -1889,7 +1914,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             using var getResponse = await ItContractV2Helper.SendGetItContractAsync(token, contractDTO.Uuid);
-            Assert.Equal(HttpStatusCode.NotFound,  getResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.NotFound, getResponse.StatusCode);
         }
 
         [Fact]

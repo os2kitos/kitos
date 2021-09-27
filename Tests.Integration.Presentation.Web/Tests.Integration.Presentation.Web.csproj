@@ -111,8 +111,10 @@
     <Compile Include="Advice\AdviceTest.cs" />
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
+    <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
+    <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
     <Compile Include="Tools\External\ApiV2HelperPatchPayloadExtensions.cs" />
     <Compile Include="Tools\External\DataProcessingRegistrationV2Helper.cs" />
     <Compile Include="KLE\V2\KleOptionV2ApiTest.cs" />

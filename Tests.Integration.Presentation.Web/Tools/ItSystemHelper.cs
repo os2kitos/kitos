@@ -132,6 +132,17 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(url, cookie, body);
         }
 
+        public static async Task<ItSystemDTO> SetNameAsync(
+            int systemId,
+            string name,
+            int organizationId,
+            Cookie optionalLogin = null)
+        {
+            using var response = await SendSetNameRequestAsync(systemId, name, organizationId, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
+        }
+
         public static async Task<HttpResponseMessage> SendSetNameRequestAsync(
             int systemId,
             string name,

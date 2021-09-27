@@ -116,6 +116,7 @@ namespace Presentation.Web.Controllers.API.V1
                     ItContract_Id = contract.Id
                 });
 
+                RaiseUpdated(contract);
                 Repository.Save();
 
                 return Ok();
@@ -147,6 +148,7 @@ namespace Presentation.Web.Controllers.API.V1
                 var relation = contract.AssociatedAgreementElementTypes.FirstOrDefault(e => e.AgreementElementType_Id == elem.Id);
                 contract.AssociatedAgreementElementTypes.Remove(relation);
 
+                RaiseUpdated(contract);
                 Repository.Save();
 
                 return Ok();
@@ -191,6 +193,7 @@ namespace Presentation.Web.Controllers.API.V1
 
                 contract.AssociatedSystemUsages.Add(new ItContractItSystemUsage { ItContractId = id, ItSystemUsageId = systemUsageId });
 
+                RaiseUpdated(contract);
                 Repository.Save();
 
                 return Ok(MapSystemUsages(contract));
@@ -230,6 +233,7 @@ namespace Presentation.Web.Controllers.API.V1
 
                 contract.AssociatedSystemUsages.Remove(contractItSystemUsage);
 
+                RaiseUpdated(contract);
                 Repository.Save();
 
                 return Ok(MapSystemUsages(contract));
@@ -352,6 +356,11 @@ namespace Presentation.Web.Controllers.API.V1
                         throw new InvalidOperationException(result.Error.ToString("G"));
                 }
             }
+        }
+
+        protected override void RaiseDeleted(ItContract entity)
+        {
+            //Delete is handled by the service so prevent duplicate deletion tracking
         }
 
         protected override void PrepareNewObject(ItContract newContract)

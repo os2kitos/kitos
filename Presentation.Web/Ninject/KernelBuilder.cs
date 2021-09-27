@@ -34,7 +34,6 @@ using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
@@ -73,7 +72,6 @@ using Infrastructure.Services.Cryptography;
 using Infrastructure.Services.DataAccess;
 using Infrastructure.Services.Http;
 using Infrastructure.Services.KLEDataBridge;
-
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Owin;
 using Ninject;
@@ -110,6 +108,8 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Tracking;
+using Core.DomainServices.Tracking;
 
 namespace Presentation.Web.Ninject
 {
@@ -236,6 +236,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IOptionResolver>().To<NinjectIOptionResolver>().InCommandScope(Mode);
             kernel.Bind<IAssignmentUpdateService>().To<AssignmentUpdateService>().InCommandScope(Mode);
             kernel.Bind<IEntityResolver>().To<NinjectEntityResolver>().InCommandScope(Mode);
+            kernel.Bind<ITrackingService>().To<TrackingService>().InCommandScope(Mode);
 
             //Role assignment services
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
@@ -321,14 +322,14 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<LocalDataProcessingOversightOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedSystemRelationsHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, ContractDeletedAdvicesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedSystemRelationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedAdvicesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedAdvicesHandler>(kernel);
 
-            RegisterDomainEvent<ContractDeleted, ContractDeletedUserNotificationsHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, ContractDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, ProjectDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, DataProcessingRegistrationDeletedUserNotificationsHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, SystemUsageDeletedUserNotificationsHandler>(kernel);
@@ -351,13 +352,28 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ExternalReference>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
-            RegisterDomainEvent<ContractDeleted, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItProject>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItInterface>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+
+            //Dirty marking
+            RegisterDomainEvent<EntityUpdatedEvent<ItInterface>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystemUsage>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<ItContract>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+            RegisterDomainEvent<EntityUpdatedEvent<DataProcessingRegistration>, MarkEntityAsDirtyOnChangeEventHandler>(kernel);
+
+            //Deletion tracking
+            RegisterDomainEvent<EntityDeletedEvent<ItProject>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItInterface>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystemUsage>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItSystem>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<ItContract>, TrackDeletedEntitiesEventHandler>(kernel);
+            RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, TrackDeletedEntitiesEventHandler>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)

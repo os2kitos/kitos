@@ -15,15 +15,15 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 {
     public static class DataProcessingRegistrationV2Helper
     {
-        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null)
+        public static async Task<IEnumerable<DataProcessingRegistrationResponseDTO>> GetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, DateTime? changedSinceGtEq = null)
         {
-            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded);
+            using var response = await SendGetDPRsAsync(token, page, pageSize, organizationUuid, systemUuid, systemUsageUuid, dataProcessorUuid, subDataProcessorUuid, agreementConcluded, changedSinceGtEq);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsAsync<IEnumerable<DataProcessingRegistrationResponseDTO>>();
         }
 
-        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null)
+        public static async Task<HttpResponseMessage> SendGetDPRsAsync(string token, int page = 0, int pageSize = 10, Guid? organizationUuid = null, Guid? systemUuid = null, Guid? systemUsageUuid = null, Guid? dataProcessorUuid = null, Guid? subDataProcessorUuid = null, bool? agreementConcluded = null, DateTime? changedSinceGtEq = null)
         {
             var queryParameters = new List<KeyValuePair<string, string>>()
             {
@@ -48,6 +48,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External
 
             if (agreementConcluded.HasValue)
                 queryParameters.Add(new KeyValuePair<string, string>("agreementConcluded", agreementConcluded.Value.ToString()));
+
+            if (changedSinceGtEq.HasValue)
+                queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
 
@@ -101,6 +104,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token, CreatePatchPayload(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids), payload));
         }
 
+        public static async Task DeleteAsync(string token, Guid uuid)
+        {
+            using var response = await SendDeleteAsync(token, uuid);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
         public static async Task<HttpResponseMessage> SendDeleteAsync(string token, Guid uuid)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations/{uuid}"), token);

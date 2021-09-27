@@ -21,6 +21,7 @@ using Core.DomainModel.KLE;
 using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Notification;
+using Core.DomainModel.Tracking;
 
 namespace Infrastructure.DataAccess
 {
@@ -175,6 +176,7 @@ namespace Infrastructure.DataAccess
         public DbSet<DataProcessingRegistrationOversightDate> DataProcessingRegistrationOversightDates { get; set; }
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<ItInterface> ItInterfaces { get; set; }
+        public DbSet<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -283,6 +285,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItSystemUsageOverviewUsingSystemUsageReadModelMap());
             modelBuilder.Configurations.Add(new UserNotificationMap());
             modelBuilder.Configurations.Add(new AttachedOptionMap());
+            modelBuilder.Configurations.Add(new LifeCycleTrackingEventMap());
         }
     }
 }

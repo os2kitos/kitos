@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Contract;
@@ -33,7 +30,6 @@ namespace Core.ApplicationServices.Contract
         private readonly IItContractRepository _repository;
         private readonly ILogger _logger;
         private readonly IContractDataProcessingRegistrationAssignmentService _contractDataProcessingRegistrationAssignmentService;
-        private readonly IOrganizationService _organizationService;
         private readonly IOrganizationalUserContext _userContext;
 
         public ItContractService(
@@ -44,8 +40,7 @@ namespace Core.ApplicationServices.Contract
             IDomainEvents domainEvents,
             IAuthorizationContext authorizationContext,
             ILogger logger,
-            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService,
-            IOrganizationService organizationService, 
+            IContractDataProcessingRegistrationAssignmentService contractDataProcessingRegistrationAssignmentService, 
             IOrganizationalUserContext userContext)
         {
             _repository = repository;
@@ -56,7 +51,6 @@ namespace Core.ApplicationServices.Contract
             _authorizationContext = authorizationContext;
             _logger = logger;
             _contractDataProcessingRegistrationAssignmentService = contractDataProcessingRegistrationAssignmentService;
-            _organizationService = organizationService;
             _userContext = userContext;
         }
 
@@ -125,7 +119,7 @@ namespace Core.ApplicationServices.Contract
                         transaction.Rollback();
                         return deleteByContractId.Error;
                     }
-                    _domainEvents.Raise(new ContractDeleted(contract));
+                    _domainEvents.Raise(new EntityDeletedEvent<ItContract>(contract));
                     _repository.DeleteContract(contract);
 
                     transaction.Commit();
@@ -159,7 +153,7 @@ namespace Core.ApplicationServices.Contract
             return WithReadAccess<IEnumerable<DataProcessingRegistration>>(id, contract =>
                 _contractDataProcessingRegistrationAssignmentService
                     .GetApplicableDataProcessingRegistrations(contract)
-                    .Where(x => x.Name.Contains(nameQuery))
+                    .ByPartOfName(nameQuery)
                     .OrderBy(x => x.Id)
                     .Take(pageSize)
                     .OrderBy(x => x.Name)

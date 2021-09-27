@@ -8,7 +8,6 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
 using Core.DomainModel.Shared;
-
 using Core.DomainModel.Notification;
 using System;
 using Core.Abstractions.Extensions;
@@ -29,7 +28,8 @@ namespace Core.DomainModel.ItSystemUsage
         IHasAttachedOptions,
         IEntityWithAdvices,
         IEntityWithUserNotification,
-        IHasUuid
+        IHasUuid,
+        IHasDirtyMarking
     {
         public const int LongProperyMaxLength = 200;
         public const int DefaultMaxLength = 100;
@@ -51,6 +51,7 @@ namespace Core.DomainModel.ItSystemUsage
             SensitiveDataLevels = new List<ItSystemUsageSensitiveDataLevel>();
             UserNotifications = new List<UserNotification>();
             Uuid = Guid.NewGuid();
+            MarkAsDirty();
         }
 
         public bool IsActive
@@ -898,6 +899,11 @@ namespace Core.DomainModel.ItSystemUsage
             }
 
             return Maybe<OperationError>.None;
+        }
+
+        public void MarkAsDirty()
+        {
+            LastChanged = DateTime.UtcNow;
         }
     }
 }

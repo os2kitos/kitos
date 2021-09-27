@@ -1,11 +1,9 @@
 ﻿using Core.DomainModel.Organization;
 using Core.DomainServices;
-using Presentation.Web.Models;
 using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using Core.DomainModel;
 using Core.DomainModel.Constants;
 using Core.DomainServices.Authorization;
 using Presentation.Web.Infrastructure.Attributes;

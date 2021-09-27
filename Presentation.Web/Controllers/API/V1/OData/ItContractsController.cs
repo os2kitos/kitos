@@ -7,7 +7,6 @@ using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 using Core.DomainModel.ItContract;
 using Core.DomainServices;
-using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Repositories.Organization;
@@ -20,16 +19,11 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [PublicApi]
     public class ItContractsController : BaseEntityController<ItContract>
     {
-        private readonly IGenericRepository<OrganizationUnit> _orgUnitRepository;
         private readonly IOrganizationUnitRepository _organizationUnitRepository;
 
-        public ItContractsController(
-            IGenericRepository<ItContract> repository,
-            IGenericRepository<OrganizationUnit> orgUnitRepository,
-            IOrganizationUnitRepository organizationUnitRepository)
+        public ItContractsController(IGenericRepository<ItContract> repository, IOrganizationUnitRepository organizationUnitRepository)
             : base(repository)
         {
-            _orgUnitRepository = orgUnitRepository;
             _organizationUnitRepository = organizationUnitRepository;
         }
 

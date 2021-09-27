@@ -85,6 +85,7 @@
     <Compile Include="Mapping\ItSystemUsageOverviewSensitiveDataLevelReadModelMap.cs" />
     <Compile Include="Mapping\ItSystemUsageOverviewTaskRefReadModelMap.cs" />
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
+    <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
     <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
@@ -830,6 +831,10 @@
     <Compile Include="Migrations\202109211348552_Advice-Fix.designer.cs">
       <DependentUpon>202109211348552_Advice-Fix.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.cs" />
+    <Compile Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.designer.cs">
+      <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1368,6 +1373,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202109211348552_Advice-Fix.resx">
       <DependentUpon>202109211348552_Advice-Fix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.resx">
+      <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

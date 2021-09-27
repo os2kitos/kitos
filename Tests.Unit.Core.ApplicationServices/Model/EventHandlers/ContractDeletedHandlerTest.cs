@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Data;
 using System.Linq;
+using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
 using Core.DomainServices.Model.EventHandlers;
@@ -28,7 +27,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
         }
 
         [Fact]
-        private void Handle_ContractDeleted_Resets_Contract_On_Associated_Relations()
+        public void Handle_ContractDeleted_Resets_Contract_On_Associated_Relations()
         {
             //Arrange
             var deletedContract = new ItContract();
@@ -41,7 +40,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new ContractDeleted(deletedContract));
+            _sut.Handle(new EntityDeletedEvent<ItContract>(deletedContract));
 
             //Assert that all interface fields were reset
             Assert.True(deletedContract.AssociatedSystemRelations.All(x => x.AssociatedContract == null));

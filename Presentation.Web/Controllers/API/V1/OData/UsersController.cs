@@ -8,7 +8,6 @@ using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization.Permissions;
-
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;
 

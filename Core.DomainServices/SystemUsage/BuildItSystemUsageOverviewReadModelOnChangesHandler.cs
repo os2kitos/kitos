@@ -3,10 +3,8 @@ using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
-using Core.DomainModel.ItSystem.DomainEvents;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.LocalOptions;
@@ -35,7 +33,7 @@ namespace Core.DomainServices.SystemUsage
     IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
     IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
     IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
-    IDomainEventHandler<ContractDeleted>,
+    IDomainEventHandler<EntityDeletedEvent<ItContract>>,
     IDomainEventHandler<EntityUpdatedEvent<ItProject>>,
     IDomainEventHandler<EntityDeletedEvent<ItProject>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
@@ -147,9 +145,9 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
         }
 
-        public void Handle(ContractDeleted domainEvent)
+        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
         {
-            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.DeletedContract.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
         }
 
         public void Handle(EntityUpdatedEvent<ItProject> domainEvent)
