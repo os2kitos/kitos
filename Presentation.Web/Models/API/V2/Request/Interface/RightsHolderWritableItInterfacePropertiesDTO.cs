@@ -2,10 +2,11 @@
 using System.ComponentModel.DataAnnotations;
 using Core.DomainModel.ItSystem;
 using Presentation.Web.Infrastructure.Attributes;
+using Presentation.Web.Models.API.V2.SharedProperties;
 
 namespace Presentation.Web.Models.API.V2.Request.Interface
 {
-    public class RightsHolderWritableItInterfacePropertiesDTO
+    public class RightsHolderWritableItInterfacePropertiesDTO : IHasNameExternal
     {
         /// <summary>
         /// UUID for IT-System exposing this IT-Interface

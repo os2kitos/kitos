@@ -11,6 +11,7 @@ using Core.ApplicationServices.RightsHolders;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Interface;
+using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -27,11 +28,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
     {
         private readonly IItInterfaceRightsHolderService _rightsHolderService;
         private readonly IItInterfaceService _itInterfaceService;
+        private readonly IItInterfaceWriteModelMapper _writeModelMapper;
 
-        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService, IItInterfaceService itInterfaceService)
+        public ItInterfaceV2Controller(IItInterfaceRightsHolderService rightsHolderService, IItInterfaceService itInterfaceService, IItInterfaceWriteModelMapper writeModelMapper)
         {
             _rightsHolderService = rightsHolderService;
             _itInterfaceService = itInterfaceService;
+            _writeModelMapper = writeModelMapper;
         }
 
 
@@ -54,14 +57,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var creationParameters = new RightsHolderItInterfaceCreationParameters(
-                request.Uuid,
-                request.ExposedBySystemUuid,
-                request.Name,
-                request.InterfaceId,
-                request.Version,
-                request.Description,
-                request.UrlReference);
+            var creationParameters = _writeModelMapper.FromPOST(request);
+
+            //var creationParameters = new RightsHolderItInterfaceCreationParameters(
+            //    request.Uuid,
+            //    request.ExposedBySystemUuid,
+            //    request.Name,
+            //    request.InterfaceId,
+            //    request.Version,
+            //    request.Description,
+            //    request.UrlReference);
 
             return _rightsHolderService
                 .CreateNewItInterface(request.RightsHolderUuid, creationParameters)
@@ -151,13 +156,35 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var updateParameters = new RightsHolderItInterfaceUpdateParameters(
-                request.ExposedBySystemUuid,
-                request.Name,
-                request.InterfaceId,
-                request.Version,
-                request.Description,
-                request.UrlReference);
+            var updateParameters = _writeModelMapper.FromPUT(request);
+
+            return _rightsHolderService
+                .UpdateItInterface(uuid, updateParameters)
+                .Select(ToRightsHolderItInterfaceResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+
+        /// <summary>
+        /// Allows partial updates of an existing it-interface
+        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
+        /// </summary>
+        /// <param name="uuid">UUID of the interface in KITOS</param>
+        /// <param name="request">Updates for the interface</param>
+        /// <returns></returns>
+        [HttpPatch]
+        [Route("rightsholder/it-interfaces/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult PatchItContract([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var updateParameters = _writeModelMapper.FromPATCH(request);
 
             return _rightsHolderService
                 .UpdateItInterface(uuid, updateParameters)

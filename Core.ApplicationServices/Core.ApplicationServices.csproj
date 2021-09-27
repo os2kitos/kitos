@@ -158,7 +158,6 @@
     <Compile Include="Model\Shared\Write\UserRolePair.cs" />
     <Compile Include="Model\System\IRightsHolderWritableSystemProperties.cs" />
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
-    <Compile Include="Model\Interface\RightsHolderItInterfaceParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />

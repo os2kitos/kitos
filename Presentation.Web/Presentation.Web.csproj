@@ -384,6 +384,8 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\YearSegmentMappingExtension.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\IItInterfaceWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItInterfaces\Mapping\ItInterfaceWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
