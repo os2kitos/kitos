@@ -170,42 +170,21 @@ IF OBJECT_ID('kitos_HangfireDB.HangFire.Set', 'U') IS NOT NULL AND
 			FROM @NewHFJobs
 		)
 
-		DECLARE @JobsWhichHasPassedAlarmDate TABLE
-		(
-			[JobId] int
-		)
 
-		INSERT INTO @JobsWhichHasPassedAlarmDate
-		SELECT NewJobs.JobId
-		FROM @NewHFJobs AS NewJobs
-			INNER JOIN
-			@AdvicesToAddToHF AS Advices ON NewJobs.AdviceId = Advices.AdviceId
-		WHERE Advices.AlarmDate <= SYSUTCDATETIME()
-
-
-		DECLARE @JobsHasYetToPassAlarmDate TABLE
+		DECLARE @JobsAdd TABLE
 		(
 			[JobId] int,
 			[AlarmDate] datetime2
 		)
 
-		INSERT INTO @JobsHasYetToPassAlarmDate ([JobId], [AlarmDate])
+		INSERT INTO @JobsAdd ([JobId], [AlarmDate])
 		SELECT NewJobs.[JobId], Advices.AlarmDate
 		FROM @NewHFJobs AS NewJobs
 			INNER JOIN
 			@AdvicesToAddToHF AS Advices ON NewJobs.AdviceId = Advices.AdviceId
-		WHERE Advices.AlarmDate > SYSUTCDATETIME()
-	
-		/* When adding to SET the [Score] which is EPOCH decides when to run the scheduled job. */
-		MERGE [kitos_HangfireDB].[HangFire].[Set] WITH (holdlock) AS [Target]
-		USING @JobsWhichHasPassedAlarmDate AS [Source]
-		ON [Target].[Key] = [Source].[JobId] AND [Target].[Value] = 'schedule'
-		WHEN MATCHED THEN UPDATE SET [Score] = DATEDIFF_BIG(SECOND, DATEFROMPARTS(1970, 1, 1), SYSUTCDATETIME())
-		WHEN NOT MATCHED THEN INSERT ([Key], [Score], [Value]) VALUES ('schedule', DATEDIFF_BIG(SECOND, DATEFROMPARTS(1970, 1, 1), SYSUTCDATETIME()), [Source].[JobId]);
-
 
 		MERGE [kitos_HangfireDB].[HangFire].[Set] WITH (holdlock) AS [Target]
-		USING @JobsHasYetToPassAlarmDate AS [Source]
+		USING @JobsAdd AS [Source]
 		ON [Target].[Key] = [Source].[JobId] AND [Target].[Value] = 'schedule'
 		WHEN MATCHED THEN UPDATE SET [Score] = DATEDIFF_BIG(SECOND, DATEFROMPARTS(1970, 1, 1), [AlarmDate])
 		WHEN NOT MATCHED THEN INSERT ([Key], [Score], [Value]) VALUES ('schedule', DATEDIFF_BIG(SECOND, DATEFROMPARTS(1970, 1, 1), [AlarmDate]), [Source].[JobId]);
