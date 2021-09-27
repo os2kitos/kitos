@@ -8,6 +8,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
+using Core.DomainModel.Tracking;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -38,6 +39,8 @@ namespace Core.DomainModel.Organization
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
+            LifeCycleTrackingEvents = new List<LifeCycleTrackingEvent>();
+            LifeCycleTrackingEventsWhereOrganizationIsRightsHolder = new List<LifeCycleTrackingEvent>();
             Uuid = Guid.NewGuid();
         }
         public string Name { get; set; }
@@ -118,6 +121,8 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
         public virtual ICollection<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
+        public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
+        public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

@@ -362,6 +362,8 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\YesNoUndecidedMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\DataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\Deltas\Mapping\TrackedEntityTypeMappingExtensions.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
@@ -432,6 +434,7 @@
     <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\PaymentResponseDTO.cs" />
+    <Compile Include="Models\API\V2\Response\Tracking\TrackingEventResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentAuditStatus.cs" />
     <Compile Include="Models\API\V2\Types\Contract\PaymentMileStoneDTO.cs" />
     <Compile Include="Models\API\V2\Types\Contract\ProcurementPlanDTO.cs" />
@@ -483,6 +486,7 @@
     <Compile Include="Models\API\V2\Response\Generic\Roles\RoleAssignmentResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\SystemUsage\GDPRRegistrationsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Types\Shared\OversightIntervalChoice.cs" />
+    <Compile Include="Models\API\V2\Types\Shared\TrackedEntityTypeChoice.cs" />
     <Compile Include="Models\API\V2\Types\Shared\YesNoIrrelevantChoice.cs" />
     <Compile Include="Models\API\V2\Types\Shared\YesNoUndecidedChoice.cs" />
     <Compile Include="Models\API\V2\Types\SystemUsage\JournalPeriodDTO.cs" />

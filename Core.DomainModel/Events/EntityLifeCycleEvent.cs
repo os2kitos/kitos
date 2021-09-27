@@ -1,11 +1,7 @@
-﻿namespace Core.DomainModel.Events
+﻿using Core.DomainModel.Shared;
+
+namespace Core.DomainModel.Events
 {
-    public enum LifeCycleEventType
-    {
-        Created,
-        Updated,
-        Deleted
-    }
 
     /// <summary>
     /// base class for entity lifecycle events. Do not use for registrations - use the specific implementations to get better granularity in what is posted to the handler

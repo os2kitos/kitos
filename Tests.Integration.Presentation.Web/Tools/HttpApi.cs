@@ -378,21 +378,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await PostWithCookieAsync(TestEnvironment.CreateUrl($"odata/Organizations({organizationId})/Rights"), cookie, roleDto);
         }
 
-        public static async Task<HttpResponseMessage> PatchOdataUserAsync(ApiUserDTO userDto, int userId)
+        public static async Task PatchOdataUserAsync(ApiUserDTO userDto, int userId)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             using var patch = await PatchWithCookieAsync(TestEnvironment.CreateUrl($"odata/Users({userId})"), cookie, userDto);
             Assert.Equal(HttpStatusCode.NoContent, patch.StatusCode);
-            return patch;
         }
 
-        public static async Task<HttpResponseMessage> DeleteUserAsync(int id)
+        public static async Task DeleteUserAsync(int id)
         {
             var cookie = await GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);
+            using var response = await DeleteWithCookieAsync(TestEnvironment.CreateUrl("api/user/" + id), cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return response;
         }
 
         public static readonly string OdataDateTimeFormat = "O"; //ISO 8601

@@ -201,5 +201,11 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/it-system-usages/{uuid}/system-relations/{systemRelationUuid}"), token);
         }
+
+        public static async Task DeleteAsync(string token, Guid usageUuid)
+        {
+            using var response = await SendDeleteAsync(token, usageUuid);
+            Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        }
     }
 }

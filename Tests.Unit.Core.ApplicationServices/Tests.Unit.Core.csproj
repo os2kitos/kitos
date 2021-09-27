@@ -170,6 +170,7 @@
     <Compile Include="ApplicationServices\AdviceServiceTest.cs" />
     <Compile Include="ApplicationServices\AdviceTriggerFactoryTest.cs" />
     <Compile Include="ApplicationServices\Contract\ItContractWriteServiceTest.cs" />
+    <Compile Include="ApplicationServices\Deltas\TrackingServiceTests.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationOptionsApplicationServiceTest.cs" />
     <Compile Include="ApplicationServices\GDPR\DataProcessingRegistrationWriteServiceTest.cs" />

@@ -5,7 +5,6 @@ using System.Web.Http;
 using Core.ApplicationServices.OptionTypes;
 using Core.DomainModel;
 using Presentation.Web.Extensions;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Controllers.API.V2.External
