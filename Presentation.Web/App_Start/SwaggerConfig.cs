@@ -60,6 +60,7 @@ namespace Presentation.Web
                     c.DocumentFilter<RemoveInternalApiOperationsFilter>();
                     c.DocumentFilter(() => new RemoveMutatingCallsFilter(doc => int.Parse(doc.info.version) < 2));
                     c.OperationFilter<FixNamingOfComplexQueryParametersFilter>();
+                    c.OperationFilter<FixContentParameterTypesOnSwaggerSpec>();
                     c.GroupActionsBy(apiDesc =>
                         {
                             var controllerName = apiDesc.ActionDescriptor.ControllerDescriptor.ControllerName;
