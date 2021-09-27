@@ -2147,7 +2147,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
+                organizationName, String.Empty, orgType, AccessModifier.Public);
             return organization;
         }
 

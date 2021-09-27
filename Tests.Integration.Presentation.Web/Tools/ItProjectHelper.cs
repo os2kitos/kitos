@@ -274,5 +274,11 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PostWithCookieAsync(url, cookie, new object());
         }
+
+        public static async Task DeleteProjectAsync(int projectId)
+        {
+            using var response = await SendDeleteProjectAsync(projectId);
+            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+        }
     }
 }
