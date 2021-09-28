@@ -51,5 +51,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             yield return referenceValues.Select(_ => true).Cast<object>().ToArray();
         }
+
+        protected static HashSet<string> GetAllInputPropertyNames<T>()
+        {
+            return typeof(T).GetProperties().Select(x => x.Name).ToHashSet();
+        }
     }
 }
