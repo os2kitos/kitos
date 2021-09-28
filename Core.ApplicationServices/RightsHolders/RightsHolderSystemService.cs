@@ -173,7 +173,7 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, IRightsHolderWritableSystemProperties updates, bool skipNameUpdate)
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, BaseRightsHolderWritableSystemProperties updates, bool skipNameUpdate)
         {
             var updateNameResult = (skipNameUpdate ? Result<ItSystem, OperationError>.Success(system) : _systemService.UpdateName(system.Id, updates.Name));
 
