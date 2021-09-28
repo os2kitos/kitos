@@ -81,7 +81,7 @@ namespace Core.ApplicationServices.RightsHolders
                 var result = _itInterfaceService
                     .CreateNewItInterface(organizationId.Value, creationParameters.AdditionalValues.Name.NewValue, creationParameters.AdditionalValues.InterfaceId.MapOptionalChangeWithFallback(string.Empty), creationParameters.RightsHolderProvidedUuid)
                     .Bind(itInterface => itInterface.WithOptionalUpdate(creationParameters.AdditionalValues.ExposingSystemUuid, UpdateExposingSystem))
-                    .Bind(ItInterface => ApplyUpdates(ItInterface, creationParameters.AdditionalValues));
+                    .Bind(itInterface => ApplyUpdates(itInterface, creationParameters.AdditionalValues));
 
                 if (result.Ok)
                 {
@@ -206,9 +206,9 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(itInterface => _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, updateParameters.Name, updateParameters.InterfaceId))
+                    .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
                     .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
-                    .Bind(ItInterface => ApplyUpdates(ItInterface, updateParameters));
+                    .Bind(itInterface => ApplyUpdates(itInterface, updateParameters));
 
                 if (result.Ok)
                 {
@@ -228,11 +228,22 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface itInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
+        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
-            return itInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (itInterface, newDescription) => _itInterfaceService.UpdateDescription(itInterface.Id, newDescription)))
-                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (itInterface, newUrlReference) => _itInterfaceService.UpdateUrlReference(itInterface.Id, newUrlReference)));
+            return originalInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)));
+        }
+
+        private Result<ItInterface, OperationError> UpdateNameAndInterfaceId(ItInterface itInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
+        {
+            if (updateParameters.Name.IsUnchanged && updateParameters.InterfaceId.IsUnchanged)
+                return itInterface; //No changes found
+
+            var newName = updateParameters.Name.MapOptionalChangeWithFallback(itInterface.Name);
+            var newInterfaceId = updateParameters.InterfaceId.MapOptionalChangeWithFallback(itInterface.ItInterfaceId);
+
+            return _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, newName, newInterfaceId);
         }
 
         private Result<ItInterface, OperationError> UpdateExposingSystem(ItInterface itInterface, Guid exposingSystemUuid)
@@ -241,9 +252,9 @@ namespace Core.ApplicationServices.RightsHolders
 
             if (exposingSystem.Failed)
             {
-                if (exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
-                    return new OperationError("Invalid exposing system id provided", OperationFailure.BadInput);
-                return exposingSystem.Error;
+                return exposingSystem.Error.FailureType == OperationFailure.NotFound 
+                    ? new OperationError("Invalid exposing system id provided", OperationFailure.BadInput) 
+                    : exposingSystem.Error;
             }
 
             return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id);

@@ -59,15 +59,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
             var creationParameters = _writeModelMapper.FromPOST(request);
 
-            //var creationParameters = new RightsHolderItInterfaceCreationParameters(
-            //    request.Uuid,
-            //    request.ExposedBySystemUuid,
-            //    request.Name,
-            //    request.InterfaceId,
-            //    request.Version,
-            //    request.Description,
-            //    request.UrlReference);
-
             return _rightsHolderService
                 .CreateNewItInterface(request.RightsHolderUuid, creationParameters)
                 .Select(ToRightsHolderItInterfaceResponseDTO)
@@ -179,7 +170,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchItContract([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        public IHttpActionResult PatchItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

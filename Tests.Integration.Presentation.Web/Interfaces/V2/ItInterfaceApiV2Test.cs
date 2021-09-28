@@ -596,7 +596,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var otherOrg = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), otherOrg.Id, AccessModifier.Public);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -629,7 +630,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                 RightsHolderUuid = org.Uuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
                 Name = withLongName ? CreateLongString("name") : A<string>(),
-                Description = withLongItInterfaceId ? CreateLongString("description") : A<string>(),
+                Description = A<string>(),
+                InterfaceId = withLongItInterfaceId ? CreateLongString("interface id") : A<string>(),
                 UrlReference = A<string>(),
                 Version = withLongVersion ? CreateLongString("version") : A<string>().Substring(0, 20)
             };
@@ -680,10 +682,17 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Put_ItInterface_As_Rightsholder_If_ExposingSystem_Does_Not_Exist()
         {
             //Arrange
-            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var updateRequest = new RightsHolderWritableItInterfacePropertiesDTO
+            {
+                ExposedBySystemUuid = A<Guid>()
+            };
 
             //Act
-            using var response = await InterfaceV2Helper.SendUpdateRightsHolderItInterfaceAsync(token, A<Guid>(), A<RightsHolderWritableItInterfacePropertiesDTO>());
+            using var response = await InterfaceV2Helper.SendUpdateRightsHolderItInterfaceAsync(token, createdInterface.Uuid, updateRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -782,7 +791,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             {
                 ExposedBySystemUuid = newExposingSystem.Uuid,
                 Name = withLongName ? CreateLongString("name") : A<string>(),
-                Description = withLongItInterfaceId ? CreateLongString("description") : A<string>(),
+                Description = A<string>(),
+                InterfaceId = withLongItInterfaceId ? CreateLongString("interface id") : A<string>(),
                 UrlReference = A<string>(),
                 Version = withLongVersion ? CreateLongString("version") : A<string>().Substring(0, 20)
             };
