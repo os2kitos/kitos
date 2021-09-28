@@ -804,6 +804,79 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
+        [Theory]
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, false, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
+        [InlineData(false, false, false, false, false, false)]
+        public async Task Can_Patch_ItInterface_As_Rightsholder(
+            bool withName,
+            bool withInterfaceId,
+            bool withExposedBySystem,
+            bool withVersion,
+            bool withDescription,
+            bool withUrlReference)
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+
+            var newName = CreateName();
+            var newInterfaceId = A<string>();
+            var newVersion = A<string>().Substring(0, 20);
+            var newDescription = A<string>();
+            var newUrlReference = A<string>();
+
+            //Act
+            if (withName)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceNameAsync(token, createdInterface.Uuid, newName);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+            if (withInterfaceId)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceInterfaceIdAsync(token, createdInterface.Uuid, newInterfaceId);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+            if (withExposedBySystem)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceExposingSystemAsync(token, createdInterface.Uuid, newExposingSystem.Uuid);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+            if (withVersion)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceVersionAsync(token, createdInterface.Uuid, newVersion);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+            if (withDescription)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceDescriptionAsync(token, createdInterface.Uuid, newDescription);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+            if (withUrlReference)
+            {
+                using var response = await InterfaceV2Helper.SendPatchItInterfaceUrlReferenceAsync(token, createdInterface.Uuid, newUrlReference);
+                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            }
+
+            //Assert
+            var dto = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, createdInterface.Uuid);
+            Assert.Equal(withName ? newName : createdInterface.Name, dto.Name);
+            Assert.Equal(withInterfaceId ? newInterfaceId : createdInterface.InterfaceId, dto.InterfaceId);
+            Assert.Equal(withExposedBySystem ? newExposingSystem.Name : createdInterface.ExposedBySystem.Name, dto.ExposedBySystem.Name);
+            Assert.Equal(withExposedBySystem ? newExposingSystem.Uuid : createdInterface.ExposedBySystem.Uuid, dto.ExposedBySystem.Uuid);
+            Assert.Equal(withVersion ? newVersion : createdInterface.Version, dto.Version);
+            Assert.Equal(withDescription ? newDescription : createdInterface.Description, dto.Description);
+            Assert.Equal(withUrlReference ? newUrlReference : createdInterface.UrlReference, dto.UrlReference);
+        }
+
         [Fact]
         public async Task Delete_As_RightsHolder_Deactivates_System()
         {

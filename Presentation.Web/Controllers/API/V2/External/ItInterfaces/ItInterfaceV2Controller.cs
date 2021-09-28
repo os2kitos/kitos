@@ -164,13 +164,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
         /// <param name="request">Updates for the interface</param>
         /// <returns></returns>
         [HttpPatch]
+        [AllowRightsHoldersAccess]
         [Route("rightsholder/it-interfaces/{uuid}")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItInterfaceResponseDTO))]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult PatchItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderWritableItInterfacePropertiesDTO request)
+        public IHttpActionResult PatchItInterfaceAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderPartialUpdateItInterfaceRequestDTO request)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);

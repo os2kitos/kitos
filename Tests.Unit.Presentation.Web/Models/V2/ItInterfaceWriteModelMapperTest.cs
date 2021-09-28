@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public void Can_Map_Name_From_Patch(string name)
         {
             //Arrange
-            var requestDto = new RightsHolderWritableItInterfacePropertiesDTO { Name = name };
+            var requestDto = new RightsHolderPartialUpdateItInterfaceRequestDTO() { Name = name };
 
             //Act
             var modificationParameters = _sut.FromPATCH(requestDto);
@@ -90,7 +90,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noUrlReference)
         {
             //Arrange
-            var emptyInput = ConfigureRequestInput(noName, noInterfaceId, noExposedBySystem, noVersion, noDescription, noUrlReference);
+            var rootProperties = GetRootProperties();
+            if (noName) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name));
+            if (noInterfaceId) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId));
+            if (noExposedBySystem) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid));
+            if (noVersion) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version));
+            if (noDescription) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description));
+            if (noUrlReference) rootProperties.Remove(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
+            var emptyInput = new RightsHolderPartialUpdateItInterfaceRequestDTO();
 
             //Act
             var output = _sut.FromPATCH(emptyInput);
@@ -115,7 +123,15 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noUrlReference)
         {
             //Arrange
-            var emptyInput = ConfigureRequestInput(noName, noInterfaceId, noExposedBySystem, noVersion, noDescription, noUrlReference);
+            var rootProperties = GetRootProperties();
+            if (noName) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Name));
+            if (noInterfaceId) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.InterfaceId));
+            if (noExposedBySystem) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.ExposedBySystemUuid));
+            if (noVersion) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Version));
+            if (noDescription) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Description));
+            if (noUrlReference) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.UrlReference));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
+            var emptyInput = new RightsHolderWritableItInterfacePropertiesDTO();
 
             //Act
             var output = _sut.FromPUT(emptyInput);
@@ -140,7 +156,14 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             bool noUrlReference)
         {
             //Arrange
-            var emptyInput = ConfigureRequestInput(noName, noInterfaceId, noExposedBySystem, noVersion, noDescription, noUrlReference);
+            var rootProperties = GetRootProperties();
+            if (noName) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Name));
+            if (noInterfaceId) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.InterfaceId));
+            if (noExposedBySystem) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.ExposedBySystemUuid));
+            if (noVersion) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Version));
+            if (noDescription) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.Description));
+            if (noUrlReference) rootProperties.Remove(nameof(RightsHolderWritableItInterfacePropertiesDTO.UrlReference));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
             var input = new RightsHolderCreateItInterfaceRequestDTO();
 
             //Act
@@ -172,7 +195,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.Uuid, output.RightsHolderProvidedUuid);
         }
 
-        private RightsHolderWritableItInterfacePropertiesDTO ConfigureRequestInput(
+        private RightsHolderWritableItInterfacePropertiesDTO ConfigurePUTRequestInput(
             bool noName,
             bool noInterfaceId,
             bool noExposedBySystem,
@@ -192,5 +215,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var emptyInput = new RightsHolderWritableItInterfacePropertiesDTO();
             return emptyInput;
         }
+
+
     }
 }

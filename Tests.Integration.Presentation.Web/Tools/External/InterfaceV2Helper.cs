@@ -169,5 +169,40 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
         }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceNameAsync(string token, Guid itInterfaceUuid, string name)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name), name));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceInterfaceIdAsync(string token, Guid itInterfaceUuid, string interfaceId)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId), interfaceId));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceExposingSystemAsync(string token, Guid itInterfaceUuid, Guid exposingSystemUuid)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid), exposingSystemUuid));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceVersionAsync(string token, Guid itInterfaceUuid, string version)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version), version));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceDescriptionAsync(string token, Guid itInterfaceUuid, string description)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description), description));
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchItInterfaceUrlReferenceAsync(string token, Guid itInterfaceUuid, string urlReference)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, CreatePatchPayload(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference), urlReference));
+        }
+
+        private static Dictionary<string, object> CreatePatchPayload(string propertyName, object dto)
+        {
+            return dto.AsPatchPayloadOfProperty(propertyName);
+        }
     }
 }
