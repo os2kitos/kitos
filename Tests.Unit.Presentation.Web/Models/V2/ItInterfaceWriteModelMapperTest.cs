@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Moq;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
-using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Interface;
 using Xunit;
 
