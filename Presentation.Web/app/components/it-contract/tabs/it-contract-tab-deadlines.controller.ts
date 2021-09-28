@@ -12,40 +12,37 @@
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.TerminationDeadlineTypes).getAll()
                 ],
                 paymentMilestones: ["$http", "$stateParams", ($http, $stateParams) =>
-                    $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(function (result) {
-                        return result.data.response;
-                    })],
+                    $http.get("api/paymentMilestone/" + $stateParams.id + "?contract=true").then(result => result.data.response)],
                 handoverTrialTypes: ["localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                     localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.HandoverTrialTypes).getAll()],
-                handoverTrials: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(function (result) {
-                    return result.data.response;
-                })]
+                handoverTrials: ["$http", "$stateParams", ($http, $stateParams) => $http.get("api/handoverTrial/" + $stateParams.id + "?byContract=true").then(result => result.data.response)]
             }
         });
     }]);
 
-    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "paymentMilestones", "handoverTrialTypes", "handoverTrials", "user", "moment", "$q",
-        function ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user, moment, $q) {
-            $scope.autosaveUrl = "api/itcontract/" + $scope.contract.id;
+    app.controller("contract.DeadlinesCtrl", ["$scope", "$http", "$timeout", "$state", "$stateParams", "notify", "optionExtensions", "terminationDeadlines", "paymentMilestones", "handoverTrialTypes", "handoverTrials", "user", "moment", "$q", "contract",
+        ($scope, $http, $timeout, $state, $stateParams, notify, optionExtensions, terminationDeadlines, paymentMilestones, handoverTrialTypes, handoverTrials, user, moment, $q, contract) => {
+            $scope.contract = contract;
+            $scope.autosaveUrl = "api/itcontract/" + contract.id;
             $scope.optionExtensions = optionExtensions;
             $scope.terminationDeadlines = terminationDeadlines;
             $scope.paymentMilestones = paymentMilestones;
             $scope.handoverTrialTypes = handoverTrialTypes;
             $scope.handoverTrials = handoverTrials;
-            $scope.durationYears = $scope.contract.durationYears;
-            $scope.durationMonths = $scope.contract.durationMonths;
-            $scope.durationOngoing = $scope.contract.durationOngoing;
+            $scope.durationYears = contract.durationYears;
+            $scope.durationMonths = contract.durationMonths;
+            $scope.durationOngoing = contract.durationOngoing;
 
 
-            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.running);
-            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption($scope.contract.byEnding);
+            $scope.running = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.running);
+            $scope.byEnding = Kitos.Models.ItContract.YearSegmentOptions.getFromOption(contract.byEnding);
 
             $scope.updateRunning = () => {
-                $scope.contract.running = $scope.running?.id;
+                contract.running = $scope.running?.id || null;
             }
 
             $scope.updateByEnding = () => {
-                $scope.contract.byEnding = $scope.byEnding?.id;
+                contract.byEnding = $scope.byEnding?.id || null;
             }
 
             $scope.deadlineOptions = Kitos.Models.ItContract.YearSegmentOptions.options;
@@ -61,13 +58,13 @@
                     }
 
                     saveDuration(payload).then(() => {
-                        $scope.contract.durationYears = $scope.durationYears;
+                        contract.durationYears = $scope.durationYears;
                     }, () => {
-                        $scope.durationYears = $scope.contract.durationYears;
+                        $scope.durationYears = contract.durationYears;
                     });
 
                 } else {
-                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    const msg = notify.addInfoMessage("Gemmer...", false);
                     msg.toErrorMessage("Antallet af år er ikke gyldig.");
                 }
                 cleanUp();
@@ -84,35 +81,35 @@
                     }
 
                     saveDuration(payload).then(() => {
-                        $scope.contract.durationMonths = $scope.durationMonths;
+                        contract.durationMonths = $scope.durationMonths;
                     }, () => {
-                        $scope.durationMonths = $scope.contract.durationMonths;
+                        $scope.durationMonths = contract.durationMonths;
                     });
 
                 } else {
-                    var msg = notify.addInfoMessage("Gemmer...", false);
+                    const msg = notify.addInfoMessage("Gemmer...", false);
                     msg.toErrorMessage("Antallet af måneder er ikke gyldig.");
                 }
                 cleanUp();
             };
 
             $scope.saveOngoingStatus = () => {
-                let payload = {
+                const payload = {
                     "DurationYears": 0,
                     "DurationMonths": 0,
                     "DurationOngoing": $scope.durationOngoing
-                }
+                };
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.patch(`odata/itcontracts(${$scope.contract.id})`, payload)
+                $http.patch(`odata/itcontracts(${contract.id})`, payload)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Varigheden blev gemt.");
                         $scope.durationYears = "";
                         $scope.durationMonths = "";
 
                         //it is done this way so '0' doesnt appear in input
-                        $scope.contract.durationOngoing = $scope.durationOngoing;
-                        $scope.contract.durationYears = $scope.durationYears;
-                        $scope.contract.durationMonths = $scope.durationMonths;
+                        contract.durationOngoing = $scope.durationOngoing;
+                        contract.durationYears = $scope.durationYears;
+                        contract.durationMonths = $scope.durationMonths;
 
                     }, function onError(result) {
                         msg.toErrorMessage("Varigheden blev ikke gemt.");
@@ -123,7 +120,7 @@
             function saveDuration(payload) {
                 const deferred = $q.defer();
                 var msg = notify.addInfoMessage("Gemmer...", false);
-                $http.patch(`odata/itcontracts(${$scope.contract.id})`, payload)
+                $http.patch(`odata/itcontracts(${contract.id})`, payload)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Varigheden blev gemt.");
 
@@ -156,13 +153,13 @@
                 parseFormats: ["yyyy-MM-dd"]
             };
 
-            $scope.saveMilestone = function (paymentMilestone) {
-                paymentMilestone.itContractId = $scope.contract.id;
+            $scope.saveMilestone = paymentMilestone => {
+                paymentMilestone.itContractId = contract.id;
 
-                var approvedDate = moment(paymentMilestone.approved, Kitos.Constants.DateFormat.DanishDateFormat);
-                var expectedDate = moment(paymentMilestone.expected, Kitos.Constants.DateFormat.DanishDateFormat);
-                var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
-                var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
+                const approvedDate = moment(paymentMilestone.approved, Kitos.Constants.DateFormat.DanishDateFormat);
+                const expectedDate = moment(paymentMilestone.expected, Kitos.Constants.DateFormat.DanishDateFormat);
+                const approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
+                const expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
                 if (approvedDateValid) {
                     paymentMilestone.approved = approvedDate.format("YYYY-MM-DD");
                 } else {
@@ -180,7 +177,7 @@
                 $http.post(`api/paymentMilestone?organizationId=${user.currentOrganizationId}`, paymentMilestone)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Gemt");
-                        var obj = result.data.response;
+                        const obj = result.data.response;
                         $scope.paymentMilestones.push(obj);
                         delete $scope.paymentMilestone; // clear input fields
                         $scope.milestoneForm.$setPristine();
@@ -201,12 +198,12 @@
             };
 
             $scope.saveTrial = function (handoverTrial) {
-                handoverTrial.itContractId = $scope.contract.id;
+                handoverTrial.itContractId = contract.id;
                 handoverTrial.handoverTrialTypeId = $scope.handoverTrialType.id;
-                var approvedDate = moment(handoverTrial.approved, Kitos.Constants.DateFormat.DanishDateFormat);
-                var expectedDate = moment(handoverTrial.expected, Kitos.Constants.DateFormat.DanishDateFormat);
-                var approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
-                var expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
+                const approvedDate = moment(handoverTrial.approved, Kitos.Constants.DateFormat.DanishDateFormat);
+                const expectedDate = moment(handoverTrial.expected, Kitos.Constants.DateFormat.DanishDateFormat);
+                const approvedDateValid = (approvedDate.isValid() || isNaN(approvedDate.valueOf()) || approvedDate.year() < 1000 || approvedDate.year() > 2099);
+                const expectedDateValid = (expectedDate.isValid() || isNaN(expectedDate.valueOf()) || expectedDate.year() < 1000 || expectedDate.year() > 2099);
 
                 if (approvedDateValid) {
                     handoverTrial.approved = approvedDate.format("YYYY-MM-DD");
@@ -226,7 +223,7 @@
                 $http.post(`api/handoverTrial?organizationId=${user.currentOrganizationId}`, handoverTrial)
                     .then(function onSuccess(result) {
                         msg.toSuccessMessage("Gemt");
-                        var obj = result.data.response;
+                        const obj = result.data.response;
                         $scope.handoverTrials.push(obj);
                         delete $scope.handoverTrial; // clear input fields
                         $scope.trialForm.$setPristine();
@@ -258,7 +255,7 @@
                     notify.addErrorMessage("Den indtastede dato er ugyldig.");
 
                 } else {
-                    var dateString = date.format("YYYY-MM-DD");
+                    const dateString = date.format("YYYY-MM-DD");
                     var payload = {};
                     payload[field] = dateString;
                     patch(payload, $scope.autosaveUrl + '?organizationId=' + user.currentOrganizationId);
@@ -291,11 +288,9 @@
             function reload() {
                 return $state.transitionTo($state.current, $stateParams, {
                     reload: true
-                }).then(function () {
+                }).then(() => {
                     $scope.hideContent = true;
-                    return $timeout(function () {
-                        return $scope.hideContent = false;
-                    }, 1);
+                    return $timeout(() => $scope.hideContent = false, 1);
                 });
             };
 
