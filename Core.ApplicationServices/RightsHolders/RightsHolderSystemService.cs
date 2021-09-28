@@ -148,7 +148,7 @@ namespace Core.ApplicationServices.RightsHolders
 
                 if (result.Ok)
                 {
-                    _logger.Information("User {userId} deactivated system with id {systemuuid} due to reason:{reason}", _userContext.UserId, systemUuid, reason);
+                    _logger.Information("User {userId} deactivated system with id {systemUuid} due to reason:{reason}", _userContext.UserId, systemUuid, reason);
                     transaction.Commit();
 
                     var currentUserEmail = _userRepository.GetById(_userContext.UserId).Email;

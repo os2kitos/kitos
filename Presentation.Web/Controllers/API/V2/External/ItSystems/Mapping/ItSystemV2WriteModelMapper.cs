@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 
         public RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderCreateItSystemRequestDTO request)
         {
-            var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.RightsHolderUuid };
+            var creationParameters = new RightsHolderSystemCreationParameters { RightsHolderProvidedUuid = request.Uuid };
             MapChanges(request, creationParameters, true);
             return creationParameters;
         }
