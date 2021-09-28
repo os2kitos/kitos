@@ -7,7 +7,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
     {
         RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderCreateItSystemRequestDTO dto);
         RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderWritableITSystemPropertiesDTO dto);
-
         RightsHolderSystemUpdateParameters FromRightsHolderPATCH(RightsHolderPartialUpdateSystemPropertiesRequestDTO dto);
     }
 
