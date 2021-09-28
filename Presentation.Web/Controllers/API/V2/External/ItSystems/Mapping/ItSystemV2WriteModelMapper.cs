@@ -49,14 +49,5 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
             destination.TaskRefKeys = ShouldChange(nameof(RightsHolderWritableITSystemPropertiesDTO.KLENumbers)) ? (source.KLENumbers ?? new List<string>()).AsChangedValue() : OptionalValueChange<IEnumerable<string>>.None;
             destination.TaskRefUuids = ShouldChange(nameof(RightsHolderWritableITSystemPropertiesDTO.KLEUuids)) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
         }
-
-        /*
-         * TODO:
-         *  - omskriv servicen
-         *  - Valider at eksisterende test stadig virker
-         *  - implementér patch
-         *  - unit test til mapping og service
-         *  - nye integrationstest til patch af hver property
-         */
     }
 }
