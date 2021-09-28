@@ -6,12 +6,12 @@ using System.Web.Http;
 using System.Web.Http.Results;
 using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Authorization;
-using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.RightsHolders;
 using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
+using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -32,12 +32,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IItSystemV2WriteModelMapper _writeModelMapper;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext)
+        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext, IItSystemV2WriteModelMapper writeModelMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;
             _authorizationContext = authorizationContext;
+            _writeModelMapper = writeModelMapper;
         }
 
         /// <summary>
@@ -206,12 +208,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var parameters = new RightsHolderSystemCreationParameters(
-                request.Name,
-                request.Uuid,
-                request.ParentUuid,
-                request.FormerName, request.Description, request.UrlReference, request.BusinessTypeUuid,
-                request.KLENumbers ?? new string[0], request.KLEUuids ?? new Guid[0]);
+            var parameters = _writeModelMapper.FromRightsHolderPOST(request);
 
             return _rightsHolderSystemService
                 .CreateNewSystem(request.RightsHolderUuid, parameters)
@@ -240,9 +237,34 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var parameters = new RightsHolderSystemUpdateParameters(request.Name, request.ParentUuid, request.FormerName,
-                request.Description, request.UrlReference, request.BusinessTypeUuid,
-                request.KLENumbers ?? Array.Empty<string>(), request.KLEUuids ?? Array.Empty<Guid>());
+            var parameters = _writeModelMapper.FromRightsHolderPUT(request);
+
+            return _rightsHolderSystemService
+                .Update(uuid, parameters)
+                .Select(ToRightsHolderResponseDTO)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Partially updates an existing it-system using json merge patch semantics (RFC7396)
+        /// NOTE: Only active systems can be modified.
+        /// </summary>
+        /// <param name="uuid">Specific IT-System UUID</param>
+        /// <returns>The updated IT-System</returns>
+        [HttpPatch]
+        [AllowRightsHoldersAccess]
+        [Route("rightsholder/it-systems/{uuid}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(RightsHolderItSystemResponseDTO))]
+        [SwaggerResponse(HttpStatusCode.BadRequest)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        [SwaggerResponse(HttpStatusCode.Forbidden)]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        public IHttpActionResult PatchItSystemAsRightsHolder([NonEmptyGuid] Guid uuid, [FromBody] RightsHolderPartialUpdateSystemPropertiesRequestDTO request)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var parameters = _writeModelMapper.FromRightsHolderPATCH(request);
 
             return _rightsHolderSystemService
                 .Update(uuid, parameters)

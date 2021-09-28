@@ -385,6 +385,8 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemV2WriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemV2WriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />
@@ -430,6 +432,8 @@
     <Compile Include="Models\API\V2\Request\Contract\PaymentRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\UpdateContractRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\DataProcessing\UpdateDataProcessingRegistrationRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\IRightsHolderWritableSystemPropertiesRequestDTO.cs" />
+    <Compile Include="Models\API\V2\Request\System\RightsHolderPartialUpdateSystemPropertiesRequestDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\ContractTerminationTermsResponseDTO.cs" />
     <Compile Include="Models\API\V2\Response\Contract\HandoverTrialResponseDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractTerminationTermsRequestDTO.cs" />

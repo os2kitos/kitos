@@ -110,6 +110,7 @@ using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Tracking;
 using Core.DomainServices.Tracking;
+using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 
 namespace Presentation.Web.Ninject
 {
@@ -267,6 +268,9 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //Systems
+            kernel.Bind<IItSystemV2WriteModelMapper>().To<ItSystemV2WriteModelMapper>().InCommandScope(Mode);
+
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);
@@ -278,7 +282,6 @@ namespace Presentation.Web.Ninject
             //Contracts
             kernel.Bind<IItContractWriteModelMapper>().To<ItContractWriteModelMapper>().InCommandScope(Mode);
             kernel.Bind<IItContractResponseMapper>().To<ItContractResponseMapper>().InCommandScope(Mode);
-
         }
 
         private void RegisterSSO(IKernel kernel)

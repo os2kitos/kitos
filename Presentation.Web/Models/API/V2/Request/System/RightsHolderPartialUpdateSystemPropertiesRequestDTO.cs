@@ -5,7 +5,7 @@ using Presentation.Web.Infrastructure.Attributes;
 
 namespace Presentation.Web.Models.API.V2.Request.System
 {
-    public class RightsHolderWritableITSystemPropertiesDTO : IRightsHolderWritableSystemPropertiesRequestDTO
+    public class RightsHolderPartialUpdateSystemPropertiesRequestDTO : IRightsHolderWritableSystemPropertiesRequestDTO
     {
         /// <summary>
         /// UUID for possible IT-System parent (if any)
@@ -16,7 +16,6 @@ namespace Presentation.Web.Models.API.V2.Request.System
         /// <summary>
         /// Name of IT-System
         /// </summary>
-        [Required(AllowEmptyStrings = false)]
         [MaxLength(Core.DomainModel.ItSystem.ItSystem.MaxNameLength)]
         public string Name { get; set; }
 
@@ -28,13 +27,11 @@ namespace Presentation.Web.Models.API.V2.Request.System
         /// <summary>
         /// Description
         /// </summary>
-        [Required(AllowEmptyStrings = false)]
         public string Description { get; set; }
 
         /// <summary>
         /// Url reference for further information
         /// </summary>
-        [Required(AllowEmptyStrings = false)]
         public string UrlReference { get; set; }
 
         /// <summary>
