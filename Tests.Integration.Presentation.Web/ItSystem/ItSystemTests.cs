@@ -116,7 +116,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, organizationId, login);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
@@ -134,7 +134,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organizationId, AccessModifier.Public);
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, organizationId, login);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
@@ -154,7 +154,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.TakeIntoUseAsync(system.Id, organizationId);
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, organizationId, login);
 
             //Assert
             await AssertCorrectConflictResponseAsync(SystemDeleteConflict.InUse, result, system.Id);
@@ -175,7 +175,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.SendSetParentSystemRequestAsync(childSystem.Id, mainSystem.Id, organizationId, login).DisposeAsync();
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(mainSystem.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(mainSystem.Id, organizationId, login);
 
             //Assert
             await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasChildren, result, mainSystem.Id);
@@ -200,7 +200,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await InterfaceExhibitHelper.CreateExhibit(system.Id, itInterface.Id);
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, organizationId, login);
 
             //Assert
             await AssertCorrectConflictResponseAsync(SystemDeleteConflict.HasInterfaceExhibits, result, system.Id);
@@ -220,7 +220,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
             await ItSystemHelper.SendSetTaskRefOnSystemRequestAsync(system.Id, taskRefId, organizationId, login).DisposeAsync();
 
             //Act
-            using var result = await ItSystemHelper.DeleteItSystemAsync(system.Id, organizationId, login);
+            using var result = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, organizationId, login);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, result.StatusCode);
