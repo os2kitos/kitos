@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Notification;
+using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Notification;
 using Core.ApplicationServices.System;
@@ -72,10 +73,17 @@ namespace Core.ApplicationServices.RightsHolders
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rights holder access in the provided organization", OperationFailure.Forbidden);
 
+                var name = creationParameters.Name;
+
+                if (name.IsUnchanged)
+                    return new OperationError("Error must be defined upon creation", OperationFailure.BadInput);
+
+                creationParameters.Name = OptionalValueChange<string>.None; //name is extracted - make sure it's not re-written pointlessly
+
                 var result = _systemService
-                    .CreateNewSystem(organizationId.Value, creationParameters.Name, creationParameters.RightsHolderProvidedUuid)
+                    .CreateNewSystem(organizationId.Value, name.NewValue, creationParameters.RightsHolderProvidedUuid)
                     .Bind(system => _systemService.UpdateRightsHolder(system.Id, rightsHolderUuid))
-                    .Bind(system => ApplyUpdates(system, creationParameters, true));
+                    .Bind(system => ApplyUpdates(system, creationParameters));
 
                 if (result.Ok)
                 {
@@ -104,7 +112,7 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetSystem(systemUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(system => ApplyUpdates(system, updateParameters, false));
+                    .Bind(system => ApplyUpdates(system, updateParameters));
 
                 if (result.Ok)
                 {
@@ -173,21 +181,29 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, BaseRightsHolderWritableSystemProperties updates, bool skipNameUpdate)
+        private Result<ItSystem, OperationError> ApplyUpdates(ItSystem system, RightsHolderSystemUpdateParameters updates)
         {
-            var updateNameResult = (skipNameUpdate ? Result<ItSystem, OperationError>.Success(system) : _systemService.UpdateName(system.Id, updates.Name));
-
-            return updateNameResult
-                .Bind(itSystem => _systemService.UpdatePreviousName(itSystem.Id, updates.FormerName))
-                .Bind(itSystem => _systemService.UpdateDescription(itSystem.Id, updates.Description))
-                .Bind(itSystem => UpdateMainUrlReference(itSystem.Id, updates.UrlReference))
-                .Bind(itSystem => UpdateParentSystem(itSystem.Id, updates.ParentSystemUuid))
-                .Bind(itSystem => _systemService.UpdateBusinessType(itSystem.Id, updates.BusinessTypeUuid))
-                .Bind(itSystem => UpdateTaskRefs(itSystem.Id, updates.TaskRefKeys, updates.TaskRefUuids));
+            return system
+                .WithOptionalUpdate(updates.Name, (itSystem, newValue) => _systemService.UpdateName(itSystem.Id, newValue))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.FormerName, (itSystem, newValue) => _systemService.UpdatePreviousName(itSystem.Id, newValue)))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.Description, (itSystem, newValue) => _systemService.UpdateDescription(itSystem.Id, newValue)))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.UrlReference, UpdateMainUrlReference))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.ParentSystemUuid, UpdateParentSystem))
+                .Bind(updatedSystem => updatedSystem.WithOptionalUpdate(updates.BusinessTypeUuid, (itSystem, newValue) => _systemService.UpdateBusinessType(itSystem.Id, newValue)))
+                .Bind(updatedSystem => UpdateTaskRefs(updatedSystem, updates.TaskRefKeys, updates.TaskRefUuids));
         }
 
-        private Result<ItSystem, OperationError> UpdateTaskRefs(int systemId, IEnumerable<string> taskRefKeys, IEnumerable<Guid> taskRefUuids)
+        private Result<ItSystem, OperationError> UpdateTaskRefs(ItSystem system, OptionalValueChange<IEnumerable<string>> taskRefKeysChanges, OptionalValueChange<IEnumerable<Guid>> taskRefUuidsChanges)
         {
+            if (taskRefKeysChanges.IsUnchanged && taskRefUuidsChanges.IsUnchanged)
+            {
+                //No changes requested - skip it
+                return system;
+            }
+
+            var taskRefKeys = taskRefKeysChanges.Match(keys => keys, Array.Empty<string>).ToList();
+            var taskRefUuids = taskRefUuidsChanges.Match(keys => keys, Array.Empty<Guid>).ToList();
+
             var taskRefIds = new HashSet<int>();
             foreach (var taskRefKey in taskRefKeys)
             {
@@ -212,18 +228,18 @@ namespace Core.ApplicationServices.RightsHolders
                     return new OperationError($"Overlapping KLE. Please specify the same KLE only once. KLE resolved by uuid {uuid} which matches overlap on KLE {taskRefValue.TaskKey}", OperationFailure.BadInput);
             }
 
-            return _systemService.UpdateTaskRefs(systemId, taskRefIds.ToList());
+            return _systemService.UpdateTaskRefs(system.Id, taskRefIds.ToList());
         }
 
-        private Result<ItSystem, OperationError> UpdateMainUrlReference(int systemId, string urlReference)
+        private Result<ItSystem, OperationError> UpdateMainUrlReference(ItSystem system, string urlReference)
         {
             if (string.IsNullOrWhiteSpace(urlReference))
                 return new OperationError("URL references are required for new rightsholder systems", OperationFailure.BadInput);
 
-            return _systemService.UpdateMainUrlReference(systemId, urlReference);
+            return _systemService.UpdateMainUrlReference(system.Id, urlReference);
         }
 
-        private Result<ItSystem, OperationError> UpdateParentSystem(int systemId, Guid? parentSystemUuid)
+        private Result<ItSystem, OperationError> UpdateParentSystem(ItSystem system, Guid? parentSystemUuid)
         {
             var parentSystemId = default(int?);
             if (parentSystemUuid.HasValue)
@@ -243,7 +259,7 @@ namespace Core.ApplicationServices.RightsHolders
                 parentSystemId = parentSystemResult.Value.Id;
             }
 
-            return _systemService.UpdateParentSystem(systemId, parentSystemId);
+            return _systemService.UpdateParentSystem(system.Id, parentSystemId);
 
         }
 
