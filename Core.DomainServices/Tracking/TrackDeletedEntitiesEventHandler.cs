@@ -21,9 +21,9 @@ namespace Core.DomainServices.Tracking
         IDomainEventHandler<EntityDeletedEvent<ItProject>>
     {
         private readonly IGenericRepository<LifeCycleTrackingEvent> _trackingEventsRepository;
-        private readonly Factory<Maybe<ActiveUserIdContext>> _userContext;
+        private readonly Maybe<ActiveUserIdContext> _userContext;
 
-        public TrackDeletedEntitiesEventHandler(IGenericRepository<LifeCycleTrackingEvent> trackingEventsRepository, Factory<Maybe<ActiveUserIdContext>> userContext)
+        public TrackDeletedEntitiesEventHandler(IGenericRepository<LifeCycleTrackingEvent> trackingEventsRepository, Maybe<ActiveUserIdContext> userContext)
         {
             _trackingEventsRepository = trackingEventsRepository;
             _userContext = userContext;
@@ -44,7 +44,7 @@ namespace Core.DomainServices.Tracking
         private void TrackDeleted<T>(T entity) where T : IHasUuid
         {
             var newEvent = CreateEvent(entity);
-            newEvent.UserId = _userContext().Select(x => x.ActiveUserId).Match(id => id, () => (int?)null);
+            newEvent.UserId = _userContext.Select(x => x.ActiveUserId).Match(id => id, () => (int?)null);
             _trackingEventsRepository.Insert(newEvent);
             _trackingEventsRepository.Save();
         }
