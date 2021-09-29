@@ -24,7 +24,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public DataProcessingRegistrationWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(GetAllRootProperties());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllRootProperties());
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -161,7 +161,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
             if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
 
             //Act
             var output = _sut.FromPATCH(input);
@@ -194,7 +194,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
             if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
 
             //Act
             var output = _sut.FromPUT(input);
@@ -227,7 +227,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
             if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(properties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
 
             //Act
             var output = _sut.FromPOST(input);

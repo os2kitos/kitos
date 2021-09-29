@@ -139,6 +139,7 @@ namespace Presentation.Web.Ninject
             _builderActions.Add(kernel => kernel.Bind<Func<IKernel>>().ToMethod(ctx => () => new Bootstrapper().Kernel));
             _builderActions.Add(kernel => kernel.Bind<IHttpModule>().To<HttpApplicationInitializationHttpModule>());
             _builderActions.Add(kernel => kernel.Bind<ICurrentHttpRequest>().To<CurrentAspNetRequest>());
+            _builderActions.Add(kernel => kernel.Bind<ICurrentRequestStream>().To<CurrentRequestStream>());
 
             //Register automapper
             _builderActions.Add(kernel => kernel.Bind<IMapper>().ToConstant(MappingConfig.CreateMapper()).InSingletonScope());

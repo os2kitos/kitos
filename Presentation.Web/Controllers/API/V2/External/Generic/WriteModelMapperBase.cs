@@ -13,11 +13,13 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 {
     public abstract class WriteModelMapperBase
     {
-        private readonly Lazy<ISet<string>> _currentRequestRootProperties;
+        private readonly ICurrentHttpRequest _currentHttpRequest;
+        private readonly IDictionary<string, HashSet<string>> _currentRequestProperties;
 
         protected WriteModelMapperBase(ICurrentHttpRequest currentHttpRequest)
         {
-            _currentRequestRootProperties = new Lazy<ISet<string>>(currentHttpRequest.GetDefinedJsonRootProperties);
+            _currentHttpRequest = currentHttpRequest;
+            _currentRequestProperties = new Dictionary<string, HashSet<string>>();
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
@@ -31,7 +33,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 
             return response;
         }
-        
+
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
@@ -44,9 +46,18 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return response;
         }
 
-        protected bool ClientRequestsChangeTo(string expectedSectionKey)
+        protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
-            return _currentRequestRootProperties.Value.Contains(expectedSectionKey);
+            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
+            var key = string.Join("", pathTokensToLeafLevel);
+            
+            if (!_currentRequestProperties.TryGetValue(key, out var properties))
+            {
+                properties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel).Select(x=>x.ToLowerInvariant()).ToHashSet();
+                _currentRequestProperties[key] = properties;
+            }
+
+            return properties.TryGetValue(expectedSectionKey.Last().ToLowerInvariant(), out _);
         }
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)

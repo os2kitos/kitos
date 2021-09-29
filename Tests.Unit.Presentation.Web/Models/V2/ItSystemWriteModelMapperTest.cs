@@ -16,7 +16,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItSystemWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties())
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
                 .Returns(GetAllInputPropertyNames<RightsHolderCreateItSystemRequestDTO>());
             _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -90,7 +90,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPATCH(emptyInput);
@@ -130,7 +130,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPOST(emptyInput);
@@ -170,7 +170,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPUT(emptyInput);
