@@ -49,7 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
             var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
-            var key = string.Join("", pathTokensToLeafLevel);
+            var key = string.Join(".", pathTokensToLeafLevel);
             
             if (!_currentRequestProperties.TryGetValue(key, out var properties))
             {

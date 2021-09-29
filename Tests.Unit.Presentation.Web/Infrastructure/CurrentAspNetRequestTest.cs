@@ -22,12 +22,12 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
         public string C1 { get; set; }
         public string C2 { get; set; }
         public GrandChildClass GrandChild { get; set; }
+    }
 
-        public class RootClass
-        {
-            public string R1 { get; set; }
-            public ChildClass Child { get; set; }
-        }
+    public class RootClass
+    {
+        public string R1 { get; set; }
+        public ChildClass Child { get; set; }
     }
 
     public class CurrentAspNetRequestTest : WithAutoFixture, IDisposable
@@ -39,7 +39,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
         {
             _testStream = new MemoryStream();
             var requestStreamMock = new Mock<ICurrentRequestStream>();
-            requestStreamMock.Setup(x => x.GetCurrentInputStream()).Returns(_testStream);
+            requestStreamMock.Setup(x => x.GetInputStreamCopy()).Returns(_testStream);
             _sut = new CurrentAspNetRequest(Mock.Of<ILogger>(), requestStreamMock.Object);
         }
 
@@ -47,26 +47,66 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
         public void Can_Get_All_Properties_At_Root()
         {
             //Arrange
-            var rootClass = A<ChildClass.RootClass>();
+            var rootClass = A<RootClass>();
             SetStreamContent(rootClass);
 
             //Act
             var definedJsonProperties = _sut.GetDefinedJsonProperties();
 
             //Assert
-            Assert.Equal(GetAllPropertyNames<ChildClass.RootClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
+            Assert.Equal(GetAllPropertyNames<RootClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
         }
 
-        private void SetStreamContent(ChildClass.RootClass rootClass)
+        [Fact]
+        public void Can_Get_All_Properties_At_Child()
         {
-            var json = JsonConvert.SerializeObject(rootClass);
+            //Arrange
+            var rootClass = A<RootClass>();
+            SetStreamContent(rootClass);
+
+            //Act
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child));
+
+            //Assert
+            Assert.Equal(GetAllPropertyNames<ChildClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void Can_Get_All_Properties_At_GrandChild()
+        {
+            //Arrange
+            var rootClass = A<RootClass>();
+            SetStreamContent(rootClass);
+
+            //Act
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child), nameof(RootClass.Child.GrandChild));
+
+            //Assert
+            Assert.Equal(GetAllPropertyNames<GrandChildClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
+        }
+
+        [Fact]
+        public void Returns_Empty_Set_For_NonExistingPath()
+        {
+            //Arrange
+            var rootClass = A<RootClass>();
+            SetStreamContent(rootClass);
+
+            //Act
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child), nameof(RootClass.Child.GrandChild), nameof(RootClass));
+
+            //Assert
+            Assert.Empty(definedJsonProperties);
+        }
+
+        private void SetStreamContent(object obj)
+        {
+            var json = JsonConvert.SerializeObject(obj);
             var writer = new StreamWriter(_testStream);
             writer.Write(json);
             writer.Flush();
             _testStream.Position = 0;
         }
-        //TODO: PArtials
-        //TODO: Missing sectoins - empty result
 
         protected static HashSet<string> GetAllPropertyNames<T>()
         {

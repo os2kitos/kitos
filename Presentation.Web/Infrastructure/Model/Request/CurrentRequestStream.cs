@@ -6,9 +6,14 @@ namespace Presentation.Web.Infrastructure.Model.Request
     public class CurrentRequestStream : ICurrentRequestStream
 
     {
-        public Stream GetCurrentInputStream()
+        public Stream GetInputStreamCopy()
         {
-            return HttpContext.Current.Request.InputStream;
+            var stream = new MemoryStream();
+            var requestInputStream = HttpContext.Current.Request.InputStream;
+            requestInputStream.CopyTo(stream);
+            requestInputStream.Position = 0;
+            stream.Position = 0;
+            return stream;
         }
     }
 }
