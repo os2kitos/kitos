@@ -18,6 +18,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.RightsHolders
 {
@@ -63,7 +64,8 @@ namespace Core.ApplicationServices.RightsHolders
             if (creationParameters.AdditionalValues.ExposingSystemUuid.IsUnchanged)
                 return new OperationError("Exposing System Uuid must be provided", OperationFailure.BadInput);
 
-            if (creationParameters.AdditionalValues.Name.IsUnchanged)
+            var name = creationParameters.AdditionalValues.Name;
+            if (name.IsUnchanged)
                 return new OperationError("Name must be provided", OperationFailure.BadInput);
 
             using var transaction = _transactionManager.Begin();
@@ -77,8 +79,14 @@ namespace Core.ApplicationServices.RightsHolders
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
 
+                var interfaceId = creationParameters.AdditionalValues.InterfaceId;
+                
+                //Remove changes for any values used during the creation process
+                creationParameters.AdditionalValues.Name = OptionalValueChange<string>.None;
+                creationParameters.AdditionalValues.InterfaceId = OptionalValueChange<string>.None;
+                
                 var result = _itInterfaceService
-                    .CreateNewItInterface(organizationId.Value, creationParameters.AdditionalValues.Name.NewValue, creationParameters.AdditionalValues.InterfaceId.MapOptionalChangeWithFallback(string.Empty), creationParameters.RightsHolderProvidedUuid)
+                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty), creationParameters.RightsHolderProvidedUuid)
                     .Bind(itInterface => ApplyUpdates(itInterface, creationParameters.AdditionalValues));
 
                 if (result.Ok)
@@ -87,7 +95,7 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error("RightsHolder {uuid} failed to create It-Interface {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.AdditionalValues.Name.NewValue, result.Error.ToString());
+                    _logger.Error("RightsHolder {uuid} failed to create It-Interface {name} due to error: {errorMessage}", rightsHolderUuid, name.NewValue, result.Error.ToString());
                 }
 
                 return result;
@@ -204,7 +212,6 @@ namespace Core.ApplicationServices.RightsHolders
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
                     .Bind(itInterface => ApplyUpdates(itInterface, updateParameters));
 
                 if (result.Ok)
@@ -228,6 +235,7 @@ namespace Core.ApplicationServices.RightsHolders
         private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
             return originalInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
+                .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)));
