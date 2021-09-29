@@ -24,19 +24,21 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
         private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
+
         /// <summary>
         /// Use for stateless calls only
         /// </summary>
-        private static readonly HttpClient StatelessHttpClient =
-            new(
-                new HttpClientHandler
-                {
-                    UseCookies = false
-                });
+        private static readonly HttpClient StatelessHttpClient;
 
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
+            StatelessHttpClient =
+                new(
+                    new HttpClientHandler
+                    {
+                        UseCookies = false
+                    });
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
