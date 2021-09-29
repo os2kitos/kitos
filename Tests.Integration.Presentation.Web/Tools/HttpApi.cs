@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
 using Core.DomainModel;
@@ -22,6 +23,57 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
+        public class StatefulScope : IDisposable
+        {
+            private static readonly ConcurrentQueue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)> StatefulHttpClients;
+
+            static StatefulScope()
+            {
+                StatefulHttpClients = Enumerable.Range(0, 4).Select(x =>
+                {
+
+                    var cookieContainer = new CookieContainer();
+                    var httpClientHandler = new HttpClientHandler() { CookieContainer = cookieContainer };
+                    var httpClient = new HttpClient(httpClientHandler);
+                    return (httpClient, httpClientHandler, cookieContainer);
+                }).Transform(clients => new ConcurrentQueue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
+            }
+
+            public HttpClient Client { get; }
+            public HttpClientHandler ClientHandler { get; }
+            public CookieContainer CookieContainer { get; }
+
+            public StatefulScope(HttpClient client, HttpClientHandler clientHandler, CookieContainer cookieContainer)
+            {
+                Client = client;
+                ClientHandler = clientHandler;
+                CookieContainer = cookieContainer;
+            }
+
+            public static StatefulScope Create()
+            {
+                bool success;
+                (HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer) result;
+                do
+                {
+                    success = StatefulHttpClients.TryDequeue(out result);
+                    if (!success)
+                        Thread.Sleep(1);
+                } while (!success);
+
+                foreach (Cookie cookie in result.cookieContainer.GetCookies(new Uri(TestEnvironment.GetBaseUrl())))
+                {
+                    cookie.Expires = DateTime.UtcNow.AddYears(-1);
+                }
+
+                return new StatefulScope(result.client, result.handler, result.cookieContainer);
+            }
+
+            public void Dispose()
+            {
+                StatefulHttpClients.Enqueue((Client, ClientHandler, CookieContainer));
+            }
+        }
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
         private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
 
@@ -128,14 +180,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             var csrfToken = await GetCSRFToken(authCookie);
             requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
 
-            var cookieContainer = new CookieContainer();
+            using var scope = StatefulScope.Create();
             if (authCookie != null)
             {
-                cookieContainer.Add(authCookie);
+                scope.CookieContainer.Add(authCookie);
             }
-            cookieContainer.Add(csrfToken.CookieToken);
-            using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
-            return await client.SendAsync(requestMessage);
+            scope.CookieContainer.Add(csrfToken.CookieToken);
+            return await scope.Client.SendAsync(requestMessage);
         }
 
         public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
@@ -147,15 +198,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 if (authCookie == null)
                 {
-                    using var client = new HttpClient();
-                    csrfResponse = await client.SendAsync(csrfRequest);
+                    using var scope = StatefulScope.Create();
+                    csrfResponse = await scope.Client.SendAsync(csrfRequest);
                 }
                 else
                 {
-                    var cookieContainer = new CookieContainer();
-                    cookieContainer.Add(authCookie);
-                    using var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer });
-                    csrfResponse = await client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                    using var scope = StatefulScope.Create();
+                    scope.CookieContainer.Add(authCookie);
+                    csrfResponse = await scope.Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
                 }
 
                 Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
@@ -236,8 +286,8 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
             var requestMessage = CreatePostMessage(url, loginDto);
-            using var client = new HttpClient();
-            return await client.SendAsync(requestMessage);
+            using var scope = StatefulScope.Create();
+            return await scope.Client.SendAsync(requestMessage);
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
