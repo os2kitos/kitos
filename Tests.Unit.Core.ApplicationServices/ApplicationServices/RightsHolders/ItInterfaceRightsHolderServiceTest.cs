@@ -719,7 +719,11 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
         public void UpdateItInterface_Returns_Error_If_UpdateNameAndInterfaceId_Fails()
         {
             //Arrange
-            var inputParameters = A<RightsHolderItInterfaceUpdateParameters>();
+            var inputParameters = new RightsHolderItInterfaceUpdateParameters()
+            {
+                Name = A<string>().AsChangedValue(),
+                InterfaceId = A<string>().AsChangedValue()
+            };
             var transactionMock = ExpectTransactionBegins();
             var exposingSystem = new ItSystem { Id = A<int>(), Uuid = A<Guid>(), BelongsToId = A<int>() };
             var itInterface = new ItInterface { Id = A<int>(), Uuid = A<Guid>(), ExhibitedBy = new ItInterfaceExhibit { ItSystem = exposingSystem } };
@@ -727,7 +731,6 @@ namespace Tests.Unit.Core.ApplicationServices.RightsHolders
             var operationError = A<OperationError>();
 
             ExpectHasSpecificAccessReturns(itInterface, true);
-            ExpectGetSystemReturns(inputParameters.ExposingSystemUuid.NewValue, exposingSystem);
             ExpectGetItInterfaceReturns(itInterface.Uuid, itInterface);
             ExpectUpdateNameAndInterfaceIdReturns(itInterface.Id, inputParameters, operationError);
 
