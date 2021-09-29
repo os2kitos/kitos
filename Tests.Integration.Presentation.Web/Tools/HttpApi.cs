@@ -37,6 +37,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
+            ServicePointManager.SetTcpKeepAlive(false, 0, 0);
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
