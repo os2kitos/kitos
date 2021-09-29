@@ -596,7 +596,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var otherOrg = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var otherOrg = await CreateOrganization();
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), otherOrg.Id, AccessModifier.Public);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
@@ -1001,27 +1001,32 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
         private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrg()
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true, true);
             return (token, org);
         }
 
         private async Task<(string token, Organization createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
             return (token, org);
         }
 
         private async Task<(string token, Organization createdOrganization1, Organization createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
         {
-            var org1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var org2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org1 = await CreateOrganization();
+            var org2 = await CreateOrganization();
 
             var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Id, true);
             await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id).DisposeAsync();
 
             return (token, org1, org2);
+        }
+
+        private async Task<Organization> CreateOrganization()
+        {
+            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
         }
 
         private string CreateName()
