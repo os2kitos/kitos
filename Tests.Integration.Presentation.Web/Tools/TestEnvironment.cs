@@ -39,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 Console.Out.WriteLine("Running locally. Loading all configuration in-line");
                 const string localDevUserPassword = "localNoSecret";
                 DefaultUserPassword = "arne123";
-                ConnectionString = @"Server=.\SQLEXPRESS01;Integrated Security=true;Initial Catalog=Kitos;MultipleActiveResultSets=True";
+                ConnectionString = @"Server=.\SQLEXPRESS;Integrated Security=true;Initial Catalog=Kitos;MultipleActiveResultSets=True";
                 UsersFromEnvironment = new Dictionary<OrganizationRole, KitosCredentials>
                 {
                     {
