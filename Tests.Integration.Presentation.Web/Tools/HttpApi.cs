@@ -51,13 +51,16 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             public static StatefulScope Create()
             {
+                //TODO: Could appear as if we do get out of clients - maybe on the same thread
                 bool success;
-                (HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer) result;
+                (HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer) result = default;
                 do
                 {
-                    success = StatefulHttpClients.TryDequeue(out result);
+                    success = StatefulHttpClients.IsEmpty == false && StatefulHttpClients.TryDequeue(out result);
                     if (!success)
-                        Thread.Sleep(1);
+                    {
+                        Thread.Sleep(100);
+                    }
                 } while (!success);
 
                 foreach (Cookie cookie in result.cookieContainer.GetCookies(new Uri(TestEnvironment.GetBaseUrl())))
@@ -70,6 +73,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             public void Dispose()
             {
+                //TODO: maybe this one is stalling - we need more info
                 StatefulHttpClients.Enqueue((Client, ClientHandler, CookieContainer));
             }
         }
