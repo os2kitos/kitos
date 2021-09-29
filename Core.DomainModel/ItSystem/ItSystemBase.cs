@@ -2,17 +2,18 @@
 
 namespace Core.DomainModel.ItSystem
 {
-    public abstract class ItSystemBase : Entity, ISystemModule, IOwnedByOrganization, IHasAccessModifier, IHasName, IHasUuid
+    public abstract class ItSystemBase : Entity, ISystemModule, IOwnedByOrganization, IHasAccessModifier, IHasName, IHasUuid, IHasDirtyMarking
     {
         protected ItSystemBase()
         {
             Uuid = Guid.NewGuid();
+            MarkAsDirty();
         }
 
         public string Name { get; set; }
         public Guid Uuid { get; set; }
         public string Description { get; set; }
-        
+
         public AccessModifier AccessModifier { get; set; }
 
         public int OrganizationId { get; set; }
@@ -25,5 +26,9 @@ namespace Core.DomainModel.ItSystem
         public virtual Organization.Organization Organization { get; set; }
 
         public DateTime? Created { get; set; }
+        public void MarkAsDirty()
+        {
+            LastChanged = DateTime.UtcNow;
+        }
     }
 }

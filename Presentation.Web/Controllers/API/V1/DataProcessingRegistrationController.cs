@@ -13,11 +13,8 @@ using Core.DomainModel;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.Shared;
 using Core.DomainServices.Model.Options;
-
 using Presentation.Web.Controllers.API.V1.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.GDPR;
 using Presentation.Web.Models.API.V1.References;

@@ -1,5 +1,4 @@
-﻿using Core.DomainModel;
-using Core.DomainModel.Constants;
+﻿using Core.DomainModel.Constants;
 using Core.DomainModel.ItProject;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Project;

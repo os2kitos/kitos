@@ -4,13 +4,11 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Contract;
-using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.References;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
-using Core.DomainModel.ItContract.DomainEvents;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -18,13 +16,12 @@ using Core.DomainServices.Contract;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.Contract;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.ApplicationServices
+namespace Tests.Unit.Core.ApplicationServices.Contract
 {
     public class ItContractServiceTest : WithAutoFixture
     {
@@ -37,7 +34,6 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IReferenceService> _referenceService;
         private readonly Mock<ILogger> _logger;
         private readonly Mock<IContractDataProcessingRegistrationAssignmentService> _contractDataProcessingRegistrationAssignmentService;
-        private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
 
         public ItContractServiceTest()
@@ -50,7 +46,6 @@ namespace Tests.Unit.Core.ApplicationServices
             _referenceService = new Mock<IReferenceService>();
             _logger = new Mock<ILogger>();
             _contractDataProcessingRegistrationAssignmentService = new Mock<IContractDataProcessingRegistrationAssignmentService>();
-            _organizationServiceMock = new Mock<IOrganizationService>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _sut = new ItContractService(
                 _contractRepository.Object,
@@ -61,7 +56,6 @@ namespace Tests.Unit.Core.ApplicationServices
                 _authorizationContext.Object,
                 _logger.Object,
                 _contractDataProcessingRegistrationAssignmentService.Object,
-                _organizationServiceMock.Object,
                 _userContextMock.Object);
         }
 
@@ -128,7 +122,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
             _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
-            _domainEvents.Verify(x => x.Raise(It.Is<ContractDeleted>(cd => cd.DeletedContract == itContract)), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }

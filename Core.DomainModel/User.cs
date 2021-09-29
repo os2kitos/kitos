@@ -7,6 +7,7 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainModel.SSO;
+using Core.DomainModel.Tracking;
 
 // ReSharper disable VirtualMemberCallInConstructor
 
@@ -162,6 +163,7 @@ namespace Core.DomainModel
 
         public bool IsGlobalAdmin { get; set; }
         public Guid Uuid { get; set; }
+        public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
 
         public override bool HasUserWriteAccess(User user)
         {

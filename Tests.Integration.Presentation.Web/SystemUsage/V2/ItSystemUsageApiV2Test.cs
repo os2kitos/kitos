@@ -87,6 +87,34 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         }
 
         [Fact]
+        public async Task Can_Get_All_ItSystemUsages_Filtered_By_LastModified()
+        {
+            //Arrange
+            var (token, user, organization, system1) = await CreatePrerequisitesAsync();
+            var system2 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+            var system3 = await CreateSystemAsync(organization.Id, AccessModifier.Public);
+
+            var system1Usage = await ItSystemHelper.TakeIntoUseAsync(system1.Id, organization.Id);
+            var system2Usage = await ItSystemHelper.TakeIntoUseAsync(system2.dbId, organization.Id);
+            var system3Usage = await ItSystemHelper.TakeIntoUseAsync(system3.dbId, organization.Id);
+
+            foreach (var systemUsageDto in new[] { system2Usage, system3Usage, system1Usage })
+            {
+                using var patchResponse = await ItSystemUsageV2Helper.SendPatchGeneral(token, systemUsageDto.Uuid, new GeneralDataUpdateRequestDTO() { Notes = A<string>() });
+                Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            }
+
+            var referenceChange = await ItSystemUsageV2Helper.GetSingleAsync(token, system3Usage.Uuid);
+
+            //Act
+            var dtos = (await ItSystemUsageV2Helper.GetManyAsync(token, organization.Uuid, changedSinceGtEq: referenceChange.LastModified, page: 0, pageSize: 10)).ToList();
+
+            //Assert that the correct dtos are provided in the right order
+            Assert.Equal(new[] { system3Usage.Uuid, system1Usage.Uuid }, dtos.Select(x => x.Uuid));
+
+        }
+
+        [Fact]
         public async Task Can_Get_All_ItSystemUsages_Filtered_By_Organization()
         {
             //Arrange
@@ -975,7 +1003,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Assert
             AssertGeneralData(request.General, createdUsage.General);
-            
+
             await AssertOrganizationalUsage(token, createdUsage.Uuid, new OrgUnitDTO[] { orgUnit }, orgUnit);
 
             AssertKLEDeviation(true, addedTaskRefs, createdUsage.LocalKLEDeviations.AddedKLE);
@@ -1254,7 +1282,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
             var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
             var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
-            
+
             var input = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid
@@ -1392,7 +1420,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
 
             // Create relation
-            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, new SystemRelationWriteRequestDTO {ToSystemUsageUuid = usage2.Uuid});
+            var createdRelation = await ItSystemUsageV2Helper.PostRelationAsync(token, usage1.Uuid, new SystemRelationWriteRequestDTO { ToSystemUsageUuid = usage2.Uuid });
             Assert.Equal(usage2.Uuid, createdRelation.ToSystemUsage.Uuid);
 
 
@@ -1441,7 +1469,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             var system2 = await CreateSystemAndGetAsync(organization.Id, AccessModifier.Public);
             var usage1 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system1.Uuid));
             var usage2 = await ItSystemUsageV2Helper.PostAsync(token, CreatePostRequest(organization.Uuid, system2.Uuid));
-            
+
             var createInput = new SystemRelationWriteRequestDTO
             {
                 ToSystemUsageUuid = usage2.Uuid
@@ -1669,7 +1697,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
                 Assert.Equal(HttpStatusCode.OK, addTaskRefResponse.StatusCode);
             }
             var kleDeviations = CreateLocalKLEDeviationsRequestDTO(addedTaskRefs, removedTaskRefs);
-            
+
 
             var externalReferences = CreateExternalReferenceDataDTOs();
 
@@ -2119,7 +2147,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
-                organizationName, string.Join("", Many<int>(8).Select(x => Math.Abs(x) % 9)), orgType, AccessModifier.Public);
+                organizationName, String.Empty, orgType, AccessModifier.Public);
             return organization;
         }
 
@@ -2130,7 +2158,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
         private static async Task<SystemRelationDTO> CreateRelationAsync(ItSystemUsageDTO fromUsage, ItSystemUsageDTO toUsage, ItContractDTO contract = null)
         {
-            return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id, ContractId = contract?.Id});
+            return await SystemRelationHelper.PostRelationAsync(new CreateSystemRelationDTO { FromUsageId = fromUsage.Id, ToUsageId = toUsage.Id, ContractId = contract?.Id });
         }
     }
 }

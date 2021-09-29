@@ -126,6 +126,31 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         [Fact]
+        public async Task Can_GET_All_DPRs_With_LastModified_Filtering()
+        {
+            //Arrange
+            var (token, user, organization) = await CreatePrerequisitesAsync();
+            var dpr1 = await CreateDPRAsync(organization.Id);
+            var dpr2 = await CreateDPRAsync(organization.Id);
+            var dpr3 = await CreateDPRAsync(organization.Id);
+
+            foreach (var dto in new[] { dpr2, dpr3, dpr1 })
+            {
+                using var patchResponse = await DataProcessingRegistrationV2Helper.SendPatchName(token, dto.Uuid, CreateName());
+                Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            }
+
+            var referenceChange = await DataProcessingRegistrationV2Helper.GetDPRAsync(token, dpr3.Uuid);
+
+            //Act
+            var dtos = await DataProcessingRegistrationV2Helper.GetDPRsAsync(token, page: 0, pageSize: 10, changedSinceGtEq: referenceChange.LastModified);
+
+            //Assert that the right items are returned in the correct order
+            Assert.Equal(new[] { dpr3.Uuid, dpr1.Uuid }, dtos.Select(x => x.Uuid));
+
+        }
+
+        [Fact]
         public async Task Can_GET_All_DPRs_With_OrganizationFiltering()
         {
             //Arrange

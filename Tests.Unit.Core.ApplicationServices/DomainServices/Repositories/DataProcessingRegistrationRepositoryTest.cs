@@ -1,5 +1,6 @@
 ﻿using Core.DomainModel.Events;
 using Core.DomainModel.GDPR;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.GDPR;
 using Moq;

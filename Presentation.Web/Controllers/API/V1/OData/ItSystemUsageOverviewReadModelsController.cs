@@ -1,5 +1,4 @@
 ﻿using System.Web.Http;
-using Core.ApplicationServices.SystemUsage;
 using Core.ApplicationServices.SystemUsage.ReadModels;
 using Microsoft.AspNet.OData;
 using Microsoft.AspNet.OData.Routing;

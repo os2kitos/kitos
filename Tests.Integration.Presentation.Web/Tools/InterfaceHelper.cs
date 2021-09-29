@@ -111,7 +111,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             }
         }
 
-        
+
         public static async Task<HttpResponseMessage> SendChangeNameRequestAsync(int interfaceId, string newName, int orgId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
@@ -140,6 +140,12 @@ namespace Tests.Integration.Presentation.Web.Tools
                 return await response.ReadOdataListResponseBodyAsAsync<ItInterfaceDTO>();
             }
 
+        }
+
+        public static async Task DeleteInterfaceAsync(int itInterfaceId)
+        {
+            using var response = await SendDeleteInterfaceRequestAsync(itInterfaceId);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
     }
 }

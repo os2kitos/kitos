@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.Shared;
 using Infrastructure.Services.DataAccess;
 using Serilog;
 

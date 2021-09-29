@@ -12,7 +12,6 @@ using Core.ApplicationServices.System;
 using Core.DomainModel.ItSystem;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.ItSystem;
-
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -50,6 +49,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// <param name="kleUuid">KLE UUID number filter</param>
         /// <param name="numberOfUsers">Greater than or equal to number of users filter</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [Route("it-systems")]
@@ -63,7 +63,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             string kleNumber = null,
             [NonEmptyGuid] Guid? kleUuid = null,
             int? numberOfUsers = null,
-            bool includeDeactivated = false,
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -83,11 +84,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
             if (numberOfUsers.HasValue)
                 refinements.Add(new QueryByNumberOfUsages(numberOfUsers.Value));
 
-            if (includeDeactivated == false)
+            if (includeDeactivated != true)
                 refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
 
+            if (changedSinceGtEq.HasValue)
+                refinements.Add(new QueryByChangedSinceGtEq<ItSystem>(changedSinceGtEq.Value));
+
             return _itSystemService.GetAvailableSystems(refinements.ToArray())
-                .OrderBy(x => x.Id)
+                .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                 .Page(paginationQuery)
                 .ToList()
                 .Select(ToSystemResponseDTO)
@@ -122,6 +126,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         /// </summary>
         /// <param name="rightsHolderUuid">Optional filtering if a user is rights holder in multiple organizations and wishes to scope the request to a single one</param>
         /// <param name="includeDeactivated">If set to true, the response will also include deactivated it-interfaces</param>
+        /// <param name="changedSinceGtEq">Include only changes which were LastModified (UTC) is equal to or greater than the provided value</param>
         /// <returns></returns>
         [HttpGet]
         [AllowRightsHoldersAccess]
@@ -132,7 +137,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         public IHttpActionResult GetItSystemsByRightsHoldersAccess(
             [NonEmptyGuid] Guid? rightsHolderUuid = null,
-            bool includeDeactivated = false,
+            bool? includeDeactivated = null,
+            DateTime? changedSinceGtEq = null,
             [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
             if (!ModelState.IsValid)
@@ -140,13 +146,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
 
             var refinements = new List<IDomainQuery<ItSystem>>();
 
-            if (includeDeactivated == false)
+            if (includeDeactivated != true)
                 refinements.Add(new QueryByEnabledEntitiesOnly<ItSystem>());
+
+            if (changedSinceGtEq.HasValue)
+                refinements.Add(new QueryByChangedSinceGtEq<ItSystem>(changedSinceGtEq.Value));
 
             return _rightsHolderSystemService
                 .GetSystemsWhereAuthenticatedUserHasRightsHolderAccess(refinements, rightsHolderUuid)
                 .Select(itSystems => itSystems
-                    .OrderBy(system => system.Id)
+                    .OrderByDefaultConventions(changedSinceGtEq.HasValue)
                     .Page(paginationQuery)
                     .ToList()
                     .Select(ToRightsHolderResponseDTO)

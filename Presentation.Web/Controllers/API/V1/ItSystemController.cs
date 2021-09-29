@@ -18,7 +18,6 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.ItSystem;
 using Swashbuckle.Swagger.Annotations;
@@ -175,7 +174,7 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 var savedItem = PostQuery(item);
-
+                RaiseNewObjectCreated(savedItem);
                 return Created(Map(savedItem), new Uri(Request.RequestUri + "/" + savedItem.Id));
             }
             catch (Exception e)
@@ -224,7 +223,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     system.TaskRefs.Add(task);
                 }
-                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+                RaiseUpdated(system);
                 Repository.Save();
                 return Ok();
             }
@@ -272,7 +271,7 @@ namespace Presentation.Web.Controllers.API.V1
                 {
                     system.TaskRefs.Remove(task);
                 }
-                DomainEvents.Raise(new EntityUpdatedEvent<ItSystem>(system));
+                RaiseUpdated(system);
                 Repository.Save();
                 return Ok();
             }
@@ -381,7 +380,7 @@ namespace Presentation.Web.Controllers.API.V1
 
             if (httpResponseMessage.IsSuccessStatusCode && namechange)
             {
-                DomainEvents.Raise(new NamedEntityChangedNameEvent<ItSystem>(itSystem));
+                RaiseUpdated(itSystem);
             }
 
             return httpResponseMessage;

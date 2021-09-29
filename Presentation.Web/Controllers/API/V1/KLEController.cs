@@ -12,7 +12,6 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API.V1

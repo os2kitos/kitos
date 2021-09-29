@@ -7,7 +7,7 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
     public class ItInterfaceResponseDTO : BaseItInterfaceResponseDTO, IHasLastModified
     {
         /// <summary>
-        /// Time of last modification
+        /// UTC timestamp of latest modification
         /// </summary>
         public DateTime LastModified { get; set; }
 

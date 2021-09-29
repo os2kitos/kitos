@@ -7,6 +7,11 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.References;
 using Core.DomainServices.Repositories.Contract;
 using Core.DomainServices.Repositories.GDPR;
@@ -90,8 +95,9 @@ namespace Core.ApplicationServices.References
                             (
                                 onSuccess: createdReference =>
                                 {
-                                    _referenceRepository.SaveRootEntity(root);
                                     _domainEvents.Raise(new EntityCreatedEvent<ExternalReference>(createdReference));
+                                    RaiseRootUpdated(root);
+                                    _referenceRepository.SaveRootEntity(root);
                                     return createdReference;
                                 },
                                 onFailure: error => error
@@ -114,6 +120,7 @@ namespace Core.ApplicationServices.References
                         }
 
                         _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(referenceAndOwner.externalReference));
+                        RaiseRootUpdated(referenceAndOwner.owner);
                         _referenceRepository.Delete(referenceAndOwner.externalReference);
                         return referenceAndOwner.externalReference;
                     })
@@ -123,6 +130,28 @@ namespace Core.ApplicationServices.References
                         onNone: () => OperationFailure.NotFound
                     );
 
+        }
+
+        private void RaiseRootUpdated(IEntityWithExternalReferences owner)
+        {
+            switch (owner)
+            {
+                case DataProcessingRegistration dataProcessingRegistration:
+                    _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(dataProcessingRegistration));
+                    break;
+                case ItContract itContract:
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItContract>(itContract));
+                    break;
+                case ItProject itProject:
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItProject>(itProject));
+                    break;
+                case ItSystem itSystem:
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(itSystem));
+                    break;
+                case ItSystemUsage itSystemUsage:
+                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(itSystemUsage));
+                    break;
+            }
         }
 
         public Result<IEnumerable<ExternalReference>, OperationFailure> DeleteBySystemId(int systemId)
@@ -238,6 +267,7 @@ namespace Core.ApplicationServices.References
                 _referenceRepository.Delete(reference);
             }
 
+            RaiseRootUpdated(root);
             transaction.Commit();
             return systemExternalReferences;
         }
