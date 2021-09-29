@@ -385,8 +385,8 @@
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\IItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\Mapping\ItContractWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItProjects\ItProjectV2Controller.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemV2WriteModelMapper.cs" />
-    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemV2WriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\IItSystemWriteModelMapper.cs" />
+    <Compile Include="Controllers\API\V2\External\ItSystems\Mapping\ItSystemWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRegisteredDataCategoryTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageRoleTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\ItSystemUsageSensitivePersonalDataTypeV2Controller.cs" />

@@ -3,7 +3,7 @@ using Presentation.Web.Models.API.V2.Request.System;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
-    public interface IItSystemV2WriteModelMapper
+    public interface IItSystemWriteModelMapper
     {
         RightsHolderSystemCreationParameters FromRightsHolderPOST(RightsHolderCreateItSystemRequestDTO dto);
         RightsHolderSystemUpdateParameters FromRightsHolderPUT(RightsHolderWritableITSystemPropertiesDTO dto);

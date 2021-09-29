@@ -8,17 +8,17 @@ using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
 {
-    public class ItSystemV2WriteModelMapperTest : WriteModelMapperTestBase
+    public class ItSystemWriteModelMapperTest : WriteModelMapperTestBase
     {
         private readonly Mock<ICurrentHttpRequest> _currentHttpRequestMock;
-        private readonly ItSystemV2WriteModelMapper _sut;
+        private readonly ItSystemWriteModelMapper _sut;
 
-        public ItSystemV2WriteModelMapperTest()
+        public ItSystemWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties())
                 .Returns(GetAllInputPropertyNames<RightsHolderCreateItSystemRequestDTO>());
-            _sut = new ItSystemV2WriteModelMapper(_currentHttpRequestMock.Object);
+            _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
         [Fact]

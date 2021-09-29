@@ -32,9 +32,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems
         private readonly IItSystemService _itSystemService;
         private readonly IRightsHolderSystemService _rightsHolderSystemService;
         private readonly IAuthorizationContext _authorizationContext;
-        private readonly IItSystemV2WriteModelMapper _writeModelMapper;
+        private readonly IItSystemWriteModelMapper _writeModelMapper;
 
-        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext, IItSystemV2WriteModelMapper writeModelMapper)
+        public ItSystemV2Controller(IItSystemService itSystemService, IRightsHolderSystemService rightsHolderSystemService, IAuthorizationContext authorizationContext, IItSystemWriteModelMapper writeModelMapper)
         {
             _itSystemService = itSystemService;
             _rightsHolderSystemService = rightsHolderSystemService;

@@ -9,9 +9,9 @@ using Presentation.Web.Models.API.V2.Request.System;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 {
-    public class ItSystemV2WriteModelMapper : WriteModelMapperBase, IItSystemV2WriteModelMapper
+    public class ItSystemWriteModelMapper : WriteModelMapperBase, IItSystemWriteModelMapper
     {
-        public ItSystemV2WriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
+        public ItSystemWriteModelMapper(ICurrentHttpRequest currentHttpRequest) : base(currentHttpRequest)
         {
         }
 

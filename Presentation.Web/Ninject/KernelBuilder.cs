@@ -269,7 +269,7 @@ namespace Presentation.Web.Ninject
         private void RegisterMappers(IKernel kernel)
         {
             //Systems
-            kernel.Bind<IItSystemV2WriteModelMapper>().To<ItSystemV2WriteModelMapper>().InCommandScope(Mode);
+            kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
 
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
