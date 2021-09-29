@@ -106,7 +106,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             return (await response.ReadResponseBodyAsAsync<GetAccessTypesResponse>()).AccessTypes;
         }
 
-        public static async Task<HttpResponseMessage> DeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
+        public static async Task DeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
+        {
+            using var response = await SendDeleteItSystemAsync(systemId, organizationId, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteItSystemAsync(int systemId, int organizationId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
@@ -139,7 +145,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             Cookie optionalLogin = null)
         {
             using var response = await SendSetNameRequestAsync(systemId, name, organizationId, optionalLogin);
-            Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemDTO>();
         }
 
