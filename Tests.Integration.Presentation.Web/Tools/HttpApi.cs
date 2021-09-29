@@ -37,6 +37,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
+            ServicePointManager.MaxServicePointIdleTime = 5000;
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
