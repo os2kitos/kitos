@@ -820,7 +820,6 @@
     <Compile Include="Controllers\API\V1\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\V1\ReferenceController.cs" />
-    <Compile Include="Controllers\API\V1\UploadFileController.cs" />
     <Compile Include="Controllers\API\V1\OData\AccessTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceSentController.cs" />
@@ -1251,7 +1250,6 @@
     <TypeScriptCompile Include="app\services\NavigationService.ts" />
     <TypeScriptCompile Include="app\services\OrganizationService.ts" />
     <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
-    <TypeScriptCompile Include="app\services\uploadFileService.ts" />
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
