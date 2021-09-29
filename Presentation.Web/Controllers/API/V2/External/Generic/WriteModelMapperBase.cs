@@ -53,11 +53,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             
             if (!_currentRequestProperties.TryGetValue(key, out var properties))
             {
-                properties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel).Select(x=>x.ToLowerInvariant()).ToHashSet();
+                properties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel).ToHashSet(StringComparer.OrdinalIgnoreCase);
                 _currentRequestProperties[key] = properties;
             }
 
-            return properties.TryGetValue(expectedSectionKey.Last().ToLowerInvariant(), out _);
+            return properties.Contains(expectedSectionKey.Last());
         }
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
