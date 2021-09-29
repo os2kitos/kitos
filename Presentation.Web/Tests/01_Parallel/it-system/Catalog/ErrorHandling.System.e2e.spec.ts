@@ -34,7 +34,7 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         it("When system is deleted successfully",
             () => {
-                var systemName = createSystemName();
+                var systemName = createName("SystemDeleteSuccess");
                 loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(systemName))
@@ -53,7 +53,7 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         it("When system is in use",
             () => {
-                var systemName = createSystemName();
+                var systemName = createName("SystemInUse");
 
                 loadPage()
                     .then(() => expectCreateButtonVisibility(true))
@@ -72,8 +72,8 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         it("When a interface depends on the system",
             () => {
-                var systemName = createSystemName();
-                var interfaceName = createInterfaceName();
+                var systemName = createName("SystemWithInterface");
+                var interfaceName = createName("Interface");
 
                 loadPage()
                     .then(() => expectCreateButtonVisibility(true))
@@ -93,17 +93,17 @@ describe("Getting the correct message when there is a conflict deleting a system
 
         it("When another system depends on it",
             () => {
-                var mainSystemName = "main" + createSystemName();
-                var childSystemName = "child" + createSystemName();
+                var mainSystemName = createName("MainSystem");
+                var childSystemName = createName("ChildSystem");
 
                 loadPage()
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(mainSystemName))
-                    .then(() => console.log("Expecting system with name " + mainSystemName))
+                    .then(() => console.log(`Expecting system with name ${mainSystemName}`))
                     .then(() => expectSystemWithName(mainSystemName))
                     .then(() => expectCreateButtonVisibility(true))
                     .then(() => CatalogHelper.createSystem(childSystemName))
-                    .then(() => console.log("Expecting system with name " + childSystemName))
+                    .then(() => console.log(`Expecting system with name ${childSystemName}`))
                     .then(() => expectSystemWithName(childSystemName))
                     .then(() => CatalogHelper.setMainSystem(mainSystemName, childSystemName))
                     .then(() => CatalogHelper.getDeleteButtonForSystem(mainSystemName))
@@ -119,7 +119,7 @@ describe("Getting the correct message when there is a conflict deleting a system
 
 
         function expectCreateButtonVisibility(expectedEnabledState: boolean) {
-            console.log("Expecting createCatalog visibility to be:" + expectedEnabledState);
+            console.log(`Expecting createCatalog visibility to be:${expectedEnabledState}`);
             return expect(itSystemPage.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
         }
 
@@ -133,22 +133,18 @@ describe("Getting the correct message when there is a conflict deleting a system
                 .then(() => waitForKendoGrid());
         }
 
-        function createSystemName() {
-            return "System" + new Date().getTime();
-        }
-
-        function createInterfaceName() {
-            return "interface" + new Date().getTime();
+        function createName(prefix: string) {
+            return `${prefix}_${new Date().getTime()}`;
         }
 
         function expectSystemWithName(name: string) {
-            console.log("Making sure " + name + " does exist");
+            console.log(`Making sure ${name} does exist`);
             return CatalogHelper.waitForKendoGrid()
                 .then(() => expect(findCatalogColumnsFor(name).first().getText()).toEqual(name));
         }
 
         function toggleSystemInUse(name: string) {
-            return element(by.xpath('//*/tbody/*/td/a[text()="' + name + '"]/parent::*/parent::*//button')).click();
+            return element(by.xpath(`//*/tbody/*/td/a[text()="${name}"]/parent::*/parent::*//button`)).click();
         }
 
         function getToastElement() {

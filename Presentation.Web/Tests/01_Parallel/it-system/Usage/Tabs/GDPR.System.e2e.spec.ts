@@ -12,7 +12,7 @@ describe("Global admin is able to", () => {
 
     var loginHelper = new login();
     var testFixture = new TestFixtureWrapper();
-    var itSystem1 = createItSystemName();
+    var itSystem = createName("SystemName");
     var consts = new Constants();
     var cssHelper = new CssHelper();
 
@@ -24,16 +24,16 @@ describe("Global admin is able to", () => {
     var testUrl = "https://www.strongminds.dk/";
     var numberValue = new Date().getDay().toString();
 
-    var purposeText = `purpose${new Date().getTime()}`;
-    var noteRiskText = `noteRiskText${new Date().getTime()}`;
-    var urlNameText = `urlName${new Date().getTime()}`;
+    var purposeText = createName("purpose");
+    var noteRiskText = createName("noteRiskText");
+    var urlNameText = createName("urlName");
 
 
     beforeAll(() => {
         loginHelper.loginAsGlobalAdmin()
-            .then(() => ItSystemCatalogHelper.createSystem(itSystem1))
-            .then(() => ItSystemCatalogHelper.getActivationToggleButton(itSystem1).click())
-            .then(() => ItSystemHelper.openLocalSystem(itSystem1));
+            .then(() => ItSystemCatalogHelper.createSystem(itSystem))
+            .then(() => ItSystemCatalogHelper.getActivationToggleButton(itSystem).click())
+            .then(() => ItSystemHelper.openLocalSystem(itSystem));
     }, testFixture.longRunningSetup());
 
     beforeEach(() => {
@@ -206,17 +206,17 @@ describe("Global admin is able to", () => {
         return element.getAttribute("value");
     }
 
-    function createItSystemName() {
-        return `GdprTest${new Date().getTime()}`;
+    function createName(prefix: string) {
+        return `${prefix}_GdprTest${new Date().getTime()}`;
     }
 
     function expectCheckboxValue(checkBoxDataElementType: string, toBe: boolean) {
-        console.log("Checking value for " + checkBoxDataElementType + " value to be " + toBe);
+        console.log(`Checking value for ${checkBoxDataElementType} value to be ${toBe}`);
         return expect(element(cssHelper.byDataElementType(checkBoxDataElementType)).isSelected()).toBe(toBe);
     }
 
     function expectDropdownValueToEqual(expectedValue: string, idOfDropDownBox: string) {
-        console.log("Expecting " + idOfDropDownBox + " to equal " + expectedValue);
+        console.log(`Expecting ${idOfDropDownBox} to equal ${expectedValue}`);
         return expect(Select2Helper.getData(idOfDropDownBox).getText()).toEqual(expectedValue);
     }
 

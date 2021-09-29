@@ -15,7 +15,6 @@ using Infrastructure.Services.DataAccess;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
@@ -80,7 +79,6 @@ namespace Core.ApplicationServices.RightsHolders
 
                 var result = _itInterfaceService
                     .CreateNewItInterface(organizationId.Value, creationParameters.AdditionalValues.Name.NewValue, creationParameters.AdditionalValues.InterfaceId.MapOptionalChangeWithFallback(string.Empty), creationParameters.RightsHolderProvidedUuid)
-                    .Bind(itInterface => itInterface.WithOptionalUpdate(creationParameters.AdditionalValues.ExposingSystemUuid, UpdateExposingSystem))
                     .Bind(itInterface => ApplyUpdates(itInterface, creationParameters.AdditionalValues));
 
                 if (result.Ok)
@@ -207,7 +205,6 @@ namespace Core.ApplicationServices.RightsHolders
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
                     .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
-                    .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
                     .Bind(itInterface => ApplyUpdates(itInterface, updateParameters));
 
                 if (result.Ok)
@@ -231,6 +228,7 @@ namespace Core.ApplicationServices.RightsHolders
         private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
             return originalInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
                 .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)));
         }

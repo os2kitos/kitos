@@ -25,13 +25,13 @@ describe("Only Global Administrator is able to create and fill out an interface"
     });
 
     it("Global Admin is able to create and fill out data on a interface", () => {
-        var interfaceName = createInterfaceName();
-        var id = createUniqueString("Id");
-        var description = createUniqueString("Description");
-        var descriptionLink = createUniqueString("DescriptionLink");
-        var note = createUniqueString("Note");
-        var dataRow = createUniqueString("DataRow");
-        var systemName = createItSystem();
+        var interfaceName = createName("InterfaceName");
+        var id = createName("Id");
+        var description = createName("Description");
+        var descriptionLink = createName("DescriptionLink");
+        var note = createName("Note");
+        var dataRow = createName("DataRow");
+        var systemName = createName("SystemName");
         var systemInterface = "CSV";
         var access = "Lokal";
         var org = "Fælles Kommune";
@@ -120,16 +120,8 @@ describe("Only Global Administrator is able to create and fill out an interface"
     }
 
 
-    function createInterfaceName() {
-        return `Interface${new Date().getTime()}`;
-    }
-
-    function createItSystem() {
-        return `ItSystem${new Date().getTime()}`;
-    }
-
-    function createUniqueString(uniquePart: string) {
-        return `${uniquePart}: Data${new Date().getTime()}`;
+    function createName(prefix: string) {
+        return `${prefix}_${createVersion()}`;
     }
 
     function createVersion() {

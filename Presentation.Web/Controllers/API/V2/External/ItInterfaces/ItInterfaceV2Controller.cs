@@ -158,7 +158,6 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
         /// <summary>
         /// Allows partial updates of an existing it-interface
-        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
         /// </summary>
         /// <param name="uuid">UUID of the interface in KITOS</param>
         /// <param name="request">Updates for the interface</param>
