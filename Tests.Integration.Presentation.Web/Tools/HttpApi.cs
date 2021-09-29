@@ -29,11 +29,10 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             static StatefulScope()
             {
-                StatefulHttpClients = Enumerable.Range(0, 4).Select(x =>
+                StatefulHttpClients = Enumerable.Range(0, Environment.ProcessorCount * 2).Select(x =>
                 {
-
                     var cookieContainer = new CookieContainer();
-                    var httpClientHandler = new HttpClientHandler() { CookieContainer = cookieContainer };
+                    var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
                     var httpClient = new HttpClient(httpClientHandler);
                     return (httpClient, httpClientHandler, cookieContainer);
                 }).Transform(clients => new ConcurrentQueue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
