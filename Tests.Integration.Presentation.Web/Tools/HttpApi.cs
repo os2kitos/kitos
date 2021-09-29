@@ -179,13 +179,15 @@ namespace Tests.Integration.Presentation.Web.Tools
             var csrfToken = await GetCSRFToken(authCookie);
             requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
 
-            using var scope = StatefulScope.Create();
-            if (authCookie != null)
+            using (var scope = StatefulScope.Create())
             {
-                scope.CookieContainer.Add(authCookie);
+                if (authCookie != null)
+                {
+                    scope.CookieContainer.Add(authCookie);
+                }
+                scope.CookieContainer.Add(csrfToken.CookieToken);
+                return await scope.Client.SendAsync(requestMessage);
             }
-            scope.CookieContainer.Add(csrfToken.CookieToken);
-            return await scope.Client.SendAsync(requestMessage);
         }
 
         public static async Task<CSRFTokenDTO> GetCSRFToken(Cookie authCookie = null)
@@ -197,14 +199,18 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
                 if (authCookie == null)
                 {
-                    using var scope = StatefulScope.Create();
-                    csrfResponse = await scope.Client.SendAsync(csrfRequest);
+                    using (var scope = StatefulScope.Create())
+                    {
+                        csrfResponse = await scope.Client.SendAsync(csrfRequest);
+                    }
                 }
                 else
                 {
-                    using var scope = StatefulScope.Create();
-                    scope.CookieContainer.Add(authCookie);
-                    csrfResponse = await scope.Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                    using (var scope = StatefulScope.Create())
+                    {
+                        scope.CookieContainer.Add(authCookie);
+                        csrfResponse = await scope.Client.SendAsync(new HttpRequestMessage(HttpMethod.Get, url));
+                    }
                 }
 
                 Assert.Equal(HttpStatusCode.OK, csrfResponse.StatusCode);
@@ -286,7 +292,9 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var requestMessage = CreatePostMessage(url, loginDto);
             using var scope = StatefulScope.Create();
-            return await scope.Client.SendAsync(requestMessage);
+            {
+                return await scope.Client.SendAsync(requestMessage);
+            }
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)

@@ -35,13 +35,15 @@ namespace Tests.Integration.Presentation.Web.Security
             };
 
             //Act
-            using var scope = HttpApi.StatefulScope.Create();
-            scope.CookieContainer.Add(cookie);
+            using (var scope = HttpApi.StatefulScope.Create())
+            {
+                scope.CookieContainer.Add(cookie);
 
-            using var response = await scope.Client.SendAsync(requestMessage);
+                using var response = await scope.Client.SendAsync(requestMessage);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                //Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
         }
 
         [Theory]
@@ -67,12 +69,14 @@ namespace Tests.Integration.Presentation.Web.Security
             requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
 
             //Act
-            using var scope = HttpApi.StatefulScope.Create();
-            scope.CookieContainer.Add(cookie);
-            using var response = await scope.Client.SendAsync(requestMessage);
+            using (var scope = HttpApi.StatefulScope.Create())
+            {
+                scope.CookieContainer.Add(cookie);
+                using var response = await scope.Client.SendAsync(requestMessage);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                //Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
         }
 
         [Theory]
@@ -97,13 +101,15 @@ namespace Tests.Integration.Presentation.Web.Security
             var csrfToken = await HttpApi.GetCSRFToken(cookie);
 
             //Act
-            using var scope = HttpApi.StatefulScope.Create();
-            scope.CookieContainer.Add(cookie);
-            scope.CookieContainer.Add(csrfToken.CookieToken);
-            using var response = await scope.Client.SendAsync(requestMessage);
+            using (var scope = HttpApi.StatefulScope.Create())
+            {
+                scope.CookieContainer.Add(cookie);
+                scope.CookieContainer.Add(csrfToken.CookieToken);
+                using var response = await scope.Client.SendAsync(requestMessage);
 
-            //Assert
-            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+                //Assert
+                Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+            }
         }
 
         [Theory]
