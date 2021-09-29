@@ -110,6 +110,7 @@ using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Tracking;
 using Core.DomainServices.Tracking;
+using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 
 namespace Presentation.Web.Ninject
@@ -268,6 +269,9 @@ namespace Presentation.Web.Ninject
 
         private void RegisterMappers(IKernel kernel)
         {
+            //Systems
+            kernel.Bind<IItSystemWriteModelMapper>().To<ItSystemWriteModelMapper>().InCommandScope(Mode);
+
             //System usage
             kernel.Bind<IItSystemUsageResponseMapper>().To<ItSystemUsageResponseMapper>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageWriteModelMapper>().To<ItSystemUsageWriteModelMapper>().InCommandScope(Mode);

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Net;
@@ -336,7 +337,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Contains(systems, dto => dto.Uuid == includedLowerBound.uuid);
             Assert.Contains(systems, dto => dto.Uuid == includedAboveLowerBound.uuid);
         }
-        
+
         [Fact]
         public async Task GET_Many_As_StakeHolder_With_ChangesSince_Filter()
         {
@@ -827,6 +828,45 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(update.ParentUuid.GetValueOrDefault(), updatedSystem.ParentSystem.Uuid);
             Assert.Equal(update.UrlReference, updatedSystem.UrlReference);
             Assert.Equal(update.KLENumbers, updatedSystem.KLE.Select(x => x.Name));
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, true, false, false)]
+        [InlineData(true, true, true, true, false, false, false)]
+        [InlineData(true, true, true, false, false, false, false)]
+        [InlineData(true, true, false, false, false, false, false)]
+        [InlineData(true, false, false, false, false, false, false)]
+        [InlineData(false, false, false, false, false, false, false)]
+        public async Task Can_PATCH_As_RightsHolder(bool updateName, bool updateFormerName, bool updateDescription, bool updateUrl, bool updateBusinessType, bool updateKle, bool updateParent)
+        {
+            //Arrange
+            var (token, rightsHolder) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
+            var createSystemRequest = await PrepareCreateRightsHolderSystemRequestAsync(false, true, true, false, true, true, rightsHolder);
+            var createdSystem = await ItSystemV2Helper.CreateRightsHolderSystemAsync(token, createSystemRequest);
+
+            var changes = new Dictionary<string, object>();
+            if (updateName) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.Name), CreateName());
+            if (updateFormerName) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.FormerName), A<string>());
+            if (updateDescription) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.Description), A<string>());
+            if (updateBusinessType) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.BusinessTypeUuid), GetBusinessType(1));
+            if (updateKle) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.KLENumbers), new[] { CreateNewTaskRefAndGetKey() });
+            if (updateParent) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.ParentUuid), (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid);
+
+            //Act
+            var updatedSystem = await ItSystemV2Helper.PatchRightsHolderSystemAsync(token, createdSystem.Uuid, changes.ToArray());
+
+            //Assert that only the patched properties have changed
+            Assert.Equal(createdSystem.Uuid, updatedSystem.Uuid); //No changes expected
+            Assert.Equal(createdSystem.Created, updatedSystem.Created); //No changes expected
+            createdSystem.RightsHolder.ToExpectedObject().ShouldMatch(updatedSystem.RightsHolder); //No changes expected
+            Assert.Equal(updateName ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.Name)] : createdSystem.Name, updatedSystem.Name);
+            Assert.Equal(updateFormerName ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.FormerName)] : createdSystem.FormerName, updatedSystem.FormerName);
+            Assert.Equal(updateDescription ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.Description)] : createdSystem.Description, updatedSystem.Description);
+            Assert.Equal(updateBusinessType ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
+            Assert.Equal(updateKle ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.KLENumbers)] : createdSystem.KLE?.Select(x=>x.Name), updatedSystem.KLE?.Select(x=>x.Name));
+            Assert.Equal(updateParent ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
         }
 
         [Theory]

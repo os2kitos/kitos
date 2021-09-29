@@ -52,6 +52,19 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             return await HttpApi.PutWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, request);
         }
 
+        public static async Task<RightsHolderItSystemResponseDTO> PatchRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            using var response = await SendPatchUpdateRightsHolderSystemAsync(token, uuid, changedProperties);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<RightsHolderItSystemResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderSystemAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
+
         public static async Task<HttpResponseMessage> SendDeleteRightsHolderSystemAsync(string token, Guid uuid, DeactivationReasonRequestDTO request)
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-systems/{uuid}"), token, request);
@@ -157,7 +170,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             int? page = null,
             int? pageSize = null,
             Guid? rightsHolderUuid = null,
-            bool? includeDeactivated = null, 
+            bool? includeDeactivated = null,
             DateTime? changedSinceGtEq = null)
         {
             var path = "api/v2/rightsholder/it-systems";
