@@ -54,7 +54,7 @@ namespace Presentation.Web.Infrastructure.Model.Request
             return child.Path.Substring(child.Parent?.Path?.Length ?? 0, child.Path.Length - child.Parent?.Path?.Length ?? 0).TrimStart('.');
         }
 
-        private static Maybe<JToken> TraverseTo(JToken root, string[] pathTokens)
+        private static Maybe<JToken> TraverseTo(JToken root, IEnumerable<string> pathTokens)
         {
             var currentRoot = root;
             var tokensToDescendInto = new Stack<string>(pathTokens.Reverse());
