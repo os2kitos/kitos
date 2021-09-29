@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -826,55 +827,28 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
             var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
 
-            var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
-
-            var newName = CreateName();
-            var newInterfaceId = A<string>();
-            var newVersion = A<string>().Substring(0, 20);
-            var newDescription = A<string>();
-            var newUrlReference = A<string>();
-
-            //Act
-            if (withName)
-            {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceNameAsync(token, createdInterface.Uuid, newName);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-            if (withInterfaceId)
-            {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceInterfaceIdAsync(token, createdInterface.Uuid, newInterfaceId);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            var changes = new Dictionary<string, object>();
+            if (withName) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name), CreateName());
+            if (withInterfaceId) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId), A<string>());
             if (withExposedBySystem)
             {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceExposingSystemAsync(token, createdInterface.Uuid, newExposingSystem.Uuid);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+                var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+                changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid), newExposingSystem.Uuid);
             }
-            if (withVersion)
-            {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceVersionAsync(token, createdInterface.Uuid, newVersion);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-            if (withDescription)
-            {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceDescriptionAsync(token, createdInterface.Uuid, newDescription);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
-            if (withUrlReference)
-            {
-                using var response = await InterfaceV2Helper.SendPatchItInterfaceUrlReferenceAsync(token, createdInterface.Uuid, newUrlReference);
-                Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            }
+            if (withVersion) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version), A<string>().Substring(0, 20));
+            if (withDescription) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description), A<string>());
+            if (withUrlReference) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference), A<string>());
+
+            //Act
+            var updatedInterface = await InterfaceV2Helper.PatchRightsHolderInterfaceAsync(token, createdInterface.Uuid, changes.ToArray());
 
             //Assert
-            var dto = await InterfaceV2Helper.GetRightsholderInterfaceAsync(token, createdInterface.Uuid);
-            Assert.Equal(withName ? newName : createdInterface.Name, dto.Name);
-            Assert.Equal(withInterfaceId ? newInterfaceId : createdInterface.InterfaceId, dto.InterfaceId);
-            Assert.Equal(withExposedBySystem ? newExposingSystem.Name : createdInterface.ExposedBySystem.Name, dto.ExposedBySystem.Name);
-            Assert.Equal(withExposedBySystem ? newExposingSystem.Uuid : createdInterface.ExposedBySystem.Uuid, dto.ExposedBySystem.Uuid);
-            Assert.Equal(withVersion ? newVersion : createdInterface.Version, dto.Version);
-            Assert.Equal(withDescription ? newDescription : createdInterface.Description, dto.Description);
-            Assert.Equal(withUrlReference ? newUrlReference : createdInterface.UrlReference, dto.UrlReference);
+            Assert.Equal(withName ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name)] : createdInterface.Name, updatedInterface.Name);
+            Assert.Equal(withInterfaceId ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId)] : createdInterface.InterfaceId, updatedInterface.InterfaceId);
+            Assert.Equal(withExposedBySystem ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid)] : createdInterface.ExposedBySystem.Uuid, updatedInterface.ExposedBySystem.Uuid);
+            Assert.Equal(withVersion ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version)] : createdInterface.Version, updatedInterface.Version);
+            Assert.Equal(withDescription ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description)] : createdInterface.Description, updatedInterface.Description);
+            Assert.Equal(withUrlReference ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference)] : createdInterface.UrlReference, updatedInterface.UrlReference);
         }
 
         [Fact]

@@ -20,7 +20,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return Map(dto, false);
+            var parameters = new RightsHolderItInterfaceUpdateParameters();
+            Map(dto, parameters, false);
+            return parameters;
         }
 
         public RightsHolderItInterfaceCreationParameters FromPOST(RightsHolderCreateItInterfaceRequestDTO dto)
@@ -28,7 +30,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return new RightsHolderItInterfaceCreationParameters(dto.Uuid, Map(dto, true));
+            var parameters = new RightsHolderItInterfaceUpdateParameters();
+            Map(dto, parameters, true);
+            return new RightsHolderItInterfaceCreationParameters(dto.Uuid, parameters);
         }
 
         public RightsHolderItInterfaceUpdateParameters FromPUT(RightsHolderWritableItInterfacePropertiesDTO dto)
@@ -36,20 +40,21 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping
             if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
-            return Map(dto, true);
+            var parameters = new RightsHolderItInterfaceUpdateParameters();
+            Map(dto, parameters, true);
+            return parameters;
         }
 
-        private RightsHolderItInterfaceUpdateParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : IRightsHolderWritableItInterfacePropertiesDTO
+        private void Map(IRightsHolderWritableItInterfacePropertiesDTO source, RightsHolderItInterfaceUpdateParameters destination, bool enforceFallbackIfNotProvided)
         {
-            return new()
-            {
-                Name = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Name)) || enforceFallbackIfNotProvided ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
-                ExposingSystemUuid = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.ExposedBySystemUuid)) || enforceFallbackIfNotProvided ? dto.ExposedBySystemUuid.AsChangedValue() : OptionalValueChange<Guid>.None,
-                Description = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Description)) || enforceFallbackIfNotProvided ? (dto.Description ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None,
-                InterfaceId = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.InterfaceId)) || enforceFallbackIfNotProvided ? (dto.InterfaceId ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None,
-                Version = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Version)) || enforceFallbackIfNotProvided ? (dto.Version ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None,
-                UrlReference = ClientRequestsChangeTo(nameof(IRightsHolderWritableItInterfacePropertiesDTO.UrlReference)) || enforceFallbackIfNotProvided ? (dto.UrlReference ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None
-            };
+            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+
+            destination.Name = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Name)) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.InterfaceId = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.InterfaceId)) ? (source.InterfaceId ?? string.Empty).AsChangedValue() : OptionalValueChange<string>.None;
+            destination.ExposingSystemUuid = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.ExposedBySystemUuid)) ? source.ExposedBySystemUuid.AsChangedValue() : OptionalValueChange<Guid>.None;
+            destination.Description = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Description)) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.Version = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.Version)) ? source.Version.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.UrlReference = ShouldChange(nameof(IRightsHolderWritableItInterfacePropertiesDTO.UrlReference)) ? source.UrlReference.AsChangedValue() : OptionalValueChange<string>.None;
         }
     }
 }
