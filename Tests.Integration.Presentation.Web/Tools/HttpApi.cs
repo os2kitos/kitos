@@ -25,18 +25,42 @@ namespace Tests.Integration.Presentation.Web.Tools
     {
         public class StatefulScope : IDisposable
         {
-            private static readonly ConcurrentQueue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)> StatefulHttpClients;
+            private static readonly object QueueLock = new();
+            private static readonly Queue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)> StatefulHttpClients;
 
             static StatefulScope()
             {
-                StatefulHttpClients = Enumerable.Range(0, Environment.ProcessorCount * 2).Select(x =>
-                {
-                    var cookieContainer = new CookieContainer();
-                    var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
-                    var httpClient = new HttpClient(httpClientHandler);
-                    return (httpClient, httpClientHandler, cookieContainer);
-                }).Transform(clients => new ConcurrentQueue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
+                StatefulHttpClients = Enumerable
+                    .Range(0, Environment.ProcessorCount * 2).Select(x => CreateClient())
+                    .Transform(clients => new Queue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
             }
+
+            private static (HttpClient httpClient, HttpClientHandler httpClientHandler, CookieContainer cookieContainer) CreateClient()
+            {
+                var cookieContainer = new CookieContainer();
+                var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
+                var httpClient = new HttpClient(httpClientHandler);
+                return (httpClient, httpClientHandler, cookieContainer);
+            }
+
+            public static StatefulScope Create()
+            {
+                (HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer) result;
+                lock (QueueLock)
+                {
+                    //If no available client, grow the pool by one
+                    result = StatefulHttpClients.Any() ? StatefulHttpClients.Dequeue() : CreateClient();
+                }
+
+                foreach (Cookie cookie in result.cookieContainer.GetCookies(new Uri(TestEnvironment.GetBaseUrl())))
+                {
+                    cookie.Expires = DateTime.UtcNow.AddYears(-1);
+                }
+
+                return new StatefulScope(result.client, result.handler, result.cookieContainer);
+            }
+
+            private bool isDisposed;
 
             public HttpClient Client { get; }
             public HttpClientHandler ClientHandler { get; }
@@ -49,32 +73,16 @@ namespace Tests.Integration.Presentation.Web.Tools
                 CookieContainer = cookieContainer;
             }
 
-            public static StatefulScope Create()
-            {
-                //TODO: Could appear as if we do get out of clients - maybe on the same thread
-                bool success;
-                (HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer) result = default;
-                do
-                {
-                    success = StatefulHttpClients.IsEmpty == false && StatefulHttpClients.TryDequeue(out result);
-                    if (!success)
-                    {
-                        Thread.Sleep(100);
-                    }
-                } while (!success);
-
-                foreach (Cookie cookie in result.cookieContainer.GetCookies(new Uri(TestEnvironment.GetBaseUrl())))
-                {
-                    cookie.Expires = DateTime.UtcNow.AddYears(-1);
-                }
-
-                return new StatefulScope(result.client, result.handler, result.cookieContainer);
-            }
-
             public void Dispose()
             {
-                //TODO: maybe this one is stalling - we need more info
-                StatefulHttpClients.Enqueue((Client, ClientHandler, CookieContainer));
+                lock (QueueLock)
+                {
+                    if (!isDisposed)
+                    {
+                        StatefulHttpClients.Enqueue((Client, ClientHandler, CookieContainer));
+                        isDisposed = true;
+                    }
+                }
             }
         }
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
