@@ -1,4 +1,6 @@
-﻿using System.Net;
+﻿using System;
+using System.Linq;
+using System.Net;
 
 namespace Infrastructure.Services.Http
 {
@@ -7,11 +9,10 @@ namespace Infrastructure.Services.Http
         public static void ConfigureValidationOfOutgoingConnections()
         {
             //Allow all versions of ssl for outgoing connections
-            ServicePointManager.SecurityProtocol =
-                SecurityProtocolType.Ssl3 |
-                SecurityProtocolType.Tls |
-                SecurityProtocolType.Tls11 |
-                SecurityProtocolType.Tls12;
+            ServicePointManager.SecurityProtocol = Enum
+                .GetValues(typeof(SecurityProtocolType))
+                .Cast<SecurityProtocolType>()
+                .Aggregate(SecurityProtocolType.SystemDefault, (acc, next) => acc | next);
         }
     }
 }

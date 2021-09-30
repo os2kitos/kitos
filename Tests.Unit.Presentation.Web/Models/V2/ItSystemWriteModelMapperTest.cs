@@ -73,7 +73,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
            bool noDescription,
            bool noFormerName,
            bool noUrlReference,
-           bool npParent,
+           bool noParent,
            bool noBusinessType,
            bool noTaskRefKeys,
            bool noTaskRefUuids)
@@ -85,7 +85,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noDescription) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.Description));
             if (noFormerName) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.FormerName));
             if (noUrlReference) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.UrlReference));
-            if (npParent) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.ParentUuid));
+            if (noParent) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.ParentUuid));
             if (noBusinessType) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.BusinessTypeUuid));
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
@@ -100,7 +100,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(output.Description.IsUnchanged, noDescription);
             Assert.Equal(output.FormerName.IsUnchanged, noFormerName);
             Assert.Equal(output.UrlReference.IsUnchanged, noUrlReference);
-            Assert.Equal(output.ParentSystemUuid.IsUnchanged, npParent);
+            Assert.Equal(output.ParentSystemUuid.IsUnchanged, noParent);
             Assert.Equal(output.BusinessTypeUuid.IsUnchanged, noBusinessType);
             Assert.Equal(output.TaskRefKeys.IsUnchanged, noTaskRefKeys);
             Assert.Equal(output.TaskRefUuids.IsUnchanged, noTaskRefUuids);
