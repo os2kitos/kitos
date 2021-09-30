@@ -853,6 +853,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             if (updateBusinessType) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.BusinessTypeUuid), GetBusinessType(1));
             if (updateKle) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.KLENumbers), new[] { CreateNewTaskRefAndGetKey() });
             if (updateParent) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.ParentUuid), (await CreateSystemAsync(rightsHolder.Id, AccessModifier.Public)).uuid);
+            if (updateUrl) changes.Add(nameof(RightsHolderWritableITSystemPropertiesDTO.UrlReference), A<string>());
 
             //Act
             var updatedSystem = await ItSystemV2Helper.PatchRightsHolderSystemAsync(token, createdSystem.Uuid, changes.ToArray());
@@ -867,6 +868,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             Assert.Equal(updateBusinessType ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.BusinessTypeUuid)] : createdSystem.BusinessType?.Uuid, updatedSystem.BusinessType?.Uuid);
             Assert.Equal(updateKle ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.KLENumbers)] : createdSystem.KLE?.Select(x=>x.Name), updatedSystem.KLE?.Select(x=>x.Name));
             Assert.Equal(updateParent ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.ParentUuid)] : createdSystem.ParentSystem?.Uuid, updatedSystem.ParentSystem?.Uuid);
+            Assert.Equal(updateUrl ? changes[nameof(RightsHolderWritableITSystemPropertiesDTO.UrlReference)] : createdSystem.UrlReference, updatedSystem.UrlReference);
         }
 
         [Theory]
