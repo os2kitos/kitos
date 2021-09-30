@@ -39,6 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 var cookieContainer = new CookieContainer();
                 var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
                 var httpClient = new HttpClient(httpClientHandler);
+                httpClient.DefaultRequestHeaders.ExpectContinue = false;
                 return (httpClient, httpClientHandler, cookieContainer);
             }
 
@@ -95,6 +96,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
+            ServicePointManager.SetTcpKeepAlive(false, 0, 0);
             StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
         }
 
