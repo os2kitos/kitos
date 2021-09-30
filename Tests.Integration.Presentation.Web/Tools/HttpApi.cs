@@ -16,6 +16,7 @@ using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -29,6 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             static StatefulScope()
             {
+                ConfigureServicePointManager();
                 StatefulHttpClients = Enumerable
                     .Range(0, Environment.ProcessorCount * 2).Select(_ => CreateClient())
                     .Transform(clients => new Queue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
@@ -96,10 +98,20 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         static HttpApi()
         {
-            ServicePointManager.Expect100Continue = false;
+            ConfigureServicePointManager();
             StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
             StatelessHttpClient.DefaultRequestHeaders.ExpectContinue = false;
             StatelessHttpClient.DefaultRequestHeaders.ConnectionClose = true;
+        }
+
+        public static void ConfigureServicePointManager()
+        {
+            ServicePointManager.SecurityProtocol = EnumRange
+                .All<SecurityProtocolType>()
+                .Where(protocol => protocol >= SecurityProtocolType.Tls12)
+                .Aggregate(SecurityProtocolType.SystemDefault, (acc, next) => acc | next);
+
+            ServicePointManager.Expect100Continue = false;
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
