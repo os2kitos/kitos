@@ -6,7 +6,6 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
 using Core.DomainModel;
@@ -31,7 +30,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             static StatefulScope()
             {
                 StatefulHttpClients = Enumerable
-                    .Range(0, Environment.ProcessorCount * 2).Select(x => CreateClient())
+                    .Range(0, Environment.ProcessorCount * 2).Select(_ => CreateClient())
                     .Transform(clients => new Queue<(HttpClient client, HttpClientHandler handler, CookieContainer cookieContainer)>(clients));
             }
 
@@ -96,12 +95,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
-            StatelessHttpClient =
-                new(
-                    new HttpClientHandler
-                    {
-                        UseCookies = false
-                    });
+            StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
