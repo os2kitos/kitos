@@ -96,7 +96,6 @@ namespace Tests.Integration.Presentation.Web.Tools
         static HttpApi()
         {
             ServicePointManager.Expect100Continue = false;
-            ServicePointManager.SetTcpKeepAlive(false, 0, 0);
             StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
             StatelessHttpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
