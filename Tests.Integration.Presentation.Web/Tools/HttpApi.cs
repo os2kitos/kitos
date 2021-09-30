@@ -40,6 +40,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 var httpClientHandler = new HttpClientHandler { CookieContainer = cookieContainer };
                 var httpClient = new HttpClient(httpClientHandler);
                 httpClient.DefaultRequestHeaders.ExpectContinue = false;
+                httpClient.DefaultRequestHeaders.ConnectionClose = true;
                 return (httpClient, httpClientHandler, cookieContainer);
             }
 
@@ -98,6 +99,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             ServicePointManager.Expect100Continue = false;
             StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
             StatelessHttpClient.DefaultRequestHeaders.ExpectContinue = false;
+            StatelessHttpClient.DefaultRequestHeaders.ConnectionClose = true;
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
