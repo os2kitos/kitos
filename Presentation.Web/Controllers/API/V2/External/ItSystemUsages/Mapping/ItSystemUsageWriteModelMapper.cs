@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             var parameters = new SystemUsageUpdateParameters
             {
-                GeneralProperties = request.General.FromNullable().Select(MapGeneralData),
+                GeneralProperties = request.General.FromNullable().Select(general => MapGeneralData(general, new UpdatedSystemUsageGeneralProperties(), true)),
                 OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
                 KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
                 ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
@@ -57,7 +57,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = generalDataInput.FromNullable().Select(MapGeneralDataUpdate),
+                GeneralProperties = generalDataInput.FromNullable().Select(general => MapGeneralDataUpdate(general, new UpdatedSystemUsageGeneralProperties(), enforceFallbackOnUndefinedProperties)),
                 OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
                 KLE = kleInput.FromNullable().Select(MapKle),
                 ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
@@ -149,10 +149,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         /// </summary>
         /// <param name="generalData"></param>
         /// <returns></returns>
-        private static UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO generalData)
+        private UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO source, UpdatedSystemUsageGeneralProperties destination, bool enforceFallbackIfNotProvided)
         {
-            var generalProperties = MapGeneralData(generalData);
-            generalProperties.MainContractUuid = (generalData.MainContractUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue();
+            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+
+            var generalProperties = MapGeneralData(source, new UpdatedSystemUsageGeneralProperties(), enforceFallbackIfNotProvided);
+            destination.MainContractUuid = ShouldChange(nameof(GeneralDataUpdateRequestDTO.MainContractUuid)) ? source.MainContractUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None;
+
             return generalProperties;
         }
 
@@ -175,25 +178,22 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private static UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO generalData)
+        private UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO source, UpdatedSystemUsageGeneralProperties destination, bool enforceFallbackIfNotProvided)
         {
-            return new UpdatedSystemUsageGeneralProperties
-            {
-                LocalCallName = generalData.LocalCallName.AsChangedValue(),
-                LocalSystemId = generalData.LocalSystemId.AsChangedValue(),
-                Notes = generalData.Notes.AsChangedValue(),
-                SystemVersion = generalData.SystemVersion.AsChangedValue(),
-                DataClassificationUuid = (generalData.DataClassificationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                NumberOfExpectedUsersInterval = (generalData
-                    .NumberOfExpectedUsers?
-                    .FromNullable()
-                    .Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ?? Maybe<(int, int?)>.None)
-                    .AsChangedValue(),
-                EnforceActive = ((generalData.Validity?.EnforcedValid)?.FromNullable() ?? Maybe<bool>.None).AsChangedValue(),
-                ValidFrom = (generalData.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
-                ValidTo = (generalData.Validity?.ValidTo?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue(),
-                AssociatedProjectUuids = (generalData.AssociatedProjectUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
-            };
+            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+
+            destination.LocalCallName = ShouldChange(nameof(GeneralDataWriteRequestDTO.LocalCallName)) ? source.LocalCallName.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.LocalSystemId = ShouldChange(nameof(GeneralDataWriteRequestDTO.LocalSystemId)) ? source.LocalSystemId.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.Notes = ShouldChange(nameof(GeneralDataWriteRequestDTO.Notes)) ? source.Notes.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.SystemVersion = ShouldChange(nameof(GeneralDataWriteRequestDTO.SystemVersion)) ? source.SystemVersion.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.DataClassificationUuid = ShouldChange(nameof(GeneralDataWriteRequestDTO.DataClassificationUuid)) ? source.DataClassificationUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None;
+            destination.NumberOfExpectedUsersInterval = ShouldChange(nameof(GeneralDataWriteRequestDTO.NumberOfExpectedUsers)) ? source.NumberOfExpectedUsers?.FromNullable().Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ?? Maybe<(int, int?)>.None.AsChangedValue() : OptionalValueChange<Maybe<(int, int?)>>.None;
+            destination.EnforceActive = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.EnforcedValid)) ? source.Validity?.EnforcedValid.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<bool>>.None;
+            destination.ValidFrom = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.ValidFrom)) ? source.Validity?.ValidFrom?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<DateTime>>.None;
+            destination.ValidTo = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.ValidTo)) ? source.Validity?.ValidTo?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<DateTime>>.None;
+            destination.AssociatedProjectUuids = ShouldChange(nameof(GeneralDataWriteRequestDTO.AssociatedProjectUuids)) ? source.AssociatedProjectUuids?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
+
+            return destination;
         }
 
         public SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData)
