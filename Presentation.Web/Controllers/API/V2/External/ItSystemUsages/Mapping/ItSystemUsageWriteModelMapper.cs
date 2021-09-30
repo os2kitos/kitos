@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.ApplicationServices.Model.SystemUsage.Write;
+using Core.DomainModel;
 using Core.DomainModel.ItSystem.DataTypes;
+using Core.DomainModel.ItSystemUsage;
+using Core.DomainModel.ItSystemUsage.GDPR;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -28,13 +32,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         {
             var parameters = new SystemUsageUpdateParameters
             {
-                GeneralProperties = request.General.FromNullable().Select(general => MapGeneralData(general, new UpdatedSystemUsageGeneralProperties(), true)),
-                OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(MapOrganizationalUsage),
-                KLE = request.LocalKleDeviations.FromNullable().Select(MapKle),
+                GeneralProperties = request.General.FromNullable().Select(general => MapGeneralData(general, true)),
+                OrganizationalUsage = request.OrganizationUsage.FromNullable().Select(orgUsage => MapOrganizationalUsage(orgUsage, true)),
+                KLE = request.LocalKleDeviations.FromNullable().Select(kle => MapKle(kle, true)),
                 ExternalReferences = request.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = request.Roles.FromNullable().Select(MapRoles),
-                GDPR = request.GDPR.FromNullable().Select(MapGDPR),
-                Archiving = request.Archiving.FromNullable().Select(MapArchiving)
+                GDPR = request.GDPR.FromNullable().Select(gdpr => MapGDPR(gdpr, true)),
+                Archiving = request.Archiving.FromNullable().Select(archiving => MapArchiving(archiving, true))
             };
 
             return parameters;
@@ -57,13 +61,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
 
             return new SystemUsageUpdateParameters
             {
-                GeneralProperties = generalDataInput.FromNullable().Select(general => MapGeneralDataUpdate(general, new UpdatedSystemUsageGeneralProperties(), enforceFallbackOnUndefinedProperties)),
-                OrganizationalUsage = orgUsageInput.FromNullable().Select(MapOrganizationalUsage),
-                KLE = kleInput.FromNullable().Select(MapKle),
+                GeneralProperties = generalDataInput.FromNullable().Select(general => MapGeneralDataUpdate(general, enforceFallbackOnUndefinedProperties)),
+                OrganizationalUsage = orgUsageInput.FromNullable().Select(orgUsage => MapOrganizationalUsage(orgUsage, enforceFallbackOnUndefinedProperties)),
+                KLE = kleInput.FromNullable().Select(kle => MapKle(kle, enforceFallbackOnUndefinedProperties)),
                 ExternalReferences = externalReferenceDataDtos.FromNullable().Select(MapReferences),
                 Roles = roles.FromNullable().Select(MapRoles),
-                GDPR = gdpr.FromNullable().Select(MapGDPR),
-                Archiving = archiving.FromNullable().Select(MapArchiving)
+                GDPR = gdpr.FromNullable().Select(gdpr => MapGDPR(gdpr, enforceFallbackOnUndefinedProperties)),
+                Archiving = archiving.FromNullable().Select(archiving => MapArchiving(archiving, enforceFallbackOnUndefinedProperties))
             };
         }
 
@@ -72,51 +76,55 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return MapUpdate(request, false);
         }
 
-        private static UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO request)
+        private UpdatedSystemUsageGDPRProperties MapGDPR(GDPRWriteRequestDTO source, bool enforceFallbackIfNotProvided)
         {
+            bool ShouldChange<TProperty>(Expression<Func<GDPRWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+
             return new UpdatedSystemUsageGDPRProperties
             {
-                Purpose = request.Purpose.AsChangedValue(),
-                BusinessCritical = MapYesNoDontKnow(request.BusinessCritical),
-                HostedAt = MapEnumChoice(request.HostedAt, HostedAtMappingExtensions.ToHostedAt),
-                DirectoryDocumentation = MapLink(request.DirectoryDocumentation),
-                DataSensitivityLevels = MapEnumList(request.DataSensitivityLevels, SensitiveDataLevelMappingExtensions.ToSensitiveDataLevel),
-                SensitivePersonDataUuids = MapCrossReferences(request.SensitivePersonDataUuids),
-                RegisteredDataCategoryUuids = MapCrossReferences(request.RegisteredDataCategoryUuids),
-                TechnicalPrecautionsInPlace = MapYesNoDontKnow(request.TechnicalPrecautionsInPlace),
-                TechnicalPrecautionsApplied = MapEnumList(request.TechnicalPrecautionsApplied, TechnicalPrecautionMappingExtensions.ToTechnicalPrecaution),
-                TechnicalPrecautionsDocumentation = MapLink(request.TechnicalPrecautionsDocumentation),
-                UserSupervision = MapYesNoDontKnow(request.UserSupervision),
-                UserSupervisionDate = request.UserSupervisionDate.AsChangedValue(),
-                UserSupervisionDocumentation = MapLink(request.UserSupervisionDocumentation),
-                RiskAssessmentConducted = MapYesNoDontKnow(request.RiskAssessmentConducted),
-                RiskAssessmentConductedDate = request.RiskAssessmentConductedDate.AsChangedValue(),
-                RiskAssessmentResult = MapEnumChoice(request.RiskAssessmentResult, RiskLevelMappingExtensions.ToRiskLevel),
-                RiskAssessmentDocumentation = MapLink(request.RiskAssessmentDocumentation),
-                RiskAssessmentNotes = request.RiskAssessmentNotes.AsChangedValue(),
-                DPIAConducted = MapYesNoDontKnow(request.DPIAConducted),
-                DPIADate = request.DPIADate.AsChangedValue(),
-                DPIADocumentation = MapLink(request.DPIADocumentation),
-                RetentionPeriodDefined = MapYesNoDontKnow(request.RetentionPeriodDefined),
-                NextDataRetentionEvaluationDate = request.NextDataRetentionEvaluationDate.AsChangedValue(),
-                DataRetentionEvaluationFrequencyInMonths = request.DataRetentionEvaluationFrequencyInMonths.AsChangedValue()
+                Purpose = ShouldChange(x => x.Purpose) ? source.Purpose.AsChangedValue() : OptionalValueChange<string>.None,
+                BusinessCritical = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.BusinessCritical) : OptionalValueChange<DataOptions?>.None,
+                HostedAt = ShouldChange(x => x.Purpose) ? MapEnumChoice(source.HostedAt, HostedAtMappingExtensions.ToHostedAt) : OptionalValueChange<HostedAt?>.None,
+                DirectoryDocumentation = ShouldChange(x => x.Purpose) ? MapLink(source.DirectoryDocumentation) : OptionalValueChange<Maybe<NamedLink>>.None,
+                DataSensitivityLevels = ShouldChange(x => x.Purpose) ? MapEnumList(source.DataSensitivityLevels, SensitiveDataLevelMappingExtensions.ToSensitiveDataLevel) : OptionalValueChange<Maybe<IEnumerable<SensitiveDataLevel>>>.None,
+                SensitivePersonDataUuids = ShouldChange(x => x.Purpose) ? MapCrossReferences(source.SensitivePersonDataUuids) : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+                RegisteredDataCategoryUuids = ShouldChange(x => x.Purpose) ? MapCrossReferences(source.RegisteredDataCategoryUuids) : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+                TechnicalPrecautionsInPlace = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.TechnicalPrecautionsInPlace) : OptionalValueChange<DataOptions?>.None,
+                TechnicalPrecautionsApplied = ShouldChange(x => x.Purpose) ? MapEnumList(source.TechnicalPrecautionsApplied, TechnicalPrecautionMappingExtensions.ToTechnicalPrecaution) : OptionalValueChange<Maybe<IEnumerable<TechnicalPrecaution>>>.None,
+                TechnicalPrecautionsDocumentation = ShouldChange(x => x.Purpose) ? MapLink(source.TechnicalPrecautionsDocumentation) : OptionalValueChange<Maybe<NamedLink>>.None,
+                UserSupervision = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.UserSupervision) : OptionalValueChange<DataOptions?>.None,
+                UserSupervisionDate = ShouldChange(x => x.Purpose) ? source.UserSupervisionDate.AsChangedValue() : OptionalValueChange<DateTime?>.None,
+                UserSupervisionDocumentation = ShouldChange(x => x.Purpose) ? MapLink(source.UserSupervisionDocumentation) : OptionalValueChange<Maybe<NamedLink>>.None,
+                RiskAssessmentConducted = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.RiskAssessmentConducted) : OptionalValueChange<DataOptions?>.None,
+                RiskAssessmentConductedDate = ShouldChange(x => x.Purpose) ? source.RiskAssessmentConductedDate.AsChangedValue() : OptionalValueChange<DateTime?>.None,
+                RiskAssessmentResult = ShouldChange(x => x.Purpose) ? MapEnumChoice(source.RiskAssessmentResult, RiskLevelMappingExtensions.ToRiskLevel) : OptionalValueChange<RiskLevel?>.None,
+                RiskAssessmentDocumentation = ShouldChange(x => x.Purpose) ? MapLink(source.RiskAssessmentDocumentation) : OptionalValueChange<Maybe<NamedLink>>.None,
+                RiskAssessmentNotes = ShouldChange(x => x.Purpose) ? source.RiskAssessmentNotes.AsChangedValue() : OptionalValueChange<string>.None,
+                DPIAConducted = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.DPIAConducted) : OptionalValueChange<DataOptions?>.None,
+                DPIADate = ShouldChange(x => x.Purpose) ? source.DPIADate.AsChangedValue() : OptionalValueChange<DateTime?>.None,
+                DPIADocumentation = ShouldChange(x => x.Purpose) ? MapLink(source.DPIADocumentation) : OptionalValueChange<Maybe<NamedLink>>.None,
+                RetentionPeriodDefined = ShouldChange(x => x.Purpose) ? MapYesNoDontKnow(source.RetentionPeriodDefined) : OptionalValueChange<DataOptions?>.None,
+                NextDataRetentionEvaluationDate = ShouldChange(x => x.Purpose) ? source.NextDataRetentionEvaluationDate.AsChangedValue() : OptionalValueChange<DateTime?>.None,
+                DataRetentionEvaluationFrequencyInMonths = ShouldChange(x => x.Purpose) ? source.DataRetentionEvaluationFrequencyInMonths.AsChangedValue() : OptionalValueChange<int?>.None
             };
         }
 
-        private static UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO archiving)
+        private UpdatedSystemUsageArchivingParameters MapArchiving(ArchivingWriteRequestDTO source, bool enforceFallbackIfNotProvided)
         {
+            bool ShouldChange<TProperty>(Expression<Func<ArchivingWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+
             return new UpdatedSystemUsageArchivingParameters()
             {
-                ArchiveDuty = MapEnumChoice(archiving.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes),
-                ArchiveTypeUuid = (archiving.TypeUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveLocationUuid = (archiving.LocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveTestLocationUuid = (archiving.TestLocationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveSupplierOrganizationUuid = (archiving.SupplierOrganizationUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                ArchiveActive = archiving.Active.AsChangedValue(),
-                ArchiveNotes = archiving.Notes.AsChangedValue(),
-                ArchiveFrequencyInMonths = archiving.FrequencyInMonths.AsChangedValue(),
-                ArchiveDocumentBearing = archiving.DocumentBearing.AsChangedValue(),
-                ArchiveJournalPeriods = archiving.JournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue()
+                ArchiveDuty = ShouldChange(x => x.ArchiveDuty) ? MapEnumChoice(source.ArchiveDuty, ArchiveDutyMappingExtensions.ToArchiveDutyTypes) : OptionalValueChange<ArchiveDutyTypes?>.None,
+                ArchiveTypeUuid = ShouldChange(x => x.TypeUuid) ? source.TypeUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None,
+                ArchiveLocationUuid = ShouldChange(x => x.LocationUuid) ? source.LocationUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None,
+                ArchiveTestLocationUuid = ShouldChange(x => x.TestLocationUuid) ? source.TestLocationUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None,
+                ArchiveSupplierOrganizationUuid = ShouldChange(x => x.SupplierOrganizationUuid) ? source.SupplierOrganizationUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None,
+                ArchiveActive = ShouldChange(x => x.Active) ? source.Active.AsChangedValue() : OptionalValueChange<bool?>.None,
+                ArchiveNotes = ShouldChange(x => x.Notes) ? source.Notes.AsChangedValue() : OptionalValueChange<string>.None,
+                ArchiveFrequencyInMonths = ShouldChange(x => x.FrequencyInMonths) ? source.FrequencyInMonths.AsChangedValue() : OptionalValueChange<int?>.None,
+                ArchiveDocumentBearing = ShouldChange(x => x.DocumentBearing) ? source.DocumentBearing.AsChangedValue() : OptionalValueChange<bool?>.None,
+                ArchiveJournalPeriods = ShouldChange(x => x.JournalPeriods) ? source.JournalPeriods.FromNullable().Select(periods => periods.Select(MapJournalPeriod)).AsChangedValue() : OptionalValueChange<Maybe<IEnumerable<SystemUsageJournalPeriod>>>.None
             };
         }
         private static SystemUsageJournalPeriod MapJournalPeriod(JournalPeriodDTO journalPeriod)
@@ -135,12 +143,19 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             return BaseMapReferences(references);
         }
 
-        private static UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO kle)
+        private UpdatedSystemUsageKLEDeviationParameters MapKle(LocalKLEDeviationsRequestDTO source, bool enforceFallbackIfNotProvided)
         {
+            bool ShouldChange<TProperty>(Expression<Func<LocalKLEDeviationsRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+            
             return new UpdatedSystemUsageKLEDeviationParameters
             {
-                AddedKLEUuids = kle.AddedKLEUuids.FromNullable().AsChangedValue(),
-                RemovedKLEUuids = kle.RemovedKLEUuids.FromNullable().AsChangedValue()
+                AddedKLEUuids = ShouldChange(x => x.AddedKLEUuids) 
+                    ? source.AddedKLEUuids.FromNullable().AsChangedValue() 
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None,
+
+                RemovedKLEUuids = ShouldChange(x => x.RemovedKLEUuids)
+                    ? source.RemovedKLEUuids.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
             };
         }
 
@@ -149,22 +164,27 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
         /// </summary>
         /// <param name="generalData"></param>
         /// <returns></returns>
-        private UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO source, UpdatedSystemUsageGeneralProperties destination, bool enforceFallbackIfNotProvided)
+        private UpdatedSystemUsageGeneralProperties MapGeneralDataUpdate(GeneralDataUpdateRequestDTO source, bool enforceFallbackIfNotProvided)
         {
-            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+            bool ShouldChange<TProperty>(Expression<Func<GeneralDataUpdateRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
 
-            var generalProperties = MapGeneralData(source, new UpdatedSystemUsageGeneralProperties(), enforceFallbackIfNotProvided);
-            destination.MainContractUuid = ShouldChange(nameof(GeneralDataUpdateRequestDTO.MainContractUuid)) ? source.MainContractUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None;
-
+            var generalProperties = MapGeneralData(source, enforceFallbackIfNotProvided);
+            generalProperties.MainContractUuid = ShouldChange(x => x.MainContractUuid) ? source.MainContractUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None;
             return generalProperties;
         }
 
-        private static UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO input)
+        private UpdatedSystemUsageOrganizationalUseParameters MapOrganizationalUsage(OrganizationUsageWriteRequestDTO source, bool enforceFallbackIfNotProvided)
         {
+            bool ShouldChange<TProperty>(Expression<Func<OrganizationUsageWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+
             return new UpdatedSystemUsageOrganizationalUseParameters
             {
-                ResponsibleOrganizationUnitUuid = (input.ResponsibleOrganizationUnitUuid?.FromNullable() ?? Maybe<Guid>.None).AsChangedValue(),
-                UsingOrganizationUnitUuids = (input.UsingOrganizationUnitUuids?.FromNullable() ?? Maybe<IEnumerable<Guid>>.None).AsChangedValue()
+                ResponsibleOrganizationUnitUuid = ShouldChange(x => x.ResponsibleOrganizationUnitUuid)
+                    ? source.ResponsibleOrganizationUnitUuid?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<Guid>>.None,
+                UsingOrganizationUnitUuids = ShouldChange(x => x.UsingOrganizationUnitUuids)
+                    ? source.UsingOrganizationUnitUuids?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
             };
         }
 
@@ -178,22 +198,43 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
             };
         }
 
-        private UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO source, UpdatedSystemUsageGeneralProperties destination, bool enforceFallbackIfNotProvided)
+        private UpdatedSystemUsageGeneralProperties MapGeneralData(GeneralDataWriteRequestDTO source, bool enforceFallbackIfNotProvided)
         {
-            bool ShouldChange(string propertyName) => ClientRequestsChangeTo(propertyName) || enforceFallbackIfNotProvided;
+            bool ShouldChange<TProperty>(Expression<Func<GeneralDataWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
 
-            destination.LocalCallName = ShouldChange(nameof(GeneralDataWriteRequestDTO.LocalCallName)) ? source.LocalCallName.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.LocalSystemId = ShouldChange(nameof(GeneralDataWriteRequestDTO.LocalSystemId)) ? source.LocalSystemId.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.Notes = ShouldChange(nameof(GeneralDataWriteRequestDTO.Notes)) ? source.Notes.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.SystemVersion = ShouldChange(nameof(GeneralDataWriteRequestDTO.SystemVersion)) ? source.SystemVersion.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.DataClassificationUuid = ShouldChange(nameof(GeneralDataWriteRequestDTO.DataClassificationUuid)) ? source.DataClassificationUuid?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<Guid>>.None;
-            destination.NumberOfExpectedUsersInterval = ShouldChange(nameof(GeneralDataWriteRequestDTO.NumberOfExpectedUsers)) ? source.NumberOfExpectedUsers?.FromNullable().Select(interval => (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ?? Maybe<(int, int?)>.None.AsChangedValue() : OptionalValueChange<Maybe<(int, int?)>>.None;
-            destination.EnforceActive = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.EnforcedValid)) ? source.Validity?.EnforcedValid.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<bool>>.None;
-            destination.ValidFrom = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.ValidFrom)) ? source.Validity?.ValidFrom?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<DateTime>>.None;
-            destination.ValidTo = ShouldChange(nameof(GeneralDataWriteRequestDTO.Validity.ValidTo)) ? source.Validity?.ValidTo?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<DateTime>>.None;
-            destination.AssociatedProjectUuids = ShouldChange(nameof(GeneralDataWriteRequestDTO.AssociatedProjectUuids)) ? source.AssociatedProjectUuids?.FromNullable().AsChangedValue() : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None;
-
-            return destination;
+            return new UpdatedSystemUsageGeneralProperties
+            {
+                LocalCallName = ShouldChange(x => x.LocalCallName)
+                    ? source.LocalCallName.AsChangedValue()
+                    : OptionalValueChange<string>.None,
+                LocalSystemId = ShouldChange(x => x.LocalSystemId)
+                    ? source.LocalSystemId.AsChangedValue()
+                    : OptionalValueChange<string>.None,
+                Notes = ShouldChange(x => x.Notes) ? source.Notes.AsChangedValue() : OptionalValueChange<string>.None,
+                SystemVersion = ShouldChange(x => x.SystemVersion)
+                    ? source.SystemVersion.AsChangedValue()
+                    : OptionalValueChange<string>.None,
+                DataClassificationUuid = ShouldChange(x => x.DataClassificationUuid)
+                    ? source.DataClassificationUuid?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<Guid>>.None,
+                NumberOfExpectedUsersInterval = ShouldChange(x => x.NumberOfExpectedUsers)
+                    ? source.NumberOfExpectedUsers?.FromNullable().Select(interval =>
+                          (interval.LowerBound.GetValueOrDefault(0), interval.UpperBound)) ??
+                      Maybe<(int, int?)>.None.AsChangedValue()
+                    : OptionalValueChange<Maybe<(int, int?)>>.None,
+                EnforceActive = ShouldChange(x => x.Validity.EnforcedValid)
+                    ? source.Validity?.EnforcedValid.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<bool>>.None,
+                ValidFrom = ShouldChange(x => x.Validity.ValidFrom)
+                    ? source.Validity?.ValidFrom?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<DateTime>>.None,
+                ValidTo = ShouldChange(x => x.Validity.ValidTo)
+                    ? source.Validity?.ValidTo?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<DateTime>>.None,
+                AssociatedProjectUuids = ShouldChange(x => x.AssociatedProjectUuids)
+                    ? source.AssociatedProjectUuids?.FromNullable().AsChangedValue()
+                    : OptionalValueChange<Maybe<IEnumerable<Guid>>>.None
+            };
         }
 
         public SystemRelationParameters MapRelation(SystemRelationWriteRequestDTO relationData)
