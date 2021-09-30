@@ -12,7 +12,7 @@ describe("Global Admin can",
         var testFixture = new TestFixtureWrapper();
         var headerButtons = itSystemReference.kendoToolbarWrapper.headerButtons();
         var inputFields = itSystemReference.kendoToolbarWrapper.inputFields();
-        var itSystemName = createItSystemName();
+        var itSystemName = createName("ItSystemRefTest");
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
@@ -30,8 +30,8 @@ describe("Global Admin can",
 
         it("Add reference to IT-System",
             () => {
-                var referenceName = createReferenceName();
-                var referenceId = createReferenceId();
+                var referenceName = createName("AddReferenceName");
+                var referenceId = createName("AddReferenceId");
                 var validUrl = generateValidUrl();
 
                 refHelper.goToSpecificItSystemReferences(itSystemName)
@@ -42,8 +42,8 @@ describe("Global Admin can",
 
         it("Edit a reference in a IT-System",
             () => {
-                var referenceName = createReferenceName();
-                var referenceId = createReferenceId();
+                var referenceName = createName("EditReferenceName");
+                var referenceId = createName("EditReferenceId");
                 var validUrl = generateValidUrl();
                 var invalidUrl = generateInvalidUrl();
 
@@ -59,8 +59,8 @@ describe("Global Admin can",
 
         it("Delete a reference in a IT-system",
             () => {
-                var referenceName = createReferenceName();
-                var referenceId = createReferenceId();
+                var referenceName = createName("DeleteReferenceName");
+                var referenceId = createName("DeleteReferenceId");
                 var validUrl = generateValidUrl();
 
                 refHelper.goToSpecificItSystemReferences(itSystemName)
@@ -71,16 +71,8 @@ describe("Global Admin can",
             });
     });
 
-function createItSystemName() {
-    return `ItSystemRefTest${new Date().getTime()}`;
-}
-
-function createReferenceName() {
-    return `Reference${new Date().getTime()}`;
-}
-
-function createReferenceId() {
-    return `ID${new Date().getTime()}`;
+function createName(prefix: string) {
+    return `${prefix}_${new Date().getTime()}`;
 }
 
 function generateValidUrl() {

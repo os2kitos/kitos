@@ -18,10 +18,10 @@ describe("User is able to create and view relation",
         var description = "some description";
         var reference = "some reference";
 
-        var relationSystemName1 = createItSystemName() + "1";
-        var relationSystemName2 = createItSystemName() + "2";
-        var interfaceName = createInterfaceName();
-        var contractName = createContractName();
+        var relationSystemName1 = createName("RelationSystem1");
+        var relationSystemName2 = createName("RelationSystem2");
+        var interfaceName = createName("RelationInterface");
+        var contractName = createName("RelationContract");
 
         // Data for edit test
         var frequencyTypeEdited = "Kvartal";
@@ -104,16 +104,8 @@ describe("User is able to create and view relation",
             });
     });
 
-function createItSystemName() {
-    return `SystemWithRelation${new Date().getTime()}`;
-}
-
-function createInterfaceName() {
-    return `InterfaceForRelation${new Date().getTime()}`;
-}
-
-function createContractName() {
-    return `ContractForRelation${new Date().getTime()}`;
+function createName(prefix: string) {
+    return `${prefix}_${new Date().getTime()}`;
 }
 
 function checkIfRelationIsDeleted(name: string) {

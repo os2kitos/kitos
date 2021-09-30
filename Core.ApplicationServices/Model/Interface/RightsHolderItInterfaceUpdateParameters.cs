@@ -1,24 +1,15 @@
-﻿using System;
+﻿using Core.ApplicationServices.Model.Shared;
+using System;
 
 namespace Core.ApplicationServices.Model.Interface
 {
-    public class RightsHolderItInterfaceUpdateParameters : IRightsHolderWriteableItInterfaceParameters
+    public class RightsHolderItInterfaceUpdateParameters
     {
-        public Guid ExposingSystemUuid { get; }
-        public string Name { get; }
-        public string InterfaceId { get; }
-        public string Version { get; }
-        public string Description { get; }
-        public string UrlReference { get; }
-
-        public RightsHolderItInterfaceUpdateParameters(Guid exposingSystemUuid, string name, string interfaceId, string version, string description, string urlReference)
-        {
-            ExposingSystemUuid = exposingSystemUuid;
-            Name = name;
-            InterfaceId = interfaceId;
-            Version = version;
-            Description = description;
-            UrlReference = urlReference;
-        }
+        public OptionalValueChange<Guid> ExposingSystemUuid { get; set; } = OptionalValueChange<Guid>.None;
+        public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> InterfaceId { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> Version { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> Description { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> UrlReference { get; set; } = OptionalValueChange<string>.None;
     }
 }

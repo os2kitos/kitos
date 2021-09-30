@@ -12,7 +12,6 @@ describe("Regular user IT Systems tests", () => {
     var headerButtons = pageObject.kendoToolbarWrapper.headerButtons();
     var headerButtonsHelper = pageObject.kendoToolbarHelper.headerButtons;
     var gridObjects = pageObject.kendoToolbarWrapper.columnObjects();
-    var headerObjects = pageObject.kendoToolbarWrapper.columnHeaders();
 
     afterEach(() => {
         testFixture.cleanupState();

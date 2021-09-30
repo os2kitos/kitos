@@ -22,7 +22,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     });
 
     it("Local Admin can still delete IT-system Catalogs that have been created locally", () => {
-        const systemName = createSystemName();
+        const systemName = createName("LocalAdminDelete");
         loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
             .then(() => waitForKendoGrid())
@@ -48,7 +48,7 @@ describe("ITSystem Catalog accessibility tests", () => {
     });
 
     it("Global Admin can create and delete It-system catalog", () => {
-        const systemName = createSystemName();
+        const systemName = createName("GlobalAdminDelete");
         loginHelper.loginAsGlobalAdmin()
             .then(() => loadPage())
             .then(() => waitForKendoGrid())
@@ -84,8 +84,8 @@ describe("ITSystem Catalog accessibility tests", () => {
         return pageObject.getPage();
     }
 
-    function createSystemName() {
-        return `System${new Date().getTime()}`;
+    function createName(prefix: string) {
+        return `${prefix}_${new Date().getTime()}`;
     }
 
     function expectSystemWithName(name: string) {

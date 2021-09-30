@@ -13,12 +13,12 @@ describe("Data processing registration oversight detail tests", () => {
     const testFixture = new TestFixtureWrapper();
     const dpaHelper = DataProcessingRegistrationHelper;
 
-    const createName = () => {
-        return `Dpa_${new Date().getTime()}`;
+    const createName = (prefix: string) => {
+        return `${prefix}_${new Date().getTime()}`;
     }
 
-    const createRemark = () => {
-        return `OversightRemark_${new Date().getTime()}`;
+    const createRemark = (prefix: string) => {
+        return `${prefix}_OversightRemark_${new Date().getTime()}`;
     }
 
     beforeAll(() => {
@@ -34,13 +34,13 @@ describe("Data processing registration oversight detail tests", () => {
 
     it("Is able to set oversight data",
         () => {
-            const name = createName();
-            const intervalRemark = createRemark();
-            const completedRemark = createRemark();
+            const name = createName("DPR");
+            const intervalRemark = createRemark("Interval");
+            const completedRemark = createRemark("Completed");
             const dropdownInterval = "Hver andet år";
             const oversightOptionName = "Egen kontrol";
-            const oversightOptionRemark = createRemark();
-            const oversightDateRemark = createRemark();
+            const oversightOptionRemark = createRemark("OversightOption");
+            const oversightDateRemark = createRemark("OversightDate");
             const dropdownCompleted = "Ja";
             const oversightDate = DateHelper.getTodayAsString();
 
@@ -60,7 +60,7 @@ describe("Data processing registration oversight detail tests", () => {
                 // Oversight option remark
                 .then(() => pageObject.getOversightOptionRemark().sendKeys(oversightOptionRemark))
                 .then(() => browser.waitForAngular())
-                .then(() => verifyOversightOptionRemark(intervalRemark))
+                .then(() => verifyOversightOptionRemark(oversightOptionRemark))
                 // Oversight is completed
                 .then(() => expectOversightCompletedLatestDateVisibility(false))
                 .then(() => dpaHelper.changeOversightCompleted(dropdownCompleted))

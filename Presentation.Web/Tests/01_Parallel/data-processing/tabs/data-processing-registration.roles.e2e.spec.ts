@@ -11,8 +11,8 @@ describe("Data processing agreement role tab tests", () => {
     const testFixture = new TestFixtureWrapper();
     const dpaHelper = DataProcessingRegistrationHelper;
 
-    const createName = () => {
-        return `Dpa${new Date().getTime()}`;
+    const createName = (prefix: string) => {
+        return `${prefix}_${new Date().getTime()}`;
     }
 
     const roleName1 = "Standard Læserolle (læs)";
@@ -36,7 +36,7 @@ describe("Data processing agreement role tab tests", () => {
 
     it("Performing role assignment and removal",
         () => {
-            var name = createName();
+            var name = createName("DPR");
 
             dpaHelper.createAndOpenDataProcessingRegistration(name)
                 .then(() => dpaHelper.goToRoles())
