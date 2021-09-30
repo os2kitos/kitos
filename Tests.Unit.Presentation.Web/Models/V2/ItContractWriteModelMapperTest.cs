@@ -23,7 +23,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItContractWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties())
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
                 .Returns(GetRootProperties());
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -414,7 +414,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
             if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
             if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(rootProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
             return emptyInput;
         }

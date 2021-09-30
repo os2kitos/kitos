@@ -138,7 +138,7 @@ namespace Tests.Unit.Core.ApplicationServices
             bool locallyEnabled = false,
             bool globallyEnabled = false,
             bool globallyObligatory = false,
-            Guid uuid = new Guid())
+            Guid? uuid = null)
         {
             var localRelationFrequencyType = new LocalRelationFrequencyType
             {
@@ -151,7 +151,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 Id = A<int>(),
                 IsEnabled = globallyEnabled,
                 IsObligatory = globallyObligatory,
-                Uuid = uuid
+                Uuid = uuid ?? Guid.NewGuid()
             };
 
             var option = new Mock<OptionEntity<RelationFrequencyType>>();

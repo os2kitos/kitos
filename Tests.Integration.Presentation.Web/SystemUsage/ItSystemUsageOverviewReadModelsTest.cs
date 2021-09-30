@@ -1027,8 +1027,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage
         public async Task When_SystemRightIsDeleted_Role_Assignment_In_Readmodel_Is_Updated()
         {
             //Arrange
-            var organizationId = TestEnvironment.DefaultOrganizationId;
-            var organizationName = TestEnvironment.DefaultOrganizationName;
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             var systemName = A<string>();
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(systemName, organizationId, AccessModifier.Public);

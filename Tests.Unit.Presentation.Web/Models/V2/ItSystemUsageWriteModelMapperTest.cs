@@ -22,7 +22,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItSystemUsageWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties())
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
                 .Returns(GetAllInputPropertyNames<UpdateItSystemUsageRequestDTO>());
             _sut = new ItSystemUsageWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -582,7 +582,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noArchiving) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Archiving));
             if (noGdpr) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.GDPR));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
 
             //Act
             var output = _sut.FromPUT(emptyInput);
@@ -619,7 +619,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noArchiving) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.Archiving));
             if (noGdpr) definedProperties.Remove(nameof(UpdateItSystemUsageRequestDTO.GDPR));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonRootProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
 
             //Act
             var output = _sut.FromPATCH(emptyInput);

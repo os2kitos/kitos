@@ -584,7 +584,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             itSystemUsage.Version = A<string>();
             itSystemUsage.ItSystemCategories = new ItSystemCategories { Name = A<string>(), Uuid = A<Guid>() };
             itSystemUsage.MainContract = new ItContractItSystemUsage { ItContract = new ItContract() { Name = A<string>(), Uuid = A<Guid>() } };
-            itSystemUsage.ItProjects = Many<string>().Select(name => new ItProject() { Name = name, Uuid = new Guid() }).ToList();
+            itSystemUsage.ItProjects = Many<string>().Select(name => new ItProject() { Name = name, Uuid = A<Guid>() }).ToList();
             itSystemUsage.Active = A<bool>();
             itSystemUsage.Concluded = A<DateTime>();
             itSystemUsage.ExpirationDate = A<DateTime>();

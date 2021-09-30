@@ -33,13 +33,14 @@ namespace Tests.Integration.Presentation.Web.Security
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
-            var cookieContainer = new CookieContainer();
-            cookieContainer.Add(cookie);
 
             //Act
-            using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
+            using (var scope = HttpApi.StatefulScope.Create())
             {
-                using var response = await client.SendAsync(requestMessage);
+                scope.CookieContainer.Add(cookie);
+
+                using var response = await scope.Client.SendAsync(requestMessage);
+
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
@@ -63,16 +64,16 @@ namespace Tests.Integration.Presentation.Web.Security
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
-            var cookieContainer = new CookieContainer();
-            cookieContainer.Add(cookie);
 
             var csrfToken = await HttpApi.GetCSRFToken(cookie);
             requestMessage.Headers.Add(Constants.CSRFValues.HeaderName, csrfToken.FormToken);
 
             //Act
-            using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
+            using (var scope = HttpApi.StatefulScope.Create())
             {
-                using var response = await client.SendAsync(requestMessage);
+                scope.CookieContainer.Add(cookie);
+                using var response = await scope.Client.SendAsync(requestMessage);
+
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }
@@ -96,17 +97,16 @@ namespace Tests.Integration.Presentation.Web.Security
             {
                 Content = new StringContent(JsonConvert.SerializeObject(itSystem), Encoding.UTF8, "application/json")
             };
-            var cookieContainer = new CookieContainer();
-            cookieContainer.Add(cookie);
 
             var csrfToken = await HttpApi.GetCSRFToken(cookie);
-            cookieContainer.Add(csrfToken.CookieToken);
-
 
             //Act
-            using (var client = new HttpClient(new HttpClientHandler { CookieContainer = cookieContainer }))
+            using (var scope = HttpApi.StatefulScope.Create())
             {
-                using var response = await client.SendAsync(requestMessage);
+                scope.CookieContainer.Add(cookie);
+                scope.CookieContainer.Add(csrfToken.CookieToken);
+                using var response = await scope.Client.SendAsync(requestMessage);
+
                 //Assert
                 Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
             }

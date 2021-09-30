@@ -16,7 +16,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
 {
     public class UsingOrganizationsTest
     {
-        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static readonly string NameSessionPart = Guid.NewGuid().ToString("N");
         private static long _nameCounter = 0;
         private static readonly object NameCounterLock = new object();
 
