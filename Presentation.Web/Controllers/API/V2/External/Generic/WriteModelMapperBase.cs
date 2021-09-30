@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
@@ -46,11 +48,55 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             return response;
         }
 
+        /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, bool enforceFallbackIfNotProvided = false) where TSection : new()
+        {
+            var response = deserializedValue;
+            if (ClientRequestsChangeTo(propertySelection) || enforceFallbackIfNotProvided)
+            {
+                response = deserializedValue ?? new TSection();
+            }
+
+            return response;
+        }
+
+        /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
+        protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
+        {
+            var response = deserializedValue;
+            if (ClientRequestsChangeTo(propertySelection) || enforceFallbackIfNotProvided)
+            {
+                response = deserializedValue ?? fallbackFactory();
+            }
+
+            return response;
+        }
+
+        protected bool ClientRequestsChangeTo<TRoot>(Expression<Func<TRoot, object>> propertySelection)
+        {
+            return ClientRequestsChangeTo<TRoot, object>(propertySelection);
+        }
+
+        protected bool ClientRequestsChangeTo<TRoot, TProperty>(Expression<Func<TRoot, TProperty>> propertySelection)
+        {
+            var expression = propertySelection.Body;
+            while (expression.NodeType == ExpressionType.Convert) //Called if implicit upcast is applied by the compiler
+            {
+                //Get the inner expression
+                expression = ((UnaryExpression)expression).Operand;
+            }
+            return expression.ToString() //the lambda body
+                .Split(new[] { '.' }, StringSplitOptions.RemoveEmptyEntries)  //We expect a property accessor devided by "."
+                .Skip(1) // first segment is skipped (is the input parameter)
+                .ToArray()
+                .Transform(ClientRequestsChangeTo);
+        }
+
         protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
             var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
             var key = string.Join(".", pathTokensToLeafLevel);
-            
+
             if (!_currentRequestProperties.TryGetValue(key, out var properties))
             {
                 properties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel).ToHashSet(StringComparer.OrdinalIgnoreCase);
