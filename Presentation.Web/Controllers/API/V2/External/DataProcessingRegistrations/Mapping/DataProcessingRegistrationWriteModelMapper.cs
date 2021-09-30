@@ -74,7 +74,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            bool ShouldChange<TProperty>(Expression<Func<DataProcessingRegistrationWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+            bool ShouldChange<TProperty>(Expression<Func<DataProcessingRegistrationWriteRequestDTO, TProperty>> pickProperty) => enforceFallbackIfNotProvided || ClientRequestsChangeTo(pickProperty);
             return new UpdatedDataProcessingRegistrationGeneralDataParameters
             {
                 DataResponsibleUuid = ShouldChange(x => x.General.DataResponsibleUuid)
@@ -126,7 +126,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private UpdatedDataProcessingRegistrationOversightDataParameters MapOversight(DataProcessingRegistrationOversightWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
-            bool ShouldChange<TProperty>(Expression<Func<DataProcessingRegistrationWriteRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceFallbackIfNotProvided;
+            bool ShouldChange<TProperty>(Expression<Func<DataProcessingRegistrationWriteRequestDTO, TProperty>> pickProperty) => enforceFallbackIfNotProvided || ClientRequestsChangeTo(pickProperty);
 
             return new UpdatedDataProcessingRegistrationOversightDataParameters
             {

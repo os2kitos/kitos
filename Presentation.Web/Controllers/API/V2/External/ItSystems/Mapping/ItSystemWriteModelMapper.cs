@@ -39,7 +39,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 
         private void MapChanges(IRightsHolderWritableSystemPropertiesRequestDTO source, RightsHolderSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
         {
-            bool ShouldChange<TProperty>(Expression<Func<IRightsHolderWritableSystemPropertiesRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceResetOnMissingProperty;
+            bool ShouldChange<TProperty>(Expression<Func<IRightsHolderWritableSystemPropertiesRequestDTO, TProperty>> pickProperty) => enforceResetOnMissingProperty || ClientRequestsChangeTo(pickProperty);
 
             destination.Name = ShouldChange(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
             destination.ParentSystemUuid = ShouldChange(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;

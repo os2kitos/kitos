@@ -28,7 +28,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(expectedSectionKey) || enforceFallbackIfNotProvided)
+            if (enforceFallbackIfNotProvided || ClientRequestsChangeTo(expectedSectionKey))
             {
                 response = deserializedValue ?? new TSection();
             }
@@ -40,7 +40,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected TSection WithResetDataIfPropertyIsDefined<TSection>(TSection deserializedValue, string expectedSectionKey, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(expectedSectionKey) || enforceFallbackIfNotProvided)
+            if (enforceFallbackIfNotProvided || ClientRequestsChangeTo(expectedSectionKey))
             {
                 response = deserializedValue ?? fallbackFactory();
             }
@@ -52,7 +52,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, bool enforceFallbackIfNotProvided = false) where TSection : new()
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(propertySelection) || enforceFallbackIfNotProvided)
+            if (enforceFallbackIfNotProvided || ClientRequestsChangeTo(propertySelection))
             {
                 response = deserializedValue ?? new TSection();
             }
@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
         protected TSection WithResetDataIfPropertyIsDefined<TRoot, TSection>(TSection deserializedValue, Expression<Func<TRoot, TSection>> propertySelection, Func<TSection> fallbackFactory, bool enforceFallbackIfNotProvided = false)
         {
             var response = deserializedValue;
-            if (ClientRequestsChangeTo(propertySelection) || enforceFallbackIfNotProvided)
+            if (enforceFallbackIfNotProvided || ClientRequestsChangeTo(propertySelection))
             {
                 response = deserializedValue ?? fallbackFactory();
             }
