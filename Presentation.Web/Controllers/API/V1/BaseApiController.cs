@@ -137,7 +137,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         protected HttpResponseMessage NoContent()
         {
-            return CreateResponse(HttpStatusCode.NoContent);
+            return Request.CreateResponse(HttpStatusCode.NoContent);
         }
 
         protected new HttpResponseMessage NotFound()
