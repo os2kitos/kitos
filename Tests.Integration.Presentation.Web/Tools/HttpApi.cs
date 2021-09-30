@@ -98,6 +98,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             ServicePointManager.Expect100Continue = false;
             ServicePointManager.SetTcpKeepAlive(false, 0, 0);
             StatelessHttpClient = new(new HttpClientHandler { UseCookies = false });
+            StatelessHttpClient.DefaultRequestHeaders.ExpectContinue = false;
         }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
