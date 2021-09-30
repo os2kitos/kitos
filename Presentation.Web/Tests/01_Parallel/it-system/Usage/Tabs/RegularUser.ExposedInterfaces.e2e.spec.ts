@@ -12,9 +12,9 @@ describe("Regular user can",
         var loginHelper = new login();
         var testFixture = new TestFixtureWrapper();
 
-        var itSystemWithInterfaceName = createItSystemInterfaceName();
-        var itSystemName = createItSystemName();
-        var interfaceName = createInterfaceName();
+        var itSystemWithInterfaceName = createName("SystemWithInterface");
+        var itSystemName = createName("SystemWithoutInterface");
+        var interfaceName = createName("Interface");
         var waitUpTo = new WaitTimers();
         var ec = protractor.ExpectedConditions;
 
@@ -66,16 +66,8 @@ describe("Regular user can",
             });
     });
 
-function createItSystemInterfaceName() {
-    return `SystemWithInterface${new Date().getTime()}`;
-}
-
-function createItSystemName() {
-    return `SystemWithoutInterface${new Date().getTime()}`;
-}
-
-function createInterfaceName() {
-    return `Interface${new Date().getTime()}`;
+function createName(prefix: string) {
+    return `${prefix}_SystemWithInterface${new Date().getTime()}`;
 }
 
 function getInterfaceName() {

@@ -15,9 +15,10 @@ using Infrastructure.Services.DataAccess;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.RightsHolders
 {
@@ -60,6 +61,13 @@ namespace Core.ApplicationServices.RightsHolders
             if (creationParameters == null)
                 throw new ArgumentNullException(nameof(creationParameters));
 
+            if (creationParameters.AdditionalValues.ExposingSystemUuid.IsUnchanged)
+                return new OperationError("Exposing System Uuid must be provided", OperationFailure.BadInput);
+
+            var name = creationParameters.AdditionalValues.Name;
+            if (name.IsUnchanged)
+                return new OperationError("Name must be provided", OperationFailure.BadInput);
+
             using var transaction = _transactionManager.Begin();
             try
             {
@@ -68,21 +76,18 @@ namespace Core.ApplicationServices.RightsHolders
                 if (organizationId.IsNone)
                     return new OperationError("Invalid rights holder id provided", OperationFailure.BadInput);
 
-                var exposingSystem = _systemService.GetSystem(creationParameters.ExposingSystemUuid);
-
-                if (exposingSystem.Failed)
-                {
-                    if (exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
-                        return new OperationError("Invalid exposing system id provided", OperationFailure.BadInput);
-                    return exposingSystem.Error;
-                }
-
                 if (!_userContext.HasRole(organizationId.Value, OrganizationRole.RightsHolderAccess))
                     return new OperationError("User does not have rightsholder access in the provided organization", OperationFailure.Forbidden);
 
+                var interfaceId = creationParameters.AdditionalValues.InterfaceId;
+                
+                //Remove changes for any values used during the creation process
+                creationParameters.AdditionalValues.Name = OptionalValueChange<string>.None;
+                creationParameters.AdditionalValues.InterfaceId = OptionalValueChange<string>.None;
+                
                 var result = _itInterfaceService
-                    .CreateNewItInterface(organizationId.Value, creationParameters.Name, creationParameters.InterfaceId, creationParameters.RightsHolderProvidedUuid)
-                    .Bind(ItInterface => ApplyUpdates(ItInterface, creationParameters, exposingSystem.Value.Id));
+                    .CreateNewItInterface(organizationId.Value, name.NewValue, interfaceId.MapOptionalChangeWithFallback(string.Empty), creationParameters.RightsHolderProvidedUuid)
+                    .Bind(itInterface => ApplyUpdates(itInterface, creationParameters.AdditionalValues));
 
                 if (result.Ok)
                 {
@@ -90,7 +95,7 @@ namespace Core.ApplicationServices.RightsHolders
                 }
                 else
                 {
-                    _logger.Error("RightsHolder {uuid} failed to create It-Interface {name} due to error: {errorMessage}", rightsHolderUuid, creationParameters.Name, result.Error.ToString());
+                    _logger.Error("RightsHolder {uuid} failed to create It-Interface {name} due to error: {errorMessage}", rightsHolderUuid, name.NewValue, result.Error.ToString());
                 }
 
                 return result;
@@ -203,21 +208,11 @@ namespace Core.ApplicationServices.RightsHolders
             using var transaction = _transactionManager.Begin();
             try
             {
-                var exposingSystem = _systemService.GetSystem(updateParameters.ExposingSystemUuid);
-
-                if (exposingSystem.Failed)
-                {
-                    if (exposingSystem.Error.FailureType == OperationFailure.NotFound) //If we can't find the exposing system the call will never work and should return BadInput.
-                        return new OperationError("Invalid exposing system id provided", OperationFailure.BadInput);
-                    return exposingSystem.Error;
-                }
-
                 var result = _itInterfaceService
                     .GetInterface(interfaceUuid)
                     .Bind(WithRightsHolderAccessTo)
                     .Bind(WithActiveEntityOnly)
-                    .Bind(itInterface => _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, updateParameters.Name, updateParameters.InterfaceId))
-                    .Bind(ItInterface => ApplyUpdates(ItInterface, updateParameters, exposingSystem.Value.Id));
+                    .Bind(itInterface => ApplyUpdates(itInterface, updateParameters));
 
                 if (result.Ok)
                 {
@@ -237,12 +232,38 @@ namespace Core.ApplicationServices.RightsHolders
             }
         }
 
-        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface itInterface, IRightsHolderWriteableItInterfaceParameters updates, int exposingSystemId)
+        private Result<ItInterface, OperationError> ApplyUpdates(ItInterface originalInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
         {
-            return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystemId)
-                .Bind(itInterface => _itInterfaceService.UpdateVersion(itInterface.Id, updates.Version))
-                .Bind(itInterface => _itInterfaceService.UpdateDescription(itInterface.Id, updates.Description))
-                .Bind(itInterface => _itInterfaceService.UpdateUrlReference(itInterface.Id, updates.UrlReference));
+            return originalInterface.WithOptionalUpdate(updateParameters.Version, (itInterface, newVersion) => _itInterfaceService.UpdateVersion(itInterface.Id, newVersion))
+                .Bind(itInterface => UpdateNameAndInterfaceId(itInterface, updateParameters))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.ExposingSystemUuid, UpdateExposingSystem))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.Description, (interfaceToUpdate, newDescription) => _itInterfaceService.UpdateDescription(interfaceToUpdate.Id, newDescription)))
+                .Bind(itInterface => itInterface.WithOptionalUpdate(updateParameters.UrlReference, (interfaceToUpdate, newUrlReference) => _itInterfaceService.UpdateUrlReference(interfaceToUpdate.Id, newUrlReference)));
+        }
+
+        private Result<ItInterface, OperationError> UpdateNameAndInterfaceId(ItInterface itInterface, RightsHolderItInterfaceUpdateParameters updateParameters)
+        {
+            if (updateParameters.Name.IsUnchanged && updateParameters.InterfaceId.IsUnchanged)
+                return itInterface; //No changes found
+
+            var newName = updateParameters.Name.MapOptionalChangeWithFallback(itInterface.Name);
+            var newInterfaceId = updateParameters.InterfaceId.MapOptionalChangeWithFallback(itInterface.ItInterfaceId);
+
+            return _itInterfaceService.UpdateNameAndInterfaceId(itInterface.Id, newName, newInterfaceId);
+        }
+
+        private Result<ItInterface, OperationError> UpdateExposingSystem(ItInterface itInterface, Guid exposingSystemUuid)
+        {
+            var exposingSystem = _systemService.GetSystem(exposingSystemUuid);
+
+            if (exposingSystem.Failed)
+            {
+                return exposingSystem.Error.FailureType == OperationFailure.NotFound 
+                    ? new OperationError("Invalid exposing system id provided", OperationFailure.BadInput) 
+                    : exposingSystem.Error;
+            }
+
+            return _itInterfaceService.UpdateExposingSystem(itInterface.Id, exposingSystem.Value.Id);
         }
 
     }

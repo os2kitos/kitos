@@ -13,7 +13,7 @@ describe("Local admin is able to toggle DataProcessing", () => {
     var dpPageHelper = new LocalDataProcessing();
     var testFixture = new TestFixtureWrapper();
     var naviHelper = new NavigationBarHelper();
-    var systemName = createItSystemName(1);
+    var systemName = createName("SystemName");
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -64,8 +64,8 @@ describe("Local admin is able to toggle DataProcessing", () => {
         expect((naviHelper.headerNavigations.dataProcessingButton).isPresent()).toBe(shown);
     }
 
-    function createItSystemName(index: number) {
-        return `ItSystem${new Date().getTime()}_${index}`;
+    function createName(prefix: string) {
+        return `${prefix}_${new Date().getTime()}`;
     }
 });
 

@@ -15,8 +15,8 @@ describe("Data processing registration tests", () => {
     const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingRegistrationHelper;
 
-    const createName = (index: number) => { 
-        return `Dpa${new Date().getTime()}_${index}`;
+    const createName = (prefix: string) => { 
+        return `${prefix}_${new Date().getTime()}`;
     }
 
     beforeAll(() => {
@@ -31,7 +31,7 @@ describe("Data processing registration tests", () => {
     });
 
     it("It is possible to create new data processing registrations", () => {
-        const name = createName(1);
+        const name = createName("DPR");
             //Verify correct creation of dpa and following update of kendo
         dpaHelper.createDataProcessingRegistration(name)
             .then(() => {

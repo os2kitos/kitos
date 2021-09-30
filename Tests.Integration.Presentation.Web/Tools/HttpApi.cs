@@ -31,7 +31,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             new(
                 new HttpClientHandler
                 {
-                    UseCookies = false
+                    UseCookies = false,
                 });
 
         static HttpApi()

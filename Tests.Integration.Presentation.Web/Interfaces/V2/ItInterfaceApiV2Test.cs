@@ -6,6 +6,7 @@ using Presentation.Web.Models;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -596,7 +597,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         {
             //Arrange
             var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
-            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public);
+            var otherOrg = await CreateOrganization();
+            var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), otherOrg.Id, AccessModifier.Public);
 
             var input = new RightsHolderCreateItInterfaceRequestDTO()
             {
@@ -629,7 +631,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
                 RightsHolderUuid = org.Uuid,
                 ExposedBySystemUuid = exposingSystem.Uuid,
                 Name = withLongName ? CreateLongString("name") : A<string>(),
-                Description = withLongItInterfaceId ? CreateLongString("description") : A<string>(),
+                Description = A<string>(),
+                InterfaceId = withLongItInterfaceId ? CreateLongString("interface id") : A<string>(),
                 UrlReference = A<string>(),
                 Version = withLongVersion ? CreateLongString("version") : A<string>().Substring(0, 20)
             };
@@ -680,10 +683,17 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
         public async Task Cannot_Put_ItInterface_As_Rightsholder_If_ExposingSystem_Does_Not_Exist()
         {
             //Arrange
-            var (token, _) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var updateRequest = new RightsHolderWritableItInterfacePropertiesDTO
+            {
+                ExposedBySystemUuid = A<Guid>()
+            };
 
             //Act
-            using var response = await InterfaceV2Helper.SendUpdateRightsHolderItInterfaceAsync(token, A<Guid>(), A<RightsHolderWritableItInterfacePropertiesDTO>());
+            using var response = await InterfaceV2Helper.SendUpdateRightsHolderItInterfaceAsync(token, createdInterface.Uuid, updateRequest);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -782,7 +792,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             {
                 ExposedBySystemUuid = newExposingSystem.Uuid,
                 Name = withLongName ? CreateLongString("name") : A<string>(),
-                Description = withLongItInterfaceId ? CreateLongString("description") : A<string>(),
+                Description = A<string>(),
+                InterfaceId = withLongItInterfaceId ? CreateLongString("interface id") : A<string>(),
                 UrlReference = A<string>(),
                 Version = withLongVersion ? CreateLongString("version") : A<string>().Substring(0, 20)
             };
@@ -792,6 +803,52 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(true, true, true, true, true, true)]
+        [InlineData(true, true, true, true, true, false)]
+        [InlineData(true, true, true, true, false, true)]
+        [InlineData(true, true, true, false, true, true)]
+        [InlineData(true, true, false, true, true, true)]
+        [InlineData(true, false, true, true, true, true)]
+        [InlineData(false, true, true, true, true, true)]
+        [InlineData(false, false, false, false, false, false)]
+        public async Task Can_Patch_ItInterface_As_Rightsholder(
+            bool withName,
+            bool withInterfaceId,
+            bool withExposedBySystem,
+            bool withVersion,
+            bool withDescription,
+            bool withUrlReference)
+        {
+            //Arrange
+            var (token, org) = await CreateRightsHolderUserInNewOrganizationAsync();
+            var creationDTO = await CreateRightsHolderItInterfaceRequestDTO(false, org);
+            var createdInterface = await InterfaceV2Helper.CreateRightsHolderItInterfaceAsync(token, creationDTO);
+
+            var changes = new Dictionary<string, object>();
+            if (withName) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name), CreateName());
+            if (withInterfaceId) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId), A<string>());
+            if (withExposedBySystem)
+            {
+                var newExposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), org.Id, AccessModifier.Public);
+                changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid), newExposingSystem.Uuid);
+            }
+            if (withVersion) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version), A<string>().Substring(0, 20));
+            if (withDescription) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description), A<string>());
+            if (withUrlReference) changes.Add(nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference), A<string>());
+
+            //Act
+            var updatedInterface = await InterfaceV2Helper.PatchRightsHolderInterfaceAsync(token, createdInterface.Uuid, changes.ToArray());
+
+            //Assert
+            Assert.Equal(withName ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Name)] : createdInterface.Name, updatedInterface.Name);
+            Assert.Equal(withInterfaceId ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.InterfaceId)] : createdInterface.InterfaceId, updatedInterface.InterfaceId);
+            Assert.Equal(withExposedBySystem ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.ExposedBySystemUuid)] : createdInterface.ExposedBySystem.Uuid, updatedInterface.ExposedBySystem.Uuid);
+            Assert.Equal(withVersion ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Version)] : createdInterface.Version, updatedInterface.Version);
+            Assert.Equal(withDescription ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.Description)] : createdInterface.Description, updatedInterface.Description);
+            Assert.Equal(withUrlReference ? changes[nameof(RightsHolderPartialUpdateItInterfaceRequestDTO.UrlReference)] : createdInterface.UrlReference, updatedInterface.UrlReference);
         }
 
         [Fact]
@@ -918,27 +975,32 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
 
         private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrg()
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true, true);
             return (token, org);
         }
 
         private async Task<(string token, Organization createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
         {
-            var org = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
             return (token, org);
         }
 
         private async Task<(string token, Organization createdOrganization1, Organization createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
         {
-            var org1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
-            var org2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var org1 = await CreateOrganization();
+            var org2 = await CreateOrganization();
 
             var (userId, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org1.Id, true);
             await HttpApi.SendAssignRoleToUserAsync(userId, OrganizationRole.RightsHolderAccess, org2.Id).DisposeAsync();
 
             return (token, org1, org2);
+        }
+
+        private async Task<Organization> CreateOrganization()
+        {
+            return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
         }
 
         private string CreateName()
