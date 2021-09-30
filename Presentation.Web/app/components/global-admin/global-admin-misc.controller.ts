@@ -25,12 +25,10 @@
         "$rootScope",
         "$scope",
         "$http",
-        "uploadFile",
         "globalConfigs",
         "_",
         "notify",
         "kleService",
-        "$window",
         "$uibModal",
         "brokenLinkStatus",
         "usersWithRightsholderAccess",
@@ -39,12 +37,10 @@
             $rootScope,
             $scope,
             $http,
-            uploadFile,
             globalConfigs,
             _,
             notify,
             kleService,
-            $window,
             $uibModal: ng.ui.bootstrap.IModalService,
             brokenLinkStatus: Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO,
             usersWithRightsholderAccess: Kitos.Models.Api.IUserWithOrganizationName[],
@@ -97,11 +93,6 @@
             }
 
             $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, g => g.key === "CanGlobalAdminOnlyEditReports");
-
-            $scope.uploadFile = () => {
-                var fileToBeUploaded = $scope.myFile;
-                uploadFile.uploadFile(fileToBeUploaded);
-            };
 
             $scope.patchConfig = config => {
                 var payload = {};
