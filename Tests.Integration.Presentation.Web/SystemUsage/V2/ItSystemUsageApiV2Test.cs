@@ -559,11 +559,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
 
             //Act - reset all
             using var modificationResponse3 = await ItSystemUsageV2Helper.SendPatchOrganizationalUsage(token,
-                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()
-                {
-                    UsingOrganizationUnitUuids = new List<Guid>(),
-                    ResponsibleOrganizationUnitUuid = null
-                }).WithExpectedResponseCode(HttpStatusCode.OK);
+                newUsage.Uuid, new OrganizationUsageWriteRequestDTO()).WithExpectedResponseCode(HttpStatusCode.OK);
 
             //Assert
             await AssertOrganizationalUsage(token, newUsage.Uuid, Enumerable.Empty<OrgUnitDTO>(), null);
