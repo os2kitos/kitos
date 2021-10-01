@@ -161,17 +161,62 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
-            if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
-            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
-            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
-            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
-            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
-            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
+            ConfigureRootProperties(noName, noGeneralData, noSystems, noOversight, noRoles, noReferences);
 
             //Act
             var output = _sut.FromPATCH(input);
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noName, output.Name.IsUnchanged);
+            Assert.Equal(noGeneralData, output.General.IsNone);
+            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
+            Assert.Equal(noOversight, output.Oversight.IsNone);
+            Assert.Equal(noRoles, output.Roles.IsNone);
+            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPUT_Enforces_Undefined_Sections(
+            bool noName,
+            bool noGeneralData,
+            bool noSystems,
+            bool noOversight,
+            bool noRoles,
+            bool noReferences)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
+            ConfigureRootProperties(noName, noGeneralData, noSystems, noOversight, noRoles, noReferences);
+
+            //Act
+            var output = _sut.FromPUT(input);
+
+            //Assert that method patched empty values before mapping
+            Assert.True(output.Name.HasChange);
+            Assert.True(output.General.HasValue);
+            Assert.True(output.SystemUsageUuids.HasValue);
+            Assert.True(output.Oversight.HasValue);
+            Assert.True(output.Roles.HasValue);
+            Assert.True(output.ExternalReferences.HasValue);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSectionsInput))]
+        public void FromPOST_Ignores_Undefined_Sections(
+           bool noName,
+           bool noGeneralData,
+           bool noSystems,
+           bool noOversight,
+           bool noRoles,
+           bool noReferences)
+        {
+            //Arrange
+            var input = new CreateDataProcessingRegistrationRequestDTO();
+            ConfigureRootProperties(noName, noGeneralData, noSystems, noOversight, noRoles, noReferences);
+
+            //Act
+            var output = _sut.FromPOST(input);
 
             //Assert that method patched empty values before mapping
             Assert.Equal(noName, output.Name.IsUnchanged);
@@ -199,24 +244,46 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
-
-            if (noDataResponsible) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleUuid));
-            if (noDataResponsibleRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleRemark));
-            if (noAgreementConcluded) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcluded));
-            if (noAgreementConcludedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcludedRemark));
-            if (noAgreementConcludedAt) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.AgreementConcludedAt));
-            if (noBasisForTransfer) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.BasisForTransferUuid));
-            if (noTransferToInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.TransferToInsecureThirdCountries));
-            if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
-            if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
-            if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
-            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
-
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General))).Returns(sectionProperties);
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
 
             //Act
             var output = _sut.FromPATCH(input).General.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noDataResponsible, output.DataResponsibleUuid.IsUnchanged);
+            Assert.Equal(noDataResponsibleRemark, output.DataResponsibleRemark.IsUnchanged);
+            Assert.Equal(noAgreementConcluded, output.IsAgreementConcluded.IsUnchanged);
+            Assert.Equal(noAgreementConcludedRemark, output.IsAgreementConcludedRemark.IsUnchanged);
+            Assert.Equal(noAgreementConcludedAt, output.AgreementConcludedAt.IsUnchanged);
+            Assert.Equal(noBasisForTransfer, output.BasisForTransferUuid.IsUnchanged);
+            Assert.Equal(noTransferToInsecureCountries, output.TransferToInsecureThirdCountries.IsUnchanged);
+            Assert.Equal(noInsecureCountries, output.InsecureCountriesSubjectToDataTransferUuids.IsUnchanged);
+            Assert.Equal(noDataProcessors, output.DataProcessorUuids.IsUnchanged);
+            Assert.Equal(noHasSubDataProcessors, output.HasSubDataProcessors.IsUnchanged);
+            Assert.Equal(noSubDataProcessors, output.SubDataProcessorUuids.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_GeneralSection(
+           bool noDataResponsible,
+           bool noDataResponsibleRemark,
+           bool noAgreementConcluded,
+           bool noAgreementConcludedRemark,
+           bool noAgreementConcludedAt,
+           bool noBasisForTransfer,
+           bool noTransferToInsecureCountries,
+           bool noInsecureCountries,
+           bool noDataProcessors,
+           bool noHasSubDataProcessors,
+           bool noSubDataProcessors)
+        {
+            //Arrange
+            var input = new CreateDataProcessingRegistrationRequestDTO();
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
+
+            //Act
+            var output = _sut.FromPOST(input).General.Value;
 
             //Assert that method patched empty values before mapping
             Assert.Equal(noDataResponsible, output.DataResponsibleUuid.IsUnchanged);
@@ -249,23 +316,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
-
-            if (noDataResponsible) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleUuid));
-            if (noDataResponsibleRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleRemark));
-            if (noAgreementConcluded) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcluded));
-            if (noAgreementConcludedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcludedRemark));
-            if (noAgreementConcludedAt) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.AgreementConcludedAt));
-            if (noBasisForTransfer) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.BasisForTransferUuid));
-            if (noTransferToInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.TransferToInsecureThirdCountries));
-            if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
-            if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
-            if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
-            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
-
-            _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General)))
-                .Returns(sectionProperties);
+            ConfigureGeneralDataInputContext(noDataResponsible, noDataResponsibleRemark, noAgreementConcluded, noAgreementConcludedRemark, noAgreementConcludedAt, noBasisForTransfer, noTransferToInsecureCountries, noInsecureCountries, noDataProcessors, noHasSubDataProcessors, noSubDataProcessors);
 
             //Act
             var output = _sut.FromPUT(input).General.Value;
@@ -284,74 +335,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.SubDataProcessorUuids.HasChange);
         }
 
-        //TODO: POST General
         //TODO: PATCH, POST, PUT of oversight
 
-        [Theory]
-        [MemberData(nameof(GetUndefinedSectionsInput))]
-        public void FromPUT_Enforces_Undefined_Sections(
-            bool noName,
-            bool noGeneralData,
-            bool noSystems,
-            bool noOversight,
-            bool noRoles,
-            bool noReferences)
-        {
-            //Arrange
-            var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
-            if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
-            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
-            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
-            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
-            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
-            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
-
-            //Act
-            var output = _sut.FromPUT(input);
-
-            //Assert that method patched empty values before mapping
-            Assert.True(output.Name.HasChange);
-            Assert.True(output.General.HasValue);
-            Assert.True(output.SystemUsageUuids.HasValue);
-            Assert.True(output.Oversight.HasValue);
-            Assert.True(output.Roles.HasValue);
-            Assert.True(output.ExternalReferences.HasValue);
-        }
-
-        [Theory]
-        [MemberData(nameof(GetUndefinedSectionsInput))]
-        public void FromPOST_Ignores_Undefined_Sections(
-           bool noName,
-           bool noGeneralData,
-           bool noSystems,
-           bool noOversight,
-           bool noRoles,
-           bool noReferences)
-        {
-            //Arrange
-            var input = new CreateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
-            if (noName) properties.Remove(nameof(CreateDataProcessingRegistrationRequestDTO.Name));
-            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
-            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
-            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
-            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
-            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
-
-            //Act
-            var output = _sut.FromPOST(input);
-
-            //Assert that method patched empty values before mapping
-            Assert.Equal(noName, output.Name.IsUnchanged);
-            Assert.Equal(noGeneralData, output.General.IsNone);
-            Assert.Equal(noSystems, output.SystemUsageUuids.IsNone);
-            Assert.Equal(noOversight, output.Oversight.IsNone);
-            Assert.Equal(noRoles, output.Roles.IsNone);
-            Assert.Equal(noReferences, output.ExternalReferences.IsNone);
-        }
 
         [Fact]
         public void MapOversight_Returns_UpdatedDataProcessingRegistrationOversightDataParameters()
@@ -497,6 +482,50 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(expected.RoleUuid, actual.RoleUuid);
                 Assert.Equal(expected.UserUuid, actual.UserUuid);
             }
+        }
+
+        private void ConfigureGeneralDataInputContext(
+           bool noDataResponsible,
+           bool noDataResponsibleRemark,
+           bool noAgreementConcluded,
+           bool noAgreementConcludedRemark,
+           bool noAgreementConcludedAt,
+           bool noBasisForTransfer,
+           bool noTransferToInsecureCountries,
+           bool noInsecureCountries,
+           bool noDataProcessors,
+           bool noHasSubDataProcessors,
+           bool noSubDataProcessors)
+        {
+            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
+
+            if (noDataResponsible) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleUuid));
+            if (noDataResponsibleRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleRemark));
+            if (noAgreementConcluded) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcluded));
+            if (noAgreementConcludedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcludedRemark));
+            if (noAgreementConcludedAt) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.AgreementConcludedAt));
+            if (noBasisForTransfer) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.BasisForTransferUuid));
+            if (noTransferToInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.TransferToInsecureThirdCountries));
+            if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
+            if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
+            if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
+            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigureRootProperties(bool noName, bool noGeneralData, bool noSystems, bool noOversight, bool noRoles, bool noReferences)
+        {
+            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
+            if (noName) properties.Remove(nameof(CreateDataProcessingRegistrationRequestDTO.Name));
+            if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
+            if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
+            if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
+            if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
+            if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
         }
     }
 }
