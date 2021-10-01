@@ -230,10 +230,61 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noDataProcessors, output.DataProcessorUuids.IsUnchanged);
             Assert.Equal(noHasSubDataProcessors, output.HasSubDataProcessors.IsUnchanged);
             Assert.Equal(noSubDataProcessors, output.SubDataProcessorUuids.IsUnchanged);
-
         }
 
-        //TODO: POST and PUT General
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_GeneralSection(
+            bool noDataResponsible,
+            bool noDataResponsibleRemark,
+            bool noAgreementConcluded,
+            bool noAgreementConcludedRemark,
+            bool noAgreementConcludedAt,
+            bool noBasisForTransfer,
+            bool noTransferToInsecureCountries,
+            bool noInsecureCountries,
+            bool noDataProcessors,
+            bool noHasSubDataProcessors,
+            bool noSubDataProcessors)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
+            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
+
+            if (noDataResponsible) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleUuid));
+            if (noDataResponsibleRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleRemark));
+            if (noAgreementConcluded) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcluded));
+            if (noAgreementConcludedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcludedRemark));
+            if (noAgreementConcludedAt) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.AgreementConcludedAt));
+            if (noBasisForTransfer) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.BasisForTransferUuid));
+            if (noTransferToInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.TransferToInsecureThirdCountries));
+            if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
+            if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
+            if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
+            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General)))
+                .Returns(sectionProperties);
+
+            //Act
+            var output = _sut.FromPUT(input).General.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.True(output.DataResponsibleUuid.HasChange);
+            Assert.True(output.DataResponsibleRemark.HasChange);
+            Assert.True(output.IsAgreementConcluded.HasChange);
+            Assert.True(output.IsAgreementConcludedRemark.HasChange);
+            Assert.True(output.AgreementConcludedAt.HasChange);
+            Assert.True(output.BasisForTransferUuid.HasChange);
+            Assert.True(output.TransferToInsecureThirdCountries.HasChange);
+            Assert.True(output.InsecureCountriesSubjectToDataTransferUuids.HasChange);
+            Assert.True(output.DataProcessorUuids.HasChange);
+            Assert.True(output.HasSubDataProcessors.HasChange);
+            Assert.True(output.SubDataProcessorUuids.HasChange);
+        }
+
+        //TODO: POST General
         //TODO: PATCH, POST, PUT of oversight
 
         [Theory]
