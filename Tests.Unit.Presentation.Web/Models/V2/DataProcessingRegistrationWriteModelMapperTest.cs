@@ -24,7 +24,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public DataProcessingRegistrationWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllRootProperties());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -154,7 +156,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllRootProperties();
+            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
             if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
             if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
@@ -187,7 +189,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new UpdateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllRootProperties();
+            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
             if (noName) properties.Remove(nameof(UpdateDataProcessingRegistrationRequestDTO.Name));
             if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
@@ -220,7 +222,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             //Arrange
             var input = new CreateDataProcessingRegistrationRequestDTO();
-            var properties = GetAllRootProperties();
+            var properties = GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>();
             if (noName) properties.Remove(nameof(CreateDataProcessingRegistrationRequestDTO.Name));
             if (noGeneralData) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.General));
             if (noSystems) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.SystemUsageUuids));
@@ -357,12 +359,6 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(orderedExpected[i].CompletedAt, orderedActual[i].CompletedAt);
                 Assert.Equal(orderedExpected[i].Remark, orderedActual[i].Remark);
             }
-        }
-
-        private static HashSet<string> GetAllRootProperties()
-        {
-            return typeof(UpdateDataProcessingRegistrationRequestDTO).GetProperties().Select(x => x.Name)
-                .ToHashSet();
         }
 
         private static void AssertOversight(DataProcessingRegistrationOversightWriteRequestDTO input,
