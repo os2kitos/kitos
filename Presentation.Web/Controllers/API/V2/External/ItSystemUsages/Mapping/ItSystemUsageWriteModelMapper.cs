@@ -293,7 +293,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping
                       Maybe<(int, int?)>.None.AsChangedValue()
                     : OptionalValueChange<Maybe<(int, int?)>>.None,
                 EnforceActive = ShouldChange(x => x.General.Validity.EnforcedValid)
-                    ? source.Validity?.EnforcedValid.FromNullable().AsChangedValue()
+                    ? (source.Validity?.EnforcedValid.FromNullable() ?? Maybe<bool>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<bool>>.None,
                 ValidFrom = ShouldChange(x => x.General.Validity.ValidFrom)
                     ? (source.Validity?.ValidFrom?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
