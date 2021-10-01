@@ -65,7 +65,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.DataProcessorUuids = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){General = input});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { General = input });
 
             //Assert
             AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.General).DataProcessorUuids);
@@ -79,7 +79,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.SubDataProcessorUuids = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){General = input});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { General = input });
 
             //Assert
             AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.General).SubDataProcessorUuids);
@@ -144,6 +144,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return CreateGetUndefinedSectionsInput(6);
         }
 
+        public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(11);
+        }
+
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPATCH_Ignores_Undefined_Sections(
@@ -176,6 +181,60 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(noRoles, output.Roles.IsNone);
             Assert.Equal(noReferences, output.ExternalReferences.IsNone);
         }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_GeneralSection(
+            bool noDataResponsible,
+            bool noDataResponsibleRemark,
+            bool noAgreementConcluded,
+            bool noAgreementConcludedRemark,
+            bool noAgreementConcludedAt,
+            bool noBasisForTransfer,
+            bool noTransferToInsecureCountries,
+            bool noInsecureCountries,
+            bool noDataProcessors,
+            bool noHasSubDataProcessors,
+            bool noSubDataProcessors)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
+            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>();
+
+            if (noDataResponsible) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleUuid));
+            if (noDataResponsibleRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataResponsibleRemark));
+            if (noAgreementConcluded) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcluded));
+            if (noAgreementConcludedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.IsAgreementConcludedRemark));
+            if (noAgreementConcludedAt) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.AgreementConcludedAt));
+            if (noBasisForTransfer) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.BasisForTransferUuid));
+            if (noTransferToInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.TransferToInsecureThirdCountries));
+            if (noInsecureCountries) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.InsecureCountriesSubjectToDataTransferUuids));
+            if (noDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.DataProcessorUuids));
+            if (noHasSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.HasSubDataProcessors));
+            if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
+
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General))).Returns(sectionProperties);
+
+            //Act
+            var output = _sut.FromPATCH(input).General.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noDataResponsible, output.DataResponsibleUuid.IsUnchanged);
+            Assert.Equal(noDataResponsibleRemark, output.DataResponsibleRemark.IsUnchanged);
+            Assert.Equal(noAgreementConcluded, output.IsAgreementConcluded.IsUnchanged);
+            Assert.Equal(noAgreementConcludedRemark, output.IsAgreementConcludedRemark.IsUnchanged);
+            Assert.Equal(noAgreementConcludedAt, output.AgreementConcludedAt.IsUnchanged);
+            Assert.Equal(noBasisForTransfer, output.BasisForTransferUuid.IsUnchanged);
+            Assert.Equal(noTransferToInsecureCountries, output.TransferToInsecureThirdCountries.IsUnchanged);
+            Assert.Equal(noInsecureCountries, output.InsecureCountriesSubjectToDataTransferUuids.IsUnchanged);
+            Assert.Equal(noDataProcessors, output.DataProcessorUuids.IsUnchanged);
+            Assert.Equal(noHasSubDataProcessors, output.HasSubDataProcessors.IsUnchanged);
+            Assert.Equal(noSubDataProcessors, output.SubDataProcessorUuids.IsUnchanged);
+
+        }
+
+        //TODO: POST and PUT General
+        //TODO: PATCH, POST, PUT of oversight
 
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
@@ -250,7 +309,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var input = A<DataProcessingRegistrationOversightWriteRequestDTO>();
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { Oversight = input });
 
             //Assert
             AssertOversight(input, AssertPropertyContainsDataChange(output.Oversight));
@@ -264,7 +323,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.OversightOptionUuids = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { Oversight = input });
 
             //Assert
             AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.Oversight).OversightOptionUuids);
@@ -278,7 +337,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             input.OversightDates = null;
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Oversight = input});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { Oversight = input });
 
             //Assert
             AssertPropertyContainsResetDataChange(AssertPropertyContainsDataChange(output.Oversight).OversightDates);
@@ -291,7 +350,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var roles = Many<RoleAssignmentRequestDTO>().OrderBy(x => x.RoleUuid).ToList();
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){Roles = roles});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { Roles = roles });
 
             //Assert
             AssertRoles(roles, AssertPropertyContainsDataChange(output.Roles));
@@ -304,10 +363,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             var references = Many<ExternalReferenceDataDTO>().OrderBy(x => x.Url).ToList();
 
             //Act
-            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO(){ExternalReferences = references});
+            var output = _sut.FromPATCH(new UpdateDataProcessingRegistrationRequestDTO() { ExternalReferences = references });
 
             //Assert
-            AssertReferences(references,AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
+            AssertReferences(references, AssertPropertyContainsDataChange(output.ExternalReferences).ToList());
         }
 
         private static void AssertReferences(IReadOnlyList<ExternalReferenceDataDTO> references, IReadOnlyList<UpdatedExternalReferenceProperties> mappedReferences)
