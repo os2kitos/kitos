@@ -149,6 +149,11 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             return CreateGetUndefinedSectionsInput(11);
         }
 
+        public static IEnumerable<object[]> GetUndefinedOversightDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(7);
+        }
+
         [Theory]
         [MemberData(nameof(GetUndefinedSectionsInput))]
         public void FromPATCH_Ignores_Undefined_Sections(
@@ -335,8 +340,92 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.True(output.SubDataProcessorUuids.HasChange);
         }
 
-        //TODO: PATCH, POST, PUT of oversight
+        [Theory]
+        [MemberData(nameof(GetUndefinedOversightDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_Oversight_Section(
+         bool noOversightOptionUuids,
+         bool noOversightOptionRemark,
+         bool noOversightInterval,
+         bool noOversightIntervalRemark,
+         bool noIsOversightCompleted,
+         bool noOversightCompletedRemark,
+         bool noOversightDates)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
 
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+
+            //Act
+            var output = _sut.FromPATCH(input).Oversight.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noOversightOptionUuids, output.OversightOptionUuids.IsUnchanged);
+            Assert.Equal(noOversightOptionRemark, output.OversightOptionsRemark.IsUnchanged);
+            Assert.Equal(noOversightInterval, output.OversightInterval.IsUnchanged);
+            Assert.Equal(noOversightIntervalRemark, output.OversightIntervalRemark.IsUnchanged);
+            Assert.Equal(noIsOversightCompleted, output.IsOversightCompleted.IsUnchanged);
+            Assert.Equal(noOversightCompletedRemark, output.OversightCompletedRemark.IsUnchanged);
+            Assert.Equal(noOversightDates, output.OversightDates.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedOversightDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_Oversight_Section(
+            bool noOversightOptionUuids,
+            bool noOversightOptionRemark,
+            bool noOversightInterval,
+            bool noOversightIntervalRemark,
+            bool noIsOversightCompleted,
+            bool noOversightCompletedRemark,
+            bool noOversightDates)
+        {
+            //Arrange
+            var input = new CreateDataProcessingRegistrationRequestDTO();
+
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+
+            //Act
+            var output = _sut.FromPOST(input).Oversight.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.Equal(noOversightOptionUuids, output.OversightOptionUuids.IsUnchanged);
+            Assert.Equal(noOversightOptionRemark, output.OversightOptionsRemark.IsUnchanged);
+            Assert.Equal(noOversightInterval, output.OversightInterval.IsUnchanged);
+            Assert.Equal(noOversightIntervalRemark, output.OversightIntervalRemark.IsUnchanged);
+            Assert.Equal(noIsOversightCompleted, output.IsOversightCompleted.IsUnchanged);
+            Assert.Equal(noOversightCompletedRemark, output.OversightCompletedRemark.IsUnchanged);
+            Assert.Equal(noOversightDates, output.OversightDates.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedOversightDataPropertiesInput))]
+        public void FromPUT_Enforces_Changes_To_Properties_In_Oversight_Section(
+            bool noOversightOptionUuids,
+            bool noOversightOptionRemark,
+            bool noOversightInterval,
+            bool noOversightIntervalRemark,
+            bool noIsOversightCompleted,
+            bool noOversightCompletedRemark,
+            bool noOversightDates)
+        {
+            //Arrange
+            var input = new UpdateDataProcessingRegistrationRequestDTO();
+
+            ConfigureOversightRequestContext(noOversightOptionUuids, noOversightOptionRemark, noOversightInterval, noOversightIntervalRemark, noIsOversightCompleted, noOversightCompletedRemark, noOversightDates);
+
+            //Act
+            var output = _sut.FromPUT(input).Oversight.Value;
+
+            //Assert that method patched empty values before mapping
+            Assert.True(output.OversightOptionUuids.HasChange);
+            Assert.True(output.OversightOptionsRemark.HasChange);
+            Assert.True(output.OversightInterval.HasChange);
+            Assert.True(output.OversightIntervalRemark.HasChange);
+            Assert.True(output.IsOversightCompleted.HasChange);
+            Assert.True(output.OversightCompletedRemark.HasChange);
+            Assert.True(output.OversightDates.HasChange);
+        }
 
         [Fact]
         public void MapOversight_Returns_UpdatedDataProcessingRegistrationOversightDataParameters()
@@ -526,6 +615,30 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
             if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
+        }
+
+        private void ConfigureOversightRequestContext(
+            bool noOversightOptionUuids,
+            bool noOversightOptionRemark,
+            bool noOversightInterval,
+            bool noOversightIntervalRemark,
+            bool noIsOversightCompleted,
+            bool noOversightCompletedRemark,
+            bool noOversightDates)
+        {
+            var sectionProperties = GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>();
+
+            if (noOversightOptionUuids) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightOptionUuids));
+            if (noOversightOptionRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightOptionsRemark));
+            if (noOversightInterval) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightInterval));
+            if (noOversightIntervalRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightIntervalRemark));
+            if (noIsOversightCompleted) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.IsOversightCompleted));
+            if (noOversightCompletedRemark) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightCompletedRemark));
+            if (noOversightDates) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightDates));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight)))
+                .Returns(sectionProperties);
         }
     }
 }
