@@ -14,7 +14,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
 {
     public class ApiPagingConstraintsTest
     {
-        [Theory(Skip = "TODO Re-Enable:https://os2web.atlassian.net/browse/KITOSUDV-2137"), MemberData(nameof(GetRESTApiInputs))]
+        [Theory, MemberData(nameof(GetRESTApiInputs))]
         public async Task Paging_Constraints_Are_Applied_To_Token_Users_Through_GET_Requests_To_REST_API(string path, int pageSize, HttpStatusCode expectedStatusCode)
         {
             //Arrange
@@ -27,7 +27,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
             Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
-        [Theory(Skip = "TODO Re-Enable:https://os2web.atlassian.net/browse/KITOSUDV-2137"), MemberData(nameof(GetODATAInputs))]
+        [Theory, MemberData(nameof(GetODATAInputs))]
         public async Task Paging_Constraints_Are_Applied_To_Token_Users_Through_GET_Requests_To_ODATA_API(string path, int pageSize, HttpStatusCode expectedStatusCode)
         {
             //Arrange
@@ -40,7 +40,7 @@ namespace Tests.Integration.Presentation.Web.Constraints
             Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
-        [Theory(Skip = "TODO Re-Enable:https://os2web.atlassian.net/browse/KITOSUDV-2137"), MemberData(nameof(GetODATAPathInputs))]
+        [Theory, MemberData(nameof(GetODATAPathInputs))]
         public async Task OData_List_Requests_Must_Contain_Top(string path)
         {
             //Arrange
