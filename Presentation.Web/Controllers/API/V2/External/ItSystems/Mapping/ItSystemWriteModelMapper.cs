@@ -39,16 +39,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping
 
         private void MapChanges(IRightsHolderWritableSystemPropertiesRequestDTO source, RightsHolderSystemUpdateParameters destination, bool enforceResetOnMissingProperty)
         {
-            bool ShouldChange<TProperty>(Expression<Func<IRightsHolderWritableSystemPropertiesRequestDTO, TProperty>> pickProperty) => ClientRequestsChangeTo(pickProperty) || enforceResetOnMissingProperty;
+            var rule = CreateChangeRule<IRightsHolderWritableSystemPropertiesRequestDTO>(enforceResetOnMissingProperty);
 
-            destination.Name = ShouldChange(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.ParentSystemUuid = ShouldChange(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.FormerName = ShouldChange(x => x.FormerName) ? source.FormerName.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.Description = ShouldChange(x => x.Description) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.UrlReference = ShouldChange(x => x.UrlReference) ? source.UrlReference.AsChangedValue() : OptionalValueChange<string>.None;
-            destination.BusinessTypeUuid = ShouldChange(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
-            destination.TaskRefKeys = ShouldChange(x => x.KLENumbers) ? (source.KLENumbers ?? new List<string>()).AsChangedValue() : OptionalValueChange<IEnumerable<string>>.None;
-            destination.TaskRefUuids = ShouldChange(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
+            destination.Name = rule.MustUpdate(x => x.Name) ? source.Name.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.ParentSystemUuid = rule.MustUpdate(x => x.ParentUuid) ? source.ParentUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
+            destination.FormerName = rule.MustUpdate(x => x.FormerName) ? source.FormerName.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.Description = rule.MustUpdate(x => x.Description) ? source.Description.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.UrlReference = rule.MustUpdate(x => x.UrlReference) ? source.UrlReference.AsChangedValue() : OptionalValueChange<string>.None;
+            destination.BusinessTypeUuid = rule.MustUpdate(x => x.BusinessTypeUuid) ? source.BusinessTypeUuid.AsChangedValue() : OptionalValueChange<Guid?>.None;
+            destination.TaskRefKeys = rule.MustUpdate(x => x.KLENumbers) ? (source.KLENumbers ?? new List<string>()).AsChangedValue() : OptionalValueChange<IEnumerable<string>>.None;
+            destination.TaskRefUuids = rule.MustUpdate(x => x.KLEUuids) ? (source.KLEUuids ?? new List<Guid>()).AsChangedValue() : OptionalValueChange<IEnumerable<Guid>>.None;
         }
     }
 }
