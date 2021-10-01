@@ -8,12 +8,12 @@ import DateHelper = require("../../../../Helpers/GetDateHelper");
 describe("Is able to create advice and delete advice",
     () => {
         var loginHelper = new login();
-        var itSystemName = createItSystemName();
+        var itSystemName = createName("AdviceTestSystemName");
         var startDate = DateHelper.getDateWithOffsetFromTodayAsString(1);
         var endDate = DateHelper.getDateWithOffsetFromTodayAsString(2);
-        var email = getRandomEmail();
-        var subjectOfAdviceToBeDeleted = getRandomText("1");
-        var subjectOfImmediateAdvice = getRandomText("2");
+        var email = createUniqueMail("AdviceTest");
+        var subjectOfAdviceToBeDeleted = createName("ToBeDeleted");
+        var subjectOfImmediateAdvice = createName("Immediate");
         var adviceHelper = new AdviceHelper();
         var waitUpTo = new WaitTimers();
         var testFixture = new TestFixtureWrapper();
@@ -44,17 +44,13 @@ describe("Is able to create advice and delete advice",
                     .then(() => verifyAdviceWasDeleted(subjectOfAdviceToBeDeleted));
             });
 
-        function createItSystemName() {
-            return `ItSystemAdviceTest${new Date().getTime()}`;
+        function createName(prefix: string) {
+            return `${prefix}_${new Date().getTime()}`;
         }
 
-        function getRandomEmail() {
+        function createUniqueMail(prefix: string) {
             //Using the special chars we need to allow
-            return `It_System.Advice-Test123456789@${new Date().getTime()}.com`;
-        }
-
-        function getRandomText(text: string) {
-            return `ItSystemAdviceText${new Date().getTime()}-${text}`;
+            return `${prefix}_It_System.Advice-Test123456789@${new Date().getTime()}.com`;
         }
 
         function verifyAdviceWasCreated(subjectName: string) {

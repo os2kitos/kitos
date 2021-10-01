@@ -5,7 +5,7 @@ import ContractHelper = require("../../Helpers/ContractHelper");
 import DataProcessingRegistrationHelper = require("../../Helpers/DataProcessingRegistrationHelper");
 import DataProcessingRegistrationEditContractPageObject = require("../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.contract.po")
 
-describe("Data processing registration it-systems test", () => {
+describe("It-Contract data processing registration test", () => {
 
     const loginHelper = new Login();
     const testFixture = new TestFixtureWrapper();
@@ -13,15 +13,11 @@ describe("Data processing registration it-systems test", () => {
     const contractHelper = ContractHelper;
     const contractDprPage = new ContractDprPage();
 
-    const createDprName = () => {
-        return `Dpr${new Date().getTime()}`;
-    }
-
-    const createContractName = () => {
-        return `ContractDpr${new Date().getTime()}`;
+    const createName = (prefix: string) => {
+        return `${prefix}_${new Date().getTime()}`;
     }
     
-    const dprName = createDprName();
+    const dprName = createName("DPR");
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -37,24 +33,24 @@ describe("Data processing registration it-systems test", () => {
 
     it("Assigning and removing dpr",
         () => {
-            const contractName = createContractName();
+            const contractName = createName("Contract");
 
             contractHelper.createContract(contractName)
                 .then(() => contractHelper.openContract(contractName))
                 .then(() => contractHelper.goToDpr())
                 .then(() => contractHelper.assignDpr(dprName))
-                .then(() => verifyDprContent([dprName], []))
+                .then(() => verifyContractContent([dprName], []))
                 .then(() => verifyContractIsPresentOnDprContractPage(dprName, contractName))
                 .then(() => contractHelper.removeDpr(dprName))
-                .then(() => verifyDprContent([], [dprName]));
+                .then(() => verifyContractContent([], [dprName]));
         });
 
-    function verifyDprContent(presentSystems: string[], unpresentSystems: string[]) {
-        presentSystems.forEach(name => {
+    function verifyContractContent(presentDPRs: string[], unpresentDPR: string[]) {
+        presentDPRs.forEach(name => {
             console.log(`Expecting dpr to be present:${name}`);
             expect(contractDprPage.getDprRow(name).isPresent()).toBeTruthy();
         });
-        unpresentSystems.forEach(name => {
+        unpresentDPR.forEach(name => {
             console.log(`Expecting dpr NOT to be present:${name}`);
             expect(contractDprPage.getDprRow(name).isPresent()).toBeFalsy();
         });

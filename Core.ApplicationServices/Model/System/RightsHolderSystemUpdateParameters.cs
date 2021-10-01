@@ -1,37 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using Core.ApplicationServices.Model.Shared;
 
 namespace Core.ApplicationServices.Model.System
 {
-    public class RightsHolderSystemUpdateParameters : IRightsHolderWritableSystemProperties
+    public class RightsHolderSystemUpdateParameters
     {
-        public string Name { get; }
-        public Guid? ParentSystemUuid { get; }
-        public string FormerName { get; }
-        public string Description { get; }
-        public string UrlReference { get; }
-        public Guid? BusinessTypeUuid { get; }
-        public IEnumerable<string> TaskRefKeys { get; }
-        public IEnumerable<Guid> TaskRefUuids { get; }
-
-        public RightsHolderSystemUpdateParameters(
-            string name,
-            Guid? parentSystemUuid,
-            string formerName,
-            string description,
-            string urlReference,
-            Guid? businessTypeUuid,
-            IEnumerable<string> taskRefKeys,
-            IEnumerable<Guid> taskRefUuids)
-        {
-            Name = name;
-            ParentSystemUuid = parentSystemUuid;
-            FormerName = formerName;
-            Description = description;
-            UrlReference = urlReference;
-            BusinessTypeUuid = businessTypeUuid;
-            TaskRefKeys = taskRefKeys;
-            TaskRefUuids = taskRefUuids;
-        }
+        public OptionalValueChange<string> Name { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<Guid?> ParentSystemUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<string> FormerName { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> Description { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<string> UrlReference { get; set; } = OptionalValueChange<string>.None;
+        public OptionalValueChange<Guid?> BusinessTypeUuid { get; set; } = OptionalValueChange<Guid?>.None;
+        public OptionalValueChange<IEnumerable<string>> TaskRefKeys { get; set; } = OptionalValueChange<IEnumerable<string>>.None;
+        public OptionalValueChange<IEnumerable<Guid>> TaskRefUuids { get; set; } = OptionalValueChange<IEnumerable<Guid>>.None;
     }
 }

@@ -31,8 +31,13 @@ namespace Tests.Integration.Presentation.Web.Tools
             new(
                 new HttpClientHandler
                 {
-                    UseCookies = false
+                    UseCookies = false,
                 });
+
+        static HttpApi()
+        {
+            ServicePointManager.Expect100Continue = false;
+        }
 
         public static Task<HttpResponseMessage> GetWithTokenAsync(Uri url, string token)
         {

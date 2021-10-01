@@ -127,7 +127,7 @@ namespace Tests.Integration.Presentation.Web.Qa
 
             //Act
             using (var deleteReferenceResponse = await ReferencesHelper.DeleteReferenceAsync(referenceToBeExplicitlyDeleted.Id))
-            using (var deleteItSystemResponse = await ItSystemHelper.DeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId))
+            using (var deleteItSystemResponse = await ItSystemHelper.SendDeleteItSystemAsync(system.Id, TestEnvironment.DefaultOrganizationId))
             using (var deleteInterfaceResponse = await InterfaceHelper.SendDeleteInterfaceRequestAsync(interfaceDto.Id))
             {
                 Assert.Equal(HttpStatusCode.OK, deleteReferenceResponse.StatusCode);

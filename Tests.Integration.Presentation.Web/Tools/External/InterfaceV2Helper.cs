@@ -169,5 +169,18 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             return await HttpApi.DeleteWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{itInterfaceUuid}"), token, request);
         }
+
+        public static async Task<RightsHolderItInterfaceResponseDTO> PatchRightsHolderInterfaceAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            using var response = await SendPatchUpdateRightsHolderInterfaceAsync(token, uuid, changedProperties);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsAsync<RightsHolderItInterfaceResponseDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendPatchUpdateRightsHolderInterfaceAsync(string token, Guid uuid, params KeyValuePair<string, object>[] changedProperties)
+        {
+            return await HttpApi.PatchWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/rightsholder/it-interfaces/{uuid}"), token, changedProperties.ToDictionary(x => x.Key, x => x.Value));
+        }
     }
 }

@@ -14,12 +14,12 @@ describe("Data processing registration it-systems test", () => {
     const pageObject = new DataProcessingRegistrationOverviewPageObject();
     const dpaHelper = DataProcessingRegistrationHelper;
 
-    const createName = (index: number) => {
-        return `Dpa${new Date().getTime()}_${index}`;
+    const createName = (prefix: string) => {
+        return `${prefix}_${new Date().getTime()}`;
     }
 
-    const system1 = createName(1);
-    const system2 = createName(2);
+    const system1 = createName("System1");
+    const system2 = createName("System2");
 
     beforeAll(() => {
         testFixture.enableLongRunningTest();
@@ -38,19 +38,19 @@ describe("Data processing registration it-systems test", () => {
 
     it("Assigning and removing systems",
         () => {
-            const dprName = createName(3);
+            const dprName = createName("DPR");
 
             dpaHelper.createAndOpenDataProcessingRegistration(dprName)
                 .then(() => dpaHelper.goToItSystems())
                 .then(() => dpaHelper.assignSystem(system1))
                 .then(() => dpaHelper.assignSystem(system2))
-                .then(() => verifySystemContent([system1, system2], []))
-                .then(() => verifyDprIsPresentOnItSystemGDPRPage(system1, dprName))
+                .then(() => verifyDPRContent([system1, system2], []))
+                .then(() => verifyDPRIsPresentOnItSystemGDPRPage(system1, dprName))
                 .then(() => dpaHelper.removeSystem(system1))
-                .then(() => verifySystemContent([system2], [system1]));
+                .then(() => verifyDPRContent([system2], [system1]));
         });
 
-    function verifySystemContent(presentSystems: string[], unpresentSystems: string[]) {
+    function verifyDPRContent(presentSystems: string[], unpresentSystems: string[]) {
         presentSystems.forEach(name => {
             console.log(`Expecting system to be present:${name}`);
             expect(pageObject.getSystemRow(name).isPresent()).toBeTruthy();
@@ -61,7 +61,7 @@ describe("Data processing registration it-systems test", () => {
         });
     }
 
-    function verifyDprIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
+    function verifyDPRIsPresentOnItSystemGDPRPage(systemName: string, dprName: string) {
         console.log(`Expecting system ${systemName} contain reference to DPR:${dprName}`);
         return dpaHelper.clickSystem(systemName)
             .then(() => LocalItSystemNavigation.openGDPRPage())

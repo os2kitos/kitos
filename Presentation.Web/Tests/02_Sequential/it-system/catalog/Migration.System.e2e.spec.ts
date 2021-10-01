@@ -28,8 +28,8 @@ describe("Global Administrator is able to migrate from one system to another", (
     });
 
     it("Global admin is able to get to the final migration window and execute a migration", () => {
-        var systemNameFrom = createItSystemName(1);
-        var systemNameTo = createItSystemName(2);
+        var systemNameFrom = createName("FromSystem");
+        var systemNameTo = createName("ToSystem");
         loginHelper.loginAsGlobalAdmin()
             .then(() => pageObject.getPage())
             .then(() => SystemCatalogHelper.createSystem(systemNameFrom))
@@ -51,8 +51,8 @@ describe("Global Administrator is able to migrate from one system to another", (
             .then(() => expect(element(cssHelper.byDataElementType(constants.startMigrationButton)).isDisplayed()).toBe(false));
     });
 
-    function createItSystemName(index: number) {
-        return `ItSystem${new Date().getTime()}_${index}`;
+    function createName(prefix: string) {
+        return `${prefix}_${new Date().getTime()}`;
     }
 
     function toggleSystemActivation(name: string) {

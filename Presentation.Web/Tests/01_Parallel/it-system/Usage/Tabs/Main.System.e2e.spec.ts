@@ -12,7 +12,7 @@ describe("User is able to view local it system main page information",
         var testFixture = new TestFixtureWrapper();
         var localItProjectPage = new LocalItProjectConfigPage();
 
-        var mainSystemName = createItSystemName();
+        var mainSystemName = createName("SystemUsageMain$");
 
         beforeAll(() => {
             loginHelper.loginAsGlobalAdmin()
@@ -54,8 +54,8 @@ describe("User is able to view local it system main page information",
 
 var itSystemUsageCommonPage = new ItSystemUsageCommon();
 
-function createItSystemName() {
-    return `SystemUsageMain${new Date().getTime()}`;
+function createName(prefix: string) {
+    return `${prefix}_${new Date().getTime()}`;
 }
 
 function checkItProjectHidden() {

@@ -665,9 +665,5 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(expected, mappedUuids);
         }
 
-        private static HashSet<string> GetAllInputPropertyNames<T>()
-        {
-            return typeof(T).GetProperties().Select(x => x.Name).ToHashSet();
-        }
     }
 }
