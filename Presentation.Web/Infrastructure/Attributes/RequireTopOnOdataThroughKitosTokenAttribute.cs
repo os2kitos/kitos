@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
@@ -14,7 +15,8 @@ namespace Presentation.Web.Infrastructure.Attributes
             var authContext = (IAuthenticationContext)actionContext.ControllerContext.Configuration.DependencyResolver.GetService(typeof(IAuthenticationContext));
             if (actionContext.Request.RequestUri.AbsoluteUri.Contains("/odata/") && authContext.Method == AuthenticationMethod.KitosToken)
             {
-                if (!actionContext.Request.RequestUri.AbsoluteUri.Contains("$top="))
+                var topPresent = actionContext.Request.GetQueryNameValuePairs().Any(x => x.Key == "$top");
+                if (!topPresent)
                 {
                     actionContext.Response = new HttpResponseMessage
                     {
