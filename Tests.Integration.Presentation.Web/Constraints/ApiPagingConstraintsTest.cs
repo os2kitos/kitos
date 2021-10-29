@@ -40,6 +40,19 @@ namespace Tests.Integration.Presentation.Web.Constraints
             Assert.Equal(expectedStatusCode, response.StatusCode);
         }
 
+        [Theory, MemberData(nameof(GetODATAInputs))]
+        public async Task Paging_Constraints_Are_Applied_To_Token_Users_Through_GET_Requests_To_ODATA_API_UrlEncodedParams(string path, int pageSize, HttpStatusCode expectedStatusCode)
+        {
+            //Arrange
+            var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+
+            //Act
+            using var response = await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"{path}?%24top={pageSize}"), token.Token);
+
+            //Assert
+            Assert.Equal(expectedStatusCode, response.StatusCode);
+        }
+
         [Theory, MemberData(nameof(GetODATAPathInputs))]
         public async Task OData_List_Requests_Must_Contain_Top(string path)
         {
