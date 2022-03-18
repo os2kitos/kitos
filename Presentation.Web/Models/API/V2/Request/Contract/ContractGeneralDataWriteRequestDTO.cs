@@ -31,6 +31,7 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         ///     - If changed from current state, the option types must be available in the organization
         /// </summary>
         public IEnumerable<Guid> AgreementElementUuids { get; set; }
+
         public string Notes { get; set; }
         /// <summary>
         /// Validity of the it-contract

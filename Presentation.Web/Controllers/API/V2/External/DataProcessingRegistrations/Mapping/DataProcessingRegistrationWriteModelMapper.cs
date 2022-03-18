@@ -64,7 +64,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private IEnumerable<UpdatedExternalReferenceProperties> MapReferences(IEnumerable<ExternalReferenceDataDTO> references)
         {
-            return BaseMapReferences(references); ;
+            return BaseMapReferences(references);
         }
 
         private UpdatedDataProcessingRegistrationGeneralDataParameters MapGeneral(DataProcessingRegistrationGeneralDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
