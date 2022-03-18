@@ -9,6 +9,7 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
+using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Xunit;
@@ -23,8 +24,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItContractWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
-                .Returns(GetRootProperties());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<ContractWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.General))).Returns(GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Responsible))).Returns(GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Procurement))).Returns(GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Supplier))).Returns(GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.AgreementPeriod))).Returns(GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.PaymentModel))).Returns(GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Payments))).Returns(GetAllInputPropertyNames<ContractPaymentsDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Termination))).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity))).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms))).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones))).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
+
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -59,6 +71,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             //Assert
             Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
         }
+
         [Theory]
         [InlineData("")]
         [InlineData(null)]
@@ -913,7 +926,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(input.OperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.NewValue.Match(val => val, () => (DateTime?)null));
             AssertPaymentMilestones(
                 input.PaymentMileStones.FromNullable().Match(val => val, () => new List<PaymentMileStoneDTO>()),
-                output.PaymentMileStones.Match(val => val, () => new List<ItContractPaymentMilestone>()));
+                output.PaymentMileStones.NewValue.Match(val => val, () => new List<ItContractPaymentMilestone>()));
         }
 
         private static void AssertPaymentMilestones(IEnumerable<PaymentMileStoneDTO> input, IEnumerable<ItContractPaymentMilestone> output)
