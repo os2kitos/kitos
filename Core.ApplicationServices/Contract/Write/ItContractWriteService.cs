@@ -389,14 +389,17 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(parameters.PaymentMileStones, UpdatePaymentMileStones));
         }
 
-        private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, IEnumerable<ItContractPaymentMilestone> milestones)
+        private Maybe<OperationError> UpdatePaymentMileStones(ItContract contract, Maybe<IEnumerable<ItContractPaymentMilestone>> milestones)
         {
             //Replace existing milestones (duplicates are allowed so we cannot derive any meaningful unique identity)
             var paymentMilestones = contract.PaymentMilestones.ToList();
             contract.ResetPaymentMilestones();
             paymentMilestones.ForEach(_paymentMilestoneRepository.Delete);
+            
+            if (milestones.IsNone)
+                return Maybe<OperationError>.None;
 
-            foreach (var newMilestone in milestones)
+            foreach (var newMilestone in milestones.Value)
             {
                 var error = contract.AddPaymentMilestone(newMilestone.Title, newMilestone.Expected, newMilestone.Approved);
                 if (error.HasValue)

@@ -29,7 +29,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
-
+        
         [Fact]
         public void MapGeneral_Returns_UpdatedDataProcessingRegistrationGeneralDataParameters()
         {
