@@ -24,18 +24,18 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItContractWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<ContractWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.General))).Returns(GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Responsible))).Returns(GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Procurement))).Returns(GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Supplier))).Returns(GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.AgreementPeriod))).Returns(GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.PaymentModel))).Returns(GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Payments))).Returns(GetAllInputPropertyNames<ContractPaymentsDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Termination))).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity))).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms))).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(ContractWriteRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones))).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<UpdateContractRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General))).Returns(GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible))).Returns(GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement))).Returns(GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier))).Returns(GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod))).Returns(GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel))).Returns(GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Payments))).Returns(GetAllInputPropertyNames<ContractPaymentsDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination))).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity))).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms))).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones))).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
 
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
@@ -88,10 +88,44 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.Equal(requestDto.Name, AssertPropertyContainsDataChange(modificationParameters.Name));
         }
 
-
         public static IEnumerable<object[]> GetUndefinedSectionsInput()
         {
             return CreateGetUndefinedSectionsInput(15);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedGeneralDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(8);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedProcurementPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(3);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedResponsibleDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(4);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedSupplierDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(4);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedPaymentModelPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(5);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedAgreementPeriodPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(6);
+        }
+
+        public static IEnumerable<object[]> GetUndefinedTerminationDataPropertiesInput()
+        {
+            return CreateGetUndefinedSectionsInput(4);
         }
 
         [Theory]
@@ -177,6 +211,506 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             Assert.False(output.Payments.IsNone);
             Assert.False(output.Termination.IsNone);
         }
+
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_GeneralSection(
+            bool noContractId,
+            bool noContractTypeUuid,
+            bool noContractTemplateUuid,
+            bool noAgreementElementUuids,
+            bool noNotes,
+            bool noEnforceValid,
+            bool noValidFrom,
+            bool noValidTo)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo);
+
+            //Act
+            var output = _sut.FromPOST(input).General.Value;
+
+            //Assert
+            Assert.Equal(noContractId, output.ContractId.IsUnchanged);
+            Assert.Equal(noContractTypeUuid, output.ContractTypeUuid.IsUnchanged);
+            Assert.Equal(noContractTemplateUuid, output.ContractTemplateUuid.IsUnchanged);
+            Assert.Equal(noAgreementElementUuids, output.AgreementElementUuids.IsUnchanged);
+            Assert.Equal(noNotes, output.Notes.IsUnchanged);
+            Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
+            Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
+            Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_GeneralSection(
+            bool noContractId,
+            bool noContractTypeUuid,
+            bool noContractTemplateUuid,
+            bool noAgreementElementUuids,
+            bool noNotes,
+            bool noEnforceValid,
+            bool noValidFrom,
+            bool noValidTo)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo);
+
+            //Act
+            var output = _sut.FromPATCH(input).General.Value;
+
+            //Assert
+            Assert.Equal(noContractId, output.ContractId.IsUnchanged);
+            Assert.Equal(noContractTypeUuid, output.ContractTypeUuid.IsUnchanged);
+            Assert.Equal(noContractTemplateUuid, output.ContractTemplateUuid.IsUnchanged);
+            Assert.Equal(noAgreementElementUuids, output.AgreementElementUuids.IsUnchanged);
+            Assert.Equal(noNotes, output.Notes.IsUnchanged);
+            Assert.Equal(noEnforceValid, output.EnforceValid.IsUnchanged);
+            Assert.Equal(noValidFrom, output.ValidFrom.IsUnchanged);
+            Assert.Equal(noValidTo, output.ValidTo.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedGeneralDataPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_GeneralSection(
+            bool noContractId,
+            bool noContractTypeUuid,
+            bool noContractTemplateUuid,
+            bool noAgreementElementUuids,
+            bool noNotes,
+            bool noEnforceValid,
+            bool noValidFrom,
+            bool noValidTo)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureGeneralDataInputContext(noContractId, noContractTypeUuid, noContractTemplateUuid, noAgreementElementUuids, noNotes, noEnforceValid, noValidFrom, noValidTo);
+
+            //Act
+            var output = _sut.FromPUT(input).General.Value;
+
+            //Assert
+            Assert.True(output.ContractId.HasChange);
+            Assert.True(output.ContractTypeUuid.HasChange);
+            Assert.True(output.ContractTemplateUuid.HasChange);
+            Assert.True(output.AgreementElementUuids.HasChange);
+            Assert.True(output.Notes.HasChange);
+            Assert.True(output.EnforceValid.HasChange);
+            Assert.True(output.ValidFrom.HasChange);
+            Assert.True(output.ValidTo.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedProcurementPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_ProcurementSection(
+            bool noProcurementStrategyUuid,
+            bool noPurchaseTypeUuid,
+            bool noProcurementPlan)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+
+            //Act
+            var output = _sut.FromPOST(input).Procurement.Value;
+
+            //Assert
+            Assert.Equal(noProcurementStrategyUuid, output.ProcurementStrategyUuid.IsUnchanged);
+            Assert.Equal(noPurchaseTypeUuid, output.PurchaseTypeUuid.IsUnchanged);
+            Assert.Equal(noProcurementPlan, output.ProcurementPlan.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedProcurementPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_ProcurementSection(
+            bool noProcurementStrategyUuid,
+            bool noPurchaseTypeUuid,
+            bool noProcurementPlan)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+
+            //Act
+            var output = _sut.FromPATCH(input).Procurement.Value;
+
+            //Assert
+            Assert.Equal(noProcurementStrategyUuid, output.ProcurementStrategyUuid.IsUnchanged);
+            Assert.Equal(noPurchaseTypeUuid, output.PurchaseTypeUuid.IsUnchanged);
+            Assert.Equal(noProcurementPlan, output.ProcurementPlan.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedProcurementPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_ProcurementSection(
+            bool noProcurementStrategyUuid,
+            bool noPurchaseTypeUuid,
+            bool noProcurementPlan)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureProcurementInputContext(noProcurementStrategyUuid, noPurchaseTypeUuid, noProcurementPlan);
+
+            //Act
+            var output = _sut.FromPUT(input).Procurement.Value;
+
+            //Assert
+            Assert.True(output.ProcurementStrategyUuid.HasChange);
+            Assert.True(output.PurchaseTypeUuid.HasChange);
+            Assert.True(output.ProcurementPlan.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedResponsibleDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_ResponsibleDataSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureResponsibleDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPOST(input).Responsible.Value;
+
+            //Assert
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUnitUuid.IsUnchanged);
+            Assert.Equal(noSigned, output.Signed.IsUnchanged);
+            Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
+            Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedResponsibleDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_ResponsibleDataSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureResponsibleDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPATCH(input).Responsible.Value;
+
+            //Assert
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUnitUuid.IsUnchanged);
+            Assert.Equal(noSigned, output.Signed.IsUnchanged);
+            Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
+            Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedResponsibleDataPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_ResponsibleDataSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureResponsibleDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPUT(input).Responsible.Value;
+
+            //Assert
+            Assert.True(output.OrganizationUnitUuid.HasChange);
+            Assert.True(output.Signed.HasChange);
+            Assert.True(output.SignedAt.HasChange);
+            Assert.True(output.SignedBy.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPOST(input).Supplier.Value;
+
+            //Assert
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noSigned, output.Signed.IsUnchanged);
+            Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
+            Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPATCH(input).Supplier.Value;
+
+            //Assert
+            Assert.Equal(noOrganizationUnitUuid, output.OrganizationUuid.IsUnchanged);
+            Assert.Equal(noSigned, output.Signed.IsUnchanged);
+            Assert.Equal(noSignedAt, output.SignedAt.IsUnchanged);
+            Assert.Equal(noSignedBy, output.SignedBy.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedSupplierDataPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_SupplierSection(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureSupplierDataInputContext(noOrganizationUnitUuid, noSigned, noSignedAt, noSignedBy);
+
+            //Act
+            var output = _sut.FromPUT(input).Supplier.Value;
+
+            //Assert
+            Assert.True(output.OrganizationUuid.HasChange);
+            Assert.True(output.Signed.HasChange);
+            Assert.True(output.SignedAt.HasChange);
+            Assert.True(output.SignedBy.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedPaymentModelPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_PaymentModelSection(
+            bool noOperationsRemunerationStartedAt,
+            bool noPaymentFrequencyUuid,
+            bool noPaymentModelUuid,
+            bool noPriceRegulationUuid,
+            bool noPaymentMileStones)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+
+            //Act
+            var output = _sut.FromPOST(input).PaymentModel.Value;
+
+            //Assert
+            Assert.Equal(noOperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.IsUnchanged);
+            Assert.Equal(noPaymentFrequencyUuid, output.PaymentFrequencyUuid.IsUnchanged);
+            Assert.Equal(noPaymentModelUuid, output.PaymentModelUuid.IsUnchanged);
+            Assert.Equal(noPriceRegulationUuid, output.PriceRegulationUuid.IsUnchanged);
+            Assert.Equal(noPaymentMileStones, output.PaymentMileStones.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedPaymentModelPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_PaymentModelSection(
+            bool noOperationsRemunerationStartedAt,
+            bool noPaymentFrequencyUuid,
+            bool noPaymentModelUuid,
+            bool noPriceRegulationUuid,
+            bool noPaymentMileStones)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+
+            //Act
+            var output = _sut.FromPATCH(input).PaymentModel.Value;
+
+            //Assert
+            Assert.Equal(noOperationsRemunerationStartedAt, output.OperationsRemunerationStartedAt.IsUnchanged);
+            Assert.Equal(noPaymentFrequencyUuid, output.PaymentFrequencyUuid.IsUnchanged);
+            Assert.Equal(noPaymentModelUuid, output.PaymentModelUuid.IsUnchanged);
+            Assert.Equal(noPriceRegulationUuid, output.PriceRegulationUuid.IsUnchanged);
+            Assert.Equal(noPaymentMileStones, output.PaymentMileStones.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedPaymentModelPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_PaymentSection(
+            bool noOperationsRemunerationStartedAt,
+            bool noPaymentFrequencyUuid,
+            bool noPaymentModelUuid,
+            bool noPriceRegulationUuid,
+            bool noPaymentMileStones)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigurePaymentModelInputContext(noOperationsRemunerationStartedAt, noPaymentFrequencyUuid, noPaymentModelUuid, noPriceRegulationUuid, noPaymentMileStones);
+
+            //Act
+            var output = _sut.FromPUT(input).PaymentModel.Value;
+
+            //Assert
+            Assert.True(output.OperationsRemunerationStartedAt.HasChange);
+            Assert.True(output.PaymentFrequencyUuid.HasChange);
+            Assert.True(output.PaymentModelUuid.HasChange);
+            Assert.True(output.PriceRegulationUuid.HasChange);
+            Assert.True(output.PaymentMileStones.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedAgreementPeriodPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_AgreementPeriodSection(
+            bool noDurationMonths,
+            bool noDurationYears,
+            bool noExtensionOptionsUsed,
+            bool noExtensionOptionsUuid,
+            bool noIrrevocableUntil,
+            bool noIsContinuous)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureAgreementPeriodInputContext(noDurationMonths, noDurationYears, noExtensionOptionsUsed, noExtensionOptionsUuid, noIrrevocableUntil, noIsContinuous);
+
+            //Act
+            var output = _sut.FromPOST(input).AgreementPeriod.Value;
+
+            //Assert
+            Assert.Equal(noDurationMonths, output.DurationMonths.IsUnchanged);
+            Assert.Equal(noDurationYears, output.DurationYears.IsUnchanged);
+            Assert.Equal(noExtensionOptionsUsed, output.ExtensionOptionsUsed.IsUnchanged);
+            Assert.Equal(noExtensionOptionsUuid, output.ExtensionOptionsUuid.IsUnchanged);
+            Assert.Equal(noIrrevocableUntil, output.IrrevocableUntil.IsUnchanged);
+            Assert.Equal(noIsContinuous, output.IsContinuous.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedAgreementPeriodPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_AgreementPeriodSection(
+            bool noDurationMonths,
+            bool noDurationYears,
+            bool noExtensionOptionsUsed,
+            bool noExtensionOptionsUuid,
+            bool noIrrevocableUntil,
+            bool noIsContinuous)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureAgreementPeriodInputContext(noDurationMonths, noDurationYears, noExtensionOptionsUsed, noExtensionOptionsUuid, noIrrevocableUntil, noIsContinuous);
+
+            //Act
+            var output = _sut.FromPATCH(input).AgreementPeriod.Value;
+
+            //Assert
+            Assert.Equal(noDurationMonths, output.DurationMonths.IsUnchanged);
+            Assert.Equal(noDurationYears, output.DurationYears.IsUnchanged);
+            Assert.Equal(noExtensionOptionsUsed, output.ExtensionOptionsUsed.IsUnchanged);
+            Assert.Equal(noExtensionOptionsUuid, output.ExtensionOptionsUuid.IsUnchanged);
+            Assert.Equal(noIrrevocableUntil, output.IrrevocableUntil.IsUnchanged);
+            Assert.Equal(noIsContinuous, output.IsContinuous.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedAgreementPeriodPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_AgreementPeriodSection(
+            bool noDurationMonths,
+            bool noDurationYears,
+            bool noExtensionOptionsUsed,
+            bool noExtensionOptionsUuid,
+            bool noIrrevocableUntil,
+            bool noIsContinuous)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureAgreementPeriodInputContext(noDurationMonths, noDurationYears, noExtensionOptionsUsed, noExtensionOptionsUuid, noIrrevocableUntil, noIsContinuous);
+
+            //Act
+            var output = _sut.FromPUT(input).AgreementPeriod.Value;
+
+            //Assert
+            Assert.True(output.DurationMonths.HasChange);
+            Assert.True(output.DurationYears.HasChange);
+            Assert.True(output.ExtensionOptionsUsed.HasChange);
+            Assert.True(output.ExtensionOptionsUuid.HasChange);
+            Assert.True(output.IrrevocableUntil.HasChange);
+            Assert.True(output.IsContinuous.HasChange);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedTerminationDataPropertiesInput))]
+        public void FromPOST_Ignores_Undefined_Properties_In_TerminationDataSection(
+            bool noTerminatedAt,
+            bool noNoticePeriodMonthsUuid,
+            bool noNoticePeriodExtendsCurrent,
+            bool noNoticeByEndOf)
+        {
+            //Arrange
+            var input = new CreateNewContractRequestDTO();
+            ConfigureTerminationDataInputContext(noTerminatedAt, noNoticePeriodMonthsUuid, noNoticePeriodExtendsCurrent, noNoticeByEndOf);
+
+            //Act
+            var output = _sut.FromPOST(input).Termination.Value;
+
+            //Assert
+            Assert.Equal(noTerminatedAt, output.TerminatedAt.IsUnchanged);
+            Assert.Equal(noNoticePeriodMonthsUuid, output.NoticePeriodMonthsUuid.IsUnchanged);
+            Assert.Equal(noNoticePeriodExtendsCurrent, output.NoticePeriodExtendsCurrent.IsUnchanged);
+            Assert.Equal(noNoticeByEndOf, output.NoticeByEndOf.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedTerminationDataPropertiesInput))]
+        public void FromPATCH_Ignores_Undefined_Properties_In_TerminationDataSection(
+            bool noTerminatedAt,
+            bool noNoticePeriodMonthsUuid,
+            bool noNoticePeriodExtendsCurrent,
+            bool noNoticeByEndOf)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureTerminationDataInputContext(noTerminatedAt, noNoticePeriodMonthsUuid, noNoticePeriodExtendsCurrent, noNoticeByEndOf);
+
+            //Act
+            var output = _sut.FromPATCH(input).Termination.Value;
+
+            //Assert
+            Assert.Equal(noTerminatedAt, output.TerminatedAt.IsUnchanged);
+            //Assert.Equal(noNoticePeriodMonthsUuid, output.NoticePeriodMonthsUuid.IsUnchanged);
+            Assert.Equal(noNoticePeriodExtendsCurrent, output.NoticePeriodExtendsCurrent.IsUnchanged);
+            Assert.Equal(noNoticeByEndOf, output.NoticeByEndOf.IsUnchanged);
+        }
+
+        [Theory]
+        [MemberData(nameof(GetUndefinedTerminationDataPropertiesInput))]
+        public void FromPUT_Enforces_Undefined_Properties_In_TerminationDataSection(
+            bool noTerminatedAt,
+            bool noNoticePeriodMonthsUuid,
+            bool noNoticePeriodExtendsCurrent,
+            bool noNoticeByEndOf)
+        {
+            //Arrange
+            var input = new UpdateContractRequestDTO();
+            ConfigureTerminationDataInputContext(noTerminatedAt, noNoticePeriodMonthsUuid, noNoticePeriodExtendsCurrent, noNoticeByEndOf);
+
+            //Act
+            var output = _sut.FromPUT(input).Termination.Value;
+
+            //Assert
+            Assert.True(output.TerminatedAt.HasChange);
+            Assert.True(output.NoticePeriodMonthsUuid.HasChange);
+            Assert.True(output.NoticePeriodExtendsCurrent.HasChange);
+            Assert.True(output.NoticeByEndOf.HasChange);
+        }
+
 
         [Fact]
         public void FromPost_Maps_General()
@@ -1042,6 +1576,153 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 Assert.Equal(exp.OrganizationUnitUuid, act.OrganizationUnitUuid);
                 Assert.Equal(exp.Other, act.Other);
             }
+        }
+        private void ConfigureGeneralDataInputContext(
+            bool noContractId,
+            bool noContractTypeUuid,
+            bool noContractTemplateUuid,
+            bool noAgreementElementUuids,
+            bool noNotes,
+            bool noEnforceValid,
+            bool noValidFrom,
+            bool noValidTo)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ItContractGeneralDataModificationParameters>();
+            var validitySectionProperties = GetAllInputPropertyNames<ValidityWriteRequestDTO>();
+
+            if (noContractId) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractId));
+            if (noContractTypeUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractTypeUuid));
+            if (noContractTemplateUuid) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.ContractTemplateUuid));
+            if (noAgreementElementUuids) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.AgreementElementUuids));
+            if (noNotes) sectionProperties.Remove(nameof(ItContractGeneralDataModificationParameters.Notes));
+
+            if (noEnforceValid) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.EnforcedValid));
+            if (noValidFrom) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.ValidFrom));
+            if (noValidTo) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.ValidTo));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General)))
+                .Returns(sectionProperties);
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity)))
+                .Returns(validitySectionProperties);
+        }
+
+        private void ConfigureProcurementInputContext(
+            bool noProcurementStrategyUuid,
+            bool noPurchaseTypeUuid,
+            bool noProcurementPlan)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>();
+
+            if (noProcurementStrategyUuid) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementStrategyUuid));
+            if (noPurchaseTypeUuid) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.PurchaseTypeUuid));
+            if (noProcurementPlan) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementPlan));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigureResponsibleDataInputContext(
+            bool noOrganizationUnitUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>();
+
+            if (noOrganizationUnitUuid) sectionProperties.Remove(nameof(ContractResponsibleDataWriteRequestDTO.OrganizationUnitUuid));
+            if (noSigned) sectionProperties.Remove(nameof(ContractResponsibleDataWriteRequestDTO.Signed));
+            if (noSignedAt) sectionProperties.Remove(nameof(ContractResponsibleDataWriteRequestDTO.SignedAt));
+            if (noSignedBy) sectionProperties.Remove(nameof(ContractResponsibleDataWriteRequestDTO.SignedBy));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigureSupplierDataInputContext(
+            bool noOrganizationUuid,
+            bool noSigned,
+            bool noSignedAt,
+            bool noSignedBy)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>();
+
+            if (noOrganizationUuid) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.OrganizationUuid));
+            if (noSigned) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.Signed));
+            if (noSignedAt) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.SignedAt));
+            if (noSignedBy) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.SignedBy));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigurePaymentModelInputContext(
+            bool noOperationsRemunerationStartedAt,
+            bool noPaymentFrequencyUuid,
+            bool noPaymentModelUuid,
+            bool noPriceRegulationUuid,
+            bool noPaymentMileStones)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>();
+
+            if (noOperationsRemunerationStartedAt) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.OperationsRemunerationStartedAt));
+            if (noPaymentFrequencyUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentFrequencyUuid));
+            if (noPaymentModelUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentModelUuid));
+            if (noPriceRegulationUuid) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PriceRegulationUuid));
+            if (noPaymentMileStones) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentMileStones));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigureAgreementPeriodInputContext(
+            bool noDurationMonths,
+            bool noDurationYears,
+            bool noExtensionOptionsUsed,
+            bool noExtensionOptionsUuid,
+            bool noIrrevocableUntil,
+            bool noIsContinuous)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>();
+
+            if (noDurationMonths) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.DurationMonths));
+            if (noDurationYears) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.DurationYears));
+            if (noExtensionOptionsUsed) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.ExtensionOptionsUsed));
+            if (noExtensionOptionsUuid) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.ExtensionOptionsUuid));
+            if (noIrrevocableUntil) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.IrrevocableUntil));
+            if (noIsContinuous) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.IsContinuous));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod)))
+                .Returns(sectionProperties);
+        }
+
+        private void ConfigureTerminationDataInputContext(
+            bool noTerminatedAt,
+            bool noNoticePeriodMonthsUuid,
+            bool noNoticePeriodExtendsCurrent,
+            bool noNoticeByEndOf)
+        {
+            var sectionProperties = GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>();
+            var termsSectionProperties = GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>();
+            
+            if (noTerminatedAt) sectionProperties.Remove(nameof(ContractTerminationDataWriteRequestDTO.TerminatedAt));
+
+            if (noNoticePeriodMonthsUuid) termsSectionProperties.Remove(nameof(ContractTerminationTermsRequestDTO.NoticePeriodMonthsUuid));
+            if (noNoticePeriodExtendsCurrent) termsSectionProperties.Remove(nameof(ContractTerminationTermsRequestDTO.NoticePeriodExtendsCurrent));
+            if (noNoticeByEndOf) termsSectionProperties.Remove(nameof(ContractTerminationTermsRequestDTO.NoticeByEndOf));
+
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination)))
+                .Returns(sectionProperties);
+            _currentHttpRequestMock
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms)))
+                .Returns(sectionProperties);
         }
     }
 }

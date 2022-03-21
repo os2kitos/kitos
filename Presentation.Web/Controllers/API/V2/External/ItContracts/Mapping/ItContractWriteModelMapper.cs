@@ -45,29 +45,40 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : ContractWriteRequestDTO, IHasNameExternal
         {
-            TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue, Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection) where TSection : new() => WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue, propertySelection, enforceFallbackIfNotProvided);
-            TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue, Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection, Func<TSection> fallbackFactory) => WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue, propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
+            TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue,
+                Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection) where TSection : new() =>
+                WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue,
+                    propertySelection, enforceFallbackIfNotProvided);
 
-            dto.General= WithResetDataIfSectionIsNotDefined(dto.General, x => x.General);
+            TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue,
+                Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection,
+                Func<TSection> fallbackFactory) =>
+                WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue,
+                    propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
+
+            dto.General = WithResetDataIfSectionIsNotDefined(dto.General, x => x.General);
             dto.Responsible = WithResetDataIfSectionIsNotDefined(dto.Responsible, x => x.Responsible);
             dto.Procurement = WithResetDataIfSectionIsNotDefined(dto.Procurement, x => x.Procurement);
             dto.Supplier = WithResetDataIfSectionIsNotDefined(dto.Supplier, x => x.Supplier);
-            dto.HandoverTrials = WithResetDataIfSectionIsNotDefinedWithFallback(dto.HandoverTrials, x => x.HandoverTrials, Array.Empty<HandoverTrialRequestDTO>);
-            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences, x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
-            dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids, x => x.SystemUsageUuids, () => new List<Guid>());
-            dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles, Array.Empty<RoleAssignmentRequestDTO>);
-            dto.DataProcessingRegistrationUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.DataProcessingRegistrationUuids, x => x.DataProcessingRegistrationUuids, () => new List<Guid>());
+            dto.HandoverTrials = WithResetDataIfSectionIsNotDefinedWithFallback(dto.HandoverTrials,
+                x => x.HandoverTrials, Array.Empty<HandoverTrialRequestDTO>);
+            dto.ExternalReferences = WithResetDataIfSectionIsNotDefinedWithFallback(dto.ExternalReferences,
+                x => x.ExternalReferences, Array.Empty<ExternalReferenceDataDTO>);
+            dto.SystemUsageUuids = WithResetDataIfSectionIsNotDefinedWithFallback(dto.SystemUsageUuids,
+                x => x.SystemUsageUuids, () => new List<Guid>());
+            dto.Roles = WithResetDataIfSectionIsNotDefinedWithFallback(dto.Roles, x => x.Roles,
+                Array.Empty<RoleAssignmentRequestDTO>);
+            dto.DataProcessingRegistrationUuids = WithResetDataIfSectionIsNotDefinedWithFallback(
+                dto.DataProcessingRegistrationUuids, x => x.DataProcessingRegistrationUuids, () => new List<Guid>());
             dto.AgreementPeriod = WithResetDataIfSectionIsNotDefined(dto.AgreementPeriod, x => x.AgreementPeriod);
             dto.PaymentModel = WithResetDataIfSectionIsNotDefined(dto.PaymentModel, x => x.PaymentModel);
             dto.Payments = WithResetDataIfSectionIsNotDefined(dto.Payments, x => x.Payments);
             dto.Termination = WithResetDataIfSectionIsNotDefined(dto.Termination, x => x.Termination);
-
+            
             return new ItContractModificationParameters
             {
-                Name = ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided
-                    ? dto.Name.AsChangedValue()
-                    : OptionalValueChange<string>.None,
-                ParentContractUuid = (ClientRequestsChangeTo<ContractWriteRequestDTO>(x => x.ParentContractUuid) || enforceFallbackIfNotProvided) 
+                Name = (ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
+                ParentContractUuid = (ClientRequestsChangeTo<ContractWriteRequestDTO>(x => x.ParentContractUuid) || enforceFallbackIfNotProvided)
                     ? dto.ParentContractUuid.AsChangedValue() 
                     : OptionalValueChange<Guid?>.None,
                 General = dto.General.FromNullable().Select(generalData => MapGeneralData(generalData, enforceFallbackIfNotProvided)),
@@ -122,13 +133,13 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     ? dto.DurationMonths.AsChangedValue()
                     : OptionalValueChange<int?>.None,
 
-                DurationYears = rule.MustUpdate(x => x.AgreementPeriod.DurationMonths)
+                DurationYears = rule.MustUpdate(x => x.AgreementPeriod.DurationYears)
                     ? dto.DurationYears.AsChangedValue()
                     : OptionalValueChange<int?>.None,
 
-                ExtensionOptionsUsed = rule.MustUpdate(x => x.AgreementPeriod.DurationMonths)
+                ExtensionOptionsUsed = rule.MustUpdate(x => x.AgreementPeriod.ExtensionOptionsUsed)
                     ? dto.ExtensionOptionsUsed.AsChangedValue()
-                    : OptionalValueChange<int>.None.NewValue,
+                    : OptionalValueChange<int>.None,
 
                 ExtensionOptionsUuid = rule.MustUpdate(x => x.AgreementPeriod.ExtensionOptionsUuid)
                     ? dto.ExtensionOptionsUuid.AsChangedValue()
@@ -167,7 +178,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return new ItContractPaymentModelModificationParameters()
             {
                 OperationsRemunerationStartedAt = rule.MustUpdate(x => x.PaymentModel.OperationsRemunerationStartedAt)
-                    ? dto.OperationsRemunerationStartedAt?.FromNullable().AsChangedValue()
+                    ? (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
                 PaymentFrequencyUuid = rule.MustUpdate(x => x.PaymentModel.PaymentFrequencyUuid)
@@ -200,14 +211,14 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
 
-            return new ItContractTerminationParameters()
+            return new ItContractTerminationParameters
             {
                 TerminatedAt = rule.MustUpdate(x => x.Termination.TerminatedAt)
-                    ? dto.TerminatedAt?.FromNullable().AsChangedValue()
+                    ? (dto.TerminatedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
                 NoticePeriodMonthsUuid = rule.MustUpdate(x => x.Termination.Terms.NoticePeriodMonthsUuid)
-                    ? (dto.Terms?.NoticePeriodMonthsUuid).AsChangedValue()
+                    ? dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
 
                 NoticePeriodExtendsCurrent = rule.MustUpdate(x => x.Termination.Terms.NoticePeriodExtendsCurrent)
@@ -271,6 +282,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         private ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
         {
             var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
+
             return new ItContractGeneralDataModificationParameters
             {
                 ContractId = rule.MustUpdate(x => x.General.ContractId) 
