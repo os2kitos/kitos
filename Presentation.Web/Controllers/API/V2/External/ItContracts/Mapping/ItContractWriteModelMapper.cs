@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using Core.Abstractions.Extensions;
+﻿using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Contracts.Write;
@@ -18,6 +14,10 @@ using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -74,12 +74,12 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             dto.PaymentModel = WithResetDataIfSectionIsNotDefined(dto.PaymentModel, x => x.PaymentModel);
             dto.Payments = WithResetDataIfSectionIsNotDefined(dto.Payments, x => x.Payments);
             dto.Termination = WithResetDataIfSectionIsNotDefined(dto.Termination, x => x.Termination);
-            
+
             return new ItContractModificationParameters
             {
                 Name = (ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
                 ParentContractUuid = (ClientRequestsChangeTo<ContractWriteRequestDTO>(x => x.ParentContractUuid) || enforceFallbackIfNotProvided)
-                    ? dto.ParentContractUuid.AsChangedValue() 
+                    ? dto.ParentContractUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
                 General = dto.General.FromNullable().Select(generalData => MapGeneralData(generalData, enforceFallbackIfNotProvided)),
                 Procurement = dto.Procurement.FromNullable().Select(procurement => MapProcurement(procurement, enforceFallbackIfNotProvided)),
@@ -190,7 +190,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     : OptionalValueChange<Guid?>.None,
 
                 PriceRegulationUuid = rule.MustUpdate(x => x.PaymentModel.PriceRegulationUuid)
-                    ? dto.PriceRegulationUuid.AsChangedValue() 
+                    ? dto.PriceRegulationUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
 
                 PaymentMileStones = rule.MustUpdate(x => x.PaymentModel.PaymentMileStones)
@@ -218,7 +218,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     : OptionalValueChange<Maybe<DateTime>>.None,
 
                 NoticePeriodMonthsUuid = rule.MustUpdate(x => x.Termination.Terms.NoticePeriodMonthsUuid)
-                    ? dto.Terms?.NoticePeriodMonthsUuid.AsChangedValue()
+                    ? (dto.Terms?.NoticePeriodMonthsUuid).AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
 
                 NoticePeriodExtendsCurrent = rule.MustUpdate(x => x.Termination.Terms.NoticePeriodExtendsCurrent)
@@ -285,7 +285,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
             return new ItContractGeneralDataModificationParameters
             {
-                ContractId = rule.MustUpdate(x => x.General.ContractId) 
+                ContractId = rule.MustUpdate(x => x.General.ContractId)
                     ? dto.ContractId.AsChangedValue()
                     : OptionalValueChange<string>.None,
 

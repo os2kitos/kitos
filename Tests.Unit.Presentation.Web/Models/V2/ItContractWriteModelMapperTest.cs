@@ -684,7 +684,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
 
             //Assert
             Assert.Equal(noTerminatedAt, output.TerminatedAt.IsUnchanged);
-            //Assert.Equal(noNoticePeriodMonthsUuid, output.NoticePeriodMonthsUuid.IsUnchanged);
+            Assert.Equal(noNoticePeriodMonthsUuid, output.NoticePeriodMonthsUuid.IsUnchanged);
             Assert.Equal(noNoticePeriodExtendsCurrent, output.NoticePeriodExtendsCurrent.IsUnchanged);
             Assert.Equal(noNoticeByEndOf, output.NoticeByEndOf.IsUnchanged);
         }
@@ -1722,7 +1722,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 .Returns(sectionProperties);
             _currentHttpRequestMock
                 .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms)))
-                .Returns(sectionProperties);
+                .Returns(termsSectionProperties);
         }
     }
 }
