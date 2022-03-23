@@ -171,11 +171,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
         [NonAction]
         public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
 
-        protected override IQueryable<User> GetAllQuery()
-        {
-            return Repository.AsQueryable().OrderBy(prp => prp.Name);
-        }
-
         private bool EmailExists(string email)
         {
             var matchingEmails = Repository.Get(x => x.Email == email);

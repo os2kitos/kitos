@@ -14,7 +14,7 @@
         }
 
         GetAllUsersFromOrganizationById = (id : number) => {
-            return this.$http.get<Models.IUser>(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq (${id}))`);
+            return this.$http.get<Models.IUser>(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq (${id}))&$orderby=Name,LastName`);
         }
     }
 
