@@ -111,6 +111,11 @@ class DataProcessingRegistrationHelper {
             .then(() => DataProcessingRegistrationHelper.goToSpecificDataProcessingRegistration(name));
     }
 
+    public static openAnyDataProcessingRegistration() {
+        console.log(`Opening any DataProcessingRegistration`);
+        return DataProcessingRegistrationHelper.findAnyDataProcessingRegistrationColumn().click();
+    }
+
 
     public static assignDataProcessor(name: string) {
         console.log("Assigning data processor with name: " + name);
@@ -229,7 +234,12 @@ class DataProcessingRegistrationHelper {
 
     private static findDataProcessingRegistrationColumnFor(name: string) {
         return this.kendoToolbarWrapper.getFilteredColumnElement(
-            this.kendoToolbarWrapper.columnObjects().dpaName, name);
+            this.kendoToolbarWrapper.columnObjects().dpaName,
+            name);
+    }
+
+    private static findAnyDataProcessingRegistrationColumn() {
+        return this.kendoToolbarWrapper.getAnyColumnElement(this.kendoToolbarWrapper.columnObjects().dpaName);
     }
 
     private static waitForKendo() {

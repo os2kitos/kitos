@@ -105,5 +105,11 @@ class SystemCatalogHelper {
         return SystemCatalogHelper.pageObject.waitForKendoGrid().then(() => browser.waitForAngular());
 
     }
+
+    public static assignLicensee(name: string) {
+        console.log(`Assigning Licensee with name: ${name}`);
+        return Select2.searchFor(name, "s2id_data-processor_select-new_config")
+            .then(() => Select2.waitForDataAndSelect());
+    }
 }
 export = SystemCatalogHelper;

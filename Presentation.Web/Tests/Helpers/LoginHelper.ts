@@ -64,12 +64,20 @@ class Login {
             .then(() => homePage.loginButton.click())
             .then(() => browser.waitForAngular())
             .then(() => {
+                console.log("User is global admin - must select organization before proceeding");
                 if (credentials.username === this.getCredentialsMap().globalAdmin.username) {
                     console.log("User is global admin - must select organization before proceeding");
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)
                         .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
                         .then(() => homePage.selectWorkingOrganizationButton.click());
-                } else {
+                }
+                else if (credentials.userName === this.getCredentialsMap().localAdmin.username) {
+                    console.log("User is a local admin - must select organization before proceeding");
+                    return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog), waitUpTo.twentySeconds)
+                        .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
+                        .then(() => homePage.selectWorkingOrganizationButton.click());
+                }
+                else {
                     return true;
                 }
             })
