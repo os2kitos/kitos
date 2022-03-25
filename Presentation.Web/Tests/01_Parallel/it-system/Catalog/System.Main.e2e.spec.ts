@@ -36,8 +36,7 @@ describe("ITSystem Catalog main screen tests", () => {
             .then(() => loadPage())
             .then(() => waitForKendoGrid())
             .then(() => console.log("Finished page loading"))
-            //.then(() => SystemCatalogHelper.createSystem(systemName))
-            .then(() => SystemCatalogHelper.openAnySystem())
+            .then(() => SystemCatalogHelper.createAndOpenSystem(systemName))
             .then(() => SystemCatalogHelper.assignLicensee(licenseeOrgName))
             .then(() => SystemCatalogHelper.validateLicenseeHasCorrectValue(licenseeOrgName));
     });

@@ -33,8 +33,7 @@ describe("ItContract main screen tests", () => {
             .then(() => orgHelper.createOrg(testOrgName))
             .then(() => orgHelper.changeOrg(testOrgName))
             .then(() => loadPage())
-            .then(() => contractHelper.createContract(contractName))
-            .then(() => contractHelper.openContract(contractName))
+            .then(() => contractHelper.createContractAndProceed(contractName))
             .then(() => contractHelper.assignSupplier(supplierOrgName))
             .then(() => contractHelper.validateSupplierHasCorrectValue(supplierOrgName));
     });

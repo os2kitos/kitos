@@ -4,6 +4,7 @@ import CSSLocator = require("../object-wrappers/CSSLocatorHelper");
 import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import Select2 = require("./Select2Helper");
+import KendoToolbarWrapper = require("../Object-wrappers/KendoToolbarWrapper");
 
 class SystemCatalogHelper {
     private static consts = new Constants();
@@ -13,17 +14,11 @@ class SystemCatalogHelper {
     private static waitUpTo = new WaitTimers();
     private static readonly visibilitySelect2 = "s2id_system-access";
     private static ec = protractor.ExpectedConditions;
+    private static kendoToolbarWrapper = new KendoToolbarWrapper();
 
     public static createSystem(name: string) {
         console.log(`Creating system: ${name}`);
-        return SystemCatalogHelper.pageObject.getPage()
-            .then(() => SystemCatalogHelper.waitForKendoGrid())
-            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
-            .then(() => browser.waitForAngular())
-            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(), SystemCatalogHelper.waitUpTo.twentySeconds))
-            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogVisible(), SystemCatalogHelper.waitUpTo.twentySeconds))
-            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput)).sendKeys(name))
-            .then(() => browser.waitForAngular())
+        return this.inputCreateData(name)
             .then(() => browser.wait(this.ec.elementToBeClickable(element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton))), this.waitUpTo.twentySeconds))
             .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogButton)).click())
             .then(() => browser.waitForAngular())
@@ -85,6 +80,15 @@ class SystemCatalogHelper {
             .then(() => browser.waitForAngular());
     }
 
+    public static createAndOpenSystem(name: string) {
+        console.log(`Create and open system: ${name}`);
+        return this.inputCreateData(name)
+            .then(() => browser.wait(this.ec.elementToBeClickable(element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogAndProceedButton))), this.waitUpTo.twentySeconds))
+            .then(() => element(SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.saveCatalogAndProceedButton)).click())
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("System created"));
+    }
+
     public static openAnySystem() {
         console.log(`open details for any system`);
         return SystemCatalogHelper.pageObject.getPage()
@@ -128,6 +132,35 @@ class SystemCatalogHelper {
     public static validateLicenseeHasCorrectValue(name: string) {
         console.log(`Validating Licensee: ${name}`);
         return expect(Select2.getData("s2id_system-belongs-to").getText()).toEqual(name);
+    }
+
+    public static openNewSystemCatalogDialog() {
+        console.log("clicking createCatalogButton");
+        return this.getCreateDpaButton().click()
+            .then(() => {
+                console.log("waiting for dialog to be visible");
+                return browser.wait(this.pageObject.isCreateCatalogAvailable(), this.waitUpTo.twentySeconds);
+            });
+    }
+
+    private static inputCreateData(name: string) {
+        console.log("Opening create dialog");
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.click())
+            .then(() => browser.waitForAngular())
+            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogAvailable(),
+                SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => browser.wait(SystemCatalogHelper.pageObject.isCreateCatalogVisible(),
+                SystemCatalogHelper.waitUpTo.twentySeconds))
+            .then(() => element(
+                    SystemCatalogHelper.cssHelper.byDataElementType(SystemCatalogHelper.consts.nameOfSystemInput))
+                .sendKeys(name))
+            .then(() => browser.waitForAngular());
+    }
+
+    private static getCreateDpaButton() {
+        return this.kendoToolbarWrapper.headerButtons().systemCatalogCreate;
     }
 }
 export = SystemCatalogHelper;

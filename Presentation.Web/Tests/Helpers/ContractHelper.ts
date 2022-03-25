@@ -20,17 +20,7 @@ class ContractHelper {
 
     public static createContract(name: string) {
         console.log(`Creating contract with name: ${name}`);
-        return this.contractPage.getPage()
-            .then(() => console.log(`Kendo`))
-            .then(() => this.waitForEconomyPageKendoGrid())
-            .then(() => console.log(`Get button`))
-            .then(() => this.contractPage.getCreateContractButton().click())
-            .then(() => console.log(`Button clicked`))
-            .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
-            .then(() => console.log(`Input present`))
-            .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
-            .then(() => console.log(`Send keys`))
-            .then(() => browser.waitForAngular())
+        return this.inputContractData(name)
             .then(() => this.contractPage.getSaveContractButton().click())
             .then(() => browser.waitForAngular())
             .then(() => console.log("Contract created"));
@@ -41,7 +31,18 @@ class ContractHelper {
         return this.contractPage.getPage()
             .then(() => this.waitForEconomyPageKendoGrid())
             .then(() => this.findCatalogColumnsFor(name).first().click())
-            .then(() => browser.waitForAngular());
+            .then(() => browser.waitForAngular())
+            .then(() => this.contractPage.getSaveContractButton().click())
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("Contract created"));
+    }
+
+    public static createContractAndProceed(name: string) {
+        console.log(`Creating and proceeding to the details for contract: ${name}`);
+        return this.inputContractData(name)
+            .then(() => element(ContractHelper.cssHelper.byDataElementType(ContractHelper.consts.saveContractAndProceedButton)).click())
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("System created"));
     }
 
     public static getRelationCountFromContractName(name: string) {
@@ -63,7 +64,7 @@ class ContractHelper {
     }
 
     public static waitForEconomyPageKendoGrid() {
-        browser.wait(this.contractTimePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
+        return this.contractTimePage.waitForKendoGrid().then(() => browser.waitForAngular());
     }
 
     public static goToDpr() {
@@ -93,6 +94,17 @@ class ContractHelper {
     public static validateSupplierHasCorrectValue(name: string) {
         console.log(`Validating Supplier: ${name}`);
         return expect(Select2Helper.getData("s2id_contract-supplier").getText()).toEqual(name);
+    }
+
+    public static inputContractData(name: string) {
+        console.log(`Input ${name} contract data`);
+        return this.contractPage.getPage()
+            .then(() => this.waitForTimePageKendoGrid())
+            .then(() => console.log("Button click"))
+            .then(() => this.contractPage.getCreateContractButton().click())
+            .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
+            .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
+            .then(() => browser.waitForAngular());
     }
 
     static clickDpr(dprName: string) { return element(by.linkText(dprName)).click() };
