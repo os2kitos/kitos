@@ -62,9 +62,17 @@ namespace Presentation.Web.Controllers.API.V1
 
         [Route("api/authorize/GetOrganizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
-        public HttpResponseMessage GetOrganizations()
+        public HttpResponseMessage GetOrganizations([FromUri]string orderBy = null, [FromUri]bool? orderByAsc = true)
         {
             var orgs = GetOrganizationsWithMembershipAccess();
+
+            if (orderBy != null)
+            {
+                // TODO: Only support name for now,
+                // TODO: Use orderByAsc to chose ordering direction
+                // TODO: In the front end, add the query parameters to the call
+                // TODO: Add an integration test to validate that direction works and that only "name" works for orderBy
+            }
 
             var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());
             return Ok(dtos);
