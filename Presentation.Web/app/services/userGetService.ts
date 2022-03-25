@@ -2,7 +2,6 @@
     "use strict";
 
 
-    //laver kaldet til odata for at hente data kollektions ud af databasen
     export class UserGetService {
 
         public static $inject: string[] = ["$http"];
@@ -13,6 +12,10 @@
             return this.$http.get<Models.IUser>(`odata/Users`);
         }
 
+        /**
+         * TODO: Add comment regarging what order to expect the results in
+         * @param id
+         */
         GetAllUsersFromOrganizationById = (id : number) => {
             return this.$http.get<Models.IUser>(`odata/Users?$filter=OrganizationRights/any(o:o/OrganizationId eq (${id}))&$orderby=Name,LastName`);
         }
