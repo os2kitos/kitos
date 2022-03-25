@@ -113,7 +113,21 @@ class DataProcessingRegistrationHelper {
 
     public static openAnyDataProcessingRegistration() {
         console.log(`Opening any DataProcessingRegistration`);
-        return DataProcessingRegistrationHelper.findAnyDataProcessingRegistrationColumn().click();
+        return this.pageObject.getPage()
+            .then(() => browser.waitForAngular())
+            .then(() => this.waitForKendo())
+            .then(() => {
+                var dprElementArrayFinder = DataProcessingRegistrationHelper.findAnyDataProcessingRegistrationColumn();
+                dprElementArrayFinder.first().click();
+                /*console.log("Checking if any DataProcessingRegistration exists");
+                if (dprElementArrayFinder.count().valueOf() > 0) {
+                    dprElementArrayFinder.click();
+                }
+                else {
+                    const name = "NewTestName";
+                    this.createAndOpenDataProcessingRegistration(name);
+                }*/
+            });
     }
 
 

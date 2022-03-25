@@ -70,7 +70,9 @@ class SystemCatalogHelper {
         console.log(`Creating local system for system: ${name}`);
         return SystemCatalogHelper.pageObject.getPage()
             .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => console.log("Getting activation toggle button"))
             .then(() => SystemCatalogHelper.getActivationToggleButton(name).click())
+            .then(() => console.log("Waiting for angular after click the button"))
             .then(() => browser.waitForAngular())
             .then(() => console.log("Local system created"));
     }
@@ -83,8 +85,20 @@ class SystemCatalogHelper {
             .then(() => browser.waitForAngular());
     }
 
+    public static openAnySystem() {
+        console.log(`open details for any system`);
+        return SystemCatalogHelper.pageObject.getPage()
+            .then(() => SystemCatalogHelper.waitForKendoGrid())
+            .then(() => SystemCatalogHelper.findAnyCatalogColumns().first().click())
+            .then(() => browser.waitForAngular());
+    }
+
     public static findCatalogColumnsFor(name: string) {
         return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getFilteredColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName, name);
+    }
+
+    public static findAnyCatalogColumns() {
+        return SystemCatalogHelper.pageObject.kendoToolbarWrapper.getAnyColumnElement(SystemCatalogHelper.pageObject.kendoToolbarWrapper.columnObjects().catalogName);
     }
 
     public static getActivationToggleButton(name: string) {
@@ -103,13 +117,17 @@ class SystemCatalogHelper {
     public static waitForKendoGrid() {
         console.log("Waiting for kendo grid to be ready");
         return SystemCatalogHelper.pageObject.waitForKendoGrid().then(() => browser.waitForAngular());
-
     }
 
     public static assignLicensee(name: string) {
         console.log(`Assigning Licensee with name: ${name}`);
-        return Select2.searchFor(name, "s2id_data-processor_select-new_config")
+        return Select2.searchFor(name, "s2id_system-belongs-to")
             .then(() => Select2.waitForDataAndSelect());
+    }
+
+    public static validateLicenseeHasCorrectValue(name: string) {
+        console.log(`Validating Licensee: ${name}`);
+        return expect(Select2.getData("s2id_system-belongs-to").getText()).toEqual(name);
     }
 }
 export = SystemCatalogHelper;

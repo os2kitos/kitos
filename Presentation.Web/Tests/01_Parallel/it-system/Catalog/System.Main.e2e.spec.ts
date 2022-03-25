@@ -16,6 +16,7 @@ describe("ITSystem Catalog main screen tests", () => {
     });
 
     beforeAll(() => {
+        loginHelper.loginAsGlobalAdmin();
         testFixture.enableLongRunningTest();
     });
 
@@ -24,24 +25,22 @@ describe("ITSystem Catalog main screen tests", () => {
     });
 
     it("Creating an organization with a special character and verifying if It System Licensee allows for a special character", () => {
-        const orgName = createName("Licensee&Test");
+        const testOrgName = createName("TestOrganization");
+        const licenseeOrgName = createName("Licensee&Test");
         const systemName = createName("LicenseeTest");
         
-        loginHelper.loginAsLocalAdmin()
-            .then(() => orgHelper.createOrg(orgName))
+        orgHelper.createOrg(licenseeOrgName)
+            .then(() => orgHelper.createOrg(testOrgName))
+            .then(() => orgHelper.changeOrg(testOrgName))
+            .then(() => console.log("Starting page loading"))
             .then(() => loadPage())
             .then(() => waitForKendoGrid())
-            .then(() => expectCreateButtonVisibility(true))
-            .then(() => expectNoSystemWithName(systemName))
-            .then(() => SystemCatalogHelper.createSystem(systemName))
-            .then(() => SystemCatalogHelper.openSystem(systemName))
-            .then(() => SystemCatalogHelper.assignLicensee(orgName));
+            .then(() => console.log("Finished page loading"))
+            //.then(() => SystemCatalogHelper.createSystem(systemName))
+            .then(() => SystemCatalogHelper.openAnySystem())
+            .then(() => SystemCatalogHelper.assignLicensee(licenseeOrgName))
+            .then(() => SystemCatalogHelper.validateLicenseeHasCorrectValue(licenseeOrgName));
     });
-
-    function expectCreateButtonVisibility(expectedEnabledState: boolean) {
-        console.log(`Expecting createCatalog visibility to be:${expectedEnabledState}`);
-        return expect(pageObject.kendoToolbarWrapper.headerButtons().systemCatalogCreate.isEnabled()).toBe(expectedEnabledState);
-    }
 
     function waitForKendoGrid() {
         return browser.waitForAngular().then(() => SystemCatalogHelper.waitForKendoGrid());
@@ -54,10 +53,5 @@ describe("ITSystem Catalog main screen tests", () => {
 
     function createName(prefix: string) {
         return `${prefix}_${new Date().getTime()}`;
-    }
-
-    function expectNoSystemWithName(name: string) {
-        console.log(`Making sure ${name} does not exist`);
-        return expect(findCatalogColumnsFor(name)).toBeEmptyArray();
     }
 });

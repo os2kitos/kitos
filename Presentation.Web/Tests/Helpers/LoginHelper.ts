@@ -10,11 +10,15 @@ class Login {
     }
 
     public loginAsGlobalAdmin() {
-        return this.login(this.getCredentialsMap().globalAdmin);
+        const credentials = this.getCredentialsMap().globalAdmin;
+        console.log(`global admin: ${credentials.username}`);
+        return this.login(credentials);
     }
 
     public loginAsLocalAdmin() {
-        return this.login(this.getCredentialsMap().localAdmin);
+        const credentials = this.getCredentialsMap().localAdmin;
+        console.log(`local admin: ${credentials.username}`); 
+        return this.login(credentials);
     }
 
     public loginAsRegularUser() {
@@ -64,7 +68,6 @@ class Login {
             .then(() => homePage.loginButton.click())
             .then(() => browser.waitForAngular())
             .then(() => {
-                console.log("User is global admin - must select organization before proceeding");
                 if (credentials.username === this.getCredentialsMap().globalAdmin.username) {
                     console.log("User is global admin - must select organization before proceeding");
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)

@@ -6,6 +6,7 @@ import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
+import Select2 = Kitos.Constants.Select2;
 
 class ContractHelper {
 
@@ -20,10 +21,15 @@ class ContractHelper {
     public static createContract(name: string) {
         console.log(`Creating contract with name: ${name}`);
         return this.contractPage.getPage()
+            .then(() => console.log(`Kendo`))
             .then(() => this.waitForEconomyPageKendoGrid())
+            .then(() => console.log(`Get button`))
             .then(() => this.contractPage.getCreateContractButton().click())
+            .then(() => console.log(`Button clicked`))
             .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
+            .then(() => console.log(`Input present`))
             .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
+            .then(() => console.log(`Send keys`))
             .then(() => browser.waitForAngular())
             .then(() => this.contractPage.getSaveContractButton().click())
             .then(() => browser.waitForAngular())
@@ -76,6 +82,17 @@ class ContractHelper {
             .click()
             .then(() => browser.switchTo().alert().accept())
             .then(() => browser.waitForAngular());
+    }
+
+    public static assignSupplier(name: string) {
+        console.log(`Assigning Supplier with name: ${name}`);
+        return Select2Helper.searchFor(name, "s2id_contract-supplier")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static validateSupplierHasCorrectValue(name: string) {
+        console.log(`Validating Supplier: ${name}`);
+        return expect(Select2Helper.getData("s2id_contract-supplier").getText()).toEqual(name);
     }
 
     static clickDpr(dprName: string) { return element(by.linkText(dprName)).click() };

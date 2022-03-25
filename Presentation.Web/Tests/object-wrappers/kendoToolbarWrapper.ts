@@ -148,13 +148,15 @@ class kendoToolbarWrapper {
         return test;
     }
 
-    public getAnyColumnElement(column: protractor.ElementArrayFinder): protractor.ElementFinder {
-        return column.first();
-    }
-
-    public clickPager() {
-        element(by.tagName("k-widget k-dropdown k-header")).click();
-        element(by.cssContainingText("li", "All")).click();
+    public getAnyColumnElement(column: protractor.ElementArrayFinder): protractor.ElementArrayFinder {
+        var test = column.filter((elem) => {
+            return elem.getText().then((val) => {
+                if (val !== null) {
+                    return elem;
+                }
+            });
+        });
+        return test;
     }
 }
 
