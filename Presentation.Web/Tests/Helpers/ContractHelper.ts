@@ -31,10 +31,7 @@ class ContractHelper {
         return this.contractPage.getPage()
             .then(() => this.waitForEconomyPageKendoGrid())
             .then(() => this.findCatalogColumnsFor(name).first().click())
-            .then(() => browser.waitForAngular())
-            .then(() => this.contractPage.getSaveContractButton().click())
-            .then(() => browser.waitForAngular())
-            .then(() => console.log("Contract created"));
+            .then(() => browser.waitForAngular());
     }
 
     public static createContractAndProceed(name: string) {
@@ -64,7 +61,7 @@ class ContractHelper {
     }
 
     public static waitForEconomyPageKendoGrid() {
-        return this.contractTimePage.waitForKendoGrid().then(() => browser.waitForAngular());
+        browser.wait(this.contractTimePage.waitForKendoGrid(), this.waitUpTo.twentySeconds);
     }
 
     public static goToDpr() {
@@ -99,8 +96,6 @@ class ContractHelper {
     public static inputContractData(name: string) {
         console.log(`Input ${name} contract data`);
         return this.contractPage.getPage()
-            .then(() => this.waitForTimePageKendoGrid())
-            .then(() => console.log("Button click"))
             .then(() => this.contractPage.getCreateContractButton().click())
             .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
             .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
