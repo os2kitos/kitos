@@ -9,11 +9,13 @@ using Core.DomainServices;
 using Presentation.Web.Infrastructure;
 using Presentation.Web.Models;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
+using AutoMapper.Execution;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
@@ -25,6 +27,7 @@ using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
+using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -66,12 +69,12 @@ namespace Presentation.Web.Controllers.API.V1
         {
             var orgs = GetOrganizationsWithMembershipAccess();
 
-            if (orderBy != null)
+            if (orderBy != null && string.Equals(orderBy, nameof(Organization.Name)))
             {
-                // TODO: Only support name for now,
-                // TODO: Use orderByAsc to chose ordering direction
-                // TODO: In the front end, add the query parameters to the call
-                // TODO: Add an integration test to validate that direction works and that only "name" works for orderBy
+                orderByAsc ??= true;
+                
+                orgs = orderByAsc.Value ? orgs.OrderBy(orderBy)
+                        : orgs.OrderByDescending(orderBy);
             }
 
             var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());
@@ -271,7 +274,7 @@ namespace Presentation.Web.Controllers.API.V1
 
             return response;
         }
-
+        
         private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto)
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))

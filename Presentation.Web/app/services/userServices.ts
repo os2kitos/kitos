@@ -86,7 +86,7 @@
             // otherwise it's the root of this organization
             var currentOrgUnitId;
             var currentOrgUnitName;
-            var isUsingDefaultOrgUnit;
+            var isUsingDefaultOrgUnit: boolean;
 
             if (defaultOrgUnitId == null) {
                 currentOrgUnitId = currOrg.root.id;
@@ -183,6 +183,18 @@
         getOrganizations = () => {
             //returns the organizations for the user whos credentials have been authorized
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize/GetOrganizations");
+        };
+
+        /**
+         * returns the organizations for the user whos credentials have been authorized
+         * @param name - orders the list by property with given name
+         * @param orderByAsc - should the list be in ascending or descending order
+         */
+        getOrganizationsOrderedByProperty = (name: string, orderByAsc?: boolean) => {
+            if(typeof orderByAsc !== "undefined")
+                return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(`api/authorize/GetOrganizations?orderBy=${name}&orderByAsc=${orderByAsc}`);
+
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(`api/authorize/GetOrganizations?orderBy=${name}`);
         };
 
         getOrganizationWithDefault = (orgId) => {
@@ -369,10 +381,17 @@
 
         };
 
-        chooseOrganization = () => {
+        chooseOrganization = (orderBy?: string, orderByAsc?: boolean) => {
+            var organizations: angular.IHttpPromise<API.Models.IApiWrapper<any>>;
+            if (typeof orderBy !== "undefined" && typeof orderByAsc !== "undefined")
+                organizations = this.getOrganizationsOrderedByProperty(orderBy, orderByAsc);
+            else if (typeof orderBy !== "undefined")
+                organizations = this.getOrganizationsOrderedByProperty(orderBy);
+            else
+                organizations = this.getOrganizations();
 
             var deferred = this.$q.defer();
-            this.getOrganizations().then((data) => {
+            organizations.then((data) => {
                 var orgs = data.data.response;
 
                 if (!this.$rootScope.userHasOrgChoices) {
@@ -446,7 +465,7 @@
             this.getCurrentUserIfAuthorized().then(result => {
 
                 user = result.data.response;
-                this.chooseOrganization().then((orgAndDefaultUnit: any) => {
+                this.chooseOrganization("Name", true).then((orgAndDefaultUnit: any) => {
 
                     this.saveUserInfo(user, orgAndDefaultUnit);
 

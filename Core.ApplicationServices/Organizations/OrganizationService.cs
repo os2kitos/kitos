@@ -224,7 +224,7 @@ namespace Core.ApplicationServices.Organizations
             }
 
             var query = new IntersectionQuery<Organization>(domainQueries);
-            return _repository.GetAll().OrderBy(prp => prp.Name).Transform(query.Apply);
+            return _repository.GetAll().Transform(query.Apply);
         }
 
         public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria)
