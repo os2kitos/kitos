@@ -21,6 +21,7 @@ using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Extensions;
+using DocumentFormat.OpenXml.Math;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
@@ -69,8 +70,11 @@ namespace Presentation.Web.Controllers.API.V1
         {
             var orgs = GetOrganizationsWithMembershipAccess();
 
-            if (orderBy != null && string.Equals(orderBy, nameof(Organization.Name)))
+            if (!string.IsNullOrEmpty(orderBy))
             {
+                if (!string.Equals(orderBy, "Name"))
+                    return BadRequest("Incorrect OrderBy Property name");
+
                 orderByAsc ??= true;
                 
                 orgs = orderByAsc.Value ? orgs.OrderBy(orderBy)
