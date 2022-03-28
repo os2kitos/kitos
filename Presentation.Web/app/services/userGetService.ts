@@ -8,12 +8,13 @@
 
         constructor(private $http: IHttpServiceWithCustomConfig) {
         }
+
         GetAllUsers = () => {
             return this.$http.get<Models.IUser>(`odata/Users`);
         }
 
         /**
-         * TODO: Add comment regarging what order to expect the results in
+         * Returns a list of users filtered by organizationId, ordered by Name asc, LastName asc
          * @param id
          */
         GetAllUsersFromOrganizationById = (id : number) => {
