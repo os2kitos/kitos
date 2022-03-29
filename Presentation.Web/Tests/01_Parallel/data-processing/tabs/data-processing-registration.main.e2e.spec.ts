@@ -45,7 +45,7 @@ describe("Data processing registration main detail tests", () => {
         testFixture.disableLongRunningTest();
     });
     
-    /*it("Creating and modifying, and deleting data processing registration",
+    it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
             var renameValue = createName(30);
@@ -97,7 +97,7 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
                 .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeFalsy());
-        });*/
+        });
 
     it("Creating an organization with a special character and verifying if dpr data processor and sub-data processor search allows for a special character",
         () => {
