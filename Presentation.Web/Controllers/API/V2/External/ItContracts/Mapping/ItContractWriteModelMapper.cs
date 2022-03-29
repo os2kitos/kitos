@@ -298,7 +298,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
                     : OptionalValueChange<Guid?>.None,
 
                 AgreementElementUuids = rule.MustUpdate(x => x.General.AgreementElementUuids)
-                    ? dto.AgreementElementUuids.AsChangedValue()
+                    ? (dto.AgreementElementUuids ?? new List<Guid>()).AsChangedValue()
                     : OptionalValueChange<IEnumerable<Guid>>.None,
 
                 Notes = rule.MustUpdate(x => x.General.Notes)
