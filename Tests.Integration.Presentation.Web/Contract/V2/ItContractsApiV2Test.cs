@@ -745,10 +745,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act - reset
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
+            //Is correct?
+            resetRequest.Validity = new ValidityWriteRequestDTO();
             using var response3 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, resetRequest);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
-
-
+            
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);
@@ -1650,6 +1651,8 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
 
             //Act
             var terminationRequest4 = new ContractTerminationDataWriteRequestDTO();
+            //Is correct?
+            terminationRequest4.Terms = new ContractTerminationTermsRequestDTO();
             using var response4 = await ItContractV2Helper.SendPatchTerminationAsync(token, contractDTO.Uuid, terminationRequest4);
             Assert.Equal(HttpStatusCode.OK, response4.StatusCode);
 
