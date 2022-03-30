@@ -267,7 +267,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public HttpResponseMessage GetAvailableDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 100)
         {
             return _dataProcessingRegistrationApplicationService
                 .GetDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
@@ -313,7 +313,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
+        public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 100)
         {
             return _dataProcessingRegistrationApplicationService
                 .GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)

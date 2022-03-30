@@ -38,7 +38,7 @@ namespace Presentation.Web.Controllers.API.V1
             return GetAll(paging);
         }
 
-        public HttpResponseMessage GetBySearch(string q, int orgId, int take = 25)
+        public HttpResponseMessage GetBySearch(string q, int orgId, int take = 100)
         {
             try
             {
