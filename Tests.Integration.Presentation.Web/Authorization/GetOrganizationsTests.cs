@@ -14,7 +14,6 @@ namespace Tests.Integration.Presentation.Web.Authorization
 {
     public class GetOrganizationsTests : WithAutoFixture
     {
-
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
@@ -60,39 +59,15 @@ namespace Tests.Integration.Presentation.Web.Authorization
         [InlineData(null)]
         public async Task Get_Organizations_Returns_List_When_Name_Parameter_Is_Empty(string orderBy)
         {
-            var organization1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
             var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
 
-            Assert.True(result.Count >= 3);
+            Assert.True(result.Count >= 2);
         }
-
-        /*[Theory]
-        [InlineData("Name")]
-        [InlineData("")]
-        [InlineData(null)]
-        public async Task Get_Organizations_Returns_List_Sorted_Descending_By_Name(string orderBy)
-        {
-            var orderByAsc = false;
-            var organization1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-
-            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy, orderByAsc);
-            Assert.True(response.IsSuccessStatusCode);
-
-            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
-            var indexOfOrg1 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization1.Id));
-            var indexOfOrg2 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization2.Id));
-            var indexOfOrg3 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization3.Id));
-
-            Assert.True(indexOfOrg1 > indexOfOrg2);
-            Assert.True(indexOfOrg2 > indexOfOrg3);
-        }*/
     }
 }
