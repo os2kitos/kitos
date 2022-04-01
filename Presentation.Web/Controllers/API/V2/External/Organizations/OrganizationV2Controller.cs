@@ -272,7 +272,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                 FirstName = context.user.Name,
                 LastName = context.user.LastName,
                 ApiAccess = context.user.HasApiAccess.GetValueOrDefault(false),
-                Roles = MapRoles(context)
+                Roles = MapRoles(context).ToList()
             };
         }
 
