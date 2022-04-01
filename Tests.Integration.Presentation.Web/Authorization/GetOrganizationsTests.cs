@@ -49,9 +49,8 @@ namespace Tests.Integration.Presentation.Web.Authorization
             var incorrectOrderBy = "IncorrectPropertyName";
 
             var response = await OrganizationHelper.GetOrganizationsResponseAsync(incorrectOrderBy);
-
-            Assert.True(!response.IsSuccessStatusCode);
-            Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
+            
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
 
         [Theory]
