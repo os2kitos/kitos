@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
@@ -13,15 +14,34 @@ namespace Tests.Integration.Presentation.Web.Authorization
 {
     public class GetOrganizationsTests : WithAutoFixture
     {
-        [Theory]
-        [InlineData("Name")]
-        [InlineData("")]
-        [InlineData(null)]
-        public async Task Get_Organizations_Returns_List(string orderBy)
-        {
-            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy);
 
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Get_Organizations_Returns_List_Sorted_By_Name(bool orderByAsc)
+        {
+            var orderBy = "Name";
+            var organization1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+
+            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy, orderByAsc);
             Assert.True(response.IsSuccessStatusCode);
+
+            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
+            var indexOfOrg1 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization1.Id));
+            var indexOfOrg2 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization2.Id));
+            var indexOfOrg3 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization3.Id));
+
+            if (orderByAsc)
+            {
+                Assert.True(indexOfOrg1 < indexOfOrg2);
+                Assert.True(indexOfOrg2 < indexOfOrg3);
+                return;
+            }
+
+            Assert.True(indexOfOrg1 > indexOfOrg2);
+            Assert.True(indexOfOrg2 > indexOfOrg3);
         }
 
         [Fact]
@@ -32,41 +52,47 @@ namespace Tests.Integration.Presentation.Web.Authorization
             var response = await OrganizationHelper.GetOrganizationsResponseAsync(incorrectOrderBy);
 
             Assert.True(!response.IsSuccessStatusCode);
+            Assert.True(response.StatusCode == HttpStatusCode.BadRequest);
         }
 
-        [Fact]
-        public async Task Get_Organizations_Returns_List_Sorted_Ascending_By_Name()
+        [Theory]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task Get_Organizations_Returns_List_When_Name_Parameter_Is_Empty(string orderBy)
         {
-            var orderBy = "Name";
             var organization1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
-            var result = await OrganizationHelper.GetOrganizationsAsync(orderBy);
-            var indexOfOrg1 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization1.Id));
-            var indexOfOrg2 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization2.Id));
-            var indexOfOrg3 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization3.Id));
+            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy);
+            Assert.True(response.IsSuccessStatusCode);
 
-            Assert.True(indexOfOrg1 < indexOfOrg2);
-            Assert.True(indexOfOrg2 < indexOfOrg3);
+            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
+
+            Assert.True(result.Count >= 3);
         }
 
-        [Fact]
-        public async Task Get_Organizations_Returns_List_Sorted_Descending_By_Name()
+        /*[Theory]
+        [InlineData("Name")]
+        [InlineData("")]
+        [InlineData(null)]
+        public async Task Get_Organizations_Returns_List_Sorted_Descending_By_Name(string orderBy)
         {
-            var orderBy = "Name";
             var orderByAsc = false;
             var organization1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
-            var result = await OrganizationHelper.GetOrganizationsAsync(orderBy, orderByAsc);
+            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy, orderByAsc);
+            Assert.True(response.IsSuccessStatusCode);
+
+            var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             var indexOfOrg1 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization1.Id));
             var indexOfOrg2 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization2.Id));
             var indexOfOrg3 = result.IndexOf(result.FirstOrDefault(prp => prp.Id == organization3.Id));
 
             Assert.True(indexOfOrg1 > indexOfOrg2);
             Assert.True(indexOfOrg2 > indexOfOrg3);
-        }
+        }*/
     }
 }

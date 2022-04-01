@@ -16,6 +16,7 @@ using System.Text;
 using System.Web;
 using System.Web.Helpers;
 using AutoMapper.Execution;
+using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
@@ -72,13 +73,11 @@ namespace Presentation.Web.Controllers.API.V1
 
             if (!string.IsNullOrEmpty(orderBy))
             {
-                if (!string.Equals(orderBy, "Name"))
-                    return BadRequest("Incorrect OrderBy Property name");
+                if (!string.Equals(orderBy, nameof(OrganizationSimpleDTO.Name)))
+                    return BadRequest($"Incorrect {nameof(orderBy)} Property name");
 
-                orderByAsc ??= true;
-                
-                orgs = orderByAsc.Value ? orgs.OrderBy(orderBy)
-                        : orgs.OrderByDescending(orderBy);
+                orgs = orderByAsc.GetValueOrDefault(true) ? orgs.OrderBy(org => org.Name)
+                    : orgs.OrderByDescending(org => org.Name);
             }
 
             var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());

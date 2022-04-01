@@ -412,7 +412,6 @@
     <Compile Include="Controllers\API\V2\External\ItSystemUsages\Mapping\ArchiveDutyMappingExtenstions.cs" />
     <Compile Include="Controllers\API\V2\Mapping\DtoModelV2MappingExtensions.cs" />
     <Compile Include="Exceptions\ConflictException.cs" />
-    <Compile Include="Extensions\IQueryableExtensions.cs" />
     <Compile Include="Extensions\QueryableApiResponseOrderingExtensions.cs" />
     <Compile Include="Infrastructure\Attributes\AllowRightsHoldersAccessAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\SimpleLinkNameMaxLengthAttribute.cs" />

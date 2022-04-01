@@ -187,14 +187,16 @@
 
         /**
          * returns the organizations for the user whos credentials have been authorized
-         * @param name - orders the list by property with given name
+         * @param orderByPropertyName - orders the list by property with given name
          * @param orderByAsc - should the list be in ascending or descending order
          */
-        getOrganizationsOrderedByProperty = (name: string, orderByAsc?: boolean) => {
-            if(typeof orderByAsc !== "undefined")
-                return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(`api/authorize/GetOrganizations?orderBy=${name}&orderByAsc=${orderByAsc}`);
+        getOrganizationsOrderedByProperty = (orderByPropertyName: string, orderByAsc?: boolean) => {
+            let query = `api/authorize/GetOrganizations?orderBy=${orderByPropertyName ?? 'Name'}`;
+            if (orderByAsc !== undefined) {
+                query = `${query}&orderByAsc=${orderByAsc}`;
+            }
 
-            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(`api/authorize/GetOrganizations?orderBy=${name}`);
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(query);
         };
 
         getOrganizationWithDefault = (orgId) => {
@@ -381,14 +383,11 @@
 
         };
 
-        chooseOrganization = (orderBy?: string, orderByAsc?: boolean) => {
+        chooseOrganization = () => {
+            const orderByPropertyName = "Name";
+            const orderByAsc = true;
             var organizations: angular.IHttpPromise<API.Models.IApiWrapper<any>>;
-            if (typeof orderBy !== "undefined" && typeof orderByAsc !== "undefined")
-                organizations = this.getOrganizationsOrderedByProperty(orderBy, orderByAsc);
-            else if (typeof orderBy !== "undefined")
-                organizations = this.getOrganizationsOrderedByProperty(orderBy);
-            else
-                organizations = this.getOrganizations();
+                organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
 
             var deferred = this.$q.defer();
             organizations.then((data) => {
@@ -465,7 +464,7 @@
             this.getCurrentUserIfAuthorized().then(result => {
 
                 user = result.data.response;
-                this.chooseOrganization("Name", true).then((orgAndDefaultUnit: any) => {
+                this.chooseOrganization().then((orgAndDefaultUnit: any) => {
 
                     this.saveUserInfo(user, orgAndDefaultUnit);
 

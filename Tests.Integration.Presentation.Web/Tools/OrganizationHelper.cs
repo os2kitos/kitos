@@ -131,14 +131,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
 
-        public static async Task<List<Organization>> GetOrganizationsAsync(string orderBy, bool orderByAsc = true)
-        {
-            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/authorize/GetOrganizations?orderBy={orderBy}&orderByAsc={orderByAsc}");
-            using var response = await GetOrganizationsResponseAsync(orderBy, orderByAsc);
-            return await  response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
-        }
-
         public static async Task<HttpResponseMessage> GetOrganizationsResponseAsync(string orderBy, bool orderByAsc = true)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
