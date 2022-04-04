@@ -11,13 +11,11 @@ class Login {
 
     public loginAsGlobalAdmin() {
         const credentials = this.getCredentialsMap().globalAdmin;
-        console.log(`global admin: ${credentials.username}`);
         return this.login(credentials);
     }
 
     public loginAsLocalAdmin() {
         const credentials = this.getCredentialsMap().localAdmin;
-        console.log(`local admin: ${credentials.username}`); 
         return this.login(credentials);
     }
 
@@ -27,6 +25,11 @@ class Login {
 
     public loginAsApiUser() {
         return this.login(this.getCredentialsMap().apiUsers.regularUser);
+    }
+
+    public loginAsLocalAdminToSpecificOrg(organization: string) {
+        const credentials = this.getCredentialsMap().localAdmin;
+        return this.login(credentials, organization);
     }
 
     public getApiUserCredentials() {
@@ -55,7 +58,7 @@ class Login {
         };
     }
 
-    private login(credentials: any) {
+    private login(credentials: any, organization?: string) {
         var homePage = new HomePage();
         var navigationBar = new LoginPage().navigationBar;
         var waitUpTo = new WaitTimers();
@@ -73,14 +76,15 @@ class Login {
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)
                         .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
                         .then(() => homePage.selectWorkingOrganizationButton.click());
-                }
-                else if (credentials.userName === this.getCredentialsMap().localAdmin.username) {
-                    console.log("User is a local admin - must select organization before proceeding");
+                }/*
+                else if (credentials.username === this.getCredentialsMap().localAdmin.username && typeof organization !== "undefined") {
+                    console.log(`Selecting Organization: ${organization}`);
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog), waitUpTo.twentySeconds)
-                        .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
+                        .then(() => homePage.selectSpecificOrganizationAsWorkingOrg(organization))
                         .then(() => homePage.selectWorkingOrganizationButton.click());
-                }
+                }*/
                 else {
+                    console.log(`Logging in as user other than global or local admin`);
                     return true;
                 }
             })

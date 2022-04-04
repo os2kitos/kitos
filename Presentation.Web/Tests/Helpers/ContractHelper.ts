@@ -39,7 +39,7 @@ class ContractHelper {
         return this.inputContractData(name)
             .then(() => element(ContractHelper.cssHelper.byDataElementType(ContractHelper.consts.saveContractAndProceedButton)).click())
             .then(() => browser.waitForAngular())
-            .then(() => console.log("System created"));
+            .then(() => console.log("Contract created"));
     }
 
     public static getRelationCountFromContractName(name: string) {
