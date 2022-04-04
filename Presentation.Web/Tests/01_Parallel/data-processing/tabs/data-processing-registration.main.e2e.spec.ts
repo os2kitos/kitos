@@ -55,8 +55,7 @@ describe("Data processing registration main detail tests", () => {
             var dataResponsibleRemark = createRemark("dataResponsible");
             var agreementConcludedRemark = createRemark("agreementConcluded");
 
-            loginHelper.loginAsLocalAdmin()
-                .then(() => dpaHelper.createAndOpenDataProcessingRegistration(name))
+            dpaHelper.createAndOpenDataProcessingRegistration(name)
                 //Changing name
                 .then(() => renameNameAndVerify(renameValue))
                 //Changing IsAgreementConcluded, AgreementConcludedAt and AgreementConcludedRemark
