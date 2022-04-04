@@ -35,6 +35,7 @@ describe("Data processing registration main detail tests", () => {
     var today = GetDateHelper.getTodayAsString();
     
     beforeAll(() => {
+        loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
         dpaHelper.checkAndEnableDpaModule();
     });
@@ -43,7 +44,7 @@ describe("Data processing registration main detail tests", () => {
         testFixture.cleanupState();
         testFixture.disableLongRunningTest();
     });
-    /*
+    
     it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
@@ -97,17 +98,14 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => getDeleteButtonAndDelete())
                 .then(() => dpaHelper.loadOverview())
                 .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeFalsy());
-        });*/
+        });
 
     it("Creating an organization with a special character and verifying if dpr data processor and sub-data processor search allows for a special character",
         () => {
             var dprName = createName(10);
             var organizationWithSpecialCharacterName = `August&Test${createName(10)}`;
 
-            loginHelper.loginAsGlobalAdmin()
-                .then(() => orgHelper.createOrg(organizationWithSpecialCharacterName))
-                .then(() => loginHelper.logout())
-                .then(() => loginHelper.loginAsLocalAdmin())
+            orgHelper.createOrg(organizationWithSpecialCharacterName)
                 .then(() => dpaHelper.createDataProcessingRegistrationAndProceed(dprName))
                 //assigning and verifying data processor with a special character
                 .then(() => dpaHelper.assignDataProcessor(organizationWithSpecialCharacterName))

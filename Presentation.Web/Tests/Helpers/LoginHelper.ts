@@ -27,11 +27,6 @@ class Login {
         return this.login(this.getCredentialsMap().apiUsers.regularUser);
     }
 
-    public loginAsLocalAdminToSpecificOrg(organization: string) {
-        const credentials = this.getCredentialsMap().localAdmin;
-        return this.login(credentials, organization);
-    }
-
     public getApiUserCredentials() {
         return this.getCredentialsMap().apiUsers.regularUser;
     }
@@ -76,13 +71,7 @@ class Login {
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)
                         .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
                         .then(() => homePage.selectWorkingOrganizationButton.click());
-                }/*
-                else if (credentials.username === this.getCredentialsMap().localAdmin.username && typeof organization !== "undefined") {
-                    console.log(`Selecting Organization: ${organization}`);
-                    return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog), waitUpTo.twentySeconds)
-                        .then(() => homePage.selectSpecificOrganizationAsWorkingOrg(organization))
-                        .then(() => homePage.selectWorkingOrganizationButton.click());
-                }*/
+                }
                 else {
                     console.log(`Logging in as user other than global or local admin`);
                     return true;
