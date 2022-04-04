@@ -104,7 +104,11 @@ describe("Data processing registration main detail tests", () => {
             var dprName = createName(10);
             var organizationWithSpecialCharacterName = `August&Test${createName(10)}`;
 
-            orgHelper.createOrg(organizationWithSpecialCharacterName)
+            loginHelper.logout()
+                .then(() => loginHelper.loginAsGlobalAdmin())
+                .then(() => orgHelper.createOrg(organizationWithSpecialCharacterName))
+                .then(() => loginHelper.logout())
+                .then(() => loginHelper.loginAsLocalAdmin())
                 .then(() => dpaHelper.createDataProcessingRegistrationAndProceed(dprName))
                 //assigning and verifying data processor with a special character
                 .then(() => dpaHelper.assignDataProcessor(organizationWithSpecialCharacterName))
