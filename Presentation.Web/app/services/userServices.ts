@@ -191,7 +191,7 @@
          * @param orderByAsc - should the list be in ascending or descending order
          */
         getOrganizationsOrderedByProperty = (orderByPropertyName: string, orderByAsc?: boolean) => {
-            let query = `api/authorize/GetOrganizations?orderBy=${orderByPropertyName ?? 'Name'}`;
+            let query = `api/authorize/GetOrganizations?orderBy=${orderByPropertyName}`;
             if (orderByAsc !== undefined) {
                 query = `${query}&orderByAsc=${orderByAsc}`;
             }

@@ -7,29 +7,23 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure;
-using Presentation.Web.Models;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Web;
 using System.Web.Helpers;
-using AutoMapper.Execution;
-using Castle.DynamicProxy.Generators.Emitters.SimpleAST;
 using Core.Abstractions.Types;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authentication;
 using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Extensions;
-using DocumentFormat.OpenXml.Math;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
-using Presentation.Web.Extensions;
 
 namespace Presentation.Web.Controllers.API.V1
 {
