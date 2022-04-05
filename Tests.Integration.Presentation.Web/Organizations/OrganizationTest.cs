@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -102,6 +103,35 @@ namespace Tests.Integration.Presentation.Web.Organizations
                 //Assert
                 Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
             }
+        }
+
+        [Fact]
+        public async Task Can_Get_Organizations_Filtered_By_Cvr_Or_Name()
+        {
+            //Arrange
+            var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var nameOrg1 = A<string>();
+            var nameOrg2 = A<string>();
+            var cvrOrg1 = (A<int>() % 9999999999).ToString("D10");
+            var cvrOrg2 = (A<int>() % 9999999999).ToString("D10");
+            const AccessModifier accessModifier = AccessModifier.Public;
+
+            //Act - perform the action with the actual role
+            var org1 = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, nameOrg1, cvrOrg1, OrganizationTypeKeys.Kommune, accessModifier, login);
+            var org2 = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, nameOrg2, cvrOrg2, OrganizationTypeKeys.Kommune, accessModifier, login);
+
+            var organizationsFilteredByCvr = await OrganizationHelper.GetOrganizationSearchResponseAsync(cvrOrg1);
+            Assert.True(organizationsFilteredByCvr.IsSuccessStatusCode);
+
+            var resultFilteredByCvr = await organizationsFilteredByCvr.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
+            Assert.True(resultFilteredByCvr.Exists(prp => prp.Cvr.Contains(cvrOrg1)));
+
+            var organizationsFilteredByName = await OrganizationHelper.GetOrganizationSearchResponseAsync(nameOrg1);
+            Assert.True(organizationsFilteredByName.IsSuccessStatusCode);
+
+            var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
+            Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
+
         }
     }
 }

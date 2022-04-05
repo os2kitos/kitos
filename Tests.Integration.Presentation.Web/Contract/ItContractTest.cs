@@ -185,5 +185,19 @@ namespace Tests.Integration.Presentation.Web.Contract
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, conflictedResponse.StatusCode);
         }
+
+        [Fact]
+        public async Task Can_Get_Organization_Filtered_By_Name()
+        {
+            //Arrange
+            var name = A<string>();
+            using var r1 = await ItContractHelper.SendCreateContract(name, TestEnvironment.DefaultOrganizationId).WithExpectedResponseCode(HttpStatusCode.Created);
+
+            //Act
+            using var conflictedResponse = await ItContractHelper.SendCreateContract(name, TestEnvironment.DefaultOrganizationId);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, conflictedResponse.StatusCode);
+        }
     }
 }
