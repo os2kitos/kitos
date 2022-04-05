@@ -243,14 +243,14 @@
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (obj: { id; name; cvr; }) {
+                                _.each(data.data.response, function (obj: { id; name; cvrNumber; }) {
                                     if (excludeSelf && obj.id == contract.id)
                                         return; // don't add self to result
 
                                     results.push({
                                         id: obj.id,
                                         text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvr
+                                        cvr: obj.cvrNumber
                                     });
                                 });
 

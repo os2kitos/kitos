@@ -59,7 +59,7 @@ namespace Presentation.Web.Controllers.API.V1
                         .Where(AllowRead)
                         .OrderBy(_ => _.Name)
                         .Take(take)
-                        .MapToNamedEntityDTOs()
+                        .MapToShallowOrganizationDTOs()
                         .ToList();
 
                 return Ok(dtos);

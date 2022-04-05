@@ -36,6 +36,7 @@
             this.bindDataResponsibleRemark();
         }
 
+
         headerName = this.dataProcessingRegistration.name;
 
         insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
@@ -208,16 +209,19 @@
         }
 
         private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
+            console.log("test");
             return dataProcessors.map(
                 dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                     id: dataProcessor.id,
                     text: dataProcessor.name,
-                    optionalObjectContext: dataProcessor
+                    optionalObjectContext: dataProcessor,
+                    cvrNumber: dataProcessor.cvrNumber
                 }
             );
         }
 
         private bindDataProcessors() {
+            console.log("test1");
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
                 () => this.dataProcessingRegistration.dataProcessors,
@@ -225,10 +229,16 @@
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
                 this.hasWriteAccess,
-                (query) => this
-                    .dataProcessingRegistrationService
-                    .getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
-                    .then(results => this.mapDataProcessingSearchResults(results))
+                (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
+                    .then(results => this.mapDataProcessingSearchResults(results)),
+                null,
+                newElement => {
+                    var result = `<div>${newElement.text}</div>`;
+                    if (newElement.optionalObjectContext.cvrNumber)
+                        result += `<div class="small">${newElement.optionalObjectContext.cvrNumber}</div>`;
+
+                    return result;
+                }
             );
         }
         private bindSubDataProcessors() {
@@ -242,7 +252,15 @@
                 (query) => this
                     .dataProcessingRegistrationService
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
-                    .then(results => this.mapDataProcessingSearchResults(results))
+                    .then(results => this.mapDataProcessingSearchResults(results)),
+                null,
+                newElement => {
+                    var result = `<div>${newElement.text}</div>`;
+                    if (newElement.optionalObjectContext.cvrNumber)
+                        result += `<div class="small">${newElement.optionalObjectContext.cvrNumber}</div>`;
+
+                    return result;
+                }
             );
         }
 

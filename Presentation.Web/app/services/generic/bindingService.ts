@@ -9,7 +9,8 @@
             allowAddition: boolean,
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<T>[]>,
-            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<T>[])
+            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<T>[],
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string)
             : void;
     }
 
@@ -28,11 +29,12 @@
             allowAddition: boolean,
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
-            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]) {
+            fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[],
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string) {
 
             let select2Config;
             if (!!searchFunc) {
-                select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false);
+                select2Config = this.select2LoadingService.loadSelect2WithDataSource(searchFunc, false, formatResult);
             } else if (!!fixedValueRange) {
                 select2Config = this.select2LoadingService.select2LocalDataNoSearch(() => fixedValueRange(), false);
             } else {
