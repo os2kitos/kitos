@@ -7,7 +7,6 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Presentation.Web.Infrastructure;
-using Presentation.Web.Models;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http.Headers;
@@ -62,9 +61,18 @@ namespace Presentation.Web.Controllers.API.V1
 
         [Route("api/authorize/GetOrganizations")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
-        public HttpResponseMessage GetOrganizations()
+        public HttpResponseMessage GetOrganizations([FromUri]string orderBy = null, [FromUri]bool? orderByAsc = true)
         {
             var orgs = GetOrganizationsWithMembershipAccess();
+
+            if (!string.IsNullOrEmpty(orderBy))
+            {
+                if (!string.Equals(orderBy, nameof(OrganizationSimpleDTO.Name)))
+                    return BadRequest($"Incorrect {nameof(orderBy)} Property name");
+
+                orgs = orderByAsc.GetValueOrDefault(true) ? orgs.OrderBy(org => org.Name)
+                    : orgs.OrderByDescending(org => org.Name);
+            }
 
             var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());
             return Ok(dtos);
@@ -263,7 +271,7 @@ namespace Presentation.Web.Controllers.API.V1
 
             return response;
         }
-
+        
         private Result<User, HttpResponseMessage> AuthenticateUser(LoginDTO loginDto)
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))

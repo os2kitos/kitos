@@ -86,7 +86,7 @@
             // otherwise it's the root of this organization
             var currentOrgUnitId;
             var currentOrgUnitName;
-            var isUsingDefaultOrgUnit;
+            var isUsingDefaultOrgUnit: boolean;
 
             if (defaultOrgUnitId == null) {
                 currentOrgUnitId = currOrg.root.id;
@@ -183,6 +183,20 @@
         getOrganizations = () => {
             //returns the organizations for the user whos credentials have been authorized
             return this.$http.get<Kitos.API.Models.IApiWrapper<any>>("api/authorize/GetOrganizations");
+        };
+
+        /**
+         * returns the organizations for the user whos credentials have been authorized
+         * @param orderByPropertyName - orders the list by property with given name
+         * @param orderByAsc - should the list be in ascending or descending order
+         */
+        getOrganizationsOrderedByProperty = (orderByPropertyName: string, orderByAsc?: boolean) => {
+            let query = `api/authorize/GetOrganizations?orderBy=${orderByPropertyName}`;
+            if (orderByAsc !== undefined) {
+                query = `${query}&orderByAsc=${orderByAsc}`;
+            }
+
+            return this.$http.get<Kitos.API.Models.IApiWrapper<any>>(query);
         };
 
         getOrganizationWithDefault = (orgId) => {
@@ -370,9 +384,13 @@
         };
 
         chooseOrganization = () => {
+            const orderByPropertyName = "Name";
+            const orderByAsc = true;
+            var organizations: angular.IHttpPromise<API.Models.IApiWrapper<any>>;
+                organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
 
             var deferred = this.$q.defer();
-            this.getOrganizations().then((data) => {
+            organizations.then((data) => {
                 var orgs = data.data.response;
 
                 if (!this.$rootScope.userHasOrgChoices) {
