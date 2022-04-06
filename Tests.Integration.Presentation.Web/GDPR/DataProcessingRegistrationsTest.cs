@@ -442,6 +442,25 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Contains(processors, x => x.Id == organization.Id);
         }
+        
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationHelper.GetAvailableDataProcessors(registration.Id, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Id == organization.Id);
+        }
 
         [Fact]
         public async Task Can_Assign_DataProcessors()
@@ -481,6 +500,24 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.DataProcessors);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationHelper.GetAvailableSubDataProcessors(registration.Id, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
         [Fact]
