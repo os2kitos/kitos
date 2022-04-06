@@ -21,7 +21,20 @@ class OrgHelper {
             .then(() => browser.waitForAngular());
     }
 
-
+    public static createOrgWithCvr(name: string, cvr: string) {
+        return this.orgPage.getPage()
+            .then(() => this.orgPage.getCreateOrgButton().click())
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgNameInput().sendKeys(name))
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgCvrInput().sendKeys(cvr))
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgRadioButton().click())
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalSaveNewOrgButton().click())
+            .then(() => browser.waitForAngular());
+    }
+    
     public static activateSystemForOrg(system: string, org: string) {
         console.log("Activating " + system + " for org " + org);
         return this.navigationHelper.dropDownExpand()

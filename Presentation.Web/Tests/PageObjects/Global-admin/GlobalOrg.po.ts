@@ -33,6 +33,11 @@ class GlobalOrg implements PageObject {
     public getModalOrgNameInput() {
         return element(this.byDataElementType("orgModalNameInput"));
     }
+    
+
+    public getModalOrgCvrInput() {
+        return element(this.byDataElementType("orgModalCvrInput"));
+    }
 
     public getModalOrgRadioButton() {
         return element(this.byDataElementType("orgModalRadioButton"));
