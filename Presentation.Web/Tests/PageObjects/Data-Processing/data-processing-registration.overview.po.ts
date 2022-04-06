@@ -37,6 +37,10 @@ class DataProcessingRegistrationOverviewPageObject implements PageObject {
         return element(this.cssHelper.byDataElementType("createDpaForm-control_submit"));
     }
 
+    getNewDpaSubmitAndProceedButton() {
+        return element(this.cssHelper.byDataElementType("createDpaForm-control_submit_and_proceed"));
+    }
+
     getCreateDpaDialog() {
         return element(this.cssHelper.byDataElementType(this.consts.createDpaForm));
     }

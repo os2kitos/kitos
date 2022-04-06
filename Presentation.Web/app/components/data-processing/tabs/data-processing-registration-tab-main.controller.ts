@@ -221,7 +221,7 @@
         }
 
         private bindDataProcessors() {
-            console.log("test1");
+            const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
                 () => this.dataProcessingRegistration.dataProcessors,
@@ -229,7 +229,7 @@
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
                 this.hasWriteAccess,
-                (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
+                (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
                 newElement => {
@@ -242,6 +242,7 @@
             );
         }
         private bindSubDataProcessors() {
+            const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.subDataProcessors = config,
                 () => this.dataProcessingRegistration.subDataProcessors,
@@ -251,7 +252,7 @@
                 this.hasWriteAccess,
                 (query) => this
                     .dataProcessingRegistrationService
-                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
+                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
                 newElement => {
