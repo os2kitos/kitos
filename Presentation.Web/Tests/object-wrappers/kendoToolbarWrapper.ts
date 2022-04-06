@@ -147,6 +147,17 @@ class kendoToolbarWrapper {
         });
         return test;
     }
+
+    public getAnyColumnElement(column: protractor.ElementArrayFinder): protractor.ElementArrayFinder {
+        var test = column.filter((elem) => {
+            return elem.getText().then((val) => {
+                if (val !== null) {
+                    return elem;
+                }
+            });
+        });
+        return test;
+    }
 }
 
 class kendoHelper {

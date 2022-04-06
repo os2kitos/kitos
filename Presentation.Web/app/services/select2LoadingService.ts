@@ -118,7 +118,7 @@
                     quietMillis: Select2LoadingService.defaultQuietMillis,
                     transport(queryParams) {
                         const extraParams = paramArray ? `&${paramArray.join("&")}` : "";
-                        const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + queryParams.data.query + extraParams).then(queryParams.success, () => null);
+                         const res = self.$http.get(url + "?" + nameContentQueryParamName + "=" + encodeURIComponent(queryParams.data.query) + extraParams).then(queryParams.success, () => null);
                         return res;
                     },
 

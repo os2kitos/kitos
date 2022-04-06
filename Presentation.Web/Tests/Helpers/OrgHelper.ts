@@ -30,9 +30,22 @@ class OrgHelper {
             .then(() => console.log("clicking change org button"))
             .then(() => this.navigationHelper.changeOrg())
             .then(() => this.homePage.selectSpecificOrganizationAsWorkingOrg(org))
+            .then(() => console.log("Organization selected"))
+            .then(() => this.homePage.selectWorkingOrganizationButton.click())
+            .then(() => console.log("Organization changed"))
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("Starting system creation"))
+            .then(() => SystemCatalogHelper.createLocalSystem(system));
+    }
+
+    public static changeOrg(org: string) {
+        console.log(`Changing org ${org}`);
+        return this.navigationHelper.dropDownExpand()
+            .then(() => browser.waitForAngular())
+            .then(() => this.navigationHelper.changeOrg())
+            .then(() => this.homePage.selectSpecificOrganizationAsWorkingOrg(org))
             .then(() => this.homePage.selectWorkingOrganizationButton.click())
             .then(() => browser.waitForAngular())
-            .then(() => SystemCatalogHelper.createLocalSystem(system));
     }
 
 }

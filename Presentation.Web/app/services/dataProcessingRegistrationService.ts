@@ -166,11 +166,11 @@
         }
 
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize = 25): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `data-processors/available?nameQuery=${query}&pageSize=${pageSize}`));
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
         }
 
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize = 25): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, `sub-data-processors/available?nameQuery=${query}&pageSize=${pageSize}`));
+            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
         }
 
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
@@ -398,7 +398,7 @@
 
         constructor(private readonly $http: ng.IHttpService) {
         }
-
+        
         private getUri(suffix: string): string {
             return this.getBaseUri() + `${suffix}`;
         }
