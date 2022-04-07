@@ -10,11 +10,13 @@ class Login {
     }
 
     public loginAsGlobalAdmin() {
-        return this.login(this.getCredentialsMap().globalAdmin);
+        const credentials = this.getCredentialsMap().globalAdmin;
+        return this.login(credentials);
     }
 
     public loginAsLocalAdmin() {
-        return this.login(this.getCredentialsMap().localAdmin);
+        const credentials = this.getCredentialsMap().localAdmin;
+        return this.login(credentials);
     }
 
     public loginAsRegularUser() {
@@ -51,7 +53,7 @@ class Login {
         };
     }
 
-    private login(credentials: any) {
+    private login(credentials: any, organization?: string) {
         var homePage = new HomePage();
         var navigationBar = new LoginPage().navigationBar;
         var waitUpTo = new WaitTimers();
@@ -69,7 +71,9 @@ class Login {
                     return browser.wait(ec.visibilityOf(homePage.selectWorkingOrganizationDialog),waitUpTo.twentySeconds)
                         .then(() => homePage.selectDefaultOrganizationAsWorkingOrg())
                         .then(() => homePage.selectWorkingOrganizationButton.click());
-                } else {
+                }
+                else {
+                    console.log(`Logging in as user other than global or local admin`);
                     return true;
                 }
             })
