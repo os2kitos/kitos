@@ -6,6 +6,7 @@ import Constants = require("../Utility/Constants");
 import WaitTimers = require("../Utility/WaitTimers");
 import NavigationHelper = require("../Utility/NavigationHelper");
 import Select2Helper = require("./Select2Helper");
+import Select2 = Kitos.Constants.Select2;
 
 class ContractHelper {
 
@@ -19,12 +20,7 @@ class ContractHelper {
 
     public static createContract(name: string) {
         console.log(`Creating contract with name: ${name}`);
-        return this.contractPage.getPage()
-            .then(() => this.waitForEconomyPageKendoGrid())
-            .then(() => this.contractPage.getCreateContractButton().click())
-            .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
-            .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
-            .then(() => browser.waitForAngular())
+        return this.inputContractData(name)
             .then(() => this.contractPage.getSaveContractButton().click())
             .then(() => browser.waitForAngular())
             .then(() => console.log("Contract created"));
@@ -36,6 +32,14 @@ class ContractHelper {
             .then(() => this.waitForEconomyPageKendoGrid())
             .then(() => this.findCatalogColumnsFor(name).first().click())
             .then(() => browser.waitForAngular());
+    }
+
+    public static createContractAndProceed(name: string) {
+        console.log(`Creating and proceeding to the details for contract: ${name}`);
+        return this.inputContractData(name)
+            .then(() => element(ContractHelper.cssHelper.byDataElementType(ContractHelper.consts.saveContractAndProceedButton)).click())
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("Contract created"));
     }
 
     public static getRelationCountFromContractName(name: string) {
@@ -75,6 +79,26 @@ class ContractHelper {
         return this.contractDprPage.getRemoveDprButton(name)
             .click()
             .then(() => browser.switchTo().alert().accept())
+            .then(() => browser.waitForAngular());
+    }
+
+    public static assignSupplier(name: string) {
+        console.log(`Assigning Supplier with name: ${name}`);
+        return Select2Helper.searchFor(name, "s2id_contract-supplier")
+            .then(() => Select2Helper.waitForDataAndSelect());
+    }
+
+    public static validateSupplierHasCorrectValue(name: string) {
+        console.log(`Validating Supplier: ${name}`);
+        return expect(Select2Helper.getData("s2id_contract-supplier").getText()).toEqual(name);
+    }
+
+    public static inputContractData(name: string) {
+        console.log(`Input ${name} contract data`);
+        return this.contractPage.getPage()
+            .then(() => this.contractPage.getCreateContractButton().click())
+            .then(() => expect(this.contractPage.getContractNameInputField().isPresent()))
+            .then(() => this.contractPage.getContractNameInputField().sendKeys(name))
             .then(() => browser.waitForAngular());
     }
 

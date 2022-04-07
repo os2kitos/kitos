@@ -72,7 +72,7 @@ namespace Presentation.Web.Controllers.API.V2.External.DataProcessingRegistratio
 
         private static IEnumerable<IdentityNamePairResponseDTO> MapSystemUsages(DataProcessingRegistration dataProcessingRegistration)
         {
-            return dataProcessingRegistration.SystemUsages.Select(x => x.MapIdentityNamePairDTO());
+            return dataProcessingRegistration.SystemUsages.Select(x => x.MapIdentityNamePairDTO()).ToList();
         }
 
         private DataProcessingRegistrationGeneralDataResponseDTO MapGeneral(DataProcessingRegistration dataProcessingRegistration)
