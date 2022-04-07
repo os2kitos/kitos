@@ -213,13 +213,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<T> ReadResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
-            var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseAsJson);
         }
 
         public static async Task<List<T>> ReadOdataListResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
-            var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsJson = await response.Content.ReadAsStringAsync();
             var spec = new { value = new List<T>() };
             var result = JsonConvert.DeserializeAnonymousType(responseAsJson, spec);
             return result.value;
@@ -227,15 +227,14 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<T> ReadResponseBodyAsKitosApiResponseAsync<T>(this HttpResponseMessage response)
         {
-            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>().ConfigureAwait(false);
+            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>();
             return apiReturnFormat.Response;
         }
 
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
             var requestMessage = CreatePostMessage(url, loginDto);
-            using var client = new HttpClient();
-            return await client.SendAsync(requestMessage);
+            return await StatelessHttpClient.SendAsync(requestMessage);
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
@@ -271,8 +270,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static async Task<GetTokenResponseDTO> GetTokenResponseDtoAsync(LoginDTO loginDto, HttpResponseMessage httpResponseMessage)
         {
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>()
-                .ConfigureAwait(false);
+            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>();
 
             Assert.Equal(loginDto.Email, tokenResponse.Email);
             Assert.True(tokenResponse.LoginSuccessful);
