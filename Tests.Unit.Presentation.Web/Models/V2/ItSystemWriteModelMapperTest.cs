@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.System;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System;
@@ -18,6 +20,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
                 .Returns(GetAllInputPropertyNames<RightsHolderCreateItSystemRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
 

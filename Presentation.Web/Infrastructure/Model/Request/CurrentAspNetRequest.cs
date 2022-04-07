@@ -49,6 +49,23 @@ namespace Presentation.Web.Infrastructure.Model.Request
             }
         }
 
+        public Maybe<JToken> GetObject(params string[] pathTokens)
+        {
+            var requestInputStream = _currentRequestStream.GetInputStreamCopy();
+            try
+            {
+                using var jsonTextReader = new JsonTextReader(new StreamReader(requestInputStream));
+
+                return TraverseTo(JObject.ReadFrom(jsonTextReader), pathTokens);
+                
+            }
+            catch (Exception e)
+            {
+                _logger.ForContext<CurrentAspNetRequest>().Error(e, "Failed while inspecting root properties");
+                return Maybe<JToken>.None;
+            }
+        }
+
         private static string ExtractPropertyName(JToken child)
         {
             return child.Path.Substring(child.Parent?.Path?.Length ?? 0, child.Path.Length - child.Parent?.Path?.Length ?? 0).TrimStart('.');
@@ -65,7 +82,7 @@ namespace Presentation.Web.Infrastructure.Model.Request
                 currentRoot = currentRoot.Children().FirstOrDefault(x => x.Transform(ExtractPropertyName).Equals(propertyName, StringComparison.OrdinalIgnoreCase))?.FirstOrDefault();
             }
 
-            return currentRoot;
+            return tokensToDescendInto.Any() ? Maybe<JToken>.None : currentRoot;
         }
     }
 }

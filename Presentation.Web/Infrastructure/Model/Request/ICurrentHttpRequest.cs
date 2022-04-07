@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Core.Abstractions.Types;
+using Newtonsoft.Json.Linq;
 
 namespace Presentation.Web.Infrastructure.Model.Request
 {
@@ -26,5 +28,6 @@ namespace Presentation.Web.Infrastructure.Model.Request
         /// </param>
         /// <returns></returns>
         ISet<string> GetDefinedJsonProperties(params string[] pathTokens);
+        Maybe<JToken> GetObject(params string[] pathTokens);
     }
 }

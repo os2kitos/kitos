@@ -6,6 +6,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.DataProcessingRegistrations.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.DataProcessing;
@@ -27,6 +28,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
         

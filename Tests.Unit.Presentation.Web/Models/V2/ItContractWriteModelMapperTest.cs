@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
+using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -36,7 +38,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity))).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms))).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones))).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
-
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
 

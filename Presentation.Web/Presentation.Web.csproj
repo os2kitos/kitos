@@ -423,6 +423,7 @@
     <Compile Include="Infrastructure\Model\Request\CurrentRequestStream.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentRequestStream.cs" />
+    <Compile Include="Infrastructure\Model\Request\JsonPropertyResult.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />

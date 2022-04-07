@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.SystemUsage.Write;
 using Moq;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
@@ -30,6 +31,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.GDPR))).Returns(GetAllInputPropertyNames<GDPRWriteRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.LocalKleDeviations))).Returns(GetAllInputPropertyNames<LocalKLEDeviationsRequestDTO>());
             _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateItSystemUsageRequestDTO.OrganizationUsage))).Returns(GetAllInputPropertyNames<OrganizationUsageWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemUsageWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
