@@ -15,14 +15,11 @@ using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Queries.User;
-
 using Presentation.Web.Controllers.API.V2.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 using Presentation.Web.Models.API.V2.Response.Organization;
-using Presentation.Web.Models.API.V2.Types;
 using Presentation.Web.Models.API.V2.Types.Organization;
 using Serilog;
 using Swashbuckle.Swagger.Annotations;
@@ -299,11 +296,11 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
 
         private IEnumerable<OrganizationUserRole> MapRoles((Guid organizationUuid, User user) context)
         {
-            return from organizationRole in context.user.GetRolesInOrganization(context.organizationUuid)
+            return (from organizationRole in context.user.GetRolesInOrganization(context.organizationUuid)
                    select MapRole(organizationRole)
                 into role
                    where role.HasValue
-                   select role.Value;
+                   select role.Value).ToList();
         }
 
         private Maybe<OrganizationUserRole> MapRole(OrganizationRole role)

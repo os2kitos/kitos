@@ -41,6 +41,22 @@ class DataProcessingRegistrationHelper {
             .then(() => this.pageObject.waitForKendoGrid());
     }
 
+    public static createDataProcessingRegistrationAndProceed(name: string) {
+        console.log(`Creating registration with name ${name}`);
+        return this.pageObject.getPage()
+            .then(() => browser.waitForAngular())
+            .then(() => this.waitForKendo())
+            .then(() => this.openNewDpaDialog())
+            .then(() => this.enterDpaName(name))
+            .then(() => {
+                console.log(`clicking 'save'`);
+                this.validateSaveDpaClickable(true);
+            })
+            .then(() => console.log("Proceed to registration"))
+            .then(() => this.pageObject.getNewDpaSubmitAndProceedButton().click())
+            .then(() => browser.waitForAngular())
+    }
+
     public static checkAndEnableDpaModule() {
         var localDpPo = new LocalDataProcessing();
         return localDpPo
@@ -111,6 +127,10 @@ class DataProcessingRegistrationHelper {
             .then(() => DataProcessingRegistrationHelper.goToSpecificDataProcessingRegistration(name));
     }
 
+    public static createAndProceedDataProcessingRegistration(name: string) {
+        console.log(`Creating registration and navigating to ${name}`);
+        return DataProcessingRegistrationHelper.createDataProcessingRegistrationAndProceed(name);
+    }
 
     public static assignDataProcessor(name: string) {
         console.log("Assigning data processor with name: " + name);
@@ -229,7 +249,12 @@ class DataProcessingRegistrationHelper {
 
     private static findDataProcessingRegistrationColumnFor(name: string) {
         return this.kendoToolbarWrapper.getFilteredColumnElement(
-            this.kendoToolbarWrapper.columnObjects().dpaName, name);
+            this.kendoToolbarWrapper.columnObjects().dpaName,
+            name);
+    }
+
+    private static findAnyDataProcessingRegistrationColumn() {
+        return this.kendoToolbarWrapper.getAnyColumnElement(this.kendoToolbarWrapper.columnObjects().dpaName);
     }
 
     private static waitForKendo() {
