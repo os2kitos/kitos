@@ -5,11 +5,9 @@ using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
 using Core.DomainModel.ItContract;
-using DocumentFormat.OpenXml.Vml.Office;
 using Presentation.Web.Controllers.API.V2.External.Generic;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Contract;
-using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.SharedProperties;
 using Presentation.Web.Models.API.V2.Types.Contract;
@@ -45,15 +43,16 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private ItContractModificationParameters Map<T>(T dto, bool enforceFallbackIfNotProvided) where T : ContractWriteRequestDTO, IHasNameExternal
         {
+            var rule = CreateChangeRule<T>(enforceFallbackIfNotProvided);
             TSection WithResetDataIfSectionIsNotDefined<TSection>(TSection deserializedValue,
                 Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection) where TSection : new() =>
-                WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue,
+                WithResetDataIfPropertyIsDefined(deserializedValue,
                     propertySelection, enforceFallbackIfNotProvided);
 
             TSection WithResetDataIfSectionIsNotDefinedWithFallback<TSection>(TSection deserializedValue,
                 Expression<Func<ContractWriteRequestDTO, TSection>> propertySelection,
                 Func<TSection> fallbackFactory) =>
-                WithResetDataIfPropertyIsDefined<ContractWriteRequestDTO, TSection>(deserializedValue,
+                WithResetDataIfPropertyIsDefined(deserializedValue,
                     propertySelection, fallbackFactory, enforceFallbackIfNotProvided);
 
             dto.General = WithResetDataIfSectionIsNotDefined(dto.General, x => x.General);
@@ -77,23 +76,23 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
             return new ItContractModificationParameters
             {
-                Name = (ClientRequestsChangeTo<IHasNameExternal>(x => x.Name) || enforceFallbackIfNotProvided) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
-                ParentContractUuid = (ClientRequestsChangeTo<ContractWriteRequestDTO>(x => x.ParentContractUuid) || enforceFallbackIfNotProvided)
+                Name = rule.MustUpdate(x=>x.Name) ? dto.Name.AsChangedValue() : OptionalValueChange<string>.None,
+                ParentContractUuid = rule.MustUpdate(x => x.ParentContractUuid)
                     ? dto.ParentContractUuid.AsChangedValue()
                     : OptionalValueChange<Guid?>.None,
-                General = dto.General.FromNullable().Select(generalData => MapGeneralData(generalData, enforceFallbackIfNotProvided)),
-                Procurement = dto.Procurement.FromNullable().Select(procurement => MapProcurement(procurement, enforceFallbackIfNotProvided)),
+                General = dto.General.FromNullable().Select(generalData => MapGeneralData(generalData, rule)),
+                Procurement = dto.Procurement.FromNullable().Select(procurement => MapProcurement(procurement, rule)),
                 SystemUsageUuids = dto.SystemUsageUuids.FromNullable(),
-                Responsible = dto.Responsible.FromNullable().Select(responsible => MapResponsible(responsible, enforceFallbackIfNotProvided)),
-                Supplier = dto.Supplier.FromNullable().Select(supplier => MapSupplier(supplier, enforceFallbackIfNotProvided)),
+                Responsible = dto.Responsible.FromNullable().Select(responsible => MapResponsible(responsible, rule)),
+                Supplier = dto.Supplier.FromNullable().Select(supplier => MapSupplier(supplier, rule)),
                 HandoverTrials = dto.HandoverTrials.FromNullable().Select(MapHandOverTrials),
                 ExternalReferences = dto.ExternalReferences.FromNullable().Select(MapReferences),
                 Roles = dto.Roles.FromNullable().Select(MapRoles),
                 DataProcessingRegistrationUuids = dto.DataProcessingRegistrationUuids.FromNullable(),
-                PaymentModel = dto.PaymentModel.FromNullable().Select(payment => MapPaymentModel(payment, enforceFallbackIfNotProvided)),
-                AgreementPeriod = dto.AgreementPeriod.FromNullable().Select(agreementPeriod => MapAgreementPeriod(agreementPeriod, enforceFallbackIfNotProvided)),
+                PaymentModel = dto.PaymentModel.FromNullable().Select(payment => MapPaymentModel(payment, rule)),
+                AgreementPeriod = dto.AgreementPeriod.FromNullable().Select(agreementPeriod => MapAgreementPeriod(agreementPeriod, rule)),
                 Payments = dto.Payments.FromNullable().Select(MapPayments),
-                Termination = dto.Termination.FromNullable().Select(termination => MapTermination(termination, enforceFallbackIfNotProvided))
+                Termination = dto.Termination.FromNullable().Select(termination => MapTermination(termination, rule))
             };
         }
 
@@ -123,11 +122,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractAgreementPeriodModificationParameters MapAgreementPeriod(ContractAgreementPeriodDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractAgreementPeriodModificationParameters MapAgreementPeriod<TRootDto>(ContractAgreementPeriodDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
-            return new ItContractAgreementPeriodModificationParameters()
+            return new ItContractAgreementPeriodModificationParameters
             {
                 DurationMonths = rule.MustUpdate(x => x.AgreementPeriod.DurationMonths)
                     ? dto.DurationMonths.AsChangedValue()
@@ -171,11 +168,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             }).ToList();
         }
 
-        private ItContractPaymentModelModificationParameters MapPaymentModel(ContractPaymentModelDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractPaymentModelModificationParameters MapPaymentModel<TRootDto>(ContractPaymentModelDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
-            return new ItContractPaymentModelModificationParameters()
+            return new ItContractPaymentModelModificationParameters
             {
                 OperationsRemunerationStartedAt = rule.MustUpdate(x => x.PaymentModel.OperationsRemunerationStartedAt)
                     ? (dto.OperationsRemunerationStartedAt?.FromNullable() ?? Maybe<DateTime>.None).AsChangedValue()
@@ -207,10 +202,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractTerminationParameters MapTermination(ContractTerminationDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractTerminationParameters MapTermination<TRootDto>(ContractTerminationDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
             return new ItContractTerminationParameters
             {
                 TerminatedAt = rule.MustUpdate(x => x.Termination.TerminatedAt)
@@ -231,11 +224,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractSupplierModificationParameters MapSupplier(ContractSupplierDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractSupplierModificationParameters MapSupplier<TRootDto>(ContractSupplierDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
-            return new ItContractSupplierModificationParameters()
+            return new ItContractSupplierModificationParameters
             {
                 OrganizationUuid = rule.MustUpdate(x => x.Supplier.OrganizationUuid)
                     ? dto.OrganizationUuid.AsChangedValue()
@@ -255,11 +246,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractResponsibleDataModificationParameters MapResponsible(ContractResponsibleDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractResponsibleDataModificationParameters MapResponsible<TRootDto>(ContractResponsibleDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
-            return new ItContractResponsibleDataModificationParameters()
+            return new ItContractResponsibleDataModificationParameters
             {
                 OrganizationUnitUuid = rule.MustUpdate(x => x.Responsible.OrganizationUnitUuid)
                     ? dto.OrganizationUnitUuid.AsChangedValue()
@@ -279,10 +268,8 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractGeneralDataModificationParameters MapGeneralData(ContractGeneralDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractGeneralDataModificationParameters MapGeneralData<TRootDto>(ContractGeneralDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where  TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-
             return new ItContractGeneralDataModificationParameters
             {
                 ContractId = rule.MustUpdate(x => x.General.ContractId)
@@ -319,10 +306,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             };
         }
 
-        private ItContractProcurementModificationParameters MapProcurement(ContractProcurementDataWriteRequestDTO dto, bool enforceFallbackIfNotProvided)
+        private static ItContractProcurementModificationParameters MapProcurement<TRootDto>(ContractProcurementDataWriteRequestDTO dto, IPropertyUpdateRule<TRootDto> rule) where TRootDto : ContractWriteRequestDTO
         {
-            var rule = CreateChangeRule<ContractWriteRequestDTO>(enforceFallbackIfNotProvided);
-            return new ItContractProcurementModificationParameters()
+            return new ItContractProcurementModificationParameters
             {
                 ProcurementStrategyUuid = rule.MustUpdate(x => x.Procurement.ProcurementStrategyUuid)
                     ? dto.ProcurementStrategyUuid.AsChangedValue()

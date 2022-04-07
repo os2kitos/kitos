@@ -105,7 +105,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 DocumentId = x.DocumentId,
                 Url = x.Url,
                 MasterReference = x.MasterReference
-            });
+            }).ToList();
         }
 
         protected static ChangedValue<Maybe<IEnumerable<UserRolePair>>> BaseMapRoleAssignments(IReadOnlyCollection<RoleAssignmentRequestDTO> roleAssignmentResponseDtos)
@@ -115,7 +115,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 {
                     RoleUuid = x.RoleUuid,
                     UserUuid = x.UserUuid
-                })) :
+                }).ToList()) :
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
         }
     }
