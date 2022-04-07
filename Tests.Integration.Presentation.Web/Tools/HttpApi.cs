@@ -245,14 +245,9 @@ namespace Tests.Integration.Presentation.Web.Tools
                 {
                     return Policy
                         .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized) //Inner policy deals with response related errors
-                        .WaitAndRetryAsync(BackOffDurations, onRetry: (result, _, _, _) => result.Result.Dispose())
+                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
                         .ExecuteAsync(() => StatelessHttpClient.SendAsync(CreatePostMessage(url, loginDto)));
                 });
-        }
-
-        private static void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
-        {
-            result.Result.Dispose();
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
@@ -298,7 +293,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return tokenResponse;
         }
 
-        public static async Task<Cookie> GetCookieAsync(KitosCredentials userCredentials)
+        public static async Task<Cookie> GetCookieAsync(KitosCredentials userCredentials, bool acceptUnAuthorized = false)
         {
             if (CookiesCache.TryGetValue(userCredentials.Username, out var cachedCookie))
                 return cachedCookie;
@@ -306,9 +301,21 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            var request = CreatePostMessage(url, loginDto);
+            using var cookieResponse = await Policy
+                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                .WaitAndRetryAsync(BackOffDurations)
+                .ExecuteAsync(async () =>
+                {
+                    return await Policy
+                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized && !acceptUnAuthorized) //Inner policy deals with response related errors
+                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
+                        .ExecuteAsync(async () =>
+                        {
+                            var request = CreatePostMessage(url, loginDto);
 
-            using var cookieResponse = await SendWithCSRFToken(request);
+                            return await SendWithCSRFToken(request);
+                        });
+                });
 
             Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
             var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
@@ -324,10 +331,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
 
-        public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
+        public static async Task<Cookie> GetCookieAsync(OrganizationRole role, bool acceptUnAuthorized = false)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
-            return await GetCookieAsync(userCredentials);
+            return await GetCookieAsync(userCredentials, acceptUnAuthorized);
         }
 
         public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
