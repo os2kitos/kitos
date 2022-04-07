@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
+using Polly;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -22,6 +23,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
+        private static IEnumerable<TimeSpan> CreateDurations(params int[] durationInSeconds) => durationInSeconds.Select(s => TimeSpan.FromMilliseconds(s)).ToArray();
+
+        private static readonly IEnumerable<TimeSpan> BackOffDurations = CreateDurations(100, 500, 2000).ToList().AsReadOnly();
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
         private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
         /// <summary>
@@ -32,6 +36,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 new HttpClientHandler
                 {
                     UseCookies = false,
+                    ServerCertificateCustomValidationCallback = (sender, certificate, chain, errors) => true
                 });
 
         static HttpApi()
@@ -233,8 +238,21 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
-            var requestMessage = CreatePostMessage(url, loginDto);
-            return await StatelessHttpClient.SendAsync(requestMessage);
+            return await Policy
+                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                .WaitAndRetryAsync(BackOffDurations)
+                .ExecuteAsync(() =>
+                {
+                    return Policy
+                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized) //Inner policy deals with response related errors
+                        .WaitAndRetryAsync(BackOffDurations, onRetry: (result, _, _, _) => result.Result.Dispose())
+                        .ExecuteAsync(() => StatelessHttpClient.SendAsync(CreatePostMessage(url, loginDto)));
+                });
+        }
+
+        private static void HandleFailedRequest(DelegateResult<HttpResponseMessage> result, TimeSpan timeSpan, int retryCount, Context context)
+        {
+            result.Result.Dispose();
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
