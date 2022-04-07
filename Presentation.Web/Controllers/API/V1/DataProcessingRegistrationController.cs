@@ -4,6 +4,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -269,6 +270,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetAvailableDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
         {
+            nameQuery = HttpUtility.UrlDecode(nameQuery);
             return _dataProcessingRegistrationApplicationService
                 .GetDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
                 .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
@@ -315,6 +317,7 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.NotFound)]
         public HttpResponseMessage GetAvailableSubDataProcessors(int id, [FromUri] string nameQuery = null, [FromUri] int pageSize = 25)
         {
+            nameQuery = HttpUtility.UrlDecode(nameQuery);
             return _dataProcessingRegistrationApplicationService
                 .GetSubDataProcessorsWhichCanBeAssigned(id, nameQuery, pageSize)
                 .Match(organizations => Ok(organizations.Select(x => x.MapToShallowOrganizationDTO()).ToList()), FromOperationError);
