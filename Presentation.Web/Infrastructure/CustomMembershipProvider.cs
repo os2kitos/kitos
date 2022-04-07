@@ -163,50 +163,58 @@ namespace Presentation.Web.Infrastructure
 
         public override bool ValidateUser(string username, string password)
         {
-            var userRepository = UserRepositoryFactory.GetUserRepository();
-            var user = userRepository.GetByEmail(username);
-
-            var isValid = false;
-
-            if (user == null)
+            try
             {
-                Logger.Info(username == null
-                    ? "Uservalidation: user not found."
-                    : $"Uservalidation: {username} not found.");
+                var userRepository = UserRepositoryFactory.GetUserRepository();
+                var user = userRepository.GetByEmail(username);
 
-                return isValid;
-            }
+                var isValid = false;
 
-            // having a LockedOutDate means that the user is locked out
-            if (user.LockedOutDate != null)
-            {
-                var lastLockoutDate = user.LockedOutDate;
-                var unlockDate = lastLockoutDate.Value.AddMinutes(PasswordAttemptWindow);
-
-                // check if user should be allowed to login again
-                if (DateTime.Now >= unlockDate)
+                if (user == null)
                 {
-                    ResetLockedOutDate(user);
-                    ResetAttempts(user);
-                    Logger.Info($"Uservalidation: {user.Email} has been unlocked.");
-                    isValid = CheckPassword(user, password);
+                    Logger.Info(username == null
+                        ? "Uservalidation: user not found."
+                        : $"Uservalidation: {username} not found.");
+
+                    return isValid;
+                }
+
+                // having a LockedOutDate means that the user is locked out
+                if (user.LockedOutDate != null)
+                {
+                    var lastLockoutDate = user.LockedOutDate;
+                    var unlockDate = lastLockoutDate.Value.AddMinutes(PasswordAttemptWindow);
+
+                    // check if user should be allowed to login again
+                    if (DateTime.Now >= unlockDate)
+                    {
+                        ResetLockedOutDate(user);
+                        ResetAttempts(user);
+                        Logger.Info($"Uservalidation: {user.Email} has been unlocked.");
+                        isValid = CheckPassword(user, password);
+                    }
+                    else
+                    {
+                        Logger.Info($"Uservalidation: {user.Email} will be unlocked {unlockDate}.");
+                    }
+
                 }
                 else
                 {
-                    Logger.Info($"Uservalidation: {user.Email} will be unlocked {unlockDate}.");
+                    isValid = CheckPassword(user, password);
                 }
 
+                userRepository.Save();
+                var userInfo = new { user.Email, user.FailedAttempts, user.LockedOutDate };
+                Logger.Info($"Uservalidation: Current User: {userInfo}");
+
+                return isValid;
             }
-            else
+            catch (Exception e)
             {
-                isValid = CheckPassword(user, password);
+                Logger.Error(e, "Failed while checking user auth in CustomMembershipProvider");
+                return false;
             }
-
-            userRepository.Save();
-            var userInfo = new { user.Email, user.FailedAttempts, user.LockedOutDate };
-            Logger.Info($"Uservalidation: Current User: {userInfo}");
-
-            return isValid;
         }
 
         private bool CheckPassword(User user, string password)

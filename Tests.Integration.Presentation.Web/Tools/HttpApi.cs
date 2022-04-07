@@ -13,6 +13,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
+using Polly;
 using Presentation.Web.Helpers;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -22,6 +23,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class HttpApi
     {
+        private static IEnumerable<TimeSpan> CreateDurations(params int[] durationInSeconds) => durationInSeconds.Select(s => TimeSpan.FromMilliseconds(s)).ToArray();
+
+        private static readonly IEnumerable<TimeSpan> BackOffDurations = CreateDurations(100, 500, 2000).ToList().AsReadOnly();
         private static readonly ConcurrentDictionary<string, Cookie> CookiesCache = new();
         private static readonly ConcurrentDictionary<string, GetTokenResponseDTO> TokenCache = new();
         /// <summary>
@@ -32,6 +36,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 new HttpClientHandler
                 {
                     UseCookies = false,
+                    ServerCertificateCustomValidationCallback = (sender, certificate, chain, errors) => true
                 });
 
         static HttpApi()
@@ -213,13 +218,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<T> ReadResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
-            var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsJson = await response.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(responseAsJson);
         }
 
         public static async Task<List<T>> ReadOdataListResponseBodyAsAsync<T>(this HttpResponseMessage response)
         {
-            var responseAsJson = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var responseAsJson = await response.Content.ReadAsStringAsync();
             var spec = new { value = new List<T>() };
             var result = JsonConvert.DeserializeAnonymousType(responseAsJson, spec);
             return result.value;
@@ -227,15 +232,22 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static async Task<T> ReadResponseBodyAsKitosApiResponseAsync<T>(this HttpResponseMessage response)
         {
-            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>().ConfigureAwait(false);
+            var apiReturnFormat = await response.ReadResponseBodyAsAsync<ApiReturnDTO<T>>();
             return apiReturnFormat.Response;
         }
 
         public static async Task<HttpResponseMessage> PostForKitosToken(Uri url, LoginDTO loginDto)
         {
-            var requestMessage = CreatePostMessage(url, loginDto);
-            using var client = new HttpClient();
-            return await client.SendAsync(requestMessage);
+            return await Policy
+                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                .WaitAndRetryAsync(BackOffDurations)
+                .ExecuteAsync(() =>
+                {
+                    return Policy
+                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized) //Inner policy deals with response related errors
+                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
+                        .ExecuteAsync(() => StatelessHttpClient.SendAsync(CreatePostMessage(url, loginDto)));
+                });
         }
 
         public static async Task<GetTokenResponseDTO> GetTokenAsync(OrganizationRole role)
@@ -271,8 +283,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         private static async Task<GetTokenResponseDTO> GetTokenResponseDtoAsync(LoginDTO loginDto, HttpResponseMessage httpResponseMessage)
         {
             Assert.Equal(HttpStatusCode.OK, httpResponseMessage.StatusCode);
-            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>()
-                .ConfigureAwait(false);
+            var tokenResponse = await httpResponseMessage.ReadResponseBodyAsKitosApiResponseAsync<GetTokenResponseDTO>();
 
             Assert.Equal(loginDto.Email, tokenResponse.Email);
             Assert.True(tokenResponse.LoginSuccessful);
@@ -282,7 +293,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return tokenResponse;
         }
 
-        public static async Task<Cookie> GetCookieAsync(KitosCredentials userCredentials)
+        public static async Task<Cookie> GetCookieAsync(KitosCredentials userCredentials, bool acceptUnAuthorized = false)
         {
             if (CookiesCache.TryGetValue(userCredentials.Username, out var cachedCookie))
                 return cachedCookie;
@@ -290,9 +301,21 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl("api/authorize");
             var loginDto = ObjectCreateHelper.MakeSimpleLoginDto(userCredentials.Username, userCredentials.Password);
 
-            var request = CreatePostMessage(url, loginDto);
+            using var cookieResponse = await Policy
+                .Handle<Exception>(e => true) //outer policy handles transient protocol errors, connection timeouts, task cancellations and so on
+                .WaitAndRetryAsync(BackOffDurations)
+                .ExecuteAsync(async () =>
+                {
+                    return await Policy
+                        .HandleResult<HttpResponseMessage>(r => r.StatusCode == HttpStatusCode.Unauthorized && !acceptUnAuthorized) //Inner policy deals with response related errors
+                        .WaitAndRetryAsync(BackOffDurations, (result, _, _, _) => result.Result.Dispose())
+                        .ExecuteAsync(async () =>
+                        {
+                            var request = CreatePostMessage(url, loginDto);
 
-            using var cookieResponse = await SendWithCSRFToken(request);
+                            return await SendWithCSRFToken(request);
+                        });
+                });
 
             Assert.Equal(HttpStatusCode.Created, cookieResponse.StatusCode);
             var cookieParts = cookieResponse.Headers.First(x => x.Key == "Set-Cookie").Value.First().Split('=');
@@ -308,10 +331,10 @@ namespace Tests.Integration.Presentation.Web.Tools
         }
 
 
-        public static async Task<Cookie> GetCookieAsync(OrganizationRole role)
+        public static async Task<Cookie> GetCookieAsync(OrganizationRole role, bool acceptUnAuthorized = false)
         {
             var userCredentials = TestEnvironment.GetCredentials(role);
-            return await GetCookieAsync(userCredentials);
+            return await GetCookieAsync(userCredentials, acceptUnAuthorized);
         }
 
         public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)

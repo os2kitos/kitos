@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
@@ -24,7 +23,7 @@ namespace Tests.Integration.Presentation.Web.Authorization
             var organization2 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var organization3 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg2" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
-            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy, orderByAsc);
+            using var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy, orderByAsc);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
@@ -48,7 +47,7 @@ namespace Tests.Integration.Presentation.Web.Authorization
         {
             var incorrectOrderBy = "IncorrectPropertyName";
 
-            var response = await OrganizationHelper.GetOrganizationsResponseAsync(incorrectOrderBy);
+            using var response = await OrganizationHelper.GetOrganizationsResponseAsync(incorrectOrderBy);
             
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
@@ -61,7 +60,7 @@ namespace Tests.Integration.Presentation.Web.Authorization
             await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "OrgTest" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, "TestOrg1" + Guid.NewGuid(), "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
 
-            var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy);
+            using var response = await OrganizationHelper.GetOrganizationsResponseAsync(orderBy);
             Assert.True(response.IsSuccessStatusCode);
 
             var result = await response.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
