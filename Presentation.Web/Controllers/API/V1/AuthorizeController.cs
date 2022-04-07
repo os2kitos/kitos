@@ -276,7 +276,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             if (!Membership.ValidateUser(loginDto.Email, loginDto.Password))
             {
-                Logger.Info("Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(loginDto.Email ?? ""));
+                Logger.Info("AUTH FAILED: Attempt to login with bad credentials for {hashEmail}", _cryptoService.Encrypt(loginDto.Email ?? ""));
                 {
                     return Unauthorized();
                 }
@@ -285,7 +285,7 @@ namespace Presentation.Web.Controllers.API.V1
             var user = _userRepository.GetByEmail(loginDto.Email);
             if (user == null)
             {
-                Logger.Error("User found during membership validation but could not be found by email: {hashEmail}", _cryptoService.Encrypt(loginDto.Email));
+                Logger.Error("AUTH FAILED: User found during membership validation but could not be found by email: {hashEmail}", _cryptoService.Encrypt(loginDto.Email));
                 {
                     return Unauthorized();
                 }
@@ -296,7 +296,7 @@ namespace Presentation.Web.Controllers.API.V1
                 return user;
             }
 
-            Logger.Info("'Non-global admin' User with id {userId} and no organization rights denied access", user.Id);
+            Logger.Info("'AUTH FAILED: Non-global admin' User with id {userId} and no organization rights denied access", user.Id);
             {
                 return Unauthorized();
             }
