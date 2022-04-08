@@ -182,10 +182,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         }
 
         /// <summary>
-        /// Allows partial updates of an existing it-contract
-        /// NOTE:At the root level, defined sections will be mapped as changes e.g. {General: null} will reset the entire "General" section.
-        /// If the section is not provided in the json, the omitted section will remain unchanged.
-        /// At the moment we only manage PATCH at the root level so all levels below that must be provided in it's entirety 
+        /// Allows partial updates of an existing it-contract using json merge patch semantics (RFC7396)
         /// </summary>
         /// <param name="contractUuid">UUID of the contract in KITOS</param>
         /// <param name="request">Full update of the contract</param>

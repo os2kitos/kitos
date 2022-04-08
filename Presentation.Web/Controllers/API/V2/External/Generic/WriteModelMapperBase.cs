@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Extensions;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.Shared.Write;
+using Newtonsoft.Json.Linq;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.Shared;
@@ -16,11 +17,13 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
     {
         private readonly ICurrentHttpRequest _currentHttpRequest;
         private readonly IDictionary<string, HashSet<string>> _currentRequestProperties;
+        private readonly IDictionary<string, bool> _currentRequestResetSectionStatus;
 
         protected WriteModelMapperBase(ICurrentHttpRequest currentHttpRequest)
         {
             _currentHttpRequest = currentHttpRequest;
             _currentRequestProperties = new Dictionary<string, HashSet<string>>();
+            _currentRequestResetSectionStatus = new Dictionary<string, bool>();
         }
 
         /// <param name="enforceFallbackIfNotProvided">If set to true, the fallback strategy will be applied even if the data property was not provided in the request</param>
@@ -85,16 +88,74 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 
         protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
-            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
-            var key = string.Join(".", pathTokensToLeafLevel);
-
-            if (!_currentRequestProperties.TryGetValue(key, out var properties))
+            string CreatePathKey(IEnumerable<string> strings)
             {
-                properties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel).ToHashSet(StringComparer.OrdinalIgnoreCase);
-                _currentRequestProperties[key] = properties;
+                var s = string.Join(".", strings);
+                return s;
             }
 
-            return properties.Contains(expectedSectionKey.Last());
+            HashSet<string> UpdateProperties(IEnumerable<string> pathTokensToLeafLevel)
+            {
+                var key = CreatePathKey(pathTokensToLeafLevel);
+                if (!_currentRequestProperties.TryGetValue(key, out var objectProperties))
+                {
+                    objectProperties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    _currentRequestProperties[key] = objectProperties;
+                    if (objectProperties.Any())
+                    {
+                        //If it has properties, it is not reset
+                        _currentRequestResetSectionStatus[key] = false;
+                    }
+                }
+
+                return objectProperties;
+            }
+
+            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToList(); //Find the base path on which the last property should exist
+
+            var properties = UpdateProperties(pathTokensToLeafLevel);
+
+            if (expectedSectionKey.Any() && properties.Contains(expectedSectionKey.Last()))
+            {
+                return true;
+            }
+
+            //If the property was not defined see if a parent was defined and set the current level explicitly to null, which dictates a propagated reset
+            var unCachedKeys = new List<string>();
+            var isPartOfScopedReset = false;
+            var tailIndex = pathTokensToLeafLevel.Count - 1;
+            while (tailIndex > 0)
+            {
+                var previousSection = pathTokensToLeafLevel[tailIndex];
+                var previousPath = pathTokensToLeafLevel.Take(tailIndex + 1).ToList();
+                var currentKey = CreatePathKey(previousPath);
+                if (_currentRequestResetSectionStatus.TryGetValue(currentKey, out var existingStatus))
+                {
+                    isPartOfScopedReset = existingStatus;
+                    break;
+                }
+                unCachedKeys.Add(currentKey);
+
+                //Check if the parent reset the section
+                var parentPath = pathTokensToLeafLevel.Take(tailIndex);
+
+                properties = UpdateProperties(parentPath);
+                if (properties.Contains(previousSection))
+                {
+                    isPartOfScopedReset = _currentHttpRequest
+                        .GetObject(previousPath)
+                        .Select(x => x.Type == JTokenType.Null)//If the parent is set to null by the grand parent, then all items below the parent are also considered to be reset and hence part of the change set
+                        .GetValueOrFallback(false);
+                    break;
+                }
+
+                tailIndex--;
+            }
+
+            unCachedKeys.ForEach(k => _currentRequestResetSectionStatus[k] = isPartOfScopedReset);
+
+            return isPartOfScopedReset;
         }
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
@@ -105,7 +166,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 DocumentId = x.DocumentId,
                 Url = x.Url,
                 MasterReference = x.MasterReference
-            });
+            }).ToList();
         }
 
         protected static ChangedValue<Maybe<IEnumerable<UserRolePair>>> BaseMapRoleAssignments(IReadOnlyCollection<RoleAssignmentRequestDTO> roleAssignmentResponseDtos)
@@ -115,7 +176,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 {
                     RoleUuid = x.RoleUuid,
                     UserUuid = x.UserUuid
-                })) :
+                }).ToList()) :
                 Maybe<IEnumerable<UserRolePair>>.None).AsChangedValue();
         }
     }
