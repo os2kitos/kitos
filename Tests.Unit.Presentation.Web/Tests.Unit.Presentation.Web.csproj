@@ -222,6 +222,7 @@
     <Compile Include="DomainServices\QueryByAccessModifierTest.cs" />
     <Compile Include="DomainServices\QueryByBusinessTypeTest.cs" />
     <Compile Include="DomainServices\QueryByChangedSinceGtEqTest.cs" />
+    <Compile Include="DomainServices\QueryByNameOrCvrContentTest.cs" />
     <Compile Include="DomainServices\QueryByCvrContentTest.cs" />
     <Compile Include="DomainServices\QueryByEnabledEntitiesOnlyTest.cs" />
     <Compile Include="DomainServices\QueryByIdsTest.cs" />

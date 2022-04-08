@@ -1,4 +1,6 @@
-﻿using Core.DomainModel.Organization;
+﻿using System.Linq;
+using Core.DomainModel.Organization;
+using Core.DomainServices.Queries.Organization;
 
 namespace Core.DomainServices.Extensions
 {
@@ -11,6 +13,11 @@ namespace Core.DomainServices.Extensions
 
             //Checking if the provided cvr is valid
             return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
+        }
+
+        public static IQueryable<Organization> ByPartOfNameOrCvr(this IQueryable<Organization> result, string query)
+        {
+            return new QueryByNameOrCvrContent(query).Apply(result);
         }
     }
 }

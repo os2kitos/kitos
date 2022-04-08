@@ -787,6 +787,36 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
         }
 
         [Fact]
+        public void Can_GetDataProcessorsWhichCanBeAssignedFilteredByCvr()
+        {
+            //Arrange
+            var id = A<int>();
+            var org1Id = A<int>();
+            var org2Id = org1Id + 1;
+            var nameQuery = A<string>();
+            var testCvr = "testCVR" + nameQuery;
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var org1 = new Organization {Id = org1Id, Name = $"{nameQuery}{1}", Cvr = testCvr};
+            var org2 = new Organization {Id = org2Id, Name = $"{nameQuery}{2}", Cvr = nameQuery};
+            var organizations = new[] { org1, org2 };
+            _dpAssignmentService.Setup(x => x.GetApplicableDataProcessors(registration)).Returns(organizations.AsQueryable());
+
+            //Act
+            var result = _sut.GetDataProcessorsWhichCanBeAssigned(id, testCvr, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+
+            var organizationWithSearchedCvr = result.Value.FirstOrDefault(prp => prp.Id == org1.Id);
+            Assert.True(organizationWithSearchedCvr != null);
+
+            var organizationWithWrongCvr = result.Value.FirstOrDefault(prp => prp.Id == org2.Id);
+            Assert.True(organizationWithWrongCvr == null);
+        }
+
+        [Fact]
         public void Can_AssignSubDataProcessor()
         {
             //Arrange
@@ -878,6 +908,36 @@ namespace Tests.Unit.Core.ApplicationServices.GDPR
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(organizations, result.Value);
+        }
+
+        [Fact]
+        public void Can_GetSubDataProcessorsWhichCanBeAssignedFilteredByCvr()
+        {
+            //Arrange
+            var id = A<int>();
+            var org1Id = A<int>();
+            var org2Id = org1Id + 1;
+            var nameQuery = A<string>();
+            var testCvr = "testCVR" + nameQuery;
+            var registration = new DataProcessingRegistration();
+            ExpectRepositoryGetToReturn(id, registration);
+            ExpectAllowReadReturns(registration, true);
+            var org1 = new Organization { Id = org1Id, Name = $"{nameQuery}{1}", Cvr = testCvr };
+            var org2 = new Organization { Id = org2Id, Name = $"{nameQuery}{2}", Cvr = nameQuery };
+            var organizations = new[] { org1, org2 };
+            _dpAssignmentService.Setup(x => x.GetApplicableSubDataProcessors(registration)).Returns(organizations.AsQueryable());
+
+            //Act
+            var result = _sut.GetSubDataProcessorsWhichCanBeAssigned(id, testCvr, new Random().Next(2, 100));
+
+            //Assert
+            Assert.True(result.Ok);
+
+            var organizationWithSearchedCvr = result.Value.FirstOrDefault(prp => prp.Id == org1.Id);
+            Assert.True(organizationWithSearchedCvr != null);
+
+            var organizationWithWrongCvr = result.Value.FirstOrDefault(prp => prp.Id == org2.Id);
+            Assert.True(organizationWithWrongCvr == null);
         }
 
         [Fact]
