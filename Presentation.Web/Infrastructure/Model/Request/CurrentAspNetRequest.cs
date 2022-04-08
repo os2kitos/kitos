@@ -21,7 +21,7 @@ namespace Presentation.Web.Infrastructure.Model.Request
             _currentRequestStream = currentRequestStream;
         }
 
-        public ISet<string> GetDefinedJsonProperties(params string[] pathTokens)
+        public ISet<string> GetDefinedJsonProperties(IEnumerable<string> pathTokens)
         {
             var requestInputStream = _currentRequestStream.GetInputStreamCopy();
             try
@@ -49,7 +49,7 @@ namespace Presentation.Web.Infrastructure.Model.Request
             }
         }
 
-        public Maybe<JToken> GetObject(params string[] pathTokens)
+        public Maybe<JToken> GetObject(IEnumerable<string> pathTokens)
         {
             var requestInputStream = _currentRequestStream.GetInputStreamCopy();
             try

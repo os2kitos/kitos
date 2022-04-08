@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Core.ApplicationServices.Model.GDPR.Write;
 using Core.ApplicationServices.Model.Shared;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared.Write;
 using Moq;
@@ -13,6 +14,7 @@ using Presentation.Web.Models.API.V2.Request.DataProcessing;
 using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Types.DataProcessing;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -25,10 +27,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public DataProcessingRegistrationWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight))).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties( Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateDataProcessingRegistrationRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<DataProcessingRegistrationGeneralDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<DataProcessingRegistrationOversightWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new DataProcessingRegistrationWriteModelMapper(_currentHttpRequestMock.Object);
         }
         
@@ -603,7 +605,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noSubDataProcessors) sectionProperties.Remove(nameof(DataProcessingRegistrationGeneralDataWriteRequestDTO.SubDataProcessorUuids));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.General).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -616,7 +618,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversight) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Oversight));
             if (noRoles) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.Roles));
             if (noReferences) properties.Remove(nameof(DataProcessingRegistrationWriteRequestDTO.ExternalReferences));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(properties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(properties);
         }
 
         private void ConfigureOversightRequestContext(
@@ -639,7 +641,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noOversightDates) sectionProperties.Remove(nameof(DataProcessingRegistrationOversightWriteRequestDTO.OversightDates));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateDataProcessingRegistrationRequestDTO.Oversight).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
     }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.System;
 using Moq;
@@ -6,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Presentation.Web.Models.API.V2.Request.System;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -18,9 +20,9 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItSystemWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties())
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch()))
                 .Returns(GetAllInputPropertyNames<RightsHolderCreateItSystemRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItSystemWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -93,7 +95,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPATCH(emptyInput);
@@ -133,7 +135,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPOST(emptyInput);
@@ -173,7 +175,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noTaskRefKeys) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLENumbers));
             if (noTaskRefUuids) definedProperties.Remove(nameof(RightsHolderPartialUpdateSystemPropertiesRequestDTO.KLEUuids));
 
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(definedProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(definedProperties);
 
             //Act
             var output = _sut.FromRightsHolderPUT(emptyInput);

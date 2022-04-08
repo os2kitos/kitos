@@ -14,6 +14,7 @@ using Presentation.Web.Models.API.V2.Request.Generic.Roles;
 using Presentation.Web.Models.API.V2.Request.Generic.Validity;
 using Presentation.Web.Models.API.V2.Types.Contract;
 using Presentation.Web.Models.API.V2.Types.Shared;
+using Tests.Toolkit.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Models.V2
@@ -26,19 +27,19 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         public ItContractWriteModelMapperTest()
         {
             _currentHttpRequestMock = new Mock<ICurrentHttpRequest>();
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(GetAllInputPropertyNames<UpdateContractRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General))).Returns(GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible))).Returns(GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement))).Returns(GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier))).Returns(GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod))).Returns(GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel))).Returns(GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Payments))).Returns(GetAllInputPropertyNames<ContractPaymentsDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination))).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity))).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms))).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones))).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
-            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<string[]>())).Returns(Maybe<JToken>.None);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(GetAllInputPropertyNames<UpdateContractRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractGeneralDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractResponsibleDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractProcurementDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractSupplierDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractAgreementPeriodDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractPaymentModelDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Payments).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractPaymentsDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination).WrapAsEnumerable().AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<ValidityWriteRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.Termination), nameof(ContractWriteRequestDTO.Termination.Terms) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>());
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.PaymentModel), nameof(ContractWriteRequestDTO.PaymentModel.PaymentMileStones) }.AsParameterMatch())).Returns(GetAllInputPropertyNames<IEnumerable<ItContractPaymentMilestone>>());
+            _currentHttpRequestMock.Setup(x => x.GetObject(It.IsAny<IEnumerable<string>>())).Returns(Maybe<JToken>.None);
             _sut = new ItContractWriteModelMapper(_currentHttpRequestMock.Object);
         }
 
@@ -963,7 +964,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noAgreementPeriod) rootProperties.Remove(nameof(UpdateContractRequestDTO.AgreementPeriod));
             if (noPayments) rootProperties.Remove(nameof(UpdateContractRequestDTO.Payments));
             if (noTermination) rootProperties.Remove(nameof(UpdateContractRequestDTO.Termination));
-            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties()).Returns(rootProperties);
+            _currentHttpRequestMock.Setup(x => x.GetDefinedJsonProperties(Enumerable.Empty<string>().AsParameterMatch())).Returns(rootProperties);
             var emptyInput = new UpdateContractRequestDTO();
             return emptyInput;
         }
@@ -1553,8 +1554,8 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             return typeof(CreateNewContractRequestDTO).GetProperties().Select(x => x.Name).ToHashSet();
         }
-		
-		private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ItContractPaymentDataModificationParameters output)
+
+        private static void AssertPayments(ContractPaymentsDataWriteRequestDTO input, ItContractPaymentDataModificationParameters output)
         {
             AssertPaymentCollection(input.Internal, AssertPropertyContainsDataChange(output.InternalPayments));
             AssertPaymentCollection(input.External, AssertPropertyContainsDataChange(output.ExternalPayments));
@@ -1603,10 +1604,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noValidTo) validitySectionProperties.Remove(nameof(ValidityWriteRequestDTO.ValidTo));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity)))
+                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.General), nameof(ContractWriteRequestDTO.General.Validity)}.AsParameterMatch()))
                 .Returns(validitySectionProperties);
         }
 
@@ -1622,7 +1623,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noProcurementPlan) sectionProperties.Remove(nameof(ContractProcurementDataWriteRequestDTO.ProcurementPlan));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Procurement).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -1640,7 +1641,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noSignedBy) sectionProperties.Remove(nameof(ContractResponsibleDataWriteRequestDTO.SignedBy));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Responsible).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -1658,7 +1659,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noSignedBy) sectionProperties.Remove(nameof(ContractSupplierDataWriteRequestDTO.SignedBy));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Supplier).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -1678,7 +1679,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noPaymentMileStones) sectionProperties.Remove(nameof(ContractPaymentModelDataWriteRequestDTO.PaymentMileStones));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.PaymentModel).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -1700,7 +1701,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noIsContinuous) sectionProperties.Remove(nameof(ContractAgreementPeriodDataWriteRequestDTO.IsContinuous));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.AgreementPeriod).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
         }
 
@@ -1712,7 +1713,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
         {
             var sectionProperties = GetAllInputPropertyNames<ContractTerminationDataWriteRequestDTO>();
             var termsSectionProperties = GetAllInputPropertyNames<ContractTerminationTermsRequestDTO>();
-            
+
             if (noTerminatedAt) sectionProperties.Remove(nameof(ContractTerminationDataWriteRequestDTO.TerminatedAt));
 
             if (noNoticePeriodMonthsUuid) termsSectionProperties.Remove(nameof(ContractTerminationTermsRequestDTO.NoticePeriodMonthsUuid));
@@ -1720,10 +1721,10 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (noNoticeByEndOf) termsSectionProperties.Remove(nameof(ContractTerminationTermsRequestDTO.NoticeByEndOf));
 
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination)))
+                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination).WrapAsEnumerable().AsParameterMatch()))
                 .Returns(sectionProperties);
             _currentHttpRequestMock
-                .Setup(x => x.GetDefinedJsonProperties(nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms)))
+                .Setup(x => x.GetDefinedJsonProperties(new[] { nameof(UpdateContractRequestDTO.Termination), nameof(UpdateContractRequestDTO.Termination.Terms)}.AsParameterMatch()))
                 .Returns(termsSectionProperties);
         }
     }

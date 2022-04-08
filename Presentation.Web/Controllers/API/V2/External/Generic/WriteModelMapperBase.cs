@@ -88,28 +88,33 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
 
         protected bool ClientRequestsChangeTo(params string[] expectedSectionKey)
         {
-            HashSet<string> UpdateProperties(string pathKey, string[] pathTokensToLeafLevel)
-            {
-                if (!_currentRequestProperties.TryGetValue(pathKey, out var objectProperties))
-                {
-                    objectProperties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel)
-                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
-                    _currentRequestProperties[pathKey] = objectProperties;
-                }
-
-                return objectProperties;
-            }
-
             string CreatePathKey(IEnumerable<string> strings)
             {
                 var s = string.Join(".", strings);
                 return s;
             }
 
-            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
-            var key = CreatePathKey(pathTokensToLeafLevel);
+            HashSet<string> UpdateProperties(IEnumerable<string> pathTokensToLeafLevel)
+            {
+                var key = CreatePathKey(pathTokensToLeafLevel);
+                if (!_currentRequestProperties.TryGetValue(key, out var objectProperties))
+                {
+                    objectProperties = _currentHttpRequest.GetDefinedJsonProperties(pathTokensToLeafLevel)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    _currentRequestProperties[key] = objectProperties;
+                    if (objectProperties.Any())
+                    {
+                        //If it has properties, it is not reset
+                        _currentRequestResetSectionStatus[key] = false;
+                    }
+                }
 
-            var properties = UpdateProperties(key, pathTokensToLeafLevel);
+                return objectProperties;
+            }
+
+            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
+
+            var properties = UpdateProperties(pathTokensToLeafLevel);
 
             if (properties.Contains(expectedSectionKey.Last()))
             {
@@ -120,7 +125,7 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
             var currentPath = pathTokensToLeafLevel.ToList();
             var unCachedKeys = new List<string>();
             var resetStatus = false;
-            
+
             while (currentPath.Count > 0)
             {
                 var currentKey = CreatePathKey(currentPath);
@@ -132,12 +137,13 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 unCachedKeys.Add(currentKey);
 
                 //Check if the parent reset the section
+
+                //TODO: Use to-from indexes in stead of materializing as list every time.. makes no sense!
                 var previousSection = currentPath.Last();
                 var previousPath = currentPath.ToList();
                 currentPath = currentPath.Take(currentPath.Count - 1).ToList();
-                var parentKey = CreatePathKey(currentPath);
 
-                properties = UpdateProperties(parentKey, pathTokensToLeafLevel);
+                properties = UpdateProperties(currentPath);
                 if (properties.Contains(previousSection))
                 {
                     resetStatus = _currentHttpRequest

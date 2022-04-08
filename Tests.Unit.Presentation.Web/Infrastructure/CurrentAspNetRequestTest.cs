@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Core.Abstractions.Extensions;
 using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -52,7 +53,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var definedJsonProperties = _sut.GetDefinedJsonProperties();
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(Enumerable.Empty<string>());
 
             //Assert
             Assert.Equal(GetAllPropertyNames<RootClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
@@ -66,7 +67,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child));
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child).WrapAsEnumerable());
 
             //Assert
             Assert.Equal(GetAllPropertyNames<ChildClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
@@ -80,7 +81,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child), nameof(RootClass.Child.GrandChild));
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(new[] { nameof(RootClass.Child), nameof(RootClass.Child.GrandChild) });
 
             //Assert
             Assert.Equal(GetAllPropertyNames<GrandChildClass>().OrderBy(x => x), definedJsonProperties.OrderBy(x => x));
@@ -95,7 +96,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var objectType = _sut.GetObject(nameof(RootClass.Child));
+            var objectType = _sut.GetObject(nameof(RootClass.Child).WrapAsEnumerable());
 
             //Assert
             Assert.True(objectType.HasValue);
@@ -110,7 +111,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var objectType = _sut.GetObject(nameof(RootClass.Child));
+            var objectType = _sut.GetObject(nameof(RootClass.Child).WrapAsEnumerable());
 
             //Assert
             Assert.True(objectType.HasValue);
@@ -125,7 +126,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var objectType = _sut.GetObject(nameof(RootClass.Child),nameof(RootClass));
+            var objectType = _sut.GetObject(new[] { nameof(RootClass.Child), nameof(RootClass) });
 
             //Assert
             Assert.True(objectType.IsNone);
@@ -139,7 +140,7 @@ namespace Tests.Unit.Presentation.Web.Infrastructure
             SetStreamContent(rootClass);
 
             //Act
-            var definedJsonProperties = _sut.GetDefinedJsonProperties(nameof(RootClass.Child), nameof(RootClass.Child.GrandChild), nameof(RootClass));
+            var definedJsonProperties = _sut.GetDefinedJsonProperties(new[] { nameof(RootClass.Child), nameof(RootClass.Child.GrandChild), nameof(RootClass) });
 
             //Assert
             Assert.Empty(definedJsonProperties);
