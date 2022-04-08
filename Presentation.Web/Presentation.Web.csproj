@@ -364,6 +364,8 @@
     <Compile Include="Controllers\API\V2\External\DataProcessingRegistrations\Mapping\IDataProcessingRegistrationWriteModelMapper.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\DeltaFeedV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\Deltas\Mapping\TrackedEntityTypeMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\IPropertyUpdateRule.cs" />
+    <Compile Include="Controllers\API\V2\External\Generic\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
@@ -418,7 +420,9 @@
     <Compile Include="Infrastructure\Attributes\NonEmptyGuidAttribute.cs" />
     <Compile Include="Infrastructure\Attributes\ValidateActionParametersAttribute.cs" />
     <Compile Include="Infrastructure\Model\Request\CurrentAspNetRequest.cs" />
+    <Compile Include="Infrastructure\Model\Request\CurrentRequestStream.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
+    <Compile Include="Infrastructure\Model\Request\ICurrentRequestStream.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />

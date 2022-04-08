@@ -157,7 +157,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
 
 
         /// <summary>
-        /// Allows partial updates of an existing it-interface
+        /// Allows partial updates of an existing it-interface using json merge patch semantics (RFC7396)
         /// </summary>
         /// <param name="uuid">UUID of the interface in KITOS</param>
         /// <param name="request">Updates for the interface</param>
