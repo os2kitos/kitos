@@ -112,51 +112,50 @@ namespace Presentation.Web.Controllers.API.V2.External.Generic
                 return objectProperties;
             }
 
-            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToArray(); //Find the base path on which the last property should exist
+            var pathTokensToLeafLevel = expectedSectionKey.Take(Math.Max(0, expectedSectionKey.Length - 1)).ToList(); //Find the base path on which the last property should exist
 
             var properties = UpdateProperties(pathTokensToLeafLevel);
 
-            if (properties.Contains(expectedSectionKey.Last()))
+            if (expectedSectionKey.Any() && properties.Contains(expectedSectionKey.Last()))
             {
                 return true;
             }
 
             //If the property was not defined see if a parent was defined and set the current level explicitly to null, which dictates a propagated reset
-            var currentPath = pathTokensToLeafLevel.ToList();
             var unCachedKeys = new List<string>();
-            var resetStatus = false;
-
-            while (currentPath.Count > 0)
+            var isPartOfScopedReset = false;
+            var tailIndex = pathTokensToLeafLevel.Count - 1;
+            while (tailIndex > 0)
             {
-                var currentKey = CreatePathKey(currentPath);
+                var previousSection = pathTokensToLeafLevel[tailIndex];
+                var previousPath = pathTokensToLeafLevel.Take(tailIndex + 1).ToList();
+                var currentKey = CreatePathKey(previousPath);
                 if (_currentRequestResetSectionStatus.TryGetValue(currentKey, out var existingStatus))
                 {
-                    resetStatus = existingStatus;
+                    isPartOfScopedReset = existingStatus;
                     break;
                 }
                 unCachedKeys.Add(currentKey);
 
                 //Check if the parent reset the section
+                var parentPath = pathTokensToLeafLevel.Take(tailIndex);
 
-                //TODO: Use to-from indexes in stead of materializing as list every time.. makes no sense!
-                var previousSection = currentPath.Last();
-                var previousPath = currentPath.ToList();
-                currentPath = currentPath.Take(currentPath.Count - 1).ToList();
-
-                properties = UpdateProperties(currentPath);
+                properties = UpdateProperties(parentPath);
                 if (properties.Contains(previousSection))
                 {
-                    resetStatus = _currentHttpRequest
-                        .GetObject(previousPath.ToArray())
+                    isPartOfScopedReset = _currentHttpRequest
+                        .GetObject(previousPath)
                         .Select(x => x.Type == JTokenType.Null)//If the parent is set to null by the grand parent, then all items below the parent are also considered to be reset and hence part of the change set
                         .GetValueOrFallback(false);
                     break;
                 }
+
+                tailIndex--;
             }
 
-            unCachedKeys.ForEach(k => _currentRequestResetSectionStatus[k] = resetStatus);
+            unCachedKeys.ForEach(k => _currentRequestResetSectionStatus[k] = isPartOfScopedReset);
 
-            return resetStatus;
+            return isPartOfScopedReset;
         }
 
         protected IEnumerable<UpdatedExternalReferenceProperties> BaseMapReferences(IEnumerable<ExternalReferenceDataDTO> references)
