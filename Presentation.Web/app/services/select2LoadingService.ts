@@ -72,7 +72,6 @@
                             );
                     },
                     results(data, _) {
-                        console.log(data);
                         return { results: data };
                     }
                 }

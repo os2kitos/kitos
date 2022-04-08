@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Queries.Organization;
 
@@ -16,9 +15,9 @@ namespace Core.DomainServices.Extensions
             return isCvrProvided && (organization.Cvr.Length > 10 || organization.Cvr.Length < 8);
         }
 
-        public static IQueryable<Organization> ByPartOfNameOrCvr(this IQueryable<Organization> result, string nameContent)
+        public static IQueryable<Organization> ByPartOfNameOrCvr(this IQueryable<Organization> result, string query)
         {
-            return new QueryByNameOrCvrContent(nameContent).Apply(result);
+            return new QueryByNameOrCvrContent(query).Apply(result);
         }
     }
 }

@@ -10,7 +10,7 @@
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<T>[]>,
             fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<T>[],
-            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string)
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<T>) => string)
             : void;
     }
 
@@ -30,7 +30,7 @@
             allowRemoval: boolean,
             searchFunc?: (query: string) => angular.IPromise<Models.ViewModel.Generic.Select2OptionViewModel<TElement>[]>,
             fixedValueRange?: () => Models.ViewModel.Generic.Select2OptionViewModel<TElement>[],
-            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<any>) => string) {
+            formatResult?: (input: Models.ViewModel.Generic.Select2OptionViewModel<TElement>) => string) {
 
             let select2Config;
             if (!!searchFunc) {

@@ -4,16 +4,16 @@ namespace Core.DomainServices.Queries.Organization
 {
     public class QueryByNameOrCvrContent : IDomainQuery<DomainModel.Organization.Organization>
     {
-        private readonly string _searchContent;
+        private readonly string _query;
 
-        public QueryByNameOrCvrContent(string searchContent)
+        public QueryByNameOrCvrContent(string query)
         {
-            _searchContent = searchContent;
+            _query = query;
         }
 
         public IQueryable<DomainModel.Organization.Organization> Apply(IQueryable<DomainModel.Organization.Organization> source)
         {
-            return source.Where(x => !string.IsNullOrEmpty(x.Cvr) && x.Cvr.Contains(_searchContent) || x.Name.Contains(_searchContent));
+            return source.Where(x => x.Cvr != null && x.Cvr.Contains(_query) || x.Name.Contains(_query));
         }
     }
 }

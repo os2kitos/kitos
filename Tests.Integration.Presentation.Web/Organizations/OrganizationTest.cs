@@ -51,11 +51,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var phone = A<string>();
 
             //Act - perform the action with the actual role
-            using (var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
+            using var result = await OrganizationHelper.SendChangeContactPersonRequestAsync(contactPersonDto.Id, organizationId, name, lastName, email, phone, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         [Theory]
@@ -98,11 +97,10 @@ namespace Tests.Integration.Presentation.Web.Organizations
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
-            using (var result = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, name, cvr, organizationType, accessModifier, login))
-            {
-                //Assert
-                Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
-            }
+            using var result = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, name, cvr, organizationType, accessModifier, login);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
         [Fact]
@@ -115,15 +113,15 @@ namespace Tests.Integration.Presentation.Web.Organizations
             const AccessModifier accessModifier = AccessModifier.Public;
 
             //Act - perform the action with the actual role
-            await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, nameOrg1, cvrOrg1, OrganizationTypeKeys.Kommune, accessModifier, login);
+            using var _ = await OrganizationHelper.SendCreateOrganizationRequestAsync(TestEnvironment.DefaultOrganizationId, nameOrg1, cvrOrg1, OrganizationTypeKeys.Kommune, accessModifier, login);
 
-            var organizationsFilteredByCvr = await OrganizationHelper.GetOrganizationSearchResponseAsync(cvrOrg1);
+            using var organizationsFilteredByCvr = await OrganizationHelper.SendGetOrganizationSearchRequestAsync(cvrOrg1);
             Assert.True(organizationsFilteredByCvr.IsSuccessStatusCode);
 
             var resultFilteredByCvr = await organizationsFilteredByCvr.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             Assert.True(resultFilteredByCvr.Exists(prp => prp.Cvr.Contains(cvrOrg1)));
 
-            var organizationsFilteredByName = await OrganizationHelper.GetOrganizationSearchResponseAsync(nameOrg1);
+            using var organizationsFilteredByName = await OrganizationHelper.SendGetOrganizationSearchRequestAsync(nameOrg1);
             Assert.True(organizationsFilteredByName.IsSuccessStatusCode);
 
             var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();

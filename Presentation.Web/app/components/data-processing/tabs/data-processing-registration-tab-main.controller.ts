@@ -75,7 +75,7 @@
                     optionalObjectContext: {
                         id: next.id,
                         name: next.name,
-                        description: next.description 
+                        description: next.description
                     }
                 };
                 return acc;
@@ -209,7 +209,6 @@
         }
 
         private mapDataProcessingSearchResults(dataProcessors: Models.DataProcessing.IDataProcessorDTO[]) {
-            console.log("test");
             return dataProcessors.map(
                 dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                     id: dataProcessor.id,
@@ -218,6 +217,16 @@
                     cvrNumber: dataProcessor.cvrNumber
                 }
             );
+        }
+
+        private formatDataProcessorChoice(choice: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
+            let result = `<div>${choice.text}</div>`;
+
+            if (choice.optionalObjectContext?.cvrNumber) {
+                result += `<div class="small">${choice.optionalObjectContext.cvrNumber}</div>`;
+            }
+
+            return result;
         }
 
         private bindDataProcessors() {
@@ -232,13 +241,7 @@
                 (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                newElement => {
-                    var result = `<div>${newElement.text}</div>`;
-                    if (newElement.optionalObjectContext.cvrNumber)
-                        result += `<div class="small">${newElement.optionalObjectContext.cvrNumber}</div>`;
-
-                    return result;
-                }
+                this.formatDataProcessorChoice
             );
         }
         private bindSubDataProcessors() {
@@ -255,13 +258,7 @@
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                newElement => {
-                    var result = `<div>${newElement.text}</div>`;
-                    if (newElement.optionalObjectContext.cvrNumber)
-                        result += `<div class="small">${newElement.optionalObjectContext.cvrNumber}</div>`;
-
-                    return result;
-                }
+                this.formatDataProcessorChoice
             );
         }
 

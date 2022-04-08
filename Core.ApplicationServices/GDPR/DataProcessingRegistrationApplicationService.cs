@@ -9,7 +9,6 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +18,6 @@ using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.Organization;
 using Core.DomainServices.Role;
 
 namespace Core.ApplicationServices.GDPR
@@ -250,13 +248,6 @@ namespace Core.ApplicationServices.GDPR
         {
             if (string.IsNullOrEmpty(nameQuery)) throw new ArgumentException($"{nameof(nameQuery)} must be defined");
             if (pageSize < 1) throw new ArgumentException($"{nameof(pageSize)} must be above 0");
-
-            var test = _dataProcessingRegistrationDataProcessorAssignmentService.GetApplicableDataProcessors(new DataProcessingRegistration {Id = 1});
-            var res = test.ByPartOfNameOrCvr("1");
-            var order = res.OrderBy(x => x.Id);
-            var take = order.Take(pageSize);
-            var order2 = take.OrderBy(x => x.Name);
-            var list = order2.ToList();
 
             return WithReadAccess<IEnumerable<Organization>>(id,
                 registration =>

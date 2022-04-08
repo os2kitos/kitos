@@ -6,12 +6,9 @@ import NavigationHelper = require("../../Utility/NavigationHelper");
 import PageObject = require("../IPageObject.po");
 import Constants = require("../../Utility/Constants");
 import WaitTimers = require("../../Utility/WaitTimers");
-var waitUpTo = new WaitTimers();
 
 class GlobalOrg implements PageObject {
     private navigationHelper = new NavigationHelper();
-    private ec = protractor.ExpectedConditions;
-    private consts = new Constants();
     private byDataElementType = new CssLocatorHelper().byDataElementType;
 
     getPage(): webdriver.promise.Promise<void> {
@@ -36,7 +33,7 @@ class GlobalOrg implements PageObject {
     
 
     public getModalOrgCvrInput() {
-        return element(this.byDataElementType("orgModalCvrInput"));
+        return element(by.id("cvr"));
     }
 
     public getModalOrgRadioButton() {

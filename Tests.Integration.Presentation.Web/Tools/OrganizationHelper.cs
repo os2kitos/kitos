@@ -130,14 +130,14 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
 
-        public static async Task<HttpResponseMessage> GetOrganizationsResponseAsync(string orderBy, bool orderByAsc = true)
+        public static async Task<HttpResponseMessage> SendGetOrganizationsRequestAsync(string orderBy, bool orderByAsc = true)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/authorize/GetOrganizations?orderBy={orderBy}&orderByAsc={orderByAsc}");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
 
-        public static async Task<HttpResponseMessage> GetOrganizationSearchResponseAsync(string search)
+        public static async Task<HttpResponseMessage> SendGetOrganizationSearchRequestAsync(string search)
         {
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/organization?q={search}");

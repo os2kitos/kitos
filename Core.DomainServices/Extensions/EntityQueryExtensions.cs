@@ -5,7 +5,6 @@ using Core.DomainModel;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Model;
 using Core.DomainServices.Queries;
-using Core.DomainServices.Queries.Organization;
 
 namespace Core.DomainServices.Extensions
 {
