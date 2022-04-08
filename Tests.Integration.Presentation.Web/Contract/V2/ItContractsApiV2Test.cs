@@ -747,8 +747,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             var resetRequest = new ContractGeneralDataWriteRequestDTO();
             using var response3 = await ItContractV2Helper.SendPatchContractGeneralDataAsync(token, dto.Uuid, resetRequest);
             Assert.Equal(HttpStatusCode.OK, response3.StatusCode);
-
-
+            
             //Assert
             freshDTO = await ItContractV2Helper.GetItContractAsync(token, dto.Uuid);
             AssertGeneralDataSection(resetRequest, null, null, null, freshDTO);

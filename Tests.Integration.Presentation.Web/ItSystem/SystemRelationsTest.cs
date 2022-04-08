@@ -19,7 +19,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
     [Collection(nameof(SequentialTestGroup))]
     public class SystemRelationsTest : WithAutoFixture
     {
-        private static readonly string NameSessionPart = new Guid().ToString("N");
+        private static readonly string NameSessionPart = Guid.NewGuid().ToString("N");
         private static long _nameCounter = 0;
         private static readonly object NameCounterLock = new object();
         private const int OrganizationId = TestEnvironment.DefaultOrganizationId;

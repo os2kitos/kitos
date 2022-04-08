@@ -9,11 +9,9 @@ using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Newtonsoft.Json.Linq;
-using Presentation.Web.Models;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
-
 using Ninject;
 using Presentation.Web.Exceptions;
 using Presentation.Web.Infrastructure.Extensions;
