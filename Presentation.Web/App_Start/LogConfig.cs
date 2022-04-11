@@ -2,6 +2,7 @@
 using Serilog;
 using Serilog.Exceptions.Core;
 using Serilog.Formatting.Compact;
+using Serilog.Sinks.Elasticsearch;
 
 namespace Presentation.Web
 {
@@ -17,6 +18,7 @@ namespace Presentation.Web
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
+                .WriteTo.Elasticsearch()
                 //.WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
