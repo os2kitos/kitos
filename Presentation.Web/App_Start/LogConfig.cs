@@ -29,12 +29,12 @@ namespace Presentation.Web
                     DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}",*/
                     FailureCallback = e =>
                     {
-                        File.WriteAllLines(@"C:\Logs\Kitos-Failure.txt", new string[] { e.MessageTemplate.Text });
+                        File.WriteAllLines(@"C:\Logs\Kitos-Failure1.txt", new string[] { e.MessageTemplate.Text });
                     },
                     EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
                                        EmitEventFailureHandling.WriteToFailureSink |
                                        EmitEventFailureHandling.RaiseCallback,
-                    FailureSink = new FileSink(@"C:\Logs\Kitos-Failure.txt", new JsonFormatter(), null)
+                    FailureSink = new FileSink(@"C:\Logs\Kitos-Failure1.txt", new JsonFormatter(), null)
                 })
                 .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
