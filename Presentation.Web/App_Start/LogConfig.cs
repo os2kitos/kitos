@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Serilog;
 using Serilog.Exceptions.Core;
 using Serilog.Formatting.Compact;
@@ -26,11 +27,14 @@ namespace Presentation.Web
                     /*AutoRegisterTemplate = true,
                     IndexFormat = "test-index-{0:yyyy.MM.dd}",
                     DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}",*/
-                    FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
+                    FailureCallback = e =>
+                    {
+                        File.WriteAllLines(@"C:\Logs\Kitos-Failure.txt", new string[] { e.MessageTemplate.Text });
+                    },
                     EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
                                        EmitEventFailureHandling.WriteToFailureSink |
                                        EmitEventFailureHandling.RaiseCallback,
-                    FailureSink = new FileSink(@"C:\Logs\Kitos-Failure-.txt", new JsonFormatter(), null)
+                    FailureSink = new FileSink(@"C:\Logs\Kitos-Failure.txt", new JsonFormatter(), null)
                 })
                 .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
