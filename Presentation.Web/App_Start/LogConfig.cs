@@ -23,9 +23,9 @@ namespace Presentation.Web
                 .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(
                     new Uri("http://10.212.74.11:9200/"))
                 {
-                    AutoRegisterTemplate = true,
+                    /*AutoRegisterTemplate = true,
                     IndexFormat = "test-index-{0:yyyy.MM.dd}",
-                    DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}",
+                    DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}",*/
                     FailureCallback = e => Console.WriteLine("Unable to submit event " + e.MessageTemplate),
                     EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
                                        EmitEventFailureHandling.WriteToFailureSink |
