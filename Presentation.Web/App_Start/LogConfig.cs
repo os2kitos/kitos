@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Exceptions.Core;
 using Serilog.Formatting.Compact;
+using Serilog.Formatting.Elasticsearch;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
@@ -21,21 +25,11 @@ namespace Presentation.Web
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
-                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(
-                    new Uri("http://10.212.74.11:9200/"))
+                /*.WriteTo.Elasticsearch(new ElasticsearchSinkOptions
                 {
-                    /*AutoRegisterTemplate = true,
-                    IndexFormat = "test-index-{0:yyyy.MM.dd}",
-                    DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}",*/
-                    FailureCallback = e =>
-                    {
-                        File.WriteAllLines(@"C:\Logs\Kitos-Failure1.txt", new string[] { e.MessageTemplate.Text });
-                    },
-                    EmitEventFailure = EmitEventFailureHandling.WriteToSelfLog |
-                                       EmitEventFailureHandling.WriteToFailureSink |
-                                       EmitEventFailureHandling.RaiseCallback,
-                    FailureSink = new FileSink(@"C:\Logs\Kitos-Failure1.txt", new JsonFormatter(), null)
-                })
+                    AutoRegisterTemplate = true,
+                    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7
+                })*/
                 .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
