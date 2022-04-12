@@ -18,8 +18,14 @@ namespace Presentation.Web
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
-                .WriteTo.Elasticsearch()
-                //.WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
+                .WriteTo.Elasticsearch(new ElasticsearchSinkOptions(
+                    new Uri("http://10.212.74.11:9200/"))
+                {
+                    AutoRegisterTemplate = true,
+                    IndexFormat = "test-index-{0:yyyy.MM.dd}",
+                    DeadLetterIndexName = "test-deadletter-{0:yyyy.MM.dd}"
+                })
+                .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
         }
 
