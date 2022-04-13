@@ -21,19 +21,16 @@ namespace Presentation.Web
 
         private static ILogger ConfigureAndCreateSerilogLogger()
         {
-            Serilog.Debugging.SelfLog.Enable(
-                msg => System.Diagnostics.Trace.WriteLine(msg));
+            //Uncomment to log the serilog errors in the Output window
+            //Serilog.Debugging.SelfLog.Enable(
+            //    msg => System.Diagnostics.Trace.WriteLine(msg));*/
             
-            var logger = new LoggerConfiguration()
+            return new LoggerConfiguration()
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
                 .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
-
-            logger.Information("Hello world");
-
-            return logger;
         }
 
         public static void RegisterLog()
