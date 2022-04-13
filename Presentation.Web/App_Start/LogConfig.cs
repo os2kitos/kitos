@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Configuration;
+using System.Reflection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using Serilog.Exceptions.Core;
 using Serilog.Formatting.Compact;
-using Serilog.Formatting.Elasticsearch;
 using Serilog.Formatting.Json;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.File;
@@ -21,17 +21,19 @@ namespace Presentation.Web
 
         private static ILogger ConfigureAndCreateSerilogLogger()
         {
-            return new LoggerConfiguration()
+            Serilog.Debugging.SelfLog.Enable(
+                msg => System.Diagnostics.Trace.WriteLine(msg));
+            
+            var logger = new LoggerConfiguration()
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
                 .Enrich.With<ExceptionEnricher>()
-                /*.WriteTo.Elasticsearch(new ElasticsearchSinkOptions
-                {
-                    AutoRegisterTemplate = true,
-                    AutoRegisterTemplateVersion = AutoRegisterTemplateVersion.ESv7
-                })*/
                 .WriteTo.File(new CompactJsonFormatter(), path: @"C:\Logs\Kitos-.txt", retainedFileCountLimit: 10, rollingInterval: RollingInterval.Day)
                 .CreateLogger();
+
+            logger.Information("Hello world");
+
+            return logger;
         }
 
         public static void RegisterLog()
