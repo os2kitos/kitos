@@ -23,7 +23,7 @@ namespace Presentation.Web
         {
             //Uncomment to log the serilog errors in the Output window
             //Serilog.Debugging.SelfLog.Enable(
-            //    msg => System.Diagnostics.Trace.WriteLine(msg));*/
+            //    msg => System.Diagnostics.Trace.WriteLine(msg));
             
             return new LoggerConfiguration()
                 .ReadFrom.AppSettings()
