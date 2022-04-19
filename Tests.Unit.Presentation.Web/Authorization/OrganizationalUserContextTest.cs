@@ -69,7 +69,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
             SetupSut(new Dictionary<int, IEnumerable<OrganizationRole>>
             {
                 {_municipalityOrganizationId,new [] {OrganizationRole.ContractModuleAdmin}},
-                {_otherOrgTypeOrganizationId,new [] {expectedResult ? OrganizationRole.GlobalAdmin : OrganizationRole.ReportModuleAdmin}}
+                {_otherOrgTypeOrganizationId,new [] {expectedResult ? OrganizationRole.GlobalAdmin : OrganizationRole.SystemModuleAdmin}}
             });
 
             //Act

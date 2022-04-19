@@ -46,7 +46,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
-        public DbSet<GlobalConfig> GlobalConfigs { get; set; }
         public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
         public DbSet<ItContractType> ItContractTypes { get; set; }
         public DbSet<DataType> DataTypes { get; set; }

@@ -284,7 +284,6 @@ namespace Presentation.Web.Controllers.API.V2.External.Organizations
                     {OrganizationRole.ProjectModuleAdmin, OrganizationUserRole.ProjectModuleAdmin},
                     {OrganizationRole.SystemModuleAdmin, OrganizationUserRole.SystemModuleAdmin},
                     {OrganizationRole.ContractModuleAdmin, OrganizationUserRole.ContractModuleAdmin},
-                    {OrganizationRole.ReportModuleAdmin, OrganizationUserRole.ReportModuleAdmin},
                     {OrganizationRole.RightsHolderAccess, OrganizationUserRole.RightsHolderAccess}
                 }.AsReadOnly();
 

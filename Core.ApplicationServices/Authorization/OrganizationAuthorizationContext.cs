@@ -370,8 +370,7 @@ namespace Core.ApplicationServices.Authorization
                 return target switch
                 {
                     IReportModule _ => IsGlobalAdmin() || 
-                                       IsLocalAdmin(ownedByOrganization.OrganizationId) ||
-                                       IsReportModuleAdmin(ownedByOrganization.OrganizationId),
+                                       IsLocalAdmin(ownedByOrganization.OrganizationId),
                     IContractModule _ => IsGlobalAdmin() || 
                                          IsLocalAdmin(ownedByOrganization.OrganizationId) ||
                                          IsContractModuleAdmin(ownedByOrganization.OrganizationId),
@@ -383,11 +382,6 @@ namespace Core.ApplicationServices.Authorization
 
             //No-one can control access modifiers that are not there
             return false;
-        }
-
-        private bool IsReportModuleAdmin(int organizationId)
-        {
-            return _activeUserContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
         }
 
         bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)

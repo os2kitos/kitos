@@ -92,8 +92,6 @@
                     });
             }
 
-            $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, g => g.key === "CanGlobalAdminOnlyEditReports");
-
             $scope.patchConfig = config => {
                 var payload = {};
                 payload["value"] = config.value;

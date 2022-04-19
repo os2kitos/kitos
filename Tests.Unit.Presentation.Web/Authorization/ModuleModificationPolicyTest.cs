@@ -25,7 +25,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public ModuleModificationPolicyTest()
         {
             _userContext = new Mock<IOrganizationalUserContext>();
-            _sut = new ModuleModificationPolicy(_userContext.Object, false);
+            _sut = new ModuleModificationPolicy(_userContext.Object);
         }
 
         public interface IRightsHolderElement : IEntity, IHasRightsHolder { }
@@ -42,7 +42,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IContractElement), false, true, null, true)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(IContractElement), false, false, OrganizationRole.ReportModuleAdmin, false)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IContractElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
@@ -50,7 +49,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IOrganizationElement), false, true, null, true)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ReportModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IOrganizationElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]
@@ -58,7 +56,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(IProjectElement), false, true, null, true)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ReportModuleAdmin, false)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(IProjectElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
@@ -66,15 +63,11 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ISystemElement), false, true, null, true)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ReportModuleAdmin, false)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), true, false, null, true)]
-        [InlineData(typeof(IReportElement), false, true, null, true)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.ReportModuleAdmin, true)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(IReportElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
@@ -82,7 +75,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ICrossCuttingElement), false, true, null, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ContractModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ReportModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ProjectModuleAdmin, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.OrganizationModuleAdmin, true)]

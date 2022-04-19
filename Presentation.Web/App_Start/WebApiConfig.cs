@@ -16,7 +16,6 @@ using Presentation.Web.Controllers.API.V1.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Presentation.Web.Models;
 using Presentation.Web.Controllers.API.V1.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
@@ -30,7 +29,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
-using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web
 {
@@ -380,8 +378,6 @@ namespace Presentation.Web
             builder.StructuralTypes.First(t => t.ClrType == typeof(Advice)).AddProperty(typeof(Advice).GetProperty(nameof(Advice.CanBeDeleted)));
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
-
-            BindEntitySet<GlobalConfig, GlobalConfigsController>(builder);
 
             var accessType = BindEntitySet<AccessType, AccessTypesController>(builder);
             accessType.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
