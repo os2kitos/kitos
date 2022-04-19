@@ -131,7 +131,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ItSystemUsage), true, false, null, true)]
         [InlineData(typeof(ItProject), true, false, null, true)]
         [InlineData(typeof(ItContract), true, false, null, true)]
-        [InlineData(typeof(Organization), true, false, null, true)]
         [InlineData(typeof(User), true, false, null, true)]
         // SYSTEM ADMIN
         [InlineData(typeof(ItSystem), false, false, OrganizationRole.SystemModuleAdmin, false)]
