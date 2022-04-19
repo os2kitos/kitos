@@ -693,7 +693,6 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
-    <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-advice\it-advice-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -1163,8 +1162,6 @@
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
-    <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
-    <Content Include="app\components\global-admin\global-admin-report.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation-modal-view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.view.html" />
