@@ -1,6 +1,7 @@
 ﻿namespace Infrastructure.DataAccess.Migrations
 {
     using System;
+    using Infrastructure.DataAccess.Tools;
     using System.Data.Entity.Migrations;
     
     public partial class RemoveReports : DbMigration
@@ -34,8 +35,9 @@
             DropTable("dbo.ReportCategoryTypes");
             DropTable("dbo.GlobalConfigs");
             DropTable("dbo.LocalReportCategoryTypes");
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("RemoveReports.sql"));
         }
-        
+
         public override void Down()
         {
             CreateTable(

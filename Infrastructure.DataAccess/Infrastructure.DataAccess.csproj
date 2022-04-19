@@ -1453,6 +1453,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Deactive_Expired_Advice_And_Schedule_Missing_Jobs.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\RemoveReports.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
