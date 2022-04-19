@@ -21,10 +21,9 @@ namespace Presentation.Web
 
         private static ILogger ConfigureAndCreateSerilogLogger()
         {
-            //Uncomment to log the serilog errors in the Output window
-            //Serilog.Debugging.SelfLog.Enable(
-            //    msg => System.Diagnostics.Trace.WriteLine(msg));
-            
+            if (Convert.ToBoolean(ConfigurationManager.AppSettings["enableSerilogSelfLog"]))
+                Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Trace.WriteLine(msg));
+
             return new LoggerConfiguration()
                 .ReadFrom.AppSettings()
                 .Enrich.FromLogContext()
