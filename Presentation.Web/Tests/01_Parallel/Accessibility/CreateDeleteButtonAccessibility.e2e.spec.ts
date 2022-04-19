@@ -3,7 +3,6 @@ import ItContractOverview = require("../../PageObjects/it-contract/ItContractOve
 import SystemOverview = require("../../PageObjects/it-system/Catalog/ItSystemCatalog.po");
 import ItProjectOverview = require("../../PageObjects/It-project/ItProjectOverview.po");
 import ItSystemInterfaceCatalog = require("../../PageObjects/it-system/Interfaces/itSystemInterface.po");
-import ReportOverview = require("../../PageObjects/report/ReportOverview.po");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
 import Constants = require("../../Utility/Constants");
 import ItSystemUsageCommon = require("../../PageObjects/it-system/Usage/Tabs/ItSystemUsageCommon.po");
@@ -16,7 +15,6 @@ var systemPage = new SystemOverview();
 var systemUsagePage = new ItSystemUsageCommon();
 var projectPage = new ItProjectOverview();
 var interfacePage = new ItSystemInterfaceCatalog();
-var reportPage = new ReportOverview();
 var usersPage = new UsersPage();
 var consts = new Constants();
 var testFixture = new TestFixtureWrapper();
@@ -51,10 +49,6 @@ describe("For user without additional roles", () => {
 
     it("Create IT project is disabled", () => {
         checkProjectAccessibility(false, true);
-    });
-
-    it("Create IT report is disabled", () => {
-        checkReportAccessibility(false, true);
     });
 
     it("Create User is disabled", () => {
@@ -94,10 +88,6 @@ describe("For Local Administrator", () => {
         checkProjectAccessibility(true, true);
     });
 
-    it("Create IT report is disabled", () => {
-        checkReportAccessibility(false, true);
-    });
-
     it("Create User is enabled", () => {
         checkUsersAccessibility(true, true);
     });
@@ -135,10 +125,6 @@ describe("For Global Administrator", () => {
         checkProjectAccessibility(true, true);
     });
 
-    it("Create IT report is enabled", () => {
-        checkReportAccessibility(true, true);
-    });
-
     it("Create User is enabled", () => {
         checkUsersAccessibility(true, true);
     });
@@ -165,10 +151,6 @@ function checkSystemUsageAccessibility(enabled: boolean, present: boolean) {
 
 function checkUsersAccessibility(enabled: boolean, visible: boolean) {
     return performAccessibilityCheck(() => usersPage.getPage(), () => usersPage.getCreateUserButton(), visible, enabled);
-}
-
-function checkReportAccessibility(enabled: boolean, visible: boolean) {
-    return performAccessibilityCheck(() => reportPage.getPage(), () => reportPage.getCreateReportButton(), visible, enabled);
 }
 
 function checkInterfaceAccessibility(enabled: boolean, visible: boolean) {
