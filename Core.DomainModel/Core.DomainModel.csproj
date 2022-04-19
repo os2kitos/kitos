@@ -265,7 +265,6 @@
     <Compile Include="Qa\References\IBrokenLinkWithOrigin.cs" />
     <Compile Include="References\AddReferenceCommand.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
-    <Compile Include="Reports\IReportModule.cs" />
     <Compile Include="Reports\Report.cs" />
     <Compile Include="Reports\ReportCategoryType.cs" />
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />

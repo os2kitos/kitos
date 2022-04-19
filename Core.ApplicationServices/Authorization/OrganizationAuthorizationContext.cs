@@ -369,8 +369,6 @@ namespace Core.ApplicationServices.Authorization
 
                 return target switch
                 {
-                    IReportModule _ => IsGlobalAdmin() || 
-                                       IsLocalAdmin(ownedByOrganization.OrganizationId),
                     IContractModule _ => IsGlobalAdmin() || 
                                          IsLocalAdmin(ownedByOrganization.OrganizationId) ||
                                          IsContractModuleAdmin(ownedByOrganization.OrganizationId),

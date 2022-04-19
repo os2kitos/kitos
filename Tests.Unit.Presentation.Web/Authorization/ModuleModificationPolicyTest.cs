@@ -32,9 +32,8 @@ namespace Tests.Unit.Presentation.Web.Authorization
         public interface IContractElement : IEntity, IContractModule { }
         public interface IOrganizationElement : IEntity, IOrganizationModule { }
         public interface IProjectElement : IEntity, IProjectModule { }
-        public interface IReportElement : IEntity, IReportModule { }
         public interface ISystemElement : IEntity, ISystemModule { }
-        public interface ICrossCuttingElement : IEntity, ISystemModule, IProjectModule, IContractModule, IReportModule, IOrganizationModule { }
+        public interface ICrossCuttingElement : IEntity, ISystemModule, IProjectModule, IContractModule, IOrganizationModule { }
 
         [Theory]
         [InlineData(typeof(IEntity), true, true, null, false)]//Unknown entity type always returns false from this policy
@@ -66,11 +65,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.SystemModuleAdmin, true)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
         [InlineData(typeof(ISystemElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.ContractModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.User, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.SystemModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.ProjectModuleAdmin, false)]
-        [InlineData(typeof(IReportElement), false, false, OrganizationRole.OrganizationModuleAdmin, false)]
         [InlineData(typeof(ICrossCuttingElement), true, false, null, true)]
         [InlineData(typeof(ICrossCuttingElement), false, true, null, true)]
         [InlineData(typeof(ICrossCuttingElement), false, false, OrganizationRole.ContractModuleAdmin, true)]
