@@ -554,7 +554,6 @@
     <Compile Include="Controllers\API\V1\GDPRExportReportController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\V1\KLEController.cs" />
-    <Compile Include="Controllers\API\V1\ReportController.cs" />
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
@@ -633,7 +632,6 @@
     <Compile Include="Models\API\V1\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractItSystemUsagesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
@@ -905,15 +903,12 @@
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\RegisterTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\ReportCategoriesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\ReportCategoryTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationUnitsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsController.cs" />
     <Compile Include="Controllers\API\V1\OData\UsersController.cs" />
     <Compile Include="Extensions\IdentityClaimExtension.cs" />
     <Compile Include="Extensions\OwinContextExtensions.cs" />

@@ -181,7 +181,6 @@
     <Compile Include="LocalOptions\LocalPurchaseFormType.cs" />
     <Compile Include="LocalOptions\LocalTerminationDeadlineType.cs" />
     <Compile Include="LocalOptions\LocalSensitiveDataType.cs" />
-    <Compile Include="LocalOptions\LocalReportCategoryType.cs" />
     <Compile Include="LocalOptions\LocalSensitivePersonalDataType.cs" />
     <Compile Include="Organization\DataProtectionAdvisor.cs" />
     <Compile Include="Organization\DataResponsible.cs" />
@@ -265,8 +264,6 @@
     <Compile Include="Qa\References\IBrokenLinkWithOrigin.cs" />
     <Compile Include="References\AddReferenceCommand.cs" />
     <Compile Include="References\ReferenceRootType.cs" />
-    <Compile Include="Reports\Report.cs" />
-    <Compile Include="Reports\ReportCategoryType.cs" />
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />

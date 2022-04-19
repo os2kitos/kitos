@@ -8,7 +8,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -246,9 +245,6 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
             yield return new object[] { new ItProject(), true };
             yield return new object[] { new ItProject(), false };
-
-            yield return new object[] { new Report(), true };
-            yield return new object[] { new Report(), false };
         }
 
         #endregion helpers

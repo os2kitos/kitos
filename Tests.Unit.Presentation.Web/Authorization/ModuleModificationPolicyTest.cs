@@ -8,8 +8,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
-
 using Moq;
 using Tests.Toolkit.Patterns;
 using Tests.Unit.Presentation.Web.Helpers;

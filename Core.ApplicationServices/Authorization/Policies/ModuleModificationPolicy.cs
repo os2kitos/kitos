@@ -9,7 +9,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Infrastructure.Services.Types;
 
 

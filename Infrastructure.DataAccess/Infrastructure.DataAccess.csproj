@@ -126,7 +126,6 @@
     <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
-    <Compile Include="Mapping\ReportMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
@@ -835,9 +834,9 @@
     <Compile Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.designer.cs">
       <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202204190859330_RemoveGlobalReportSetting.cs" />
-    <Compile Include="Migrations\202204190859330_RemoveGlobalReportSetting.designer.cs">
-      <DependentUpon>202204190859330_RemoveGlobalReportSetting.cs</DependentUpon>
+    <Compile Include="Migrations\202204190948423_RemoveReports.cs" />
+    <Compile Include="Migrations\202204190948423_RemoveReports.designer.cs">
+      <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1381,8 +1380,8 @@
     <EmbeddedResource Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.resx">
       <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202204190859330_RemoveGlobalReportSetting.resx">
-      <DependentUpon>202204190859330_RemoveGlobalReportSetting.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202204190948423_RemoveReports.resx">
+      <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

@@ -9,7 +9,6 @@ using System;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using Core.DomainModel.Advice;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Core.DomainModel.LocalOptions;
 using Core.DomainModel.BackgroundJobs;
 using Core.DomainModel.GDPR;
@@ -43,7 +42,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ArchiveLocation> ArchiveLocation { get; set; }
         public DbSet<ArchiveTestLocation> ArchiveTestLocation { get; set; }
         public DbSet<BusinessType> BusinessTypes { get; set; }
-        public DbSet<ReportCategoryType> ReportCategoryTypes { get; set; }
         public DbSet<Communication> Communications { get; set; }
         public DbSet<Config> Configs { get; set; }
         public DbSet<ItContractTemplateType> ItContractTemplateTypes { get; set; }
@@ -91,7 +89,6 @@ namespace Infrastructure.DataAccess
         public DbSet<ProcurementStrategyType> ProcurementStrategyTypes { get; set; }
         public DbSet<ItProjectType> ItProjectTypes { get; set; }
         public DbSet<PurchaseFormType> PurchaseFormTypes { get; set; }
-        public DbSet<Report> Reports { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<SensitiveDataType> SensitiveDataTypes { get; set; }
         public DbSet<Stakeholder> Stakeholders { get; set; }
@@ -125,7 +122,6 @@ namespace Infrastructure.DataAccess
         public DbSet<LocalPriceRegulationType> LocalPriceRegulationTypes { get; set; }
         public DbSet<LocalProcurementStrategyType> LocalProcurementStrategyTypes { get; set; }
         public DbSet<LocalPurchaseFormType> LocalPurchaseFormTypes { get; set; }
-        public DbSet<LocalReportCategoryType> LocalReportCategoryTypes { get; set; }
         public DbSet<LocalSensitiveDataType> LocalSensitiveDataTypes { get; set; }
         public DbSet<LocalTerminationDeadlineType> LocalTerminationDeadlineTypes { get; set; }
         public DbSet<LocalSensitivePersonalDataType> LocalSensitivePersonalDataTypes { get; set; }
@@ -212,7 +208,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItInterfaceMap());
             modelBuilder.Configurations.Add(new ItInterfaceExhibitMap());
             modelBuilder.Configurations.Add(new ItContractMap());
-
             modelBuilder.Configurations.Add(new ItContractRightMap());
             modelBuilder.Configurations.Add(new ItContractRoleMap());
             modelBuilder.Configurations.Add(new ItProjectMap());
@@ -235,7 +230,6 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new ItProjectTypeMap());
             modelBuilder.Configurations.Add(new ProcurementStrategyTypeMap());
             modelBuilder.Configurations.Add(new PurchaseFormTypeMap());
-            modelBuilder.Configurations.Add(new ReportMap());
             modelBuilder.Configurations.Add(new RiskMap());
             modelBuilder.Configurations.Add(new SensitiveDataTypeMap());
             modelBuilder.Configurations.Add(new StakeholderMap());

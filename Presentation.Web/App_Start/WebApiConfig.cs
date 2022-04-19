@@ -7,7 +7,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.API.V1.OData;
 using Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers;
@@ -325,9 +324,6 @@ namespace Presentation.Web
             var localPurchaseFormType = BindEntitySet<LocalPurchaseFormType, LocalPurchaseFormTypesController>(builder);
             localPurchaseFormType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localReportCategoryType = BindEntitySet<LocalReportCategoryType, LocalReportCategoryTypesController>(builder);
-            localReportCategoryType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var removeOption = builder.Function("RemoveOption");
             removeOption.Parameter<int>("id");
             removeOption.Parameter<int>("objectId");
@@ -384,14 +380,9 @@ namespace Presentation.Web
 
             BindEntitySet<ArchivePeriod, ArchivePeriodsController>(builder);
 
-            var reports = builder.EntitySet<Report>("Reports");
-            reports.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var references = builder.EntitySet<ExternalReference>("ExternalReferences");
             references.EntityType.HasKey(x => x.Id);
             references.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
-
-            BindEntitySet<ReportCategoryType, ReportCategoryTypesController>(builder);
 
             BindEntitySet<HelpText, HelpTextsController>(builder);
 
