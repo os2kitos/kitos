@@ -28,5 +28,6 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria);
         public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid);
+        Maybe<OperationError> RemoveOrganization(Guid organizationUuid);
     }
 }

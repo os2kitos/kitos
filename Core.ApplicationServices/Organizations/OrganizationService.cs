@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -29,7 +28,6 @@ namespace Core.ApplicationServices.Organizations
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ILogger _logger;
-        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly ITransactionManager _transactionManager;
 
         public OrganizationService(
@@ -39,7 +37,6 @@ namespace Core.ApplicationServices.Organizations
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
             ILogger logger,
-            IOrganizationRoleService organizationRoleService,
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
             IOrgUnitService orgUnitService)
@@ -50,7 +47,6 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
             _userContext = userContext;
             _logger = logger;
-            _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
             _repository = repository;
             _orgUnitService = orgUnitService;
@@ -236,6 +232,37 @@ namespace Core.ApplicationServices.Organizations
                             ? unit
                             : new OperationError(OperationFailure.Forbidden),
                         () => new OperationError(OperationFailure.NotFound));
+        }
+
+        public Maybe<OperationError> RemoveOrganization(Guid uuid)
+        {
+            var organizationWhichCanBeDeleted = GetOrganization(uuid)
+                .Bind<Organization>(organization =>
+                {
+                    if (_authorizationContext.AllowDelete(organization))
+                    {
+                        return organization;
+                    }
+
+                    return new OperationError(OperationFailure.Forbidden);
+                });
+
+            if (organizationWhichCanBeDeleted.Failed)
+            {
+                return organizationWhichCanBeDeleted.Error;
+            }
+
+            try
+            {
+                _orgRepository.DeleteWithReferencePreload(organizationWhichCanBeDeleted.Value);
+                _orgRepository.Save();
+            }
+            catch (Exception error)
+            {
+                _logger.Error(error, "Failed while deleting organization with uuid: {uuid}", uuid);
+                return new OperationError("Exception during deletion", OperationFailure.UnknownError);
+            }
+            return Maybe<OperationError>.None;
         }
     }
 }

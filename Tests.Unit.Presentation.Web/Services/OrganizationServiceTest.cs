@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Extensions;
@@ -27,7 +26,6 @@ namespace Tests.Unit.Presentation.Web.Services
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly OrganizationService _sut;
-        private readonly Mock<IOrganizationRoleService> _roleService;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly User _user;
         private readonly Mock<IGenericRepository<Organization>> _organizationRepository;
@@ -42,7 +40,6 @@ namespace Tests.Unit.Presentation.Web.Services
             _user = new User { Id = new Fixture().Create<int>() };
             _authorizationContext = new Mock<IAuthorizationContext>();
             _userContext = new Mock<IOrganizationalUserContext>();
-            _roleService = new Mock<IOrganizationRoleService>();
             _transactionManager = new Mock<ITransactionManager>();
             _userContext.Setup(x => x.UserId).Returns(_user.Id);
             _userContext.Setup(x => x.OrganizationIds).Returns(new Fixture().Create<IEnumerable<int>>());
@@ -58,7 +55,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 _authorizationContext.Object,
                 _userContext.Object,
                 Mock.Of<ILogger>(),
-                _roleService.Object,
                 _transactionManager.Object,
                 _repositoryMock.Object,
                 _orgUnitServiceMock.Object);

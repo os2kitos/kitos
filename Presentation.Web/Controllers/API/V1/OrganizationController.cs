@@ -10,6 +10,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Generic;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Infrastructure.Attributes;
@@ -21,13 +22,16 @@ namespace Presentation.Web.Controllers.API.V1
     public class OrganizationController : GenericApiController<Organization, OrganizationDTO>
     {
         private readonly IOrganizationService _organizationService;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public OrganizationController(
             IGenericRepository<Organization> repository,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            IEntityIdentityResolver identityResolver)
             : base(repository)
         {
             _organizationService = organizationService;
+            _identityResolver = identityResolver;
         }
 
         public virtual HttpResponseMessage Get([FromUri] string q, [FromUri] PagingModel<Organization> paging)
@@ -114,6 +118,20 @@ namespace Presentation.Web.Controllers.API.V1
             }
 
             return base.Patch(id, organizationId, obj);
+        }
+
+        public override HttpResponseMessage Delete(int id, int organizationId)
+        {
+            var uuid = _identityResolver.ResolveUuid<Organization>(id);
+            if (uuid.IsNone)
+            {
+                return NotFound();
+            }
+
+            return _organizationService
+                .RemoveOrganization(uuid.Value)
+                .Select(FromOperationError)
+                .GetValueOrFallback(Ok());
         }
     }
 }
