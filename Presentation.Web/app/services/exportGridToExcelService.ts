@@ -4,7 +4,7 @@
     export class ExportGridToExcelService {
         private exportFlag = false;
         static $inject = ["needsWidthFixService"];
-        private checkedColumns: string[];
+        private columnsToShow = [];
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
@@ -14,13 +14,20 @@
             if (!this.exportFlag) {
                 e.preventDefault();
                 _.forEach(columns, column => {
-                    //check if column has any related columns
-                    var columnsWithSameFieldName =  columns.filter(x => x.field === column.field);
-                    if (columnsWithSameFieldName.length < 2)
+                    if (column.attributes.parentId === undefined)
                         return;
 
-                    this.showColumnWithRelatedColumnsIfIsVisible(columnsWithSameFieldName, e);
+                    //look for a parent column and check if any was found, and if any parent column should be visible
+                    var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.attributes.parentId);
+                    if (columnsWithMatchingParentId.length < 1)
+                        return;
+                    if (this.checkIfAllColumnsAreHidden(columnsWithMatchingParentId))
+                        return;
+
+                    this.columnsToShow.push(column);
                 });
+
+                this.showSelectedColumns(this.columnsToShow, e);
 
                 timeout(() => {
                     this.exportFlag = true;
@@ -84,21 +91,18 @@
             return template;
         }
 
-        private showColumnWithRelatedColumnsIfIsVisible(columns: IKendoGridColumn<any>[], e: IKendoGridExcelExportEvent<any>) {
-            if (this.checkIfAnyColumnIsVisible(columns))
-                this.showSelectedColumns(columns, e);
-        }
-
-        private checkIfAnyColumnIsVisible(columns: IKendoGridColumn<any>[]) : boolean {
-            let isVisible = false;
+        private checkIfAllColumnsAreHidden(columns: IKendoGridColumn<any>[]) : boolean {
+            let isHidden = true;
             columns.forEach(column => {
-                if (!column.hidden)
-                    isVisible = true;
+                if (!column.hidden) {
+                    isHidden = false;
+                    return;
+                }
             });
 
-            return isVisible;
+            return isHidden;
         }
-
+        
         private showSelectedColumns(columns: IKendoGridColumn<any>[], e: IKendoGridExcelExportEvent<any>) {
             _.forEach(columns,
                 column => {
