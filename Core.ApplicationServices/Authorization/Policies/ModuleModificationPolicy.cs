@@ -9,7 +9,6 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.KendoConfig;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Infrastructure.Services.Types;
 
 
@@ -20,12 +19,10 @@ namespace Core.ApplicationServices.Authorization.Policies
         IModuleCreationPolicy
     {
         private readonly IOrganizationalUserContext _userContext;
-        private readonly bool _onlyGlobalAdminMayEditReports;
 
-        public ModuleModificationPolicy(IOrganizationalUserContext userContext, bool onlyGlobalAdminMayEditReports)
+        public ModuleModificationPolicy(IOrganizationalUserContext userContext)
         {
             _userContext = userContext;
-            _onlyGlobalAdminMayEditReports = onlyGlobalAdminMayEditReports;
         }
 
         /// <summary>
@@ -43,11 +40,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                     // Rights holders bypass the regular rules
                     return true;
                 }
-            }
-
-            if (_onlyGlobalAdminMayEditReports && target is IReportModule)
-            {
-                return IsGlobalAdmin();
             }
 
             var possibleConditions = GetPossibleModificationConditions(target).ToList();
@@ -79,8 +71,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                 yield return IsProjectModuleAdmin;
             if (target is ISystemModule _)
                 yield return IsSystemModuleAdmin;
-            if (target is IReportModule _)
-                yield return IsReportModuleAdmin;
             if (target is IDataProcessingModule _)
             {
                 yield return IsSystemModuleAdmin;
@@ -118,11 +108,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return false;
             }
 
-            if (MatchType<Report>(target) && _onlyGlobalAdminMayEditReports)
-            {
-                return false;
-            }
-
             //If local admin, all types from this point on are allowed
             if (IsLocalAdmin(organizationId))
             {
@@ -155,11 +140,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return IsOrganizationModuleAdmin(organizationId);
             }
 
-            if (MatchType<Report>(target))
-            {
-                return IsReportModuleAdmin(organizationId);
-            }
-
             if (MatchType<DataProcessingRegistration>(target))
             {
                 return IsSystemModuleAdmin(organizationId) || IsContractModuleAdmin(organizationId);
@@ -172,11 +152,6 @@ namespace Core.ApplicationServices.Authorization.Policies
         private bool IsRightsHolder(int organizationId)
         {
             return _userContext.HasRole(organizationId, OrganizationRole.RightsHolderAccess);
-        }
-
-        private bool IsReportModuleAdmin(int organizationId)
-        {
-            return _userContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
         }
 
         private bool IsOrganizationModuleAdmin(int organizationId)
@@ -234,11 +209,6 @@ namespace Core.ApplicationServices.Authorization.Policies
             }
 
             return organizationIds.Any(id => _userContext.HasRole(id, role));
-        }
-
-        private bool IsReportModuleAdmin(IEntity target)
-        {
-            return CheckRequiredRoleInRelationTo(target, OrganizationRole.ReportModuleAdmin);
         }
 
         private bool IsSystemModuleAdmin(IEntity target)

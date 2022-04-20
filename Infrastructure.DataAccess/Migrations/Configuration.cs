@@ -7,7 +7,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Infrastructure.Services.Cryptography;
 
 namespace Infrastructure.DataAccess.Migrations
@@ -108,8 +107,6 @@ namespace Infrastructure.DataAccess.Migrations
                 AddOptions<TerminationDeadlineType, ItContract>(context.TerminationDeadlineTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
 
                 AddOptions<HandoverTrialType, HandoverTrial>(context.HandoverTrialTypes, globalAdmin, "Funktionsprøve", "Driftovertagelsesprøve");
-
-                AddOptions<ReportCategoryType, Report>(context.ReportCategoryTypes, globalAdmin, "IT Kontrakt", "IT Projekt", "IT System", "Organisation", "Andet", "Tværgående");
 
                 AddOptions<ItSystemCategories, ItSystemUsage>(context.ItSystemCategories, globalAdmin, "Offentlige data", "Interne data", "Fortrolige data", "Hemmelige data");
 
@@ -700,18 +697,6 @@ namespace Infrastructure.DataAccess.Migrations
                         ObjectOwnerId = globalAdmin.Id,
                         LastChangedByUserId = globalAdmin.Id
                     });
-                }
-
-                #endregion
-
-                #region Global Config
-
-                if (!context.GlobalConfigs.Any(x => x.key == GlobalConfigKeys.OnlyGlobalAdminMayEditReports))
-                {
-                    var globalConfig = new GlobalConfig { key = GlobalConfigKeys.OnlyGlobalAdminMayEditReports, value = "true" };
-                    context.GlobalConfigs.AddOrUpdate(globalConfig);
-
-                    context.SaveChanges();
                 }
 
                 #endregion
