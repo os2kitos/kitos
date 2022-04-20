@@ -838,6 +838,10 @@
     <Compile Include="Migrations\202204190948423_RemoveReports.designer.cs">
       <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204200556500_Remove_Access_Types.cs" />
+    <Compile Include="Migrations\202204200556500_Remove_Access_Types.designer.cs">
+      <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1382,6 +1386,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202204190948423_RemoveReports.resx">
       <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204200556500_Remove_Access_Types.resx">
+      <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
