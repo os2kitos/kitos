@@ -375,9 +375,6 @@ namespace Presentation.Web
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
 
-            var accessType = BindEntitySet<AccessType, AccessTypesController>(builder);
-            accessType.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
-
             BindEntitySet<ArchivePeriod, ArchivePeriodsController>(builder);
 
             var references = builder.EntitySet<ExternalReference>("ExternalReferences");
