@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Http;
 using System.Security;
+using System.Web;
 using System.Web.Http;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
@@ -42,6 +43,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             try
             {
+                q = HttpUtility.UrlDecode(q);
                 var canSeeAll = GetCrossOrganizationReadAccessLevel() == CrossOrganizationDataReadAccessLevel.All;
                 var userId = UserId;
                 var dtos =
@@ -59,7 +61,7 @@ namespace Presentation.Web.Controllers.API.V1
                         .Where(AllowRead)
                         .OrderBy(_ => _.Name)
                         .Take(take)
-                        .MapToNamedEntityDTOs()
+                        .MapToShallowOrganizationDTOs()
                         .ToList();
 
                 return Ok(dtos);

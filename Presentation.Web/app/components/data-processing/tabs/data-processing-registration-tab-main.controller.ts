@@ -36,6 +36,7 @@
             this.bindDataResponsibleRemark();
         }
 
+
         headerName = this.dataProcessingRegistration.name;
 
         insecureThirdCountries: Models.ViewModel.Generic.IMultipleSelectionWithSelect2ConfigViewModel<Models.Generic.NamedEntity.NamedEntityWithDescriptionAndExpirationStatusDTO>;
@@ -74,7 +75,7 @@
                     optionalObjectContext: {
                         id: next.id,
                         name: next.name,
-                        description: next.description 
+                        description: next.description
                     }
                 };
                 return acc;
@@ -212,12 +213,24 @@
                 dataProcessor => <Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>>{
                     id: dataProcessor.id,
                     text: dataProcessor.name,
-                    optionalObjectContext: dataProcessor
+                    optionalObjectContext: dataProcessor,
+                    cvrNumber: dataProcessor.cvrNumber
                 }
             );
         }
 
+        private formatDataProcessorChoice(choice: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
+            let result = `<div>${choice.text}</div>`;
+
+            if (choice.optionalObjectContext?.cvrNumber) {
+                result += `<div class="small">${choice.optionalObjectContext.cvrNumber}</div>`;
+            }
+
+            return result;
+        }
+
         private bindDataProcessors() {
+            const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.dataProcessors = config,
                 () => this.dataProcessingRegistration.dataProcessors,
@@ -225,13 +238,14 @@
                 newElement => this.addDataProcessor(newElement),
                 this.hasWriteAccess,
                 this.hasWriteAccess,
-                (query) => this
-                    .dataProcessingRegistrationService
-                    .getApplicableDataProcessors(this.dataProcessingRegistrationId, query)
-                    .then(results => this.mapDataProcessingSearchResults(results))
+                (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
+                    .then(results => this.mapDataProcessingSearchResults(results)),
+                null,
+                this.formatDataProcessorChoice
             );
         }
         private bindSubDataProcessors() {
+            const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
                 config => this.subDataProcessors = config,
                 () => this.dataProcessingRegistration.subDataProcessors,
@@ -241,8 +255,10 @@
                 this.hasWriteAccess,
                 (query) => this
                     .dataProcessingRegistrationService
-                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query)
-                    .then(results => this.mapDataProcessingSearchResults(results))
+                    .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
+                    .then(results => this.mapDataProcessingSearchResults(results)),
+                null,
+                this.formatDataProcessorChoice
             );
         }
 

@@ -1,11 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.Shared;
 using Core.DomainModel.Organization;
 using ExpectedObjects;
@@ -25,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var response = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var response = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Assert
             Assert.NotNull(response);
@@ -38,8 +35,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
 
             //Act
-            var responseInFirstOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
-            var responseInSecondOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.SecondOrganizationId, name).ConfigureAwait(false);
+            var responseInFirstOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
+            var responseInSecondOrg = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.SecondOrganizationId, name);
 
             //Assert
             Assert.NotNull(responseInFirstOrg);
@@ -56,8 +53,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
             //Act
-            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
-            using var secondResponse = await DataProcessingRegistrationHelper.SendCreateRequestAsync(organizationId, name).ConfigureAwait(false);
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
+            using var secondResponse = await DataProcessingRegistrationHelper.SendCreateRequestAsync(organizationId, name);
 
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, secondResponse.StatusCode);
@@ -68,7 +65,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Act
             var gotten = await DataProcessingRegistrationHelper.GetAsync(dto.Id);
@@ -83,7 +80,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var dto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Act
             using var deleteResponse = await DataProcessingRegistrationHelper.SendDeleteRequestAsync(dto.Id);
@@ -98,7 +95,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name1 = A<string>();
             var name2 = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1);
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(registrationDto.Id, name2);
@@ -113,8 +110,8 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Arrange
             var name1 = A<string>();
             var name2 = A<string>();
-            await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1).ConfigureAwait(false);
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name2).ConfigureAwait(false);
+            await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name1);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name2);
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(registrationDto.Id, name1);
@@ -143,7 +140,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
             const int organizationId = TestEnvironment.DefaultOrganizationId;
 
-            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name).ConfigureAwait(false);
+            await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendCanCreateRequestAsync(organizationId, name);
@@ -442,6 +439,25 @@ namespace Tests.Integration.Presentation.Web.GDPR
             //Assert
             Assert.Contains(processors, x => x.Id == organization.Id);
         }
+        
+
+        [Fact]
+        public async Task Can_Get_Available_DataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationHelper.GetAvailableDataProcessors(registration.Id, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Id == organization.Id);
+        }
 
         [Fact]
         public async Task Can_Assign_DataProcessors()
@@ -481,6 +497,24 @@ namespace Tests.Integration.Presentation.Web.GDPR
             Assert.Equal(HttpStatusCode.OK, removeResponse.StatusCode);
             var dto = await DataProcessingRegistrationHelper.GetAsync(registration.Id);
             Assert.Empty(dto.DataProcessors);
+        }
+
+        [Fact]
+        public async Task Can_Get_Available_SubDataProcessors_By_Cvr()
+        {
+            //Arrange
+            const int organizationId = TestEnvironment.DefaultOrganizationId;
+            var orgPrefix = A<string>();
+            var orgName = $"{orgPrefix}_{A<int>()}";
+            var orgCvr = A<string>().Substring(0, 9);
+            var organization = await OrganizationHelper.CreateOrganizationAsync(organizationId, orgName, orgCvr, OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, A<string>());
+
+            //Act
+            var processors = await DataProcessingRegistrationHelper.GetAvailableSubDataProcessors(registration.Id, orgCvr);
+
+            //Assert
+            Assert.Contains(processors, x => x.Id == organization.Id);
         }
 
         [Fact]
@@ -549,7 +583,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var yesNoIrrelevantOption = A<YesNoIrrelevantOption>();
 
             //Act
@@ -564,7 +598,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var remark = A<string>();
 
             //Act
@@ -581,7 +615,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var dateTime = A<DateTime>();
 
             //Act
@@ -596,7 +630,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
 
             //Act
             using var response = await DataProcessingRegistrationHelper.SendChangeAgreementConcludedAtRequestAsync(registrationDto.Id, null);
@@ -669,7 +703,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Get_AvailableDataResponsibleOptions()
         {
             //Arrange
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
 
             //Act
             var dataProcessingOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
@@ -683,7 +717,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
 
@@ -701,7 +735,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var dataOptions = await DataProcessingRegistrationHelper.GetAvailableOptionsRequestAsync(registrationDto.Id);
             var dataResponsibleOption = dataOptions.DataResponsibleOptions.First();
             using var assingResponse = await DataProcessingRegistrationHelper.SendAssignDataResponsibleRequestAsync(registrationDto.Id, dataResponsibleOption.Id);
@@ -721,7 +755,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var remark = A<string>();
 
             //Act
@@ -766,7 +800,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         public async Task Can_Change_OversightOptionRemark()
         {
             //Arrange
-            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>()).ConfigureAwait(false);
+            var registration = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, A<string>());
             var remark = A<string>();
 
             //Act
@@ -783,7 +817,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var yesNoUndecidedOption = A<YesNoUndecidedOption>();
 
             //Act
@@ -800,7 +834,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
 
@@ -823,7 +857,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
 
@@ -854,7 +888,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
 
@@ -880,7 +914,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
         {
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var remark = A<string>();
 
             //Act
@@ -898,7 +932,7 @@ namespace Tests.Integration.Presentation.Web.GDPR
 
             //Arrange
             var name = A<string>();
-            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name).ConfigureAwait(false);
+            var registrationDto = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId, name);
             var oversightDate = A<DateTime>();
             var oversightRemark = A<string>();
             using var isCompletedYesResponse = await DataProcessingRegistrationHelper.SendChangeIsOversightCompletedRequestAsync(registrationDto.Id, YesNoUndecidedOption.Yes);

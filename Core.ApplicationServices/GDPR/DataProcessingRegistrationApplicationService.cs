@@ -9,7 +9,6 @@ using Core.DomainServices.GDPR;
 using Core.DomainServices.Repositories.GDPR;
 using Core.DomainServices.Repositories.Reference;
 using Infrastructure.Services.DataAccess;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -254,7 +253,7 @@ namespace Core.ApplicationServices.GDPR
                 registration =>
                     _dataProcessingRegistrationDataProcessorAssignmentService
                         .GetApplicableDataProcessors(registration)
-                        .ByPartOfName(nameQuery)
+                        .ByPartOfNameOrCvr(nameQuery)
                         .OrderBy(x => x.Id)
                         .Take(pageSize)
                         .OrderBy(x => x.Name)
@@ -280,7 +279,7 @@ namespace Core.ApplicationServices.GDPR
                 registration =>
                     _dataProcessingRegistrationDataProcessorAssignmentService
                         .GetApplicableSubDataProcessors(registration)
-                        .ByPartOfName(nameQuery)
+                        .ByPartOfNameOrCvr(nameQuery)
                         .OrderBy(x => x.Id)
                         .Take(pageSize)
                         .OrderBy(x => x.Name)

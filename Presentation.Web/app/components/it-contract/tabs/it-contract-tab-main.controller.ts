@@ -207,7 +207,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['take=25','orgId=' + user.currentOrganizationId]);
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['take=100','orgId=' + user.currentOrganizationId]);
 
                 function formatSupplier(supplier) {
                     var result = '<div>' + supplier.text + '</div>';
@@ -232,7 +232,7 @@
                             quietMillis: 500,
                             transport: function (queryParams) {
                                 var extraParams = paramAry ? '&' + paramAry.join('&') : '';
-                                var res = $http.get(url + '?q=' + queryParams.data.query + extraParams).then(queryParams.success);
+                                var res = $http.get(url + '?q=' + encodeURIComponent(queryParams.data.query) + extraParams).then(queryParams.success);
                                 res.abort = function () {
                                     return null;
                                 };
@@ -243,14 +243,14 @@
                             results: function (data, page) {
                                 var results = [];
 
-                                _.each(data.data.response, function (obj: { id; name; cvr; }) {
+                                _.each(data.data.response, function (obj: { id; name; cvrNumber; }) {
                                     if (excludeSelf && obj.id == contract.id)
                                         return; // don't add self to result
 
                                     results.push({
                                         id: obj.id,
                                         text: obj.name ? obj.name : 'Unavngiven',
-                                        cvr: obj.cvr
+                                        cvr: obj.cvrNumber
                                     });
                                 });
 

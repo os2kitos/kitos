@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -62,8 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/contactPerson/{contactPersonId}?organizationId={organizationId}"), cookie, body);
         }
-
-
+        
         public static async Task<Organization> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             using var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin);
@@ -128,6 +128,20 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/organizationUnit/{orgUnitId}?organizationId={organizationId}");
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendGetOrganizationsRequestAsync(string orderBy, bool orderByAsc = true)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/authorize/GetOrganizations?orderBy={orderBy}&orderByAsc={orderByAsc}");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendGetOrganizationSearchRequestAsync(string search)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/organization?q={search}");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
         }
     }
 }

@@ -5,6 +5,7 @@ import DataProcessingRegistrationOverviewPageObject = require("../../../PageObje
 import WaitTimers = require("../../../Utility/WaitTimers");
 import DataProcessingRegistrationEditMainPageObject = require("../../../PageObjects/Data-Processing/Tabs/data-processing-registration.edit.main.po");
 import DataProcessingRegistrationHelper = require("../../../Helpers/DataProcessingRegistrationHelper");
+import OrganizationHelper = require("../../../Helpers/OrgHelper");
 import GetDateHelper = require("../../../Helpers/GetDateHelper");
 import Select2Helper = require("../../../Helpers/Select2Helper");
 
@@ -17,10 +18,16 @@ describe("Data processing registration main detail tests", () => {
     const waitUpTo = new WaitTimers();
     const ec = protractor.ExpectedConditions;
     const dpaHelper = DataProcessingRegistrationHelper;
+    const orgHelper = OrganizationHelper;
+
     const dataProcessorName = "Fælles Kommune";
 
     const createName = (index: number) => {
         return `Dpa${new Date().getTime()}_${index}`;
+    }
+
+    const createCvr = () => {
+        return `${new Date().getTime()}`.substring(1,9);
     }
 
     const createRemark = (uniqueValue: string) => {
@@ -30,7 +37,7 @@ describe("Data processing registration main detail tests", () => {
     var dropdownYes = "Ja";
 
     var today = GetDateHelper.getTodayAsString();
-
+    
     beforeAll(() => {
         loginHelper.loginAsLocalAdmin();
         testFixture.enableLongRunningTest();
@@ -41,8 +48,7 @@ describe("Data processing registration main detail tests", () => {
         testFixture.cleanupState();
         testFixture.disableLongRunningTest();
     });
-
-
+    
     it("Creating and modifying, and deleting data processing registration",
         () => {
             var name = createName(10);
@@ -97,6 +103,35 @@ describe("Data processing registration main detail tests", () => {
                 .then(() => expect(pageObjectOverview.findSpecificDpaInNameColumn(renameValue).isPresent()).toBeFalsy());
         });
 
+    it("Creating an organization with a special character and a cvr and verifying if dpr data processor and sub-data processor search allows for a special character and searching by cvr",
+        () => {
+            var dprName = createName(10);
+            var organizationWithSpecialCharacterName = `August&Test${createName(10)}`;
+            var organizationWithSpecialCharacterCvr = createCvr();
+
+            loginHelper.logout()
+                .then(() => loginHelper.loginAsGlobalAdmin())
+                .then(() => orgHelper.createOrgWithCvr(organizationWithSpecialCharacterName, organizationWithSpecialCharacterCvr))
+                .then(() => loginHelper.logout())
+                .then(() => loginHelper.loginAsLocalAdmin())
+                .then(() => dpaHelper.createDataProcessingRegistrationAndProceed(dprName))
+                //assigning and verifying data processor with a special character
+                .then(() => dpaHelper.assignDataProcessor(organizationWithSpecialCharacterName))
+                .then(() => verifyDataProcessorContent([organizationWithSpecialCharacterName], []))
+                .then(() => dpaHelper.removeDataProcessor(organizationWithSpecialCharacterName))
+                .then(() => verifyDataProcessorContent([], [organizationWithSpecialCharacterName]))
+                .then(() => dpaHelper.assignDataProcessor(organizationWithSpecialCharacterCvr))
+                .then(() => verifyDataProcessorContent([organizationWithSpecialCharacterCvr], []))
+                //assigning and verifying sub-data processor with a special character
+                .then(() => dpaHelper.enableSubDataProcessors())
+                .then(() => dpaHelper.verifyHasSubDataProcessorsToBeEnabled())
+                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterName))
+                .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterName], []))
+                .then(() => dpaHelper.removeSubDataProcessor(organizationWithSpecialCharacterName))
+                .then(() => verifySubDataProcessorContent([], [organizationWithSpecialCharacterName]))
+                .then(() => dpaHelper.assignSubDataProcessor(organizationWithSpecialCharacterCvr))
+                .then(() => verifySubDataProcessorContent([organizationWithSpecialCharacterCvr], []));
+        });
 
     function verifyDataProcessorContent(presentNames: string[], unpresentNames: string[]) {
         presentNames.forEach(name => {

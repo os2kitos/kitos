@@ -21,7 +21,20 @@ class OrgHelper {
             .then(() => browser.waitForAngular());
     }
 
-
+    public static createOrgWithCvr(name: string, cvr: string) {
+        return this.orgPage.getPage()
+            .then(() => this.orgPage.getCreateOrgButton().click())
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgNameInput().sendKeys(name))
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgCvrInput().sendKeys(cvr))
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalOrgRadioButton().click())
+            .then(() => browser.waitForAngular())
+            .then(() => this.orgPage.getModalSaveNewOrgButton().click())
+            .then(() => browser.waitForAngular());
+    }
+    
     public static activateSystemForOrg(system: string, org: string) {
         console.log("Activating " + system + " for org " + org);
         return this.navigationHelper.dropDownExpand()
@@ -30,9 +43,22 @@ class OrgHelper {
             .then(() => console.log("clicking change org button"))
             .then(() => this.navigationHelper.changeOrg())
             .then(() => this.homePage.selectSpecificOrganizationAsWorkingOrg(org))
+            .then(() => console.log("Organization selected"))
+            .then(() => this.homePage.selectWorkingOrganizationButton.click())
+            .then(() => console.log("Organization changed"))
+            .then(() => browser.waitForAngular())
+            .then(() => console.log("Starting system creation"))
+            .then(() => SystemCatalogHelper.createLocalSystem(system));
+    }
+
+    public static changeOrg(org: string) {
+        console.log(`Changing org ${org}`);
+        return this.navigationHelper.dropDownExpand()
+            .then(() => browser.waitForAngular())
+            .then(() => this.navigationHelper.changeOrg())
+            .then(() => this.homePage.selectSpecificOrganizationAsWorkingOrg(org))
             .then(() => this.homePage.selectWorkingOrganizationButton.click())
             .then(() => browser.waitForAngular())
-            .then(() => SystemCatalogHelper.createLocalSystem(system));
     }
 
 }

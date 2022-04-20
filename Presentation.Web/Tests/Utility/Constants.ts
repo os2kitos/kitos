@@ -47,6 +47,8 @@
     readonly contractNameVariable = "Name";
     readonly nameOfSystemInput = "nameOfItSystemInput";
     readonly saveCatalogButton = "itCatalogSaveButton";
+    readonly saveCatalogAndProceedButton = "itCatalogSaveAndProceedButton";
+    readonly saveContractAndProceedButton = "contractSaveAndProceedButton";
     readonly toggleActivatingSystem = "toggleActivatingSystem";
     readonly moveSystemButton = "migrateItSystem";
     readonly consequenceButton = "consequenceButton";

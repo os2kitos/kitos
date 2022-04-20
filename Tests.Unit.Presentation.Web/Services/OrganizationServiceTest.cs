@@ -286,7 +286,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Act
             var result = _sut.GetAllOrganizations();
-
+            
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(3, result.Value.Count());

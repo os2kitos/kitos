@@ -111,6 +111,7 @@
     <Compile Include="Queries\KLE\QueryByKeyPrefix.cs" />
     <Compile Include="Queries\KLE\QueryByParentKey.cs" />
     <Compile Include="Queries\KLE\QueryByParentUuid.cs" />
+    <Compile Include="Queries\Organization\QueryByNameOrCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryByCvrContent.cs" />
     <Compile Include="Queries\Organization\QueryOrganizationByIdsOrSharedAccess.cs" />
     <Compile Include="Queries\QueryByChangedSinceGtEq.cs" />
