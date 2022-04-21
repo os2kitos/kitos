@@ -709,6 +709,7 @@
     <TypeScriptCompile Include="app\components\user-notification\user-notification-modal.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
+    <TypeScriptCompile Include="app\helpers\ArrayHelper.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
     <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
     <TypeScriptCompile Include="app\helpers\SystemNameFormatter.ts" />
