@@ -5,18 +5,14 @@
     export class ExportGridToExcelService {
         private exportFlag = false;
         static $inject = ["needsWidthFixService"];
-        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string, indexBeforeMoving?: number, indexAfterMoving?: number }> = [];
-        private originalColumns: IKendoGridColumn<any>[];
+        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string}> = [];
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
         getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>) {
-            const sheet = e.workbook.sheets[0];
             var columns = e.sender.columns;
 
             if (!this.exportFlag) {
-                this.originalColumns = JSON.parse(JSON.stringify(columns));
-
                 e.preventDefault();
                 _.forEach(columns, (column, i) => {
                     if (!column.hidden) {
@@ -32,12 +28,11 @@
                         return;
                     if (this.checkIfAllColumnsAreHidden(columnsWithMatchingParentId))
                         return;
-
-                    //this.showSelectedColumn(column, e);
+                    
                     var index = columns.indexOf(columnsWithMatchingParentId[0]);
 
-                    this.columnsToShow.push({ columnId: column.persistId, parentId: column.attributes.parentId, indexBeforeMoving: i, indexAfterMoving: index + 1});
-                    ArrayHelper.arrayMoveElementToRightSide(columns, i, index);
+                    this.columnsToShow.push({ columnId: column.persistId, parentId: column.attributes.parentId});
+                    e.sender.reorderColumn(index + 1, column);
                 });
 
                 this.showSelectedColumns(columns, e);
@@ -53,7 +48,7 @@
             }
 
             this.exportFlag = false;
-
+            const sheet = e.workbook.sheets[0];
 
             // render templates
             // skip header row
@@ -62,13 +57,12 @@
 
                 // -1 as sheet has header and dataSource doesn't
                 const dataItem = e.data[rowIndex - 1];
-
-                //todo cell indexes are not equal to columns array indexes so data will be incorrect.
+                
                 for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
-                    const mappedIndex = this.columnsToShow.indexOf(this.columnsToShow[columnIndex]);
                     const columnOriginalIndex = this.columnsToShow[columnIndex].index;
+                    if (columnOriginalIndex === undefined) continue;
                     if (columns[columnOriginalIndex].field === "" || columns[columnOriginalIndex].hidden) continue;
-                    const cell = row.cells[mappedIndex];
+                    const cell = row.cells[columnIndex];
 
                     const template = this.getTemplateMethod(columns[columnOriginalIndex]);
 
@@ -79,31 +73,14 @@
                     cell.value = computedValue;
                 }
             }
-            columns.filter(x => x.tempVisual).forEach(column => {
-                var original = this.originalColumns.filter(x => x.persistId === column.persistId)[0];
-                original.tempVisual = true;
-            });
-            columns = this.originalColumns;
 
             // hide columns on visual grid
-            this.originalColumns.forEach(column => {
+            columns.forEach(column => {
                 if (column.tempVisual) {
                     delete column.tempVisual;
                     e.sender.hideColumn(column);
-                    //10,12
                 }
             });
-            /*this.columnsToShow.forEach(column => {
-                if (column.parentId === undefined)
-                    return;
-
-                var originalColumn = originalColumns.filter(x => x.persistId === column.columnId)[0];
-                var movedColumn = columns.filter(x => x.persistId === column.columnId)[0];
-                var originalIndex = originalColumns.indexOf(originalColumn);
-                var movedIndex = columns.indexOf(movedColumn);
-                ArrayHelper.arrayMoveElementTo(columns, movedIndex, originalIndex);
-            });*/
-            //columns = originalColumns;
 
             // hide loadingbar when export is finished
             kendo.ui.progress(kendoGrid.element, false);
@@ -153,11 +130,6 @@
                     e.sender.showColumn(columnToShow);
                 }
             );
-        }
-
-        private showSelectedColumn(column: IKendoGridColumn<any>, e: IKendoGridExcelExportEvent<any>) {
-            column.tempVisual = true;
-            e.sender.showColumn(column);
         }
 
         private sortColumnArray() {
