@@ -1179,7 +1179,6 @@
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
     <Content Include="app\components\it-reference\it-reference-modal.view.html" />
     <Content Include="app\components\it-reference\it-reference.view.html" />
-    <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
@@ -1213,8 +1212,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
-    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />

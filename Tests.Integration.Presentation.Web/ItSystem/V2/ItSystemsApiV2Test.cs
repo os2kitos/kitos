@@ -10,6 +10,7 @@ using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using ExpectedObjects;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Request.System;
 using Presentation.Web.Models.API.V2.Response.System;
@@ -1103,7 +1104,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (entityUuid, createdSystem.Id);
         }
 
-        private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
+        private async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
 
@@ -1112,7 +1113,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (token, organization);
         }
 
-        private async Task<(string token, Organization createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAsync()
+        private async Task<(string token, OrganizationDTO createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
 
@@ -1121,7 +1122,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (token, organization);
         }
 
-        private async Task<(int userId, string token, Organization createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync()
+        private async Task<(int userId, string token, OrganizationDTO createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAndGetFullUserAsync()
         {
             var organization = await CreateOrganizationAsync();
 
@@ -1130,7 +1131,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             return (id, token, organization);
         }
 
-        private async Task<Organization> CreateOrganizationAsync()
+        private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
@@ -1167,7 +1168,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem.V2
             bool withKleUuid,
             bool withParent,
             bool withFormerName,
-            Organization rightsHolderOrganization)
+            OrganizationDTO rightsHolderOrganization)
         {
             var parentCandidate = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Local);
 

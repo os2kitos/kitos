@@ -26,6 +26,7 @@ using Tests.Toolkit.Extensions;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using ExpectedObjects;
+using Presentation.Web.Models.API.V1;
 
 namespace Tests.Integration.Presentation.Web.GDPR.V2
 {
@@ -1189,7 +1190,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
         }
 
         private void AssertGeneralData(
-            Organization organization,
+            OrganizationDTO organization,
             IdentityNamePairResponseDTO inputDataResponsible,
             DataProcessingRegistrationGeneralDataWriteRequestDTO input,
             IdentityNamePairResponseDTO inputBasisForTransfer,
@@ -1218,13 +1219,13 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(expectedUser.GetFullName(), actualRight.User.Name);
         }
 
-        private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
+        private static void AssertExpectedShallowDPRs(DataProcessingRegistrationDTO expectedContent, OrganizationDTO expectedOrganization, IEnumerable<DataProcessingRegistrationResponseDTO> dtos)
         {
             var dto = Assert.Single(dtos, dpr => dpr.Uuid == expectedContent.Uuid);
             AssertExpectedShallowDPR(expectedContent, expectedOrganization, dto);
         }
 
-        private static void AssertExpectedShallowDPR(DataProcessingRegistrationDTO expectedContent, Organization expectedOrganization, DataProcessingRegistrationResponseDTO dto)
+        private static void AssertExpectedShallowDPR(DataProcessingRegistrationDTO expectedContent, OrganizationDTO expectedOrganization, DataProcessingRegistrationResponseDTO dto)
         {
             Assert.Equal(expectedContent.Uuid, dto.Uuid);
             Assert.Equal(expectedContent.Name, dto.Name);
@@ -1233,7 +1234,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             Assert.Equal(expectedOrganization.Cvr, dto.OrganizationContext.Cvr);
         }
 
-        private static void AssertOrganizationReference(Organization expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
+        private static void AssertOrganizationReference(OrganizationDTO expected, ShallowOrganizationResponseDTO organizationReferenceDTO)
         {
             Assert.Equal(expected.Name, organizationReferenceDTO.Name);
             Assert.Equal(expected.Cvr, organizationReferenceDTO.Cvr);
@@ -1296,7 +1297,7 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
            bool withResponsible,
            bool withBasisForTransfer,
            bool withInsecureCountries,
-           Organization organization)
+           OrganizationDTO organization)
         {
             var dataProcessor1 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
             var dataProcessor2 = withDataProcessors ? await CreateOrganizationAsync(A<OrganizationTypeKeys>()) : default;
@@ -1344,28 +1345,28 @@ namespace Tests.Integration.Presentation.Web.GDPR.V2
             return await DataProcessingRegistrationHelper.CreateAsync(orgId, CreateName());
         }
 
-        private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync()
+        private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
             var (user, token) = await CreateApiUserAsync(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             return (token, user, organization);
         }
-        private async Task<(User user, string token)> CreateApiUserAsync(Organization organization)
+        private async Task<(User user, string token)> CreateApiUserAsync(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
 
-        private async Task<User> CreateUser(Organization organization)
+        private async Task<User> CreateUser(OrganizationDTO organization)
         {
             var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, organization.Id);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
             return user;
         }
 
-        private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)
+        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,

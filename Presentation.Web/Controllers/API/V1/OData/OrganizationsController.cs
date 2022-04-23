@@ -2,7 +2,6 @@
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using System.Net;
-using System.Security;
 using System.Web.Http;
 using Microsoft.AspNet.OData;
 using Core.DomainModel;
@@ -51,21 +50,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return BadRequest("No user ID specified");
         }
 
-        [EnableQuery]
-        public IHttpActionResult Post(Organization organization)
-        {
-            if (organization == null)
-            {
-                return BadRequest();
-            }
-
-            var result = _organizationService.CreateNewOrganization(organization);
-
-            return result.Ok ? 
-                Created(result.Value) : 
-                FromOperationFailure(result.Error);
-        }
-
         [NonAction]
         public override IHttpActionResult Post(int organizationId, Organization organization) => throw new NotSupportedException();
 
@@ -82,26 +66,10 @@ namespace Presentation.Web.Controllers.API.V1.OData
             return Ok(result);
         }
 
-        public override IHttpActionResult Patch(int key, Delta<Organization> delta)
-        {
+        [NonAction]
+        public override IHttpActionResult Patch(int key, Delta<Organization> delta) => throw new NotSupportedException();
 
-            try
-            {
-                var organization = delta.GetInstance();
-                if (organization.TypeId > 0)
-                {
-                    var typeKey = (OrganizationTypeKeys)organization.TypeId;
-                    if (!_organizationService.CanChangeOrganizationType(organization, typeKey))
-                    {
-                        return Forbidden();
-                    }
-                }
-            }
-            catch (SecurityException e)
-            {
-                return Forbidden();
-            }
-            return base.Patch(key, delta);
-        }
+        [NonAction]
+        public override IHttpActionResult Delete(int key) => throw new NotSupportedException();
     }
 }

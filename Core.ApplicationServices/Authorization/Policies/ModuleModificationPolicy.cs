@@ -108,6 +108,12 @@ namespace Core.ApplicationServices.Authorization.Policies
                 return false;
             }
 
+            if (MatchType<Organization>(target))
+            {
+                //Only global admin may create organizations
+                return false;
+            }
+
             //If local admin, all types from this point on are allowed
             if (IsLocalAdmin(organizationId))
             {
@@ -127,12 +133,6 @@ namespace Core.ApplicationServices.Authorization.Policies
             if (MatchType<ItContract>(target))
             {
                 return IsContractModuleAdmin(organizationId);
-            }
-
-            if (MatchType<Organization>(target))
-            {
-                //Only local admin and global admin may create organizations
-                return false;
             }
 
             if (MatchType<User>(target))
