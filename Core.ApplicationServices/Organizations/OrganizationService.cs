@@ -4,8 +4,8 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
-using Core.ApplicationServices.Contract;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -24,7 +24,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IOrganizationRepository _repository;
         private readonly IOrgUnitService _orgUnitService;
-        private readonly IItContractService _contractService;
+        private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.Organizations
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
             IOrgUnitService orgUnitService,
-            IItContractService contractService)
+            IDomainEvents domainEvents)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -53,7 +53,7 @@ namespace Core.ApplicationServices.Organizations
             _transactionManager = transactionManager;
             _repository = repository;
             _orgUnitService = orgUnitService;
-            _contractService = contractService;
+            _domainEvents = domainEvents;
         }
 
         //returns the default org unit for that user inside that organization
@@ -261,17 +261,13 @@ namespace Core.ApplicationServices.Organizations
             {
                 var organization = organizationWhichCanBeDeleted.Value;
 
-                //Delete contracts
-                var itContracts = organization.ItContracts.ToList();
-                organization.ItContracts.Clear();
-                itContracts.ForEach(c => _contractService.Delete(c.Id)); //TODO: Check result
+                organization.Supplier.Clear();
 
-                //organization.ItSystems.Clear(); //TODO: What about the case where local creations are deleted? .. move ownership to "fælles"?
-                //organization.ItSystemUsages.Clear();
-                //organization.ItInterfaces.Clear();//TODO: What about the case where local creations are deleted? .. move ownership to "fælles"?
-                //organization.ItProjects.Clear();
-                //organization.DataProcessingRegistrations.Clear();
+                organization.SubDataProcessorForDataProcessingRegistrations.Clear();
+                organization.DataProcessorForDataProcessingRegistrations.Clear();
+                organization.BelongingSystems.Clear();
 
+                _domainEvents.Raise(new EntityDeletedEvent<Organization>(organization));
                 _orgRepository.DeleteWithReferencePreload(organization);
                 _orgRepository.Save();
                 transaction.Commit();

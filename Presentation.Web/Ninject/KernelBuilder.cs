@@ -108,6 +108,7 @@ using Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItSystemUsages.Mapping;
 using Presentation.Web.Infrastructure.Model.Request;
 using Core.ApplicationServices.Generic.Write;
+using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.DomainServices.Tracking;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
@@ -382,6 +383,10 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityDeletedEvent<ItSystem>, TrackDeletedEntitiesEventHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<ItContract>, TrackDeletedEntitiesEventHandler>(kernel);
             RegisterDomainEvent<EntityDeletedEvent<DataProcessingRegistration>, TrackDeletedEntitiesEventHandler>(kernel);
+
+            //Organization
+            RegisterDomainEvent<EntityDeletedEvent<Organization>, HandleOrganizationDeleted>(kernel);
+            //TODO: Read models where it is involved must be scheduled for rebuild.. do it in a different handler (one of the read model handlers)
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)

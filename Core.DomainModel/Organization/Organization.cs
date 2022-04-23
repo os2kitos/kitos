@@ -21,7 +21,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization, IHasUuid
+    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasName, IIsPartOfOrganization, IHasUuid
     {
         public const int MaxNameLength = 100;
 
@@ -35,18 +35,18 @@ namespace Core.DomainModel.Organization
             OrgUnits = new List<OrganizationUnit>();
             Rights = new List<OrganizationRight>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
-            ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
             LifeCycleTrackingEvents = new List<LifeCycleTrackingEvent>();
             LifeCycleTrackingEventsWhereOrganizationIsRightsHolder = new List<LifeCycleTrackingEvent>();
             Uuid = Guid.NewGuid();
+            DataResponsibles = new List<DataResponsible>();
+            DataProtectionAdvisors = new List<DataProtectionAdvisor>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Adress { get; set; }
         public string Email { get; set; }
         public int TypeId { get; set; }
-        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public virtual OrganizationType Type { get; set; }
         /// <summary>
         /// Cvr number

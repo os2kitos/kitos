@@ -846,6 +846,10 @@
     <Compile Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.designer.cs">
       <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204231017335_Remove_References_From_Organization.cs" />
+    <Compile Include="Migrations\202204231017335_Remove_References_From_Organization.designer.cs">
+      <DependentUpon>202204231017335_Remove_References_From_Organization.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1396,6 +1400,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.resx">
       <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204231017335_Remove_References_From_Organization.resx">
+      <DependentUpon>202204231017335_Remove_References_From_Organization.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
