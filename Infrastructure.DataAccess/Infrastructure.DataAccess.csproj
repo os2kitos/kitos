@@ -842,6 +842,10 @@
     <Compile Include="Migrations\202204200556500_Remove_Access_Types.designer.cs">
       <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.cs" />
+    <Compile Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.designer.cs">
+      <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1389,6 +1393,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202204200556500_Remove_Access_Types.resx">
       <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.resx">
+      <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

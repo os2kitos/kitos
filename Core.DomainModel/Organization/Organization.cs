@@ -112,15 +112,13 @@ namespace Core.DomainModel.Organization
         public virtual int? ContactPersonId { get; set; }
 
         public virtual ContactPerson ContactPerson { get; set; }
-        public int? DataResponsibleId { get; set; }
-        public virtual DataResponsible DataResponsible { get; set; }
-        public int? DataProtectionAdvisorId { get; set; }
-        public virtual DataProtectionAdvisor DataProtectionAdvisor { get; set; }
         public virtual ICollection<DataProcessingRegistration> DataProcessorForDataProcessingRegistrations { get; set; }
         public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
         public virtual ICollection<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
+        public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
+        public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

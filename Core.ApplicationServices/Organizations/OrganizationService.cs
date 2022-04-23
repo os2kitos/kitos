@@ -4,6 +4,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Contract;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
@@ -23,6 +24,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IOrganizationRepository _repository;
         private readonly IOrgUnitService _orgUnitService;
+        private readonly IItContractService _contractService;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -39,7 +41,8 @@ namespace Core.ApplicationServices.Organizations
             ILogger logger,
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
-            IOrgUnitService orgUnitService)
+            IOrgUnitService orgUnitService,
+            IItContractService contractService)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -50,6 +53,7 @@ namespace Core.ApplicationServices.Organizations
             _transactionManager = transactionManager;
             _repository = repository;
             _orgUnitService = orgUnitService;
+            _contractService = contractService;
         }
 
         //returns the default org unit for that user inside that organization
@@ -236,6 +240,7 @@ namespace Core.ApplicationServices.Organizations
 
         public Maybe<OperationError> RemoveOrganization(Guid uuid)
         {
+            using var transaction = _transactionManager.Begin();
             var organizationWhichCanBeDeleted = GetOrganization(uuid)
                 .Bind<Organization>(organization =>
                 {
@@ -254,8 +259,22 @@ namespace Core.ApplicationServices.Organizations
 
             try
             {
-                _orgRepository.DeleteWithReferencePreload(organizationWhichCanBeDeleted.Value);
+                var organization = organizationWhichCanBeDeleted.Value;
+
+                //Delete contracts
+                var itContracts = organization.ItContracts.ToList();
+                organization.ItContracts.Clear();
+                itContracts.ForEach(c => _contractService.Delete(c.Id)); //TODO: Check result
+
+                //organization.ItSystems.Clear(); //TODO: What about the case where local creations are deleted? .. move ownership to "fælles"?
+                //organization.ItSystemUsages.Clear();
+                //organization.ItInterfaces.Clear();//TODO: What about the case where local creations are deleted? .. move ownership to "fælles"?
+                //organization.ItProjects.Clear();
+                //organization.DataProcessingRegistrations.Clear();
+
+                _orgRepository.DeleteWithReferencePreload(organization);
                 _orgRepository.Save();
+                transaction.Commit();
             }
             catch (Exception error)
             {

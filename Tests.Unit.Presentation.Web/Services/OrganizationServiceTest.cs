@@ -6,8 +6,10 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Contract;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -57,7 +59,8 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _transactionManager.Object,
                 _repositoryMock.Object,
-                _orgUnitServiceMock.Object);
+                _orgUnitServiceMock.Object,
+                Mock.Of<IItContractService>());
         }
 
         [Fact]

@@ -34,13 +34,13 @@ namespace Infrastructure.DataAccess.Mapping
             HasOptional(o => o.ContactPerson)
                 .WithOptionalDependent(c => c.Organization)
                 .WillCascadeOnDelete(true);
-//TODO: Maybe not working
-            HasOptional(x => x.DataResponsible)
-                .WithRequired(dr => dr.Organization)
+            
+            HasMany(x => x.DataResponsibles)
+                .WithOptional(dr => dr.Organization)
                 .WillCascadeOnDelete(true);
-//TODO: Maybe not working
-            HasOptional(x => x.DataProtectionAdvisor)
-                .WithRequired(dr => dr.Organization)
+            
+            HasMany(x => x.DataProtectionAdvisors)
+                .WithOptional(dr => dr.Organization)
                 .WillCascadeOnDelete(true);
 
             TypeMapping.AddIndexOnAccessModifier<OrganizationMap, Organization>(this);
