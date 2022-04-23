@@ -35,10 +35,9 @@ namespace Presentation.Web
                           builder.Version("2", "OS2Kitos API - V2")
                               .Description(
                                   "<b><i>OBS: Dokumentation for V1 findes ved at skifte version på dokumentet til 1 øverst på siden</i></b><br/><br/>" +
-                                  "Arbejdet med V2 er påbegyndt og " +
-                                  "resultatet heraf opdateres løbende på denne side. I første omgang vil V2 omfatte supplerende data fra it-system- og " +
-                                  "snitfladekataloget. V2 kommer til at omfatte tilsvarende funktionalitet som V1.<br/><br/>" +
-                                  "Generelt er anvendelsen beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
+                                  "KITOS API V2 understøtter både læse- og skriveoperationer for de væsentlige registreringsobjekter i KITOS. <br/><br/>" +
+                                  "Se mere om designet og konventionerne i API'et her: <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/2059599873/API+Design+V2'>API V2</a>.<br/><br/>" +
+                                  "Generelt er anvendelsen af KITOS API(er) beskrevet på projektets <a href='https://os2web.atlassian.net/wiki/spaces/KITOS/pages/658145384/S+dan+kommer+du+igang'>Confluence side</a>.<br/>"
                               );
                           builder.Version("1", "OS2Kitos API - V1")
                               .Description(

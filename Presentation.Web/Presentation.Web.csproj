@@ -825,7 +825,6 @@
     <Compile Include="Controllers\API\V1\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\V1\ReferenceController.cs" />
-    <Compile Include="Controllers\API\V1\OData\AccessTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\API\V1\OData\ArchivePeriodsController.cs" />
@@ -1174,8 +1173,6 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.view.html" />
-    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.view.html" />
-    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
     <Content Include="app\components\it-reference\it-reference-modal.view.html" />
     <Content Include="app\components\it-reference\it-reference.view.html" />
@@ -1196,7 +1193,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference.ts" />
@@ -1204,7 +1200,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-create-modal.state.ts" />
