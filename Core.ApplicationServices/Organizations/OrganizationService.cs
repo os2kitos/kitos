@@ -257,16 +257,10 @@ namespace Core.ApplicationServices.Organizations
                 return organizationWhichCanBeDeleted.Error;
             }
 
+            //TODO: Check if organization has it-systems or interfaces used by registrations in other organizations (these must then be migrated)
             try
             {
                 var organization = organizationWhichCanBeDeleted.Value;
-
-                organization.Supplier.Clear();
-
-                organization.SubDataProcessorForDataProcessingRegistrations.Clear();
-                organization.DataProcessorForDataProcessingRegistrations.Clear();
-                organization.BelongingSystems.Clear();
-
                 _domainEvents.Raise(new EntityDeletedEvent<Organization>(organization));
                 _orgRepository.DeleteWithReferencePreload(organization);
                 _orgRepository.Save();
