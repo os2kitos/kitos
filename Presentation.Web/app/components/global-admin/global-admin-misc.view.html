@@ -1,19 +1,5 @@
 ﻿﻿<div class="container">
     <h3>Global config</h3>
-    <div class="well">
-        <!-- User startpage preferences -->
-        <label class="col-xs-4 control-label" title="Her vælges den primære arbejdsenhed, som systemet så starter i når brugeren logger ind på sin konto">
-            Kun Global Admin kan redigere rapporter
-        </label>
-        <label class="radio-inline">
-            <input type="radio" data-ng-model="canGlobalAdminOnlyEditReports.value" name="inlineRadioOptions"
-                   id="inlineRadioYes" value="true" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Ja
-        </label>
-        <label class="radio-inline">
-            <input type="radio" data-ng-model="canGlobalAdminOnlyEditReports.value" name="inlineRadioOptions"
-                   id="inlineRadioNo" value="false" data-ng-change="patchConfig(canGlobalAdminOnlyEditReports)"> Nej
-        </label>
-    </div>
     <h3>KLE</h3>
     <div class="well">
         <label class="col-xs-12" id="KLEStatusLabel" data-element-type="KLEStatusLabel">{{KLEUpdateAvailableLabel}}</label>

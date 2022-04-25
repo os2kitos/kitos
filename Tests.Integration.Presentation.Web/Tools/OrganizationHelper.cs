@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using AutoFixture;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Xunit;
 
@@ -64,23 +62,22 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/contactPerson/{contactPersonId}?organizationId={organizationId}"), cookie, body);
         }
         
-        public static async Task<Organization> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
+        public static async Task<OrganizationDTO> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             using var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin);
             Assert.Equal(HttpStatusCode.Created, createdResponse.StatusCode);
-            return await createdResponse.ReadResponseBodyAsAsync<Organization>();
+            return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<OrganizationDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendCreateOrganizationRequestAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl("odata/Organizations");
+            var url = TestEnvironment.CreateUrl("api/Organization?organizationId=0");
 
-            var body = new
+            var body = new OrganizationDTO
             {
-                AccessModifier = ((int)accessModifier).ToString("D"),
+                AccessModifier = accessModifier,
                 Cvr = cvr,
-                Id = owningOrganizationId, //This looks odd, but is checked in BaseEntityController. Id is changed once created
                 Name = name,
                 TypeId = (int)type
             };

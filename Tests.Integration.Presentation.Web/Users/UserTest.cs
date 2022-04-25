@@ -3,6 +3,7 @@ using Core.DomainModel.Organization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -126,7 +127,7 @@ namespace Tests.Integration.Presentation.Web.Users
             return (userId, email, organization.Name);
         }
 
-        private async Task<(int userId, string userEmail, Organization createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAsync()
+        private async Task<(int userId, string userEmail, OrganizationDTO createdOrganization)> CreateRightsHolderAccessUserInNewOrganizationAsync()
         {
             var organization = await CreateOrganizationAsync();
             var email = CreateEmail();
@@ -135,7 +136,7 @@ namespace Tests.Integration.Presentation.Web.Users
             return (userId, email, organization);
         }
 
-        private async Task<Organization> CreateOrganizationAsync()
+        private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,

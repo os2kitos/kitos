@@ -554,7 +554,6 @@
     <Compile Include="Controllers\API\V1\GDPRExportReportController.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageDataSensitivityLevelController.cs" />
     <Compile Include="Controllers\API\V1\KLEController.cs" />
-    <Compile Include="Controllers\API\V1\ReportController.cs" />
     <Content Include="app\components\data-processing\data-processing-registration-edit.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-overview.view.html" />
     <Content Include="app\components\data-processing\data-processing-registration-modal-create.view.html" />
@@ -633,7 +632,6 @@
     <Compile Include="Models\API\V1\KLEUpdateDTO.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractAgreementElementTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractItSystemUsagesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalReportCategoryTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitiveDataTypesController.cs" />
     <Compile Include="Extensions\HttpMethodIntent.cs" />
     <Compile Include="Controllers\API\V1\ItSystemUsageMigrationController.cs" />
@@ -693,7 +691,6 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
-    <TypeScriptCompile Include="app\components\global-admin\global-admin-report.controller.ts" />
     <TypeScriptCompile Include="app\components\it-advice\it-advice-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -828,7 +825,6 @@
     <Compile Include="Controllers\API\V1\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\V1\ItProjectOrgUnitUsageController.cs" />
     <Compile Include="Controllers\API\V1\ReferenceController.cs" />
-    <Compile Include="Controllers\API\V1\OData\AccessTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceController.cs" />
     <Compile Include="Controllers\API\V1\OData\AdviceSentController.cs" />
     <Compile Include="Controllers\API\V1\OData\ArchivePeriodsController.cs" />
@@ -841,7 +837,6 @@
     <Compile Include="Controllers\API\V1\OData\BaseOptionController.cs" />
     <Compile Include="Controllers\API\V1\OData\ConfigsController.cs" />
     <Compile Include="Controllers\API\V1\OData\EconomyStreamsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\GlobalConfigsController.cs" />
     <Compile Include="Controllers\API\V1\OData\HelpTextsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\ItContractsController.cs" />
@@ -907,15 +902,12 @@
     <Compile Include="Controllers\API\V1\OData\OptionControllers\ProcurementStrategyTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\PurchaseFormTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\RegisterTypesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\ReportCategoriesController.cs" />
-    <Compile Include="Controllers\API\V1\OData\OptionControllers\ReportCategoryTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\SensitivePersonalDataTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OptionControllers\TerminationDeadlineTypesController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationUnitRightsController.cs" />
     <Compile Include="Controllers\API\V1\OData\OrganizationUnitsController.cs" />
-    <Compile Include="Controllers\API\V1\OData\ReportsController.cs" />
     <Compile Include="Controllers\API\V1\OData\UsersController.cs" />
     <Compile Include="Extensions\IdentityClaimExtension.cs" />
     <Compile Include="Extensions\OwinContextExtensions.cs" />
@@ -1140,7 +1132,6 @@
     <TypeScriptCompile Include="Tests\PageObjects\Organization\UsersPage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemFrontpage.po.ts" />
     <TypeScriptCompile Include="Tests\PageObjects\It-system\Tabs\ItSystemReference.po.ts" />
-    <TypeScriptCompile Include="Tests\PageObjects\report\ReportOverview.po.ts" />
     <TypeScriptCompile Include="Tests\Utility\Constants.ts" />
     <TypeScriptCompile Include="Tests\Helpers\LoginHelper.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\It-System\RegularUser.System.e2e.spec.ts" />
@@ -1159,17 +1150,11 @@
     <TypeScriptCompile Include="Tests\Utility\WaitTimers.ts" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="appReport\css\stimulsoft.designer.office2013.whiteblue.css" />
-    <Content Include="appReport\css\stimulsoft.viewer.office2013.whiteblue.css" />
-    <Content Include="appReport\locales\da-DK.xml" />
-    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.maps.js" />
     <Content Include="app\components\global-admin\global-admin-help-texts-create.modal.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts-edit.view.html" />
     <Content Include="app\components\global-admin\global-admin-help-texts.view.html" />
     <Content Include="app\components\global-admin\global-admin-misc.view.html" />
     <Content Include="app\components\global-admin\global-admin-option-edit-roles.modal.view.html" />
-    <Content Include="app\components\global-admin\global-admin-option-edit-types.modal.view.html" />
-    <Content Include="app\components\global-admin\global-admin-report.view.html" />
     <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-interfaces.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation-modal-view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-relation.view.html" />
@@ -1188,12 +1173,9 @@
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.view.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project.modal.html" />
     <Content Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.view.html" />
-    <Content Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.view.html" />
-    <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.view.html" />
     <Content Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.view.html" />
     <Content Include="app\components\it-reference\it-reference-modal.view.html" />
     <Content Include="app\components\it-reference\it-reference.view.html" />
-    <Content Include="app\components\local-config\local-admin-organization-modal.view.html" />
     <Content Include="app\components\local-config\local-config-current-org.view.html" />
     <Content Include="app\components\org\user\user-rights-details\user-rights.view.html" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-edit-options.controller.ts" />
@@ -1211,7 +1193,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-history-modal.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-update-modal.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-create-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference-edit-modal.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-tab-reference.ts" />
@@ -1219,7 +1200,6 @@
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\edit\tabs\it-system-edit-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\it-interface\it-interface-edit-tab-main.controller.ts" />
-    <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-access-control.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-archiving.controller.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference-create-modal.state.ts" />
@@ -1227,8 +1207,6 @@
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-reference.ts" />
     <TypeScriptCompile Include="app\components\it-system\usage\tabs\it-system-usage-tab-main.controller.ts" />
     <TypeScriptCompile Include="app\components\it-contract\it-contract-details\it-contract-plan-detail.directive.ts" />
-    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-create.controller.ts" />
-    <TypeScriptCompile Include="app\components\local-config\local-admin-organization-modal-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-current-org.controller.ts" />
     <TypeScriptCompile Include="app\components\local-config\local-config-edit-options.ts" />
     <TypeScriptCompile Include="app\components\local-config\localOptionList\localOptionList.directive.ts" />
@@ -1238,7 +1216,6 @@
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-contract-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\advis.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-system-rights.directive.ts" />
-    <TypeScriptCompile Include="app\components\reports\report-edit.controller.ts" />
     <TypeScriptCompile Include="app\models\general-role-entity.ts" />
     <TypeScriptCompile Include="app\models\help-text.ts" />
     <TypeScriptCompile Include="app\models\IReference.ts" />
@@ -1249,17 +1226,12 @@
     <TypeScriptCompile Include="app\models\option-entity.ts" />
     <TypeScriptCompile Include="app\models\it-system\it-system-right.ts" />
     <TypeScriptCompile Include="app\models\odata-wrappers.ts" />
-    <TypeScriptCompile Include="appReport\index.d.ts" />
-    <TypeScriptCompile Include="appReport\report-viewer.controller.ts" />
-    <TypeScriptCompile Include="appReport\reportApp.module.ts" />
-    <TypeScriptCompile Include="appReport\services\stimulsoftService.ts" />
     <TypeScriptCompile Include="app\services\httpServices.ts" />
     <TypeScriptCompile Include="app\services\itContractsService.ts" />
     <TypeScriptCompile Include="app\services\itProjectService.ts" />
     <TypeScriptCompile Include="app\services\itSystemService.ts" />
     <TypeScriptCompile Include="app\services\NavigationService.ts" />
     <TypeScriptCompile Include="app\services\OrganizationService.ts" />
-    <TypeScriptCompile Include="app\services\ReportCategoriesService.ts" />
     <TypeScriptCompile Include="app\services\userGetService.ts" />
     <TypeScriptCompile Include="app\services\userServices.ts" />
     <TypeScriptCompile Include="app\shared\autosave.directive.ts" />
@@ -1274,17 +1246,10 @@
     <TypeScriptCompile Include="app\shared\kleFilter\kleFilter.directive.ts" />
     <TypeScriptCompile Include="app\shared\match.directive.ts" />
     <TypeScriptCompile Include="app\services\needsWidthFixService.ts" />
-    <Content Include="appReport\css\report.css" />
-    <Content Include="appReport\Index.html" />
-    <Content Include="appReport\scripts\stimulsoft\stimulsoft.designer.js" />
-    <Content Include="appReport\scripts\stimulsoft\stimulsoft.reports.js" />
-    <Content Include="appReport\scripts\stimulsoft\stimulsoft.viewer.js" />
-    <Content Include="app\components\reports\report-edit.modal.view.html" />
     <Content Include="app\shared\helpText\helpText.view.html" />
     <Content Include="app\shared\helpText\helpTextModal.view.html" />
     <Content Include="app\shared\navigation\navigation-buttons.view.html" />
     <TypeScriptCompile Include="app\shared\filters\joinBy.filter.ts" />
-    <Content Include="app\components\reports\reports-overview.html" />
     <TypeScriptCompile Include="app\shared\optionList\optionList.directive.ts" />
     <TypeScriptCompile Include="app\shared\orderBy\orderBy.directive.ts" />
     <TypeScriptCompile Include="app\shared\paginationButtons\paginationButtons.directive.ts" />
@@ -1468,8 +1433,6 @@
     <TypeScriptCompile Include="app\components\org\user\user-rights-details\user-project-rights.directive.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-edit.controller.ts" />
     <TypeScriptCompile Include="app\components\org\user\org-user-create.controller.ts" />
-    <TypeScriptCompile Include="app\components\reports\reports-overview.ts" />
-    <TypeScriptCompile Include="app\components\reports\reports-subnav.controller.ts" />
     <TypeScriptCompile Include="app\index.d.ts" />
     <TypeScriptCompile Include="app\directiveFactory.ts" />
     <TypeScriptCompile Include="app\models\Api\organization-role.ts" />
@@ -1531,7 +1494,6 @@
     <TypeScriptCompile Include="app\models\it-system-usage\it-system-usage.ts" />
     <TypeScriptCompile Include="app\models\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\password-reset-request.ts" />
-    <TypeScriptCompile Include="app\models\report\report.ts" />
     <TypeScriptCompile Include="app\models\task-ref.ts" />
     <TypeScriptCompile Include="app\models\task-usage.ts" />
     <TypeScriptCompile Include="app\models\traffic-light.ts" />
@@ -1539,7 +1501,6 @@
     <TypeScriptCompile Include="app\models\user.ts" />
     <TypeScriptCompile Include="app\services\economyCalc.ts" />
     <TypeScriptCompile Include="app\services\gridStateService.ts" />
-    <TypeScriptCompile Include="app\services\ReportService.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.directive.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.factory.ts" />
     <TypeScriptCompile Include="app\shared\notify\notify.module.ts" />
@@ -1651,7 +1612,6 @@
     <Content Include="Robots.Test.txt" />
     <Content Include="Scripts\angular-bundle.min.js" />
     <Content Include="Scripts\app-bundle.min.js" />
-    <Content Include="Scripts\appReport-bundle.min.js" />
     <Content Include="Scripts\library-bundle.min.js" />
     <Content Include="Scripts\skins\lightgray\content.min.css" />
     <Content Include="Scripts\skins\lightgray\skin.min.css" />

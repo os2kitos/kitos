@@ -1676,7 +1676,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return (targetInterface.Uuid, targetInterface.Name);
         }
 
-        private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(Organization organization, ItSystemDTO system)
+        private async Task<(GeneralDataWriteRequestDTO, OrgUnitDTO, OrganizationUsageWriteRequestDTO, Guid[], Guid[], LocalKLEDeviationsRequestDTO, IEnumerable<ExternalReferenceDataDTO>, IEnumerable<RoleAssignmentRequestDTO>, GDPRWriteRequestDTO, ArchivingWriteRequestDTO)> CreateFullDataRequestDTO(OrganizationDTO organization, ItSystemDTO system)
         {
             var project1 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
             var project2 = await ItProjectHelper.CreateProject(CreateName(), organization.Id);
@@ -1812,7 +1812,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             };
         }
 
-        private async Task<GDPRWriteRequestDTO> CreateGDPRInputAsync(Organization organization)
+        private async Task<GDPRWriteRequestDTO> CreateGDPRInputAsync(OrganizationDTO organization)
         {
             var registerTypes =
                 await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItSystemUsageRegisterTypes,
@@ -1857,7 +1857,7 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             Assert.Equal(gdprInput.DataRetentionEvaluationFrequencyInMonths ?? 0, gdprResponse.DataRetentionEvaluationFrequencyInMonths);
         }
 
-        private async Task<(string token, User user, Organization organization, ItSystemDTO system)> CreatePrerequisitesAsync()
+        private async Task<(string token, User user, OrganizationDTO organization, ItSystemDTO system)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync(A<OrganizationTypeKeys>());
             var (user, token) = await CreateApiUser(organization);
@@ -2129,21 +2129,21 @@ namespace Tests.Integration.Presentation.Web.SystemUsage.V2
             return createdSystem;
         }
 
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
 
-        private async Task<User> CreateUser(Organization organization)
+        private async Task<User> CreateUser(OrganizationDTO organization)
         {
             var userId = await HttpApi.CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(CreateEmail(), false), OrganizationRole.User, organization.Id);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userId));
             return user;
         }
 
-        private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)
+        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
