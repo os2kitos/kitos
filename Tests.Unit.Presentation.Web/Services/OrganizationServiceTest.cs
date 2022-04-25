@@ -143,11 +143,11 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Theory]
-        [InlineData(OrganizationTypeKeys.Kommune, false)]
-        [InlineData(OrganizationTypeKeys.Virksomhed, false)]
-        [InlineData(OrganizationTypeKeys.Interessefællesskab, true)]
-        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed, false)]
-        public void CreateNewOrganization_Returns_Ok(OrganizationTypeKeys organizationType, bool expectRolesAssigned)
+        [InlineData(OrganizationTypeKeys.Kommune)]
+        [InlineData(OrganizationTypeKeys.Virksomhed)]
+        [InlineData(OrganizationTypeKeys.Interessefællesskab)]
+        [InlineData(OrganizationTypeKeys.AndenOffentligMyndighed)]
+        public void CreateNewOrganization_Returns_Ok(OrganizationTypeKeys organizationType)
         {
             //Arrange
             var newOrg = new Organization
@@ -174,8 +174,6 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(newOrg.Name, newOrg.OrgUnits.First().Name);
             Assert.NotNull(newOrg.Config);
             _organizationRepository.Verify(x => x.Save(), Times.Once);
-            _roleService.Verify(x => x.MakeLocalAdmin(_user, newOrg), Times.Exactly(expectRolesAssigned ? 1 : 0));
-            _roleService.Verify(x => x.MakeUser(_user, newOrg), Times.Exactly(expectRolesAssigned ? 1 : 0));
         }
 
         [Theory]

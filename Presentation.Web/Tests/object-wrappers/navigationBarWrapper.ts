@@ -7,7 +7,6 @@ type navigations = {
     system: protractor.ElementFinder,
     contract: protractor.ElementFinder,
     dataProcessingButton: protractor.ElementFinder,
-    reports: protractor.ElementFinder
 }
 type userDropdown = {
     dropDownElement: protractor.ElementFinder,
@@ -28,7 +27,6 @@ class navigationBarWrapper {
         system: element(byDataElementType(consts.navigationSystemButton)),
         contract: element(byDataElementType(consts.navigationContractButton)),
         dataProcessingButton: element(byDataElementType(consts.navigationDataProcessingButton)),
-        reports: element(byDataElementType(consts.navigationReportsButton))
         };
 
     public dropDownMenu: userDropdown = {

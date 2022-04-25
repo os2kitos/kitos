@@ -6,9 +6,6 @@
             controller: "globalAdminMisc",
             authRoles: ["GlobalAdmin"],
             resolve: {
-                globalConfigs: [
-                    "$http", $http => $http.get("/odata/GlobalConfigs").then(result => result.data.value)
-                ],
                 brokenLinkStatus: [
                     "brokenLinksReportService", (brokenLinksReportService: Kitos.Services.BrokenLinksReport.IBrokenLinksReportService) => brokenLinksReportService.getStatus()
                 ],
@@ -25,7 +22,6 @@
         "$rootScope",
         "$scope",
         "$http",
-        "globalConfigs",
         "_",
         "notify",
         "kleService",
@@ -37,7 +33,6 @@
             $rootScope,
             $scope,
             $http,
-            globalConfigs,
             _,
             notify,
             kleService,
@@ -91,19 +86,6 @@
                         notify.addErrorMessage("Der skete en fejl ifm. tjek af ny KLE version");
                     });
             }
-
-            $scope.canGlobalAdminOnlyEditReports = _.find(globalConfigs, g => g.key === "CanGlobalAdminOnlyEditReports");
-
-            $scope.patchConfig = config => {
-                var payload = {};
-                payload["value"] = config.value;
-
-                $http.patch("/odata/GlobalConfigs(" + config.Id + ")", payload).then(newUser => {
-                    notify.addSuccessMessage("Feltet er opdateret!");
-                }, () => {
-                    notify.addErrorMessage("Fejl! Kunne ikke opdatere feltet!");
-                });
-            };
 
             $scope.GetKLEChanges = () => {
                 toggleKleButtonsClickAbility(false, false);
