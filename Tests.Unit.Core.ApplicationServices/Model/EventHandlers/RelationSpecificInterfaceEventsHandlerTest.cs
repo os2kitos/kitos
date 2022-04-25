@@ -64,7 +64,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new EntityDeletedEvent<ItInterface>(affectedInterface));
+            _sut.Handle(new EntityBeingDeletedEvent<ItInterface>(affectedInterface));
 
             //Assert that all interface fields were reset
             Assert.True(affectedInterface.AssociatedSystemRelations.All(x => x.RelationInterface == null));

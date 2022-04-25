@@ -84,7 +84,7 @@ namespace Core.ApplicationServices.Interface
                 _dataRowRepository.Save();
 
                 // delete it interface
-                _domainEvents.Raise(new EntityDeletedEvent<ItInterface>(itInterface));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ItInterface>(itInterface));
                 _interfaceRepository.Delete(itInterface);
 
                 transaction.Commit();

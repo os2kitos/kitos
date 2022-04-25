@@ -277,7 +277,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             //Assert
             Assert.True(result.Ok);
-            _domainEvents.Verify(x => x.Raise(It.Is<EntityDeletedEvent<ItInterface>>(d => d.Entity == interfaceToDelete)), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItInterface>>(d => d.Entity == interfaceToDelete)), Times.Once);
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow1.Id), Times.Once);
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow2.Id), Times.Once);
             _dataRowRepository.Verify(x => x.Save(), Times.Once);

@@ -34,11 +34,11 @@ namespace Infrastructure.DataAccess.Mapping
             HasOptional(o => o.ContactPerson)
                 .WithOptionalDependent(c => c.Organization)
                 .WillCascadeOnDelete(true);
-            
+
             HasMany(x => x.DataResponsibles)
                 .WithOptional(dr => dr.Organization)
                 .WillCascadeOnDelete(true);
-            
+
             HasMany(x => x.DataProtectionAdvisors)
                 .WithOptional(dr => dr.Organization)
                 .WillCascadeOnDelete(true);
@@ -49,6 +49,9 @@ namespace Infrastructure.DataAccess.Mapping
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_Organization_UUID", 0);
 
+            Property(x => x.IsDefaultOrganization)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DEFAULT_ORG", 0);
         }
     }
 }

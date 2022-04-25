@@ -127,9 +127,9 @@ namespace Presentation.Web.Controllers.API.V1
             {
                 return NotFound();
             }
-
+            //TODO: Add enforce to the model
             return _organizationService
-                .RemoveOrganization(uuid.Value)
+                .RemoveOrganization(uuid.Value, true) //TODO: Set the enforce
                 .Select(FromOperationError)
                 .GetValueOrFallback(Ok());
         }

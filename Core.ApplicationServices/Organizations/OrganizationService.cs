@@ -4,6 +4,7 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
@@ -238,7 +239,57 @@ namespace Core.ApplicationServices.Organizations
                         () => new OperationError(OperationFailure.NotFound));
         }
 
-        public Maybe<OperationError> RemoveOrganization(Guid uuid)
+        public Result<OrganizationRemovalConflicts, OperationError> ComputeOrganizationRemovalConflicts(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Select(organization =>
+                {
+                    var systemsWithUsagesOutsideTheOrganization = organization
+                        .ItSystems
+                        .Where(x => x.Usages.Any(usage => usage.OrganizationId != organization.Id))
+                        .ToList();
+                    var interfacesExposedOnSystemsOutsideTheOrganization = organization
+                        .ItInterfaces
+                        .Where(x => x.ExhibitedBy != null && x.ExhibitedBy.ItSystem != null && x.ExhibitedBy.ItSystem.OrganizationId != organization.Id)
+                        .ToList();
+                    var systemsExposingInterfacesDefinedInOtherOrganizations = organization
+                        .ItSystems
+                        .Where(x => x.ItInterfaceExhibits.Any(ex => ex.ItInterface != null && ex.ItInterface.OrganizationId != organization.Id))
+                        .ToList();
+                    var systemsSetAsParentSystemToSystemsInOtherOrganizations = organization
+                        .ItSystems
+                        .Where(x => x.Children.Any(c => c.OrganizationId != organization.Id))
+                        .ToList();
+                    var dprInOtherOrganizationsWhereOrgIsDataProcessor = organization
+                        .DataProcessorForDataProcessingRegistrations
+                        .Where(x => x.OrganizationId != organization.Id)
+                        .ToList();
+                    var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organization
+                        .SubDataProcessorForDataProcessingRegistrations
+                        .Where(x => x.OrganizationId != organization.Id)
+                        .ToList();
+                    var contractsInOtherOrganizationsWhereOrgIsSupplier = organization
+                        .Supplier
+                        .Where(x => x.OrganizationId != organization.Id)
+                        .ToList();
+                    var systemsInOtherOrgsWhereOrgIsRightsHolder = organization
+                        .BelongingSystems
+                        .Where(x => x.OrganizationId != organization.Id)
+                        .ToList();
+
+                    return new OrganizationRemovalConflicts(
+                        systemsWithUsagesOutsideTheOrganization,
+                        interfacesExposedOnSystemsOutsideTheOrganization,
+                        systemsExposingInterfacesDefinedInOtherOrganizations,
+                        systemsSetAsParentSystemToSystemsInOtherOrganizations,
+                        dprInOtherOrganizationsWhereOrgIsDataProcessor,
+                        dprInOtherOrganizationsWhereOrgIsSubDataProcessor,
+                        contractsInOtherOrganizationsWhereOrgIsSupplier,
+                        systemsInOtherOrgsWhereOrgIsRightsHolder);
+                });
+        }
+
+        public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
         {
             using var transaction = _transactionManager.Begin();
             var organizationWhichCanBeDeleted = GetOrganization(uuid)
@@ -257,11 +308,23 @@ namespace Core.ApplicationServices.Organizations
                 return organizationWhichCanBeDeleted.Error;
             }
 
-            //TODO: Check if organization has it-systems or interfaces used by registrations in other organizations (these must then be migrated)
+            if (organizationWhichCanBeDeleted.Value.IsDefaultOrganization == true)
+            {
+                return new OperationError("Cannot delete default organization", OperationFailure.BadInput);
+            }
+
+            var conflicts = ComputeOrganizationRemovalConflicts(uuid);
+            if (conflicts.Failed)
+                return conflicts.Error;
+
+            var conflictsToResolve = conflicts.Value;
+            if (conflictsToResolve.Any && !enforceDeletion)
+                return new OperationError("Removal conflicts not resolved", OperationFailure.Conflict);
+
             try
             {
                 var organization = organizationWhichCanBeDeleted.Value;
-                _domainEvents.Raise(new EntityDeletedEvent<Organization>(organization));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<Organization>(organization));
                 _orgRepository.DeleteWithReferencePreload(organization);
                 _orgRepository.Save();
                 transaction.Commit();

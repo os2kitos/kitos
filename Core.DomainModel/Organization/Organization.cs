@@ -41,6 +41,7 @@ namespace Core.DomainModel.Organization
             Uuid = Guid.NewGuid();
             DataResponsibles = new List<DataResponsible>();
             DataProtectionAdvisors = new List<DataProtectionAdvisor>();
+            IsDefaultOrganization = null;
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -119,6 +120,10 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
         public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+        /// <summary>
+        /// Determines if this is the "Default" organization in KITOS
+        /// </summary>
+        public bool? IsDefaultOrganization { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently

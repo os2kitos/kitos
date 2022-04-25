@@ -14,7 +14,7 @@ namespace Core.DomainServices.Model.EventHandlers
 {
     public class RelationSpecificInterfaceEventsHandler :
         IDomainEventHandler<ExposingSystemChanged>,
-        IDomainEventHandler<EntityDeletedEvent<ItInterface>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly ITransactionManager _transactionManager;
@@ -76,7 +76,7 @@ namespace Core.DomainServices.Model.EventHandlers
             }
         }
 
-        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItInterface> domainEvent)
         {
             if (domainEvent == null)
                 throw new ArgumentNullException(nameof(domainEvent));

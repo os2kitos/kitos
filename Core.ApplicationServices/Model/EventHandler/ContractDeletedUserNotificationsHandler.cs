@@ -7,7 +7,7 @@ using Core.DomainModel.ItContract;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class ContractDeletedUserNotificationsHandler : IDomainEventHandler<EntityDeletedEvent<ItContract>>
+    public class ContractDeletedUserNotificationsHandler : IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>
     {
         private readonly IUserNotificationRepository _userNotificationRepository;
         private readonly IUserNotificationService _userNotificationService;
@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Model.EventHandler
             _userNotificationService = userNotificationService;
         }
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
             var contractDeleted = domainEvent.Entity;
             var toBeDeleted = _userNotificationRepository.GetByRelatedEntityIdAndType(contractDeleted.Id, RelatedEntityType.itContract).ToList();

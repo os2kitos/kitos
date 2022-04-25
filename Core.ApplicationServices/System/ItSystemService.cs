@@ -216,7 +216,7 @@ namespace Core.ApplicationServices.System
                     transaction.Rollback();
                     return SystemDeleteResult.UnknownError;
                 }
-                _domainEvents.Raise(new EntityDeletedEvent<ItSystem>(system));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ItSystem>(system));
                 _itSystemRepository.DeleteSystem(system);
                 transaction.Commit();
                 return SystemDeleteResult.Ok;
