@@ -133,11 +133,6 @@
                 isRole: false
             },
             {
-                id: "global-admin.report.edit-report-types",
-                urlSuffix: "edit-report-types",
-                isRole: false
-            },
-            {
                 id: "global-admin.data-processing.edit-data-processing-registration-roles",
                 urlSuffix: "edit-data-processing-registration-roles",
                 isRole: true
