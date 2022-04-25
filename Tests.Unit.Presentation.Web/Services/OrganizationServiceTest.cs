@@ -58,10 +58,10 @@ namespace Tests.Unit.Presentation.Web.Services
                 _authorizationContext.Object,
                 _userContext.Object,
                 Mock.Of<ILogger>(),
-                _roleService.Object,
                 _transactionManager.Object,
                 _repositoryMock.Object,
-                _orgUnitServiceMock.Object);
+                _orgUnitServiceMock.Object,
+                Mock.Of<IOrganizationRightsService>());
         }
 
         [Fact]

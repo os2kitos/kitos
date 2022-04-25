@@ -13,6 +13,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -58,7 +59,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _authorizationContextMock.Object,
                 _domainEventsMock.Object,
                 _repositoryMock.Object,
-                _organizationServiceMock.Object);
+                _organizationServiceMock.Object,
+                Mock.Of<ITransactionManager>());
         }
 
         [Fact]

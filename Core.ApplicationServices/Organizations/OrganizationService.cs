@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -24,12 +23,12 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IOrganizationRepository _repository;
         private readonly IOrgUnitService _orgUnitService;
+        private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly ILogger _logger;
-        private readonly IOrganizationRoleService _organizationRoleService;
         private readonly ITransactionManager _transactionManager;
 
         public OrganizationService(
@@ -39,10 +38,10 @@ namespace Core.ApplicationServices.Organizations
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
             ILogger logger,
-            IOrganizationRoleService organizationRoleService,
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
-            IOrgUnitService orgUnitService)
+            IOrgUnitService orgUnitService,
+            IOrganizationRightsService organizationRightsService)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -50,10 +49,10 @@ namespace Core.ApplicationServices.Organizations
             _authorizationContext = authorizationContext;
             _userContext = userContext;
             _logger = logger;
-            _organizationRoleService = organizationRoleService;
             _transactionManager = transactionManager;
             _repository = repository;
             _orgUnitService = orgUnitService;
+            _organizationRightsService = organizationRightsService;
         }
 
         //returns the default org unit for that user inside that organization
@@ -82,6 +81,7 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="userId">The user to be removed.</param>
         public Result<Organization, OperationFailure> RemoveUser(int organizationId, int userId)
         {
+            using var transaction = _transactionManager.Begin();
             var organization = _orgRepository.GetByKey(organizationId);
             if (organization == null)
             {
@@ -100,9 +100,15 @@ namespace Core.ApplicationServices.Organizations
 
             foreach (var right in rights)
             {
-                _orgRightRepository.DeleteByKey(right.Id);
+                var result = _organizationRightsService.RemoveRole(right.Id);
+                if (result.Failed)
+                {
+                    _logger.Error("Failed to delete right with id {rightId} due to error: {errorCode}", right.Id, result.Error);
+                    transaction.Rollback();
+                    return Result<Organization, OperationFailure>.Failure(OperationFailure.UnknownError);
+                }
             }
-            _orgRightRepository.Save();
+            transaction.Commit();
 
             return organization;
         }
