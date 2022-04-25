@@ -10,7 +10,7 @@
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
         getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>) {
-            var columns = e.sender.columns;
+            const columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
@@ -116,11 +116,29 @@
             return isHidden;
         }
 
+        private reorderAllColumns(columns: IKendoGridColumn<any>[]): boolean {
+            let isHidden = true;
+            columns.forEach(column => {
+                if (!column.hidden) {
+                    isHidden = false;
+                    return;
+                }
+            });
+
+            return isHidden;
+        }
+
         private showSelectedColumns(columns: IKendoGridColumn<any>[], e: IKendoGridExcelExportEvent<any>) {
             _.forEach(this.columnsToShow,
                 column => {
                     if (column.parentId === undefined)
                         return;
+                    var parentColumn = columns.filter(x => x.persistId === column.parentId)[0];
+                    if (parentColumn === undefined) {
+                        const errorMsg = `Error ParentColumn with id ${column.parentId} was not found`;
+                        console.log(errorMsg);
+                        throw new Error(errorMsg);
+                    }
 
                     const columnToShow = columns.filter(x => x.persistId === column.columnId)[0];
                     if (columnToShow === undefined || columnToShow === null)
