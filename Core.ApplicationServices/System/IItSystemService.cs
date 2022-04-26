@@ -13,7 +13,7 @@ namespace Core.ApplicationServices.System
         Result<ItSystem, OperationError> CreateNewSystem(int organizationId, string name, Guid? uuid = null);
         Result<ItSystem, OperationError> GetSystem(Guid uuid);
         Result<ItSystem, OperationError> GetSystem(int id);
-        SystemDeleteResult Delete(int id);
+        SystemDeleteResult Delete(int id, bool breakBindings = false);
         IQueryable<ItSystem> GetAvailableSystems(params IDomainQuery<ItSystem>[] conditions);
         IQueryable<ItSystem> GetAvailableSystems(int organizationId, string optionalNameSearch = null);
         IEnumerable<ItSystem> GetHierarchy(int systemId);

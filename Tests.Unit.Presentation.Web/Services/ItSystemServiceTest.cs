@@ -24,6 +24,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -67,7 +69,9 @@ namespace Tests.Unit.Presentation.Web.Services
                 _logger.Object,
                 _userContext.Object,
                 Mock.Of<IDomainEvents>(),
-                Mock.Of<IOperationClock>()
+                Mock.Of<IOperationClock>(),
+                Mock.Of<IItInterfaceService>(),
+                Mock.Of<IItSystemUsageService>()
                 );
         }
 
@@ -1214,7 +1218,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.Ok);
-            Assert.True(result.Select(x=>x.Disabled).Value);
+            Assert.True(result.Select(x => x.Disabled).Value);
             _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
@@ -1234,7 +1238,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Deactivate(systemId);
 
             //Assert
-            AssertUpdateFailure(result,OperationFailure.Forbidden);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -1243,7 +1247,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId,null);
+            ExpectGetSystemReturns(systemId, null);
 
             //Act
             var result = _sut.Deactivate(systemId);

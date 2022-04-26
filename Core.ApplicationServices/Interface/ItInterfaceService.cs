@@ -54,7 +54,7 @@ namespace Core.ApplicationServices.Interface
             _userContext = userContext;
             _operationClock = operationClock;
         }
-        public Result<ItInterface, OperationFailure> Delete(int id)
+        public Result<ItInterface, OperationFailure> Delete(int id, bool breakBindings = false)
         {
             using (var transaction = _transactionManager.Begin())
             {
@@ -73,7 +73,16 @@ namespace Core.ApplicationServices.Interface
 
                 if (itInterface.ExhibitedBy != null)
                 {
-                    return OperationFailure.Conflict;
+                    if (breakBindings)
+                    {
+                        var updateExposingSystemResult = UpdateExposingSystem(id, null);
+                        if (updateExposingSystemResult.Failed)
+                            return updateExposingSystemResult.Error.FailureType;
+                    }
+                    else
+                    {
+                        return OperationFailure.Conflict;
+                    }
                 }
 
                 var dataRows = itInterface.DataRows.ToList();

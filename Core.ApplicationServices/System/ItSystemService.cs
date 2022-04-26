@@ -6,9 +6,11 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Extensions;
+using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Shared;
 using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.References;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel;
 using Core.DomainModel.Events;
 using Core.DomainModel.ItSystem;
@@ -44,6 +46,8 @@ namespace Core.ApplicationServices.System
         private readonly IOrganizationalUserContext _userContext;
         private readonly IDomainEvents _domainEvents;
         private readonly IOperationClock _operationClock;
+        private readonly IItInterfaceService _interfaceService;
+        private readonly IItSystemUsageService _systemUsageService;
 
         public ItSystemService(
             IItSystemRepository itSystemRepository,
@@ -56,7 +60,9 @@ namespace Core.ApplicationServices.System
             ILogger logger,
             IOrganizationalUserContext userContext,
             IDomainEvents domainEvents,
-            IOperationClock operationClock
+            IOperationClock operationClock,
+            IItInterfaceService interfaceService,
+            IItSystemUsageService systemUsageService
             )
         {
             _itSystemRepository = itSystemRepository;
@@ -70,6 +76,8 @@ namespace Core.ApplicationServices.System
             _userContext = userContext;
             _domainEvents = domainEvents;
             _operationClock = operationClock;
+            _interfaceService = interfaceService;
+            _systemUsageService = systemUsageService;
         }
 
         public Result<ItSystem, OperationError> GetSystem(Guid uuid)
@@ -176,8 +184,9 @@ namespace Core.ApplicationServices.System
             return parents;
         }
 
-        public SystemDeleteResult Delete(int id)
+        public SystemDeleteResult Delete(int id, bool breakBindings = false)
         {
+            using var transaction = _transactionManager.Begin();
             var system = _itSystemRepository.GetSystem(id);
 
             if (system == null)
@@ -192,20 +201,64 @@ namespace Core.ApplicationServices.System
 
             if (system.Usages.Any())
             {
-                return SystemDeleteResult.InUse;
+                if (breakBindings)
+                {
+                    var failedUsageDeletion = system.Usages.ToList().Select(usage=>_systemUsageService.Delete(usage.Id)).FirstOrDefault(x=>x.Failed);
+                    if (failedUsageDeletion != null)
+                    {
+                        _logger.Error("Failed to delete system with id {id} because deleting usages failed", id);
+                        return SystemDeleteResult.UnknownError;
+                    }
+                }
+                else
+                {
+                    return SystemDeleteResult.InUse;
+                }
             }
 
             if (system.Children.Any())
             {
-                return SystemDeleteResult.HasChildren;
+                if (breakBindings)
+                {
+                    var failedChildDeletion = system
+                        .Children
+                        .ToList()
+                        .Select(child => UpdateParentSystem(child.Id))
+                        .FirstOrDefault(result => result.Failed);
+                    if (failedChildDeletion != null)
+                    {
+                        _logger.Error("Failed to delete system with id {id} because deleting children failed", id);
+                        return SystemDeleteResult.UnknownError;
+                    }
+                    system.Children.Clear();
+                }
+                else
+                {
+                    return SystemDeleteResult.HasChildren;
+                }
             }
 
             if (system.ItInterfaceExhibits.Any())
             {
-                return SystemDeleteResult.HasInterfaceExhibits;
+                if (breakBindings)
+                {
+                    var failedUpdate = system
+                        .ItInterfaceExhibits
+                        .ToList()
+                        .Select(exhibit=>_interfaceService.UpdateExposingSystem(exhibit.ItInterface.Id,null))
+                        .FirstOrDefault(x=>x.Failed);
+                    if (failedUpdate != null)
+                    {
+                        _logger.Error("Failed to delete system with id {id} because deleting interface exposures failed",id);
+                        return SystemDeleteResult.UnknownError;
+                    }
+                    system.ItInterfaceExhibits.Clear();
+                }
+                else
+                {
+                    return SystemDeleteResult.HasInterfaceExhibits;
+                }
             }
-
-            using var transaction = _transactionManager.Begin();
 
             try
             {
