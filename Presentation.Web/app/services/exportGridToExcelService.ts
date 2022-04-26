@@ -24,15 +24,18 @@
 
                     //look for a parent column and check if any was found, and if any parent column should be visible
                     var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.attributes.parentId);
-                    if (columnsWithMatchingParentId.length < 1)
+                    if (columnsWithMatchingParentId.length !== 1) {
+                        console.error("Column has multiple columns with matching parentId");
                         return;
-                    if (this.checkIfAllColumnsAreHidden(columnsWithMatchingParentId))
+                    }
+                    const parentColumn = columnsWithMatchingParentId[0];
+                    if (parentColumn.hidden)
                         return;
                     
-                    var index = columns.indexOf(columnsWithMatchingParentId[0]);
+                    var parentIndex = columns.indexOf(parentColumn);
 
                     this.columnsToShow.push({ columnId: column.persistId, parentId: column.attributes.parentId});
-                    e.sender.reorderColumn(index + 1, column);
+                    e.sender.reorderColumn(parentIndex + 1, column);
                 });
 
                 this.showSelectedColumns(columns, e);
@@ -102,30 +105,6 @@
                 template = t => t;
             }
             return template;
-        }
-
-        private checkIfAllColumnsAreHidden(columns: IKendoGridColumn<any>[]): boolean {
-            let isHidden = true;
-            columns.forEach(column => {
-                if (!column.hidden) {
-                    isHidden = false;
-                    return;
-                }
-            });
-
-            return isHidden;
-        }
-
-        private reorderAllColumns(columns: IKendoGridColumn<any>[]): boolean {
-            let isHidden = true;
-            columns.forEach(column => {
-                if (!column.hidden) {
-                    isHidden = false;
-                    return;
-                }
-            });
-
-            return isHidden;
         }
 
         private showSelectedColumns(columns: IKendoGridColumn<any>[], e: IKendoGridExcelExportEvent<any>) {
