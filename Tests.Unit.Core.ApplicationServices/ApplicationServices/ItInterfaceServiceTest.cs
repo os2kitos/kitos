@@ -252,6 +252,37 @@ namespace Tests.Unit.Core.ApplicationServices
         }
 
         [Fact]
+        public void Delete_Clears_Exhibits_If_BreakBindingsIsTrue_Returns_Conflict_If_Interface_Is_Exhibited()
+        {
+            //Arrange
+            var interfaceId = A<int>();
+            var dataRow1 = new DataRow { Id = A<int>() };
+            var dataRow2 = new DataRow { Id = A<int>() };
+            var itInterface = new ItInterface
+            {
+                InterfaceId = interfaceId,
+                ExhibitedBy = new ItInterfaceExhibit() { ItSystem = new ItSystem() },
+                DataRows = new List<DataRow>()
+                {
+                dataRow1,
+                dataRow2
+            }
+            };
+            var transaction = new Mock<IDatabaseTransaction>();
+            ExpectGetInterfaceReturns(interfaceId, itInterface);
+            ExpectAllowModifyReturns(itInterface, true);
+            ExpectAllowDeleteReturns(itInterface, true);
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.Delete(interfaceId, true);
+
+            //Assert
+            Assert.True(result.Ok);
+            VerifySuccessfulDeletion(result, itInterface, dataRow1, dataRow2, transaction, 2); //2 commits because first one is removing the exhibit and then the interface itself
+        }
+
+        [Fact]
         public void Delete_Returns_Ok_And_Raises_Domain_Event()
         {
             //Arrange
@@ -261,7 +292,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var interfaceToDelete = new ItInterface
             {
                 InterfaceId = interfaceId,
-                DataRows = new List<DataRow>()
+                DataRows = new List<DataRow>
                 {
                     dataRow1,
                     dataRow2
@@ -276,13 +307,20 @@ namespace Tests.Unit.Core.ApplicationServices
             var result = _sut.Delete(interfaceId);
 
             //Assert
+            VerifySuccessfulDeletion(result, interfaceToDelete, dataRow1, dataRow2, transaction, 1);
+        }
+
+        private void VerifySuccessfulDeletion(Result<ItInterface, OperationFailure> result, ItInterface interfaceToDelete, DataRow dataRow1, DataRow dataRow2,
+            Mock<IDatabaseTransaction> transaction, int expectedCommitsToTransaction = 1)
+        {
             Assert.True(result.Ok);
-            _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItInterface>>(d => d.Entity == interfaceToDelete)), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItInterface>>(d => d.Entity == interfaceToDelete)),
+                Times.Once);
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow1.Id), Times.Once);
             _dataRowRepository.Verify(x => x.DeleteByKey(dataRow2.Id), Times.Once);
             _dataRowRepository.Verify(x => x.Save(), Times.Once);
             _repository.Verify(x => x.Delete(interfaceToDelete), Times.Once);
-            transaction.Verify(x => x.Commit(), Times.Once);
+            transaction.Verify(x => x.Commit(), Times.Exactly(expectedCommitsToTransaction));
         }
 
         [Fact]
@@ -549,7 +587,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _repository.Setup(x => x.GetInterface(uuid)).Returns(Maybe<ItInterface>.None);
             _repository.Setup(x => x.GetInterfaces()).Returns(new List<ItInterface>().AsQueryable()); //Returns nothing so no conflicts exists
             _operationClock.Setup(x => x.Now).Returns(DateTime.Now);
-            _authorizationContext.Setup(x=>x.HasPermission(It.IsAny<CreateEntityWithVisibilityPermission>())).Returns(true);
+            _authorizationContext.Setup(x => x.HasPermission(It.IsAny<CreateEntityWithVisibilityPermission>())).Returns(true);
 
             //Act
             var createdInterfaceResult = _sut.CreateNewItInterface(org.Id, name, itInterfaceId, withSpecifiedUuid ? uuid : null, withAccessModifier ? accessModifier : null);
@@ -569,7 +607,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
             Assert.Equal(name, createdInterfaceResult.Value.Name);
             Assert.Equal(itInterfaceId, createdInterfaceResult.Value.ItInterfaceId);
-            
+
 
 
             _domainEvents.Verify(x => x.Raise(It.IsAny<EntityCreatedEvent<ItInterface>>()), Times.Once);
@@ -821,10 +859,10 @@ namespace Tests.Unit.Core.ApplicationServices
 
             var transaction = SetupTransaction();
             _repository.Setup(x => x.GetInterface(itInterface.Id)).Returns(itInterface);
-            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true); 
+            _authorizationContext.Setup(x => x.AllowModify(itInterface)).Returns(true);
             _repository.Setup(x => x.GetInterfaces()).Returns(
-                new List<ItInterface>() { 
-                    new ItInterface() { OrganizationId = itInterface.OrganizationId, Name = newName, ItInterfaceId = newItInterfaceId } 
+                new List<ItInterface>() {
+                    new ItInterface() { OrganizationId = itInterface.OrganizationId, Name = newName, ItInterfaceId = newItInterfaceId }
                 }.AsQueryable()); //Returns interface with same org, name and new ItInterfaceId
 
             //Act
