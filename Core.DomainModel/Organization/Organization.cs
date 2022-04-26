@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.SSO;
@@ -42,6 +43,10 @@ namespace Core.DomainModel.Organization
             DataResponsibles = new List<DataResponsible>();
             DataProtectionAdvisors = new List<DataProtectionAdvisor>();
             IsDefaultOrganization = null;
+            ItInterfaces = new List<ItInterface>();
+            DataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            BelongingSystems = new List<ItSystem.ItSystem>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }

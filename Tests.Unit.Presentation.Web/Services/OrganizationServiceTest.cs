@@ -35,6 +35,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationRepository> _repositoryMock;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public OrganizationServiceTest()
         {
@@ -49,6 +50,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _userRepository = new Mock<IGenericRepository<User>>();
             _repositoryMock = new Mock<IOrganizationRepository>();
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
+            _domainEventsMock = new Mock<IDomainEvents>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -59,7 +61,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 _transactionManager.Object,
                 _repositoryMock.Object,
                 _orgUnitServiceMock.Object,
-                Mock.Of<IDomainEvents>());
+                _domainEventsMock.Object);
         }
 
         [Fact]
@@ -282,7 +284,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Act
             var result = _sut.GetAllOrganizations();
-            
+
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(3, result.Value.Count());
@@ -386,7 +388,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var uuid = A<Guid>();
-            var expectedOrg = new Organization {Id = A<int>() };
+            var expectedOrg = new Organization { Id = A<int>() };
             ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
             ExpectAllowReadOrganizationReturns(expectedOrg, true);
             ExpectGetOrganizationReadAccessLevelReturns(expectedOrg.Id, accessLevel);
@@ -460,22 +462,22 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<Guid>();
-            var organization = new Organization() { Id = A<int>()};
-            var allOrgUnits = new []{new OrganizationUnit(), new OrganizationUnit(), new OrganizationUnit()}.AsQueryable();
+            var organization = new Organization() { Id = A<int>() };
+            var allOrgUnits = new[] { new OrganizationUnit(), new OrganizationUnit(), new OrganizationUnit() }.AsQueryable();
             var filteredUnits = allOrgUnits.Skip(1);
             var orgUnitQueryMock = new Mock<IDomainQuery<OrganizationUnit>>();
-            
+
             orgUnitQueryMock.Setup(x => x.Apply(allOrgUnits)).Returns(filteredUnits);
             ExpectGetOrganizationByUuidReturns(organizationId, organization);
             ExpectGetOrganizationAccessLevel(organization.Id, OrganizationDataReadAccessLevel.All);
-            _orgUnitServiceMock.Setup(x=>x.GetOrganizationUnits(organization)).Returns(allOrgUnits);
+            _orgUnitServiceMock.Setup(x => x.GetOrganizationUnits(organization)).Returns(allOrgUnits);
 
             //Act
             var result = _sut.GetOrganizationUnits(organizationId, orgUnitQueryMock.Object);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(filteredUnits.ToList(),result.Value.ToList());
+            Assert.Equal(filteredUnits.ToList(), result.Value.ToList());
         }
 
         [Theory]
@@ -503,7 +505,6 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<Guid>();
-            var organization = new Organization() { Id = A<int>() };
             ExpectGetOrganizationByUuidReturns(organizationId, Maybe<Organization>.None);
 
             //Act
@@ -513,6 +514,52 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_NoConflicts()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
+            ExpectGetOrganizationByUuidReturns(organizationId, organization);
+            ExpectAllowReadOrganizationReturns(organization, true);
+            ExpectAllowDeleteReturns(organization, true);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organizationId);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(result.Value.Any);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_Forbidden_If_No_Deletion_Access()
+        {
+            //Arrange
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
+            ExpectGetOrganizationByUuidReturns(organizationId, organization);
+            ExpectAllowReadOrganizationReturns(organization, true);
+            ExpectAllowDeleteReturns(organization, false);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organizationId);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden,result.Error.FailureType);
+        }
+
+
+        //TODO: Calculate delete conflicts
+        //TODO: Delete
+
+        private void ExpectAllowDeleteReturns(Organization organization, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowDelete(organization)).Returns(value);
+        }
+
         private void ExpectGetOrganizationAccessLevel(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(organizationDataReadAccessLevel);

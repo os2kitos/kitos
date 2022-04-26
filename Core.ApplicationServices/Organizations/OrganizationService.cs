@@ -242,39 +242,40 @@ namespace Core.ApplicationServices.Organizations
         public Result<OrganizationRemovalConflicts, OperationError> ComputeOrganizationRemovalConflicts(Guid organizationUuid)
         {
             return GetOrganization(organizationUuid)
-                .Select(organization =>
+                .Bind(WithDeletionAccess)
+                .Select(organizationWhichCanBeDeleted =>
                 {
-                    var systemsWithUsagesOutsideTheOrganization = organization
+                    var systemsWithUsagesOutsideTheOrganization = organizationWhichCanBeDeleted
                         .ItSystems
-                        .Where(x => x.Usages.Any(usage => usage.OrganizationId != organization.Id))
+                        .Where(x => x.Usages.Any(usage => usage.OrganizationId != organizationWhichCanBeDeleted.Id))
                         .ToList();
-                    var interfacesExposedOnSystemsOutsideTheOrganization = organization
+                    var interfacesExposedOnSystemsOutsideTheOrganization = organizationWhichCanBeDeleted
                         .ItInterfaces
-                        .Where(x => x.ExhibitedBy != null && x.ExhibitedBy.ItSystem != null && x.ExhibitedBy.ItSystem.OrganizationId != organization.Id)
+                        .Where(x => x.ExhibitedBy != null && x.ExhibitedBy.ItSystem != null && x.ExhibitedBy.ItSystem.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-                    var systemsExposingInterfacesDefinedInOtherOrganizations = organization
+                    var systemsExposingInterfacesDefinedInOtherOrganizations = organizationWhichCanBeDeleted
                         .ItSystems
-                        .Where(x => x.ItInterfaceExhibits.Any(ex => ex.ItInterface != null && ex.ItInterface.OrganizationId != organization.Id))
+                        .Where(x => x.ItInterfaceExhibits.Any(ex => ex.ItInterface != null && ex.ItInterface.OrganizationId != organizationWhichCanBeDeleted.Id))
                         .ToList();
-                    var systemsSetAsParentSystemToSystemsInOtherOrganizations = organization
+                    var systemsSetAsParentSystemToSystemsInOtherOrganizations = organizationWhichCanBeDeleted
                         .ItSystems
-                        .Where(x => x.Children.Any(c => c.OrganizationId != organization.Id))
+                        .Where(x => x.Children.Any(c => c.OrganizationId != organizationWhichCanBeDeleted.Id))
                         .ToList();
-                    var dprInOtherOrganizationsWhereOrgIsDataProcessor = organization
+                    var dprInOtherOrganizationsWhereOrgIsDataProcessor = organizationWhichCanBeDeleted
                         .DataProcessorForDataProcessingRegistrations
-                        .Where(x => x.OrganizationId != organization.Id)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-                    var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organization
+                    var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organizationWhichCanBeDeleted
                         .SubDataProcessorForDataProcessingRegistrations
-                        .Where(x => x.OrganizationId != organization.Id)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-                    var contractsInOtherOrganizationsWhereOrgIsSupplier = organization
+                    var contractsInOtherOrganizationsWhereOrgIsSupplier = organizationWhichCanBeDeleted
                         .Supplier
-                        .Where(x => x.OrganizationId != organization.Id)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
-                    var systemsInOtherOrgsWhereOrgIsRightsHolder = organization
+                    var systemsInOtherOrgsWhereOrgIsRightsHolder = organizationWhichCanBeDeleted
                         .BelongingSystems
-                        .Where(x => x.OrganizationId != organization.Id)
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
                         .ToList();
 
                     return new OrganizationRemovalConflicts(
@@ -292,16 +293,7 @@ namespace Core.ApplicationServices.Organizations
         public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
         {
             using var transaction = _transactionManager.Begin();
-            var organizationWhichCanBeDeleted = GetOrganization(uuid)
-                .Bind<Organization>(organization =>
-                {
-                    if (_authorizationContext.AllowDelete(organization))
-                    {
-                        return organization;
-                    }
-
-                    return new OperationError(OperationFailure.Forbidden);
-                });
+            var organizationWhichCanBeDeleted = GetOrganization(uuid).Bind(WithDeletionAccess);
 
             if (organizationWhichCanBeDeleted.Failed)
             {
@@ -335,6 +327,16 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;
+        }
+
+        private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
+        {
+            if (_authorizationContext.AllowDelete(organization))
+            {
+                return organization;
+            }
+
+            return new OperationError(OperationFailure.Forbidden);
         }
     }
 }
