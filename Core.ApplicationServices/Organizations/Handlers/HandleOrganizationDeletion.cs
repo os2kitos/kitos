@@ -201,7 +201,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
                 {
                     Supplier = new ItContractSupplierModificationParameters()
                     { OrganizationUuid = OptionalValueChange<Guid?>.With(null) }
-                })); //TODO: Check result
+                }).ThrowOnFailure()); 
             organization.Supplier.Clear();
         }
     }
