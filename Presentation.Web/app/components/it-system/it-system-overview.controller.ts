@@ -316,26 +316,38 @@
                         .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
                 .withStandardSorting("SystemName");
 
-            overviewOptions.systemRoles.forEach(role =>
+            overviewOptions.systemRoles.forEach(role => {
+                const roleColumnId = `systemUsage${getRoleKey(role)}`;
                 launcher = launcher
                     .withColumn(builder =>
                         builder
-                            .withDataSourceName(getRoleKey(role))
-                            .withTitle(role.name)
-                            .withId(`systemUsage${getRoleKey(role)}`)
-                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                            .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
-                            .withContentOverflow()
-                            .withInitialVisibility(false)
-                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-${getRoleKey(role)}-rendering`, "it-system.usage.roles", dataItem.SourceEntityId, roleIdToUserNamesMap[dataItem.Id][role.id]))
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToUserNamesMap[dataItem.Id][role.id])))
+                        .withDataSourceName(getRoleKey(role))
+                        .withTitle(role.name)
+                        .withId(roleColumnId)
+                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                        .withContentOverflow()
+                        .withInitialVisibility(false)
+                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                            `kendo-system-usage-${getRoleKey(role)}-rendering`,
+                            "it-system.usage.roles",
+                            dataItem.SourceEntityId,
+                            roleIdToUserNamesMap[dataItem.Id][role.id]))
+                        .withExcelOutput(
+                            dataItem => Helpers.ExcelExportHelper.renderString(
+                                roleIdToUserNamesMap[dataItem.Id][role.id])))
                     .withExcelOnlyColumn(builder =>
                         builder
-                            .withId(`systemUsage${getRoleKey(role)}_emails`)
-                            .withDataSourceName(getRoleKey(role))
-                            .withTitle(`${role.name} Email"`)
-                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(roleIdToEmailMap[dataItem.Id][role.id]))
-                    )
+                        .withId(`systemUsage${getRoleKey(role)}_emails`)
+                        .withDataSourceName(getRoleKey(role))
+                        .withTitle(`${role.name} Email"`)
+                        .withParentColumnId(roleColumnId)
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                                roleIdToEmailMap[dataItem.Id][role.id]
+                            )
+                        )
+                    );
+                }
             );
 
             launcher = launcher
