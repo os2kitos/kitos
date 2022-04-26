@@ -11,7 +11,7 @@
             AddColumn("dbo.Organization", "IsDefaultOrganization", c => c.Boolean());
             CreateIndex("dbo.Organization", "IsDefaultOrganization", name: "IX_DEFAULT_ORG");
             SqlResource(SqlMigrationScriptRepository.GetResourceName("Set_Default_Organization.sql"));
-
+            SqlResource(SqlMigrationScriptRepository.GetResourceName("Set_OwnerOrgUnitOnAllTaskRefs.sql"));
         }
 
         public override void Down()

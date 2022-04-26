@@ -1487,6 +1487,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Set_Default_Organization.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Set_OwnerOrgUnitOnAllTaskRefs.sql" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

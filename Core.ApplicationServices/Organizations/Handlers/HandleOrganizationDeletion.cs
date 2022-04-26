@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Linq;
+using Core.Abstractions.Exceptions;
+using Core.Abstractions.Extensions;
 using Core.ApplicationServices.Contract.Write;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Interface;
 using Core.ApplicationServices.Model.Contracts.Write;
 using Core.ApplicationServices.Model.Shared;
+using Core.ApplicationServices.Model.System;
 using Core.ApplicationServices.Project;
 using Core.ApplicationServices.System;
 using Core.ApplicationServices.SystemUsage.Write;
 using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
+using Core.DomainServices;
 using Core.DomainServices.Context;
 
 namespace Core.ApplicationServices.Organizations.Handlers
@@ -24,6 +28,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IItInterfaceService _interfaceService;
         private readonly IOrganizationService _organizationService;
         private readonly IDefaultOrganizationResolver _defaultOrganizationResolver;
+        private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
 
         public HandleOrganizationDeletion(
             IItContractWriteService contractService,
@@ -33,7 +38,8 @@ namespace Core.ApplicationServices.Organizations.Handlers
             IItProjectService projectService,
             IItInterfaceService interfaceService,
             IOrganizationService organizationService,
-            IDefaultOrganizationResolver defaultOrganizationResolver)
+            IDefaultOrganizationResolver defaultOrganizationResolver,
+            IGenericRepository<TaskUsage> taskUsageRepository)
         {
             _contractService = contractService;
             _itSystemUsageService = itSystemUsageService;
@@ -43,6 +49,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
             _interfaceService = interfaceService;
             _organizationService = organizationService;
             _defaultOrganizationResolver = defaultOrganizationResolver;
+            _taskUsageRepository = taskUsageRepository;
         }
 
         public void Handle(EntityBeingDeletedEvent<Organization> domainEvent)
@@ -58,36 +65,36 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
             //Removing registrations on DPRs where organization is set as data processor or sub data processor
             var subDataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor.ToList();
-            subDataProcessorContext.ForEach(x => _dataProcessingRegistrationService.RemoveSubDataProcessor(x.Id, organization.Id));//TODO: Check result
+            subDataProcessorContext.ForEach(x => _dataProcessingRegistrationService.RemoveSubDataProcessor(x.Id, organization.Id).ThrowOnFailure());
             organization.SubDataProcessorForDataProcessingRegistrations.Clear();
 
             var dataProcessorContext = conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor.ToList();
-            dataProcessorContext.ForEach(x => _dataProcessingRegistrationService.RemoveDataProcessor(x.Id, organization.Id));//TODO: Check result
+            dataProcessorContext.ForEach(x => _dataProcessingRegistrationService.RemoveDataProcessor(x.Id, organization.Id).ThrowOnFailure());
             organization.DataProcessorForDataProcessingRegistrations.Clear();
 
             //Removing registration on it-systems where organization is set as rightsholder
             var itSystems = conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder.ToList();
-            itSystems.ForEach(x => _itSystemService.UpdateRightsHolder(x.Id, null)); //TODO: Check result
+            itSystems.ForEach(x => _itSystemService.UpdateRightsHolder(x.Id, null).ThrowOnFailure());
             organization.BelongingSystems.Clear();
 
             //Removing contracts created in the org
             var itContracts = organization.ItContracts.ToList();
-            itContracts.ForEach(c => _contractService.Delete(c.Uuid)); //TODO: Check result
+            itContracts.ForEach(c => _contractService.Delete(c.Uuid).ThrowOnValue());
             organization.ItContracts.Clear();
 
             //Removing system usages created in the organization
             var itSystemUsages = organization.ItSystemUsages.ToList();
-            itSystemUsages.ForEach(x => _itSystemUsageService.Delete(x.Uuid)); //TODO: Check result
+            itSystemUsages.ForEach(x => _itSystemUsageService.Delete(x.Uuid).ThrowOnValue());
             organization.ItSystemUsages.Clear();
 
             //Removing DPRs created in the organization
             var dprs = organization.DataProcessingRegistrations.ToList();
-            dprs.ForEach(x => _dataProcessingRegistrationService.Delete(x.Id)); //TODO: Check result
+            dprs.ForEach(x => _dataProcessingRegistrationService.Delete(x.Id).ThrowOnFailure());
             organization.DataProcessingRegistrations.Clear();
 
             //Removing Projects created in the organization
             var itProjects = organization.ItProjects.ToList();
-            itProjects.ForEach(x => _projectService.DeleteProject(x.Id)); //TODO: Check result
+            itProjects.ForEach(x => _projectService.DeleteProject(x.Id).ThrowOnFailure());
             organization.ItProjects.Clear();
 
             //Move systems which are used on global objects outside the organization into the "Default org"
@@ -111,15 +118,30 @@ namespace Core.ApplicationServices.Organizations.Handlers
 
             //Removing it-interfaces created in the organization
             var itInterfaces = organization.ItInterfaces.Where(x => movedInterfaceIds.Contains(x.Id) == false).ToList();
-            itInterfaces.ForEach(x => _interfaceService.UpdateExposingSystem(x.Id, null));//TODO: Check result
-            itInterfaces.ForEach(x => _interfaceService.Delete(x.Id));//TODO: Check result
+            itInterfaces.ForEach(x => _interfaceService.UpdateExposingSystem(x.Id, null).ThrowOnFailure());
+            itInterfaces.ForEach(x => _interfaceService.Delete(x.Id).ThrowOnFailure());
             organization.ItInterfaces.Clear();
 
             //Removing IT-Systems created in the organization
             var systems = organization.ItSystems.Where(x => movedSystemIds.Contains(x.Id) == false).ToList();
             systems.ForEach(x => x.Children.ToList().ForEach(x.RemoveChildSystem));
-            systems.ForEach(x => _itSystemService.Delete(x.Id)); //TODO: Check result
+            systems.ForEach(x =>
+            {
+                var systemDeleteResult = _itSystemService.Delete(x.Id);
+                if (systemDeleteResult != SystemDeleteResult.Ok)
+                {
+                    throw new OperationErrorException<SystemDeleteResult>(systemDeleteResult);
+                }
+            });
             organization.ItSystems.Clear();
+
+            //Strip all task usages in the organization
+            foreach (var organizationUnit in organization.OrgUnits.ToList())
+            {
+                _taskUsageRepository.RemoveRange(organizationUnit.TaskUsages.ToList());
+                organizationUnit.TaskUsages.Clear();
+            }
+            _taskUsageRepository.Save();
 
             //TODO: Add a boolean (break dependencies to the delete methods.. then deep domain knowledge does not bleed into this class)
         }

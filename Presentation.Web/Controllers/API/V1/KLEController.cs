@@ -65,9 +65,9 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPut]
         [Route("update")]
-        public HttpResponseMessage PutKLEChanges(int organizationId)
+        public HttpResponseMessage PutKLEChanges()
         {
-            var result = _kleApplicationService.UpdateKLE(organizationId);
+            var result = _kleApplicationService.UpdateKLE();
 
             return result.Ok ?
                 Ok(

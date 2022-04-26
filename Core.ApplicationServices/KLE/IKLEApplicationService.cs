@@ -14,7 +14,7 @@ namespace Core.ApplicationServices.KLE
     {
         Result<KLEStatus, OperationFailure> GetKLEStatus();
         Result<IEnumerable<KLEChange>, OperationFailure> GetKLEChangeSummary();
-        Result<KLEUpdateStatus, OperationFailure> UpdateKLE(int organizationId);
+        Result<KLEUpdateStatus, OperationFailure> UpdateKLE();
         /// <summary>
         /// Performs KLE search and responds with a versioned result set
         /// </summary>
