@@ -129,7 +129,8 @@ module Kitos.Utility.KendoGrid {
             return {
                 field: this.dataSourceName,
                 title: this.title,
-                attributes: { "parentId": this.parentId },
+                attributes: [],
+                parentId: this.parentId,
                 width: this.standardWidth,
                 persistId: `${this.id}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")this.id,
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,

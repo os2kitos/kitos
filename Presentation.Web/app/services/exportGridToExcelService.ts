@@ -19,11 +19,10 @@
                         this.columnsToShow.push({ columnId: column.persistId });
                         return;
                     }
-                    if (column.attributes.parentId === undefined)
+                    if (column.parentId === undefined)
                         return;
-
                     //look for a parent column and check if any was found, and if any parent column should be visible
-                    var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.attributes.parentId);
+                    var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
                     if (columnsWithMatchingParentId.length !== 1) {
                         console.error("Column has multiple columns with matching parentId");
                         return;
@@ -34,7 +33,7 @@
                     
                     var parentIndex = columns.indexOf(parentColumn);
 
-                    this.columnsToShow.push({ columnId: column.persistId, parentId: column.attributes.parentId});
+                    this.columnsToShow.push({ columnId: column.persistId, parentId: column.parentId});
                     e.sender.reorderColumn(parentIndex + 1, column);
                 });
 
@@ -115,7 +114,7 @@
                     var parentColumn = columns.filter(x => x.persistId === column.parentId)[0];
                     if (parentColumn === undefined) {
                         const errorMsg = `Error ParentColumn with id ${column.parentId} was not found`;
-                        console.log(errorMsg);
+                        console.error(errorMsg);
                         throw new Error(errorMsg);
                     }
 
