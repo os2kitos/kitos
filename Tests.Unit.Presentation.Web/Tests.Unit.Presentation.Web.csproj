@@ -250,6 +250,8 @@
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="DomainServices\Users\QueryByRoleAssignmentTest.cs" />
     <Compile Include="DomainServices\Users\QueryByCrossOrganizationPermissionsTest.cs" />
+    <Compile Include="Extensions\ItInterfaceExtensions.cs" />
+    <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
     <Compile Include="Extensions\SystemDeleteReturnConflictMapperTest.cs" />
     <Compile Include="Helpers\KitosRestControllerApiTestWithAutofixture.cs" />
     <Compile Include="Helpers\MoqTools.cs" />

@@ -9,6 +9,8 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -19,6 +21,7 @@ using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
+using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services
@@ -519,41 +522,102 @@ namespace Tests.Unit.Presentation.Web.Services
         public void ComputeOrganizationRemovalConflicts_Returns_NoConflicts()
         {
             //Arrange
-            var organizationId = A<Guid>();
-            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
-            ExpectGetOrganizationByUuidReturns(organizationId, organization);
-            ExpectAllowReadOrganizationReturns(organization, true);
-            ExpectAllowDeleteReturns(organization, true);
+            var organization = SetupConflictCalculationPrerequisites(true, true);
 
             //Act
-            var result = _sut.ComputeOrganizationRemovalConflicts(organizationId);
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
 
             //Assert
             Assert.True(result.Ok);
             Assert.False(result.Value.Any);
         }
 
-        [Fact]
-        public void ComputeOrganizationRemovalConflicts_Returns_Forbidden_If_No_Deletion_Access()
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        public void ComputeOrganizationRemovalConflicts_Returns_Forbidden_If_No_Access(bool allowRead, bool allowDelete)
         {
             //Arrange
-            var organizationId = A<Guid>();
-            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
-            ExpectGetOrganizationByUuidReturns(organizationId, organization);
-            ExpectAllowReadOrganizationReturns(organization, true);
-            ExpectAllowDeleteReturns(organization, false);
+            var organization = SetupConflictCalculationPrerequisites(allowRead, allowDelete);
 
             //Act
-            var result = _sut.ComputeOrganizationRemovalConflicts(organizationId);
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(OperationFailure.Forbidden,result.Error.FailureType);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsWithUsagesInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            organization.ItSystems.Add(new ItSystem { Usages = { CreateItSystemUsage(organization) } }.InOrganization(organization)); //not included - it belongs to deleted organization
+            var match1 = new ItSystem { Usages = { CreateItSystemUsage(organization), CreateItSystemUsage(anotherOrg) } }.InOrganization(organization); //used both inside and outside the org
+            var match2 = new ItSystem { Usages = { CreateItSystemUsage(anotherOrg) } }.InOrganization(organization); //only used outside the org
+            organization.ItSystems.Add(match1);
+            organization.ItSystems.Add(match2);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match2 }, conflicts.SystemsWithUsagesOutsideTheOrganization);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_InterfacesExposedOutsideTheOrganization()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var systemInDeletedOrg = new ItSystem().InOrganization(organization);
+            var systemInAnotherOrg = new ItSystem().InOrganization(anotherOrg);
+            organization.ItInterfaces.Add(new ItInterface().ExhibitedBy(systemInDeletedOrg).InOrganization(organization)); //not included it is exposed on the deleted org so fine to nuke
+            organization.ItInterfaces.Add(new ItInterface()); //not included because no exhibits so fine to nuke it
+            var match1 = new ItInterface().ExhibitedBy(systemInAnotherOrg).InOrganization(organization); //exhibited by system owned by another organization
+            organization.ItInterfaces.Add(match1);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1 }, conflicts.InterfacesExposedOnSystemsOutsideTheOrganization);
+        }
+
+
+        private static ItSystemUsage CreateItSystemUsage(Organization organization)
+        {
+            return new ItSystemUsage { OrganizationId = organization.Id, Organization = organization };
         }
 
 
         //TODO: Calculate delete conflicts
         //TODO: Delete
+
+        private Organization SetupConflictCalculationPrerequisites(bool allowRead, bool allowDelete)
+        {
+            var organization = CreateOrganization();
+            ExpectGetOrganizationByUuidReturns(organization.Uuid, organization);
+            ExpectAllowReadOrganizationReturns(organization, allowRead);
+            ExpectAllowDeleteReturns(organization, allowDelete);
+            return organization;
+        }
+
+        private Organization CreateOrganization()
+        {
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
+            return organization;
+        }
 
         private void ExpectAllowDeleteReturns(Organization organization, bool value)
         {
