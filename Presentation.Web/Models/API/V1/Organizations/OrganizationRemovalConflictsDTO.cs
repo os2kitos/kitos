@@ -1,18 +1,21 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 
 namespace Presentation.Web.Models.API.V1.Organizations
 {
     public class OrganizationRemovalConflictsDTO
     {
-        public IEnumerable<SystemWithUsageOutsideOrganizationConflictDTO> SystemsWithUsagesOutsideTheOrganization { get; }
-        public IEnumerable<InterfaceExposedOnSystemsOutsideTheOrganizationConflictDTO> InterfacesExposedOnSystemsOutsideTheOrganization { get; }
-        public IEnumerable<SystemExposingInterfacesDefinedInOtherOrganizationsConflictDTO> SystemsExposingInterfacesDefinedInOtherOrganizations { get; }
-        public IEnumerable<SystemSetAsParentSystemToSystemsInOtherOrganizationsConflictDTO> SystemsSetAsParentSystemToSystemsInOtherOrganizations { get; }
-        public IEnumerable<EntityWithOrganizationRelationshipDTO> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
-        public IEnumerable<EntityWithOrganizationRelationshipDTO> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
-        public IEnumerable<EntityWithOrganizationRelationshipDTO> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }
-        public IEnumerable<EntityWithOrganizationRelationshipDTO> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; }
+        public IEnumerable<SystemWithUsageOutsideOrganizationConflictDTO> SystemsWithUsagesOutsideTheOrganization { get; set; }
+        public IEnumerable<InterfaceExposedOnSystemsOutsideTheOrganizationConflictDTO> InterfacesExposedOnSystemsOutsideTheOrganization { get; set; }
+        public IEnumerable<SystemExposingInterfacesDefinedInOtherOrganizationsConflictDTO> SystemsExposingInterfacesDefinedInOtherOrganizations { get; set; }
+        public IEnumerable<SystemSetAsParentSystemToSystemsInOtherOrganizationsConflictDTO> SystemsSetAsParentSystemToSystemsInOtherOrganizations { get; set; }
+        public IEnumerable<EntityWithOrganizationRelationshipDTO> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; set; }
+        public IEnumerable<EntityWithOrganizationRelationshipDTO> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; set; }
+        public IEnumerable<EntityWithOrganizationRelationshipDTO> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; set; }
+        public IEnumerable<EntityWithOrganizationRelationshipDTO> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; set; }
+
+        public OrganizationRemovalConflictsDTO()
+        {
+        }
 
         public OrganizationRemovalConflictsDTO(
             IEnumerable<SystemWithUsageOutsideOrganizationConflictDTO> systemsWithUsagesOutsideTheOrganization,
@@ -33,15 +36,5 @@ namespace Presentation.Web.Models.API.V1.Organizations
             ContractsInOtherOrganizationsWhereOrgIsSupplier = contractsInOtherOrganizationsWhereOrgIsSupplier;
             SystemsInOtherOrganizationsWhereOrgIsRightsHolder = systemsInOtherOrganizationsWhereOrgIsRightsHolder;
         }
-
-        public bool Any => SystemsWithUsagesOutsideTheOrganization.Any() ||
-                           InterfacesExposedOnSystemsOutsideTheOrganization.Any() ||
-                           SystemsExposingInterfacesDefinedInOtherOrganizations.Any() ||
-                           SystemsSetAsParentSystemToSystemsInOtherOrganizations.Any() ||
-                           DprInOtherOrganizationsWhereOrgIsDataProcessor.Any() ||
-                           DprInOtherOrganizationsWhereOrgIsSubDataProcessor.Any() ||
-                           ContractsInOtherOrganizationsWhereOrgIsSupplier.Any() ||
-                           SystemsInOtherOrganizationsWhereOrgIsRightsHolder.Any();
-
     }
 }

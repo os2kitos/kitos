@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Organizations;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Tools
@@ -61,7 +63,7 @@ namespace Tests.Integration.Presentation.Web.Tools
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/contactPerson/{contactPersonId}?organizationId={organizationId}"), cookie, body);
         }
-        
+
         public static async Task<OrganizationDTO> CreateOrganizationAsync(int owningOrganizationId, string name, string cvr, OrganizationTypeKeys type, AccessModifier accessModifier, Cookie optionalLogin = null)
         {
             using var createdResponse = await SendCreateOrganizationRequestAsync(owningOrganizationId, name, cvr, type, accessModifier, optionalLogin);
@@ -102,10 +104,10 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl("api/organizationUnit/");
             var fixture = new Fixture();
-            var parentUnitId = 
-                parentId ?? 
+            var parentUnitId =
+                parentId ??
                 //Fallback to the root of the organization
-                DatabaseAccess.MapFromEntitySet<OrganizationUnit,int>(units=>units.AsQueryable().ByOrganizationId(organizationId).First(x=>x.ParentId == null).Id);
+                DatabaseAccess.MapFromEntitySet<OrganizationUnit, int>(units => units.AsQueryable().ByOrganizationId(organizationId).First(x => x.ParentId == null).Id);
             var body = new
             {
                 name = orgUnitName,
@@ -120,10 +122,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await createdResponse.ReadResponseBodyAsKitosApiResponseAsync<OrgUnitDTO>();
         }
 
-        public static async Task<HttpResponseMessage> SendDeleteOrganizationUnitRequestAsync(int orgUnitId, int organizationId, Cookie optionalLogin = null)
+        public static async Task<OrganizationRemovalConflictsDTO> GetOrganizationRemovalConflictsAsync(Guid organizationUuid, Cookie optionalLogin = null)
+        {
+            using var response = await SendGetOrganizationRemovalConflictsRequestAsync(organizationUuid, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<OrganizationRemovalConflictsDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendGetOrganizationRemovalConflictsRequestAsync(Guid organizationUuid, Cookie optionalLogin = null)
+        {
+            var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/deletion/conflicts");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteOrganizationRequestAsync(Guid organizationUuid, bool enforce = false, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/organizationUnit/{orgUnitId}?organizationId={organizationId}");
+            var url = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationUuid:D}/deletion?enforce={enforce}");
             return await HttpApi.DeleteWithCookieAsync(url, cookie);
         }
 

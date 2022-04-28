@@ -1,9 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.External;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -75,8 +79,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(accessModifier, result.AccessModifier);
-            Assert.Equal(name, (string) result.Name);
-            Assert.Equal(cvr, (string) result.Cvr);
+            Assert.Equal(name, (string)result.Name);
+            Assert.Equal(cvr, (string)result.Cvr);
         }
 
         [Theory]
@@ -126,7 +130,127 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
+        }
+
+        [Theory]
+        [InlineData(OrganizationRole.GlobalAdmin, true)]
+        [InlineData(OrganizationRole.LocalAdmin, false)]
+        [InlineData(OrganizationRole.User, false)]
+        public async Task Can_Delete_Organization_Without_Conflicts(OrganizationRole role, bool expectAllowedToDelete)
+        {
+            //Arrange
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var loginCookie = await HttpApi.GetCookieAsync(role);
+
+            //Act
+            using var response = await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, false, loginCookie);
+
+            //Assert
+            Assert.Equal(expectAllowedToDelete ? HttpStatusCode.OK : HttpStatusCode.Forbidden, response.StatusCode);
+            await AssertGetOrganizationResponse(organization.Uuid, expectAllowedToDelete ? HttpStatusCode.NotFound : HttpStatusCode.OK);
 
         }
+
+        [Fact]
+        public async Task Cannot_Delete_If_Deletion_Has_Conflicts_And_Enforce_Is_False()
+        {
+            //Arrange
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var systemUsedInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(systemUsedInAnotherOrg.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            using var response = await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
+            await AssertGetOrganizationResponse(organization.Uuid, HttpStatusCode.OK);
+
+        }
+
+        [Fact]
+        public async Task Can_Delete_If_Deletion_Has_Conflicts_And_Enforce_Is_True()
+        {
+            //Arrange
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var systemUsedInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(systemUsedInAnotherOrg.Id, TestEnvironment.DefaultOrganizationId);
+
+            //Act
+            using var response = await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, true);
+
+            //Assert
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            await AssertGetOrganizationResponse(organization.Uuid, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task Get_GET_DeletionConflicts_And_Delete_With_Enforce_Set_To_True()
+        {
+            //Arrange
+            var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var anotherOrg1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
+            var systemInAnotherOrg1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
+            var interfaceInAnotherOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, anotherOrg1.Id, AccessModifier.Public));
+
+            //System used in another organization
+            var systemUsedInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            await ItSystemHelper.TakeIntoUseAsync(systemUsedInAnotherOrg.Id, anotherOrg1.Id);
+
+            //Interface exposed on system in another org
+            var interfaceExposedOnSystemInAnotherOrg = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, organization.Id, AccessModifier.Public));
+            await InterfaceExhibitHelper.CreateExhibit(systemInAnotherOrg1.Id, interfaceExposedOnSystemInAnotherOrg.Id);
+
+
+            //TODO: System exposing interface in another org
+            //TODO: SystemsSetAsParentToSystemsInOtherOrgs
+            //TODO: DataProcessorForDprInOtherOrg
+            //TODO: SubDataProcessorForDprInOtherOrg
+            //TODO: ContractsInOtherOrgWhereOrgIsSupplier
+            //TODO: SystemsInOtherOrgWhereOrgIsRightsHolder
+
+            //Act
+            var conflicts = await OrganizationHelper.GetOrganizationRemovalConflictsAsync(organization.Uuid);
+
+            //Assert - systems used by other organizations
+            var usageOutsideOrganization = Assert.Single(conflicts.SystemsWithUsagesOutsideTheOrganization);
+            AssertNamedEntity(systemUsedInAnotherOrg.Id, systemUsedInAnotherOrg.Name, usageOutsideOrganization.System);
+            var org = Assert.Single(usageOutsideOrganization.OtherOrganizationsWhichUseTheSystem);
+            AssertNamedEntity(anotherOrg1.Id, anotherOrg1.Name, org);
+
+            //Interfaces exposed by systems in other organizations
+            var interfaceExposedBySystemsInOtherOrgs = Assert.Single(conflicts.InterfacesExposedOnSystemsOutsideTheOrganization);
+            AssertNamedEntity(interfaceExposedOnSystemInAnotherOrg.Id, interfaceExposedOnSystemInAnotherOrg.Name, interfaceExposedBySystemsInOtherOrgs.ExposedInterface);
+            AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrg1.Id, systemInAnotherOrg1.Name, anotherOrg1.Id, anotherOrg1.Name, interfaceExposedBySystemsInOtherOrgs.ExposedBy);
+
+
+            //TODO: Delete and then check the expected changes
+        }
+
+        private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)
+        {
+            Assert.Equal(expectedId, dto.Id);
+            Assert.Equal(expectedName, dto.Name);
+        }
+
+        private static void AssertNamedEntityWithOrganizationalRelationship(int expectedId, string expectedName, int expectedOrgId, string expectedOrgName, EntityWithOrganizationRelationshipDTO dto)
+        {
+            Assert.Equal(expectedId, dto.Id);
+            Assert.Equal(expectedName, dto.Name);
+            Assert.Equal(expectedOrgId, dto.Organization.Id);
+            Assert.Equal(expectedOrgName, dto.Organization.Name);
+        }
+
+
+        private static async Task AssertGetOrganizationResponse(Guid organizationId, HttpStatusCode expected)
+        {
+            var globalAdminToken = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
+            using var getAfterDeleteResponse = await OrganizationV2Helper.SendGetOrganizationAsync(globalAdminToken.Token, organizationId);
+            Assert.Equal(expected, getAfterDeleteResponse.StatusCode);
+        }
+
+        //TODO: Create a full conflicts helper.. reuse that in the full deletion test
+        //TODO: Get data in all conflicts
+        //TODO: Delete with full conflicts
     }
 }

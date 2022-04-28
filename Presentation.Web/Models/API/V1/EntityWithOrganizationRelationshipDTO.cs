@@ -2,7 +2,7 @@
 {
     public class EntityWithOrganizationRelationshipDTO : NamedEntityDTO
     {
-        public ShallowOrganizationDTO Organization { get; }
+        public ShallowOrganizationDTO Organization { get; set; }
 
         public EntityWithOrganizationRelationshipDTO(int id, string name, ShallowOrganizationDTO organization) 
             : base(id, name)
