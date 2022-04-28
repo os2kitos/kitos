@@ -619,13 +619,41 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(new[] { match1, match2 }, conflicts.SystemsExposingInterfacesDefinedInOtherOrganizations);
         }
 
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsSetAsParentSystemToSystemsInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var systemInSameOrg = CreateItSystem().InOrganization(organization);
+
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization)); //not included - no parent
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithParentSystem(systemInSameOrg)); //not included - parent belongs to deleted organization
+            var match = CreateItSystem().InOrganization(organization);
+            CreateItSystem().InOrganization(anotherOrg).WithParentSystem(match); //Set a "match" as parent to a system in another org
+            organization.ItSystems.Add(match);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match }, conflicts.SystemsSetAsParentSystemToSystemsInOtherOrganizations);
+        }
+
         private ItInterface CreateInterface()
         {
-            return new ItInterface() { Id = A<int>(), Uuid = A<Guid>() };
+            return new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+        private ItSystem CreateItSystem()
+        {
+            return new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
         }
 
         /*
-        public IReadOnlyList<ItSystem> SystemsSetAsParentSystemToSystemsInOtherOrganizations { get; }
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
         public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }
