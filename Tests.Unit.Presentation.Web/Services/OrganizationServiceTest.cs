@@ -643,6 +643,27 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(new[] { match }, conflicts.SystemsSetAsParentSystemToSystemsInOtherOrganizations);
         }
 
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsInOtherOrganizationsWhereOrgIsRightsHolder()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization)); //not included - no rights holder
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithRightsHolder(organization)); //not included - deleted org is rightsholder
+            var match = CreateItSystem().InOrganization(anotherOrg).WithRightsHolder(organization);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match }, conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder);
+        }
+
         private ItInterface CreateInterface()
         {
             return new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
@@ -654,10 +675,9 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         /*
+        public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }        
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
-        public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }
-        public IReadOnlyList<ItSystem> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; }
          */
 
 
