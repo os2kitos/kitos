@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
@@ -650,9 +651,10 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = SetupConflictCalculationPrerequisites(true, true);
             var anotherOrg = CreateOrganization();
 
-            organization.ItSystems.Add(CreateItSystem().InOrganization(organization)); //not included - no rights holder
-            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithRightsHolder(organization)); //not included - deleted org is rightsholder
-            var match = CreateItSystem().InOrganization(anotherOrg).WithRightsHolder(organization);
+            organization.ItContracts.Add(CreateContract().InOrganization(organization)); //not included - no supplier
+            organization.ItContracts.Add(CreateContract().InOrganization(organization).WithSupplier(organization)); //not included - supplier is deleted org
+            var match = CreateContract().InOrganization(anotherOrg).WithSupplier(organization);
+            organization.ItContracts.Add(match);
 
             //Act
             var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
@@ -661,12 +663,17 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Ok);
             var conflicts = result.Value;
             Assert.True(conflicts.Any);
-            Assert.Equal(new[] { match }, conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder);
+            Assert.Equal(new[] { match }, conflicts.ContractsInOtherOrganizationsWhereOrgIsSupplier);
         }
 
         private ItInterface CreateInterface()
         {
             return new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+        private ItContract CreateContract()
+        {
+            return new ItContract { Id = A<int>(), Uuid = A<Guid>() };
         }
 
         private ItSystem CreateItSystem()
@@ -675,7 +682,6 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         /*
-        public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }        
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
         public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
          */

@@ -250,6 +250,7 @@
     <Compile Include="DomainServices\RejectAllResultsQueryTest.cs" />
     <Compile Include="DomainServices\Users\QueryByRoleAssignmentTest.cs" />
     <Compile Include="DomainServices\Users\QueryByCrossOrganizationPermissionsTest.cs" />
+    <Compile Include="Extensions\ItcontractExtensions.cs" />
     <Compile Include="Extensions\ItInterfaceExtensions.cs" />
     <Compile Include="Extensions\ItSystemExtensions.cs" />
     <Compile Include="Extensions\OrganizationOwnedObjectExtensions.cs" />
