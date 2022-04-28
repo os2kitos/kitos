@@ -171,7 +171,7 @@
     <Compile Include="Model\EventHandler\ContractDeletedUserNotificationsHandler.cs" />
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
-    <Compile Include="Organizations\Handlers\HandleOrganizationDeletion.cs" />
+    <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\IRightsHolderSystemService.cs" />

@@ -386,7 +386,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityBeingDeletedEvent<DataProcessingRegistration>, TrackDeletedEntitiesEventHandler>(kernel);
 
             //Organization
-            RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationDeletion>(kernel);
+            RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationBeingDeleted>(kernel);
             //TODO: Read models where it is involved must be scheduled for rebuild.. do it in a different handler (one of the read model handlers)
         }
 

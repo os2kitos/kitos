@@ -21,7 +21,7 @@ using Core.DomainServices.Context;
 
 namespace Core.ApplicationServices.Organizations.Handlers
 {
-    public class HandleOrganizationDeletion : IDomainEventHandler<EntityBeingDeletedEvent<Organization>>
+    public class HandleOrganizationBeingDeleted : IDomainEventHandler<EntityBeingDeletedEvent<Organization>>
     {
         private readonly IItContractWriteService _contractService;
         private readonly IItSystemUsageWriteService _itSystemUsageService;
@@ -34,7 +34,7 @@ namespace Core.ApplicationServices.Organizations.Handlers
         private readonly IGenericRepository<TaskUsage> _taskUsageRepository;
         private readonly IDomainEvents _domainEvents;
 
-        public HandleOrganizationDeletion(
+        public HandleOrganizationBeingDeleted(
             IItContractWriteService contractService,
             IItSystemUsageWriteService itSystemUsageService,
             IItSystemService itSystemService,
