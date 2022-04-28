@@ -9,33 +9,16 @@
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
-        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>) {
+        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, isExportAll: boolean) {
             const columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                _.forEach(columns, (column, i) => {
-                    if (!column.hidden) {
-                        this.columnsToShow.push({ columnId: column.persistId });
-                        return;
-                    }
-                    if (column.parentId === undefined)
-                        return;
-                    //look for a parent column and check if any was found, and if any parent column should be visible
-                    var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
-                    if (columnsWithMatchingParentId.length !== 1) {
-                        console.error("Column has multiple columns with matching parentId");
-                        return;
-                    }
-                    const parentColumn = columnsWithMatchingParentId[0];
-                    if (parentColumn.hidden)
-                        return;
-                    
-                    var parentIndex = columns.indexOf(parentColumn);
-
-                    this.columnsToShow.push({ columnId: column.persistId, parentId: column.parentId});
-                    e.sender.reorderColumn(parentIndex + 1, column);
-                });
+                if (isExportAll) {
+                    this.displayAllColumns(e, columns);
+                } else {
+                    this.displayOnlySelectedColumns(e, columns);
+                }
 
                 this.showSelectedColumns(columns, e);
                 this.sortColumnArray();
@@ -89,6 +72,42 @@
             this.needsWidthFixService.fixWidth();
 
             this.columnsToShow = [];
+        }
+
+        private displayOnlySelectedColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+            _.forEach(columns, (column) => {
+                if (!column.hidden) {
+                    this.columnsToShow.push({ columnId: column.persistId });
+                    return;
+                }
+                if (column.parentId === undefined)
+                    return;
+                //look for a parent column and check if any was found, and if any parent column should be visible
+                var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
+                if (columnsWithMatchingParentId.length !== 1) {
+                    console.error("Column has multiple columns with matching parentId");
+                    return;
+                }
+                const parentColumn = columnsWithMatchingParentId[0];
+                if (parentColumn.hidden)
+                    return;
+
+                var parentIndex = columns.indexOf(parentColumn);
+
+                this.columnsToShow.push({ columnId: column.persistId, parentId: column.parentId });
+                e.sender.reorderColumn(parentIndex + 1, column);
+            });
+        }
+
+        private displayAllColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+            _.forEach(columns, (column) => {
+                this.columnsToShow.push({ columnId: column.persistId });
+                if (column.hidden) {
+                    column.tempVisual = true;
+                    e.sender.showColumn(column);
+                }
+                return;
+            });
         }
 
         private getTemplateMethod(column) {

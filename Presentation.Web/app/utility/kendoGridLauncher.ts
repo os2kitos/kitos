@@ -673,7 +673,11 @@ module Kitos.Utility.KendoGrid {
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
+
+            var modalInstance = Kitos.ExcelExport.Modal.Create.createModalInstance(_, );
+            modalInstance.result.then(angular.noop, angular.noop);
+
+            //this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, true);
         }
 
         private checkRequiredField(name: string, value: any) {

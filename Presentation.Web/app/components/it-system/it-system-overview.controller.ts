@@ -211,6 +211,36 @@
                     }
                 } as Utility.KendoGrid.IKendoToolbarEntry)
                 .withToolbarEntry({
+                    id: "excelExportSelector",
+                    title: "export",
+                    color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                    position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
+                    implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                    enabled: () => true,
+                    dropDownConfiguration: {
+                        selectedOptionChanged: newItem => {
+                            if (newItem === null)
+                                return;
+
+                            if (newItem.id === "exportExcelOnlyVisible") {
+                                //this.excelService.getExcel();
+                                console.log("ALL");
+                                return;
+                            }
+                            console.log("ONLY");
+                        },
+                        availableOptions: [
+                            {
+                                id: "exportExcelAll",
+                                text: "Alt data"
+                            },
+                            {
+                                id: "exportExcelOnlyVisible",
+                                text: "Kun de viste kolonner"
+                            }]
+                    }
+                } as Utility.KendoGrid.IKendoToolbarEntry)
+                .withToolbarEntry({
                     id: "gdprExportAnchor",
                     title: "Exportér GPDR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
