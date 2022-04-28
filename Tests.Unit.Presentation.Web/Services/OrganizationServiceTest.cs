@@ -593,6 +593,45 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(new[] { match1 }, conflicts.InterfacesExposedOnSystemsOutsideTheOrganization);
         }
 
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsExposingInterfacesDefinedInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var interface1InOwnOrg = CreateInterface().InOrganization(organization);
+            var interface2InOwnOrg = CreateInterface().InOrganization(organization);
+            var interface1InAnotherOrg = CreateInterface().InOrganization(anotherOrg);
+            var interface2InAnotherOrg = CreateInterface().InOrganization(anotherOrg);
+            organization.ItSystems.Add(new ItSystem().WithInterfaceExhibit(interface1InOwnOrg).InOrganization(organization)); //not included - it belongs to deleted organization
+            var match1 = new ItSystem().WithInterfaceExhibit(interface2InOwnOrg).WithInterfaceExhibit(interface1InAnotherOrg).InOrganization(organization); //exhibited on interfaces both inside and outside the org
+            var match2 = new ItSystem().WithInterfaceExhibit(interface2InAnotherOrg).InOrganization(organization); //only exhibited by interface outside the org
+            organization.ItSystems.Add(match1);
+            organization.ItSystems.Add(match2);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match2 }, conflicts.SystemsExposingInterfacesDefinedInOtherOrganizations);
+        }
+
+        private ItInterface CreateInterface()
+        {
+            return new ItInterface() { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+        /*
+        public IReadOnlyList<ItSystem> SystemsSetAsParentSystemToSystemsInOtherOrganizations { get; }
+        public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
+        public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
+        public IReadOnlyList<ItContract> ContractsInOtherOrganizationsWhereOrgIsSupplier { get; }
+        public IReadOnlyList<ItSystem> SystemsInOtherOrganizationsWhereOrgIsRightsHolder { get; }
+         */
+
 
         private static ItSystemUsage CreateItSystemUsage(Organization organization)
         {
