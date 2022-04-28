@@ -9,6 +9,7 @@ using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
@@ -666,6 +667,91 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Equal(new[] { match }, conflicts.ContractsInOtherOrganizationsWhereOrgIsSupplier);
         }
 
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_DprConflicts()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+
+            var match1 = CreateDpr().InOrganization(anotherOrg).WithDataProcessor(organization);
+            var match2 = CreateDpr().InOrganization(anotherOrg).WithSubDataProcessor(organization);
+            var match3 = CreateDpr().InOrganization(anotherOrg).WithSubDataProcessor(organization).WithDataProcessor(organization);
+
+            CreateDpr().InOrganization(organization).WithDataProcessor(organization).WithDataProcessor(anotherOrg).WithSubDataProcessor(anotherOrg); //not included since DPR is in same org as deleted org
+
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match3 }, conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor);
+            Assert.Equal(new[] { match2, match3 }, conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_Of_No_Conflicts()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, false);
+
+            //Assert
+            VerifyOrganizationDeleted(result, transaction, organization);
+        }
+
+        [Fact]
+        public void Delete_Returns_Conflict_If_Conflicts_And_EnforceDeletion_Is_False()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithInterfaceExhibit(CreateInterface().InOrganization(CreateOrganization()))); //Create a conflict
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, false);
+
+            //Assert
+            _organizationRepository.Verify(x => x.Save(), Times.Never());
+            transaction.Verify(x => x.Commit(), Times.Never());
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Conflict, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_If_Conflicts_And_EnforceDeletion_Is_True()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, true);
+
+            //Assert
+            VerifyOrganizationDeleted(result, transaction, organization);
+        }
+
+        private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
+        {
+            Assert.True(result.IsNone);
+            _organizationRepository.Verify(x => x.Save(), Times.Once());
+            _organizationRepository.Verify(x => x.DeleteWithReferencePreload(organization), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _domainEventsMock.Verify(
+                x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Once());
+        }
+
         private ItInterface CreateInterface()
         {
             return new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
@@ -681,20 +767,16 @@ namespace Tests.Unit.Presentation.Web.Services
             return new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
         }
 
-        /*
-        public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsDataProcessor { get; }
-        public IReadOnlyList<DataProcessingRegistration> DprInOtherOrganizationsWhereOrgIsSubDataProcessor { get; }
-         */
-
 
         private static ItSystemUsage CreateItSystemUsage(Organization organization)
         {
             return new ItSystemUsage { OrganizationId = organization.Id, Organization = organization };
         }
 
-
-        //TODO: Calculate delete conflicts
-        //TODO: Delete
+        private static DataProcessingRegistration CreateDpr()
+        {
+            return new DataProcessingRegistration();
+        }
 
         private Organization SetupConflictCalculationPrerequisites(bool allowRead, bool allowDelete)
         {
