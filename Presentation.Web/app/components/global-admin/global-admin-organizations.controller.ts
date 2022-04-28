@@ -172,7 +172,7 @@
             var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
 
             if (this.$window.confirm("Er du sikker på at slette " + dataItem["Name"] + "?")) {
-                this.$http.delete(`api/organization/${dataItem["Id"]}?organizationId=${this.user.currentOrganizationId}`)
+                this.$http.delete(`api/v1/organizations/${dataItem["Uuid"]}/deletion?enforce=true`)
                     .then(
                         success => {
                             this.notify.addSuccessMessage("Organisation slettet");
