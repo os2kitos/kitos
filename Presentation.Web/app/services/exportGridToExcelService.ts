@@ -1,5 +1,6 @@
 ﻿module Kitos.Services.System {
     import ArrayHelper = Helpers.ArrayHelper;
+    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export class ExportGridToExcelService {
@@ -9,16 +10,16 @@
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
-        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, isExportAll: boolean) {
-            const columns = e.sender.columns;
+        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, config?: IExcelConfig) {            const columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                if (isExportAll) {
-                    this.displayAllColumns(e, columns);
-                } else {
-                    this.displayOnlySelectedColumns(e, columns);
+                var onlyVisibleColumns = false;
+                if (config !== undefined && config.onlyVisibleColumns === undefined) {
+                    onlyVisibleColumns = config.onlyVisibleColumns;
                 }
+
+                this.displayOnlySelectedColumns(e, columns, onlyVisibleColumns);
 
                 this.showSelectedColumns(columns, e);
                 this.sortColumnArray();
@@ -74,7 +75,10 @@
             this.columnsToShow = [];
         }
 
-        private displayOnlySelectedColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+        private displayOnlySelectedColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[], exportOnlyVisibleColumns: boolean) {
+            if (!exportOnlyVisibleColumns) {
+                this.setAllNonExcelOnlyColumnsAsVisible(e, columns);
+            }
             _.forEach(columns, (column) => {
                 if (!column.hidden) {
                     this.columnsToShow.push({ columnId: column.persistId });
@@ -99,14 +103,13 @@
             });
         }
 
-        private displayAllColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
-            _.forEach(columns, (column) => {
-                this.columnsToShow.push({ columnId: column.persistId });
-                if (column.hidden) {
-                    column.tempVisual = true;
-                    e.sender.showColumn(column);
-                }
-                return;
+        private setAllNonExcelOnlyColumnsAsVisible(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+            _.forEach(columns,
+                column => {
+                    if (column.hidden && column.parentId === undefined) {
+                        column.tempVisual = true;
+                        e.sender.showColumn(column);
+                    }
             });
         }
 

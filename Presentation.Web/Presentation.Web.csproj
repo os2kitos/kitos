@@ -561,7 +561,6 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight.view.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
-    <Content Include="app\components\excel-export\excel-export-modal-view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
@@ -691,7 +690,6 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-reference.controller.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
-    <TypeScriptCompile Include="app\components\excel-export\excel-export-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-advice\it-advice-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
@@ -716,6 +714,7 @@
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
     <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
+    <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />

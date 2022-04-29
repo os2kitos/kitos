@@ -5,6 +5,7 @@
      * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
      */
 module Kitos.Utility.KendoGrid {
+    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export enum KendoGridColumnFiltering {
@@ -672,12 +673,11 @@ module Kitos.Utility.KendoGrid {
             this.$state.go(".", null, { reload: true });
         }
 
+        private excelConfig: IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-
-            var modalInstance = Kitos.ExcelExport.Modal.Create.createModalInstance(_, );
-            modalInstance.result.then(angular.noop, angular.noop);
-
-            //this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, true);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, this.excelConfig);
         }
 
         private checkRequiredField(name: string, value: any) {
@@ -770,6 +770,43 @@ module Kitos.Utility.KendoGrid {
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
+
+            //TODO: POC on ADDING custom property before export...
+            //TODO: Hide the standard button
+            //TODO: Use dropdown config in stead
+            this.customToolbarEntries.push({
+                show: true,
+                id: "excelExportSelector",
+                title: "Excel custom",
+                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
+                implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                enabled: () => true,
+                dropDownConfiguration: {
+                    selectedOptionChanged: newItem => {
+                        if (newItem === null)
+                            return;
+
+                        if (newItem.id === "exportExcelOnlyVisible") {
+                            this.excelConfig.onlyVisibleColumns = true;
+                        }
+                        else {
+                            this.excelConfig.onlyVisibleColumns = false;
+                        }
+
+                        this.gridBinding.mainGrid.saveAsExcel();
+                    },
+                    availableOptions: [
+                        {
+                            id: "exportExcelAll",
+                            text: "Alt data"
+                        },
+                        {
+                            id: "exportExcelOnlyVisible",
+                            text: "Kun de viste kolonner"
+                        }]
+                }
+            });
 
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {
@@ -914,7 +951,7 @@ module Kitos.Utility.KendoGrid {
                 // is for the one we're interested in.
                 if (widget === this.gridBinding.mainGrid) {
 
-                    this.loadGridOptions();
+                    //this.loadGridOptions();
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     this.$(".k-grid-excel").click(() => {
