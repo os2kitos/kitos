@@ -27,10 +27,7 @@
         /// Has write access to everything within the contract module
         /// </summary>
         ContractModuleAdmin = 5,
-        /// <summary>
-        /// Has write access to organization reports.
-        /// </summary>
-        ReportModuleAdmin = 6,
+        //NOTE: a jump from 5-7 due to the old report admin
         /// <summary>
         /// God mode
         /// </summary>

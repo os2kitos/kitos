@@ -54,7 +54,7 @@
             this.optionType = $scope.optionType;
         }
 
-        $onInit() {            
+        $onInit() {
 
             this.mainGridOptions = {
                 dataSource: {
@@ -111,122 +111,79 @@
                 }
             };
 
-            if (this.dirId === "reportCategoryTypeId") {
-                this.mainGridOptions["columns"] = [
-                    {
-                        field: "Name",
-                        title: "Navn",
-                        width: 230,
-                        persistId: "name", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Name,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        field: "Description",
-                        title: "Beskrivelse",
-                        width: 230,
-                        persistId: "description", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Description,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
-                        }
-                    },
-                    {
-                        name: "editOption",
-                        text: "Redigér",
-                        template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button>",
-                        title: " ",
-                        width: 176
-                    } as any
-                ];
-             } else {
-                this.mainGridOptions["columns"] = [
-                    {
-                        field: "IsEnabled",
-                        title: "Tilgængelig",
-                        width: 112,
-                        persistId: "isEnabled", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: `# if(IsEnabled) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "IsObligatory",
-                        title: "Obligatorisk",
-                        width: 112,
-                        persistId: "IsObligatory", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        title: "Prioritet",
-                        template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-arrow-up' aria-hidden='true'></i></button>` +
+            this.mainGridOptions["columns"] = [
+                {
+                    field: "IsEnabled",
+                    title: "Tilgængelig",
+                    width: 112,
+                    persistId: "isEnabled", // DON'T YOU DARE RENAME!
+                    attributes: { "class": "text-center" },
+                    template: `# if(IsEnabled) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+                    field: "IsObligatory",
+                    title: "Obligatorisk",
+                    width: 112,
+                    persistId: "IsObligatory", // DON'T YOU DARE RENAME!
+                    attributes: { "class": "text-center" },
+                    template: `# if(IsObligatory) { # <span class="glyphicon glyphicon-check text-success" aria-hidden="true"></span> # } else { # <span class="glyphicon glyphicon-unchecked" aria-hidden="true"></span> # } #`,
+                    hidden: false,
+                    filterable: false,
+                    sortable: false
+                },
+                {
+                    title: "Prioritet",
+                    template: `<button class='btn btn-link' data-ng-click='ctrl.pushUp($event)'"><i class='fa fa-arrow-up' aria-hidden='true'></i></button>` +
                         `<button class='btn btn-link' data-ng-click='ctrl.pushDown($event)'"><i class='fa fa-arrow-down' aria-hidden='true'></i></button>`,
-                        width: 100,
-                        attributes: { "class": "text-center" },
-                        persistId: "command"
+                    width: 100,
+                    attributes: { "class": "text-center" },
+                    persistId: "command"
 
-                    },
-                    {
-                        field: "Name",
-                        title: "Navn",
-                        width: 230,
-                        persistId: "name", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Name,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
+                },
+                {
+                    field: "Name",
+                    title: "Navn",
+                    width: 230,
+                    persistId: "name", // DON'T YOU DARE RENAME!
+                    template: (dataItem) => dataItem.Name,
+                    hidden: false,
+                    filterable: {
+                        cell: {
+                            template: customFilter,
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
                         }
-                    },
-                    {
-                        field: "Description",
-                        title: "Beskrivelse",
-                        width: 230,
-                        persistId: "description", // DON'T YOU DARE RENAME!
-                        template: (dataItem) => dataItem.Description,
-                        hidden: false,
-                        filterable: {
-                            cell: {
-                                template: customFilter,
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
+                    }
+                },
+                {
+                    field: "Description",
+                    title: "Beskrivelse",
+                    width: 230,
+                    persistId: "description", // DON'T YOU DARE RENAME!
+                    template: (dataItem) => dataItem.Description,
+                    hidden: false,
+                    filterable: {
+                        cell: {
+                            template: customFilter,
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
                         }
-                    },
-                    {
-                        name: "editOption",
-                        text: "Redigér",
-                        template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
-                        title: " ",
-                        width: 176
-                    } as any
-                ];
-            }
+                    }
+                },
+                {
+                    name: "editOption",
+                    text: "Redigér",
+                    template: "<button type='button' class='btn btn-link' title='Redigér type' ng-click='ctrl.editOption($event)'><i class='fa fa-pencil' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type utilgængelig' ng-click='ctrl.disableEnableOption($event, false)' ng-if='dataItem.IsEnabled'><i class='fa fa-times' aria-hidden='true'></i></button> <button type='button' class='btn btn-link' title='Gør type tilgængelig' ng-click='ctrl.disableEnableOption($event, true)' ng-if='!dataItem.IsEnabled'><i class='fa fa-check' aria-hidden='true'></i></button>",
+                    title: " ",
+                    width: 176
+                } as any
+            ];
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''

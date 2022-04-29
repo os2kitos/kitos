@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Presentation.Web.Models.API.V2.Types.Organization;
 using Tests.Integration.Presentation.Web.Tools;
@@ -219,21 +220,21 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(expectedRoles, dtoUser.Roles.ToHashSet());
         }
 
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
 
-        private async Task<User> CreateUser(Organization organization)
+        private async Task<User> CreateUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, organization.Id, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return user;
         }
 
-        private async Task AssignRoles(Organization organization, int userId, params OrganizationRole[] roles)
+        private static async Task AssignRoles(OrganizationDTO organization, int userId, params OrganizationRole[] roles)
         {
             foreach (var organizationRole in roles)
             {
@@ -242,7 +243,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             }
         }
 
-        private async Task<Organization> CreateOrganizationAsync()
+        private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
             return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, null, A<OrganizationTypeKeys>(), AccessModifier.Public);

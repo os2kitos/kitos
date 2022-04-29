@@ -7,7 +7,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Microsoft.OData.Edm;
 using Presentation.Web.Controllers.API.V1.OData;
 using Presentation.Web.Controllers.API.V1.OData.LocalOptionControllers;
@@ -16,7 +15,6 @@ using Presentation.Web.Controllers.API.V1.OData.OptionControllers;
 using Presentation.Web.Infrastructure;
 using Core.DomainModel.Advice;
 using System.Linq;
-using Presentation.Web.Models;
 using Presentation.Web.Controllers.API.V1.OData.AttachedOptions;
 using Microsoft.OData;
 using Microsoft.OData.UriParser;
@@ -30,7 +28,6 @@ using Presentation.Web.Infrastructure.Attributes;
 using DataType = Core.DomainModel.ItSystem.DataType;
 using HelpText = Core.DomainModel.HelpText;
 using Core.DomainModel.Shared;
-using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web
 {
@@ -327,9 +324,6 @@ namespace Presentation.Web
             var localPurchaseFormType = BindEntitySet<LocalPurchaseFormType, LocalPurchaseFormTypesController>(builder);
             localPurchaseFormType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
-            var localReportCategoryType = BindEntitySet<LocalReportCategoryType, LocalReportCategoryTypesController>(builder);
-            localReportCategoryType.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
-
             var removeOption = builder.Function("RemoveOption");
             removeOption.Parameter<int>("id");
             removeOption.Parameter<int>("objectId");
@@ -381,21 +375,11 @@ namespace Presentation.Web
 
             BindEntitySet<AdviceSent, AdviceSentController>(builder);
 
-            BindEntitySet<GlobalConfig, GlobalConfigsController>(builder);
-
-            var accessType = BindEntitySet<AccessType, AccessTypesController>(builder);
-            accessType.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
-
             BindEntitySet<ArchivePeriod, ArchivePeriodsController>(builder);
-
-            var reports = builder.EntitySet<Report>("Reports");
-            reports.HasRequiredBinding(u => u.Organization, entitySetOrganizations);
 
             var references = builder.EntitySet<ExternalReference>("ExternalReferences");
             references.EntityType.HasKey(x => x.Id);
             references.HasRequiredBinding(a => a.ItSystem, entitySetItSystems);
-
-            BindEntitySet<ReportCategoryType, ReportCategoryTypesController>(builder);
 
             BindEntitySet<HelpText, HelpTextsController>(builder);
 
