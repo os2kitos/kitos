@@ -1949,7 +1949,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, Organization organization)
+        private async Task<List<Guid>> CreateDataProcessingRegistrationUuids(string token, OrganizationDTO organization)
         {
             var dpr1 = await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO
             {
@@ -1964,7 +1964,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return new List<Guid> { dpr1.Uuid, dpr2.Uuid };
         }
 
-        private async Task<List<RoleAssignmentRequestDTO>> CreateRoles(Organization organization)
+        private async Task<List<RoleAssignmentRequestDTO>> CreateRoles(OrganizationDTO organization)
         {
             var user1 = await CreateApiUserAsync(organization);
             var user2 = await CreateApiUserAsync(organization);
@@ -1987,7 +1987,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return roles;
         }
 
-        private async Task<List<Guid>> CreateSystemUsageUuids(string token, Organization organization)
+        private async Task<List<Guid>> CreateSystemUsageUuids(string token, OrganizationDTO organization)
         {
             var system1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
             var system2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
@@ -2109,7 +2109,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(Organization organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2170,7 +2170,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
-        private async Task<Organization> CreateOrganizationAsync()
+        private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, "13370000", OrganizationTypeKeys.Kommune, AccessModifier.Public);
@@ -2193,13 +2193,13 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(expected?.Name, actual?.Name);
         }
 
-        private static void AssertExpectedShallowContracts(ItContractDTO expectedContent, Organization expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
+        private static void AssertExpectedShallowContracts(ItContractDTO expectedContent, OrganizationDTO expectedOrganization, IEnumerable<ItContractResponseDTO> dtos)
         {
             var dto = Assert.Single(dtos, contract => contract.Uuid == expectedContent.Uuid);
             AssertExpectedShallowContract(expectedContent, expectedOrganization, dto);
         }
 
-        private static void AssertExpectedShallowContract(ItContractDTO expectedContent, Organization expectedOrganization, ItContractResponseDTO dto)
+        private static void AssertExpectedShallowContract(ItContractDTO expectedContent, OrganizationDTO expectedOrganization, ItContractResponseDTO dto)
         {
             Assert.Equal(expectedContent.Uuid, dto.Uuid);
             Assert.Equal(expectedContent.Name, dto.Name);
@@ -2216,14 +2216,14 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return await ItContractHelper.CreateContract(name, orgId);
         }
 
-        private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync()
+        private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync()
         {
             var organization = await CreateOrganizationAsync();
             var (user, token) = await CreateApiUserAsync(organization);
             await HttpApi.SendAssignRoleToUserAsync(user.Id, OrganizationRole.LocalAdmin, organization.Id).DisposeAsync();
             return (token, user, organization);
         }
-        private async Task<(User user, string token)> CreateApiUserAsync(Organization organization)
+        private async Task<(User user, string token)> CreateApiUserAsync(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
@@ -2263,7 +2263,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(contractResponsibleDataWriteRequestDto.SignedBy, freshDTO.Supplier.SignedBy);
         }
 
-        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, Organization organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
+        private async Task<ContractResponsibleDataWriteRequestDTO> CreateContractResponsibleDataRequestDTO(string token, OrganizationDTO organization, bool withOrgUnit, bool withSignedAt, bool withSignedBy)
         {
             var organizationUnit = withOrgUnit
                 ? (await OrganizationUnitV2Helper.GetOrganizationUnitsAsync(token, organization.Uuid, 0, 10)).RandomItem()
@@ -2343,7 +2343,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
-        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(Organization organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
+        private async Task<List<HandoverTrialRequestDTO>> CreateHandoverTrials(OrganizationDTO organization, bool oneWithBothExpectedAndApproved, bool oneWithExpectedOnly, bool oneWithApprovedOnly)
         {
             var handoverTrialTypes = (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractHandoverTrialTypes, organization.Uuid, 10, 0)).ToList();
             var handoverTrials = new List<HandoverTrialRequestDTO>();
@@ -2406,7 +2406,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
         }
 
-        private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, Organization organization, bool withExternal, bool withInternal)
+        private async Task<ContractPaymentsDataWriteRequestDTO> CreatePaymentsInput(string token, OrganizationDTO organization, bool withExternal, bool withInternal)
         {
             List<PaymentRequestDTO> internalPayments = null;
             List<PaymentRequestDTO> externalPayments = null;
@@ -2449,7 +2449,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         }
 
         private async Task<ContractAgreementPeriodDataWriteRequestDTO> CreateAgreementPeriodInput(bool hasExtensionOption, bool isContinuous, bool hasIrrevocableDate,
-            Organization organization)
+            OrganizationDTO organization)
         {
             var extensionOption = hasExtensionOption
                 ? (await OptionV2ApiHelper.GetOptionsAsync(

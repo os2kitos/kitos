@@ -12,9 +12,7 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Newtonsoft.Json.Linq;
 using Presentation.Web.Controllers.API.V1.Mapping;
-using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 
 namespace Presentation.Web.Controllers.API.V1

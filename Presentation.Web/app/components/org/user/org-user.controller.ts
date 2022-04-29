@@ -9,7 +9,6 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
-        isReportAdmin: boolean;
         isRightsHolder: boolean;
     }
 
@@ -188,7 +187,6 @@
                                 usr.isProjectAdmin = this.hasRole(usr, Models.OrganizationRole.ProjectModuleAdmin);
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
-                                usr.isReportAdmin = this.hasRole(usr, Models.OrganizationRole.ReportModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
                             });
                             return response;
@@ -388,15 +386,6 @@
                         persistId: "contractadminrole", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: (dataItem) => setBooleanValue(dataItem.isContractAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
-                        field: "isReportAdmin", title: "Rapport Admin", width: 112,
-                        persistId: "reportadminrole", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isReportAdmin),
                         hidden: false,
                         filterable: false,
                         sortable: false

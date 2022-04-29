@@ -6,6 +6,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Response.Organization;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
@@ -74,7 +75,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(newOrg.Uuid, dto.Uuid);
             Assert.Equal(newOrg.Name, dto.Name);
             AssertOrganizationType(orgType, dto);
-            Assert.Equal(newOrg.GetActiveCvr(), dto.Cvr);
+            Assert.Equal(newOrg.Cvr, dto.Cvr);
         }
 
         [Fact]
@@ -177,7 +178,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(expectedResult, dto.OrganizationType);
         }
 
-        private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)
+        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,

@@ -35,7 +35,6 @@
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService,
             private user) {
-            $rootScope.page.title = "Org overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -118,12 +117,6 @@
                     serverFiltering: true,
                 },
                 toolbar: [
-                    {
-                        name: "opretOrganisation",
-                        text: "Opret Organisation",
-                        template:
-                            "<a ui-sref='local-config.org.create' class='btn btn-success pull-right'>#: text #</a>"
-                    },
                     {
                         name: "clearFilter",
                         text: "Gendan kolonneopsætning",

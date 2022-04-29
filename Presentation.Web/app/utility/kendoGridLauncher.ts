@@ -46,6 +46,7 @@ module Kitos.Utility.KendoGrid {
         withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        withParentColumnId(parentId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
@@ -74,6 +75,7 @@ module Kitos.Utility.KendoGrid {
         private title: string = null;
         private id: string = null;
         private dataSourceName: string = null;
+        private parentId: string = null;
         private excelOutput: (source: TDataSource) => string = null;
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
@@ -106,6 +108,12 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
+        withParentColumnId(parentId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (parentId == null) throw "parentId must be defined";
+            this.parentId = parentId;
+            return this;
+        }
+
         private checkRequiredField(name: string, value: any) {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
@@ -122,6 +130,7 @@ module Kitos.Utility.KendoGrid {
                 field: this.dataSourceName,
                 title: this.title,
                 attributes: [],
+                parentId: this.parentId,
                 width: this.standardWidth,
                 persistId: `${this.id}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")this.id,
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,

@@ -49,8 +49,7 @@ const cleanScriptBundles = function (callBack) {
     return del([
         config.script(config.libraryBundle),
         config.script(config.angularBundle),
-        config.script(config.appBundle),
-        config.script(config.appReportBundle),
+        config.script(config.appBundle)
     ]);
 };
 
@@ -79,16 +78,6 @@ const appBundle = function (callBack) {
     return src(config.appSrc)
         .pipe(sourceMaps.init())
         .pipe(concat(config.appBundle))
-        .pipe(uglify())
-        .pipe(sourceMaps.write(config.maps))
-        .pipe(dest(paths.sourceScript));
-};
-
-// create app report bundled file
-const appReportBundle = function (callBack) {
-    return src(config.appReportSrc)
-        .pipe(sourceMaps.init())
-        .pipe(concat(config.appReportBundle))
         .pipe(uglify())
         .pipe(sourceMaps.write(config.maps))
         .pipe(dest(paths.sourceScript));
@@ -137,7 +126,7 @@ const tinyMCEFixLang = function (callBack) {
 const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang));
 
 // run bundle tasks
-const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle, appReportBundle));
+const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
 
 // bundle and deploy scripts and styles
 exports.deployProd = series(typescript, parallel(scripts, styles), cleanJsAndMaps);

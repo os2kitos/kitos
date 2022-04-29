@@ -11,7 +11,6 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
-        isReportAdmin: boolean;
         hasApi: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
@@ -27,7 +26,6 @@
         public isUserProjectAdmin = false;
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
-        public isUserReportAdmin = false;
         public hasApi = false;
 
         public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_"];
@@ -50,7 +48,6 @@
             this.isUserProjectAdmin = user.isProjectAdmin;
             this.isUserSystemAdmin = user.isSystemAdmin;
             this.isUserContractAdmin = user.isContractAdmin;
-            this.isUserReportAdmin = user.isReportAdmin;
             this.hasApi = user.hasApi;
 
             autofocus();
@@ -73,8 +70,6 @@
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.SystemModuleAdmin));
             if (this.vm.isContractAdmin)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ContractModuleAdmin));
-            if (this.vm.isReportAdmin)
-                promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.ReportModuleAdmin));
             if (this.vm.isRightsHolder)
                 promises.push(this.addRole(currentOrganizationId, userId, Models.OrganizationRole.RightsHolderAccess));
         }

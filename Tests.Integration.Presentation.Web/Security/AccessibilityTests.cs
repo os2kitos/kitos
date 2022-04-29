@@ -6,7 +6,6 @@ using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Tests.Integration.Presentation.Web.Tools;
 using Xunit;
 using Tests.Integration.Presentation.Web.Tools.Model;
@@ -55,8 +54,6 @@ namespace Tests.Integration.Presentation.Web.Security
         [InlineData("api/itsystem", typeof(Core.DomainModel.ItSystem.ItSystem))]
         [InlineData("odata/itinterfaces", typeof(ItInterface))]
         [InlineData("api/itinterface", typeof(ItInterface))]
-        [InlineData("odata/reports", typeof(Report))]
-        [InlineData("api/report", typeof(Report))]
         [InlineData("odata/itsystemusages", typeof(ItSystemUsage))]
         [InlineData("api/itsystemusage", typeof(ItSystemUsage))]
         [InlineData("odata/itcontracts", typeof(ItContract))]

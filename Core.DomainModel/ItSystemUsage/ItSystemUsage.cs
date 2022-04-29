@@ -41,7 +41,6 @@ namespace Core.DomainModel.ItSystemUsage
             Contracts = new List<ItContractItSystemUsage>();
             ArchivePeriods = new List<ArchivePeriod>();
             TaskRefs = new List<TaskRef>();
-            AccessTypes = new List<AccessType>();
             TaskRefsOptOut = new List<TaskRef>();
             UsedBy = new List<ItSystemUsageOrgUnitUsage>();
             ItProjects = new List<ItProject.ItProject>();
@@ -239,7 +238,6 @@ namespace Core.DomainModel.ItSystemUsage
 
         public int? ReferenceId { get; set; }
         public virtual ExternalReference Reference { get; set; }
-        public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         public ArchiveDutyTypes? ArchiveDuty { get; set; }
 

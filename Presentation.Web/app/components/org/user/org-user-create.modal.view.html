@@ -67,9 +67,6 @@
                 <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserContractAdmin">
                     <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isContractAdmin">Kontrakt admin</label>
                 </div>
-                <div class="checkbox" ng-show="ctrl.isUserGlobalAdmin || ctrl.isUserLocalAdmin || ctrl.isUserReportAdmin">
-                    <label><input type="checkbox" value="" data-ng-model="ctrl.vm.isReportAdmin">Rapport admin</label>
-                </div>
             </div>
         </div>
         <div class="form-group" data-ng-hide="userExists || !ctrl.isUserGlobalAdmin">
