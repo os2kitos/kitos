@@ -126,7 +126,6 @@
     <Compile Include="Mapping\PriceRegulationTypeMap.cs" />
     <Compile Include="Mapping\ProcurementStrategyTypeMap.cs" />
     <Compile Include="Mapping\GoalTypeMap.cs" />
-    <Compile Include="Mapping\ReportMap.cs" />
     <Compile Include="Mapping\RightMap.cs" />
     <Compile Include="Mapping\EconomyYearMap.cs" />
     <Compile Include="Mapping\DataTypeMap.cs" />
@@ -835,6 +834,14 @@
     <Compile Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.designer.cs">
       <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204190948423_RemoveReports.cs" />
+    <Compile Include="Migrations\202204190948423_RemoveReports.designer.cs">
+      <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202204200556500_Remove_Access_Types.cs" />
+    <Compile Include="Migrations\202204200556500_Remove_Access_Types.designer.cs">
+      <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1377,6 +1384,12 @@
     <EmbeddedResource Include="Migrations\202109270936076_Add_LifeCycleTrackingEvent.resx">
       <DependentUpon>202109270936076_Add_LifeCycleTrackingEvent.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204190948423_RemoveReports.resx">
+      <DependentUpon>202204190948423_RemoveReports.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204200556500_Remove_Access_Types.resx">
+      <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1446,6 +1459,9 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\Deactive_Expired_Advice_And_Schedule_Missing_Jobs.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\RemoveReports.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

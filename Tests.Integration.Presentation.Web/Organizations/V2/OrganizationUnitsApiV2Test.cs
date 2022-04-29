@@ -157,14 +157,14 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
 
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return (user, userAndGetToken.token);
         }
 
-        private async Task<Organization> CreateOrganizationAsync()
+        private async Task<OrganizationDTO> CreateOrganizationAsync()
         {
             var organizationName = CreateName();
             return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, organizationName, null, A<OrganizationTypeKeys>(), AccessModifier.Public);

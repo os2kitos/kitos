@@ -48,9 +48,6 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasForeignKey(d => d.ItSystemUsageId)
                 .WillCascadeOnDelete(false);
 
-            this.HasMany(t => t.AccessTypes)
-                .WithMany(t => t.ItSystemUsages);
-
             this.HasOptional(t => t.ArchiveLocation)
                 .WithMany(t => t.References)
                 .HasForeignKey(d => d.ArchiveLocationId);

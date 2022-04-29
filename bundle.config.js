@@ -55,22 +55,6 @@ module.exports = {
     appSrc: paths.allJavaScriptNoTests,
     appBundle: "app-bundle.min.js",
 
-    // app script bundle
-    appReportSrc: [
-        app("models/api/organization-role.js"),
-        appReport("reportApp.module.js"),
-        app("shared/notify/notify.module.js"),
-        app("shared/notify/notify.directive.js"),
-        app("shared/notify/notify.factory.js"),
-        appReport("services/stimulsoftService.js"),
-        app("services/ReportService.js"),
-        app("services/userServices.js"),
-        app("services/authorizationService.js"),
-        app("interceptors/csrfRequestInterceptor.js"),
-        appReport("report-viewer.controller.js")
-    ],
-    appReportBundle: "appReport-bundle.min.js",
-
     // font bundle
     fontSrc: [
         npm("/bootstrap/dist/fonts/*.*"),
@@ -116,13 +100,3 @@ function content(file) {
 function npm(file) {
     return paths.npm + "/" + file;
 }
-
-function app(file) {
-    return "Presentation.Web/app/" + file;
-}
-
-function appReport(file) {
-    return "Presentation.Web/appReport/" + file;
-}
-
-
