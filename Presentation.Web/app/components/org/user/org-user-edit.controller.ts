@@ -12,7 +12,6 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
-        isReportAdmin: boolean;
         isRightsHolder: boolean;
         hasStakeHolderAccess: boolean;
     }
@@ -25,7 +24,6 @@
         public isUserProjectAdmin = false;
         public isUserSystemAdmin = false;
         public isUserContractAdmin = false;
-        public isUserReportAdmin = false;
         public hasApi = false;
 
         private userId: number;
@@ -57,7 +55,6 @@
                 isProjectAdmin: hasRole(Models.OrganizationRole.ProjectModuleAdmin),
                 isSystemAdmin: hasRole(Models.OrganizationRole.SystemModuleAdmin),
                 isContractAdmin: hasRole(Models.OrganizationRole.ContractModuleAdmin),
-                isReportAdmin: hasRole(Models.OrganizationRole.ReportModuleAdmin),
                 isRightsHolder: hasRole(Models.OrganizationRole.RightsHolderAccess),
                 hasStakeHolderAccess: user.HasStakeHolderAccess
             };
@@ -71,7 +68,6 @@
             this.isUserProjectAdmin = currentUser.isProjectAdmin;
             this.isUserSystemAdmin = currentUser.isSystemAdmin;
             this.isUserContractAdmin = currentUser.isContractAdmin;
-            this.isUserReportAdmin = currentUser.isReportAdmin;
         }
 
         private changeRight(diffRights, property: string, role: Models.OrganizationRole): ng.IHttpPromise<any> {
@@ -103,7 +99,6 @@
             promises.push(this.changeRight(diffRights, "isProjectAdmin", Models.OrganizationRole.ProjectModuleAdmin));
             promises.push(this.changeRight(diffRights, "isSystemAdmin", Models.OrganizationRole.SystemModuleAdmin));
             promises.push(this.changeRight(diffRights, "isContractAdmin", Models.OrganizationRole.ContractModuleAdmin));
-            promises.push(this.changeRight(diffRights, "isReportAdmin", Models.OrganizationRole.ReportModuleAdmin));
             promises.push(this.changeRight(diffRights, "isRightsHolder", Models.OrganizationRole.RightsHolderAccess));
 
             var payload: Models.IUser = {

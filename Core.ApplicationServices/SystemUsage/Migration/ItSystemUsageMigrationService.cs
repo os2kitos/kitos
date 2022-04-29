@@ -192,9 +192,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                     //Perform final switchover of "source IT-System"
                     //***********************************************
 
-                    // Delete access types (they are bound to the system)
-                    DeleteAccessTypes(systemUsage);
-
                     // Switch the ID
                     systemUsage.ItSystemId = toSystemId;
                     _systemUsageRepository.Update(systemUsage);
@@ -218,17 +215,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         public bool CanExecuteMigration()
         {
             return _authorizationContext.HasPermission(new SystemUsageMigrationPermission());
-        }
-
-        private static void DeleteAccessTypes(ItSystemUsage systemUsage)
-        {
-            if (systemUsage.AccessTypes?.Any() == true)
-            {
-                foreach (var accessType in systemUsage.AccessTypes.ToList())
-                {
-                    systemUsage.AccessTypes.Remove(accessType);
-                }
-            }
         }
 
         private static IEnumerable<SystemRelation> GetRelationMigrations(ItSystemUsage fromSystemUsage)

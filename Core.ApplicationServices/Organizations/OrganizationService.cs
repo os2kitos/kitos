@@ -165,20 +165,12 @@ namespace Core.ApplicationServices.Organizations
                 return OperationFailure.BadInput;
             }
 
-            using (var transaction = _transactionManager.Begin())
-            {
-                newOrg = _orgRepository.Insert(newOrg);
-                _orgRepository.Save();
+            using var transaction = _transactionManager.Begin();
 
-                if (newOrg.TypeId == (int)OrganizationTypeKeys.Interessefællesskab)
-                {
-                    _organizationRoleService.MakeLocalAdmin(user, newOrg);
-                    _organizationRoleService.MakeUser(user, newOrg);
-                }
-
-                transaction.Commit();
-                return newOrg;
-            }
+            newOrg = _orgRepository.Insert(newOrg);
+            _orgRepository.Save();
+            transaction.Commit();
+            return newOrg;
         }
 
         public Result<Organization, OperationError> GetOrganization(Guid organizationUuid, OrganizationDataReadAccessLevel? withMinimumAccessLevel = null)

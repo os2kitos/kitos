@@ -20,7 +20,7 @@ namespace Presentation.Web.Models.API.V1
         public OrgUnitSimpleDTO Root { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
-        public Guid? Uuid { get; set; }
+        public Guid Uuid { get; set; }
 
         public virtual int? ContactPersonId { get; set; }
         public virtual UserDTO ContactPerson { get; set; }

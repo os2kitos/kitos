@@ -5755,24 +5755,24 @@ BEGIN
 			ItSystemUsage.LastChangedByUserId,
 			ItSystemUsage.ObjectOwnerId
         FROM 
-			kitos.dbo.ItSystemUsage
+			ItSystemUsage
 			INNER JOIN
-			kitos.dbo.ItSystem ON ItSystem.Id = ItSystemUsage.ItSystemId
+			ItSystem ON ItSystem.Id = ItSystemUsage.ItSystemId
 		WHERE 
 			ItSystemUsage.Id NOT IN (
 				SELECT
 					ItSystemUsageId
 				FROM
-					kitos.dbo.ItContractItSystemUsages
+					ItContractItSystemUsages
 					INNER JOIN
-					kitos.dbo.ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId
+					ItContract ON ItContract.Id = ItContractItSystemUsages.ItContractId
 			)
 			AND
 			ItSystemUsage.Id NOT IN (
 				SELECT
 					ItSystemUsage_Id
 				FROM
-					kitos.dbo.DataProcessingRegistrationItSystemUsages
+					DataProcessingRegistrationItSystemUsages
 			)
 			AND 
 			(
@@ -5794,7 +5794,7 @@ BEGIN
 					SELECT
 						ItSystemUsageId
 					FROM
-						kitos.dbo.ItSystemUsageDataWorkerRelations
+						ItSystemUsageDataWorkerRelations
 				)
 			)
 				
@@ -5806,7 +5806,7 @@ BEGIN
 	*/
 
 	INSERT INTO 
-		kitos.dbo.DataProcessingRegistrations (OrganizationId, Name, LastChanged, DataResponsibleRemark, IsOversightCompleted, LatestOversightDate, OversightCompletedRemark, ObjectOwnerId, LastChangedByUserId)
+		DataProcessingRegistrations (OrganizationId, Name, LastChanged, DataResponsibleRemark, IsOversightCompleted, LatestOversightDate, OversightCompletedRemark, ObjectOwnerId, LastChangedByUserId)
 	OUTPUT
 		inserted.Id into @DprIds_5
 	SELECT
@@ -5834,7 +5834,7 @@ BEGIN
 	*/
 
 	INSERT INTO
-		kitos.dbo.DataProcessingRegistrationItSystemUsages (DataProcessingRegistration_Id, ItSystemUsage_Id)
+		DataProcessingRegistrationItSystemUsages (DataProcessingRegistration_Id, ItSystemUsage_Id)
 	SELECT
 		DprId, ItSystemUsageId
 	FROM 
@@ -5845,18 +5845,18 @@ BEGIN
 	*/
 
 	INSERT INTO
-		kitos.dbo.DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
+		DataProcessingRegistrationOrganizations (DataProcessingRegistration_Id, Organization_Id)
 	SELECT DISTINCT
 		DprId, DataWorkerId
 	FROM 
 		@DprsWithSystemKeys_5 AS dprWithSystem
 		INNER JOIN
-		kitos.dbo.ItSystemUsageDataWorkerRelations ON dprWithSystem.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
+		ItSystemUsageDataWorkerRelations ON dprWithSystem.ItSystemUsageId = ItSystemUsageDataWorkerRelations.ItSystemUsageId
 	WHERE DataWorkerId IS NOT NULL
 		AND
 		DataWorkerId NOT IN (
 			SELECT Organization_Id
-			FROM kitos.dbo.DataProcessingRegistrationOrganizations
+			FROM DataProcessingRegistrationOrganizations
 			WHERE DataProcessingRegistration_Id = DprId
 		)
 
@@ -5868,7 +5868,7 @@ BEGIN
 	DECLARE @DBRReferences_5 Table (Id int)
 
 	INSERT INTO
-		kitos.dbo.ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
+		ExternalReferences (Title, URL, Display, LastChanged, Created, DataProcessingRegistration_Id, ObjectOwnerId)
 	OUTPUT 
 		inserted.Id into @DBRReferences_5
 	SELECT

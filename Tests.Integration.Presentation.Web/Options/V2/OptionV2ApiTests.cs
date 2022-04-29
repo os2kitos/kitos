@@ -37,7 +37,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var name = A<string>();
             await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, name, orgId);
             var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var organizationUuid = organizationDto.Uuid;
             var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(name)); //Get the newly created type.
 
@@ -58,7 +58,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var newName = A<string>();
             var createdType = await EntityOptionHelper.CreateOptionTypeAsync(apiv1OptionResource, newName, orgId);
             var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var organizationUuid = organizationDto.Uuid;
             var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(newName)); //Get the newly created type.
 
@@ -83,7 +83,7 @@ namespace Tests.Integration.Presentation.Web.Options.V2
             var name = A<string>();
             await EntityOptionHelper.CreateRoleOptionTypeAsync(apiv1OptionResource, name, orgId, writeAccess);
             var organizationDto = await OrganizationHelper.GetOrganizationAsync(orgId);
-            var organizationUuid = organizationDto.Uuid.GetValueOrDefault();
+            var organizationUuid = organizationDto.Uuid;
             var options = await OptionV2ApiHelper.GetOptionsAsync(apiv2OptionResource, organizationUuid, 100, 0); //100 should be more than enough to get all.
             var option = options.First(x => x.Name.Equals(name)); //Get the newly created type.
 

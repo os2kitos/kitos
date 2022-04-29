@@ -81,7 +81,6 @@
         ProcurementStrategyTypes,
         PurchaseFormTypes,
         RegisterTypes,
-        ReportCategoryTypes,
         SensitivePersonalDataTypes,
         SensitiveDataTypes,
         TerminationDeadlineTypes,
@@ -170,8 +169,6 @@
                     return "LocalPurchaseFormTypes";
                 case LocalOptionType.RegisterTypes:
                     return "LocalRegisterTypes";
-                case LocalOptionType.ReportCategoryTypes:
-                    return "LocalReportCategoryTypes";
                 case LocalOptionType.SensitivePersonalDataTypes:
                     return "LocalSensitivePersonalDataTypes";
                 case LocalOptionType.SensitiveDataTypes:

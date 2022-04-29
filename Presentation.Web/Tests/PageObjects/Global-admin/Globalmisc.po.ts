@@ -1,7 +1,4 @@
-﻿import KendoToolbarWrapper = require("../../object-wrappers/KendoToolbarWrapper");
-import NavigationBarWrapper = require("../../object-wrappers/NavigationBarWrapper");
-import SubNavigationBarWrapper = require("../../object-wrappers/SubNavigationBarWrapper");
-import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
+﻿import CssLocatorHelper = require("../../Object-wrappers/CSSLocatorHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import PageObject = require("../IPageObject.po");
 import Constants = require("../../Utility/Constants");
@@ -35,7 +32,7 @@ class GlobalMisc implements PageObject {
     }
 
     public waitForStatusText(text: string) {
-        let condition = this.ec.textToBePresentInElement(element(this.byDataElementType(this.consts.kleStatusLabel)), text);
+        const condition = this.ec.textToBePresentInElement(element(this.byDataElementType(this.consts.kleStatusLabel)), text);
         return browser.wait(condition, waitUpTo.twoMinutes);
     }
 }

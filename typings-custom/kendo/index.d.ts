@@ -3836,6 +3836,7 @@ declare namespace kendo.ui {
         values?: any;
         menu?: boolean;
         persistId?: string;
+        parentId?: string;
     }
 
     interface GridEditable {

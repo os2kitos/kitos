@@ -15,8 +15,6 @@
         SystemModuleAdmin = "SystemModuleAdmin" as any,
         /** Has write access to everything within the contract module */
         ContractModuleAdmin = "ContractModuleAdmin" as any,
-        /** Has write access to everything within the report module */
-        ReportModuleAdmin = "ReportModuleAdmin" as any,
         /* Global admin - part of enum so must be here to prevent issues deserialization */
         GlobalAdmin = "GlobalAdmin" as any,
         /** Special rightsholder access bypasses regular organizational shields and gives special access to data for which it is marked as rightsholder **/
