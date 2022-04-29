@@ -18,8 +18,6 @@ Output/
 Presentation.Web/[Ss]cripts/
 Presentation.Web/app/**/*.js
 Presentation.Web/app/**/*.js.map
-Presentation.Web/appReport/**/*.js
-Presentation.Web/appReport/**/*.js.map
 Presentation.Web/Content/css/
 Presentation.Web/Content/fonts/
 Presentation.Web/Scripts/*-bundle*.js

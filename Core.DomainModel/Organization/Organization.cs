@@ -6,7 +6,6 @@ using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
-using Core.DomainModel.Reports;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Tracking;
 
@@ -35,7 +34,6 @@ namespace Core.DomainModel.Organization
             ItContracts = new List<ItContract.ItContract>();
             OrgUnits = new List<OrganizationUnit>();
             Rights = new List<OrganizationRight>();
-            Reports = new List<Report>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
             ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
@@ -104,8 +102,6 @@ namespace Core.DomainModel.Organization
         public virtual Config Config { get; set; }
 
         public virtual ICollection<OrganizationRight> Rights { get; set; }
-
-        public virtual ICollection<Report> Reports { get; set; }
 
         public virtual ICollection<SsoOrganizationIdentity> SsoIdentities { get; set; }
 

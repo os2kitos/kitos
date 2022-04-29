@@ -956,7 +956,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
-        private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, Organization rightsHolderOrganization)
+        private async Task<RightsHolderCreateItInterfaceRequestDTO> CreateRightsHolderItInterfaceRequestDTO(bool withProvidedUuid, OrganizationDTO rightsHolderOrganization)
         {
             var exposingSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), rightsHolderOrganization.Id, AccessModifier.Public);
 
@@ -973,21 +973,21 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             };
         }
 
-        private async Task<(string token, Organization createdOrganization)> CreateStakeHolderUserInNewOrg()
+        private async Task<(string token, OrganizationDTO createdOrganization)> CreateStakeHolderUserInNewOrg()
         {
             var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, org.Id, true, true);
             return (token, org);
         }
 
-        private async Task<(string token, Organization createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
+        private async Task<(string token, OrganizationDTO createdOrganization)> CreateRightsHolderUserInNewOrganizationAsync()
         {
             var org = await CreateOrganization();
             var (_, _, token) = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.RightsHolderAccess, org.Id, true);
             return (token, org);
         }
 
-        private async Task<(string token, Organization createdOrganization1, Organization createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
+        private async Task<(string token, OrganizationDTO createdOrganization1, OrganizationDTO createdOrganization2)> CreateRightsHolderUserInMultipleNewOrganizationsAsync()
         {
             var org1 = await CreateOrganization();
             var org2 = await CreateOrganization();
@@ -998,7 +998,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             return (token, org1, org2);
         }
 
-        private async Task<Organization> CreateOrganization()
+        private async Task<OrganizationDTO> CreateOrganization()
         {
             return await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, CreateName(), "11223344", OrganizationTypeKeys.Virksomhed, AccessModifier.Public);
         }

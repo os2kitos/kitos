@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -445,27 +444,6 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.True(result.Ok);
             transaction.Verify(x => x.Commit(), Times.Never);
-        }
-
-        [Fact]
-        public void ExecuteMigration_Returns_Ok_And_Deletes_Access_Types()
-        {
-            //Arrange
-            var newSystem = CreateSystem();
-            var systemUsage = CreateSystemUsage();
-
-            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, newSystem);
-            var transaction = ExpectBeginTransaction();
-            ExpectAllowModifyReturns(systemUsage, true);
-            systemUsage.AccessTypes = new List<AccessType> { new AccessType(), new AccessType() }; //Set access types
-
-            //Act
-            var result = _sut.ExecuteSystemUsageMigration(systemUsage.Id, newSystem.Id);
-
-            //Assert - Check that access types have been removed from the system usage
-            Assert.True(result.Ok);
-            Assert.Empty(systemUsage.AccessTypes);
-            VerifySystemMigrationCommitted(systemUsage, newSystem, transaction);
         }
 
         [Fact]

@@ -5,7 +5,6 @@ using Microsoft.AspNet.OData.Routing;
 using System.Net;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainServices;
-using Core.DomainModel.ItSystem;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
@@ -17,12 +16,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
     [PublicApi]
     public class ItSystemUsagesController : BaseEntityController<ItSystemUsage>
     {
-        private readonly IGenericRepository<AccessType> _accessTypeRepository;
-
-        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository, IGenericRepository<AccessType> accessTypeRepository)
+        public ItSystemUsagesController(IGenericRepository<ItSystemUsage> repository)
             : base(repository)
         {
-            _accessTypeRepository = accessTypeRepository;
         }
 
         /// <summary>
@@ -49,65 +45,6 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 .ByOrganizationId(orgKey);
 
             return Ok(result);
-        }
-
-        [AcceptVerbs("POST", "PUT")]
-        [ODataRoute("ItSystemUsages({key})/AccessTypes/{accessTypeId}")]
-        public IHttpActionResult CreateRef(int key, int accessTypeId)
-        {
-            var itSystemUsage = Repository.GetByKey(key);
-            if (itSystemUsage == null)
-            {
-                return NotFound();
-            }
-
-            if (!AllowModify(itSystemUsage))
-            {
-                return Forbidden();
-            }
-
-            var accessType = _accessTypeRepository.GetByKey(accessTypeId);
-            if (accessType == null)
-            {
-                return BadRequest("Invalid accessTypeId");
-            }
-
-            itSystemUsage.AccessTypes.Add(accessType);
-
-            RaiseUpdatedDomainEvent(itSystemUsage);
-            Repository.Save();
-
-            return StatusCode(HttpStatusCode.NoContent);
-        }
-
-        [AcceptVerbs("DELETE")]
-        [ODataRoute("ItSystemUsages({key})/AccessTypes/{accessTypeId}")]
-        public IHttpActionResult DeleteRef(int key, int accessTypeId)
-        {
-            var itSystemUsage = Repository.GetByKey(key);
-            if (itSystemUsage == null)
-            {
-                return NotFound();
-            }
-
-            if (!AllowModify(itSystemUsage))
-            {
-                return Forbidden();
-            }
-
-            var accessType = _accessTypeRepository.GetByKey(accessTypeId);
-
-            if (accessType == null)
-            {
-                return BadRequest("Invalid accessTypeId");
-            }
-
-            itSystemUsage.AccessTypes.Remove(accessType);
-
-            RaiseUpdatedDomainEvent(itSystemUsage);
-            Repository.Save();
-
-            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }

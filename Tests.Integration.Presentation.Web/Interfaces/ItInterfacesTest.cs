@@ -110,8 +110,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces
         [InlineData(OrganizationRole.User, AccessModifier.Local, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, AccessModifier.Public, false)]
         [InlineData(OrganizationRole.OrganizationModuleAdmin, AccessModifier.Local, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, AccessModifier.Public, false)]
-        [InlineData(OrganizationRole.ReportModuleAdmin, AccessModifier.Local, false)]
         [InlineData(OrganizationRole.LocalAdmin, AccessModifier.Local, true)]
         [InlineData(OrganizationRole.LocalAdmin, AccessModifier.Public, false)]
         [InlineData(OrganizationRole.SystemModuleAdmin, AccessModifier.Local, true)]
