@@ -4,6 +4,7 @@ using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Organizations;
 using Tests.Integration.Presentation.Web.Tools;
@@ -212,11 +213,21 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var systemInAnotherOrg2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
             var systemSetAsParentToSystemsInOtherOrgs = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
             await ItSystemHelper.SendSetParentSystemRequestAsync(systemInOwnOrg2.Id, systemSetAsParentToSystemsInOtherOrgs.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await ItSystemHelper.SendSetParentSystemRequestAsync(systemInAnotherOrg2.Id, systemSetAsParentToSystemsInOtherOrgs.Id,anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetParentSystemRequestAsync(systemInAnotherOrg2.Id, systemSetAsParentToSystemsInOtherOrgs.Id, anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            // Conflicts due to DPR where org is set as data processor or sub data processor (the two dprs in own org should not be included in the final result)
+            var dprOwnOrg1 = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, A<string>());
+            var dprOwnOrg2 = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, A<string>());
+            await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(dprOwnOrg1.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprOwnOrg2.Id,YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dprOwnOrg2.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            var dprConflictOnDataProcessor = await DataProcessingRegistrationHelper.CreateAsync(anotherOrg1.Id, A<string>());
+            var dprConflictOnSubDataProcessor = await DataProcessingRegistrationHelper.CreateAsync(anotherOrg1.Id, A<string>());
+            await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(dprConflictOnDataProcessor.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprConflictOnSubDataProcessor.Id,YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dprConflictOnSubDataProcessor.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
 
-            //TODO: DataProcessorForDprInOtherOrg
-            //TODO: SubDataProcessorForDprInOtherOrg
             //TODO: ContractsInOtherOrgWhereOrgIsSupplier
             //TODO: SystemsInOtherOrgWhereOrgIsRightsHolder
 
@@ -245,6 +256,12 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertNamedEntity(systemSetAsParentToSystemsInOtherOrgs.Id, systemSetAsParentToSystemsInOtherOrgs.Name, systemWithChildrenInOtherOrgs.System);
             var conflictingChild = Assert.Single(systemWithChildrenInOtherOrgs.Children);
             AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrg2.Id, systemInAnotherOrg2.Name, anotherOrg1.Id, anotherOrg1.Name, conflictingChild);
+
+            //DPR conflicts on data processor and sub data processor
+            var dataProcessorConflict = Assert.Single(conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor);
+            var subDataProcessorConflict = Assert.Single(conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor);
+            AssertNamedEntityWithOrganizationalRelationship(dprConflictOnDataProcessor.Id, dprConflictOnDataProcessor.Name, anotherOrg1.Id, anotherOrg1.Name, dataProcessorConflict);
+            AssertNamedEntityWithOrganizationalRelationship(dprConflictOnSubDataProcessor.Id, dprConflictOnSubDataProcessor.Name, anotherOrg1.Id, anotherOrg1.Name, subDataProcessorConflict);
         }
 
         private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)
