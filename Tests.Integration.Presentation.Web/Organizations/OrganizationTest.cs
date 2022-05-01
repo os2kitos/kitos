@@ -186,7 +186,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
         }
 
         [Fact]
-        public async Task Get_GET_DeletionConflicts_And_Delete_With_Enforce_Set_To_True()
+        public async Task Get_GET_DeletionConflicts_And_DELETE_Organization_With_Enforce_Set_To_True()
         {
             //Arrange
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
@@ -219,17 +219,26 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var dprOwnOrg1 = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, A<string>());
             var dprOwnOrg2 = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, A<string>());
             await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(dprOwnOrg1.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprOwnOrg2.Id,YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprOwnOrg2.Id, YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dprOwnOrg2.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             var dprConflictOnDataProcessor = await DataProcessingRegistrationHelper.CreateAsync(anotherOrg1.Id, A<string>());
             var dprConflictOnSubDataProcessor = await DataProcessingRegistrationHelper.CreateAsync(anotherOrg1.Id, A<string>());
             await DataProcessingRegistrationHelper.SendAssignDataProcessorRequestAsync(dprConflictOnDataProcessor.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
-            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprConflictOnSubDataProcessor.Id,YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await DataProcessingRegistrationHelper.SendSetUseSubDataProcessorsStateRequestAsync(dprConflictOnSubDataProcessor.Id, YesNoUndecidedOption.Yes).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await DataProcessingRegistrationHelper.SendAssignSubDataProcessorRequestAsync(dprConflictOnSubDataProcessor.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
+            //Contracts in other orgs where deleted org is supplier
+            var contractInOwnOrgNoConflict = await ItContractHelper.CreateContract(A<string>(), organization.Id);
+            var contractAnotherOrgOrgWithConflict = await ItContractHelper.CreateContract(A<string>(), anotherOrg1.Id);
 
-            //TODO: ContractsInOtherOrgWhereOrgIsSupplier
-            //TODO: SystemsInOtherOrgWhereOrgIsRightsHolder
+            await ItContractHelper.SendAssignSupplierAsync(contractInOwnOrgNoConflict.Id, organization.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItContractHelper.SendAssignSupplierAsync(contractAnotherOrgOrgWithConflict.Id, organization.Id, anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //Systems in other orgs where org is rightsholder
+            var systemInOwnOrgNoRightsHolderConflict = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            var systemInAnotherOrgWithRightsHolderConflict = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
+            await ItSystemHelper.SendSetBelongsToRequestAsync(systemInOwnOrgNoRightsHolderConflict.Id, organization.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetBelongsToRequestAsync(systemInAnotherOrgWithRightsHolderConflict.Id, organization.Id, anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
             //Act
             var conflicts = await OrganizationHelper.GetOrganizationRemovalConflictsAsync(organization.Uuid);
@@ -262,6 +271,18 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var subDataProcessorConflict = Assert.Single(conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor);
             AssertNamedEntityWithOrganizationalRelationship(dprConflictOnDataProcessor.Id, dprConflictOnDataProcessor.Name, anotherOrg1.Id, anotherOrg1.Name, dataProcessorConflict);
             AssertNamedEntityWithOrganizationalRelationship(dprConflictOnSubDataProcessor.Id, dprConflictOnSubDataProcessor.Name, anotherOrg1.Id, anotherOrg1.Name, subDataProcessorConflict);
+
+            // Contract in another org with deleted org set as suppllier
+            var contractConflict = Assert.Single(conflicts.ContractsInOtherOrganizationsWhereOrgIsSupplier);
+            AssertNamedEntityWithOrganizationalRelationship(contractAnotherOrgOrgWithConflict.Id, contractAnotherOrgOrgWithConflict.Name, anotherOrg1.Id, anotherOrg1.Name, contractConflict);
+
+            //Systems in other orgs with deleted org as rights holder
+            var rightsHolderConflict = Assert.Single(conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder);
+            AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrgWithRightsHolderConflict.Id, systemInAnotherOrgWithRightsHolderConflict.Name, anotherOrg1.Id, anotherOrg1.Name, rightsHolderConflict);
+
+            // TODO ========================================
+            //TODO: Do the delete and assert the conflicts
+            // TODO ========================================
         }
 
         private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)
