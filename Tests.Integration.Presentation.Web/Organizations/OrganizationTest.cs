@@ -190,20 +190,31 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Arrange
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
             var anotherOrg1 = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId, A<string>(), "", OrganizationTypeKeys.Kommune, AccessModifier.Public);
-            var systemInAnotherOrg1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
-            var interfaceInAnotherOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, anotherOrg1.Id, AccessModifier.Public));
 
             //System used in another organization
             var systemUsedInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
             await ItSystemHelper.TakeIntoUseAsync(systemUsedInAnotherOrg.Id, anotherOrg1.Id);
 
             //Interface exposed on system in another org
+            var systemInAnotherOrg1 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
             var interfaceExposedOnSystemInAnotherOrg = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, organization.Id, AccessModifier.Public));
             await InterfaceExhibitHelper.CreateExhibit(systemInAnotherOrg1.Id, interfaceExposedOnSystemInAnotherOrg.Id);
 
+            // System exposing interface in another organization (also exopose one which is not conflicting and check that it is not in the conflicts list)
+            var interfaceInOwnOrgOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, organization.Id, AccessModifier.Public));
+            var interfaceInAnotherOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, anotherOrg1.Id, AccessModifier.Public));
+            var systemExposingInterfaceInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            await InterfaceExhibitHelper.CreateExhibit(systemExposingInterfaceInAnotherOrg.Id, interfaceInAnotherOrg1.Id);
+            await InterfaceExhibitHelper.CreateExhibit(systemExposingInterfaceInAnotherOrg.Id, interfaceInOwnOrgOrg1.Id); //should not show up in conflicts
 
-            //TODO: System exposing interface in another org
-            //TODO: SystemsSetAsParentToSystemsInOtherOrgs
+            // Systems set as parents to systems in other orgs (expect one result because one of the children are in the same org)
+            var systemInOwnOrg2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            var systemInAnotherOrg2 = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
+            var systemSetAsParentToSystemsInOtherOrgs = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
+            await ItSystemHelper.SendSetParentSystemRequestAsync(systemInOwnOrg2.Id, systemSetAsParentToSystemsInOtherOrgs.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+            await ItSystemHelper.SendSetParentSystemRequestAsync(systemInAnotherOrg2.Id, systemSetAsParentToSystemsInOtherOrgs.Id,anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+
             //TODO: DataProcessorForDprInOtherOrg
             //TODO: SubDataProcessorForDprInOtherOrg
             //TODO: ContractsInOtherOrgWhereOrgIsSupplier
@@ -223,8 +234,17 @@ namespace Tests.Integration.Presentation.Web.Organizations
             AssertNamedEntity(interfaceExposedOnSystemInAnotherOrg.Id, interfaceExposedOnSystemInAnotherOrg.Name, interfaceExposedBySystemsInOtherOrgs.ExposedInterface);
             AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrg1.Id, systemInAnotherOrg1.Name, anotherOrg1.Id, anotherOrg1.Name, interfaceExposedBySystemsInOtherOrgs.ExposedBy);
 
+            // System exposing interface in another organization
+            var systemExposingInterfaceInOtherOrgs = Assert.Single(conflicts.SystemsExposingInterfacesDefinedInOtherOrganizations);
+            AssertNamedEntity(systemExposingInterfaceInAnotherOrg.Id, systemExposingInterfaceInAnotherOrg.Name, systemExposingInterfaceInOtherOrgs.System);
+            var conflictInterface = Assert.Single(systemExposingInterfaceInOtherOrgs.ExposedInterfaces);
+            AssertNamedEntityWithOrganizationalRelationship(interfaceInAnotherOrg1.Id, interfaceInAnotherOrg1.Name, anotherOrg1.Id, anotherOrg1.Name, conflictInterface);
 
-            //TODO: Delete and then check the expected changes
+            // Systems set as parents to systems in other orgs (expect one result because one of the children are in the same org)
+            var systemWithChildrenInOtherOrgs = Assert.Single(conflicts.SystemsSetAsParentSystemToSystemsInOtherOrganizations);
+            AssertNamedEntity(systemSetAsParentToSystemsInOtherOrgs.Id, systemSetAsParentToSystemsInOtherOrgs.Name, systemWithChildrenInOtherOrgs.System);
+            var conflictingChild = Assert.Single(systemWithChildrenInOtherOrgs.Children);
+            AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrg2.Id, systemInAnotherOrg2.Name, anotherOrg1.Id, anotherOrg1.Name, conflictingChild);
         }
 
         private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)
