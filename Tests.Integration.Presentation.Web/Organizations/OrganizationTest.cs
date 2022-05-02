@@ -201,7 +201,7 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var interfaceExposedOnSystemInAnotherOrg = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, organization.Id, AccessModifier.Public));
             await InterfaceExhibitHelper.CreateExhibit(systemInAnotherOrg1.Id, interfaceExposedOnSystemInAnotherOrg.Id);
 
-            // System exposing interface in another organization (also exopose one which is not conflicting and check that it is not in the conflicts list)
+            // System exposing interface in another organization (also expose one which is not conflicting and check that it is not in the conflicts list)
             var interfaceInOwnOrgOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, organization.Id, AccessModifier.Public));
             var interfaceInAnotherOrg1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), null, anotherOrg1.Id, AccessModifier.Public));
             var systemExposingInterfaceInAnotherOrg = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), organization.Id, AccessModifier.Public);
@@ -280,9 +280,39 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var rightsHolderConflict = Assert.Single(conflicts.SystemsInOtherOrganizationsWhereOrgIsRightsHolder);
             AssertNamedEntityWithOrganizationalRelationship(systemInAnotherOrgWithRightsHolderConflict.Id, systemInAnotherOrgWithRightsHolderConflict.Name, anotherOrg1.Id, anotherOrg1.Name, rightsHolderConflict);
 
-            // TODO ========================================
-            //TODO: Do the delete and assert the conflicts
-            // TODO ========================================
+            // ACT - DELETE The organization
+            await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, true).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            // Assert - verify the expected consequences!
+
+            // Check 1: Verify that systems we expect to be moved to default org have been moved (they are used by / exposing interfaces from other orgs)
+            systemUsedInAnotherOrg = await ItSystemHelper.GetSystemAsync(systemUsedInAnotherOrg.Id);
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, systemUsedInAnotherOrg.OrganizationId);
+
+            systemSetAsParentToSystemsInOtherOrgs = await ItSystemHelper.GetSystemAsync(systemSetAsParentToSystemsInOtherOrgs.Id);
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, systemSetAsParentToSystemsInOtherOrgs.OrganizationId);
+
+            systemExposingInterfaceInAnotherOrg = await ItSystemHelper.GetSystemAsync(systemExposingInterfaceInAnotherOrg.Id);
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, systemExposingInterfaceInAnotherOrg.OrganizationId);
+
+            // Check 2: Verify that interfaces we expect to be moved to default org have been moved (they are exposed on systems from other orgs)
+            interfaceExposedOnSystemInAnotherOrg = await InterfaceHelper.GetInterfaceById(interfaceExposedOnSystemInAnotherOrg.Id);
+            Assert.Equal(TestEnvironment.DefaultOrganizationId, interfaceExposedOnSystemInAnotherOrg.OrganizationId);
+
+            // Check 3: Verify that rights holder has been cleared on systems which had the old org as rights holder
+            systemInAnotherOrgWithRightsHolderConflict = await ItSystemHelper.GetSystemAsync(systemInAnotherOrgWithRightsHolderConflict.Id);
+            Assert.Null(systemInAnotherOrgWithRightsHolderConflict.BelongsToId);
+
+            // Check 4: Verify that supplier is cleared on contracts that had the org as supplier
+            contractAnotherOrgOrgWithConflict = await ItContractHelper.GetItContract(contractAnotherOrgOrgWithConflict.Id);
+            Assert.Null(contractAnotherOrgOrgWithConflict.SupplierId);
+
+            // Check 5: Verify that DPR conflicts have been resolved by removing org from data processor and sub data processor
+            dprConflictOnDataProcessor = await DataProcessingRegistrationHelper.GetAsync(dprConflictOnDataProcessor.Id);
+            Assert.DoesNotContain(dprConflictOnDataProcessor.DataProcessors, x => x.Id == organization.Id);
+
+            dprConflictOnSubDataProcessor = await DataProcessingRegistrationHelper.GetAsync(dprConflictOnSubDataProcessor.Id);
+            Assert.DoesNotContain(dprConflictOnSubDataProcessor.SubDataProcessors, x => x.Id == organization.Id);
         }
 
         private static void AssertNamedEntity(int expectedId, string expectedName, NamedEntityDTO dto)
