@@ -283,7 +283,9 @@ namespace Tests.Integration.Presentation.Web.Organizations
             // ACT - DELETE The organization
             await OrganizationHelper.SendDeleteOrganizationRequestAsync(organization.Uuid, true).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
 
-            // Assert - verify the expected consequences!
+            // Assert
+            // Check 0 - organization is indeed gone
+            await OrganizationHelper.SendGetOrganizationRequestAsync(organization.Id).WithExpectedResponseCode(HttpStatusCode.NotFound).DisposeAsync();
 
             // Check 1: Verify that systems we expect to be moved to default org have been moved (they are used by / exposing interfaces from other orgs)
             systemUsedInAnotherOrg = await ItSystemHelper.GetSystemAsync(systemUsedInAnotherOrg.Id);
