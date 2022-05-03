@@ -1,0 +1,17 @@
+﻿<div class="modal-header">
+    <h3 class="modal-title">{{ctrl.title}}</h3>
+</div>
+
+<form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
+    <div class="modal-body">
+
+        <div class="form-group">
+
+        </div>
+    </div>
+    <div class="modal-footer">
+        <label ng-if="ctrl.requireAcceptConsequences" for="deleteOrgAcceptChkBox">Jeg forstår og accepterer ovenstående konsekvenser</label><input type="checkbox" ng-if="ctrl.requireAcceptConsequences" ng-model="ctrl.consequencesAccepted" id="deleteOrgAcceptChkBox" />
+        <button type="submit" class="btn btn-success" data-ng-disabled="!ctrl.consequencesAccepted" data-disabled-on-busy="" id="deleteOrgSubmit">Slet</button>
+        <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
+    </div>
+</form>

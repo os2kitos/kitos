@@ -13,4 +13,8 @@
         expired: boolean;
         description: string;
     }
+
+    export interface EntityWithOrganizationRelationshipDTO extends NamedEntityDTO {
+        organization : Organization.ShallowOrganizationDTO
+    }
 }
