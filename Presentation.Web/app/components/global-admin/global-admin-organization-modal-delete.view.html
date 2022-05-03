@@ -4,9 +4,90 @@
 
 <form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
     <div class="modal-body">
+        <div ng-if="!ctrl.conflictsDetected" class="row">
+            Organisationen kan slettes uden tværgående konsekvenser.
+        </div>
+        <div ng-if="ctrl.conflictsDetected" class="row">
 
-        <div class="form-group">
+            <!-- Contracts where the deleted org is set as supplier and deleting the org will reset the supplier -->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved.length > 0">
+                <div class="panel-heading"><strong>Kontrakter hvor "Leverandør" nulstilles:</strong></div>
 
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">Kontrakt</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-repeat="contract in ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved">
+                            <td>{{contract.name}}</td>
+                            <td>{{contract.organizationName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DPR conflicts on data processor-->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfDataProcessors.length > 0">
+                <div class="panel-heading"><strong>Registreringer i modulet "Databehandling", hvor organisationen fjernes som databehandler:</strong></div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">Databehandling</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-repeat="dpr in ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfDataProcessors">
+                            <td>{{dpr.name}}</td>
+                            <td>{{dpr.organizationName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- DPR conflicts on sub data processor-->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfSubDataProcessors.length > 0">
+                <div class="panel-heading"><strong>Registreringer i modulet "Databehandling", hvor organisationen fjernes som underdatabehandler:</strong></div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">Databehandling</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-repeat="dpr in ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfSubDataProcessors">
+                            <td>{{dpr.name}}</td>
+                            <td>{{dpr.organizationName}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Rights holder conflicts-->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved.length > 0">
+                <div class="panel-heading"><strong>IT-Systemer i kataloget, hvor "Rettighedshaver" nulstilles:</strong></div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                    <tr>
+                        <th class="col-xs-1">IT-System</th>
+                        <th class="col-xs-1">Oprettet i (organisation)</th>
+                    </tr>
+                    </thead>
+                    <tbody class="small">
+                    <tr ng-repeat="system in ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved">
+                        <td>{{system.name}}</td>
+                        <td>{{system.organizationName}}</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="modal-footer">
