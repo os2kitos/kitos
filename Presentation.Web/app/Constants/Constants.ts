@@ -26,4 +26,17 @@
         static readonly DanishDateFormat = "DD-MM-YYYY";
 
     }
+
+    export class ExcelExportDropdown {
+        static readonly Id = "excelExportSelector";
+        static readonly DefaultValue = "0";
+        static readonly DefaultTitle = "Eksportér til Excel";
+        static readonly DataKey = "kendoDropDownList";
+        static readonly DefaultPosition = "pull-right";
+
+        static readonly SelectAllId = "exportExcelAll";
+        static readonly SelectAllValue = "Alt data";
+        static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
+        static readonly SelectOnlyVisibleValue = "Kun de viste kolonner";
+    }
 }

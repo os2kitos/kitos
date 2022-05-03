@@ -1,4 +1,5 @@
 ﻿module Kitos.ItContract.OverviewPlan {
+    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export interface IOverviewPlanController {
@@ -203,6 +204,9 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
+
+        private excelConfig: IExcelConfig = {
+        };
 
         private activate() {
 
@@ -826,6 +830,30 @@
                     }
                 ]
             };
+            
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                try {
+                    this.mainGrid.saveAsExcel();
+                } catch (ex) {
+                    console.log(ex);
+                }
+
+                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$,
+                this.$scope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''

@@ -1,11 +1,17 @@
 ﻿module Kitos.GlobalAdmin.Organization {
+    import IGridViewAccess = Utility.KendoGrid.IGridViewAccess;
+    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export class OrganizationController {
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
+        public gridBinding: IGridViewAccess<Models.IOrganization>;
 
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout', 'exportGridToExcelService'];
+
+        private excelConfig: IExcelConfig = {
+        };
 
         constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout, private exportGridToExcelService) {
             $rootScope.page.title = 'Organisationer';
@@ -44,9 +50,9 @@
                     {
                         name: "opretOrganisation",
                         text: "Opret Organisation",
-                        template: "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
-                    },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                        template:
+                            "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
+                    }
                 ],
                 excel: {
                     fileName: "Organisationer.xlsx",
@@ -73,7 +79,9 @@
                 excelExport: this.exportToExcel,
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 230,
+                        field: "Name",
+                        title: "Navn",
+                        width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!,
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Name,
@@ -87,7 +95,9 @@
                         }
                     },
                     {
-                        field: "Cvr", title: "CVR", width: 230,
+                        field: "Cvr",
+                        title: "CVR",
+                        width: 230,
                         persistId: "cvr", // DON'T YOU DARE RENAME!
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Cvr,
@@ -101,16 +111,23 @@
                         }
                     },
                     {
-                        field: "Type.Name", title: "Type", width: 230,
+                        field: "Type.Name",
+                        title: "Type",
+                        width: 230,
                         persistId: "type", // DON'T YOU DARE RENAME!
                         hidden: false,
                         template: (dataItem) => dataItem.Type.Name,
                         excelTemplate: (dataItem) => dataItem.Type.Name,
                         filterable: {
                             cell: {
-                                template: function (args) {
+                                template: function(args) {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Kommune", value: "Kommune" }, { type: "Interessefællesskab", value: "Interessefællesskab" }, { type: "Virksomhed", value: "Virksomhed" }, { type: "Anden offentlig myndighed", value: "Anden offentlig myndighed" }],
+                                        dataSource: [
+                                            { type: "Kommune", value: "Kommune" },
+                                            { type: "Interessefællesskab", value: "Interessefællesskab" },
+                                            { type: "Virksomhed", value: "Virksomhed" },
+                                            { type: "Anden offentlig myndighed", value: "Anden offentlig myndighed" }
+                                        ],
                                         dataTextField: "type",
                                         dataValueField: "value",
                                         valuePrimitive: true
@@ -121,7 +138,9 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 230,
+                        field: "AccessModifier",
+                        title: "Synlighed",
+                        width: 230,
                         persistId: "synlighed", // DON'T YOU DARE RENAME!
                         hidden: false,
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
@@ -137,14 +156,51 @@
                     },
                     {
                         command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            {
+                                text: "Redigér",
+                                click: this.onEdit,
+                                imageClass: "k-edit",
+                                className: "k-custom-edit",
+                                iconClass: "k-icon"
+                            } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            {
+                                text: "Slet",
+                                click: this.onDelete,
+                                imageClass: "k-delete",
+                                className: "k-custom-delete",
+                                iconClass: "k-icon"
+                            } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                         ],
-                        title: " ", width: 176,
+                        title: " ",
+                        width: 176,
                         persistId: "command"
                     }
                 ]
             };
+            
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                try {
+                    this.mainGrid.saveAsExcel();
+                } catch (ex) {
+                    console.log(ex);
+                }
+
+                $(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$,
+                this.$scope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -157,7 +213,7 @@
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private onEdit = (e: JQueryEventObject) => {
