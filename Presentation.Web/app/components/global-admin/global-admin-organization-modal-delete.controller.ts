@@ -5,8 +5,9 @@
         static $inject: string[] = ["$scope", "organizationApiService", "notify", "orgToDelete", "conflicts"];
 
         readonly title: string;
-        readonly requireAcceptConsequences: boolean;
+        readonly conflictsDetected: boolean;
         readonly consequencesAccepted: boolean;
+        readonly conflictsModel: Models.ViewModel.Organization.OrganizationDeletionConflictsViewModel | null;
 
         constructor(
             private readonly $scope,
@@ -17,10 +18,54 @@
             this.title = `Slet "${orgToDelete.name}"`;
 
 
-            this.requireAcceptConsequences = Models.Api.Organization.detectConflicts(conflicts);
-            //TODO: Simple VM with grouped resolutions and their cause (present simple overview)
-            //TODO: Clipboard button
-            this.consequencesAccepted = !this.requireAcceptConsequences;
+            const mapEntityFromOrg = (input: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO): Models.ViewModel.Organization.EntityFromOrganization => {
+                return {
+                    name: input.name,
+                    organizationName: input.organization.name
+                };
+            }
+
+            this.conflictsDetected = Models.Api.Organization.detectConflicts(conflicts);
+            if (this.conflictsDetected) {
+                this.conflictsModel = {
+                    contractsWhereSupplierWillBeRemoved: conflicts.contractsInOtherOrganizationsWhereOrgIsSupplier.map(mapEntityFromOrg),
+                    dprWhereOrganizationIsRemovedFromListOfDataProcessors: conflicts.dprInOtherOrganizationsWhereOrgIsDataProcessor.map(mapEntityFromOrg),
+                    dprWhereOrganizationIsRemovedFromListOfSubDataProcessors: conflicts.dprInOtherOrganizationsWhereOrgIsSubDataProcessor.map(mapEntityFromOrg),
+                    interfacesBeingMovedToDefaultOrg: {
+                        exposedOnSystemsInOtherOrganizations: conflicts.interfacesExposedOnSystemsOutsideTheOrganization.map(input => {
+                            return {
+                                name: input.exposedInterface.name,
+                                exposedOnSystem: mapEntityFromOrg(input.exposedBy)
+                            };
+                        })
+                    },
+                    systemsBeingMovedToDefaultOrg: {
+                        systemsExposingInterfacesOutsideTheOrganization: conflicts.systemsExposingInterfacesDefinedInOtherOrganizations.map(conflict => {
+                            return {
+                                name: conflict.system.name,
+                                exposedInterfaces: conflict.exposedInterfaces.map(mapEntityFromOrg)
+                            };
+                        }),
+                        systemsSetAsParentsToSystemsOutsideTheOrganization: conflicts.systemsSetAsParentSystemToSystemsInOtherOrganizations.map(conflict => {
+                            return {
+                                name: conflict.system.name,
+                                children: conflict.children.map(mapEntityFromOrg)
+                            };
+                        }),
+                        systemsUsedOutsideTheOrganization: conflicts.systemsWithUsagesOutsideTheOrganization.map(conflict => {
+                            return {
+                                name: conflict.system.name,
+                                organizations: conflict.otherOrganizationsWhichUseTheSystem.map(org => org.name)
+                            };
+                        })
+                    },
+                    systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved: conflicts.systemsInOtherOrganizationsWhereOrgIsRightsHolder.map(mapEntityFromOrg)
+                };
+            } else {
+                this.conflictsModel = null;
+            }
+
+            this.consequencesAccepted = !this.conflictsDetected;
         }
 
 

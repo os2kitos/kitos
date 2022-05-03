@@ -10,7 +10,7 @@
         </div>
     </div>
     <div class="modal-footer">
-        <label ng-if="ctrl.requireAcceptConsequences" for="deleteOrgAcceptChkBox">Jeg forstår og accepterer ovenstående konsekvenser</label><input type="checkbox" ng-if="ctrl.requireAcceptConsequences" ng-model="ctrl.consequencesAccepted" id="deleteOrgAcceptChkBox" />
+        <label ng-if="ctrl.conflictsDetected" for="deleteOrgAcceptChkBox">Jeg forstår og accepterer ovenstående konsekvenser</label><input type="checkbox" ng-if="ctrl.conflictsDetected" ng-model="ctrl.consequencesAccepted" id="deleteOrgAcceptChkBox" />
         <button type="submit" class="btn btn-success" data-ng-disabled="!ctrl.consequencesAccepted" data-disabled-on-busy="" id="deleteOrgSubmit">Slet</button>
         <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
     </div>
