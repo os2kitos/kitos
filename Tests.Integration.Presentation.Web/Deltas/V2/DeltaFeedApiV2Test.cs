@@ -23,6 +23,11 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
     [Collection(nameof(SequentialTestGroup))]
     public class DeltaFeedApiV2Test : WithAutoFixture
     {
+        public DeltaFeedApiV2Test()
+        {
+            //TODO: Delete the changes table
+        }
+
         [Fact]
         public async Task GetDeletedItems_Without_Detailed_Query()
         {
