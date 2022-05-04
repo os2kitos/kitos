@@ -718,11 +718,6 @@
                 ]
             };
             
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
-                () => this.mainGrid,
-                this.$scope,
-                this.mainGridOptions.toolbar);
-
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -795,6 +790,11 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
         
         private excelConfig: Models.IExcelConfig = {
