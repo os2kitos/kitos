@@ -159,6 +159,8 @@ namespace Presentation.Web
             var orgNameSpace = entitySetOrganizations;
 
             var organizations = BindEntitySet<Organization, OrganizationsController>(builder);
+            builder.StructuralTypes.First(t => t.ClrType == typeof(Organization)).RemoveProperty(typeof(Organization).GetProperty(nameof(Organization.IsDefaultOrganization)));
+
             organizations.EntityType.HasMany(x => x.OrgUnits).IsNavigable().Name = "OrganizationUnits";
             organizations.EntityType.Property(p => p.Uuid).IsOptional();
 
