@@ -158,7 +158,7 @@
 
         /**
          * Wrapper method which configures an ExcelExportDropdown
-         * @param entry - ExcelExportDropdown
+         * @param entry
          * @param scope
          * @param toolbar
          */
@@ -200,7 +200,7 @@
          * Configures a specified entry to be a Dropdown with classes required for excel export to work,
          * Adds the entry to the selected toolbar
          * @param toolbar
-         * @param entry - ExcelExportDropdown
+         * @param entry
          */
         static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
             var position = "";
@@ -215,10 +215,9 @@
         }
 
         /**
-         * Ensures kendoVm is defined
          * Adds/updates the entry in the KendoVm and configures the ExcelExportDropdown
          * @param scope
-         * @param entry - ExcelExportDropdown
+         * @param entry
          */
         static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
             if (scope.kendoVm === undefined)
