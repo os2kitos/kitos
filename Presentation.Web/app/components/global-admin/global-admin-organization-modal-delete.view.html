@@ -4,34 +4,34 @@
 
 <form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
     <div class="modal-body">
-        <div ng-if="!ctrl.conflictsDetected" class="row">
+        <div ng-if="!ctrl.conflictsDetected">
             Organisationen kan slettes uden tværgående konsekvenser.
         </div>
-        <div ng-if="ctrl.conflictsDetected" class="row">
+        <div ng-if="ctrl.conflictsDetected" id="consequencesOverview">
 
             <!-- Contracts where the deleted org is set as supplier and deleting the org will reset the supplier -->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved.length > 0">
-                <div class="panel-heading"><strong>Kontrakter hvor "Leverandør" nulstilles:</strong></div>
+                <div class="panel-heading">Kontrakter hvor organisationen "{{ctrl.orgName}}" er sat som "Leverandør", og hvor feltet dermed nulstilles:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
-                        <tr>
-                            <th class="col-xs-1">Kontrakt</th>
-                            <th class="col-xs-1">Oprettet i (organisation)</th>
-                        </tr>
+                    <tr>
+                        <th class="col-xs-1">Kontrakt</th>
+                        <th class="col-xs-1">Oprettet i (organisation)</th>
+                    </tr>
                     </thead>
                     <tbody class="small">
-                        <tr ng-repeat="contract in ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved">
-                            <td>{{contract.name}}</td>
-                            <td>{{contract.organizationName}}</td>
-                        </tr>
+                    <tr ng-repeat="contract in ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved">
+                        <td>{{contract.name}}</td>
+                        <td>{{contract.organizationName}}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- DPR conflicts on data processor-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfDataProcessors.length > 0">
-                <div class="panel-heading"><strong>Registreringer i modulet "Databehandling", hvor organisationen fjernes som databehandler:</strong></div>
+                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{ctrl.orgName}}" fjernes som databehandler:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
@@ -51,7 +51,7 @@
 
             <!-- DPR conflicts on sub data processor-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfSubDataProcessors.length > 0">
-                <div class="panel-heading"><strong>Registreringer i modulet "Databehandling", hvor organisationen fjernes som underdatabehandler:</strong></div>
+                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{ctrl.orgName}}" fjernes som underdatabehandler:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
@@ -71,27 +71,33 @@
 
             <!-- Rights holder conflicts-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved.length > 0">
-                <div class="panel-heading"><strong>IT-Systemer i kataloget, hvor "Rettighedshaver" nulstilles:</strong></div>
+                <div class="panel-heading">IT-Systemer i kataloget, hvor "{{ctrl.orgName}}" er sat som "Rettighedshaver", og hvor feltet dermed nulstilles:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
-                    <tr>
-                        <th class="col-xs-1">IT-System</th>
-                        <th class="col-xs-1">Oprettet i (organisation)</th>
-                    </tr>
+                        <tr>
+                            <th class="col-xs-1">IT-System (i kataloget)</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
                     </thead>
                     <tbody class="small">
-                    <tr ng-repeat="system in ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved">
-                        <td>{{system.name}}</td>
-                        <td>{{system.organizationName}}</td>
-                    </tr>
+                        <tr ng-repeat="system in ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved">
+                            <td>{{system.name}}</td>
+                            <td>{{system.organizationName}}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
     <div class="modal-footer">
-        <label ng-if="ctrl.conflictsDetected" for="deleteOrgAcceptChkBox">Jeg forstår og accepterer ovenstående konsekvenser</label><input type="checkbox" ng-if="ctrl.conflictsDetected" ng-model="ctrl.consequencesAccepted" id="deleteOrgAcceptChkBox" />
+        <button ng-if="ctrl.conflictsDetected" type="button" class="btn pull-left" data-ng-click="ctrl.copyToClipBoard()" data-disabled-on-busy="">Kopier konsekvenser til udklipsholder</button>
+        <div class="checkbox-inline" ng-if="ctrl.conflictsDetected">
+            <label for="deleteOrgAcceptChkBox">
+                <input id="deleteOrgAcceptChkBox" type="checkbox" ng-model="ctrl.consequencesAccepted" />
+                Jeg forstår og accepterer ovenstående konsekvenser
+            </label>
+        </div>
         <button type="submit" class="btn btn-success" data-ng-disabled="!ctrl.consequencesAccepted" data-disabled-on-busy="" id="deleteOrgSubmit">Slet</button>
         <button type="button" class="btn btn-warning" data-ng-click="ctrl.dismiss()" data-disabled-on-busy="">Annuller</button>
     </div>

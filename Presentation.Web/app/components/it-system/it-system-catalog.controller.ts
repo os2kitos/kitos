@@ -968,7 +968,8 @@
             }
         }
 
-        public copyToClipBoard() {
+        copyToClipBoard() {
+            //TODO: Create helper funktion and re-use in migration window
             window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
             document.execCommand("Copy");
             window.getSelection().removeAllRanges();

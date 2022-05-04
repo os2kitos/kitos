@@ -5,6 +5,7 @@
         static $inject: string[] = ["$scope", "organizationApiService", "notify", "orgToDelete", "conflicts"];
 
         readonly title: string;
+        readonly orgName : string;
         readonly conflictsDetected: boolean;
         readonly consequencesAccepted: boolean;
         readonly conflictsModel: Models.ViewModel.Organization.OrganizationDeletionConflictsViewModel | null;
@@ -16,7 +17,7 @@
             private readonly orgToDelete: Models.Api.Organization.Organization,
             private readonly conflicts: Models.Api.Organization.OrganizationDeleteConflicts) {
             this.title = `Slet "${orgToDelete.name}"`;
-
+            this.orgName = orgToDelete.name;
 
             const mapEntityFromOrg = (input: Models.Generic.NamedEntity.EntityWithOrganizationRelationshipDTO): Models.ViewModel.Organization.EntityFromOrganization => {
                 return {
@@ -68,6 +69,12 @@
             this.consequencesAccepted = !this.conflictsDetected;
         }
 
+        copyToClipBoard() {
+            window.getSelection().selectAllChildren(document.getElementById("consequencesOverview"));
+            document.execCommand("Copy");
+            window.getSelection().removeAllRanges();
+            this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+        }
 
         dismiss() {
             this.$scope.$dismiss();
