@@ -249,7 +249,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -440,6 +440,25 @@
             }
 
             this.mainGridOptions = mainGridOptions;
+
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                this.mainGrid.saveAsExcel();
+
+                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                    .value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
         public onEdit(entityId) {
@@ -462,8 +481,11 @@
             }
         }
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
     }

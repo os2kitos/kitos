@@ -770,14 +770,11 @@ module Kitos.Utility.KendoGrid {
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
-
-            //TODO: POC on ADDING custom property before export...
-            //TODO: Hide the standard button
-            //TODO: Use dropdown config in stead
+            
             this.customToolbarEntries.push({
                 show: true,
-                id: "excelExportSelector",
-                title: "Excel custom",
+                id: Constants.ExcelExportDropdown.Id,
+                title: Constants.ExcelExportDropdown.DefaultTitle,
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
@@ -787,23 +784,22 @@ module Kitos.Utility.KendoGrid {
                         if (newItem === null)
                             return;
 
-                        if (newItem.id === "exportExcelOnlyVisible") {
+                        this.excelConfig.onlyVisibleColumns = false;
+                        if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
                             this.excelConfig.onlyVisibleColumns = true;
-                        }
-                        else {
-                            this.excelConfig.onlyVisibleColumns = false;
-                        }
 
                         this.gridBinding.mainGrid.saveAsExcel();
+
+                        this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
                     },
                     availableOptions: [
                         {
-                            id: "exportExcelAll",
-                            text: "Alt data"
+                            id: Constants.ExcelExportDropdown.SelectAllId,
+                            text: Constants.ExcelExportDropdown.SelectAllValue
                         },
                         {
-                            id: "exportExcelOnlyVisible",
-                            text: "Kun de viste kolonner"
+                            id: Constants.ExcelExportDropdown.SelectOnlyVisibleId,
+                            text: Constants.ExcelExportDropdown.SelectOnlyVisibleValue
                         }]
                 }
             });
@@ -836,7 +832,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${getPositionClass(entry.position)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),

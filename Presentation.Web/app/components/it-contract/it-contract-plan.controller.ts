@@ -75,8 +75,6 @@
                     // widgets in this controller, we need to check that the event
                     // is for the one we're interested in.
                     if (widget === this.mainGrid) {
-                        this.loadGridOptions();
-
                         // show loadingbar when export to excel is clicked
                         // hidden again in method exportToExcel callback
                         $(".k-grid-excel").click(() => {
@@ -156,13 +154,7 @@
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
-
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
-        }
-
+        
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -398,7 +390,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -839,20 +831,15 @@
                 this.excelConfig.onlyVisibleColumns = false;
                 if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
                     this.excelConfig.onlyVisibleColumns = true;
-
-                try {
-                    this.mainGrid.saveAsExcel();
-                } catch (ex) {
-                    console.log(ex);
-                }
+                
+                this.mainGrid.saveAsExcel();
 
                 this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
             };
 
             Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
-                this.$,
                 this.$scope,
-                this.mainGridOptions.toolbar);
+                mainGridOptions.toolbar);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
@@ -930,7 +917,7 @@
         }
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractPlan>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private concatRoles(roles: Array<any>): string {

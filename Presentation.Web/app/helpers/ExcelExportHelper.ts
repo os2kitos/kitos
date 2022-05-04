@@ -1,6 +1,5 @@
 ﻿module Kitos.Helpers {
     import IItProjectInactiveOverview = ItProject.OverviewInactive.IItProjectInactiveOverview;
-    import IExcelConfig = Models.IExcelConfig;
 
     interface IStatusColor {
         danish: string;
@@ -157,11 +156,21 @@
             return value || ExcelExportHelper.noValueFallback;
         }
 
-        static setupExcelExportDropdown(entry: Utility.KendoGrid.IKendoToolbarEntry, $: any, scope: ng.IScope, toolbar: IKendoGridToolbarItem[]) {
+        /**
+         * Wrapper method which configures an ExcelExportDropdown
+         * @param entry - ExcelExportDropdown
+         * @param scope
+         * @param toolbar
+         */
+        static setupExcelExportDropdown(entry: Utility.KendoGrid.IKendoToolbarEntry, scope: ng.IScope, toolbar: IKendoGridToolbarItem[]) {
             this.addExcelExportDropdownToToolbar(toolbar, entry);
             this.setupKendoVm(scope, entry);
         }
 
+        /**
+          * Creates an object of type IKendoToolbarEntry configured as an ExcelExportDropdown
+          * WARNING the method doesn't implement the selectedOptionChanged method
+          */
         static createExcelExportDropdownEntry() : Utility.KendoGrid.IKendoToolbarEntry {
             return {
                 show: true,
@@ -187,18 +196,36 @@
             }
         }
 
+        /**
+         * Configures a specified entry to be a Dropdown with classes required for excel export to work,
+         * Adds the entry to the selected toolbar
+         * @param toolbar
+         * @param entry - ExcelExportDropdown
+         */
         static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
+            var position = "";
+            if (entry.position === Utility.KendoGrid.KendoToolbarButtonPosition.Right)
+                position = "pull-right";
+
             toolbar.push({
                 name: entry.id,
                 text: entry.title,
-                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${Constants.ExcelExportDropdown.DefaultPosition}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
             });
         }
 
+        /**
+         * Ensures kendoVm is defined
+         * Adds/updates the entry in the KendoVm and configures the ExcelExportDropdown
+         * @param scope
+         * @param entry - ExcelExportDropdown
+         */
         static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
-            scope.kendoVm = {
-                standardToolbar: {}
-            }
+            if (scope.kendoVm === undefined)
+                scope.kendoVm = {
+                    standardToolbar: {}
+                }
+            
             scope.kendoVm[entry.id] = {
                 enabled: true,
                 getOptions: () => {

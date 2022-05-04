@@ -10,9 +10,9 @@
 
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout', 'exportGridToExcelService'];
 
-        private excelConfig: IExcelConfig = {
+        private readonly excelConfig: IExcelConfig = {
         };
-
+        
         constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout, private exportGridToExcelService) {
             $rootScope.page.title = 'Organisationer';
 
@@ -76,7 +76,7 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 columns: [
                     {
                         field: "Name",
@@ -187,17 +187,13 @@
                 if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
                     this.excelConfig.onlyVisibleColumns = true;
 
-                try {
-                    this.mainGrid.saveAsExcel();
-                } catch (ex) {
-                    console.log(ex);
-                }
+                this.mainGrid.saveAsExcel();
 
-                $(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
+                $(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                    .value(Constants.ExcelExportDropdown.DefaultValue);
             };
 
             Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
-                this.$,
                 this.$scope,
                 this.mainGridOptions.toolbar);
 

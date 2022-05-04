@@ -79,8 +79,6 @@
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
-
-                    this.loadGridOptions();
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     $(".k-grid-excel").click(() => {
@@ -175,12 +173,6 @@
         // Resets the scrollbar position
         private onPaging = () => {
             Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
-        }
-
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile() {
@@ -420,7 +412,7 @@
                 columnHide: self.saveGridOptions,
                 columnShow: self.saveGridOptions,
                 columnReorder: self.saveGridOptions,
-                excelExport: self.exportToExcel,
+                excelExport: (e:any) => self.exportToExcel(e),
                 page: self.onPaging,
                 columns: [
                     {
@@ -976,6 +968,25 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                this.mainGrid.saveAsExcel();
+
+                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                    .value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
         private getCurrentUserRights(project: IItProjectOverview) {
@@ -1069,8 +1080,11 @@
             }
         };
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItProject.IItProject>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private concatRoles(roles: Array<any>): string {

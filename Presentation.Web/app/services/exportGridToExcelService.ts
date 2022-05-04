@@ -10,12 +10,13 @@
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
-        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, config?: IExcelConfig) {            const columns = e.sender.columns;
+        getExcel(e: IKendoGridExcelExportEvent<any>, _: ILoDashWithMixins, timeout: ng.ITimeoutService, kendoGrid: IKendoGrid<any>, config?: IExcelConfig) {
+            const columns = e.sender.columns;
 
             if (!this.exportFlag) {
                 e.preventDefault();
                 var onlyVisibleColumns = false;
-                if (config !== undefined && config.onlyVisibleColumns === undefined) {
+                if (config !== undefined && config.onlyVisibleColumns !== undefined) {
                     onlyVisibleColumns = config.onlyVisibleColumns;
                 }
 

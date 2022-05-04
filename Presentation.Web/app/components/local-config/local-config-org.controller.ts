@@ -22,7 +22,8 @@
             "notify",
             "gridStateService",
             "exportGridToExcelService",
-            "user"
+            "user",
+            '$'
         ];
 
         constructor(
@@ -34,7 +35,8 @@
             private notify,
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService,
-            private user) {
+            private user,
+            private $) {
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -140,13 +142,7 @@
                         text: "Slet filter",
                         template:
                             "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='orgCtrl.clearGridProfile()' data-ng-disabled='!orgCtrl.doesGridProfileExist()' data-element-type='removeFilterButton'>#: text #</button>"
-                    },
-                    {
-                        name: "excel",
-                        text: "Eksportér til Excel",
-                        template: "<a role='button' class='k-button k-button-icontext pull-right k-grid-excel' data-ng-click='orgCtrl.generateExcel()'> <span class='k-icon k-i-file-excel'> </span> Eksportér til Excel</a>"
-
-        }
+                    }
                 ],
                 excel: {
                     fileName: "Organisationer.xlsx",
@@ -174,7 +170,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -255,10 +251,32 @@
             }
 
             this.mainGridOptions = mainGridOptions;
+
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                this.mainGrid.saveAsExcel();
+
+                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                    .value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
     }
 

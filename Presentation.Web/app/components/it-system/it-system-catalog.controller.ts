@@ -101,8 +101,6 @@
                     // widgets in this controller, we need to check that the event
                     // is for the one we're interested in.
                     if (widget === this.mainGrid) {
-                        this.loadGridOptions();
-
                         // find the access modifier filter row section
                         var accessModifierFilterRow = $(".k-filter-row [data-field='AccessModifier']");
                         // find the access modifier kendo widget
@@ -348,7 +346,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -725,6 +723,26 @@
                     }
                 ]
             };
+            
+            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
+            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
+                if (newItem === null)
+                    return;
+
+                this.excelConfig.onlyVisibleColumns = false;
+                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
+                    this.excelConfig.onlyVisibleColumns = true;
+
+                this.mainGrid.saveAsExcel();
+
+                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                    .value(Constants.ExcelExportDropdown.DefaultValue);
+            };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+                this.$scope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ""
@@ -735,7 +753,7 @@
         public createITSystem() {
             var self = this;
 
-            var modalInstance = this.$uibModal.open({
+            this.$uibModal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                 windowClass: "modal fade in",
@@ -798,12 +816,6 @@
         // Resets the scrollbar position
         private onPaging = () => {
             Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
-        }
-
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         public saveGridProfile = () => {
@@ -1014,8 +1026,11 @@
             ],
         };
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         // adds usage at selected system within current context
