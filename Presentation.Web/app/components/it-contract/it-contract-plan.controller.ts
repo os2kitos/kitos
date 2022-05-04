@@ -906,7 +906,7 @@
             this.mainGridOptions = mainGridOptions;
         }
 
-        private excelConfig: Models.IExcelConfig = {
+        private readonly excelConfig: Models.IExcelConfig = {
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractPlan>) => {

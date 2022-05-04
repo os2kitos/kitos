@@ -218,7 +218,7 @@
          * @param toolbar
          * @param entry
          */
-        static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
+        private static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
             var position = "";
             if (entry.position === Utility.KendoGrid.KendoToolbarButtonPosition.Right)
                 position = "pull-right";
@@ -235,7 +235,7 @@
          * @param scope
          * @param entry
          */
-        static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
+        private static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
             if (scope.kendoVm === undefined)
                 scope.kendoVm = {
                     standardToolbar: {}
