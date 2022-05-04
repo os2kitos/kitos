@@ -14,7 +14,6 @@ using Xunit;
 namespace Tests.Integration.Presentation.Web.Organizations
 {
     [Collection(nameof(SequentialTestGroup))]
-
     public class OrganizationSequentialTests : WithAutoFixture
     {
         [Theory]
@@ -33,7 +32,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Assert
             Assert.Equal(expectAllowedToDelete ? HttpStatusCode.OK : HttpStatusCode.Forbidden, response.StatusCode);
             await AssertGetOrganizationResponse(organization.Uuid, expectAllowedToDelete ? HttpStatusCode.NotFound : HttpStatusCode.OK);
-
         }
 
         [Fact]
@@ -50,7 +48,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
             //Assert
             Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
             await AssertGetOrganizationResponse(organization.Uuid, HttpStatusCode.OK);
-
         }
 
         [Fact]
