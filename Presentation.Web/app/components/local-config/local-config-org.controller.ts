@@ -22,8 +22,7 @@
             "notify",
             "gridStateService",
             "exportGridToExcelService",
-            "user",
-            '$'
+            "user"
         ];
 
         constructor(
@@ -35,8 +34,7 @@
             private notify,
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService,
-            private user,
-            private $) {
+            private user) {
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {

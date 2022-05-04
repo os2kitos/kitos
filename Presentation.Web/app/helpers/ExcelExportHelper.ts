@@ -157,7 +157,7 @@
         }
 
         /**
-         * Wrapper method which creates and configures an ExcelExportDropdown
+         * Wrapper method which creates and configures a dropdown for excel export
          * @param entry
          * @param scope
          * @param toolbar
@@ -167,11 +167,13 @@
             this.addExcelExportDropdownToToolbar(toolbar, entry);
             this.setupKendoVm(scope, entry);
         }
-
+        
         /**
-          * Creates an object of type IKendoToolbarEntry configured as an ExcelExportDropdown
-          */
-        static createExcelExportDropdownEntry(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<Models.IOrganization>): Utility.KendoGrid.IKendoToolbarEntry {
+          * Creates an object of type IKendoToolbarEntry configured as a dropdown for excel export
+         * @param excelConfig
+         * @param mainGrid
+         */
+        static createExcelExportDropdownEntry(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<any>): Utility.KendoGrid.IKendoToolbarEntry {
             return {
                 show: true,
                 id: Constants.ExcelExportDropdown.Id,
@@ -229,7 +231,7 @@
         }
 
         /**
-         * Adds/updates the entry in the KendoVm and configures the ExcelExportDropdown
+         * Adds/updates the entry in the KendoVm and configures the dropdown for excel export
          * @param scope
          * @param entry
          */

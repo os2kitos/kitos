@@ -1,5 +1,4 @@
 ﻿module Kitos.ItContract.Overview {
-    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export interface IOverviewController {
@@ -229,9 +228,6 @@
                     return "";
             }
         }
-
-        private excelConfig: IExcelConfig = {
-        };
 
         private activate() {
             var self = this;
@@ -800,6 +796,9 @@
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
         }
+        
+        private excelConfig: Models.IExcelConfig = {
+        };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractOverview>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);

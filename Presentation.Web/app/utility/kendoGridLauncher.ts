@@ -5,7 +5,6 @@
      * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
      */
 module Kitos.Utility.KendoGrid {
-    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export enum KendoGridColumnFiltering {
@@ -672,7 +671,7 @@ module Kitos.Utility.KendoGrid {
             this.$state.go(".", null, { reload: true });
         }
 
-        private excelConfig: IExcelConfig = {
+        private excelConfig: Models.IExcelConfig = {
         };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
@@ -770,38 +769,7 @@ module Kitos.Utility.KendoGrid {
                 }
             ];
             
-            this.customToolbarEntries.push({
-                show: true,
-                id: Constants.ExcelExportDropdown.Id,
-                title: Constants.ExcelExportDropdown.DefaultTitle,
-                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
-                position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
-                implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
-                enabled: () => true,
-                dropDownConfiguration: {
-                    selectedOptionChanged: newItem => {
-                        if (newItem === null)
-                            return;
-
-                        this.excelConfig.onlyVisibleColumns = false;
-                        if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
-                            this.excelConfig.onlyVisibleColumns = true;
-
-                        this.gridBinding.mainGrid.saveAsExcel();
-
-                        this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey).value(Constants.ExcelExportDropdown.DefaultValue);
-                    },
-                    availableOptions: [
-                        {
-                            id: Constants.ExcelExportDropdown.SelectAllId,
-                            text: Constants.ExcelExportDropdown.SelectAllValue
-                        },
-                        {
-                            id: Constants.ExcelExportDropdown.SelectOnlyVisibleId,
-                            text: Constants.ExcelExportDropdown.SelectOnlyVisibleValue
-                        }]
-                }
-            });
+            this.customToolbarEntries.push(Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid));
 
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {

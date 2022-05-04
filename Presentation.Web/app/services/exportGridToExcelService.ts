@@ -20,7 +20,7 @@
                     onlyVisibleColumns = config.onlyVisibleColumns;
                 }
 
-                this.displayOnlySelectedColumns(e, columns, onlyVisibleColumns);
+                this.selectColumnsToDisplay(e, columns, onlyVisibleColumns);
 
                 this.showSelectedColumns(columns, e);
                 this.sortColumnArray();
@@ -76,7 +76,7 @@
             this.columnsToShow = [];
         }
 
-        private displayOnlySelectedColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[], exportOnlyVisibleColumns: boolean) {
+        private selectColumnsToDisplay(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[], exportOnlyVisibleColumns: boolean) {
             if (!exportOnlyVisibleColumns) {
                 this.setAllNonExcelOnlyColumnsAsVisible(e, columns);
             }
