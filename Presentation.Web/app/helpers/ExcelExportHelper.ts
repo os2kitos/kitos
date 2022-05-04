@@ -157,21 +157,21 @@
         }
 
         /**
-         * Wrapper method which configures an ExcelExportDropdown
+         * Wrapper method which creates and configures an ExcelExportDropdown
          * @param entry
          * @param scope
          * @param toolbar
          */
-        static setupExcelExportDropdown(entry: Utility.KendoGrid.IKendoToolbarEntry, scope: ng.IScope, toolbar: IKendoGridToolbarItem[]) {
+        static setupExcelExportDropdown(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<any>, scope: ng.IScope, toolbar: IKendoGridToolbarItem[]) {
+            const entry = this.createExcelExportDropdownEntry(excelConfig, mainGrid);
             this.addExcelExportDropdownToToolbar(toolbar, entry);
             this.setupKendoVm(scope, entry);
         }
 
         /**
           * Creates an object of type IKendoToolbarEntry configured as an ExcelExportDropdown
-          * WARNING the method doesn't implement the selectedOptionChanged method
           */
-        static createExcelExportDropdownEntry() : Utility.KendoGrid.IKendoToolbarEntry {
+        static createExcelExportDropdownEntry(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<Models.IOrganization>): Utility.KendoGrid.IKendoToolbarEntry {
             return {
                 show: true,
                 id: Constants.ExcelExportDropdown.Id,
@@ -182,6 +182,20 @@
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: newItem => {
+                        if (newItem === null)
+                            return;
+
+                        const config = excelConfig();
+                        config.onlyVisibleColumns = false;
+
+                        if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId) {
+                            config.onlyVisibleColumns = true;
+                        }
+
+                        mainGrid().saveAsExcel();
+
+                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                            .value(Constants.ExcelExportDropdown.DefaultValue);
                     },
                     availableOptions: [
                         {
@@ -224,7 +238,7 @@
                 scope.kendoVm = {
                     standardToolbar: {}
                 }
-            
+
             scope.kendoVm[entry.id] = {
                 enabled: true,
                 getOptions: () => {

@@ -6,13 +6,9 @@
     export class OrganizationController {
         public mainGrid: IKendoGrid<Models.IOrganization>;
         public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
-        public gridBinding: IGridViewAccess<Models.IOrganization>;
 
         public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout', 'exportGridToExcelService'];
 
-        private readonly excelConfig: IExcelConfig = {
-        };
-        
         constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout, private exportGridToExcelService) {
             $rootScope.page.title = 'Organisationer';
 
@@ -76,7 +72,7 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                excelExport: (e:any) => this.exportToExcel(e),
+                excelExport: (e: any) => this.exportToExcel(e),
                 columns: [
                     {
                         field: "Name",
@@ -120,7 +116,7 @@
                         excelTemplate: (dataItem) => dataItem.Type.Name,
                         filterable: {
                             cell: {
-                                template: function(args) {
+                                template: function (args) {
                                     args.element.kendoDropDownList({
                                         dataSource: [
                                             { type: "Kommune", value: "Kommune" },
@@ -177,23 +173,9 @@
                     }
                 ]
             };
-            
-            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
-            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
-                if (newItem === null)
-                    return;
 
-                this.excelConfig.onlyVisibleColumns = false;
-                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
-                    this.excelConfig.onlyVisibleColumns = true;
-
-                this.mainGrid.saveAsExcel();
-
-                $(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
-                    .value(Constants.ExcelExportDropdown.DefaultValue);
-            };
-
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
                 this.$scope,
                 this.mainGridOptions.toolbar);
 
@@ -207,6 +189,9 @@
         private reload() {
             this.$state.go(".", null, { reload: true });
         }
+
+        private readonly excelConfig: IExcelConfig = {
+        };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);

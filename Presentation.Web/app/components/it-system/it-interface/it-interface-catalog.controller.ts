@@ -481,22 +481,8 @@
                 ]
             };
 
-            const entry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry();
-            entry.dropDownConfiguration.selectedOptionChanged = newItem => {
-                if (newItem === null)
-                    return;
-
-                this.excelConfig.onlyVisibleColumns = false;
-                if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId)
-                    this.excelConfig.onlyVisibleColumns = true;
-
-                this.mainGrid.saveAsExcel();
-
-                this.$(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
-                    .value(Constants.ExcelExportDropdown.DefaultValue);
-            };
-
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(entry,
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
                 this.$scope,
                 this.mainGridOptions.toolbar);
 
