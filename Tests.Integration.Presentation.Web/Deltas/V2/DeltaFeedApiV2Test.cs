@@ -27,14 +27,14 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
         public DeltaFeedApiV2Test()
         {
             //Reset the event stream to control expectations
-            DatabaseAccess.MutateEntitySet< LifeCycleTrackingEvent>(repository=>
-            {
-                var allIds = repository.AsQueryable().Select(x=>x.Id).ToList();
-                foreach (var id in allIds)
-                {
-                    repository.DeleteByKey(id);
-                }
-            });
+            DatabaseAccess.MutateEntitySet<LifeCycleTrackingEvent>(repository =>
+           {
+               var allIds = repository.AsQueryable().Select(x => x.Id).ToList();
+               foreach (var id in allIds)
+               {
+                   repository.DeleteByKey(id);
+               }
+           });
         }
 
         [Fact]
