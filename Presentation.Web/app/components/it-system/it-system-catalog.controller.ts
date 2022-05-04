@@ -968,11 +968,9 @@
             }
         }
 
-        public copyToClipBoard() {
-            window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
-            document.execCommand("Copy");
-            window.getSelection().removeAllRanges();
-            this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+        copyToClipBoard() {
+            Utility.copyPageContentToClipBoard("copyPasteConsequence");
+            this.notify.addSuccessMessage("Overblik er kopieret til udklipsholderen");
 
         }
 

@@ -6,6 +6,7 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.KLE;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Context;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
 using Core.DomainServices.Repositories.TaskRefs;
@@ -23,14 +24,15 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         private readonly Mock<IOrganizationalUserContext> _mockOrganizationalUserContext;
         private readonly Mock<IKLEUpdateHistoryItemRepository> _mockUpdateHistoryItemRepository;
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
-
+        private readonly int _defaultOrganizationId;
         public KLEApplicationServiceTest()
         {
             _mockKleStandardRepository = new Mock<IKLEStandardRepository>();
             _mockUpdateHistoryItemRepository = new Mock<IKLEUpdateHistoryItemRepository>();
             _mockOrganizationalUserContext = new Mock<IOrganizationalUserContext>();
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
-            _sut = new KLEApplicationService(_mockOrganizationalUserContext.Object, _mockKleStandardRepository.Object, _mockUpdateHistoryItemRepository.Object, _taskRefRepositoryMock.Object);
+            _defaultOrganizationId = new Random(DateTime.Now.Millisecond).Next();
+            _sut = new KLEApplicationService(_mockOrganizationalUserContext.Object, _mockKleStandardRepository.Object, _mockUpdateHistoryItemRepository.Object, _taskRefRepositoryMock.Object,Mock.Of<IDefaultOrganizationResolver>(x=>x.Resolve() == new Organization(){OrgUnits = new List<OrganizationUnit>(){new(){Id = _defaultOrganizationId}}}));
 
         }
 
@@ -86,10 +88,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             // Arrange
             _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(role == OrganizationRole.GlobalAdmin);
-            const int activeOrganizationId = 1;
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
-                .Setup(r => r.UpdateKLE(activeOrganizationId))
+                .Setup(r => r.UpdateKLE(_defaultOrganizationId))
                 .Returns(publishedDate);
             _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<Maybe<DateTime>>())).Returns(
                 new KLEStatus
@@ -104,7 +105,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             }.OrderBy(c => c.TaskKey));
 
             // Act
-            var result = _sut.UpdateKLE(activeOrganizationId);
+            var result = _sut.UpdateKLE();
 
             // Assert
             Assert.Equal(isOk, result.Ok);
@@ -116,10 +117,9 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
         {
             // Arrange
             _mockOrganizationalUserContext.Setup(r => r.IsGlobalAdmin()).Returns(true);
-            const int activeOrganizationId = 1;
             var publishedDate = DateTime.Today;
             _mockKleStandardRepository
-                .Setup(r => r.UpdateKLE(activeOrganizationId))
+                .Setup(r => r.UpdateKLE(_defaultOrganizationId))
                 .Returns(publishedDate);
             _mockKleStandardRepository.Setup(r => r.GetKLEStatus(It.IsAny<Maybe<DateTime>>())).Returns(
                 new KLEStatus
@@ -130,7 +130,7 @@ namespace Tests.Unit.Core.ApplicationServices.KLE
             );
 
             // Act
-            var result = _sut.UpdateKLE(activeOrganizationId);
+            var result = _sut.UpdateKLE();
 
             // Assert
             Assert.False(result.Ok);

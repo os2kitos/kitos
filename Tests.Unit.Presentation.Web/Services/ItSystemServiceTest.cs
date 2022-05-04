@@ -16,7 +16,6 @@ using Core.DomainServices.Repositories.System;
 using Core.DomainServices.Repositories.TaskRefs;
 using Core.DomainServices.Time;
 using Infrastructure.Services.DataAccess;
-
 using Moq;
 using Serilog;
 using System;
@@ -24,6 +23,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Interface;
+using Core.ApplicationServices.SystemUsage;
 using Core.DomainModel.Events;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -43,6 +44,9 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationRepository> _organizationRepositoryMock;
         private readonly Mock<IOptionsService<ItSystem, BusinessType>> _businessTypeServiceMock;
         private readonly Mock<ITaskRefRepository> _taskRefRepositoryMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IItInterfaceService> _interfaceServiceMock;
+        private readonly Mock<IItSystemUsageService> _systemUsageServiceMock;
 
         public ItSystemServiceTest()
         {
@@ -56,6 +60,9 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRepositoryMock = new Mock<IOrganizationRepository>();
             _businessTypeServiceMock = new Mock<IOptionsService<ItSystem, BusinessType>>();
             _taskRefRepositoryMock = new Mock<ITaskRefRepository>();
+            _domainEventsMock = new Mock<IDomainEvents>();
+            _interfaceServiceMock = new Mock<IItInterfaceService>();
+            _systemUsageServiceMock = new Mock<IItSystemUsageService>();
             _sut = new ItSystemService(
                 _systemRepository.Object,
                 _authorizationContext.Object,
@@ -66,8 +73,10 @@ namespace Tests.Unit.Presentation.Web.Services
                 _organizationRepositoryMock.Object,
                 _logger.Object,
                 _userContext.Object,
-                Mock.Of<IDomainEvents>(),
-                Mock.Of<IOperationClock>()
+                _domainEventsMock.Object,
+                Mock.Of<IOperationClock>(),
+                _interfaceServiceMock.Object,
+                _systemUsageServiceMock.Object
                 );
         }
 
@@ -350,6 +359,27 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Delete_Returns_Ok_If_System_Is_In_Use_And_BreakBindings_Is_True()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var organization = CreateOrganization();
+            var systemUsage = CreateSystemUsage(organization);
+            AddUsage(system, systemUsage);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectTransactionToBeSet();
+            _systemUsageServiceMock.Setup(x => x.Delete(systemUsage.Id)).Returns(Result<ItSystemUsage, OperationError>.Success(systemUsage));
+            ExpectReferenceDeletionSuccess(system);
+
+            //Act
+            var result = _sut.Delete(system.Id, true);
+
+            //Assert
+            AssertSystemDeleted(result);
+        }
+
+        [Fact]
         public void Delete_Returns_HasChildren_If_System_Has_Children()
         {
             //Arrange
@@ -367,6 +397,28 @@ namespace Tests.Unit.Presentation.Web.Services
         }
 
         [Fact]
+        public void Delete_Returns_Ok_If_If_System_Has_Children_And_BreakBindings_Are_Specified()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var childSystem = CreateSystem();
+            AddChild(system, childSystem);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectAllowModifyReturns(childSystem, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectGetSystemReturns(childSystem.Id, childSystem);
+            ExpectTransactionToBeSet();
+            ExpectReferenceDeletionSuccess(system);
+
+            //Act
+            var result = _sut.Delete(system.Id, true);
+
+            //Assert
+            AssertSystemDeleted(result);
+            Assert.Null(childSystem.Parent);
+        }
+
+        [Fact]
         public void Delete_Returns_HasExhibitInterfaces_If_System_Has_Exhibit_Interfaces()
         {
             //Arrange
@@ -381,6 +433,26 @@ namespace Tests.Unit.Presentation.Web.Services
             //Assert
             Assert.Equal(SystemDeleteResult.HasInterfaceExhibits, result);
             _dbTransaction.Verify(x => x.Commit(), Times.Never);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_If_System_Has_Exhibit_Interfaces_And_BreakBindings_Is_True()
+        {
+            //Arrange
+            var system = CreateSystem();
+            var itInterfaceExhibit = CreateInterfaceExhibit();
+            AddInterfaceExhibit(system, itInterfaceExhibit);
+            ExpectAllowDeleteReturns(system, true);
+            ExpectGetSystemReturns(system.Id, system);
+            ExpectTransactionToBeSet();
+            _interfaceServiceMock.Setup(x => x.UpdateExposingSystem(itInterfaceExhibit.ItInterface.Id, null)).Returns(Result<ItInterface, OperationError>.Success(itInterfaceExhibit.ItInterface));
+            ExpectReferenceDeletionSuccess(system);
+
+            //Act
+            var result = _sut.Delete(system.Id, true);
+
+            //Assert
+            AssertSystemDeleted(result);
         }
 
         [Fact]
@@ -407,14 +479,13 @@ namespace Tests.Unit.Presentation.Web.Services
             ExpectAllowDeleteReturns(system, true);
             ExpectGetSystemReturns(system.Id, system);
             ExpectTransactionToBeSet();
-            _referenceService.Setup(x => x.DeleteBySystemId(system.Id)).Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
+            ExpectReferenceDeletionSuccess(system);
 
             //Act
             var result = _sut.Delete(system.Id);
 
             //Assert
-            Assert.Equal(SystemDeleteResult.Ok, result);
-            _dbTransaction.Verify(x => x.Commit(), Times.Once);
+            AssertSystemDeleted(result);
         }
 
         [Fact]
@@ -1214,7 +1285,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Assert
             Assert.True(result.Ok);
-            Assert.True(result.Select(x=>x.Disabled).Value);
+            Assert.True(result.Select(x => x.Disabled).Value);
             _systemRepository.Verify(x => x.Update(It.IsAny<ItSystem>()), Times.Once);
             _dbTransaction.Verify(x => x.Commit(), Times.Once);
         }
@@ -1234,7 +1305,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var result = _sut.Deactivate(systemId);
 
             //Assert
-            AssertUpdateFailure(result,OperationFailure.Forbidden);
+            AssertUpdateFailure(result, OperationFailure.Forbidden);
         }
 
         [Fact]
@@ -1243,7 +1314,7 @@ namespace Tests.Unit.Presentation.Web.Services
             //Arrange
             var systemId = A<int>();
             ExpectTransactionToBeSet();
-            ExpectGetSystemReturns(systemId,null);
+            ExpectGetSystemReturns(systemId, null);
 
             //Act
             var result = _sut.Deactivate(systemId);
@@ -1345,7 +1416,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
         private ItInterfaceExhibit CreateInterfaceExhibit()
         {
-            return new() { Id = A<int>() };
+            return new() { Id = A<int>(), ItInterface = new ItInterface() { Id = A<int>() } };
         }
 
         private ExternalReference CreateExternalReference()
@@ -1430,6 +1501,18 @@ namespace Tests.Unit.Presentation.Web.Services
         private void ExpectGetTaskRefReturnsNone(int taskRefId1)
         {
             _taskRefRepositoryMock.Setup(x => x.GetTaskRef(taskRefId1)).Returns(Maybe<TaskRef>.None);
+        }
+
+        private void AssertSystemDeleted(SystemDeleteResult result)
+        {
+            Assert.Equal(SystemDeleteResult.Ok, result);
+            _dbTransaction.Verify(x => x.Commit(), Times.AtLeastOnce());
+        }
+
+        private void ExpectReferenceDeletionSuccess(ItSystem system)
+        {
+            _referenceService.Setup(x => x.DeleteBySystemId(system.Id))
+                .Returns(Result<IEnumerable<ExternalReference>, OperationFailure>.Success(new ExternalReference[0]));
         }
     }
 }

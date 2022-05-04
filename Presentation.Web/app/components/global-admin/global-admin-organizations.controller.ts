@@ -2,13 +2,19 @@
     "use strict";
 
     export class OrganizationController {
-        public mainGrid: IKendoGrid<Models.IOrganization>;
-        public mainGridOptions: IKendoGridOptions<Models.IOrganization>;
+        mainGrid: IKendoGrid<Models.IOrganization>;
+        mainGridOptions: IKendoGridOptions<Models.IOrganization>;
 
-        public static $inject: string[] = ['$rootScope', '$scope', '$http', 'notify', 'user', '_', '$', '$state', '$window', '$timeout', 'exportGridToExcelService'];
+        static $inject: string[] = ["$rootScope", "_", "$", "$state", "$timeout", "exportGridToExcelService"];
 
-        constructor(private $rootScope, private $scope: ng.IScope, private $http, private notify, private user, private _, private $, private $state, private $window, private $timeout, private exportGridToExcelService) {
-            $rootScope.page.title = 'Organisationer';
+        constructor(
+            private readonly $rootScope,
+            private readonly _,
+            private readonly $,
+            private readonly $state,
+            private readonly $timeout,
+            private readonly exportGridToExcelService) {
+            $rootScope.page.title = "Organisationer";
 
             this.mainGridOptions = {
                 dataSource: {
@@ -147,7 +153,7 @@
             };
             function customFilter(args) {
                 args.element.kendoAutoComplete({
-                    noDataTemplate: ''
+                    noDataTemplate: ""
                 });
             }
         }
@@ -160,48 +166,34 @@
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
         }
 
+        private getSenderGridItemId(e: JQueryEventObject) {
+            const dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
+            return  dataItem["Id"];
+        }
+
         private onEdit = (e: JQueryEventObject) => {
             e.preventDefault();
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-            var entityId = dataItem["Id"];
+            var entityId = this.getSenderGridItemId(e);
             this.$state.go("global-admin.organizations.edit", { id: entityId });
         }
 
         private onDelete = (e: JQueryEventObject) => {
             e.preventDefault();
-            var dataItem = this.mainGrid.dataItem(this.$(e.currentTarget).closest("tr"));
-
-            if (this.$window.confirm("Er du sikker på at slette " + dataItem["Name"] + "?")) {
-                this.$http.delete(`api/organization/${dataItem["Id"]}?organizationId=${this.user.currentOrganizationId}`)
-                    .then(
-                        success => {
-                            this.notify.addSuccessMessage("Organisation slettet");
-                            this.reload();
-                        },
-                        error => {
-                            this.notify.addErrorMessage("Kunne ikke slette organisationen");
-                        });
-            }
+            var entityId = this.getSenderGridItemId(e);
+            this.$state.go("global-admin.organizations.delete", { id: entityId });
         }
     }
 
     angular
         .module("app")
         .config([
-            '$stateProvider', ($stateProvider) => {
-                $stateProvider.state('global-admin.organizations', {
-                    url: '/organisations',
-                    templateUrl: 'app/components/global-admin/global-admin-organizations.view.html',
+            "$stateProvider", ($stateProvider) => {
+                $stateProvider.state("global-admin.organizations", {
+                    url: "/organisations",
+                    templateUrl: "app/components/global-admin/global-admin-organizations.view.html",
                     controller: OrganizationController,
-                    controllerAs: 'orgCtrl',
-                    authRoles: ['GlobalAdmin'],
-                    resolve: {
-                        user: [
-                            'userService', (userService) => {
-                                return userService.getUser();
-                            }
-                        ]
-                    }
+                    controllerAs: "orgCtrl",
+                    authRoles: ["GlobalAdmin"]
                 });
             }
         ]);

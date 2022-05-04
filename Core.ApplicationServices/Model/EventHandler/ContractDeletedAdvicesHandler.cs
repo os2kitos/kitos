@@ -6,7 +6,7 @@ using Core.DomainServices.Repositories.Advice;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class ContractDeletedAdvicesHandler : IDomainEventHandler<EntityDeletedEvent<ItContract>>
+    public class ContractDeletedAdvicesHandler : IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>
     {
         private readonly IAdviceRepository _adviceRepository;
         private readonly IAdviceService _adviceService;
@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Model.EventHandler
             _adviceService = adviceService;
         }
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
             var contractDeleted = domainEvent.Entity;
             var toBeDeleted = _adviceRepository.GetByRelationIdAndType(contractDeleted.Id, RelatedEntityType.itContract).ToList();

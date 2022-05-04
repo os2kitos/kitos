@@ -40,7 +40,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new EntityDeletedEvent<ItContract>(deletedContract));
+            _sut.Handle(new EntityBeingDeletedEvent<ItContract>(deletedContract));
 
             //Assert that all interface fields were reset
             Assert.True(deletedContract.AssociatedSystemRelations.All(x => x.AssociatedContract == null));

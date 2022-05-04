@@ -13,12 +13,12 @@ using Core.DomainServices.Context;
 namespace Core.DomainServices.Tracking
 {
     public class TrackDeletedEntitiesEventHandler :
-        IDomainEventHandler<EntityDeletedEvent<ItSystem>>,
-        IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>,
-        IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
-        IDomainEventHandler<EntityDeletedEvent<ItContract>>,
-        IDomainEventHandler<EntityDeletedEvent<ItInterface>>,
-        IDomainEventHandler<EntityDeletedEvent<ItProject>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItSystem>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ItProject>>
     {
         private readonly IGenericRepository<LifeCycleTrackingEvent> _trackingEventsRepository;
         private readonly Maybe<ActiveUserIdContext> _userContext;
@@ -29,17 +29,17 @@ namespace Core.DomainServices.Tracking
             _userContext = userContext;
         }
 
-        public void Handle(EntityDeletedEvent<ItSystem> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<ItSystem> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityDeletedEvent<DataProcessingRegistration> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<DataProcessingRegistration> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityDeletedEvent<ItInterface> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<ItInterface> domainEvent) => TrackDeleted(domainEvent.Entity);
 
-        public void Handle(EntityDeletedEvent<ItProject> domainEvent) => TrackDeleted(domainEvent.Entity);
+        public void Handle(EntityBeingDeletedEvent<ItProject> domainEvent) => TrackDeleted(domainEvent.Entity);
 
         private void TrackDeleted<T>(T entity) where T : IHasUuid
         {

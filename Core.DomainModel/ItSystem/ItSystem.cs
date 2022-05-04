@@ -237,5 +237,28 @@ namespace Core.DomainModel.ItSystem
         {
             Disabled = true;
         }
+
+        public void ChangeOrganization(Organization.Organization newOrganization)
+        {
+            if (newOrganization == null)
+            {
+                throw new ArgumentNullException(nameof(newOrganization));
+            }
+            Organization = newOrganization;
+            OrganizationId = newOrganization.Id;
+        }
+
+        public void RemoveChildSystem(ItSystem child)
+        {
+            if (child.ParentId == Id)
+            {
+                Children.Remove(child);
+                child.ResetParentSystem();
+            }
+            else
+            {
+                throw new ArgumentException(nameof(child));
+            }
+        }
     }
 }

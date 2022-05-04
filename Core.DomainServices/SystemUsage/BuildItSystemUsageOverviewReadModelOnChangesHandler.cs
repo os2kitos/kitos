@@ -16,30 +16,30 @@ using Core.DomainServices.Repositories.SystemUsage;
 namespace Core.DomainServices.SystemUsage
 {
     public class BuildItSystemUsageOverviewReadModelOnChangesHandler :
-    IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityCreatedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityUpdatedEvent<ItSystemUsage>>,
     IDomainEventHandler<EntityUpdatedEvent<ItSystem>>,
     IDomainEventHandler<EntityUpdatedEvent<User>>,
     IDomainEventHandler<EntityUpdatedEvent<OrganizationUnit>>,
-    IDomainEventHandler<EntityDeletedEvent<OrganizationUnit>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<OrganizationUnit>>,
     IDomainEventHandler<EntityUpdatedEvent<Organization>>,
-    IDomainEventHandler<EntityDeletedEvent<Organization>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<Organization>>,
     IDomainEventHandler<EntityUpdatedEvent<BusinessType>>,
     IDomainEventHandler<EntityCreatedEvent<LocalBusinessType>>,
     IDomainEventHandler<EntityUpdatedEvent<LocalBusinessType>>,
     IDomainEventHandler<EntityUpdatedEvent<TaskRef>>,
-    IDomainEventHandler<EntityDeletedEvent<ExternalReference>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<ExternalReference>>,
     IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
     IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
     IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
-    IDomainEventHandler<EntityDeletedEvent<ItContract>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>,
     IDomainEventHandler<EntityUpdatedEvent<ItProject>>,
-    IDomainEventHandler<EntityDeletedEvent<ItProject>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<ItProject>>,
     IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
-    IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
+    IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>,
     IDomainEventHandler<EntityUpdatedEvent<ItInterface>>,
-    IDomainEventHandler<EntityDeletedEvent<ItInterface>>
+    IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>
     {
         private readonly IPendingReadModelUpdateRepository _pendingReadModelUpdateRepository;
         private readonly IItSystemUsageOverviewReadModelRepository _readModelRepository;
@@ -55,7 +55,7 @@ namespace Core.DomainServices.SystemUsage
             _readModelUpdate = readModelUpdate;
         }
 
-        public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
             _readModelRepository.DeleteBySourceId(domainEvent.Entity.Id);
          
@@ -103,7 +103,7 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
         }
 
-        public void Handle(EntityDeletedEvent<OrganizationUnit> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<OrganizationUnit> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_OrganizationUnit));
         }
@@ -113,7 +113,7 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_Organization));
         }
 
-        public void Handle(EntityDeletedEvent<Organization> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<Organization> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.ItSystemUsage_Organization));
         }
@@ -145,7 +145,7 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
         }
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Contract));
         }
@@ -155,7 +155,7 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Project));
         }
 
-        public void Handle(EntityDeletedEvent<ItProject> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItProject> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_Project));
         }
@@ -165,7 +165,7 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_DataProcessingRegistration));
         }
 
-        public void Handle(EntityDeletedEvent<DataProcessingRegistration> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<DataProcessingRegistration> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_DataProcessingRegistration));
         }
@@ -175,12 +175,12 @@ namespace Core.DomainServices.SystemUsage
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
         }
 
-        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItInterface> domainEvent)
         {
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.ItSystemUsage_ItInterface));
         }
 
-        public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
+        public void Handle(EntityBeingDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
 
         public void Handle(EntityCreatedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
 

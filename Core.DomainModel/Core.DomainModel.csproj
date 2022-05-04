@@ -55,7 +55,7 @@
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
-    <Compile Include="Events\EntityDeletedEvent.cs" />
+    <Compile Include="Events\EntityBeingDeletedEvent.cs" />
     <Compile Include="Events\EntityLifeCycleEvent.cs" />
     <Compile Include="Events\EntityUpdatedEvent.cs" />
     <Compile Include="Events\IDomainEvent.cs" />

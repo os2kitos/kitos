@@ -231,7 +231,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         protected virtual void RaiseDeleted(TModel entity)
         {
-            DomainEvents.Raise(new EntityDeletedEvent<TModel>(entity));
+            DomainEvents.Raise(new EntityBeingDeletedEvent<TModel>(entity));
         }
 
         // DELETE api/T

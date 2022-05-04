@@ -9,7 +9,7 @@ namespace Core.ApplicationServices.Interface
 {
     public interface IItInterfaceService
     {
-        Result<ItInterface, OperationFailure> Delete(int id);
+        Result<ItInterface, OperationFailure> Delete(int id, bool breakBindings = false);
         IQueryable<ItInterface> GetAvailableInterfaces(params IDomainQuery<ItInterface>[] conditions);
         Result<ItInterface, OperationError> GetInterface(Guid uuid);
         Result<ItInterface, OperationError> CreateNewItInterface(int organizationId, string name, string itInterfaceId, Guid? rightsHolderProvidedUuid = null, AccessModifier? accessModifier = null);

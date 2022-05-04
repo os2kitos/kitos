@@ -4,6 +4,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.SSO;
@@ -21,7 +22,7 @@ namespace Core.DomainModel.Organization
     /// Holds local configuration and admin roles, as well as collections of
     /// ItSystems, ItProjects, etc that was created in this organization.
     /// </summary>
-    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasReferences, IHasName, IIsPartOfOrganization, IHasUuid
+    public class Organization : Entity, IHasAccessModifier, IOrganizationModule, IHasName, IIsPartOfOrganization, IHasUuid
     {
         public const int MaxNameLength = 100;
 
@@ -35,18 +36,23 @@ namespace Core.DomainModel.Organization
             OrgUnits = new List<OrganizationUnit>();
             Rights = new List<OrganizationRight>();
             OrganizationOptions = new List<LocalOptionEntity<Entity>>();
-            ExternalReferences = new List<ExternalReference>();
             UserNotifications = new List<UserNotification>();
             LifeCycleTrackingEvents = new List<LifeCycleTrackingEvent>();
             LifeCycleTrackingEventsWhereOrganizationIsRightsHolder = new List<LifeCycleTrackingEvent>();
             Uuid = Guid.NewGuid();
+            DataResponsibles = new List<DataResponsible>();
+            DataProtectionAdvisors = new List<DataProtectionAdvisor>();
+            IsDefaultOrganization = null;
+            ItInterfaces = new List<ItInterface>();
+            DataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
+            BelongingSystems = new List<ItSystem.ItSystem>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
         public string Adress { get; set; }
         public string Email { get; set; }
         public int TypeId { get; set; }
-        public virtual ICollection<ExternalReference> ExternalReferences { get; set; }
         public virtual OrganizationType Type { get; set; }
         /// <summary>
         /// Cvr number
@@ -112,13 +118,17 @@ namespace Core.DomainModel.Organization
         public virtual int? ContactPersonId { get; set; }
 
         public virtual ContactPerson ContactPerson { get; set; }
-
         public virtual ICollection<DataProcessingRegistration> DataProcessorForDataProcessingRegistrations { get; set; }
-
         public virtual ICollection<DataProcessingRegistration> SubDataProcessorForDataProcessingRegistrations { get; set; }
         public virtual ICollection<ItSystemUsageOverviewReadModel> ItSystemUsageOverviewReadModels { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
+        public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
+        public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+        /// <summary>
+        /// Determines if this is the "Default" organization in KITOS
+        /// </summary>
+        public bool? IsDefaultOrganization { get; set; }
 
         /// <summary>
         /// Get the level-0 organization unit, which by convention is named represently
