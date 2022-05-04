@@ -606,7 +606,6 @@ module Kitos.Utility.KendoGrid {
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            this.gridBinding.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.gridBinding.mainGrid);
         }
 
@@ -947,7 +946,7 @@ module Kitos.Utility.KendoGrid {
                 // is for the one we're interested in.
                 if (widget === this.gridBinding.mainGrid) {
 
-                    //this.loadGridOptions();
+                    this.loadGridOptions();
                     // show loadingbar when export to excel is clicked
                     // hidden again in method exportToExcel callback
                     this.$(".k-grid-excel").click(() => {
