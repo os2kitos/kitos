@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -25,7 +26,15 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
     {
         public DeltaFeedApiV2Test()
         {
-            //TODO: Delete the changes table
+            //Reset the event stream to control expectations
+            DatabaseAccess.MutateEntitySet< LifeCycleTrackingEvent>(repository=>
+            {
+                var allIds = repository.AsQueryable().Select(x=>x.Id).ToList();
+                foreach (var id in allIds)
+                {
+                    repository.DeleteByKey(id);
+                }
+            });
         }
 
         [Fact]
