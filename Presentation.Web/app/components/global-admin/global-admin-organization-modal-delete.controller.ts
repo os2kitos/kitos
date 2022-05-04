@@ -70,9 +70,7 @@
         }
 
         copyToClipBoard() {
-            window.getSelection().selectAllChildren(document.getElementById("consequencesOverview"));
-            document.execCommand("Copy");
-            window.getSelection().removeAllRanges();
+            Utility.copyPageContentToClipBoard("consequencesOverview");
             this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
         }
 

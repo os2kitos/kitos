@@ -969,11 +969,8 @@
         }
 
         copyToClipBoard() {
-            //TODO: Create helper funktion and re-use in migration window
-            window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
-            document.execCommand("Copy");
-            window.getSelection().removeAllRanges();
-            this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+            Utility.copyPageContentToClipBoard("copyPasteConsequence");
+            this.notify.addSuccessMessage("Overblik er kopieret til udklipsholderen");
 
         }
 

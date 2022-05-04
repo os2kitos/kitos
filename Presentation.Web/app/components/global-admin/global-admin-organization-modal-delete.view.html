@@ -1,5 +1,5 @@
 ﻿<div class="modal-header">
-    <h3 class="modal-title">{{ctrl.title}}</h3>
+    <h3 class="modal-title">{{::ctrl.title}}</h3>
 </div>
 
 <form class="form-horizontal" role="form" name="form" data-ng-submit="ctrl.submit()">
@@ -11,27 +11,27 @@
 
             <!-- Contracts where the deleted org is set as supplier and deleting the org will reset the supplier -->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved.length > 0">
-                <div class="panel-heading">Kontrakter hvor organisationen "{{ctrl.orgName}}" er sat som "Leverandør", og hvor feltet dermed nulstilles:</div>
+                <div class="panel-heading">Kontrakter hvor organisationen "{{::ctrl.orgName}}" er sat som "Leverandør", og hvor feltet dermed nulstilles:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
-                    <tr>
-                        <th class="col-xs-1">Kontrakt</th>
-                        <th class="col-xs-1">Oprettet i (organisation)</th>
-                    </tr>
+                        <tr>
+                            <th class="col-xs-1">Kontrakt</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
                     </thead>
                     <tbody class="small">
-                    <tr ng-repeat="contract in ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved">
-                        <td>{{contract.name}}</td>
-                        <td>{{contract.organizationName}}</td>
-                    </tr>
+                        <tr ng-repeat="contract in ctrl.conflictsModel.contractsWhereSupplierWillBeRemoved">
+                            <td>{{::contract.name}}</td>
+                            <td>{{::contract.organizationName}}</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
 
             <!-- DPR conflicts on data processor-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfDataProcessors.length > 0">
-                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{ctrl.orgName}}" fjernes som databehandler:</div>
+                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{::ctrl.orgName}}" fjernes som databehandler:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
@@ -42,8 +42,8 @@
                     </thead>
                     <tbody class="small">
                         <tr ng-repeat="dpr in ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfDataProcessors">
-                            <td>{{dpr.name}}</td>
-                            <td>{{dpr.organizationName}}</td>
+                            <td>{{::dpr.name}}</td>
+                            <td>{{::dpr.organizationName}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -51,7 +51,7 @@
 
             <!-- DPR conflicts on sub data processor-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfSubDataProcessors.length > 0">
-                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{ctrl.orgName}}" fjernes som underdatabehandler:</div>
+                <div class="panel-heading">Registreringer i modulet "Databehandling", hvor organisationen "{{::ctrl.orgName}}" fjernes som underdatabehandler:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
@@ -62,8 +62,8 @@
                     </thead>
                     <tbody class="small">
                         <tr ng-repeat="dpr in ctrl.conflictsModel.dprWhereOrganizationIsRemovedFromListOfSubDataProcessors">
-                            <td>{{dpr.name}}</td>
-                            <td>{{dpr.organizationName}}</td>
+                            <td>{{::dpr.name}}</td>
+                            <td>{{::dpr.organizationName}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -71,7 +71,7 @@
 
             <!-- Rights holder conflicts-->
             <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved.length > 0">
-                <div class="panel-heading">IT-Systemer i kataloget, hvor "{{ctrl.orgName}}" er sat som "Rettighedshaver", og hvor feltet dermed nulstilles:</div>
+                <div class="panel-heading">IT-Systemer i kataloget, hvor "{{::ctrl.orgName}}" er sat som "Rettighedshaver", og hvor feltet dermed nulstilles:</div>
 
                 <table class="table table-striped table-condensed table-fixed">
                     <thead>
@@ -82,9 +82,103 @@
                     </thead>
                     <tbody class="small">
                         <tr ng-repeat="system in ctrl.conflictsModel.systemsInOtherOrganizationsWhereRightsHolderWillBeRemoved">
-                            <td>{{system.name}}</td>
-                            <td>{{system.organizationName}}</td>
+                            <td>{{::system.name}}</td>
+                            <td>{{::system.organizationName}}</td>
                         </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Systems moved to default org due to exposing interfaces from other organizations -->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsExposingInterfacesOutsideTheOrganization.length > 0">
+                <div class="panel-heading">IT-Systemer som flyttes til "Fælles kommune", da de udstiller Snitflader oprettet i andre organisationer:</div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">IT-System (i kataloget)</th>
+                            <th class="col-xs-1">Udstillet Snitflade</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-if="0" ng-repeat-start="system in ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsExposingInterfacesOutsideTheOrganization" />
+                        <tr ng-repeat="exposedInterface in system.exposedInterfaces">
+                            <td>{{::system.name}}</td>
+                            <td>{{::exposedInterface.name}}</td>
+                            <td>{{::exposedInterface.organizationName}}</td>
+                        </tr>
+                        <tr ng-if="0" ng-repeat-end />
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Systems moved to default org due to parent relationship to one or more it-systems in other orgs -->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsSetAsParentsToSystemsOutsideTheOrganization.length > 0">
+                <div class="panel-heading">IT-Systemer som flyttes til "Fælles kommune", da de er sat som "Overordnet IT-System" på systemer oprettet i andre organisationer:</div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">IT-System (i kataloget)</th>
+                            <th class="col-xs-1">Overordnet system for (IT-System)</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-if="0" ng-repeat-start="system in ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsSetAsParentsToSystemsOutsideTheOrganization" />
+                        <tr ng-repeat="child in system.children">
+                            <td>{{::system.name}}</td>
+                            <td>{{::child.name}}</td>
+                            <td>{{::child.organizationName}}</td>
+                        </tr>
+                        <tr ng-if="0" ng-repeat-end />
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Systems moved to default org due to usage in other organizations -->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsUsedOutsideTheOrganization.length > 0">
+                <div class="panel-heading">IT-Systemer som flyttes til "Fælles kommune", da de stadig er er i anvendelse i andre organisationer:</div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">IT-System (i kataloget)</th>
+                            <th class="col-xs-1">Anvendt i (organisationer)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        <tr ng-repeat="system in ctrl.conflictsModel.systemsBeingMovedToDefaultOrg.systemsUsedOutsideTheOrganization">
+                            <td>{{::system.name}}</td>
+                            <td>
+                                <ul ng-repeat="organization in system.organizations">
+                                    <li>{{::organization}}</li>
+                                </ul>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Interfaces moved to default org since they are exposed on systems created in other organizations -->
+            <div class="panel panel-default" ng-if="ctrl.conflictsModel.interfacesBeingMovedToDefaultOrg.exposedOnSystemsInOtherOrganizations.length > 0">
+                <div class="panel-heading">Snitflader som flyttes til "Fælles kommune", da de er udstillet på IT-Systemer oprettet i andre organisationer:</div>
+
+                <table class="table table-striped table-condensed table-fixed">
+                    <thead>
+                        <tr>
+                            <th class="col-xs-1">Snitflade</th>
+                            <th class="col-xs-1">Udstillet på i (IT-System)</th>
+                            <th class="col-xs-1">Oprettet i (organisation)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                    <tr ng-repeat="itInterface in ctrl.conflictsModel.interfacesBeingMovedToDefaultOrg.exposedOnSystemsInOtherOrganizations">
+                        <td>{{::itInterface.name}}</td>
+                        <td>{{::itInterface.exposedOnSystem.name}}</td>
+                        <td>{{::itInterface.exposedOnSystem.organizationName}}</td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
