@@ -34,7 +34,7 @@
         static readonly DataKey = "kendoDropDownList";
 
         static readonly SelectAllId = "exportExcelAll";
-        static readonly SelectAllValue = "Alt data";
+        static readonly SelectAllValue = "Alle kolonner";
         static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
         static readonly SelectOnlyVisibleValue = "Viste kolonner";
     }
