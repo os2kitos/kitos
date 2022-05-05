@@ -220,7 +220,6 @@
             return `<span class="k-button-icontext"><span class="k-icon k-i-file-excel"></span>${text}</span>`;
         }
 
-
         /**
          * Configures a specified entry to be a Dropdown with classes required for excel export to work,
          * Adds the entry to the selected toolbar
