@@ -726,6 +726,7 @@
     <TypeScriptCompile Include="app\models\Api\organization\organization.ts" />
     <TypeScriptCompile Include="app\models\generic\ShallowOrganizationDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
+    <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
@@ -1064,8 +1065,8 @@
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
     <TypeScriptCompile Include="app\utility\ClipBoardHelper.ts" />
-    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
+    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\view-data-state.ts" />

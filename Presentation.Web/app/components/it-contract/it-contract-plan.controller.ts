@@ -92,7 +92,7 @@
 
             var self = this;
 
-            var modalInstance = this.$modal.open({
+            this.$modal.open({
                 windowClass: "modal fade in",
                 templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
                 controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
@@ -155,13 +155,7 @@
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
-
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
-        }
-
+        
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -198,6 +192,11 @@
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
+        }
+
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         private reload() {
@@ -394,7 +393,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -826,6 +825,7 @@
                     }
                 ]
             };
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -899,10 +899,18 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractPlan>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private concatRoles(roles: Array<any>): string {

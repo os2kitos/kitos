@@ -155,5 +155,109 @@
         static renderString(value: string) {
             return value || ExcelExportHelper.noValueFallback;
         }
+
+        /**
+         * Wrapper method which creates and configures a dropdown for excel export
+         * @param entry
+         * @param scope
+         * @param toolbar
+         */
+        static setupExcelExportDropdown(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<any>, scope: ng.IScope, toolbar: IKendoGridToolbarItem[]) {
+            const entry = this.createExcelExportDropdownEntry(excelConfig, mainGrid);
+            this.addExcelExportDropdownToToolbar(toolbar, entry);
+            this.setupKendoVm(scope, entry);
+        }
+        
+        /**
+          * Creates an object of type IKendoToolbarEntry configured as a dropdown for excel export
+         * @param excelConfig
+         * @param mainGrid
+         */
+        static createExcelExportDropdownEntry(excelConfig: () => Models.IExcelConfig, mainGrid: () => IKendoGrid<any>): Utility.KendoGrid.IKendoToolbarEntry {
+            return {
+                show: true,
+                id: Constants.ExcelExportDropdown.Id,
+                title: Constants.ExcelExportDropdown.DefaultTitle,
+                color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
+                position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
+                implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                enabled: () => true,
+                dropDownConfiguration: {
+                    selectedOptionChanged: newItem => {
+                        if (newItem === null)
+                            return;
+
+                        const config = excelConfig();
+                        config.onlyVisibleColumns = false;
+
+                        if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId) {
+                            config.onlyVisibleColumns = true;
+                        }
+
+                        mainGrid().saveAsExcel();
+
+                        jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
+                            .value(Constants.ExcelExportDropdown.DefaultValue);
+                    },
+                    availableOptions: [
+                        {
+                            id: Constants.ExcelExportDropdown.SelectAllId,
+                            text: Constants.ExcelExportDropdown.SelectAllValue
+                        },
+                        {
+                            id: Constants.ExcelExportDropdown.SelectOnlyVisibleId,
+                            text: Constants.ExcelExportDropdown.SelectOnlyVisibleValue
+                        }]
+                }
+            }
+        }
+
+        /**
+         * Configures a specified entry to be a Dropdown with classes required for excel export to work,
+         * Adds the entry to the selected toolbar
+         * @param toolbar
+         * @param entry
+         */
+        private static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
+            var position = "";
+            if (entry.position === Utility.KendoGrid.KendoToolbarButtonPosition.Right)
+                position = "pull-right";
+
+            toolbar.push({
+                name: entry.id,
+                text: entry.title,
+                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+            });
+        }
+
+        /**
+         * Adds/updates the entry in the KendoVm and configures the dropdown for excel export
+         * @param scope
+         * @param entry
+         */
+        private static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
+            if (scope.kendoVm === undefined)
+                scope.kendoVm = {
+                    standardToolbar: {}
+                }
+
+            scope.kendoVm[entry.id] = {
+                enabled: true,
+                getOptions: () => {
+                    return {
+                        autoBind: false,
+                        dataSource: entry.dropDownConfiguration.availableOptions,
+                        dataTextField: "text",
+                        dataValueField: "id",
+                        optionLabel: entry.title,
+                        change: e => {
+                            var selectedId = e.sender.value();
+                            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                        }
+                    }
+                }
+            };
+        }
     }
 }

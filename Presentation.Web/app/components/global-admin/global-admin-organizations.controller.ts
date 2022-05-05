@@ -1,4 +1,6 @@
 ﻿module Kitos.GlobalAdmin.Organization {
+    import IGridViewAccess = Utility.KendoGrid.IGridViewAccess;
+    import IExcelConfig = Models.IExcelConfig;
     "use strict";
 
     export class OrganizationController {
@@ -50,9 +52,9 @@
                     {
                         name: "opretOrganisation",
                         text: "Opret Organisation",
-                        template: "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
-                    },
-                    { name: "excel", text: "Eksportér til Excel", className: "pull-right" }
+                        template:
+                            "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
+                    }
                 ],
                 excel: {
                     fileName: "Organisationer.xlsx",
@@ -76,10 +78,12 @@
                 groupable: false,
                 columnMenu: true,
                 height: window.innerHeight - 200,
-                excelExport: this.exportToExcel,
+                excelExport: (e: any) => this.exportToExcel(e),
                 columns: [
                     {
-                        field: "Name", title: "Navn", width: 230,
+                        field: "Name",
+                        title: "Navn",
+                        width: 230,
                         persistId: "name", // DON'T YOU DARE RENAME!,
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Name,
@@ -93,7 +97,9 @@
                         }
                     },
                     {
-                        field: "Cvr", title: "CVR", width: 230,
+                        field: "Cvr",
+                        title: "CVR",
+                        width: 230,
                         persistId: "cvr", // DON'T YOU DARE RENAME!
                         hidden: false,
                         excelTemplate: (dataItem) => dataItem.Cvr,
@@ -107,7 +113,9 @@
                         }
                     },
                     {
-                        field: "Type.Name", title: "Type", width: 230,
+                        field: "Type.Name",
+                        title: "Type",
+                        width: 230,
                         persistId: "type", // DON'T YOU DARE RENAME!
                         hidden: false,
                         template: (dataItem) => dataItem.Type.Name,
@@ -116,7 +124,12 @@
                             cell: {
                                 template: function (args) {
                                     args.element.kendoDropDownList({
-                                        dataSource: [{ type: "Kommune", value: "Kommune" }, { type: "Interessefællesskab", value: "Interessefællesskab" }, { type: "Virksomhed", value: "Virksomhed" }, { type: "Anden offentlig myndighed", value: "Anden offentlig myndighed" }],
+                                        dataSource: [
+                                            { type: "Kommune", value: "Kommune" },
+                                            { type: "Interessefællesskab", value: "Interessefællesskab" },
+                                            { type: "Virksomhed", value: "Virksomhed" },
+                                            { type: "Anden offentlig myndighed", value: "Anden offentlig myndighed" }
+                                        ],
                                         dataTextField: "type",
                                         dataValueField: "value",
                                         valuePrimitive: true
@@ -127,7 +140,9 @@
                         }
                     },
                     {
-                        field: "AccessModifier", title: "Synlighed", width: 230,
+                        field: "AccessModifier",
+                        title: "Synlighed",
+                        width: 230,
                         persistId: "synlighed", // DON'T YOU DARE RENAME!
                         hidden: false,
                         template: `<display-access-modifier value="dataItem.AccessModifier"></display-access-modifier>`,
@@ -143,14 +158,33 @@
                     },
                     {
                         command: [
-                            { text: "Redigér", click: this.onEdit, imageClass: "k-edit", className: "k-custom-edit", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
-                            { text: "Slet", click: this.onDelete, imageClass: "k-delete", className: "k-custom-delete", iconClass: "k-icon" } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            {
+                                text: "Redigér",
+                                click: this.onEdit,
+                                imageClass: "k-edit",
+                                className: "k-custom-edit",
+                                iconClass: "k-icon"
+                            } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
+                            {
+                                text: "Slet",
+                                click: this.onDelete,
+                                imageClass: "k-delete",
+                                className: "k-custom-delete",
+                                iconClass: "k-icon"
+                            } /* kendo typedef is missing imageClass and iconClass so casting to any */ as any,
                         ],
-                        title: " ", width: 176,
+                        title: " ",
+                        width: 176,
                         persistId: "command"
                     }
                 ]
             };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$rootScope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ""
@@ -162,8 +196,11 @@
             this.$state.go(".", null, { reload: true });
         }
 
+        private readonly excelConfig: IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private getSenderGridItemId(e: JQueryEventObject) {

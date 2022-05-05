@@ -605,7 +605,6 @@ module Kitos.Utility.KendoGrid {
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            this.gridBinding.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.gridBinding.mainGrid);
         }
 
@@ -672,8 +671,11 @@ module Kitos.Utility.KendoGrid {
             this.$state.go(".", null, { reload: true });
         }
 
+        private excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, this.excelConfig);
         }
 
         private checkRequiredField(name: string, value: any) {
@@ -766,6 +768,8 @@ module Kitos.Utility.KendoGrid {
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
+            
+            this.customToolbarEntries.push(Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid));
 
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {
@@ -795,7 +799,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${getPositionClass(entry.position)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
