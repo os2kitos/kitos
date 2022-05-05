@@ -272,7 +272,7 @@
          * @param scope
          * @param entry
          */
-        static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
+        private static setupKendoVm(scope: ng.IScope, entry: Utility.KendoGrid.IKendoToolbarEntry) {
             if (scope.kendoVm === undefined)
                 scope.kendoVm = {
                     standardToolbar: {}

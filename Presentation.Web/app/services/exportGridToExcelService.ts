@@ -15,11 +15,8 @@
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                var onlyVisibleColumns = false;
-                if (config !== undefined && config.onlyVisibleColumns !== undefined) {
-                    onlyVisibleColumns = config.onlyVisibleColumns;
-                }
-
+                var onlyVisibleColumns = config?.onlyVisibleColumns === true;
+                
                 this.selectColumnsToDisplay(e, columns, onlyVisibleColumns);
 
                 this.showSelectedColumns(columns, e);
@@ -78,7 +75,7 @@
 
         private selectColumnsToDisplay(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[], exportOnlyVisibleColumns: boolean) {
             if (!exportOnlyVisibleColumns) {
-                this.setAllNonExcelOnlyColumnsAsVisible(e, columns);
+                this.showAllRootColumns(e, columns);
             }
             _.forEach(columns, (column) => {
                 if (!column.hidden) {
@@ -104,7 +101,7 @@
             });
         }
 
-        private setAllNonExcelOnlyColumnsAsVisible(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
+        private showAllRootColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
             _.forEach(columns,
                 column => {
                     if (column.hidden && column.parentId === undefined) {

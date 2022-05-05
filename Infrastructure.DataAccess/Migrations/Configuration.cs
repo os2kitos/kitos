@@ -646,7 +646,7 @@ namespace Infrastructure.DataAccess.Migrations
 
                 var orgType = context.OrganizationTypes.Single(x => x.Name == "Kommune");
 
-                var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin);
+                var commonOrganization = CreateOrganization("Fælles Kommune", orgType, globalAdmin, true);
 
                 context.Organizations.AddOrUpdate(x => x.Name, commonOrganization/*, muni1, muni2*/);
                 context.SaveChanges();
@@ -763,7 +763,7 @@ namespace Infrastructure.DataAccess.Migrations
             }
         }
 
-        private static Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null)
+        private static Organization CreateOrganization(string name, OrganizationType organizationType, User objectOwner = null, bool isDefault = false)
         {
             var org = new Organization
             {
@@ -772,7 +772,8 @@ namespace Infrastructure.DataAccess.Migrations
                 TypeId = organizationType.Id,
                 ObjectOwnerId = objectOwner?.Id,
                 LastChangedByUserId = objectOwner?.Id,
-                AccessModifier = AccessModifier.Public
+                AccessModifier = AccessModifier.Public,
+                IsDefaultOrganization = isDefault
             };
 
             org.OrgUnits.Add(new OrganizationUnit

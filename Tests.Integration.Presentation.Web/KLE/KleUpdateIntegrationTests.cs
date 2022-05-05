@@ -106,7 +106,7 @@ namespace Tests.Integration.Presentation.Web.KLE
         public async Task Put_Kle_Returns_Forbidden(OrganizationRole role)
         {
             //Arrange
-            var url = TestEnvironment.CreateUrl($"api/v1/kle/update?organizationId={TestEnvironment.DefaultOrganizationId}");
+            var url = TestEnvironment.CreateUrl($"api/v1/kle/update");
             var login = await HttpApi.GetCookieAsync(role);
 
             //Act
@@ -497,7 +497,7 @@ namespace Tests.Integration.Presentation.Web.KLE
 
         private static async Task PutKle()
         {
-            var url = TestEnvironment.CreateUrl($"api/v1/kle/update?organizationId={TestEnvironment.DefaultOrganizationId}");
+            var url = TestEnvironment.CreateUrl("api/v1/kle/update");
             var login = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             using (var response = await HttpApi.PutWithCookieAsync(url, login))
             {

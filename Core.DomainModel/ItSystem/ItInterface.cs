@@ -114,5 +114,15 @@ namespace Core.DomainModel.ItSystem
                 return AssociatedSystemRelations.GroupBy(x => (x.FromSystemUsage.Organization.Id, x.FromSystemUsage.Organization.Name)).Distinct().Select(x => x.Key.Name).OrderBy(x => x).ToList();
             }
         }
+
+        public void ChangeOrganization(Organization.Organization newOrganization)
+        {
+            if (newOrganization == null)
+            {
+                throw new ArgumentNullException(nameof(newOrganization));
+            }
+            Organization = newOrganization;
+            OrganizationId = newOrganization.Id;
+        }
     }
 }

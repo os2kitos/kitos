@@ -119,7 +119,7 @@ namespace Core.ApplicationServices.Contract
                         transaction.Rollback();
                         return deleteByContractId.Error;
                     }
-                    _domainEvents.Raise(new EntityDeletedEvent<ItContract>(contract));
+                    _domainEvents.Raise(new EntityBeingDeletedEvent<ItContract>(contract));
                     _repository.DeleteContract(contract);
 
                     transaction.Commit();

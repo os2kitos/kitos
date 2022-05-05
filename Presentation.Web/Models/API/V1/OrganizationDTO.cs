@@ -3,10 +3,8 @@ using Core.DomainModel;
 
 namespace Presentation.Web.Models.API.V1
 {
-    public class OrganizationDTO
+    public class OrganizationDTO : NamedEntityDTO
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
         public string Phone { get; set; }
         public string Adress { get; set; }
         public string Email { get; set; }

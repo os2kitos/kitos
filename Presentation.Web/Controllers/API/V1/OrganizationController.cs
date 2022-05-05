@@ -115,5 +115,8 @@ namespace Presentation.Web.Controllers.API.V1
 
             return base.Patch(id, organizationId, obj);
         }
+
+        [NonAction]
+        public override HttpResponseMessage Delete(int id, int organizationId) => throw new NotSupportedException();
     }
 }
