@@ -37,5 +37,8 @@
         static readonly SelectAllValue = "Alle kolonner";
         static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
         static readonly SelectOnlyVisibleValue = "Viste kolonner";
+
+        static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
+        static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
 }
