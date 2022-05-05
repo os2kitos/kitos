@@ -359,7 +359,7 @@
                         name: "opretITProjekt",
                         text: "Opret IT Projekt",
                         template:
-                            "<button data-element-type='createProjectButton' ng-click='projectOverviewVm.opretITProjekt()' class='btn btn-success pull-right' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
+                            "<button data-element-type='createProjectButton' ng-click='projectOverviewVm.opretITProjekt()' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left' data-ng-disabled=\"!projectOverviewVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",

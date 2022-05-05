@@ -435,6 +435,7 @@ module Kitos.Utility.KendoGrid {
         implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
+        additionalHtmlClasses?: string[];
     }
 
     type UrlFactory = (options: any) => string;
@@ -696,7 +697,7 @@ module Kitos.Utility.KendoGrid {
             var getColorClass = (color: KendoToolbarButtonColor): string => {
                 switch (color) {
                     case KendoToolbarButtonColor.Green:
-                        return "btn btn-success";
+                        return "btn kendo-btn-sm btn-success";
                     case KendoToolbarButtonColor.Grey:
                         return "k-button k-button-icontext";
                     default:
@@ -713,6 +714,13 @@ module Kitos.Utility.KendoGrid {
                     default:
                         throw `Unknown position ${position}`;
                 }
+            };
+
+            var getAdditionalHtmlClasses= (htmlClasses?: string[]): string => {
+                if (htmlClasses === undefined)
+                    return "";
+
+                return htmlClasses.join(" ");
             };
 
             this.$scope.kendoVm = {
@@ -777,7 +785,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)} ${getAdditionalHtmlClasses(entry.additionalHtmlClasses)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             onClick: entry.onClick,
@@ -799,7 +807,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${getPositionClass(entry.position)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${getPositionClass(entry.position)} ${getAdditionalHtmlClasses(entry.additionalHtmlClasses)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),

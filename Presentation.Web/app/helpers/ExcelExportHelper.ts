@@ -181,6 +181,7 @@
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                additionalHtmlClasses: ["kendo-margin-right"],
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: newItem => {
@@ -226,7 +227,7 @@
             toolbar.push({
                 name: entry.id,
                 text: entry.title,
-                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position} kendo-margin-right' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
             });
         }
 
