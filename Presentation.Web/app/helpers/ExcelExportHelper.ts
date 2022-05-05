@@ -167,7 +167,7 @@
             this.addExcelExportDropdownToToolbar(toolbar, entry);
             this.setupKendoVm(scope, entry);
         }
-        
+
         /**
           * Creates an object of type IKendoToolbarEntry configured as a dropdown for excel export
          * @param excelConfig
@@ -184,22 +184,22 @@
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: newItem => {
-                        if (newItem === null)
+                        if (newItem === null || newItem.id === Constants.ExcelExportDropdown.ChooseWhichExcelOptionId)
                             return;
 
                         const config = excelConfig();
-                        config.onlyVisibleColumns = false;
-
-                        if (newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId) {
-                            config.onlyVisibleColumns = true;
-                        }
+                        config.onlyVisibleColumns = newItem.id === Constants.ExcelExportDropdown.SelectOnlyVisibleId;
 
                         mainGrid().saveAsExcel();
 
                         jQuery(`#${Constants.ExcelExportDropdown.Id}`).data(Constants.ExcelExportDropdown.DataKey)
-                            .value(Constants.ExcelExportDropdown.DefaultValue);
+                            .value(Constants.ExcelExportDropdown.ChooseWhichExcelOptionId);
                     },
                     availableOptions: [
+                        {
+                            id: Constants.ExcelExportDropdown.ChooseWhichExcelOptionId,
+                            text: Constants.ExcelExportDropdown.ChooseWhichExcelOptionValue
+                        },
                         {
                             id: Constants.ExcelExportDropdown.SelectAllId,
                             text: Constants.ExcelExportDropdown.SelectAllValue
@@ -213,21 +213,57 @@
         }
 
         /**
+         * Renders the text choice param as a text with an excel icon on the left side
+         * @param text
+         */
+        static renderExcelChoice(text: string) {
+            return `<span class="k-button-icontext"><span class="k-icon k-i-file-excel"></span>${text}</span>`;
+        }
+
+        /**
          * Configures a specified entry to be a Dropdown with classes required for excel export to work,
          * Adds the entry to the selected toolbar
          * @param toolbar
          * @param entry
          */
-        private static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
-            var position = "";
+        static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
+            let position = "";
             if (entry.position === Utility.KendoGrid.KendoToolbarButtonPosition.Right)
-                position = "pull-right";
+                position = "pull-right ";
 
             toolbar.push({
                 name: entry.id,
                 text: entry.title,
-                template: `<select id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                template: `<input id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"/>`
             });
+        }
+
+        /**
+         * Creates kendo dropdown options for the specific excel dropdown type
+         * @param entry
+         */
+        static createExportToExcelDropDownOptions(entry: Utility.KendoGrid.IKendoToolbarEntry) {
+            return {
+                autoWidth: true,
+                autoBind: false,
+                dataSource: entry.dropDownConfiguration.availableOptions,
+                dataTextField: "text",
+                dataValueField: "id",
+                template: (item) => {
+                    console.log(item);
+                    if (item.id === Constants.ExcelExportDropdown.ChooseWhichExcelOptionId) {
+                        return `<span>${item.text}</span>`;
+                    }
+                    return this.renderExcelChoice(item.text);
+                },
+                //Always show the title in the combobox selector
+                valueTemplate: (_) => this.renderExcelChoice(entry.title),
+                change: e => {
+                    var selectedId = e.sender.value();
+                    const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
+                    entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
+                }
+            }
         }
 
         /**
@@ -240,23 +276,9 @@
                 scope.kendoVm = {
                     standardToolbar: {}
                 }
-
             scope.kendoVm[entry.id] = {
                 enabled: true,
-                getOptions: () => {
-                    return {
-                        autoBind: false,
-                        dataSource: entry.dropDownConfiguration.availableOptions,
-                        dataTextField: "text",
-                        dataValueField: "id",
-                        optionLabel: entry.title,
-                        change: e => {
-                            var selectedId = e.sender.value();
-                            const newSelection = entry.dropDownConfiguration.availableOptions.filter(x => x.id === selectedId);
-                            entry.dropDownConfiguration.selectedOptionChanged(newSelection.length > 0 ? newSelection[0] : null);
-                        }
-                    }
-                }
+                getOptions: () => this.createExportToExcelDropDownOptions(entry)
             };
         }
     }

@@ -29,7 +29,6 @@
 
     export class ExcelExportDropdown {
         static readonly Id = "excelExportSelector";
-        static readonly DefaultValue = "0";
         static readonly DefaultTitle = "Eksportér til Excel";
         static readonly DataKey = "kendoDropDownList";
 
@@ -37,5 +36,8 @@
         static readonly SelectAllValue = "Alle kolonner";
         static readonly SelectOnlyVisibleId = "exportExcelOnlyVisible";
         static readonly SelectOnlyVisibleValue = "Viste kolonner";
+
+        static readonly ChooseWhichExcelOptionId = "chooseWhichExcelSelector";
+        static readonly ChooseWhichExcelOptionValue = "- - - Vælg hvordan - - -";
     }
 }

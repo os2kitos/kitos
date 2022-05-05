@@ -768,8 +768,10 @@ module Kitos.Utility.KendoGrid {
                     template: "<button data-element-type='removeFilterOrgButton' type='button' class='k-button k-button-icontext' title='Slet kolonneopsætning for organisation' data-ng-click='kendoVm.standardToolbar.clearGridForOrganization()' data-ng-disabled='!kendoVm.standardToolbar.canDeleteGridForOrganization()' ng-show='kendoVm.standardToolbar.showGridForOrganizationButtons()'>#: text #</button>"
                 }
             ];
-            
-            this.customToolbarEntries.push(Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid));
+
+            //Add the excel export button with multiple options
+            const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
+            this.customToolbarEntries.push(excelExportDropdownEntry);
 
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {
@@ -804,6 +806,10 @@ module Kitos.Utility.KendoGrid {
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
                             getOptions: () => {
+                                // The excel options are customized and not a generic dropdown
+                                if (entry === excelExportDropdownEntry) {
+                                    return Helpers.ExcelExportHelper.createExportToExcelDropDownOptions(entry);
+                                }
                                 return {
                                     autoBind: false,
                                     dataSource: entry.dropDownConfiguration.availableOptions,
