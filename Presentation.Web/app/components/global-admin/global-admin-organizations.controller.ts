@@ -53,7 +53,7 @@
                         name: "opretOrganisation",
                         text: "Opret Organisation",
                         template:
-                            "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn btn-success pull-right'>#: text #</a>"
+                            "<a ui-sref='global-admin.organizations.create' data-element-type='createNewOrgButton' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left'>#: text #</a>"
                     }
                 ],
                 excel: {

@@ -181,6 +181,7 @@
                 color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                 position: Utility.KendoGrid.KendoToolbarButtonPosition.Right,
                 implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
+                margins: [Utility.KendoGrid.KendoToolbarMargin.Right],
                 enabled: () => true,
                 dropDownConfiguration: {
                     selectedOptionChanged: newItem => {
@@ -227,14 +228,10 @@
          * @param entry
          */
         static addExcelExportDropdownToToolbar(toolbar: IKendoGridToolbarItem[], entry: Utility.KendoGrid.IKendoToolbarEntry) {
-            let position = "";
-            if (entry.position === Utility.KendoGrid.KendoToolbarButtonPosition.Right)
-                position = "pull-right ";
-
             toolbar.push({
                 name: entry.id,
                 text: entry.title,
-                template: `<input id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${position}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"/>`
+                template: `<input id='${entry.id}' data-element-type='${entry.id}DropDownList' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"/>`
             });
         }
 

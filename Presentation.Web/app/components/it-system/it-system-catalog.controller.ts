@@ -60,7 +60,7 @@
                 "$uibModal",
                 "exportGridToExcelService",
                 "systemUsageUserAccessRights",
-                "$window",
+                "$window"
             ];
 
         constructor(
@@ -288,7 +288,7 @@
                         name: "createITSystem",
                         text: "Opret IT System",
                         template:
-                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='createITSystemButton' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
+                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='createITSystemButton' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
