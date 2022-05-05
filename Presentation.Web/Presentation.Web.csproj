@@ -343,6 +343,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />

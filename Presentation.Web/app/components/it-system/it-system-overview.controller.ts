@@ -187,7 +187,7 @@
                     title: "Vælg systemrolle...",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
                     position: Utility.KendoGrid.KendoToolbarButtonPosition.Left,
-                    additionalHtmlClasses: ["kendo-margin-left"],
+                    margins: [Utility.KendoGrid.KendoToolbarMargin.Left],
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.DropDownList,
                     enabled: () => true,
                     dropDownConfiguration: {
