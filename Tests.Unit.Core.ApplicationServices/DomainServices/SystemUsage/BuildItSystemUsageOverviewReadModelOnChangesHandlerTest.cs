@@ -73,7 +73,7 @@ namespace Tests.Unit.Core.DomainServices.SystemUsage
             };
 
             //Act
-            _sut.Handle(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
+            _sut.Handle(new EntityBeingDeletedEvent<ItSystemUsage>(itSystemUsage));
 
             //Assert
             _repository.Verify(x => x.DeleteBySourceId(itSystemUsage.Id), Times.Once);

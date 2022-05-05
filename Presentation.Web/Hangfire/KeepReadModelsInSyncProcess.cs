@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using Hangfire.Server;
 using Infrastructure.Services.BackgroundJobs;
 using Microsoft.Extensions.DependencyInjection;

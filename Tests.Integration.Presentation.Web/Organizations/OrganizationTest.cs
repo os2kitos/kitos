@@ -75,8 +75,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(accessModifier, result.AccessModifier);
-            Assert.Equal(name, (string) result.Name);
-            Assert.Equal(cvr, (string) result.Cvr);
+            Assert.Equal(name, (string)result.Name);
+            Assert.Equal(cvr, (string)result.Cvr);
         }
 
         [Theory]
@@ -126,7 +126,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
-
         }
     }
 }

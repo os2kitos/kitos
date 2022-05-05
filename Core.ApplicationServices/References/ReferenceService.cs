@@ -119,7 +119,7 @@ namespace Core.ApplicationServices.References
                             return OperationFailure.Forbidden;
                         }
 
-                        _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(referenceAndOwner.externalReference));
+                        _domainEvents.Raise(new EntityBeingDeletedEvent<ExternalReference>(referenceAndOwner.externalReference));
                         RaiseRootUpdated(referenceAndOwner.owner);
                         _referenceRepository.Delete(referenceAndOwner.externalReference);
                         return referenceAndOwner.externalReference;
@@ -263,7 +263,7 @@ namespace Core.ApplicationServices.References
 
             foreach (var reference in systemExternalReferences)
             {
-                _domainEvents.Raise(new EntityDeletedEvent<ExternalReference>(reference));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ExternalReference>(reference));
                 _referenceRepository.Delete(reference);
             }
 

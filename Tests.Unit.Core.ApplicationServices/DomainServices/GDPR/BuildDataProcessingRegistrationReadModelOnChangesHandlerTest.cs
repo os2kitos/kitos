@@ -83,7 +83,7 @@ namespace Tests.Unit.Core.DomainServices.GDPR
             };
 
             //Act
-            _sut.Handle(new EntityDeletedEvent<DataProcessingRegistration>(registration));
+            _sut.Handle(new EntityBeingDeletedEvent<DataProcessingRegistration>(registration));
 
             //Assert
             _repository.Verify(x => x.DeleteBySourceId(registration.Id), Times.Once);

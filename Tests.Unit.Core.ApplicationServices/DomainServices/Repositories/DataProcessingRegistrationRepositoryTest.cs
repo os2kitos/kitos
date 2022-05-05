@@ -52,7 +52,7 @@ namespace Tests.Unit.Core.DomainServices.Repositories
             //Assert
             _repository.Verify(x => x.DeleteWithReferencePreload(registration), Times.Once);
             Assert.True(deleted);
-            VerifyLifeCycleEvent(registration, LifeCycleEventType.Deleted);
+            VerifyLifeCycleEvent(registration, LifeCycleEventType.Deleting);
             VerifySaved();
         }
 

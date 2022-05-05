@@ -5,6 +5,10 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public NamedEntityDTO()
+        {
+        }
+
         public NamedEntityDTO(int id, string name)
         {
             Id = id;

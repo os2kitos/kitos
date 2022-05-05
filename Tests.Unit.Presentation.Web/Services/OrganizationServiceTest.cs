@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using AutoFixture;
 using Core.Abstractions.Extensions;
@@ -9,6 +8,11 @@ using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel;
+using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItSystem;
+using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -19,6 +23,7 @@ using Infrastructure.Services.DataAccess;
 using Moq;
 using Serilog;
 using Tests.Toolkit.Patterns;
+using Tests.Unit.Presentation.Web.Extensions;
 using Xunit;
 
 namespace Tests.Unit.Presentation.Web.Services
@@ -27,7 +32,6 @@ namespace Tests.Unit.Presentation.Web.Services
     {
         private readonly Mock<IAuthorizationContext> _authorizationContext;
         private readonly OrganizationService _sut;
-        private readonly Mock<IOrganizationRoleService> _roleService;
         private readonly Mock<ITransactionManager> _transactionManager;
         private readonly User _user;
         private readonly Mock<IGenericRepository<Organization>> _organizationRepository;
@@ -36,13 +40,13 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationRepository> _repositoryMock;
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
+        private readonly Mock<IDomainEvents> _domainEventsMock;
 
         public OrganizationServiceTest()
         {
             _user = new User { Id = new Fixture().Create<int>() };
             _authorizationContext = new Mock<IAuthorizationContext>();
             _userContext = new Mock<IOrganizationalUserContext>();
-            _roleService = new Mock<IOrganizationRoleService>();
             _transactionManager = new Mock<ITransactionManager>();
             _userContext.Setup(x => x.UserId).Returns(_user.Id);
             _userContext.Setup(x => x.OrganizationIds).Returns(new Fixture().Create<IEnumerable<int>>());
@@ -51,6 +55,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _userRepository = new Mock<IGenericRepository<User>>();
             _repositoryMock = new Mock<IOrganizationRepository>();
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
+            _domainEventsMock = new Mock<IDomainEvents>();
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -58,10 +63,10 @@ namespace Tests.Unit.Presentation.Web.Services
                 _authorizationContext.Object,
                 _userContext.Object,
                 Mock.Of<ILogger>(),
-                _roleService.Object,
                 _transactionManager.Object,
                 _repositoryMock.Object,
-                _orgUnitServiceMock.Object);
+                _orgUnitServiceMock.Object,
+                _domainEventsMock.Object);
         }
 
         [Fact]
@@ -284,7 +289,7 @@ namespace Tests.Unit.Presentation.Web.Services
 
             //Act
             var result = _sut.GetAllOrganizations();
-            
+
             //Assert
             Assert.True(result.Ok);
             Assert.Equal(3, result.Value.Count());
@@ -388,7 +393,7 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var uuid = A<Guid>();
-            var expectedOrg = new Organization {Id = A<int>() };
+            var expectedOrg = new Organization { Id = A<int>() };
             ExpectGetOrganizationByUuidReturns(uuid, expectedOrg);
             ExpectAllowReadOrganizationReturns(expectedOrg, true);
             ExpectGetOrganizationReadAccessLevelReturns(expectedOrg.Id, accessLevel);
@@ -462,22 +467,22 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<Guid>();
-            var organization = new Organization() { Id = A<int>()};
-            var allOrgUnits = new []{new OrganizationUnit(), new OrganizationUnit(), new OrganizationUnit()}.AsQueryable();
+            var organization = new Organization() { Id = A<int>() };
+            var allOrgUnits = new[] { new OrganizationUnit(), new OrganizationUnit(), new OrganizationUnit() }.AsQueryable();
             var filteredUnits = allOrgUnits.Skip(1);
             var orgUnitQueryMock = new Mock<IDomainQuery<OrganizationUnit>>();
-            
+
             orgUnitQueryMock.Setup(x => x.Apply(allOrgUnits)).Returns(filteredUnits);
             ExpectGetOrganizationByUuidReturns(organizationId, organization);
             ExpectGetOrganizationAccessLevel(organization.Id, OrganizationDataReadAccessLevel.All);
-            _orgUnitServiceMock.Setup(x=>x.GetOrganizationUnits(organization)).Returns(allOrgUnits);
+            _orgUnitServiceMock.Setup(x => x.GetOrganizationUnits(organization)).Returns(allOrgUnits);
 
             //Act
             var result = _sut.GetOrganizationUnits(organizationId, orgUnitQueryMock.Object);
 
             //Assert
             Assert.True(result.Ok);
-            Assert.Equal(filteredUnits.ToList(),result.Value.ToList());
+            Assert.Equal(filteredUnits.ToList(), result.Value.ToList());
         }
 
         [Theory]
@@ -505,7 +510,6 @@ namespace Tests.Unit.Presentation.Web.Services
         {
             //Arrange
             var organizationId = A<Guid>();
-            var organization = new Organization() { Id = A<int>() };
             ExpectGetOrganizationByUuidReturns(organizationId, Maybe<Organization>.None);
 
             //Act
@@ -515,6 +519,286 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_NoConflicts()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            Assert.False(result.Value.Any);
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(true, false)]
+        public void ComputeOrganizationRemovalConflicts_Returns_Forbidden_If_No_Access(bool allowRead, bool allowDelete)
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(allowRead, allowDelete);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error.FailureType);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsWithUsagesInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            organization.ItSystems.Add(new ItSystem { Usages = { CreateItSystemUsage(organization) } }.InOrganization(organization)); //not included - it belongs to deleted organization
+            var match1 = new ItSystem { Usages = { CreateItSystemUsage(organization), CreateItSystemUsage(anotherOrg) } }.InOrganization(organization); //used both inside and outside the org
+            var match2 = new ItSystem { Usages = { CreateItSystemUsage(anotherOrg) } }.InOrganization(organization); //only used outside the org
+            organization.ItSystems.Add(match1);
+            organization.ItSystems.Add(match2);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match2 }, conflicts.SystemsWithUsagesOutsideTheOrganization);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_InterfacesExposedOutsideTheOrganization()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var systemInDeletedOrg = new ItSystem().InOrganization(organization);
+            var systemInAnotherOrg = new ItSystem().InOrganization(anotherOrg);
+            organization.ItInterfaces.Add(new ItInterface().ExhibitedBy(systemInDeletedOrg).InOrganization(organization)); //not included it is exposed on the deleted org so fine to nuke
+            organization.ItInterfaces.Add(new ItInterface()); //not included because no exhibits so fine to nuke it
+            var match1 = new ItInterface().ExhibitedBy(systemInAnotherOrg).InOrganization(organization); //exhibited by system owned by another organization
+            organization.ItInterfaces.Add(match1);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1 }, conflicts.InterfacesExposedOnSystemsOutsideTheOrganization);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsExposingInterfacesDefinedInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var interface1InOwnOrg = CreateInterface().InOrganization(organization);
+            var interface2InOwnOrg = CreateInterface().InOrganization(organization);
+            var interface1InAnotherOrg = CreateInterface().InOrganization(anotherOrg);
+            var interface2InAnotherOrg = CreateInterface().InOrganization(anotherOrg);
+            organization.ItSystems.Add(new ItSystem().WithInterfaceExhibit(interface1InOwnOrg).InOrganization(organization)); //not included - it belongs to deleted organization
+            var match1 = new ItSystem().WithInterfaceExhibit(interface2InOwnOrg).WithInterfaceExhibit(interface1InAnotherOrg).InOrganization(organization); //exhibited on interfaces both inside and outside the org
+            var match2 = new ItSystem().WithInterfaceExhibit(interface2InAnotherOrg).InOrganization(organization); //only exhibited by interface outside the org
+            organization.ItSystems.Add(match1);
+            organization.ItSystems.Add(match2);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match2 }, conflicts.SystemsExposingInterfacesDefinedInOtherOrganizations);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsSetAsParentSystemToSystemsInOtherOrganizations()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+            var systemInSameOrg = CreateItSystem().InOrganization(organization);
+
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization)); //not included - no parent
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithParentSystem(systemInSameOrg)); //not included - parent belongs to deleted organization
+            var match = CreateItSystem().InOrganization(organization);
+            CreateItSystem().InOrganization(anotherOrg).WithParentSystem(match); //Set a "match" as parent to a system in another org
+            organization.ItSystems.Add(match);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match }, conflicts.SystemsSetAsParentSystemToSystemsInOtherOrganizations);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_SystemsInOtherOrganizationsWhereOrgIsRightsHolder()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+
+            organization.ItContracts.Add(CreateContract().InOrganization(organization)); //not included - no supplier
+            organization.ItContracts.Add(CreateContract().InOrganization(organization).WithSupplier(organization)); //not included - supplier is deleted org
+            var match = CreateContract().InOrganization(anotherOrg).WithSupplier(organization);
+            organization.ItContracts.Add(match);
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match }, conflicts.ContractsInOtherOrganizationsWhereOrgIsSupplier);
+        }
+
+        [Fact]
+        public void ComputeOrganizationRemovalConflicts_Returns_DprConflicts()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var anotherOrg = CreateOrganization();
+
+            var match1 = CreateDpr().InOrganization(anotherOrg).WithDataProcessor(organization);
+            var match2 = CreateDpr().InOrganization(anotherOrg).WithSubDataProcessor(organization);
+            var match3 = CreateDpr().InOrganization(anotherOrg).WithSubDataProcessor(organization).WithDataProcessor(organization);
+
+            CreateDpr().InOrganization(organization).WithDataProcessor(organization).WithDataProcessor(anotherOrg).WithSubDataProcessor(anotherOrg); //not included since DPR is in same org as deleted org
+
+
+            //Act
+            var result = _sut.ComputeOrganizationRemovalConflicts(organization.Uuid);
+
+            //Assert
+            Assert.True(result.Ok);
+            var conflicts = result.Value;
+            Assert.True(conflicts.Any);
+            Assert.Equal(new[] { match1, match3 }, conflicts.DprInOtherOrganizationsWhereOrgIsDataProcessor);
+            Assert.Equal(new[] { match2, match3 }, conflicts.DprInOtherOrganizationsWhereOrgIsSubDataProcessor);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_Of_No_Conflicts()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, false);
+
+            //Assert
+            VerifyOrganizationDeleted(result, transaction, organization);
+        }
+
+        [Fact]
+        public void Delete_Returns_Conflict_If_Conflicts_And_EnforceDeletion_Is_False()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            organization.ItSystems.Add(CreateItSystem().InOrganization(organization).WithInterfaceExhibit(CreateInterface().InOrganization(CreateOrganization()))); //Create a conflict
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, false);
+
+            //Assert
+            _organizationRepository.Verify(x => x.Save(), Times.Never());
+            transaction.Verify(x => x.Commit(), Times.Never());
+            _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
+            Assert.True(result.HasValue);
+            Assert.Equal(OperationFailure.Conflict, result.Value.FailureType);
+        }
+
+        [Fact]
+        public void Delete_Returns_Ok_If_Conflicts_And_EnforceDeletion_Is_True()
+        {
+            //Arrange
+            var organization = SetupConflictCalculationPrerequisites(true, true);
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+
+            //Act
+            var result = _sut.RemoveOrganization(organization.Uuid, true);
+
+            //Assert
+            VerifyOrganizationDeleted(result, transaction, organization);
+        }
+
+        private void VerifyOrganizationDeleted(Maybe<OperationError> result, Mock<IDatabaseTransaction> transaction, Organization organization)
+        {
+            Assert.True(result.IsNone);
+            _organizationRepository.Verify(x => x.Save(), Times.Once());
+            _organizationRepository.Verify(x => x.DeleteWithReferencePreload(organization), Times.Once());
+            transaction.Verify(x => x.Commit(), Times.Once());
+            _domainEventsMock.Verify(
+                x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Once());
+        }
+
+        private ItInterface CreateInterface()
+        {
+            return new ItInterface { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+        private ItContract CreateContract()
+        {
+            return new ItContract { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+        private ItSystem CreateItSystem()
+        {
+            return new ItSystem { Id = A<int>(), Uuid = A<Guid>() };
+        }
+
+
+        private static ItSystemUsage CreateItSystemUsage(Organization organization)
+        {
+            return new ItSystemUsage { OrganizationId = organization.Id, Organization = organization };
+        }
+
+        private static DataProcessingRegistration CreateDpr()
+        {
+            return new DataProcessingRegistration();
+        }
+
+        private Organization SetupConflictCalculationPrerequisites(bool allowRead, bool allowDelete)
+        {
+            var organization = CreateOrganization();
+            ExpectGetOrganizationByUuidReturns(organization.Uuid, organization);
+            ExpectAllowReadOrganizationReturns(organization, allowRead);
+            ExpectAllowDeleteReturns(organization, allowDelete);
+            return organization;
+        }
+
+        private Organization CreateOrganization()
+        {
+            var organizationId = A<Guid>();
+            var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
+            return organization;
+        }
+
+        private void ExpectAllowDeleteReturns(Organization organization, bool value)
+        {
+            _authorizationContext.Setup(x => x.AllowDelete(organization)).Returns(value);
+        }
+
         private void ExpectGetOrganizationAccessLevel(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
             _authorizationContext.Setup(x => x.GetOrganizationReadAccessLevel(organizationId)).Returns(organizationDataReadAccessLevel);

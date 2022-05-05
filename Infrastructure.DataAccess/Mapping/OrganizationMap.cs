@@ -35,12 +35,23 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithOptionalDependent(c => c.Organization)
                 .WillCascadeOnDelete(true);
 
+            HasMany(x => x.DataResponsibles)
+                .WithOptional(dr => dr.Organization)
+                .WillCascadeOnDelete(true);
+
+            HasMany(x => x.DataProtectionAdvisors)
+                .WithOptional(dr => dr.Organization)
+                .WillCascadeOnDelete(true);
+
             TypeMapping.AddIndexOnAccessModifier<OrganizationMap, Organization>(this);
 
             Property(x => x.Uuid)
                 .IsRequired()
                 .HasUniqueIndexAnnotation("UX_Organization_UUID", 0);
 
+            Property(x => x.IsDefaultOrganization)
+                .IsOptional()
+                .HasIndexAnnotation("IX_DEFAULT_ORG", 0);
         }
     }
 }

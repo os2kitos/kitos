@@ -15,11 +15,11 @@ using Core.DomainServices.Repositories.GDPR;
 namespace Core.DomainServices.GDPR
 {
     public class BuildDataProcessingRegistrationReadModelOnChangesHandler :
-        IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityCreatedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityUpdatedEvent<User>>,
-        IDomainEventHandler<EntityDeletedEvent<ExternalReference>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ExternalReference>>,
         IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
         IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
         IDomainEventHandler<NamedEntityChangedNameEvent<ItSystem>>,
@@ -32,7 +32,7 @@ namespace Core.DomainServices.GDPR
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingOversightOption>>,
         IDomainEventHandler<EntityUpdatedEvent<LocalDataProcessingOversightOption>>,
         IDomainEventHandler<EntityUpdatedEvent<ItContract>>,
-        IDomainEventHandler<EntityDeletedEvent<ItContract>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>
     {
         private readonly IDataProcessingRegistrationReadModelRepository _readModelRepository;
         private readonly IReadModelUpdate<DataProcessingRegistration, DataProcessingRegistrationReadModel> _mapper;
@@ -54,7 +54,7 @@ namespace Core.DomainServices.GDPR
             _mapper.Apply(dataProcessingRegistration, model);
         }
 
-        public void Handle(EntityDeletedEvent<DataProcessingRegistration> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<DataProcessingRegistration> domainEvent)
         {
             _readModelRepository.DeleteBySourceId(domainEvent.Entity.Id);
         }
@@ -78,7 +78,7 @@ namespace Core.DomainServices.GDPR
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
         }
 
-        public void Handle(EntityDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
+        public void Handle(EntityBeingDeletedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
 
         public void Handle(EntityCreatedEvent<ExternalReference> domainEvent) => HandleExternalReference(domainEvent);
 
@@ -147,7 +147,7 @@ namespace Core.DomainServices.GDPR
             _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_ItContract));
         }
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
             domainEvent
                 .Entity
