@@ -29,7 +29,6 @@
 
     export class ExcelExportDropdown {
         static readonly Id = "excelExportSelector";
-        static readonly DefaultValue = "0";
         static readonly DefaultTitle = "Eksportér til Excel";
         static readonly DataKey = "kendoDropDownList";
 
