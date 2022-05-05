@@ -182,7 +182,7 @@
 
             Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
                 () => this.mainGrid,
-                this.$scope,
+                this.$rootScope,
                 this.mainGridOptions.toolbar);
 
             function customFilter(args) {

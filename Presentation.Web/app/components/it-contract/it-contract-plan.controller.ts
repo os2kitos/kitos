@@ -92,7 +92,7 @@
 
             var self = this;
 
-            var modalInstance = this.$modal.open({
+            this.$modal.open({
                 windowClass: "modal fade in",
                 templateUrl: "app/components/it-contract/it-contract-modal-create.view.html",
                 controller: ["$scope", "$uibModalInstance", function ($scope, $modalInstance) {
@@ -825,11 +825,6 @@
                     }
                 ]
             };
-            
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
-                () => this.mainGrid,
-                this.$scope,
-                this.mainGridOptions.toolbar);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
@@ -904,6 +899,11 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
         private readonly excelConfig: Models.IExcelConfig = {
