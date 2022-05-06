@@ -728,6 +728,7 @@
     <TypeScriptCompile Include="app\models\generic\ShallowOrganizationDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
     <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\kitos-module-ui-customization.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
