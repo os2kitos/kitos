@@ -296,6 +296,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItInterfaces
             outputDTO.InterfaceId = input.ItInterfaceId;
             outputDTO.Version = input.Version;
             outputDTO.Description = input.Description;
+            outputDTO.Notes = input.Note;
             outputDTO.UrlReference = input.Url;
             outputDTO.Deactivated = input.Disabled;
             outputDTO.Created = input.Created;
