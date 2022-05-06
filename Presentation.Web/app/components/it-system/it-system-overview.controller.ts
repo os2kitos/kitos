@@ -340,7 +340,7 @@
                     .withExcelOnlyColumn(builder =>
                         builder
                         .withId(`systemUsage${getRoleKey(role)}_emails`)
-                        .withDataSourceName(getRoleKey(role))
+                        .withDataSourceName(`${getRoleKey(role)}_emails`)
                         .withTitle(`${role.name} Email"`)
                         .withParentColumnId(roleColumnId)
                         .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(

@@ -6,7 +6,7 @@
     export class ExportGridToExcelService {
         private exportFlag = false;
         static $inject = ["needsWidthFixService"];
-        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string}> = [];
+        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string }> = [];
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
@@ -15,8 +15,8 @@
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                var onlyVisibleColumns = config?.onlyVisibleColumns === true;
-                
+                const onlyVisibleColumns = config?.onlyVisibleColumns === true;
+
                 this.selectColumnsToDisplay(e, columns, onlyVisibleColumns);
 
                 this.showSelectedColumns(columns, e);
@@ -27,7 +27,7 @@
                     this.exportFlag = true;
                     e.sender.saveAsExcel();
                 });
-                
+
                 return;
             }
 
@@ -41,7 +41,7 @@
 
                 // -1 as sheet has header and dataSource doesn't
                 const dataItem = e.data[rowIndex - 1];
-                
+
                 for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                     const columnOriginalIndex = this.columnsToShow[columnIndex].index;
                     if (columnOriginalIndex === undefined) continue;
@@ -89,7 +89,7 @@
                         column.tempVisual = true;
                         e.sender.showColumn(column);
                     }
-            });
+                });
         }
 
         private getTemplateMethod(column) {
@@ -142,7 +142,19 @@
                 //look for a parent column and check if any was found, and if any parent column should be visible
                 var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
                 if (columnsWithMatchingParentId.length !== 1) {
-                    console.error("Column has multiple columns with matching parentId");
+                    if (columnsWithMatchingParentId.length === 0) {
+
+                    } else {
+                        console.error(
+                            "Column ",
+                            column.persistId,
+                            " has multiple(",
+                            columnsWithMatchingParentId.length,
+                            ") columns with matching parentId (",
+                            column.parentId, "):",
+                            columnsWithMatchingParentId.map(x => x.persistId).join(","));
+                    }
+
                     return;
                 }
                 const parentColumn = columnsWithMatchingParentId[0];
@@ -160,7 +172,7 @@
         }
 
         private sortColumnArray() {
-            this.columnsToShow.forEach((column, i)=> {
+            this.columnsToShow.forEach((column, i) => {
                 if (column.parentId === undefined)
                     return;
 
@@ -171,7 +183,7 @@
         }
 
         private mapIndexes(columns: IKendoGridColumn<any>[]) {
-            columns.forEach((column, i)=> {
+            columns.forEach((column, i) => {
                 var selectedColumn = this.columnsToShow.filter(x => x.columnId === column.persistId)[0];
                 if (selectedColumn === undefined || selectedColumn === null)
                     return;
