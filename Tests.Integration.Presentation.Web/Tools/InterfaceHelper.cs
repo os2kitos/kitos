@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Xunit;
 
@@ -18,14 +15,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             string name,
             string interfaceId,
             int orgId,
-            AccessModifier access)
+            AccessModifier access,
+            string notes = null)
         {
             return new ItInterfaceDTO
             {
                 ItInterfaceId = interfaceId,
                 Name = name,
                 OrganizationId = orgId,
-                AccessModifier = access
+                AccessModifier = access,
+                Note = notes
             };
         }
 
