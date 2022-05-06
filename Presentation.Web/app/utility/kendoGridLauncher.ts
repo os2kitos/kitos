@@ -5,6 +5,7 @@
      * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
      */
 module Kitos.Utility.KendoGrid {
+    import Helpers = Kitos.Helpers;
     "use strict";
 
     export enum KendoGridColumnFiltering {
@@ -413,6 +414,13 @@ module Kitos.Utility.KendoGrid {
         DropDownList
     }
 
+    export enum KendoToolbarMargin {
+        Left,
+        Right,
+        Down,
+        Top
+    }
+
     export interface IKendoToolbarDropDownEntry {
         id: string;
         text: string;
@@ -435,6 +443,7 @@ module Kitos.Utility.KendoGrid {
         implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
+        margins?: KendoToolbarMargin[];
     }
 
     type UrlFactory = (options: any) => string;
@@ -691,30 +700,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-
-            //Build toolbar buttons
-            var getColorClass = (color: KendoToolbarButtonColor): string => {
-                switch (color) {
-                    case KendoToolbarButtonColor.Green:
-                        return "btn btn-success";
-                    case KendoToolbarButtonColor.Grey:
-                        return "k-button k-button-icontext";
-                    default:
-                        throw `Unknown color ${color}`;
-                }
-            };
-
-            var getPositionClass = (position: KendoToolbarButtonPosition): string => {
-                switch (position) {
-                    case KendoToolbarButtonPosition.Left:
-                        return "";
-                    case KendoToolbarButtonPosition.Right:
-                        return "pull-right";
-                    default:
-                        throw `Unknown position ${position}`;
-                }
-            };
-
+            
             this.$scope.kendoVm = {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
@@ -779,7 +765,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             onClick: entry.onClick,
@@ -791,7 +777,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<a data-element-type='${entry.id}Button' role='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled()
@@ -801,7 +787,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${getPositionClass(entry.position)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
