@@ -247,7 +247,6 @@
                 dataTextField: "text",
                 dataValueField: "id",
                 template: (item) => {
-                    console.log(item);
                     if (item.id === Constants.ExcelExportDropdown.ChooseWhichExcelOptionId) {
                         return `<span>${item.text}</span>`;
                     }

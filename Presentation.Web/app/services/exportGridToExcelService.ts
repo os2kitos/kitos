@@ -6,7 +6,7 @@
     export class ExportGridToExcelService {
         private exportFlag = false;
         static $inject = ["needsWidthFixService"];
-        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string}> = [];
+        private columnsToShow: Array<{ columnId: string, index?: number, parentId?: string }> = [];
 
         constructor(private readonly needsWidthFixService: NeedsWidthFix) { }
 
@@ -15,8 +15,8 @@
 
             if (!this.exportFlag) {
                 e.preventDefault();
-                var onlyVisibleColumns = config?.onlyVisibleColumns === true;
-                
+                const onlyVisibleColumns = config?.onlyVisibleColumns === true;
+
                 this.selectColumnsToDisplay(e, columns, onlyVisibleColumns);
 
                 this.showSelectedColumns(columns, e);
@@ -27,7 +27,7 @@
                     this.exportFlag = true;
                     e.sender.saveAsExcel();
                 });
-                
+
                 return;
             }
 
@@ -41,7 +41,7 @@
 
                 // -1 as sheet has header and dataSource doesn't
                 const dataItem = e.data[rowIndex - 1];
-                
+
                 for (let columnIndex = 0; columnIndex < row.cells.length; columnIndex++) {
                     const columnOriginalIndex = this.columnsToShow[columnIndex].index;
                     if (columnOriginalIndex === undefined) continue;
@@ -77,28 +77,9 @@
             if (!exportOnlyVisibleColumns) {
                 this.showAllRootColumns(e, columns);
             }
-            _.forEach(columns, (column) => {
-                if (!column.hidden) {
-                    this.columnsToShow.push({ columnId: column.persistId });
-                    return;
-                }
-                if (column.parentId === undefined)
-                    return;
-                //look for a parent column and check if any was found, and if any parent column should be visible
-                var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
-                if (columnsWithMatchingParentId.length !== 1) {
-                    console.error("Column has multiple columns with matching parentId");
-                    return;
-                }
-                const parentColumn = columnsWithMatchingParentId[0];
-                if (parentColumn.hidden)
-                    return;
 
-                var parentIndex = columns.indexOf(parentColumn);
-
-                this.columnsToShow.push({ columnId: column.persistId, parentId: column.parentId });
-                e.sender.reorderColumn(parentIndex + 1, column);
-            });
+            this.mapShownColumns(columns);
+            this.moveRelatedColumns(columns, e);
         }
 
         private showAllRootColumns(e: IKendoGridExcelExportEvent<any>, columns: IKendoGridColumn<any>[]) {
@@ -108,7 +89,7 @@
                         column.tempVisual = true;
                         e.sender.showColumn(column);
                     }
-            });
+                });
         }
 
         private getTemplateMethod(column) {
@@ -148,19 +129,61 @@
             );
         }
 
+        private mapShownColumns(columns: IKendoGridColumn<any>[]) {
+            columns.filter(x => !x.hidden).forEach(column => {
+                this.columnsToShow.push({ columnId: column.persistId });
+            }, this);
+        }
+
+        private moveRelatedColumns(columns: IKendoGridColumn<any>[], e: IKendoGridExcelExportEvent<any>) {
+            columns.filter(x => x.hidden).forEach(column => {
+                if (column.parentId === undefined)
+                    return;
+                //look for a parent column and check if any was found, and if any parent column should be visible
+                var columnsWithMatchingParentId = columns.filter(x => x.persistId === column.parentId);
+                if (columnsWithMatchingParentId.length !== 1) {
+                    if (columnsWithMatchingParentId.length === 0) {
+
+                    } else {
+                        console.error(
+                            "Column ",
+                            column.persistId,
+                            " has multiple(",
+                            columnsWithMatchingParentId.length,
+                            ") columns with matching parentId (",
+                            column.parentId, "):",
+                            columnsWithMatchingParentId.map(x => x.persistId).join(","));
+                    }
+
+                    return;
+                }
+                const parentColumn = columnsWithMatchingParentId[0];
+                if (parentColumn.hidden)
+                    return;
+
+                var parentIndex = columns.indexOf(parentColumn);
+
+                this.columnsToShow.push({ columnId: column.persistId, parentId: column.parentId });
+
+                //if the related column is on the "left" side of the parent don't increment parentIndex by 1, as the indexes will be decreased by 1 when the related column is moved
+                const addNumberToParentIndex = (columns.indexOf(column) > parentIndex) ? 1 : 0;
+                e.sender.reorderColumn(parentIndex + addNumberToParentIndex, column);
+            }, this);
+        }
+
         private sortColumnArray() {
-            this.columnsToShow.forEach((column, i)=> {
+            this.columnsToShow.forEach((column, i) => {
                 if (column.parentId === undefined)
                     return;
 
                 var parentColumn = this.columnsToShow.filter(x => x.columnId === column.parentId)[0];
                 var parentIndex = this.columnsToShow.indexOf(parentColumn);
                 ArrayHelper.arrayMoveElementToRightSide(this.columnsToShow, i, parentIndex);
-            });
+            }, this);
         }
 
         private mapIndexes(columns: IKendoGridColumn<any>[]) {
-            columns.forEach((column, i)=> {
+            columns.forEach((column, i) => {
                 var selectedColumn = this.columnsToShow.filter(x => x.columnId === column.persistId)[0];
                 if (selectedColumn === undefined || selectedColumn === null)
                     return;
