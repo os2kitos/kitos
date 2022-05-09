@@ -59,4 +59,7 @@
             throw errorCategory;
         }
     }
+
+    app.service("genericApiWrapper", ApiWrapper);
+
 }

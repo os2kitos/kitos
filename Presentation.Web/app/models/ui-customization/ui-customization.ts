@@ -1,4 +1,4 @@
-﻿module Kitos.UICustomization {
+﻿module Kitos.Models.UICustomization {
 
     /**
      * Defines the valid customization modules for kitos

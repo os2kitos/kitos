@@ -1,4 +1,4 @@
-﻿module Kitos.UICustomization.Configs.BluePrints {
+﻿module Kitos.Models.UICustomization.Configs.BluePrints {
     export const ItSystemUsageUiCustomizationBluePrint: ICustomizableUIModuleConfigBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItSystemUsage,
         readOnly: false,

@@ -1,4 +1,4 @@
-﻿module Kitos.UICustomization.Configs {
+﻿module Kitos.Models.UICustomization.Configs {
 
     export interface ICustomizableUINodeConfig {
         readOnly?: boolean;
