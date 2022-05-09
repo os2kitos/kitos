@@ -2,7 +2,7 @@
 
 var { src, series } = require("gulp");
 var log = require("fancy-log");
-var protractor = require("gulp-protractor");
+var protractor = require("../custom.gulp.protractor.js");
 var del = require("del");
 var paths = require("../paths.config.js");
 
