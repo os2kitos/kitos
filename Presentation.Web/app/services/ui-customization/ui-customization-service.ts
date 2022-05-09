@@ -34,7 +34,7 @@
             return this
                 .userService
                 .getUser()
-                .then(user => this.genericApiWrapper.getDataFromUrl<Models.Api.UICustomization.IUIModuleCustomizationDTO>("api/v1/ui-customization/modules?organizationId=" + user.currentOrganizationId)
+                .then(user => this.genericApiWrapper.getDataFromUrl<Models.Api.UICustomization.IUIModuleCustomizationDTO>(`api/v1/ui-customization/modules?organizationId=${user.currentOrganizationId}`)
                     .then(
                         response => response,
                         error => {
