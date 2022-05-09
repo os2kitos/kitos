@@ -13,6 +13,8 @@
     /**
      * Post-processing for compile-time fixed ui customization configs.
      * Will walk the config tree and create full configuration keys used to enable server-side persistence as well as rich model validation client side.
+     *
+     * When this function is done, the TS clients can fetch the fullKey (used for the state check) by e.g. : Kitos.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint.children.interfaces.fullKey
      * @param currentLevelKey The string identifier for the "config" node
      * @param config Current level "config" node
      * @param ancestorKeys key components of the current level's ancestry

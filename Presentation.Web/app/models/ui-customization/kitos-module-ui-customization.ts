@@ -165,23 +165,14 @@
 
     //TODO: Merge server config into structure?
 
-    //TODO: Config structure could be a typescript object that we post-process and add the full key to each level
-    /*
-     *
-     *    const iSystemConfig: {
-     *          enabled: boolean
-     *          children: [{
-     *              {
-     *                  frontPage {
-     *                      enabledByDefault: true,
-     *                      
-     *                  }
-     *              }
-     *          }]
-     *      }
-     *
-     */
-
-    // TODO: change events to trigger save when used on the configuration side?
     //TODO: Create a factory which can create the different levels based on a typescript record type
+
+    /*
+     *TODO: A service to get the active configuration:
+     * - Get the blueprimt
+     * - Get the server config and create a dictionary with key->state
+     * - Based on the blueprint, recursively build the tree and use the server config to override known keys (depth first to prevent issues caused by the hierarchy).
+     * - for each key used, add a "used" boolean to the state
+     * - If any keys are not "used", add a warning to the console to simplify checks...
+     */
 }
