@@ -21,7 +21,7 @@ const launchHeadLess = function (done, files, config) {
             args: [
                 "--params.login.email", args[0],
                 "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
+                "--params.baseUrl", args[2]
             ],
             "debug": false
         }))
@@ -62,7 +62,7 @@ const protractorLocal = function (done) {
             args: [
                 "--params.login.email", args[0],
                 "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
+                "--params.baseUrl", args[2]
             ],
             "debug": false
         }))
@@ -90,7 +90,7 @@ const protractorSingle = function (done) {
             args: [
                 "--params.login.email", args[0],
                 "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
+                "--params.baseUrl", args[2]
             ],
             "debug": false
         }))
