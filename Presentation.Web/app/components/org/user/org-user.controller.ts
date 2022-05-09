@@ -9,7 +9,6 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
-        isReportAdmin: boolean;
         isRightsHolder: boolean;
     }
 
@@ -188,7 +187,6 @@
                                 usr.isProjectAdmin = this.hasRole(usr, Models.OrganizationRole.ProjectModuleAdmin);
                                 usr.isSystemAdmin = this.hasRole(usr, Models.OrganizationRole.SystemModuleAdmin);
                                 usr.isContractAdmin = this.hasRole(usr, Models.OrganizationRole.ContractModuleAdmin);
-                                usr.isReportAdmin = this.hasRole(usr, Models.OrganizationRole.ReportModuleAdmin);
                                 usr.isRightsHolder = this.hasRole(usr, Models.OrganizationRole.RightsHolderAccess);
                             });
                             return response;
@@ -215,7 +213,7 @@
                         name: "deleteFilter",
                         text: "Slet filter",
                         template: "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='ctrl.clearGridProfile()' data-ng-disabled='!systemOverviewVm.doesGridProfileExist()' data-element-type='removeFilterButton'>#: text #</button>"
-                    },
+                    }
                 ],
                 excel: {
                     fileName: "Brugere.xlsx",
@@ -251,7 +249,6 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
                 page: this.onPaging,
                 columns: [
                     {
@@ -393,15 +390,6 @@
                         sortable: false
                     },
                     {
-                        field: "isReportAdmin", title: "Rapport Admin", width: 112,
-                        persistId: "reportadminrole", // DON'T YOU DARE RENAME!
-                        attributes: { "class": "text-center" },
-                        template: (dataItem) => setBooleanValue(dataItem.isReportAdmin),
-                        hidden: false,
-                        filterable: false,
-                        sortable: false
-                    },
-                    {
 
                         field: "rightsHolder", title: "Rettighedshaveradgang", width: 160,
                         persistId: "rightsHolder", // DON'T YOU DARE RENAME!
@@ -472,11 +460,6 @@
                 this.notify.addErrorMessage("Brugeren har ikke rettigheder til at ændre i organisationen");
             }
         }
-
-        private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
-        }
-
     }
 
     angular

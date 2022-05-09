@@ -9,8 +9,8 @@ using Infrastructure.Services.DataAccess;
 namespace Core.DomainServices.Model.EventHandlers
 {
     public class UnbindBrokenReferenceReportsOnSourceDeletedHandler :
-        IDomainEventHandler<EntityDeletedEvent<ItInterface>>,
-        IDomainEventHandler<EntityDeletedEvent<ExternalReference>>
+        IDomainEventHandler<EntityBeingDeletedEvent<ItInterface>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<ExternalReference>>
     {
         private readonly IGenericRepository<BrokenLinkInExternalReference> _externalReferenceBrokenLinks;
         private readonly IGenericRepository<BrokenLinkInInterface> _interfaceBrokenLinks;
@@ -26,7 +26,7 @@ namespace Core.DomainServices.Model.EventHandlers
             _transactionManager = transactionManager;
         }
 
-        public void Handle(EntityDeletedEvent<ExternalReference> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ExternalReference> domainEvent)
         {
             using var transaction = _transactionManager.Begin();
             foreach (var report in domainEvent.Entity.BrokenLinkReports.ToList())
@@ -36,7 +36,7 @@ namespace Core.DomainServices.Model.EventHandlers
             transaction.Commit();
         }
 
-        public void Handle(EntityDeletedEvent<ItInterface> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItInterface> domainEvent)
         {
             using var transaction = _transactionManager.Begin();
             foreach (var report in domainEvent.Entity.BrokenLinkReports.ToList())

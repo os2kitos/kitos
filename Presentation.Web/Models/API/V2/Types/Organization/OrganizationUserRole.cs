@@ -27,10 +27,7 @@
         /// Has write access to everything within the contract module
         /// </summary>
         ContractModuleAdmin = 5,
-        /// <summary>
-        /// Has write access to organization reports.
-        /// </summary>
-        ReportModuleAdmin = 6,
+        //NOTE: A jump from 5-7 due to old report admin
         /// <summary>
         /// Access based on the rightsholder of the entity. This is a special type of access which will override some other rights and organization-boundaries and for that reason it should not be combined with other roles.
         /// </summary>

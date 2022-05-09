@@ -6,7 +6,6 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
-using Core.DomainModel.Reports;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Infrastructure.Services.DataAccess;
@@ -237,6 +236,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
+                    Organization _ => IsGlobalAdmin(),
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),
@@ -369,9 +369,6 @@ namespace Core.ApplicationServices.Authorization
 
                 return target switch
                 {
-                    IReportModule _ => IsGlobalAdmin() || 
-                                       IsLocalAdmin(ownedByOrganization.OrganizationId) ||
-                                       IsReportModuleAdmin(ownedByOrganization.OrganizationId),
                     IContractModule _ => IsGlobalAdmin() || 
                                          IsLocalAdmin(ownedByOrganization.OrganizationId) ||
                                          IsContractModuleAdmin(ownedByOrganization.OrganizationId),
@@ -383,11 +380,6 @@ namespace Core.ApplicationServices.Authorization
 
             //No-one can control access modifiers that are not there
             return false;
-        }
-
-        private bool IsReportModuleAdmin(int organizationId)
-        {
-            return _activeUserContext.HasRole(organizationId, OrganizationRole.ReportModuleAdmin);
         }
 
         bool IPermissionVisitor.Visit(AdministerOrganizationRightPermission permission)

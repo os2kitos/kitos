@@ -10,7 +10,7 @@ using Serilog;
 
 namespace Core.DomainServices.Model.EventHandlers
 {
-    public class ContractDeletedSystemRelationsHandler : IDomainEventHandler<EntityDeletedEvent<ItContract>>
+    public class ContractDeletedSystemRelationsHandler : IDomainEventHandler<EntityBeingDeletedEvent<ItContract>>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly ITransactionManager _transactionManager;
@@ -27,7 +27,7 @@ namespace Core.DomainServices.Model.EventHandlers
             _logger = logger;
         }
 
-        public void Handle(EntityDeletedEvent<ItContract> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItContract> domainEvent)
         {
             if (domainEvent == null)
             {

@@ -116,6 +116,7 @@
     <Compile Include="Constraints\ApiPagingConstraintsTest.cs" />
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
+    <Compile Include="Organizations\OrganizationSequentialTests.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />
@@ -186,7 +187,6 @@
     <Compile Include="Tools\Model\ApiUserDTO.cs" />
     <Compile Include="Tools\Model\CreateUserDTO.cs" />
     <Compile Include="Tools\Model\CSRFTokenDTO.cs" />
-    <Compile Include="Tools\Model\GetAccessTypesResponse.cs" />
     <Compile Include="Tools\Model\KitosCredentials.cs" />
     <Compile Include="Tools\Model\KitosTestEnvironment.cs" />
     <Compile Include="Tools\Model\OrgRightDTO.cs" />

@@ -22,7 +22,6 @@ namespace Core.DomainModel.ItSystem
             ItInterfaceExhibits = new List<ItInterfaceExhibit>();
             Children = new List<ItSystem>();
             TaskRefs = new List<TaskRef>();
-            AccessTypes = new List<AccessType>();
             Usages = new List<ItSystemUsage.ItSystemUsage>();
             ExternalReferences = new List<ExternalReference>();
         }
@@ -89,8 +88,6 @@ namespace Core.DomainModel.ItSystem
         public virtual BusinessType BusinessType { get; set; }
 
         public virtual ICollection<TaskRef> TaskRefs { get; set; }
-
-        public virtual ICollection<AccessType> AccessTypes { get; set; }
 
         public bool Disabled { get; set; }
 
@@ -239,6 +236,29 @@ namespace Core.DomainModel.ItSystem
         public void Deactivate()
         {
             Disabled = true;
+        }
+
+        public void ChangeOrganization(Organization.Organization newOrganization)
+        {
+            if (newOrganization == null)
+            {
+                throw new ArgumentNullException(nameof(newOrganization));
+            }
+            Organization = newOrganization;
+            OrganizationId = newOrganization.Id;
+        }
+
+        public void RemoveChildSystem(ItSystem child)
+        {
+            if (child.ParentId == Id)
+            {
+                Children.Remove(child);
+                child.ResetParentSystem();
+            }
+            else
+            {
+                throw new ArgumentException(nameof(child));
+            }
         }
     }
 }

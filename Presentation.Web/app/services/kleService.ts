@@ -3,9 +3,9 @@
 
     export class KLEservice
     {
-        public static $inject: string[] = ["$http", "userService"];
+        public static $inject: string[] = ["$http"];
 
-        constructor(private $http: ng.IHttpService, private userService : IUserService) {
+        constructor(private $http: ng.IHttpService) {
         }
         
         getStatus() {
@@ -19,11 +19,7 @@
         }
 
         applyUpdateKLE() {
-            return this
-                .userService
-                .getUser()
-                .then((user: IUser) =>
-                    this.$http({ method: "PUT", url: `api/v1/kle/update?organizationId=${user.id}` }));
+            return this.$http({ method: "PUT", url: "api/v1/kle/update" });
         }
 
     }

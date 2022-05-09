@@ -15,7 +15,6 @@
         isProjectAdmin: boolean;
         isSystemAdmin: boolean;
         isContractAdmin: boolean;
-        isReportAdmin: boolean;
         hasApi: boolean;
 
         orgAndDefaultUnit: any;
@@ -78,10 +77,6 @@
                 return userRight.role == Kitos.API.Models.OrganizationRole.ContractModuleAdmin && userRight.organizationId == currOrg.id;
             });
 
-            var isReportAdmin = this._.some(user.organizationRights, function (userRight: { role; organizationId; }) {
-                return userRight.role == Kitos.API.Models.OrganizationRole.ReportModuleAdmin && userRight.organizationId == currOrg.id;
-            });
-
             // the current org unit is the default org unit for this organization if the user has selected one
             // otherwise it's the root of this organization
             var currentOrgUnitId;
@@ -118,7 +113,6 @@
                 isProjectAdmin: isProjectAdmin,
                 isSystemAdmin: isSystemAdmin,
                 isContractAdmin: isContractAdmin,
-                isReportAdmin: isReportAdmin,
                 orgAndDefaultUnit: orgAndDefaultUnit,
                 currentOrganizationUnitId: currentOrgUnitId,
                 currentOrganizationUnitName: currentOrgUnitName,

@@ -227,7 +227,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
 
         protected virtual void RaiseDeletedDomainEvent(T entity)
         {
-            DomainEvents.Raise(new EntityDeletedEvent<T>(entity));
+            DomainEvents.Raise(new EntityBeingDeletedEvent<T>(entity));
         }
 
         protected CrossOrganizationDataReadAccessLevel GetCrossOrganizationReadAccessLevel()

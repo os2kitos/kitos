@@ -81,7 +81,7 @@ class Login {
     }
 
     private parseStringAsArrayAndGetIndex(input: string, index: number) {
-        return input.substring(1, input.length - 1).split(", ")[index];
+        return String(input).substring(1, input.length - 1).split(", ")[index];
     }
 }
 

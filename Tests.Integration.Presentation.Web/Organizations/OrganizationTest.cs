@@ -62,8 +62,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Interessefællesskab)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Kommune)]
         [InlineData(OrganizationRole.GlobalAdmin, OrganizationTypeKeys.Virksomhed)]
-        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Interessefællesskab)]
-        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Virksomhed)]
         public async Task Can_Create_Organization_Of_Type(OrganizationRole role, OrganizationTypeKeys organizationType)
         {
             //Arrange
@@ -77,8 +75,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             //Assert
             Assert.Equal(accessModifier, result.AccessModifier);
-            Assert.Equal(name, (string) result.Name);
-            Assert.Equal(cvr, (string) result.Cvr);
+            Assert.Equal(name, (string)result.Name);
+            Assert.Equal(cvr, (string)result.Cvr);
         }
 
         [Theory]
@@ -88,6 +86,8 @@ namespace Tests.Integration.Presentation.Web.Organizations
         [InlineData(OrganizationRole.User, OrganizationTypeKeys.Virksomhed)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Kommune)]
         [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.AndenOffentligMyndighed)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Interessefællesskab)]
+        [InlineData(OrganizationRole.LocalAdmin, OrganizationTypeKeys.Virksomhed)]
         public async Task Cannot_Create_Organization_Of_Type(OrganizationRole role, OrganizationTypeKeys organizationType)
         {
             //Arrange
@@ -126,7 +126,6 @@ namespace Tests.Integration.Presentation.Web.Organizations
 
             var resultFilteredByName = await organizationsFilteredByName.ReadResponseBodyAsKitosApiResponseAsync<List<Organization>>();
             Assert.True(resultFilteredByName.Exists(prp => prp.Name.Contains(nameOrg1)));
-
         }
     }
 }

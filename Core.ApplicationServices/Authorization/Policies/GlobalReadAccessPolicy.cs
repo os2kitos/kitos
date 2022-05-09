@@ -21,7 +21,6 @@ namespace Core.ApplicationServices.Authorization.Policies
                 {
                     typeof(Text),
                     typeof(HelpText),
-                    typeof(GlobalConfig),
                     typeof(ExternalReference),
                     typeof(TaskRef)
                 };

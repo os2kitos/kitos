@@ -103,7 +103,7 @@ namespace Core.ApplicationServices.Project
                     return deleteByProjectId.Error;
                 }
                 project.Handover?.Participants?.Clear();
-                _domainEvents.Raise(new EntityDeletedEvent<ItProject>(project));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ItProject>(project));
                 _projectRepository.DeleteWithReferencePreload(project);
                 _projectRepository.Save();
                 transaction.Commit();

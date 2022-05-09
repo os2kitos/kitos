@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Authorization;
@@ -28,5 +29,18 @@ namespace Core.ApplicationServices.Organizations
 
         public Result<IQueryable<OrganizationUnit>, OperationError> GetOrganizationUnits(Guid organizationUuid, params IDomainQuery<OrganizationUnit>[] criteria);
         public Result<OrganizationUnit, OperationError> GetOrganizationUnit(Guid organizationUnitUuid);
+        /// <summary>
+        /// Computes the blocking conflicts related to removing an organization
+        /// </summary>
+        /// <param name="organizationUuid"></param>
+        /// <returns></returns>
+        Result<OrganizationRemovalConflicts, OperationError> ComputeOrganizationRemovalConflicts(Guid organizationUuid);
+        /// <summary>
+        /// Removes an organization
+        /// </summary>
+        /// <param name="organizationUuid"></param>
+        /// <param name="enforceDeletion">If set to <c>true</c> any removal conflicts will be ignored and the deletion will proceed</param>
+        /// <returns></returns>
+        Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
     }
 }
