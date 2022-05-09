@@ -75,8 +75,6 @@
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
             throw new Error("Not implemented");
         }
-
-
     }
 
     app.service("uiCustomizationService", UICustomizationService);
