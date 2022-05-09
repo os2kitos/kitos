@@ -52,7 +52,37 @@
         }
 
         private buildActiveConfiguration(bluePrint: Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint, persistedPreferences: Models.Api.UICustomization.IUIModuleCustomizationDTO): Models.UICustomization.ICustomizedModuleUI {
-            throw "TODO";
+            //Create a lookup to define the initial state of nodes as they were saved by the local administrator
+            const persistedConfigLookup: Record<string, boolean> = persistedPreferences.nodes.reduce((currentMap, node) => {
+                currentMap[node.fullKey] = node.enabled;
+                return currentMap;
+            }, {});
+
+
+            function buildChildren(currentNodeBluePrint: Models.UICustomization.Configs.ICustomizableUINodeConfig, parentAvailable: boolean): Array<Models.UICustomization.IUINode> {
+                const children: Array<Models.UICustomization.IUINode> = [];
+                const childrenObj = currentNodeBluePrint.children;
+                if (childrenObj != undefined) {
+                    for (let childKey of Object.keys(childrenObj)) {
+                        const bluePrint: Models.UICustomization.Configs.ICustomizableUINodeConfig = currentNodeBluePrint.children[childKey];
+                        const serverConfig = persistedConfigLookup[bluePrint.fullKey];
+                        const available = serverConfig != undefined ? serverConfig : true;
+                        children.push(new Models.UICustomization.UINode
+                            (
+                                bluePrint.fullKey,                      //key
+                                !bluePrint.readOnly && parentAvailable, //editable
+                                available,                              //available state
+                                bluePrint.readOnly,                     //readonly
+                                buildChildren(bluePrint, available      //build children recursively
+                                )
+                            )
+                        );
+                    }
+                }
+                return children;
+            }
+
+            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, false, true, true, buildChildren(bluePrint, true)));
         }
 
         loadActiveConfiguration(module: Models.UICustomization.CustomizableKitosModule): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
@@ -73,7 +103,7 @@
         }
 
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
-            throw new Error("Not implemented");
+            throw new Error("TODO: Not implemented");
         }
     }
 

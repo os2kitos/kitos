@@ -36,7 +36,7 @@
         children: Array<IUINode>;
     }
 
-    class UINode implements IUINode {
+    export class UINode implements IUINode {
         private readonly _isReadOnly: boolean;
         private _editable: boolean;
         private _available: boolean;
@@ -44,7 +44,7 @@
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
 
-        constructor(editable: boolean, available: boolean, key: string, children: IUINode[], isReadOnly: boolean) {
+        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean,children: IUINode[]) {
             this._isReadOnly = isReadOnly;
             this._children = children;
             this._editable = editable && !isReadOnly;
@@ -142,7 +142,7 @@
     }
 
 
-    class CustomizedModuleUI implements ICustomizedModuleUI {
+    export class CustomizedModuleUI implements ICustomizedModuleUI {
         private readonly _root: IUINode;
         private readonly _module: CustomizableKitosModule;
 
@@ -162,17 +162,4 @@
 
         get module() { return this._module; }
     }
-
-    //TODO: Merge server config into structure?
-
-    //TODO: Create a factory which can create the different levels based on a typescript record type
-
-    /*
-     *TODO: A service to get the active configuration:
-     * - Get the blueprimt
-     * - Get the server config and create a dictionary with key->state
-     * - Based on the blueprint, recursively build the tree and use the server config to override known keys (depth first to prevent issues caused by the hierarchy).
-     * - for each key used, add a "used" boolean to the state
-     * - If any keys are not "used", add a warning to the console to simplify checks...
-     */
 }
