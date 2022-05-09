@@ -30,7 +30,6 @@
 
     export interface IUINode extends IStatefulUICustomizationNode {
         readOnly: boolean;
-        helpText: boolean;
         editable: boolean;
         available: boolean;
         key: string;
@@ -39,18 +38,16 @@
 
     class UINode implements IUINode {
         private readonly _isReadOnly: boolean;
-        private readonly _helpText: boolean;
         private _editable: boolean;
         private _available: boolean;
         private readonly _key: string;
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
 
-        constructor(helpText: boolean, editable: boolean, available: boolean, key: string, children: IUINode[], isReadOnly: boolean) {
+        constructor(editable: boolean, available: boolean, key: string, children: IUINode[], isReadOnly: boolean) {
             this._isReadOnly = isReadOnly;
             this._children = children;
-            this._helpText = helpText;
-            this._editable = editable;
+            this._editable = editable && !isReadOnly;
             this._available = available;
             this._key = key;
             this._childGroupLookup = {};
@@ -64,7 +61,7 @@
         }
 
         private extractChildPath(key: string): string {
-            const matchChildRegex = new RegExp(`^${this._key.replace(".","\\")}\.([a-z\-]+)(\..*)*$`);
+            const matchChildRegex = new RegExp(`^${this._key.replace(".","\\")}\.([a-zA-Z\-]+)(\..*)*$`);
             const results = matchChildRegex.exec(key);
             if (results.length < 2) {
                 throw new Error(`${key} does not have a valid key as a child of this level with key: ${this._key}`);
@@ -124,8 +121,6 @@
         get children(): IUINode[] { return [...this._children]; }
 
         get readOnly() { return this._isReadOnly; }
-
-        get helpText() { return this._helpText; }
 
         get editable() { return this._isReadOnly === false && this._editable; }
         set editable(newState: boolean) {
