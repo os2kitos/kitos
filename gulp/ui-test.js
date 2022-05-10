@@ -18,11 +18,7 @@ const launchHeadLess = function (done, files, config) {
     src(files)
         .pipe(protractor.protractor({
             configFile: config,
-            args: [
-                "--params.login.email", args[0],
-                "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
-            ],
+            args: args,
             "debug": false
         }))
         .on("error", function (err) {
@@ -59,11 +55,7 @@ const protractorLocal = function (done) {
     src(paths.e2eFiles)
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",
-            args: [
-                "--params.login.email", args[0],
-                "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
-            ],
+            args: args,
             "debug": false
         }))
         .on("error", function (err) {
@@ -77,7 +69,7 @@ const protractorLocal = function (done) {
 
 const protractorSingle = function (done) {
     const params = process.argv;
-    const args = params.length === 7 ? [params[3], params[4], params[5], params[6]] : [];
+    let args = params.length === 7 ? [params[3], params[4], params[5], params[6]] : [];
 
     log.info(`e2e arguments: ${args}`);
 
@@ -87,11 +79,7 @@ const protractorSingle = function (done) {
     src(singleSpecPath)
         .pipe(protractor.protractor({
             configFile: "protractor.conf.js",
-            args: [
-                "--params.login.email", args[0],
-                "--params.login.pwd", args[1],
-                "--baseUrl", args[2]
-            ],
+            args: args.slice(0,3),
             "debug": false
         }))
         .on("error", function (err) {
