@@ -35,6 +35,11 @@
      */
     export interface ICustomizedModuleUI extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
         module: CustomizableKitosModule;
+        /**
+         * Extracts the fullKey from the config object and calls isAvailable
+         * @param blueprintObject
+         */
+        isBluePrintNodeAvailable(blueprintObject : Object): boolean;
     }
 
     export interface IUINode extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
@@ -162,6 +167,11 @@
 
 
     export class CustomizedModuleUI implements ICustomizedModuleUI {
+        checkIsAvailableFromBluePrintObject(blueprintObject): boolean {
+            const key = UICustomization.Configs.getFullKey(blueprintObject);
+            return this.isAvailable(key);
+        }
+
         private readonly _root: IUINode;
         private readonly _module: CustomizableKitosModule;
 

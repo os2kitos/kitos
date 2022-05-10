@@ -1,5 +1,5 @@
 ﻿module Kitos.Models.UICustomization.Configs.BluePrints {
-    export const ItSystemUsageUiCustomizationBluePrint: ICustomizableUIModuleConfigBluePrint = {
+    export const ItSystemUsageUiCustomizationBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItSystemUsage,
         readOnly: false,
         children: {
@@ -21,7 +21,7 @@
             archiving: {},
             gdpr: {}
         }
-    }
+    };
 
     // Mandatory post-processing to build the keys
     processConfigurationTree(ItSystemUsageUiCustomizationBluePrint.module, ItSystemUsageUiCustomizationBluePrint, []);
