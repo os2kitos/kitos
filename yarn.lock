@@ -175,11 +175,6 @@ angular-messages@1.8.3:
   resolved "https://registry.yarnpkg.com/angular-messages/-/angular-messages-1.8.3.tgz#56b26807bc81ea5218fe6337979ccb89f5de6825"
   integrity sha512-f/ywtg32lqzX8FnXkBJOyn13lbCbo333/xy/5TTFcsH/gZdXoiuERj+dLTOs8xHCkOeFQhFx0VD0DgtMgSag7A==
 
-angular-mocks@1.8.3:
-  version "1.8.3"
-  resolved "https://registry.yarnpkg.com/angular-mocks/-/angular-mocks-1.8.3.tgz#c0dd05e5c3fc014e07af6289b23f0e817d7a4724"
-  integrity sha512-vqsT6zwu80cZ8RY7qRQBZuy6Fq5X7/N5hkV9LzNT0c8b546rw4ErGK6muW1u2JnDKYa7+jJuaGM702bWir4HGw==
-
 angular-resource@1.8.3:
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/angular-resource/-/angular-resource-1.8.3.tgz#013994c332f0e084f2735fe28af7bccc82f0774c"

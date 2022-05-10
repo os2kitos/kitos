@@ -51,7 +51,6 @@
         "angular-i18n": "1.8.3",
         "angular-loading-bar": "^0.9.0",
         "angular-messages": "1.8.3",
-        "angular-mocks": "1.8.3",
         "angular-resource": "1.8.3",
         "angular-route": "1.8.3",
         "angular-sanitize": "1.8.3",
