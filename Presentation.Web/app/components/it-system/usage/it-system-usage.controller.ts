@@ -28,7 +28,7 @@
         });
     }]);
 
-    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess", "user", "",
+    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess", "user", "uiState",
         ($rootScope, $scope, itSystemUsage, hasWriteAccess, user, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.usage = itSystemUsage;

@@ -32,5 +32,5 @@
     }
 
     app.constant("uiCustomizationStateCache", cache);
-    app.constant("uiCustomizationStateService", UICustomizationStateService);
+    app.service("uiCustomizationStateService", UICustomizationStateService);
 }
