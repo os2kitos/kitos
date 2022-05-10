@@ -15,18 +15,18 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
     public class UIConfigurationHelper
     {
 
-        public static async Task<HttpResponseMessage> SendPutRequestAsync(int organizationId, string module, List<CustomizedUINodeDTO> body, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendPutRequestAsync(int organizationId, string module, UIModuleCustomizationDTO body, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var uri = TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}");
             return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}"), cookie, body);
         }
 
-        public static async Task<List<CustomizedUINodeDTO>> GetAllAsync(int organizationId, string module, Cookie optionalLogin = null)
+        public static async Task<UIModuleCustomizationDTO> GetAllAsync(int organizationId, string module, Cookie optionalLogin = null)
         {
             using var response = await SendGetRequestAsync(organizationId, module, optionalLogin);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<CustomizedUINodeDTO>>();
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
         }
 
         public static async Task<HttpResponseMessage> SendGetRequestAsync(int organizationId, string module, Cookie optionalLogin = null)

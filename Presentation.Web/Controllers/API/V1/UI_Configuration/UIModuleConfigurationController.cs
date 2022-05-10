@@ -14,16 +14,21 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
 {
     [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationId}/ui-config/modules/{module}")]
-    public class UIConfigurationController : BaseApiController
+    public class UIModuleConfigurationController : BaseApiController
     {
         [HttpGet]
         [Route]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<CustomizedUINodeDTO>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<UIModuleCustomizationDTO>))]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public HttpResponseMessage Get(int organizationId, string module)
         {
-            return Ok();
+            var response = new UIModuleCustomizationDTO
+            {
+                Nodes = new List<CustomizedUINodeDTO>()
+            };
+            return Ok(response);
         }
 
         [HttpPut]
@@ -32,7 +37,8 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage Put(int organizationId, string module, [FromBody] List<CustomizedUINodeDTO> dtos)
+        [SwaggerResponse(HttpStatusCode.Unauthorized)]
+        public HttpResponseMessage Put(int organizationId, string module, [FromBody] UIModuleCustomizationDTO dto)
         {
             return NoContent();
         }

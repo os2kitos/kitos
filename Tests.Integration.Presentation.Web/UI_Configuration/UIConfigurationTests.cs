@@ -22,17 +22,20 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var key = "Module.Key";
             var isEnabled = false;
 
-            var body = new List<CustomizedUINodeDTO>()
+            var body = new UIModuleCustomizationDTO
             {
-                new()
+                Nodes = new List<CustomizedUINodeDTO>
                 {
-                    FullKey = key,
-                    Enabled = isEnabled
+                    new()
+                    {
+                        Key = key,
+                        Enabled = isEnabled
+                    }
                 }
             };
 
             //Act
-            var response = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, body);
+            using var response = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, body);
 
             //Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -45,10 +48,14 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var module = A<string>();
 
             //Act
-            var response = await UIConfigurationHelper.SendGetRequestAsync(TestEnvironment.DefaultOrganizationId, module);
+            using var response = await UIConfigurationHelper.SendGetRequestAsync(TestEnvironment.DefaultOrganizationId, module);
 
             //Assert
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var data = await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
+            Assert.Empty(data.Nodes);
+            Assert.NotNull(data.Nodes);
         }
     }
 }
