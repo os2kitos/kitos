@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
