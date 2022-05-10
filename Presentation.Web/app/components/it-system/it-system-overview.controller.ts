@@ -22,7 +22,8 @@
             "kendoGridLauncherFactory",
             "needsWidthFixService",
             "overviewOptions",
-            "_"
+            "_",
+            "uiState"
         ];
 
         constructor(
@@ -32,8 +33,11 @@
             kendoGridLauncherFactory: Utility.KendoGrid.IKendoGridLauncherFactory,
             needsWidthFixService: any,
             overviewOptions: Models.ItSystemUsage.IItSystemUsageOverviewOptionsDTO,
-            _
+            _,
+            uiState: Models.UICustomization.ICustomizedModuleUI
         ) {
+            const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+
             $rootScope.page.title = "IT System - Overblik";
             const orgUnits: Array<Models.Generic.Hierarchy.HierarchyNodeDTO> = _.addHierarchyLevelOnFlatAndSort(overviewOptions.organizationUnits, "id", "parentId");
             const itSystemUsageOverviewType = Models.Generic.OverviewType.ItSystemUsage;
@@ -120,10 +124,20 @@
                                 "IncomingRelatedItSystemUsages/any(c: $1c/ItSystemUsageName$2)");
 
                         //Concluded has a special case for UNDECIDED | NULL which must be treated the same, so first we replace the expression to point to the collection and then we redefine it
-                        const dprUndecidedQuery = `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}' or c/IsAgreementConcluded eq null) or (DataProcessingRegistrations/any() eq false)`;
+                        const dprUndecidedQuery =
+                            `DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq '${Models.Api.Shared
+                                .YesNoIrrelevantOption
+                                .UNDECIDED
+                            }' or c/IsAgreementConcluded eq null) or (DataProcessingRegistrations/any() eq false)`;
                         parameterMap.$filter = parameterMap.$filter
-                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"), "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
-                            .replace(new RegExp(`DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api.Shared.YesNoIrrelevantOption.UNDECIDED}'\\)`, "i"), dprUndecidedQuery);
+                            .replace(new RegExp(`DataProcessingRegistrationsConcludedAsCsv eq ('\\w+')`, "i"),
+                                "DataProcessingRegistrations/any(c: c/IsAgreementConcluded eq $1)")
+                            .replace(new RegExp(
+                                `DataProcessingRegistrations\\/any\\(c: c\\/IsAgreementConcluded eq '${Models.Api
+                                    .Shared
+                                    .YesNoIrrelevantOption.UNDECIDED}'\\)`,
+                                "i"),
+                                dprUndecidedQuery);
 
                         // Org unit is stripped from the odata query and passed on to the url factory!
                         const captureOrgUnit = new RegExp(`ResponsibleOrganizationUnitId eq (\\d+)`, "i");
@@ -181,8 +195,9 @@
                         }
                     });
                     return response;
-                })
-                .withToolbarEntry({
+                });
+            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRoles)) {
+                launcher = launcher.withToolbarEntry({
                     id: "roleSelector",
                     title: "Vælg systemrolle...",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
@@ -210,8 +225,10 @@
                             };
                         })
                     }
-                } as Utility.KendoGrid.IKendoToolbarEntry)
-                .withToolbarEntry({
+                } as Utility.KendoGrid.IKendoToolbarEntry);
+            }
+            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)) {
+                launcher = launcher.withToolbarEntry({
                     id: "gdprExportAnchor",
                     title: "Exportér GPDR data til Excel",
                     color: Utility.KendoGrid.KendoToolbarButtonColor.Grey,
@@ -219,28 +236,31 @@
                     implementation: Utility.KendoGrid.KendoToolbarImplementation.Link,
                     enabled: () => true,
                     link: `api/v1/gdpr-report/csv/${user.currentOrganizationId}`
-                } as Utility.KendoGrid.IKendoToolbarEntry)
-                .withColumn(builder =>
-                    builder
-                        .withDataSourceName("IsActive")
-                        .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
-                        .withTitle("Gyldig/Ikke gyldig")
-                        .withId("isActive")
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
-                        .withFixedValueRange([
-                            {
-                                textValue: "Gyldig",
-                                remoteValue: true
-                            },
-                            {
-                                textValue: "Ikke gyldig",
-                                remoteValue: false
-                            }
-                        ],
-                            false)
-                        .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
-                        .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
-                        .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig"))
+                } as Utility.KendoGrid.IKendoToolbarEntry);
+            }
+
+            launcher = launcher.withColumn(builder =>
+                builder
+                    .withDataSourceName("IsActive")
+                    .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Boolean)
+                    .withTitle("Gyldig/Ikke gyldig")
+                    .withId("isActive")
+                    .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.FixedValueRange)
+                    .withFixedValueRange([
+                        {
+                            textValue: "Gyldig",
+                            remoteValue: true
+                        },
+                        {
+                            textValue: "Ikke gyldig",
+                            remoteValue: false
+                        }
+                    ],
+                        false)
+                    .withRendering(dataItem => dataItem.IsActive ? '<span class="fa fa-file text-success" aria-hidden="true"></span>' : '<span class="fa fa-file-o text-muted" aria-hidden="true"></span>')
+                    .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
+                    .withExcelOutput(dataItem => dataItem.IsActive ? "Gyldig" : "Ikke gyldig")
+                    .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalSystemId")
@@ -249,7 +269,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInitialVisibility(false))
+                        .withInitialVisibility(false)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ItSystemUuid")
@@ -285,7 +306,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInitialVisibility(false))
+                        .withInitialVisibility(false)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalCallName")
@@ -294,7 +316,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInitialVisibility(false))
+                        .withInitialVisibility(false)
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.frontPage)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ResponsibleOrganizationUnitId") //Using org unit id for better search performance and org unit name is used during sorting (in the parameter mapper)
@@ -314,42 +337,45 @@
                             false,
                             dataItem => "&nbsp;&nbsp;&nbsp;&nbsp;".repeat(dataItem.optionalContext.$level) + dataItem.optionalContext.name)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
-                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName)))
+                        .withExcelOutput(dataItem => Helpers.RenderFieldsHelper.renderString(dataItem.ResponsibleOrganizationUnitName))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.organization)))
                 .withStandardSorting("SystemName");
 
-            overviewOptions.systemRoles.forEach(role => {
-                const roleColumnId = `systemUsage${getRoleKey(role)}`;
-                launcher = launcher
-                    .withColumn(builder =>
-                        builder
-                        .withDataSourceName(getRoleKey(role))
-                        .withTitle(role.name)
-                        .withId(roleColumnId)
-                        .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
-                        .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
-                        .withContentOverflow()
-                        .withInitialVisibility(false)
-                        .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
-                            `kendo-system-usage-${getRoleKey(role)}-rendering`,
-                            "it-system.usage.roles",
-                            dataItem.SourceEntityId,
-                            roleIdToUserNamesMap[dataItem.Id][role.id]))
-                        .withExcelOutput(
-                            dataItem => Helpers.ExcelExportHelper.renderString(
-                                roleIdToUserNamesMap[dataItem.Id][role.id])))
-                    .withExcelOnlyColumn(builder =>
-                        builder
-                        .withId(`systemUsage${getRoleKey(role)}_emails`)
-                        .withDataSourceName(`${getRoleKey(role)}_emails`)
-                        .withTitle(`${role.name} Email"`)
-                        .withParentColumnId(roleColumnId)
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
-                                roleIdToEmailMap[dataItem.Id][role.id]
-                            )
-                        )
-                    );
+            if (uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRoles)) {
+                overviewOptions.systemRoles.forEach(role => {
+                    const roleColumnId = `systemUsage${getRoleKey(role)}`;
+                    launcher = launcher
+                        .withColumn(builder =>
+                            builder
+                                .withDataSourceName(getRoleKey(role))
+                                .withTitle(role.name)
+                                .withId(roleColumnId)
+                                .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                                .withoutSorting() //Sorting is not possible on expressions which are required on role columns since they are generated in the UI as a result of content of a complex typed child collection
+                                .withContentOverflow()
+                                .withInitialVisibility(false)
+                                .withRendering(dataItem => Helpers.RenderFieldsHelper.renderInternalReference(
+                                    `kendo-system-usage-${getRoleKey(role)}-rendering`,
+                                    "it-system.usage.roles",
+                                    dataItem.SourceEntityId,
+                                    roleIdToUserNamesMap[dataItem.Id][role.id]))
+                                .withExcelOutput(
+                                    dataItem => Helpers.ExcelExportHelper.renderString(
+                                        roleIdToUserNamesMap[dataItem.Id][role.id])))
+                        .withExcelOnlyColumn(builder =>
+                            builder
+                                .withId(`systemUsage${getRoleKey(role)}_emails`)
+                                .withDataSourceName(`${getRoleKey(role)}_emails`)
+                                .withTitle(`${role.name} Email"`)
+                                .withParentColumnId(roleColumnId)
+                                .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderString(
+                                    roleIdToEmailMap[dataItem.Id][role.id]
+                                )
+                                )
+                        );
                 }
-            );
+                );
+            }
 
             launcher = launcher
                 .withColumn(builder =>
@@ -397,7 +423,9 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Left)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlWithOptionalTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl)))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlWithOptionalTitle(dataItem.LocalReferenceTitle, dataItem.LocalReferenceUrl))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.localReferences)))
+
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LocalReferenceDocumentId")
@@ -407,7 +435,8 @@
                         .withInitialVisibility(false)
                         .withContentAlignment(Utility.KendoGrid.KendoColumnAlignment.Center)
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.localReferences)))
 
                 .withColumn(builder =>
                     builder
@@ -434,7 +463,8 @@
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("HasMainContract")
@@ -467,7 +497,9 @@
                                 : "fa-file-o text-muted";
                             return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
                         })
-                        .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : ""))
+                        .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : "")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
+
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("MainContractSupplierName")
@@ -477,7 +509,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ItSystemRightsHolderName")
@@ -497,7 +530,8 @@
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.projects)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ObjectOwnerName")
@@ -554,7 +588,8 @@
                         })
                             , false)
                         .withRendering(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
-                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty)))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.ArchiveDutyMapper.map(dataItem.ArchiveDuty))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("IsHoldingDocument")
@@ -575,7 +610,8 @@
                         ]
                             , false)
                         .withRendering(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
-                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej"))
+                        .withExcelOutput(dataItem => dataItem.IsHoldingDocument ? "Ja" : "Nej")
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ActiveArchivePeriodEndDate")
@@ -585,7 +621,8 @@
                         .withoutSorting()   //NOTICE: NO sorting OR filtering on computed field!
                         .withInitialVisibility(false)
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate)))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.ActiveArchivePeriodEndDate))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.archiving)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("RiskSupervisionDocumentationName")
@@ -595,7 +632,8 @@
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderUrlWithTitle(dataItem.RiskSupervisionDocumentationName, dataItem.RiskSupervisionDocumentationUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.RiskSupervisionDocumentationUrl, dataItem.RiskSupervisionDocumentationName)))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.RiskSupervisionDocumentationUrl, dataItem.RiskSupervisionDocumentationName))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("LinkToDirectoryName")
@@ -605,7 +643,8 @@
                         .withInitialVisibility(false)
                         .withContentOverflow()
                         .withRendering(dataItem => Helpers.RenderFieldsHelper.renderReference(dataItem.LinkToDirectoryName, dataItem.LinkToDirectoryUrl))
-                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName)))
+                        .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderUrlOrFallback(dataItem.LinkToDirectoryUrl, dataItem.LinkToDirectoryName))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("HostedAt")
@@ -621,7 +660,8 @@
                             })
                             , false)
                         .withRendering(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt))
-                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt)))
+                        .withExcelOutput(dataItem => Models.Odata.ItSystemUsage.HostedAtMapper.map(dataItem.HostedAt))
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("GeneralPurpose")
@@ -630,7 +670,8 @@
                         .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DataProcessingRegistrationsConcludedAsCsv")
@@ -658,7 +699,8 @@
                             .filter(registration => agreementConcludedIsDefined(registration))
                             .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, Models.ViewModel.Shared.YesNoIrrelevantOptions.getText(Models.Api.Shared.YesNoIrrelevantOption[registration.IsAgreementConcluded])))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DataProcessingRegistrationNamesAsCsv")
@@ -671,7 +713,8 @@
                             .DataProcessingRegistrations
                             .map(registration => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-dpr-link`, "data-processing.edit-registration.main", registration.DataProcessingRegistrationId, registration.DataProcessingRegistrationName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.gdpr)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("OutgoingRelatedItSystemUsagesNamesAsCsv")
@@ -684,7 +727,8 @@
                             .OutgoingRelatedItSystemUsages
                             .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRelations)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("DependsOnInterfacesNamesAsCsv")
@@ -697,7 +741,8 @@
                             .DependsOnInterfaces
                             .map(dependsOnInterface => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-interface-link`, "it-system.interface-edit.main", dependsOnInterface.InterfaceId, dependsOnInterface.InterfaceName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput())
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRelations)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("IncomingRelatedItSystemUsagesNamesAsCsv")
@@ -710,7 +755,8 @@
                             .IncomingRelatedItSystemUsages
                             .map(relatedItSystemUsage => Helpers.RenderFieldsHelper.renderInternalReference(`kendo-system-usage-link`, "it-system.usage.main", relatedItSystemUsage.ItSystemUsageId, relatedItSystemUsage.ItSystemUsageName))
                             .reduce((combined: string, next: string, __) => combined.length === 0 ? next : `${combined}, ${next}`, ""))
-                        .withSourceValueEchoExcelOutput());
+                        .withSourceValueEchoExcelOutput()
+                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.systemRelations)));
 
             //Launch kendo grid
             launcher.launch();
@@ -733,6 +779,9 @@
                         overviewOptions: [
                             "itSystemUsageOptionsService",
                             (itSystemUsageOptionsService: Services.ItSystemUsage.IItSystemUsageOptionsService) => itSystemUsageOptionsService.getOptions()
+                        ],
+                        uiState: [
+                            "uiCustomizationStateService", (uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Models.UICustomization.CustomizableKitosModule.ItSystemUsage)
                         ]
                     }
                 });
