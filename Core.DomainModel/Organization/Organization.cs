@@ -127,7 +127,7 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
-        public virtual ICollection<UIVisibilityConfiguration> UiVisibilityConfigurations { get; set; }
+        public virtual ICollection<UIModuleCustomization> UiVisibilityConfigurations { get; set; }
 
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS

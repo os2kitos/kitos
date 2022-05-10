@@ -8,17 +8,13 @@ using Core.DomainModel.UIConfiguration;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class UIVisibilityConfigurationMap : EntityTypeConfiguration<UIVisibilityConfiguration>
+    public class UIModuleCustomizationMap : EntityTypeConfiguration<UIModuleCustomization>
     {
-        public UIVisibilityConfigurationMap()
+        public UIModuleCustomizationMap()
         {
             HasKey(x => x.Id);
 
-            Property(x => x.Key)
-                .IsRequired();
             Property(x => x.Module)
-                .IsRequired();
-            Property(x => x.Enabled)
                 .IsRequired();
             Property(x => x.OrganizationId)
                 .IsRequired();

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace Presentation.Web.Models.API.V1.UI_Configuration
 {
     public class UIModuleCustomizationDTO
     {
-        public List<CustomizedUINodeDTO> Nodes { set; get; }
+        public IEnumerable<CustomizedUINodeDTO> Nodes { set; get; }
     }
 }

@@ -8,9 +8,9 @@ using Core.DomainModel.UIConfiguration;
 
 namespace Core.DomainServices.UIConfiguration
 {
-    public interface IUIVisibilityConfigurationRepository
+    public interface IUIModuleCustomizationRepository
     {
-        void UpdateRange(IEnumerable<UIVisibilityConfiguration> entities);
-        IQueryable<UIVisibilityConfiguration> GetModuleConfigurationForOrganization(int organizationId, string module);
+        void UpdateRange(IEnumerable<UIModuleCustomization> entities);
+        IQueryable<UIModuleCustomization> GetModuleConfigurationForOrganization(int organizationId, string module);
     }
 }

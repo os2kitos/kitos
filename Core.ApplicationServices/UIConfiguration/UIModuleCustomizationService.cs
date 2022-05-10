@@ -1,50 +1,57 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.DomainModel.Constants;
+using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 using Core.DomainServices.UIConfiguration;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.UIConfiguration
 {
-    public class UIVisibilityConfigurationService : IUIVisibilityConfigurationService
+    public class UIModuleCustomizationService : IUIModuleCustomizationService
     {
         private readonly ITransactionManager _transactionManager;
-        private readonly IUIVisibilityConfigurationRepository _repository;
+        private readonly IUIModuleCustomizationRepository _repository;
         private readonly IAuthorizationContext _authorizationContext;
+        private readonly IOrganizationalUserContext _userContext;
 
-        public UIVisibilityConfigurationService(ITransactionManager transactionManager, 
-            IUIVisibilityConfigurationRepository repository,
-            IAuthorizationContext authorizationContext)
+        public UIModuleCustomizationService(ITransactionManager transactionManager, 
+            IUIModuleCustomizationRepository repository,
+            IAuthorizationContext authorizationContext,
+            IOrganizationalUserContext userContext)
         {
             _transactionManager = transactionManager;
             _repository = repository;
             _authorizationContext = authorizationContext;
+            _userContext = userContext;
         }
 
 
-        public Result<List<UIVisibilityConfiguration>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
+        public Result<List<UIModuleCustomization>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
         {
             var result = _repository.GetModuleConfigurationForOrganization(organizationId, module).ToList();
-            if(result.Count() < 1) 
+            if(result.Count < 1) 
                 return new OperationError(OperationFailure.NotFound);
             //if(_authorizationContext.AllowReads())
 
             return result;
         }
 
-        public Result<List<UIVisibilityConfiguration>, OperationError> Put(int organizationId, string module, List<UIVisibilityConfiguration> configurations)
+        public Result<List<UIModuleCustomization>, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration)
         {
-            if (IsAnyKeyInvalid(configurations))
+            /*if (IsAnyKeyInvalid(configurations))
                 return new OperationError(OperationFailure.BadInput);
 
             using var transaction = _transactionManager.Begin();
+
+            //TODO: Allowed to modify the org (which owns the modules¤)
+            //TODO: Add the functionality (merging, uniqueness check etc to the org domain model)
+            //_userContext.HasRole(organizationId,OrganizationRole.LocalAdmin)
 
             var configurationEntities = _repository.GetModuleConfigurationForOrganization(organizationId, module).ToList();
             
@@ -62,18 +69,18 @@ namespace Core.ApplicationServices.UIConfiguration
             _repository.UpdateRange(configurationEntities);
             transaction.Commit();
 
-            return configurationEntities;
+            return configurationEntities;*/
+            throw new NotImplementedException();
         }
 
-        private bool IsAnyKeyInvalid(List<UIVisibilityConfiguration> configurations)
+        private bool IsAnyKeyInvalid(List<CustomizedUINode> configurations)
         {
-            //TODO: Get regex from constants class
-            var searchExpresion = new Regex("^([a-zA-Z]+)(\\.[a-zA-Z]+)*$");
+            var searchExpresion = new Regex(UIModuleConfigurationConstants.ConfigurationKeyRegex);
 
             if (configurations.Any(x => searchExpresion.Matches(x.Key).Count < 1))
-                return false;
+                return true;
 
-            return true;
+            return false;
         }
     }
 }
