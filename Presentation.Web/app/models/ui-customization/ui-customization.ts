@@ -167,7 +167,7 @@
 
 
     export class CustomizedModuleUI implements ICustomizedModuleUI {
-        checkIsAvailableFromBluePrintObject(blueprintObject): boolean {
+        isBluePrintNodeAvailable(blueprintObject): boolean {
             const key = UICustomization.Configs.getFullKey(blueprintObject);
             return this.isAvailable(key);
         }

@@ -23,7 +23,7 @@
         visitNode(node: Models.UICustomization.UINode) {
             this._nodes.push({
                 enabled: node.available,
-                fullKey: node.key
+                key: node.key
             });
         }
 
@@ -73,7 +73,7 @@
         private buildActiveConfiguration(bluePrint: Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint, persistedPreferences: Models.Api.UICustomization.IUIModuleCustomizationDTO): Models.UICustomization.ICustomizedModuleUI {
             //Create a lookup to define the initial state of nodes as they were saved by the local administrator
             const persistedConfigLookup: Record<string, boolean> = persistedPreferences.nodes.reduce((currentMap, node) => {
-                currentMap[node.fullKey] = node.enabled;
+                currentMap[node.key] = node.enabled;
                 return currentMap;
             }, {});
 
