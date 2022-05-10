@@ -9,7 +9,7 @@ class HomePagePo implements IPageObject {
     private consts = new Constants();
 
     public getPage(): webdriver.promise.Promise<void> {
-        return browser.get(browser.params.baseUrl[1]);
+        return browser.get(browser.params.baseUrl);
     }
 
     public loginFormField = element(this.byDataElementType(this.consts.loginFormField));

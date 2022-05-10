@@ -3,7 +3,7 @@
     public getPage(destUrl: string): webdriver.promise.Promise<void> {
         return browser.getCurrentUrl()
             .then(url => {
-                const navigateToUrl = browser.params.baseUrl[1] + destUrl;
+                const navigateToUrl = browser.params.baseUrl + destUrl;
                 if (navigateToUrl !== url) {
                     console.log("Not at " + navigateToUrl + " but at:" + url + ". Navigating to:" + navigateToUrl);
                     return browser.get(navigateToUrl)

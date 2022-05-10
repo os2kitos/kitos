@@ -48,8 +48,8 @@ class Login {
 
     private getCredentials(credentialsIndex: number) {
         return {
-            username: this.parseStringAsArrayAndGetIndex(browser.params.login.email[1], credentialsIndex),
-            password: this.parseStringAsArrayAndGetIndex(browser.params.login.pwd[1], credentialsIndex)
+            username: this.parseStringAsArrayAndGetIndex(browser.params.login.email, credentialsIndex),
+            password: this.parseStringAsArrayAndGetIndex(browser.params.login.pwd, credentialsIndex)
         };
     }
 
