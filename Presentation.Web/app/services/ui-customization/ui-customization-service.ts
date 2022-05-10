@@ -10,7 +10,11 @@
          * Saves the active configuration for the current organization
          * @param config
          */
-        saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<Models.UICustomization.ICustomizedModuleUI>;
+        saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void>;
+    }
+
+    class CollectNodeKeysUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+        
     }
 
 
@@ -34,7 +38,7 @@
             return this
                 .userService
                 .getUser()
-                .then(user => this.genericApiWrapper.getDataFromUrl<Models.Api.UICustomization.IUIModuleCustomizationDTO>(`api/v1/ui-customization/modules?organizationId=${user.currentOrganizationId}`)
+                .then(user => this.genericApiWrapper.getDataFromUrl<Models.Api.UICustomization.IUIModuleCustomizationDTO>(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${module}`)
                     .then(
                         response => response,
                         error => {
@@ -102,8 +106,21 @@
             return persisted.then(config => this.buildActiveConfiguration(bluePrint, config));
         }
 
-        saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
-            throw new Error("TODO: Not implemented");
+        saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void> {
+            return this
+                .userService
+                .getUser()
+                .then(user => {
+
+                    const nodes: Array<Models.Api.UICustomization.IUIModuleCustomizationDTO> = [];
+
+                    const dto: Models.Api.UICustomization.IUIModuleCustomizationDTO = {
+                        module: config.module,
+                        organizationId: user.currentOrganizationId,
+                        nodes: []
+                    };
+                    return this.genericApiWrapper.put(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${config.module}`);
+                });
         }
     }
 

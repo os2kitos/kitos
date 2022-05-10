@@ -7,6 +7,15 @@
         ItSystemUsage = "it-system-usage"
     }
 
+    export interface IUICustomizationTreeVisitor {
+        visit(node: UINode);
+        visit(node: CustomizedModuleUI);
+    }
+
+    export interface IUICustomizationTreeMember {
+        accept(visitor: IUICustomizationTreeVisitor): void;
+    }
+
     export interface IStatefulUICustomizationNode {
         /**
             * Used by the generic directive to check if the node is enabled
@@ -24,11 +33,11 @@
     /**
      * Defines a customized KITOS module including "module.group[1..*].setting
      */
-    export interface ICustomizedModuleUI extends IStatefulUICustomizationNode {
+    export interface ICustomizedModuleUI extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
         module: CustomizableKitosModule;
     }
 
-    export interface IUINode extends IStatefulUICustomizationNode {
+    export interface IUINode extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
         readOnly: boolean;
         editable: boolean;
         available: boolean;
@@ -44,9 +53,9 @@
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
 
-        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean,children: IUINode[]) {
+        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[]) {
             this._isReadOnly = isReadOnly;
-            this._children = children;
+            this._children = children ?? [];
             this._editable = editable && !isReadOnly;
             this._available = available;
             this._key = key;
@@ -61,7 +70,7 @@
         }
 
         private extractChildPath(key: string): string {
-            const matchChildRegex = new RegExp(`^${this._key.replace(".","\\")}\.([a-zA-Z]+)(\..*)*$`);
+            const matchChildRegex = new RegExp(`^${this._key.replace(".", "\\")}\.([a-zA-Z]+)(\..*)*$`);
             const results = matchChildRegex.exec(key);
             if (results.length < 2) {
                 throw new Error(`${key} does not have a valid key as a child of this level with key: ${this._key}`);
@@ -118,6 +127,11 @@
             }
         }
 
+        accept(visitor: IUICustomizationTreeVisitor): void {
+            visitor.visit(this);
+            this.children.forEach(child => child.accept(visitor));
+        }
+
         get children(): IUINode[] { return [...this._children]; }
 
         get readOnly() { return this._isReadOnly; }
@@ -159,7 +173,11 @@
             this._root.changeAvailableState(fullKey, newState);
         }
 
-
         get module() { return this._module; }
+
+        accept(visitor: IUICustomizationTreeVisitor): void {
+            visitor.visit(this);
+            this._root.accept(visitor);
+        }
     }
 }
