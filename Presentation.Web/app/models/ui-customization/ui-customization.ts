@@ -8,8 +8,8 @@
     }
 
     export interface IUICustomizationTreeVisitor {
-        visit(node: UINode);
-        visit(node: CustomizedModuleUI);
+        visitNode(node: UINode);
+        visitModule(node: CustomizedModuleUI);
     }
 
     export interface IUICustomizationTreeMember {
@@ -128,7 +128,7 @@
         }
 
         accept(visitor: IUICustomizationTreeVisitor): void {
-            visitor.visit(this);
+            visitor.visitNode(this);
             this.children.forEach(child => child.accept(visitor));
         }
 
@@ -176,7 +176,7 @@
         get module() { return this._module; }
 
         accept(visitor: IUICustomizationTreeVisitor): void {
-            visitor.visit(this);
+            visitor.visitModule(this);
             this._root.accept(visitor);
         }
     }

@@ -13,10 +13,22 @@
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void>;
     }
 
-    class CollectNodeKeysUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
-        
-    }
+    class CollectNodeStatesFromUiCustomizationTreeVisitor implements Models.UICustomization.IUICustomizationTreeVisitor {
+        private readonly _nodes: Array<Models.Api.UICustomization.ICustomizedUINodeDTO> = [];
 
+        get nodes() {
+            return [...this._nodes];
+        }
+
+        visitNode(node: Models.UICustomization.UINode) {
+            this._nodes.push({
+                enabled: node.available,
+                fullKey: node.key
+            });
+        }
+
+        visitModule(node: Models.UICustomization.CustomizedModuleUI) { /* We don't care much for modules - we care about the nodes */ }
+    }
 
     class UICustomizationService implements IUICustomizationService {
 
@@ -112,14 +124,11 @@
                 .getUser()
                 .then(user => {
 
-                    const nodes: Array<Models.Api.UICustomization.IUIModuleCustomizationDTO> = [];
+                    const nodeCollectionVisitor = new CollectNodeStatesFromUiCustomizationTreeVisitor();
+                    config.accept(nodeCollectionVisitor);
 
-                    const dto: Models.Api.UICustomization.IUIModuleCustomizationDTO = {
-                        module: config.module,
-                        organizationId: user.currentOrganizationId,
-                        nodes: []
-                    };
-                    return this.genericApiWrapper.put(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${config.module}`);
+                    const dto: Models.Api.UICustomization.IUIModuleCustomizationDTO = { nodes: nodeCollectionVisitor.nodes };
+                    return this.genericApiWrapper.put(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${config.module}`, dto);
                 });
         }
     }

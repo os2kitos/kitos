@@ -4,8 +4,6 @@
         enabled: boolean;
     }
     export interface IUIModuleCustomizationDTO {
-        organizationId: number;
-        module: Models.UICustomization.CustomizableKitosModule;
         nodes: Array<ICustomizedUINodeDTO>;
     }
 }
