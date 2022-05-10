@@ -92,8 +92,8 @@
                                 !bluePrint.readOnly && parentAvailable, //editable
                                 available,                              //available state
                                 bluePrint.readOnly,                     //readonly
-                                buildChildren(bluePrint, available      //build children recursively
-                                )
+                                buildChildren(bluePrint, available),    //build children recursively,
+                                bluePrint.helpText                      //help text for the local admin
                             )
                         );
                     }

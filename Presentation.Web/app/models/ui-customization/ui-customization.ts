@@ -43,22 +43,25 @@
         available: boolean;
         key: string;
         children: Array<IUINode>;
+        helpText?: string;
     }
 
     export class UINode implements IUINode {
         private readonly _isReadOnly: boolean;
         private _editable: boolean;
         private _available: boolean;
+        private readonly _helpText: string | undefined;
         private readonly _key: string;
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
 
-        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[]) {
+        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[], helpText?: string) {
             this._isReadOnly = isReadOnly;
             this._children = children ?? [];
             this._editable = editable && !isReadOnly;
             this._available = available;
             this._key = key;
+            this._helpText = helpText;
             this._childGroupLookup = {};
             children.forEach(child => {
                 const path = this.extractChildPath(child.key);
@@ -153,6 +156,8 @@
         get available() { return this._available; }
 
         get key() { return this._key; }
+
+        get helpText() { return this._helpText; }
     }
 
 
