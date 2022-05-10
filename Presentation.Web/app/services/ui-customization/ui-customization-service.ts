@@ -83,17 +83,17 @@
                 const childrenObj = currentNodeBluePrint.children;
                 if (childrenObj != undefined) {
                     for (let childKey of Object.keys(childrenObj)) {
-                        const bluePrint: Models.UICustomization.Configs.ICustomizableUINodeConfig = currentNodeBluePrint.children[childKey];
-                        const serverConfig = persistedConfigLookup[bluePrint.fullKey];
+                        const nodeBluePrint: Models.UICustomization.Configs.ICustomizableUINodeConfig = currentNodeBluePrint.children[childKey];
+                        const serverConfig = persistedConfigLookup[nodeBluePrint.fullKey];
                         const available = serverConfig != undefined ? serverConfig : true;
                         children.push(new Models.UICustomization.UINode
                             (
-                                bluePrint.fullKey,                      //key
-                                !bluePrint.readOnly && parentAvailable, //editable
+                                nodeBluePrint.fullKey,                      //key
+                                !nodeBluePrint.readOnly && parentAvailable, //editable
                                 available,                              //available state
-                                bluePrint.readOnly,                     //readonly
-                                buildChildren(bluePrint, available),    //build children recursively,
-                                bluePrint.helpText                      //help text for the local admin
+                                nodeBluePrint.readOnly,                     //readonly
+                                buildChildren(nodeBluePrint, available),    //build children recursively,
+                                nodeBluePrint.helpText                      //help text for the local admin
                             )
                         );
                     }
