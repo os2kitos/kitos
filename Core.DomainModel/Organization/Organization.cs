@@ -9,6 +9,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Tracking;
+using Core.DomainModel.UIConfiguration;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -125,6 +126,9 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
         public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+
+        public virtual ICollection<UIVisibilityConfiguration> UiVisibilityConfigurations { get; set; }
+
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS
         /// </summary>

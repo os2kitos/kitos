@@ -274,6 +274,7 @@
     <Compile Include="Tracking\BaseTrackingEvent.cs" />
     <Compile Include="Tracking\TrackedLifeCycleEventType.cs" />
     <Compile Include="TrafficLight.cs" />
+    <Compile Include="UIConfiguration\UIVisibilityConfiguration.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>
