@@ -347,6 +347,7 @@
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
+    <Compile Include="Controllers\API\V1\UI_Configuration\UIConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
@@ -432,6 +433,7 @@
     <Compile Include="Models\API\V1\Organizations\SystemExposingInterfacesDefinedInOtherOrganizationsConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\SystemSetAsParentSystemToSystemsInOtherOrganizationsConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\SystemWithUsageOutsideOrganizationConflictDTO.cs" />
+    <Compile Include="Models\API\V1\UI_Configuration\CustomizedUINodeDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractPaymentModelDataWriteRequestDTO.cs" />
