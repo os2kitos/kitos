@@ -61,7 +61,7 @@
         }
 
         private extractChildPath(key: string): string {
-            const matchChildRegex = new RegExp(`^${this._key.replace(".","\\")}\.([a-zA-Z\-]+)(\..*)*$`);
+            const matchChildRegex = new RegExp(`^${this._key.replace(".","\\")}\.([a-zA-Z]+)(\..*)*$`);
             const results = matchChildRegex.exec(key);
             if (results.length < 2) {
                 throw new Error(`${key} does not have a valid key as a child of this level with key: ${this._key}`);
