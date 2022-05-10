@@ -46,50 +46,19 @@
 
             // Setup available tabs
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
-            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
-
-
-            /**
-          * <li data-ui-sref-active="active" ng-if="isFrontPageEnabled">
-                 <a data-ui-sref="it-system.usage.main"><img src="/Content/img/Systemforside.svg"></img> Systemforside</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isInterfacesEnabled">
-                 <a data-ui-sref="it-system.usage.interfaces"><img src="/Content/img/Snitflader.svg"></img> Udstillede snitflader</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isRelationsEnabled">
-                 <a data-ui-sref="it-system.usage.relation"><img src="/Content/img/ITsystemer.svg"></img> Relationer</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isContractsEnabled">
-                 <a data-ui-sref="it-system.usage.contracts"><img src="/Content/img/Kontrakter.svg"></img> Kontrakter</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isHierarchyEnabled">
-                 <a data-ui-sref="it-system.usage.hierarchy"><img src="/Content/img/Hierarki.svg"></img> Hierarki</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isSystemRolesEnabled">
-                 <a data-ui-sref="it-system.usage.roles"><img src="/Content/img/Systemroller.svg"></img> Systemroller</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isOrganizationEnabled">
-                 <a data-ui-sref="it-system.usage.org"><img src="/Content/img/Organisation.svg"></img> Organisation</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isLocalKleEnabled">
-                 <a data-ui-sref="it-system.usage.kle"><img src="/Content/img/KLE.svg"></img> Lokale KLE</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isProjectModuleEnabled">
-                 <a data-ui-sref="it-system.usage.proj"><img src="/Content/img/ITprojekter.svg"></img> IT Projekter</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isAdviceEnabled">
-                 <a data-ui-sref="it-system.usage.advice" data-element-type="AdviceTabButton"><img src="/Content/img/Advis.svg"></img> Advis</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="usLocalReferencesEnabled">
-                 <a data-ui-sref="it-system.usage.references"><img src="/Content/img/References.svg"></img> Lokale referencer</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isArchivingEnabled">
-                 <a data-ui-sref="it-system.usage.archiving"><img src="/Content/img/Arkiv.svg"></img> Arkivering</a>
-             </li>
-             <li data-ui-sref-active="active" ng-if="isGdprEnabled">
-                 <a data-ui-sref="it-system.usage.GDPR"><img src="/Content/img/folder-lock.svg"></img> GDPR</a>
-             </li>
-          */
+            $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
+            $scope.isInterfacesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.interfaces);
+            $scope.isRelationsEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRelations);
+            $scope.isContractsEnabled = user.currentConfig.ShowItContractModule && uiState.isBluePrintNodeAvailable(blueprint.children.contracts);
+            $scope.isHierarchyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.hierarchy);
+            $scope.isSystemRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRoles);
+            $scope.isOrganizationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.organization);
+            $scope.isLocalKleEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localKle);
+            $scope.isAdviceEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.advice);
+            $scope.usLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
+            $scope.isArchivingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.archiving);
+            $scope.isGdprEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr);
+            $scope.isProjectModuleEnabled = user.currentConfig.ShowItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
         }
     ]);
 })(angular, app);
