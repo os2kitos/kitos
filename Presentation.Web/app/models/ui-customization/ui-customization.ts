@@ -69,6 +69,15 @@
             });
         }
 
+        private getChild(fullKey: string): IUINode {
+            const path = this.extractChildPath(fullKey);
+            const child = this._childGroupLookup[path];
+            if (!child) {
+                throw new Error(`Not possible to find child based on:${fullKey} in object with key ${this._key}`);
+            }
+            return child;
+        }
+
         private extractChildPath(key: string): string {
             const matchChildRegex = new RegExp(`^${this._key.replace(".", "\\")}\.([a-zA-Z]+)(\..*)*$`);
             const results = matchChildRegex.exec(key);
@@ -84,12 +93,7 @@
                     return true;
                 }
 
-                const path = this.extractChildPath(fullKey);
-                const child = this._childGroupLookup[path];
-                if (!child) {
-                    console.warn(path, " belongs to this ui customization tree, but is not defined in the persisted structure. This indicates that it is a new customization field which has not been configured by local admin yet, so by default it is available.");
-                    return true;
-                }
+                const child = this.getChild(fullKey);
                 return child.isAvailable(fullKey);
             }
 
@@ -116,11 +120,7 @@
                         });
                 }
             } else if (this.available) {
-                const path = this.extractChildPath(fullKey);
-                const child = this._childGroupLookup[path];
-                if (!child) {
-                    throw new Error(`No available path to descendant with key ${fullKey} could be found on ui node ${this._key}`);
-                }
+                const child = this.getChild(fullKey);
                 child.changeAvailableState(fullKey, newState);
             } else {
                 throw new Error(`Cannot change state of descendant ${fullKey} if ancestor with key ${this.key} is unavailable`);
