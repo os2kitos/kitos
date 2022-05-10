@@ -814,6 +814,7 @@
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
     <TypeScriptCompile Include="app\services\SystemRelationService.ts" />
     <TypeScriptCompile Include="app\services\toastTranslatorService.ts" />
+    <TypeScriptCompile Include="app\services\ui-customization\ui-customization-state-service.ts" />
     <TypeScriptCompile Include="app\services\ui-customization\ui-customization-service.ts" />
     <TypeScriptCompile Include="app\services\userNotificationService.ts" />
     <TypeScriptCompile Include="app\shared\datePicker\datePicker.directive.ts" />

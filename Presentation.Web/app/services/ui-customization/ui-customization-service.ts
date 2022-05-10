@@ -32,9 +32,12 @@
 
     class UICustomizationService implements IUICustomizationService {
 
-        static $inject = ["genericApiWrapper", "userService"];
+        static $inject = ["genericApiWrapper", "userService", "uiCustomizationStateCache"];
 
-        constructor(private readonly genericApiWrapper: Services.Generic.ApiWrapper, private readonly userService: Services.IUserService) { }
+        constructor(
+            private readonly genericApiWrapper: Services.Generic.ApiWrapper,
+            private readonly userService: Services.IUserService,
+            private readonly uiCustomizationStateCache: UiCustomizationStateCache) { }
 
         private loadBluePrint(module: Models.UICustomization.CustomizableKitosModule): Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint {
 
@@ -115,7 +118,13 @@
                 default:
                     throw `Unknown module:${module}`;
             }
-            return persisted.then(config => this.buildActiveConfiguration(bluePrint, config));
+            return persisted
+                .then(config => this.buildActiveConfiguration(bluePrint, config))
+                .then(activeConfig => {
+                    //update the shared cache with the latest data
+                    this.uiCustomizationStateCache[module] = activeConfig;
+                    return activeConfig;
+                });
         }
 
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void> {
@@ -128,7 +137,12 @@
                     config.accept(nodeCollectionVisitor);
 
                     const dto: Models.Api.UICustomization.IUIModuleCustomizationDTO = { nodes: nodeCollectionVisitor.nodes };
-                    return this.genericApiWrapper.put(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${config.module}`, dto);
+                    return this
+                        .genericApiWrapper.put(`/api/v1/organizations/${user.currentOrganizationId}/ui-config/modules/${config.module}`, dto)
+                        .then(_ => {
+                            //Update the shared application cache
+                            this.uiCustomizationStateCache[config.module] = config;
+                        });
                 });
         }
     }
