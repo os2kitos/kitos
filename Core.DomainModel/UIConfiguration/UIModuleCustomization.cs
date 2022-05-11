@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 
 namespace Core.DomainModel.UIConfiguration
 {
@@ -20,5 +21,11 @@ namespace Core.DomainModel.UIConfiguration
         public virtual Organization.Organization Organization{ get; set; }
         public virtual ICollection<CustomizedUINode> Nodes { get; set; }
 
+        public void MirrorNodes(ICollection<CustomizedUINode> nodes)
+        {
+            Nodes ??= new List<CustomizedUINode>();
+
+            nodes.MirrorTo(Nodes, x => x.Key);
+        }
     }
 }

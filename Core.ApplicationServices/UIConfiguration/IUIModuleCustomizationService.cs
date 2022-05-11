@@ -7,6 +7,6 @@ namespace Core.ApplicationServices.UIConfiguration
     public interface IUIModuleCustomizationService
     {
         Result<List<UIModuleCustomization>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module);
-        Result<List<UIModuleCustomization>, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration);
+        Result<UIModuleCustomization, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration);
     }
 }

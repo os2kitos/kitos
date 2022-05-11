@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Core.DomainModel.Events;
+using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 
 namespace Core.DomainServices.UIConfiguration
@@ -16,9 +17,9 @@ namespace Core.DomainServices.UIConfiguration
             _domainEvents = domainEvents;
         }
 
-        public void UpdateRange(IEnumerable<UIModuleCustomization> entities)
+        public void Update(Organization organization)
         {
-            //TODO: domainEvents.Raise<EntityUpdated<Organization>>()
+            _domainEvents.Raise(new EntityUpdatedEvent<Organization>(organization));
             _repository.Save();
         }
 

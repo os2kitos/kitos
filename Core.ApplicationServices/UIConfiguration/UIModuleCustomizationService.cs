@@ -5,9 +5,11 @@ using System.Text.RegularExpressions;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
+using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.UIConfiguration;
 using Infrastructure.Services.DataAccess;
 
@@ -19,68 +21,60 @@ namespace Core.ApplicationServices.UIConfiguration
         private readonly IUIModuleCustomizationRepository _repository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
+        private readonly IOrganizationService _organizationService;
 
         public UIModuleCustomizationService(ITransactionManager transactionManager, 
             IUIModuleCustomizationRepository repository,
             IAuthorizationContext authorizationContext,
-            IOrganizationalUserContext userContext)
+            IOrganizationalUserContext userContext,
+            IOrganizationService organizationService)
         {
             _transactionManager = transactionManager;
             _repository = repository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
+            _organizationService = organizationService;
         }
 
 
         public Result<List<UIModuleCustomization>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
         {
-            var result = _repository.GetModuleConfigurationForOrganization(organizationId, module).ToList();
-            if(result.Count < 1) 
+            var organization = GetOrganizationById(organizationId);
+            if (organization == null)
                 return new OperationError(OperationFailure.NotFound);
-            //if(_authorizationContext.AllowReads())
+            if (!_authorizationContext.AllowReads(organization))
+                return new OperationError(OperationFailure.Forbidden);
 
-            return result;
+            var uiModules = organization.UIModuleCustomizations.Where(x => string.Equals(x.Module, module)).ToList();
+            if(uiModules.Count < 1) 
+                return new OperationError(OperationFailure.NotFound);
+
+            return uiModules;
         }
 
-        public Result<List<UIModuleCustomization>, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration)
+        public Result<UIModuleCustomization, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration)
         {
-            /*if (IsAnyKeyInvalid(configurations))
-                return new OperationError(OperationFailure.BadInput);
+            var organization = GetOrganizationById(organizationId);
+            if (organization == null)
+                return new OperationError(OperationFailure.NotFound);
+            /*if (!_userContext.HasRole(organizationId, OrganizationRole.LocalAdmin))
+                return new OperationError(OperationFailure.Forbidden);*/
 
-            using var transaction = _transactionManager.Begin();
+            organization.ModifyModuleCustomization(module, configuration.Nodes);
 
             //TODO: Allowed to modify the org (which owns the modules¤)
             //TODO: Add the functionality (merging, uniqueness check etc to the org domain model)
-            //_userContext.HasRole(organizationId,OrganizationRole.LocalAdmin)
-
-            var configurationEntities = _repository.GetModuleConfigurationForOrganization(organizationId, module).ToList();
             
-            foreach (var config in configurations)
-            {
-                if (!_authorizationContext.AllowModify(config))
-                    return new OperationError(OperationFailure.Forbidden);
-
-                config.OrganizationId = organizationId;
-                config.Module = module;
-            }
-
-            configurations.MirrorTo(configurationEntities, prp => prp.Key);
-
-            _repository.UpdateRange(configurationEntities);
+            using var transaction = _transactionManager.Begin();
+            _repository.Update(organization);
             transaction.Commit();
-
-            return configurationEntities;*/
-            throw new NotImplementedException();
+            
+            return configuration;
         }
 
-        private bool IsAnyKeyInvalid(List<CustomizedUINode> configurations)
+        private Organization GetOrganizationById(int organizationId)
         {
-            var searchExpresion = new Regex(UIModuleConfigurationConstants.ConfigurationKeyRegex);
-
-            if (configurations.Any(x => searchExpresion.Matches(x.Key).Count < 1))
-                return true;
-
-            return false;
+            return _organizationService.SearchAccessibleOrganizations().FirstOrDefault(prp => prp.Id == organizationId);
         }
     }
 }

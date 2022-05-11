@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Abstractions.Types;
+﻿using System.Linq;
+using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
 
 namespace Core.DomainServices.UIConfiguration
 {
     public interface IUIModuleCustomizationRepository
     {
-        void UpdateRange(IEnumerable<UIModuleCustomization> entities);
+        void Update(Organization organization);
         IQueryable<UIModuleCustomization> GetModuleConfigurationForOrganization(int organizationId, string module);
     }
 }

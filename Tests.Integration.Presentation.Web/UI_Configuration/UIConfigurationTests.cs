@@ -19,20 +19,8 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         {
             //Arrange
             var module = A<string>();
-            var key = "Module.Key";
-            var isEnabled = false;
 
-            var body = new UIModuleCustomizationDTO
-            {
-                Nodes = new List<CustomizedUINodeDTO>
-                {
-                    new()
-                    {
-                        Key = key,
-                        Enabled = isEnabled
-                    }
-                }
-            };
+            var body = PrepareTestUiModuleCustomizationDto();
 
             //Act
             using var response = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, body);
@@ -46,16 +34,38 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         {
             //Arrange
             var module = A<string>();
+            var uiModuleCustomizationDto = PrepareTestUiModuleCustomizationDto();
 
             //Act
-            using var response = await UIConfigurationHelper.SendGetRequestAsync(TestEnvironment.DefaultOrganizationId, module);
+            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, uiModuleCustomizationDto);
+            Assert.Equal(HttpStatusCode.NoContent, putResponse.StatusCode);
+
+            using var getNodulesresponse = await UIConfigurationHelper.SendGetRequestAsync(TestEnvironment.DefaultOrganizationId, module);
 
             //Assert
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, getNodulesresponse.StatusCode);
 
-            var data = await response.ReadResponseBodyAsKitosApiResponseAsync<UIModuleCustomizationDTO>();
-            Assert.Empty(data.Nodes);
-            Assert.NotNull(data.Nodes);
+            var data = await getNodulesresponse.ReadResponseBodyAsKitosApiResponseAsync<List<UIModuleCustomizationDTO>>();
+            Assert.NotNull(data);
+            Assert.Single(data);
+        }
+
+        private UIModuleCustomizationDTO PrepareTestUiModuleCustomizationDto()
+        {
+            var key = "Module.Key";
+            var isEnabled = false;
+
+            return new UIModuleCustomizationDTO
+            {
+                Nodes = new List<CustomizedUINodeDTO>
+                {
+                    new()
+                    {
+                        Key = key,
+                        Enabled = isEnabled
+                    }
+                }
+            };
         }
     }
 }

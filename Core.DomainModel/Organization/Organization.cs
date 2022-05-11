@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystem;
@@ -127,7 +129,7 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
 
-        public virtual ICollection<UIModuleCustomization> UiVisibilityConfigurations { get; set; }
+        public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
 
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS
@@ -148,6 +150,40 @@ namespace Core.DomainModel.Organization
         public Maybe<OrganizationUnit> GetOrganizationUnit(Guid organizationUnitId)
         {
             return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
+        }
+
+        public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, ICollection<CustomizedUINode> nodes)
+        {
+            if(IsAnyKeyInvalid(nodes))
+                return new OperationError(OperationFailure.BadInput);
+
+            UIModuleCustomizations ??= new List<UIModuleCustomization>();
+            var moduleCustomization = UIModuleCustomizations.FirstOrDefault(x => string.Equals(x.Module, module));
+            if (moduleCustomization == null)
+            {
+                moduleCustomization = new UIModuleCustomization() { OrganizationId = Id, Module = module };
+                UIModuleCustomizations.Add(moduleCustomization);
+            }
+
+            moduleCustomization.MirrorNodes(nodes);
+            
+            return moduleCustomization;
+        }
+
+        private bool IsAnyKeyInvalid(ICollection<CustomizedUINode> configurations)
+        {
+            var searchExpresion = new Regex(UIModuleConfigurationConstants.ConfigurationKeyRegex);
+            
+            if(!configurations.Any())
+                return true;
+            //check if every key matches the Regex expresion
+            if (configurations.Any(x => searchExpresion.Matches(x.Key).Count < 1))
+                return true;
+            //check if every key is unique
+            if(configurations.GroupBy(x => x.Key).Any(g => g.Count() > 1))
+                return true;
+
+            return false;
         }
     }
 }
