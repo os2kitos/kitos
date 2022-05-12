@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainModel.Shared;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.UI_Configuration;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -119,6 +122,11 @@ namespace Tests.Integration.Presentation.Web.Organizations
             var systemInAnotherOrgWithRightsHolderConflict = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), anotherOrg1.Id, AccessModifier.Public);
             await ItSystemHelper.SendSetBelongsToRequestAsync(systemInOwnOrgNoRightsHolderConflict.Id, organization.Id, organization.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
             await ItSystemHelper.SendSetBelongsToRequestAsync(systemInAnotherOrgWithRightsHolderConflict.Id, organization.Id, anotherOrg1.Id).WithExpectedResponseCode(HttpStatusCode.OK).DisposeAsync();
+
+            //UI Customization in org
+            var module = A<string>();
+            var (userId, user, cookie)= await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+            await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
 
             //Act
             var conflicts = await OrganizationHelper.GetOrganizationRemovalConflictsAsync(organization.Uuid);

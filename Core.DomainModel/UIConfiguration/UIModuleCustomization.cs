@@ -11,8 +11,7 @@ namespace Core.DomainModel.UIConfiguration
     public class UIModuleCustomization : Entity, IOwnedByOrganization
     {
         public int OrganizationId { get; set; }
-
-        //TODO: Doesn not belong on the node level.. put it in a moduleconfig with moduleConfig--->*nodeConfig relation
+        
         /// <summary>
         /// Application module, e.g. It-System
         /// </summary>

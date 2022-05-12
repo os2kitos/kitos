@@ -25,7 +25,8 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
-        private readonly Mock<IUIModuleCustomizationService> _uiModuleCustomizationServiceMock;
+
+        private readonly UIModuleCustomizationService _uiModuleCustomizationService;
 
         public UIModuleCustomisationTests()
         {
@@ -34,7 +35,13 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _uiModuleCustomizationServiceMock = new Mock<IUIModuleCustomizationService>();
+
+            _uiModuleCustomizationService = new UIModuleCustomizationService(
+                _transactionManagerMock.Object, 
+                _repositoryMock.Object, 
+                _authorizationContextMock.Object,
+                _userContextMock.Object,
+                _organizationServiceMock.Object);
         }
 
         [Theory]
@@ -82,8 +89,8 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         {
             //arrange
             var module = A<string>();
-            var organization = new Organization(){Id = 1};
-            var nodes = PrepareTestNodes();
+            var organization = new Organization{Id = 1};
+            var nodes = PrepareTestNodes(0);
 
             //act
             var result = organization.ModifyModuleCustomization(module, nodes);
@@ -120,21 +127,144 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             Assert.NotNull(organization.UIModuleCustomizations);
         }
 
-        /*[Fact]
-        public void Can_Put()
+        [Fact]
+        public void PUT_Returns_NotFound_When_Organization_Doesnt_Exist()
         {
-            //Arrange
-            var orgId = A<int>();
+            var organizationId = A<int>();
             var module = A<string>();
-            var uiModuleCustomization = PrepareTestUiModuleCustomizationDto();
+            var uiModule = PrepareTestUiModuleCustomization();
 
-            var transaction = new Mock<IDatabaseTransaction>();
-            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
-            _uiModuleCustomizationServiceMock.Setup(x => x.Put(orgId, module, uiModuleCustomization));
-            //Act
+            var emptyOrganizationList = new List<Organization>();
+            ExpectOrganizationServiceSearchReturns(emptyOrganizationList);
 
-            //Assert
-        }*/
+            var result = _uiModuleCustomizationService.Put(organizationId, module, uiModule);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void PUT_Returns_Forbidden_If_Not_LocalAdmin_In_Organization()
+        {
+            var organizationId = A<int>();
+            var module = A<string>();
+            var uiModule = PrepareTestUiModuleCustomization();
+            var organizationRole = OrganizationRole.GlobalAdmin;
+
+            var organizations = new List<Organization>
+            {
+                new()
+                {
+                    Id = organizationId
+                }
+            };
+            ExpectOrganizationServiceSearchReturns(organizations);
+            ExpectHasRoleReturns(organizationId, organizationRole, false);
+            
+            var result = _uiModuleCustomizationService.Put(organizationId, module, uiModule);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void GET_Returns_NotFound_When_Organization_Doesnt_Exist()
+        {
+            var organizationId = A<int>();
+            var module = A<string>();
+
+            var emptyOrganizationList = new List<Organization>();
+            ExpectOrganizationServiceSearchReturns(emptyOrganizationList);
+
+            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void GET_Returns_Forbidden_If_Not_Authorized_To_Read()
+        {
+            var organizationId = A<int>();
+            var module = A<string>();
+            var organization = new Organization {Id = organizationId, UIModuleCustomizations = new List<UIModuleCustomization>()};
+
+            var organizations = new List<Organization>
+            {
+                organization
+            };
+            ExpectOrganizationServiceSearchReturns(organizations);
+            ExpectAllowReadsReturns(organization, false);
+            
+            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.Forbidden, result.Error);
+        }
+
+        [Fact]
+        public void GET_Returns_NotFound_If_UIModule_Doesnt_Exist()
+        {
+            var organizationId = A<int>();
+            var module = A<string>();
+            var organization = new Organization { Id = organizationId, UIModuleCustomizations = new List<UIModuleCustomization>()};
+
+            var organizations = new List<Organization>
+            {
+                organization
+            };
+
+            ExpectOrganizationServiceSearchReturns(organizations);
+            ExpectAllowReadsReturns(organization, true);
+            
+            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
+            
+            Assert.True(result.Failed);
+            Assert.Equal(OperationFailure.NotFound, result.Error);
+        }
+
+        [Fact]
+        public void GET_Returns_List_Filtered_By_Module()
+        {
+            var organizationId = A<int>();
+            var module1 = A<string>();
+            var module2 = A<string>();
+            var moduleObject1 = PrepareTestUiModuleCustomization(organizationId, module1);
+            var moduleObject2 = PrepareTestUiModuleCustomization(organizationId, module2);
+            var organization = new Organization
+            {
+                Id = organizationId, 
+                UIModuleCustomizations = new List<UIModuleCustomization>()
+                {
+                    moduleObject1,
+                    moduleObject2
+                }
+            };
+
+            var organizations = new List<Organization>
+            {
+                organization
+            };
+
+            ExpectOrganizationServiceSearchReturns(organizations);
+            ExpectAllowReadsReturns(organization, true);
+            
+            var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module1);
+            
+            Assert.True(result.Ok);
+            Assert.Single(result.Value);
+            Assert.Contains(moduleObject1, result.Value);
+        }
+
+        private UIModuleCustomization PrepareTestUiModuleCustomization(int orgId = 0, string module = "", int numberOfElements = 1, string key = "", bool isEnabled = false)
+        {
+            return new UIModuleCustomization
+            {
+                OrganizationId = orgId,
+                Module = module,
+                Nodes = PrepareTestNodes(numberOfElements, key, isEnabled)
+            };
+        }
 
         private List<CustomizedUINode> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
         {
@@ -146,6 +276,21 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             }
 
             return nodes;
+        }
+
+        private void ExpectOrganizationServiceSearchReturns(List<Organization> orgList)
+        {
+            _organizationServiceMock.Setup(x => x.SearchAccessibleOrganizations()).Returns(orgList.AsQueryable);
+        }
+
+        private void ExpectHasRoleReturns(int organizationId, OrganizationRole role, bool value)
+        {
+            _userContextMock.Setup(x => x.HasRole(organizationId, role)).Returns(value);
+        }
+
+        private void ExpectAllowReadsReturns(Organization organization, bool value)
+        {
+            _authorizationContextMock.Setup(x => x.AllowReads(organization)).Returns(value);
         }
 
         private string GenerateKey()

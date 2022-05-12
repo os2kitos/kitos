@@ -40,11 +40,11 @@ namespace Core.ApplicationServices.UIConfiguration
         public Result<List<UIModuleCustomization>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
         {
             var organization = GetOrganizationById(organizationId);
-            if (organization == null)
+            if (organization == null || organization.UIModuleCustomizations == null)
                 return new OperationError(OperationFailure.NotFound);
             if (!_authorizationContext.AllowReads(organization))
                 return new OperationError(OperationFailure.Forbidden);
-
+            
             var uiModules = organization.UIModuleCustomizations.Where(x => string.Equals(x.Module, module)).ToList();
             if(uiModules.Count < 1) 
                 return new OperationError(OperationFailure.NotFound);
@@ -57,13 +57,12 @@ namespace Core.ApplicationServices.UIConfiguration
             var organization = GetOrganizationById(organizationId);
             if (organization == null)
                 return new OperationError(OperationFailure.NotFound);
-            /*if (!_userContext.HasRole(organizationId, OrganizationRole.LocalAdmin))
-                return new OperationError(OperationFailure.Forbidden);*/
+            if (!_userContext.HasRole(organizationId, OrganizationRole.LocalAdmin))
+                return new OperationError(OperationFailure.Forbidden);
 
-            organization.ModifyModuleCustomization(module, configuration.Nodes);
-
-            //TODO: Allowed to modify the org (which owns the modules¤)
-            //TODO: Add the functionality (merging, uniqueness check etc to the org domain model)
+            var result = organization.ModifyModuleCustomization(module, configuration.Nodes);
+            if (result.Failed)
+                return result;
             
             using var transaction = _transactionManager.Begin();
             _repository.Update(organization);
