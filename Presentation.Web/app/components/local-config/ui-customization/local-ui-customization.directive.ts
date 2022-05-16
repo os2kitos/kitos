@@ -13,29 +13,54 @@
     }
 
     interface IDirectiveScope {
+        /**
+         * The full ui configuration view model
+         */
         customizationModel: Models.UICustomization.ICustomizedModuleUI | null;
+        /**
+         * Determines the Id of the customization module
+         */
         customizedModuleId: Models.UICustomization.CustomizableKitosModule;
-        //TODO: OnClicked! to do the changes!
-        //TODO: One-way binding only to do the rendering! (on the node level but not on the root level)
+        /**
+         * Determines if the editor is open or closed
+         */
+        isOpen: boolean;
+        /**
+         * Update function to toggle a specific setting
+         * @param key
+         */
+        toggleSetting(key : string) : void;
     }
 
     class LocalUiCustomizationController implements IDirectiveScope {
         customizationModel: Models.UICustomization.ICustomizedModuleUI | null = null;
         customizedModuleId: Models.UICustomization.CustomizableKitosModule;
+        isOpen: boolean;
 
         static $inject: string[] = ["$scope", "uiCustomizationService", "uiCustomizationStateService"];
 
         constructor(
             $scope,
             private readonly uiCustomizationService: Services.UICustomization.IUICustomizationService,
-            private readonly uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) {
-
+            uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) {
+            this.isOpen = false;
             this.customizedModuleId = $scope.customizedModuleId;
             uiCustomizationStateService
                 .getCurrentState(this.customizedModuleId)
                 .then(customizationModel => {
                     this.customizationModel = customizationModel;
                 });
+        }
+
+        toggleSetting(key : string) {
+            const node = this.customizationModel.locateNode(key);
+
+            if (node.editable) {
+                this.customizationModel.changeAvailableState(node.key, !node.available);
+                return this.uiCustomizationService.saveActiveConfiguration(this.customizationModel);
+            }
+
+            return false;
         }
     }
     angular.module("app")

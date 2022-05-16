@@ -32,12 +32,13 @@
 
     class UICustomizationService implements IUICustomizationService {
 
-        static $inject = ["genericApiWrapper", "userService", "uiCustomizationStateCache"];
+        static $inject = ["genericApiWrapper", "userService", "uiCustomizationStateCache", "apiUseCaseFactory"];
 
         constructor(
             private readonly genericApiWrapper: Services.Generic.ApiWrapper,
             private readonly userService: Services.IUserService,
-            private readonly uiCustomizationStateCache: UiCustomizationStateCache) { }
+            private readonly uiCustomizationStateCache: UiCustomizationStateCache,
+            private readonly apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory) { }
 
         private loadBluePrint(module: Models.UICustomization.CustomizableKitosModule): Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint {
 
@@ -130,7 +131,8 @@
         }
 
         saveActiveConfiguration(config: Models.UICustomization.ICustomizedModuleUI): ng.IPromise<void> {
-            return this
+
+            const update = () => this
                 .userService
                 .getUser()
                 .then(user => {
@@ -146,6 +148,11 @@
                             this.uiCustomizationStateCache[config.module] = config;
                         });
                 });
+
+            return this
+                .apiUseCaseFactory
+                .createUpdate<never>(`UI Opsætning for ${config.root.text}`, update)
+                .executeAsync();
         }
     }
 

@@ -28,6 +28,11 @@
          * @param newState
          */
         changeAvailableState(fullKey: string, newState: boolean): void;
+        /**
+         * Locates a specific node in the customization tree - must not be used when applying mutations since mutations are subject to hierachial rules
+         * @param fullKey
+         */
+        locateNode(fullKey: string): IUINode;
     }
 
     /**
@@ -81,11 +86,15 @@
             });
         }
 
-        private getChild(fullKey: string): IUINode {
+        /**
+         * Locate the child that is part of the key path provided in the fullKey. 
+         * @param fullKey
+         */
+        private getChildCallPath(fullKey: string): IUINode {
             const path = this.extractChildPath(fullKey);
             const child = this._childGroupLookup[path];
             if (!child) {
-                throw new Error(`Not possible to find child based on:${fullKey} in object with key ${this._key}`);
+                throw new Error(`Not possible to find a suitable child path based on:${fullKey} in object with key ${this._key}`);
             }
             return child;
         }
@@ -99,13 +108,23 @@
             return results[1];
         }
 
+        locateNode(fullKey: string): IUINode {
+
+            if (fullKey === this._key) {
+                return this;
+            }
+
+            const child = this.getChildCallPath(fullKey);
+            return child.locateNode(fullKey);
+        }
+
         isAvailable(fullKey: string): boolean {
             if (this._available) {
                 if (fullKey === this._key) {
                     return true;
                 }
 
-                const child = this.getChild(fullKey);
+                const child = this.getChildCallPath(fullKey);
                 return child.isAvailable(fullKey);
             }
 
@@ -115,9 +134,10 @@
 
         changeAvailableState(fullKey: string, newState: boolean): void {
             if (fullKey === this.key) {
-                if (this.editable) {
+                if (!this.editable) {
                     throw new Error(`Cannot change ui customization node ${this._key} since it is not editable.`);
-                } else if (newState !== this._available) {
+                }
+                if (newState !== this._available) {
                     this._available = newState;
                     this.children
                         .filter(child => child.readOnly === false)
@@ -132,7 +152,7 @@
                         });
                 }
             } else if (this.available) {
-                const child = this.getChild(fullKey);
+                const child = this.getChildCallPath(fullKey);
                 child.changeAvailableState(fullKey, newState);
             } else {
                 throw new Error(`Cannot change state of descendant ${fullKey} if ancestor with key ${this.key} is unavailable`);
@@ -173,17 +193,21 @@
 
 
     export class CustomizedModuleUI implements ICustomizedModuleUI {
-        isBluePrintNodeAvailable(blueprintObject): boolean {
-            const key = UICustomization.Configs.getFullKey(blueprintObject);
-            return this.isAvailable(key);
-        }
-
         private readonly _root: IUINode;
         private readonly _module: CustomizableKitosModule;
 
         constructor(module: CustomizableKitosModule, root: IUINode) {
             this._root = root;
             this._module = module;
+        }
+
+        locateNode(fullKey: string): IUINode {
+            return this._root.locateNode(fullKey);
+        }
+
+        isBluePrintNodeAvailable(blueprintObject): boolean {
+            const key = UICustomization.Configs.getFullKey(blueprintObject);
+            return this.isAvailable(key);
         }
 
         isAvailable(fullKey: string): boolean {
