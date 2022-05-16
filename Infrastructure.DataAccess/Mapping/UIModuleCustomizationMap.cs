@@ -22,7 +22,7 @@ namespace Infrastructure.DataAccess.Mapping
             HasRequired(t => t.Organization)
                 .WithMany(t => t.UIModuleCustomizations)
                 .HasForeignKey(d => d.OrganizationId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
         }
     }
 }

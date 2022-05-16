@@ -63,11 +63,12 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             //Arrange
             var module = A<string>();
             var (cookie, organization) = await CreatePrerequisitesAsync();
+            var (cookieUser2, _) = await CreatePrerequisitesAsync();
 
             await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
 
             //Act
-            using var response = await UIConfigurationHelper.SendGetRequestAsync(organization.Id, module);
+            using var response = await UIConfigurationHelper.SendGetRequestAsync(organization.Id, module, cookieUser2);
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden ,response.StatusCode);

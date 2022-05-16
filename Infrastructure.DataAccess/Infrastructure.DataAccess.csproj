@@ -868,6 +868,10 @@
     <Compile Include="Migrations\202205101349457_SplitUIModuleCustomizationResponsibilities.designer.cs">
       <DependentUpon>202205101349457_SplitUIModuleCustomizationResponsibilities.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.cs" />
+    <Compile Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.designer.cs">
+      <DependentUpon>202205161348373_CascadeUICustomizationOnDelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1433,6 +1437,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202205101349457_SplitUIModuleCustomizationResponsibilities.resx">
       <DependentUpon>202205101349457_SplitUIModuleCustomizationResponsibilities.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.resx">
+      <DependentUpon>202205161348373_CascadeUICustomizationOnDelete.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

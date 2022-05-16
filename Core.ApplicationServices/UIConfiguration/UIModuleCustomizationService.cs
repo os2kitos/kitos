@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
-using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
-using Core.DomainModel.Constants;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
-using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.UIConfiguration;
 using Infrastructure.Services.DataAccess;
 
 namespace Core.ApplicationServices.UIConfiguration
@@ -18,19 +12,16 @@ namespace Core.ApplicationServices.UIConfiguration
     public class UIModuleCustomizationService : IUIModuleCustomizationService
     {
         private readonly ITransactionManager _transactionManager;
-        private readonly IUIModuleCustomizationRepository _repository;
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IOrganizationalUserContext _userContext;
         private readonly IOrganizationService _organizationService;
 
-        public UIModuleCustomizationService(ITransactionManager transactionManager, 
-            IUIModuleCustomizationRepository repository,
+        public UIModuleCustomizationService(ITransactionManager transactionManager,
             IAuthorizationContext authorizationContext,
             IOrganizationalUserContext userContext,
             IOrganizationService organizationService)
         {
             _transactionManager = transactionManager;
-            _repository = repository;
             _authorizationContext = authorizationContext;
             _userContext = userContext;
             _organizationService = organizationService;
@@ -65,7 +56,7 @@ namespace Core.ApplicationServices.UIConfiguration
                 return result;
             
             using var transaction = _transactionManager.Begin();
-            _repository.Update(organization);
+            _organizationService.UpdateOrganizationAndRaizeDomainEvent(organization);
             transaction.Commit();
             
             return configuration;

@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.ApplicationServices.UIConfiguration;
 using Core.DomainModel.Organization;
 using Core.DomainModel.UIConfiguration;
-using Core.DomainServices.UIConfiguration;
 using Infrastructure.Services.DataAccess;
 using Moq;
 using Tests.Toolkit.Patterns;
@@ -21,7 +17,6 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
     public class UIModuleCustomisationTests : WithAutoFixture
     {
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<IUIModuleCustomizationRepository> _repositoryMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
@@ -31,14 +26,12 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         public UIModuleCustomisationTests()
         {
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _repositoryMock = new Mock<IUIModuleCustomizationRepository>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationServiceMock = new Mock<IOrganizationService>();
 
             _uiModuleCustomizationService = new UIModuleCustomizationService(
                 _transactionManagerMock.Object, 
-                _repositoryMock.Object, 
                 _authorizationContextMock.Object,
                 _userContextMock.Object,
                 _organizationServiceMock.Object);

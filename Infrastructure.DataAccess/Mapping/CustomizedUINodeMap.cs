@@ -20,7 +20,7 @@ namespace Infrastructure.DataAccess.Mapping
             HasRequired(t => t.UiModuleCustomization)
                 .WithMany(t => t.Nodes)
                 .HasForeignKey(d => d.ModuleId)
-                .WillCascadeOnDelete(false);
+                .WillCascadeOnDelete(true);
         }
     }
 }

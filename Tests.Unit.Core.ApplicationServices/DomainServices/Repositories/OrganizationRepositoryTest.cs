@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Repositories.Organization;
@@ -12,12 +13,14 @@ namespace Tests.Unit.Core.DomainServices.Repositories
     public class OrganizationRepositoryTest : WithAutoFixture
     {
         private readonly Mock<IGenericRepository<Organization>> _repository;
+        private readonly Mock<IDomainEvents> _domainEvents;
         private readonly OrganizationRepository _sut;
 
         public OrganizationRepositoryTest()
         {
             _repository = new Mock<IGenericRepository<Organization>>();
-            _sut = new OrganizationRepository(_repository.Object);
+            _domainEvents = new Mock<IDomainEvents>();
+            _sut = new OrganizationRepository(_repository.Object, _domainEvents.Object);
         }
 
         [Fact]

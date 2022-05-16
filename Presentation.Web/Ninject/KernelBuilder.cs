@@ -112,7 +112,6 @@ using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
 using Core.DomainServices.Tracking;
-using Core.DomainServices.UIConfiguration;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 
@@ -536,7 +535,6 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IAdviceRootResolution>().To<AdviceRootResolution>().InCommandScope(Mode);
             kernel.Bind<IUserNotificationRepository>().To<UserNotificationRepository>().InCommandScope(Mode);
             kernel.Bind<ITaskRefRepository>().To<TaskRefRepository>().InCommandScope(Mode);
-            kernel.Bind<IUIModuleCustomizationRepository>().To<UIModuleCustomizationRepository>().InCommandScope(Mode);
         }
 
         private void RegisterAuthenticationContext(IKernel kernel)

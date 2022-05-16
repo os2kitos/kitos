@@ -234,8 +234,6 @@
     <Compile Include="Repositories\KLE\KLEUpdateHistoryItemRepository.cs" />
     <Compile Include="Tracking\TrackDeletedEntitiesEventHandler.cs" />
     <Compile Include="Tracking\MarkEntityAsDirtyOnChangeEventHandler.cs" />
-    <Compile Include="UIConfiguration\IUIModuleCustomizationRepository.cs" />
-    <Compile Include="UIConfiguration\UIModuleCustomizationRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
