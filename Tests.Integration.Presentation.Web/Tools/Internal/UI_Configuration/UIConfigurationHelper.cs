@@ -59,8 +59,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
                 Nodes = PrepareTestNodes(numberOfElements, key, isEnabled)
             };
         }
-
-
+        
         public static List<CustomizedUINodeDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false, params string[] keys)
         {
             var nodes = new List<CustomizedUINodeDTO>();
@@ -68,11 +67,6 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
             {
                 key = string.IsNullOrEmpty(key) ? RandomString(10) : key;
                 nodes.Add(new CustomizedUINodeDTO { Key = key, Enabled = isEnabled });
-            }
-
-            foreach (var keyKey in keys)
-            {
-
             }
 
             return nodes;

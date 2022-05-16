@@ -135,7 +135,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static Task<HttpResponseMessage> PutWithTokenAsync(Uri url, string token, object body = null)
         {
             var requestMessage = CreatePutMessage(url, body);
-            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("Bearer " + token);
+            requestMessage.Headers.Authorization = AuthenticationHeaderValue.Parse("bearer " + token);
             return StatelessHttpClient.SendAsync(requestMessage);
         }
 
