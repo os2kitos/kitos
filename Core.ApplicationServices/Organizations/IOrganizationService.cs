@@ -42,7 +42,7 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationUuid"></param>
         /// <param name="enforceDeletion">If set to <c>true</c> any removal conflicts will be ignored and the deletion will proceed</param>
         /// <returns></returns>
-        Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion);
+        Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
         void UpdateOrganizationAndRaizeDomainEvent(Organization organization);
     }
 }
