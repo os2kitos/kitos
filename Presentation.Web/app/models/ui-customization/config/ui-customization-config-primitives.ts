@@ -1,6 +1,7 @@
 ﻿module Kitos.Models.UICustomization.Configs {
 
     export interface ICustomizableUINodeConfig {
+        text: string;
         readOnly?: boolean;
         children?: Record<string, ICustomizableUINodeConfig>;
         fullKey?: string; // Added by the post-processor so that controllers/ui can bind to a hierarchy while getting the right key for configuration checks...
@@ -45,4 +46,8 @@
         }
         return fullKey;
     }
+
+    export const helpTexts = {
+        cannotChangeTab: "Det er ikke muligt at slå dette faneblad fra"
+}
 }

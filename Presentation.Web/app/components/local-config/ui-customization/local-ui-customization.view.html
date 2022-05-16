@@ -1,0 +1,220 @@
+﻿<div class="panel panel-default">
+    <div class="panel-heading">
+        <a class="task-fold" data-ng-click="ctrl.isOpen = !ctrl.isOpen">
+            <i class="glyphicon small"
+               data-ng-class="{'glyphicon-chevron-down': ctrl.isOpen, 'glyphicon-chevron-right': !ctrl.isOpen}"></i>
+            {{:: ctrl.customizationModel.root.text}}
+        </a>
+
+        <span ng-if="ctrl.customizationModel.root.helpText" class="help-block small">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+            {{:: ctrl.customizationModel.root.helpText}}
+        </span>
+    </div>
+    <table class="full-width table" ng-show="ctrl.isOpen">
+        <thead>
+            <tr>
+                <th width="30%">Faneblad</th>
+                <th width="70%">Individuelle felter/grupper</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!--Tabs-->
+            <tr ng-repeat="tabConfig in ctrl.customizationModel.root.children">
+                <td>
+                    <label style="font-weight: normal">
+                        <!-- TODO: Editable seems to be wrong! -->
+                        <input type="checkbox" ng-checked="tabConfig.available" ng-disabled="!tabConfig.editable" />
+                        {{:: tabConfig.text}}
+                    <span ng-if="tabConfig.helpText" class="help-block small">
+                        <i class="fa fa-info-circle" aria-hidden="true"></i>
+                        {{:: tabConfig.helpText}}
+                    </span>
+                    </label>
+                </td>
+                <td>
+                    <span ng-if="tabConfig.children.length < 1" class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                    <!--TODO: If not, render it all-->
+                </td>
+            </tr>
+
+            <!-- TODO: Remove hard coded -->
+            <!--<tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" disabled="disabled" />
+                        Systemforside
+                        <span class="help-block small">
+                            <i class="fa fa-info-circle" aria-hidden="true"></i>
+                            Det er ikke muligt at slå dette faneblad fra
+                        </span>
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Udstillede snitflader
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Relationer
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Kontrakter
+                    </label>
+                </td>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Hvilken kontrakt skal afgøre om systemet er aktivt
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Hierarki
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Systemroller
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Organisation
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Lokale KLE
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        IT Projekter
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Advis
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Lokale referencer
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        Arkivering
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label style="font-weight: normal">
+                        <input type="checkbox" checked="checked" />
+                        GDPR
+                    </label>
+                </td>
+                <td>
+                    <span class="help-block small">
+                        Tilpasning på feltniveau endnu ikke muligt
+                    </span>
+                </td>
+            </tr>-->
+        </tbody>
+    </table>
+</div>

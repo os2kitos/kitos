@@ -86,12 +86,14 @@
                         const nodeBluePrint: Models.UICustomization.Configs.ICustomizableUINodeConfig = currentNodeBluePrint.children[childKey];
                         const serverConfig = persistedConfigLookup[nodeBluePrint.fullKey];
                         const available = serverConfig != undefined ? serverConfig : true;
+                        const readOnly = nodeBluePrint.readOnly != undefined && nodeBluePrint.readOnly;
                         children.push(new Models.UICustomization.UINode
                             (
                                 nodeBluePrint.fullKey,                      //key
-                                !nodeBluePrint.readOnly && parentAvailable, //editable
-                                available,                              //available state
-                                nodeBluePrint.readOnly,                     //readonly
+                                nodeBluePrint.text,                         //human readable text
+                                !readOnly && parentAvailable,               //editable
+                                available,                                  //available state
+                                readOnly,                                   //readonly
                                 buildChildren(nodeBluePrint, available),    //build children recursively,
                                 nodeBluePrint.helpText                      //help text for the local admin
                             )
@@ -101,7 +103,7 @@
                 return children;
             }
 
-            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, false, true, true, buildChildren(bluePrint, true)));
+            return new Models.UICustomization.CustomizedModuleUI(bluePrint.module, new Models.UICustomization.UINode(bluePrint.module, bluePrint.text, false, true, true, buildChildren(bluePrint, true), bluePrint.helpText));
         }
 
         loadActiveConfiguration(module: Models.UICustomization.CustomizableKitosModule): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {

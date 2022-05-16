@@ -49,7 +49,7 @@
             $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
             $scope.isInterfacesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.interfaces);
             $scope.isRelationsEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRelations);
-            $scope.isContractsEnabled = user.currentConfig.ShowItContractModule && uiState.isBluePrintNodeAvailable(blueprint.children.contracts);
+            $scope.isContractsEnabled = user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(blueprint.children.contracts);
             $scope.isHierarchyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.hierarchy);
             $scope.isSystemRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRoles);
             $scope.isOrganizationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.organization);
@@ -58,7 +58,7 @@
             $scope.usLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
             $scope.isArchivingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.archiving);
             $scope.isGdprEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr);
-            $scope.isProjectModuleEnabled = user.currentConfig.ShowItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
+            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
         }
     ]);
 })(angular, app);

@@ -39,10 +39,12 @@
          * Extracts the fullKey from the config object and calls isAvailable
          * @param blueprintObject
          */
-        isBluePrintNodeAvailable(blueprintObject : Object): boolean;
+        isBluePrintNodeAvailable(blueprintObject: Object): boolean;
+        root: IUINode;
     }
 
     export interface IUINode extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
+        text: string;
         readOnly: boolean;
         editable: boolean;
         available: boolean;
@@ -59,13 +61,15 @@
         private readonly _key: string;
         private readonly _children: IUINode[];
         private readonly _childGroupLookup: Record<string, IUINode>;
+        private readonly _text: string;
 
-        constructor(key: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[], helpText?: string) {
+        constructor(key: string, text: string, editable: boolean, available: boolean, isReadOnly: boolean, children: IUINode[], helpText?: string) {
             this._isReadOnly = isReadOnly;
             this._children = children ?? [];
             this._editable = editable && !isReadOnly;
             this._available = available;
             this._key = key;
+            this._text = text;
             this._helpText = helpText;
             this._childGroupLookup = {};
             children.forEach(child => {
@@ -140,7 +144,7 @@
             this.children.forEach(child => child.accept(visitor));
         }
 
-        get children(): IUINode[] { return [...this._children]; }
+        get children(): IUINode[] { return this._children; }
 
         get readOnly() { return this._isReadOnly; }
 
@@ -161,6 +165,8 @@
         get available() { return this._available; }
 
         get key() { return this._key; }
+
+        get text() { return this._text; }
 
         get helpText() { return this._helpText; }
     }
@@ -189,6 +195,8 @@
         }
 
         get module() { return this._module; }
+
+        get root() { return this._root; }
 
         accept(visitor: IUICustomizationTreeVisitor): void {
             visitor.visitModule(this);
