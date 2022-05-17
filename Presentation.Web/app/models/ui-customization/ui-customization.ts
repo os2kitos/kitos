@@ -16,6 +16,14 @@
         accept(visitor: IUICustomizationTreeVisitor): void;
     }
 
+    export interface IUICustomizationNodeSearch {
+        /**
+         * Locates a specific node in the customization tree - must not be used when applying mutations since mutations are subject to hierachial rules
+         * @param fullKey
+         */
+        locateNode(fullKey: string): IUINode;
+    }
+
     export interface IStatefulUICustomizationNode {
         /**
             * Used by the generic directive to check if the node is enabled
@@ -28,17 +36,12 @@
          * @param newState
          */
         changeAvailableState(fullKey: string, newState: boolean): void;
-        /**
-         * Locates a specific node in the customization tree - must not be used when applying mutations since mutations are subject to hierachial rules
-         * @param fullKey
-         */
-        locateNode(fullKey: string): IUINode;
     }
 
     /**
      * Defines a customized KITOS module including "module.group[1..*].setting
      */
-    export interface ICustomizedModuleUI extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
+    export interface ICustomizedModuleUI extends IStatefulUICustomizationNode, IUICustomizationTreeMember, IUICustomizationNodeSearch {
         module: CustomizableKitosModule;
         /**
          * Extracts the fullKey from the config object and calls isAvailable
@@ -48,7 +51,7 @@
         root: IUINode;
     }
 
-    export interface IUINode extends IStatefulUICustomizationNode, IUICustomizationTreeMember {
+    export interface IUINode extends IStatefulUICustomizationNode, IUICustomizationTreeMember, IUICustomizationNodeSearch {
         text: string;
         readOnly: boolean;
         editable: boolean;
