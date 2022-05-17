@@ -173,7 +173,6 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -372,7 +371,7 @@
                         name: "opretITKontrakt",
                         text: "Opret IT Kontrakt",
                         template:
-                            "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn btn-success pull-right' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
+                            "<button ng-click='contractOverviewVm.opretITKontrakt()' data-element-type='createContractButton' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left' data-ng-disabled=\"!contractOverviewVm.canCreate\">#: text #</Button>"
                     },
                     {
                         name: "clearFilter",
@@ -428,7 +427,7 @@
                 columnHide: self.saveGridOptions,
                 columnShow: self.saveGridOptions,
                 columnReorder: self.saveGridOptions,
-                excelExport: self.exportToExcel,
+                excelExport: (e:any) => self.exportToExcel(e),
                 page: self.onPaging,
                 columns: [
                     {
@@ -718,6 +717,7 @@
                     }
                 ]
             };
+            
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -790,10 +790,18 @@
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
+        
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
 
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractOverview>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private orgUnitDropDownList = (args) => {

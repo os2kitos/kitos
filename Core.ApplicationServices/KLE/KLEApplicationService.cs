@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.DomainModel.KLE;
 using Core.DomainModel.Organization;
+using Core.DomainServices.Context;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Repositories.KLE;
@@ -20,16 +21,19 @@ namespace Core.ApplicationServices.KLE
         private readonly IKLEStandardRepository _kleStandardRepository;
         private readonly IKLEUpdateHistoryItemRepository _kleUpdateHistoryItemRepository;
         private readonly ITaskRefRepository _taskRefRepository;
+        private readonly IDefaultOrganizationResolver _defaultOrganizationResolver;
 
         public KLEApplicationService(IOrganizationalUserContext organizationalUserContext,
             IKLEStandardRepository kleStandardRepository,
             IKLEUpdateHistoryItemRepository kleUpdateHistoryItemRepository,
-            ITaskRefRepository taskRefRepository)
+            ITaskRefRepository taskRefRepository,
+            IDefaultOrganizationResolver defaultOrganizationResolver)
         {
             _organizationalUserContext = organizationalUserContext;
             _kleStandardRepository = kleStandardRepository;
             _kleUpdateHistoryItemRepository = kleUpdateHistoryItemRepository;
             _taskRefRepository = taskRefRepository;
+            _defaultOrganizationResolver = defaultOrganizationResolver;
         }
 
         public Result<KLEStatus, OperationFailure> GetKLEStatus()
@@ -50,7 +54,7 @@ namespace Core.ApplicationServices.KLE
             return Result<IEnumerable<KLEChange>, OperationFailure>.Success(_kleStandardRepository.GetKLEChangeSummary());
         }
 
-        public Result<KLEUpdateStatus, OperationFailure> UpdateKLE(int organizationId)
+        public Result<KLEUpdateStatus, OperationFailure> UpdateKLE()
         {
             if (!AllowUpdate())
             {
@@ -61,7 +65,8 @@ namespace Core.ApplicationServices.KLE
                 return OperationFailure.BadInput;
             }
 
-            var publishedDate = _kleStandardRepository.UpdateKLE(organizationId);
+            var organization = _defaultOrganizationResolver.Resolve(); // Always use the default organization as kle owner
+            var publishedDate = _kleStandardRepository.UpdateKLE(organization.GetRoot().Id);
             _kleUpdateHistoryItemRepository.Insert(publishedDate);
             return KLEUpdateStatus.Ok;
         }

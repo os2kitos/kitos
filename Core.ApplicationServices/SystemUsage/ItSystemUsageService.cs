@@ -167,7 +167,7 @@ namespace Core.ApplicationServices.SystemUsage
 
                 _itSystemUsageAttachedOptionRepository.DeleteAllBySystemUsageId(id);
 
-                _domainEvents.Raise(new EntityDeletedEvent<ItSystemUsage>(itSystemUsage));
+                _domainEvents.Raise(new EntityBeingDeletedEvent<ItSystemUsage>(itSystemUsage));
                 _usageRepository.DeleteByKeyWithReferencePreload(id);
                 _usageRepository.Save();
                 transaction.Commit();

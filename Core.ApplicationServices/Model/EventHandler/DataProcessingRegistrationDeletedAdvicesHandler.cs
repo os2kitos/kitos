@@ -6,7 +6,7 @@ using Core.DomainServices.Repositories.Advice;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class DataProcessingRegistrationDeletedAdvicesHandler : IDomainEventHandler<EntityDeletedEvent<DataProcessingRegistration>>
+    public class DataProcessingRegistrationDeletedAdvicesHandler : IDomainEventHandler<EntityBeingDeletedEvent<DataProcessingRegistration>>
     {
         private readonly IAdviceRepository _adviceRepository;
         private readonly IAdviceService _adviceService;
@@ -17,7 +17,7 @@ namespace Core.ApplicationServices.Model.EventHandler
             _adviceService = adviceService;
         }
 
-        public void Handle(EntityDeletedEvent<DataProcessingRegistration> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<DataProcessingRegistration> domainEvent)
         {
             var dataProcessingRegistration = domainEvent.Entity;
             var toBeDeleted = _adviceRepository.GetByRelationIdAndType(dataProcessingRegistration.Id, RelatedEntityType.dataProcessingRegistration).ToList();

@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -14,13 +15,28 @@ using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Deltas.V2
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class DeltaFeedApiV2Test : WithAutoFixture
     {
+        public DeltaFeedApiV2Test()
+        {
+            //Reset the event stream to control expectations
+            DatabaseAccess.MutateEntitySet<LifeCycleTrackingEvent>(repository =>
+           {
+               var allIds = repository.AsQueryable().Select(x => x.Id).ToList();
+               foreach (var id in allIds)
+               {
+                   repository.DeleteByKey(id);
+               }
+           });
+        }
+
         [Fact]
         public async Task GetDeletedItems_Without_Detailed_Query()
         {
@@ -107,9 +123,9 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync(OrganizationTypeKeys.Virksomhed);
             var dpr = await CreateDprAsync(token, organization);
-            var system = await CreateItItSystemAsync(token, organization);
+            var system = await CreateItItSystemAsync(organization);
             var systemUsage = await CreateItItSystemUsageAsync(token, organization);
-            var project = await CreateItProjectAsync(token, organization);
+            var project = await CreateItProjectAsync(organization);
             var contract = await CreateItContractAsync(token, organization);
             var itInterface = await CreateItItInterfaceAsync(token, organization);
 
@@ -133,7 +149,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             await DataProcessingRegistrationV2Helper.DeleteAsync(token, dpr1.Uuid);
         }
 
-        private async Task<DataProcessingRegistrationResponseDTO> CreateDprAsync(string token, Organization organization)
+        private async Task<DataProcessingRegistrationResponseDTO> CreateDprAsync(string token, OrganizationDTO organization)
         {
             return await DataProcessingRegistrationV2Helper.PostAsync(token, new CreateDataProcessingRegistrationRequestDTO()
             {
@@ -142,33 +158,33 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             });
         }
 
-        private async Task<ItProjectDTO> CreateItProjectAsync(string token, Organization organization)
+        private async Task<ItProjectDTO> CreateItProjectAsync(OrganizationDTO organization)
         {
             return await ItProjectHelper.CreateProject(CreateName(), organization.Id);
         }
 
-        private async Task<ItContractResponseDTO> CreateItContractAsync(string token, Organization organization)
+        private async Task<ItContractResponseDTO> CreateItContractAsync(string token, OrganizationDTO organization)
         {
             return await ItContractV2Helper.PostContractAsync(token, new CreateNewContractRequestDTO() { OrganizationUuid = organization.Uuid, Name = CreateName() });
         }
 
-        private async Task<ItSystemDTO> CreateItItSystemAsync(string token, Organization organization)
+        private async Task<ItSystemDTO> CreateItItSystemAsync(OrganizationDTO organization)
         {
             return await ItSystemHelper.CreateItSystemInOrganizationAsync(CreateName(), organization.Id, AccessModifier.Public);
         }
 
-        private async Task<ItSystemUsageResponseDTO> CreateItItSystemUsageAsync(string token, Organization organization)
+        private async Task<ItSystemUsageResponseDTO> CreateItItSystemUsageAsync(string token, OrganizationDTO organization)
         {
-            var itItSystemAsync = await CreateItItSystemAsync(token, organization);
+            var itItSystemAsync = await CreateItItSystemAsync(organization);
             return await ItSystemUsageV2Helper.PostAsync(token, new CreateItSystemUsageRequestDTO { OrganizationUuid = organization.Uuid, SystemUuid = itItSystemAsync.Uuid });
         }
 
-        private async Task<ItInterfaceDTO> CreateItItInterfaceAsync(string token, Organization organization)
+        private async Task<ItInterfaceDTO> CreateItItInterfaceAsync(string token, OrganizationDTO organization)
         {
             return await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(CreateName(), A<string>(), organization.Id, AccessModifier.Public));
         }
 
-        private async Task<(string token, User user, Organization organization)> CreatePrerequisitesAsync(OrganizationTypeKeys organizationType)
+        private async Task<(string token, User user, OrganizationDTO organization)> CreatePrerequisitesAsync(OrganizationTypeKeys organizationType)
         {
             var organization = await CreateOrganizationAsync(organizationType);
             var (user, token) = await CreateApiUser(organization);
@@ -176,7 +192,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             return (token, user, organization);
         }
 
-        private async Task<Organization> CreateOrganizationAsync(OrganizationTypeKeys orgType)
+        private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
         {
             var organizationName = CreateName();
             var organization = await OrganizationHelper.CreateOrganizationAsync(TestEnvironment.DefaultOrganizationId,
@@ -184,7 +200,7 @@ namespace Tests.Integration.Presentation.Web.Deltas.V2
             return organization;
         }
 
-        private async Task<(User user, string token)> CreateApiUser(Organization organization)
+        private async Task<(User user, string token)> CreateApiUser(OrganizationDTO organization)
         {
             var userAndGetToken = await HttpApi.CreateUserAndGetToken(CreateEmail(), OrganizationRole.User, organization.Id, true, false);
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));

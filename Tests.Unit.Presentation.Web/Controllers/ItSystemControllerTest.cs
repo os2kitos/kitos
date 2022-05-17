@@ -258,7 +258,7 @@ namespace Tests.Unit.Presentation.Web.Controllers
 
         private void ExpectDeleteSystemReturn(int systemId, SystemDeleteResult deleteResult)
         {
-            _systemService.Setup(x => x.Delete(systemId))
+            _systemService.Setup(x => x.Delete(systemId,false))
                 .Returns(deleteResult);
         }
 

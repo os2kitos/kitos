@@ -1,6 +1,5 @@
 ﻿class Constants {
     readonly kendoSystemNameObjects = "sysnameKendoObject";
-    readonly kendoReportNameObjects = "reportNameKendoObject";
     readonly kendoProjectNameObjects = "projectNameKendoObject";
     readonly kendoSystemRightsOwnerObject = "belongstoKendoObject";
     readonly kendoSystemButtonCreate = "createITSystemButton";
@@ -13,7 +12,6 @@
     readonly kendoButtonDeleteFilter = "removeFilterButton";
     readonly kendoContractButtonCreateContract = "createContractButton";
     readonly kendoProjectButtonCreateProject = "createProjectButton";
-    readonly kendoReportButtonCreateReport = "createReportButton";
     readonly kendoCatalogNameHeader = "catalogNameHeader";
     readonly kendoCatalogNameObjects = "catalogNameObject";
     readonly kendoInterfaceNameHeader = "interfaceNameHeader";
@@ -92,7 +90,6 @@
     readonly navigationRemoveSystemUsageButton = "removeSystemUsageButton";
     readonly navigationContractButton = "contractButton";
     readonly navigationDataProcessingButton = "dataProcessingButton";
-    readonly navigationReportsButton = "reportButton";
 
     readonly navigationDropdown = "dropdown-button";
     readonly navigationDropdownMyProfile = "myProfileAnchor";

@@ -60,7 +60,6 @@
         createOrganizationUnitAuthorization(): IOperationAuthorizationService;
         createSystemAuthorization(): IOperationAuthorizationService;
         createSystemUsageAuthorization(): IOperationAuthorizationService;
-        createReportAuthorization(): IOperationAuthorizationService;
         createContractAuthorization(): IOperationAuthorizationService;
         createProjectAuthorization(): IOperationAuthorizationService;
         createInterfaceAuthorization(): IOperationAuthorizationService;
@@ -93,10 +92,6 @@
 
         createSystemUsageAuthorization(): IOperationAuthorizationService {
             return this.createFor("ItSystemUsage");
-        }
-
-        createReportAuthorization(): IOperationAuthorizationService {
-            return this.createFor("Report");
         }
 
         createContractAuthorization(): IOperationAuthorizationService {

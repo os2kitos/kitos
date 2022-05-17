@@ -65,28 +65,6 @@
 
     export class DataProcessingRegistrationService implements IDataProcessingRegistrationService {
 
-        private handleServerError(error) {
-            console.log("Request failed with:", error);
-            let errorCategory: Models.Api.ApiResponseErrorCategory;
-            switch (error.status) {
-                case 400:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.BadInput;
-                    break;
-                case 404:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.NotFound;
-                    break;
-                case 409:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.Conflict;
-                    break;
-                case 500:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.ServerError;
-                    break;
-                default:
-                    errorCategory = Models.Api.ApiResponseErrorCategory.UnknownError;
-            }
-            throw errorCategory;
-        }
-
         //Use for contracts that take an input defined as SingleValueDTO
         private simplePatch(url: string, value: any): angular.IPromise<IDataProcessingRegistrationPatchResult> {
 
@@ -105,20 +83,7 @@
                             optionalServerDataPush: res.response
                         };
                     },
-                    error => this.handleServerError(error)
-                );
-        }
-
-        private getDataFromUrl<TResponse>(url: string) {
-            return this
-                .$http
-                .get<API.Models.IApiWrapper<any>>(url)
-                .then(
-                    result => {
-                        var response = result.data as { response: TResponse }
-                        return response.response;
-                    },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -137,7 +102,7 @@
                             deletedObjectId: response.data.response.id,
                         };
                     },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
 
         }
@@ -156,21 +121,21 @@
                             createdObjectId: response.data.response.id
                         };
                     },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
 
         get(dataProcessingRegistrationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationDTO> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
+            return this.apiWrapper.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationDTO>(this.getUri(dataProcessingRegistrationId.toString()));
         }
 
         getApplicableDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize = 25): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
+            return this.apiWrapper.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
         }
 
         getApplicableSubDataProcessors(dataProcessingRegistrationId: number, query: string, pageSize = 25): angular.IPromise<Models.DataProcessing.IDataProcessorDTO[]> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
+            return this.apiWrapper.getDataFromUrl<Models.DataProcessing.IDataProcessorDTO[]>(this.getUriWithIdAndSuffix(dataProcessingRegistrationId, "sub-data-processors/available?nameQuery=" + encodeURIComponent(query) + `&pageSize=${pageSize}`));
         }
 
         setMasterReference(dataProcessingRegistrationId: number, referenceId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
@@ -245,7 +210,7 @@
                         var response = result.data as { response: Models.Generic.NamedEntity.NamedEntityWithEnabledStatusDTO[] }
                         return response.response;
                     },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -259,7 +224,7 @@
                         var response = result.data as { response: Models.DataProcessing.IDataProcessingRoleDTO[] }
                         return response.response;
                     },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -272,7 +237,7 @@
                         var response = result.data as { response: Models.DataProcessing.ISimpleUserDTO[] }
                         return response.response;
                     },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -288,7 +253,7 @@
                     payload)
                 .then(
                     result => { },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -302,7 +267,7 @@
                     payload)
                 .then(
                     result => { },
-                    error => this.handleServerError(error)
+                    error => this.apiWrapper.handleServerError(error)
                 );
         }
 
@@ -327,7 +292,7 @@
         }
 
         getApplicableDataProcessingRegistrationOptions(organizationId: number): angular.IPromise<Models.DataProcessing.IDataProcessingRegistrationOptions> {
-            return this.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationOptions>(this.getUri(`available-options-in/${organizationId}`));
+            return this.apiWrapper.getDataFromUrl<Models.DataProcessing.IDataProcessingRegistrationOptions>(this.getUri(`available-options-in/${organizationId}`));
         }
 
         assignOversightOption(dataProcessingRegistrationId: number, oversightOptionId: number): angular.IPromise<IDataProcessingRegistrationPatchResult> {
@@ -350,7 +315,7 @@
         }
 
         assignOversightDate(dataProcessingRegistrationId: number, dateTime: string, remark: string) {
-            var payload = {
+            const payload = {
                 oversightDate: dateTime,
                 oversightRemark: remark
             };
@@ -361,7 +326,7 @@
                     response => {
                         return response.data.response;
                     },
-                    error => this.handleServerError(error));
+                    error => this.apiWrapper.handleServerError(error));
         }
 
         updateOversightDate(dataProcessingRegistrationId: number, oversightDateId: number, dateTime: string, remark: string) {
@@ -377,7 +342,7 @@
                     response => {
                         return response.data.response;
                     },
-                    error => this.handleServerError(error));
+                    error => this.apiWrapper.handleServerError(error));
         }
 
         removeOversightDate(dataProcessingRegistrationId: number, oversightDateId: number) {
@@ -391,12 +356,13 @@
                     response => {
                         return response.data.response;
                     },
-                    error => this.handleServerError(error));
+                    error => this.apiWrapper.handleServerError(error));
         }
 
         static $inject = ["$http"];
-
+        private readonly apiWrapper : Services.Generic.ApiWrapper;
         constructor(private readonly $http: ng.IHttpService) {
+            this.apiWrapper = new Services.Generic.ApiWrapper($http);
         }
         
         private getUri(suffix: string): string {

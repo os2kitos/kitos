@@ -35,7 +35,6 @@
             private gridStateService: Services.IGridStateFactory,
             private exportGridToExcelService,
             private user) {
-            $rootScope.page.title = "Org overblik";
 
             $scope.$on("kendoWidgetCreated", (event, widget) => {
                 if (widget === this.mainGrid) {
@@ -119,12 +118,6 @@
                 },
                 toolbar: [
                     {
-                        name: "opretOrganisation",
-                        text: "Opret Organisation",
-                        template:
-                            "<a ui-sref='local-config.org.create' class='btn btn-success pull-right'>#: text #</a>"
-                    },
-                    {
                         name: "clearFilter",
                         text: "Gendan kolonneopsætning",
                         template:
@@ -147,13 +140,7 @@
                         text: "Slet filter",
                         template:
                             "<button type='button' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='orgCtrl.clearGridProfile()' data-ng-disabled='!orgCtrl.doesGridProfileExist()' data-element-type='removeFilterButton'>#: text #</button>"
-                    },
-                    {
-                        name: "excel",
-                        text: "Eksportér til Excel",
-                        template: "<a role='button' class='k-button k-button-icontext pull-right k-grid-excel' data-ng-click='orgCtrl.generateExcel()'> <span class='k-icon k-i-file-excel'> </span> Eksportér til Excel</a>"
-
-        }
+                    }
                 ],
                 excel: {
                     fileName: "Organisationer.xlsx",
@@ -181,7 +168,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -262,10 +249,18 @@
             }
 
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.IOrganizationRight>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
     }
 

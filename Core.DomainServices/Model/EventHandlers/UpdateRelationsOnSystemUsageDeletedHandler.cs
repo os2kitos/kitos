@@ -8,7 +8,7 @@ using Serilog;
 
 namespace Core.DomainServices.Model.EventHandlers
 {
-    public class UpdateRelationsOnSystemUsageDeletedHandler : IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>
+    public class UpdateRelationsOnSystemUsageDeletedHandler : IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>
     {
         private readonly IGenericRepository<ItSystemUsage> _systemUsageRepository;
         private readonly IGenericRepository<SystemRelation> _systemRelationRepository;
@@ -27,12 +27,12 @@ namespace Core.DomainServices.Model.EventHandlers
             _logger = logger;
         }
 
-        public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
             if (domainEvent == null)
                 throw new ArgumentNullException(nameof(domainEvent));
 
-            if (domainEvent.ChangeType != LifeCycleEventType.Deleted)
+            if (domainEvent.ChangeType != LifeCycleEventType.Deleting)
                 return;
 
             using var transaction = _transactionManager.Begin();

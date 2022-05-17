@@ -56,7 +56,9 @@
     <Compile Include="Authorization\EntityReadAccessLevel.cs" />
     <Compile Include="Authorization\OrganizationDataReadAccessLevel.cs" />
     <Compile Include="Context\ActiveUserIdContext.cs" />
+    <Compile Include="Context\DefaultOrganizationResolver.cs" />
     <Compile Include="Context\FallbackUserResolver.cs" />
+    <Compile Include="Context\IDefaultOrganizationResolver.cs" />
     <Compile Include="Context\IFallbackUserResolver.cs" />
     <Compile Include="Contract\ContractDataProcessingRegistrationAssignmentService.cs" />
     <Compile Include="Contract\IContractDataProcessingRegistrationAssignmentService.cs" />

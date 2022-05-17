@@ -5,7 +5,7 @@ using Core.DomainServices.Repositories.GDPR;
 
 namespace Core.DomainServices.GDPR
 {
-    public class CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent : IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>
+    public class CleanupDataProcessingRegistrationsOnSystemUsageDeletedEvent : IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>
     {
         private readonly IDataProcessingRegistrationRepository _dataProcessingRegistrationRepository;
         private readonly IDataProcessingRegistrationSystemAssignmentService _assignmentService;
@@ -18,7 +18,7 @@ namespace Core.DomainServices.GDPR
             _assignmentService = assignmentService;
         }
 
-        public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
             var usage = domainEvent.Entity;
             foreach (var dataProcessingRegistration in usage.AssociatedDataProcessingRegistrations.ToList())
