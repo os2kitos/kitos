@@ -124,7 +124,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         }
 
         [Fact]
-        public void PUT_Returns_NotFound_If_Not_LocalAdmin_In_Organization()
+        public void PUT_Returns_Forbidden_If_Not_LocalAdmin_In_Organization()
         {
             var uiModule = PrepareTestUiModuleCustomizationParameters();
             var organizationRole = OrganizationRole.GlobalAdmin;
@@ -138,7 +138,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             var result = _uiModuleCustomizationService.UpdateModule(uiModule);
 
             Assert.True(result.HasValue);
-            Assert.Equal(OperationFailure.NotFound, result.Value.FailureType);
+            Assert.Equal(OperationFailure.Forbidden, result.Value.FailureType);
         }
 
         [Fact]
