@@ -38,7 +38,7 @@
             private readonly genericApiWrapper: Services.Generic.ApiWrapper,
             private readonly userService: Services.IUserService,
             private readonly uiCustomizationStateCache: UiCustomizationStateCache,
-            private readonly apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory) { }
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) { }
 
         private loadBluePrint(module: Models.UICustomization.CustomizableKitosModule): Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint {
 

@@ -36,8 +36,17 @@
 
     class HelpTextService implements IHelpTextService {
         deleteHelpText(id: number, key: string): angular.IPromise<unknown> {
-            clearCache(key);
-            return this.$http({ method: "DELETE", url: `odata/HelpTexts(${id})` });
+
+            return this.apiUseCaseFactory
+                .createDeletion
+                (
+                    `Hjælpeteksten for '${key}'`,
+                    () => this.$http({ method: "DELETE", url: `odata/HelpTexts(${id})` })
+                )
+                .executeAsync(result => {
+                    clearCache(key);
+                    return result;
+                });
         }
 
         updateHelpText(id: number, key: string, title: string, text: string): angular.IPromise<unknown> {
@@ -45,14 +54,20 @@
                 Title: title,
                 Description: text
             };
-            return this.$http<unknown>({
-                method: "PATCH",
-                url: `odata/HelpTexts(${id})`,
-                data: payload
-            }).then(result => {
-                clearCache(key);
-                return result;
-            });
+
+            return this.apiUseCaseFactory
+                .createUpdate(
+                    `Hjælpeteksten for '${key}'`,
+                    () => this.$http<unknown>({
+                        method: "PATCH",
+                        url: `odata/HelpTexts(${id})`,
+                        data: payload
+                    })
+                )
+                .executeAsync(result => {
+                    clearCache(key);
+                    return result;
+                });
         }
 
         loadHelpText(key: string, ignoreCache?: boolean): angular.IPromise<IHelpText> {
@@ -80,12 +95,13 @@
 
         }
 
-        static $inject = ["$http", "$sce", "$q"];
+        static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory"];
 
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly $sce: ng.ISCEService,
-            private readonly $q: ng.IQService) { }
+            private readonly $q: ng.IQService,
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) { }
     }
 
     app.service("helpTextService", HelpTextService);
