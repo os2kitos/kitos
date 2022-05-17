@@ -34,20 +34,7 @@
         }
     }
 
-    /**
-     * Convenience method which expects a ICustomizableUINodeConfig and returns the fullKey
-     * @param node
-     */
-    export function getFullKey(node: Object) {
-        const asConfig = <ICustomizableUINodeConfig>node;
-        let fullKey = asConfig.fullKey;
-        if (fullKey == undefined) {
-            throw new Error("passed node is not a valid ICustomizableUINodeConfig");
-        }
-        return fullKey;
-    }
-
     export const helpTexts = {
         cannotChangeTab: "Det er ikke muligt at slå dette faneblad fra"
-}
+    }
 }

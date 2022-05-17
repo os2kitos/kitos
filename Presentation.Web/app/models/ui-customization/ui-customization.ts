@@ -44,7 +44,7 @@
          * Extracts the fullKey from the config object and calls isAvailable
          * @param blueprintObject
          */
-        isBluePrintNodeAvailable(blueprintObject: Object): boolean;
+        isBluePrintNodeAvailable(blueprintObject: UICustomization.Configs.ICustomizableUINodeConfig): boolean;
         root: IUINode;
     }
 
@@ -205,9 +205,8 @@
             return this._root.locateNode(fullKey);
         }
 
-        isBluePrintNodeAvailable(blueprintObject): boolean {
-            const key = UICustomization.Configs.getFullKey(blueprintObject);
-            return this.isAvailable(key);
+        isBluePrintNodeAvailable(blueprintObject: UICustomization.Configs.ICustomizableUINodeConfig): boolean {
+            return this.isAvailable(blueprintObject.fullKey);
         }
 
         isAvailable(fullKey: string): boolean {
