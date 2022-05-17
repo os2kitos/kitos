@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -48,25 +49,44 @@ namespace Core.ApplicationServices.UIConfiguration
 
         public Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters)
         {
-            return GetOrganizationById(parameters.OrganizationId)
+            using var transaction = _transactionManager.Begin();
+            var error = GetOrganizationById(parameters.OrganizationId)
                 .Match(organization =>
                     {
-                        //using var transaction = _transactionManager.Begin();
                         if (!_userContext.HasRole(parameters.OrganizationId, OrganizationRole.LocalAdmin))
-                            return new OperationError("User is not a local admin in organization",OperationFailure.Forbidden);
+                            return new OperationError("User is not a local admin in organization",
+                                OperationFailure.Forbidden);
+
+                        var nodesBefore = organization
+                            .GetUiModuleCustomization(parameters.Module)
+                            .Select(x => x.Nodes.ToList())
+                            .GetValueOrFallback(new List<CustomizedUINode>());
 
                         var result = organization.ModifyModuleCustomization(parameters.Module,
                             MapNodeParametersToCustomizedUiNodes(parameters.Nodes));
+
                         if (result.Failed)
                             return result.Error;
-                        
-                        _repository.Update(organization, result.Value);
-                        //transaction.Commit();
+
+                        var nodesAfter = organization
+                            .GetUiModuleCustomization(parameters.Module)
+                            .Select(x => x.Nodes.ToList())
+                            .GetValueOrFallback(new List<CustomizedUINode>());
+
+                        var deletedNodes = nodesBefore.Except(nodesAfter).ToList();
+
+                        _repository.DeleteNodes(deletedNodes);
+                        _repository.Update(result.Value);
 
                         return Maybe<OperationError>.None;
                     },
                     error => error
                 );
+            if (error.IsNone)
+            {
+                transaction.Commit();
+            }
+            return error;
         }
 
         private Result<Organization, OperationError> GetOrganizationById(int organizationId)
@@ -83,7 +103,7 @@ namespace Core.ApplicationServices.UIConfiguration
 
         private static IEnumerable<CustomizedUINode> MapNodeParametersToCustomizedUiNodes(IEnumerable<CustomUINodeParameters> parameters)
         {
-            return parameters.Select(x => new CustomizedUINode() {Key = x.Key, Enabled = x.Enabled});
+            return parameters.Select(x => new CustomizedUINode { Key = x.Key, Enabled = x.Enabled });
         }
     }
 }

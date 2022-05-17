@@ -1,9 +1,11 @@
-﻿using Core.DomainModel.UIConfiguration;
+﻿using System.Collections.Generic;
+using Core.DomainModel.UIConfiguration;
 
 namespace Core.DomainServices.Repositories.UICustomization
 {
     public interface IUIModuleCustomizationRepository
     {
-        void Update(DomainModel.Organization.Organization organization, UIModuleCustomization uiModuleCustomization);
+        void DeleteNodes(IEnumerable<CustomizedUINode> nodes);
+        void Update(UIModuleCustomization uiModuleCustomization);
     }
 }

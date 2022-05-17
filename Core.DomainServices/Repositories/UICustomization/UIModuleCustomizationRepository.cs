@@ -1,23 +1,37 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using Core.DomainModel.Events;
 using Core.DomainModel.UIConfiguration;
-
 namespace Core.DomainServices.Repositories.UICustomization
 {
     public class UIModuleCustomizationRepository : IUIModuleCustomizationRepository
     {
         private readonly IGenericRepository<UIModuleCustomization> _repository;
+        private readonly IGenericRepository<CustomizedUINode> _nodesRepository;
         private readonly IDomainEvents _domainEvents;
 
-        public UIModuleCustomizationRepository(IGenericRepository<UIModuleCustomization> repository, IDomainEvents domainEvents)
+        public UIModuleCustomizationRepository(
+            IGenericRepository<UIModuleCustomization> repository,
+            IGenericRepository<CustomizedUINode> nodesRepository,
+            IDomainEvents domainEvents)
         {
             _repository = repository;
+            _nodesRepository = nodesRepository;
             _domainEvents = domainEvents;
         }
 
-        public void Update(DomainModel.Organization.Organization organization, UIModuleCustomization uiModuleCustomization)
+        public void DeleteNodes(IEnumerable<CustomizedUINode> nodes)
         {
-            _domainEvents.Raise(new EntityUpdatedEvent<DomainModel.Organization.Organization>(organization));
+            if (nodes == null) throw new ArgumentNullException(nameof(nodes));
+
+            _nodesRepository.RemoveRange(nodes);
+            _repository.Save();
+        }
+
+        public void Update(UIModuleCustomization uiModuleCustomization)
+        {
+            _repository.Update(uiModuleCustomization);
+            _domainEvents.Raise(new EntityUpdatedEvent<UIModuleCustomization>(uiModuleCustomization));
             _repository.Save();
         }
     }

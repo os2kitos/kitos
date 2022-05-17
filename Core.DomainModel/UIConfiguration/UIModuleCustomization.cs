@@ -21,7 +21,7 @@ namespace Core.DomainModel.UIConfiguration
 
         public void UpdateConfigurationNodes(IEnumerable<CustomizedUINode> nodes)
         {
-            nodes.MirrorTo(Nodes, x => x.Key);
+            nodes.MirrorTo(Nodes, x => $"K:{x.Key}_S:{x.Enabled}");
         }
     }
 }

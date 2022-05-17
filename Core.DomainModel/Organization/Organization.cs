@@ -193,7 +193,7 @@ namespace Core.DomainModel.Organization
             //check if every key matches the Regex expression
             var incorrectKeys = customizedUiNodes.Where(x => searchExpression.Matches(x.Key).Count < 1).ToList();
             if (incorrectKeys.Count > 0)
-                return $"One or more keys are incorrect: {string.Join(", ", incorrectKeys)}";
+                return $" One or more keys are incorrect: {string.Join(", ", incorrectKeys)}";
             
             //check if every key is unique
             var groupedKeys = customizedUiNodes.GroupBy(x => x.Key);
