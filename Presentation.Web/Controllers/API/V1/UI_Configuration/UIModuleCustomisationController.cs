@@ -14,11 +14,11 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
 {
     [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationId}/ui-config/modules/{module}")]
-    public class UIModuleConfigurationController : BaseApiController
+    public class UIModuleCustomisationController : BaseApiController
     {
         private readonly IUIModuleCustomizationService _uiVisibilityConfigurationService;
 
-        public UIModuleConfigurationController(IUIModuleCustomizationService uiVisibilityConfigurationService)
+        public UIModuleCustomisationController(IUIModuleCustomizationService uiVisibilityConfigurationService)
         {
             _uiVisibilityConfigurationService = uiVisibilityConfigurationService;
         }

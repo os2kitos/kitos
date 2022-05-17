@@ -68,7 +68,7 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         }
 
         [Fact]
-        public async Task Put_Updates_Data()
+        public async Task Put_Deletes_Nodes()
         {
             var module = A<string>();
             var multipleUiCustomizations= UIConfigurationHelper.PrepareTestUiModuleCustomizationDto(10);

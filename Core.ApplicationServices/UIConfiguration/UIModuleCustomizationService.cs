@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -62,8 +61,7 @@ namespace Core.ApplicationServices.UIConfiguration
                             .Select(x => x.Nodes.ToList())
                             .GetValueOrFallback(new List<CustomizedUINode>());
 
-                        var result = organization.ModifyModuleCustomization(parameters.Module,
-                            MapNodeParametersToCustomizedUiNodes(parameters.Nodes));
+                        var result = organization.ModifyModuleCustomization(parameters.Module, MapNodeParametersToCustomizedUiNodes(parameters.Nodes));
 
                         if (result.Failed)
                             return result.Error;
