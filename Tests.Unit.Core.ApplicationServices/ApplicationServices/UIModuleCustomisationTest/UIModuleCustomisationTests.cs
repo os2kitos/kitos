@@ -143,7 +143,6 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             var module = A<string>();
             var orgUuid = Guid.NewGuid();
 
-            var emptyOrganizationList = new List<Organization>();
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
@@ -174,13 +173,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         {
             var organizationId = A<int>();
             var module = A<string>();
-            var organization = new Organization {Id = organizationId, UIModuleCustomizations = new List<UIModuleCustomization>()};
             var orgUuid = Guid.NewGuid();
-
-            var organizations = new List<Organization>
-            {
-                organization
-            };
 
             ExpectResolveUuidReturns(organizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Success(new Organization()), orgUuid);
