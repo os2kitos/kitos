@@ -37,16 +37,15 @@
         customizedModuleId: Models.UICustomization.CustomizableKitosModule;
         isOpen: boolean;
 
-        static $inject: string[] = ["$scope", "uiCustomizationService", "uiCustomizationStateService"];
+        static $inject: string[] = ["$scope", "uiCustomizationService"];
 
         constructor(
             $scope,
-            private readonly uiCustomizationService: Services.UICustomization.IUICustomizationService,
-            uiCustomizationStateService: Services.UICustomization.IUICustomizationStateService) {
+            private readonly uiCustomizationService: Services.UICustomization.IUICustomizationService) {
             this.isOpen = false;
             this.customizedModuleId = $scope.customizedModuleId;
-            uiCustomizationStateService
-                .getCurrentState(this.customizedModuleId)
+            uiCustomizationService //Load a fresh configuration
+                .loadActiveConfiguration(this.customizedModuleId)
                 .then(customizationModel => {
                     this.customizationModel = customizationModel;
                 });
