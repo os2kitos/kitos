@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
-using Presentation.Web.Models.API.V1.UI_Configuration;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
@@ -37,11 +31,10 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             //Act
             await UIConfigurationHelper.CreateUIModuleAndSaveAsync(TestEnvironment.DefaultOrganizationId, module);
             
-            var data = await UIConfigurationHelper.GetAllAsync(TestEnvironment.DefaultOrganizationId, module);
+            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
 
             //Assert
             Assert.NotNull(data);
-            Assert.Single(data);
         }
 
         [Fact]
@@ -72,6 +65,23 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden ,response.StatusCode);
+        }
+
+        [Fact]
+        public async Task Put_Updates_Data()
+        {
+            var module = A<string>();
+            var multipleUiCustomizations= UIConfigurationHelper.PrepareTestUiModuleCustomizationDto(10);
+            var singleUiCustomization = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto();
+            
+            using var firstPutResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, multipleUiCustomizations);
+            Assert.Equal(HttpStatusCode.NoContent, firstPutResponse.StatusCode);
+
+            using var secondPutResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, singleUiCustomization);
+            Assert.Equal(HttpStatusCode.NoContent, secondPutResponse.StatusCode);
+
+            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
+            Assert.Equal(singleUiCustomization.Nodes.Count(), response.Nodes.Count());
         }
 
         [Fact]
@@ -110,7 +120,7 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             //Arrange
             var module = A<string>();
             var uiModuleCustomizationDto = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto();
-            var (cookie, organization) = await CreatePrerequisitesAsync();
+            var (cookie, _) = await CreatePrerequisitesAsync();
 
             //Act
             using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, uiModuleCustomizationDto, cookie);

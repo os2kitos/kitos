@@ -133,6 +133,8 @@
     <Compile Include="Repositories\Notification\UserNotificationRepository.cs" />
     <Compile Include="Repositories\TaskRefs\ITaskRefRepository.cs" />
     <Compile Include="Repositories\TaskRefs\TaskRefRepository.cs" />
+    <Compile Include="Repositories\UICustomization\IUIModuleCustomizationRepository.cs" />
+    <Compile Include="Repositories\UICustomization\UIModuleCustomizationRepository.cs" />
     <Compile Include="Role\IRoleAssignmentService.cs" />
     <Compile Include="Role\RoleAssignmentService.cs" />
     <Compile Include="SystemUsage\AttachedOptionsAssignmentService.cs" />

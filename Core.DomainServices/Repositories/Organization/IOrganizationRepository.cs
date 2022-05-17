@@ -11,6 +11,5 @@ namespace Core.DomainServices.Repositories.Organization
         Maybe<DomainModel.Organization.Organization> GetById(int id);
         Maybe<DomainModel.Organization.Organization> GetByCvr(string cvrNumber);
         Maybe<DomainModel.Organization.Organization> GetByUuid(Guid uuid);
-        void Update(DomainModel.Organization.Organization organization);
     }
 }

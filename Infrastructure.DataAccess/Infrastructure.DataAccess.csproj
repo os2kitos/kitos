@@ -856,21 +856,9 @@
     <Compile Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.designer.cs">
       <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202205101203187_AddUiVisibilityConfiguration.cs" />
-    <Compile Include="Migrations\202205101203187_AddUiVisibilityConfiguration.designer.cs">
-      <DependentUpon>202205101203187_AddUiVisibilityConfiguration.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205101240150_UpdatedUIModuleCustomization.cs" />
-    <Compile Include="Migrations\202205101240150_UpdatedUIModuleCustomization.designer.cs">
-      <DependentUpon>202205101240150_UpdatedUIModuleCustomization.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205101349457_SplitUIModuleCustomizationResponsibilities.cs" />
-    <Compile Include="Migrations\202205101349457_SplitUIModuleCustomizationResponsibilities.designer.cs">
-      <DependentUpon>202205101349457_SplitUIModuleCustomizationResponsibilities.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.cs" />
-    <Compile Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.designer.cs">
-      <DependentUpon>202205161348373_CascadeUICustomizationOnDelete.cs</DependentUpon>
+    <Compile Include="Migrations\202205170626420_Added_UICustomization.cs" />
+    <Compile Include="Migrations\202205170626420_Added_UICustomization.designer.cs">
+      <DependentUpon>202205170626420_Added_UICustomization.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1429,17 +1417,8 @@
     <EmbeddedResource Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.resx">
       <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205101203187_AddUiVisibilityConfiguration.resx">
-      <DependentUpon>202205101203187_AddUiVisibilityConfiguration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205101240150_UpdatedUIModuleCustomization.resx">
-      <DependentUpon>202205101240150_UpdatedUIModuleCustomization.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205101349457_SplitUIModuleCustomizationResponsibilities.resx">
-      <DependentUpon>202205101349457_SplitUIModuleCustomizationResponsibilities.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205161348373_CascadeUICustomizationOnDelete.resx">
-      <DependentUpon>202205161348373_CascadeUICustomizationOnDelete.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202205170626420_Added_UICustomization.resx">
+      <DependentUpon>202205170626420_Added_UICustomization.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

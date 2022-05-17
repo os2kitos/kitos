@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using Core.Abstractions.Types;
+﻿using Core.Abstractions.Types;
+using Core.ApplicationServices.Model.UiCustomization;
 using Core.DomainModel.UIConfiguration;
 
 namespace Core.ApplicationServices.UIConfiguration
 {
     public interface IUIModuleCustomizationService
     {
-        Result<List<UIModuleCustomization>, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module);
-        Result<UIModuleCustomization, OperationError> Put(int organizationId, string module, UIModuleCustomization configuration);
+        Result<UIModuleCustomization, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module);
+        Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters);
     }
 }

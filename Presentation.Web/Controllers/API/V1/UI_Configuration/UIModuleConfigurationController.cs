@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using Core.ApplicationServices.Model.UiCustomization;
 using Core.ApplicationServices.UIConfiguration;
 using Core.DomainModel.UIConfiguration;
 using Presentation.Web.Infrastructure.Attributes;
@@ -32,7 +33,8 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         {
             return _uiVisibilityConfigurationService
                 .GetModuleConfigurationForOrganization(organizationId, module)
-                .Match(entities => Ok(entities.Select(ToDto).ToList()), FromOperationError);
+                .Select(ToDto)
+                .Match(Ok, FromOperationError);
         }
 
         [HttpPut]
@@ -45,35 +47,24 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         public HttpResponseMessage Put(int organizationId, string module, [FromBody] UIModuleCustomizationDTO dto)
         {
             return _uiVisibilityConfigurationService
-                .Put(
-                    organizationId,
-                    module,
-                    ToEntity(dto, organizationId, module)
+                .UpdateModule(PrepareParameters(dto, organizationId, module)
                 )
-                .Match(_ => NoContent(), FromOperationError);
+                .Match(FromOperationError, NoContent);
         }
-
-        private static UIModuleCustomization ToEntity(
+        
+        private static UIModuleCustomizationParameters PrepareParameters(
             UIModuleCustomizationDTO value,
             int organizationId,
             string module)
         {
-            return new UIModuleCustomization
-            {
-                OrganizationId = organizationId,
-                Module = module,
-                Nodes = value.Nodes.Select(NodeToEntity).ToList()
-            };
+            return new UIModuleCustomizationParameters(organizationId, module,
+                value.Nodes.Select(PrepareNodeParameters).ToList());
         }
 
-        private static CustomizedUINode NodeToEntity(
+        private static CustomUINodeParameters PrepareNodeParameters(
             CustomizedUINodeDTO value)
         {
-            return new CustomizedUINode()
-            {
-                Key = value.Key,
-                Enabled = value.Enabled
-            };
+            return new CustomUINodeParameters(value.Key, value.Enabled);
         }
 
         private static UIModuleCustomizationDTO ToDto(

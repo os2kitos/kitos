@@ -43,6 +43,5 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="enforceDeletion">If set to <c>true</c> any removal conflicts will be ignored and the deletion will proceed</param>
         /// <returns></returns>
         Maybe<OperationError> RemoveOrganization(Guid organizationUuid, bool enforceDeletion);
-        void UpdateOrganizationAndRaizeDomainEvent(Organization organization);
     }
 }

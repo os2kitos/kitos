@@ -290,11 +290,6 @@ namespace Core.ApplicationServices.Organizations
                 });
         }
 
-        public void UpdateOrganizationAndRaizeDomainEvent(Organization organization)
-        {
-            _repository.Update(organization);
-        }
-
         public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
         {
             using var transaction = _transactionManager.Begin();

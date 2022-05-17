@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddUiVisibilityConfiguration : IMigrationMetadata
+    public sealed partial class Added_UICustomization : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddUiVisibilityConfiguration));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_UICustomization));
         
         string IMigrationMetadata.Id
         {
-            get { return "202205101203187_AddUiVisibilityConfiguration"; }
+            get { return "202205170626420_Added_UICustomization"; }
         }
         
         string IMigrationMetadata.Source

@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Core.Abstractions.Extensions;
 
 namespace Core.DomainModel.UIConfiguration
 {
     public class UIModuleCustomization : Entity, IOwnedByOrganization
     {
+        public UIModuleCustomization()
+        {
+            Nodes = new List<CustomizedUINode>();
+        }
         public int OrganizationId { get; set; }
         
         /// <summary>
@@ -20,10 +19,8 @@ namespace Core.DomainModel.UIConfiguration
         public virtual Organization.Organization Organization{ get; set; }
         public virtual ICollection<CustomizedUINode> Nodes { get; set; }
 
-        public void MirrorNodes(ICollection<CustomizedUINode> nodes)
+        public void UpdateConfigurationNodes(IEnumerable<CustomizedUINode> nodes)
         {
-            Nodes ??= new List<CustomizedUINode>();
-
             nodes.MirrorTo(Nodes, x => x.Key);
         }
     }

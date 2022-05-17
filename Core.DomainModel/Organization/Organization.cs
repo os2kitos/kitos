@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.DomainModel.Constants;
 using Core.DomainModel.GDPR;
@@ -50,6 +51,7 @@ namespace Core.DomainModel.Organization
             DataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
             SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
             BelongingSystems = new List<ItSystem.ItSystem>();
+            UIModuleCustomizations = new List<UIModuleCustomization>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -152,38 +154,54 @@ namespace Core.DomainModel.Organization
             return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
         }
 
-        public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, ICollection<CustomizedUINode> nodes)
+        public Maybe<UIModuleCustomization> GetUiModuleCustomization(string module)
         {
-            if(IsAnyKeyInvalid(nodes))
-                return new OperationError(OperationFailure.BadInput);
+            if (module == null)
+                throw new ArgumentNullException(nameof(module));
+            
+            return UIModuleCustomizations
+                .SingleOrDefault(config => config.Module == module)
+                .FromNullable();
+        }
 
-            UIModuleCustomizations ??= new List<UIModuleCustomization>();
-            var moduleCustomization = UIModuleCustomizations.FirstOrDefault(x => string.Equals(x.Module, module));
+        public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
+        {
+            var uiNodes = nodes.ToList();
+            var customizedUiNodes = uiNodes.ToList();
+
+            var keysValidity = CheckKeysValidity(uiNodes);
+            if(keysValidity.HasValue)
+                return new OperationError(keysValidity.Value, OperationFailure.BadInput);
+
+            var moduleCustomization = GetUiModuleCustomization(module).GetValueOrDefault();
             if (moduleCustomization == null)
             {
-                moduleCustomization = new UIModuleCustomization() { OrganizationId = Id, Module = module };
+                moduleCustomization = new UIModuleCustomization { OrganizationId = Id, Module = module };
                 UIModuleCustomizations.Add(moduleCustomization);
             }
 
-            moduleCustomization.MirrorNodes(nodes);
+            moduleCustomization.UpdateConfigurationNodes(customizedUiNodes);
             
             return moduleCustomization;
         }
 
-        private bool IsAnyKeyInvalid(ICollection<CustomizedUINode> configurations)
+        private static Maybe<string> CheckKeysValidity(IEnumerable<CustomizedUINode> configurations)
         {
-            var searchExpresion = new Regex(UIModuleConfigurationConstants.ConfigurationKeyRegex);
+            var customizedUiNodes = configurations.ToList();
+            var searchExpression = new Regex(UIModuleConfigurationConstants.ConfigurationKeyRegex);
             
-            if(!configurations.Any())
-                return true;
-            //check if every key matches the Regex expresion
-            if (configurations.Any(x => searchExpresion.Matches(x.Key).Count < 1))
-                return true;
+            //check if every key matches the Regex expression
+            var incorrectKeys = customizedUiNodes.Where(x => searchExpression.Matches(x.Key).Count < 1).ToList();
+            if (incorrectKeys.Count > 0)
+                return $"One or more keys are incorrect: {string.Join(", ", incorrectKeys)}";
+            
             //check if every key is unique
-            if(configurations.GroupBy(x => x.Key).Any(g => g.Count() > 1))
-                return true;
+            var groupedKeys = customizedUiNodes.GroupBy(x => x.Key);
+            var duplicateKeys = (from keyGroup in groupedKeys where keyGroup.Count() > 1 select keyGroup.Key).ToList();
 
-            return false;
+            return duplicateKeys.Count > 0 
+                ? $"One or more keys are duplicate: {string.Join(",", incorrectKeys)}" 
+                : Maybe<string>.None;
         }
     }
 }
