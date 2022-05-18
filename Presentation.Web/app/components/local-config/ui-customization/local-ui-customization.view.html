@@ -23,7 +23,7 @@
             <tr ng-repeat="tabConfig in ctrl.customizationModel.root.children">
                 <td>
                     <label style="font-weight: normal">
-                        <input type="checkbox" ng-checked="tabConfig.available" ng-disabled="!tabConfig.editable" ng-click="ctrl.toggleSetting(tabConfig.key)" />
+                        <input id="{{::tabConfig.key}}" type="checkbox" ng-checked="tabConfig.available" ng-disabled="!tabConfig.editable" ng-click="ctrl.toggleSetting(tabConfig.key)" />
                         {{:: tabConfig.text}}
                         <span ng-if="tabConfig.helpText" class="help-block small">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
@@ -38,7 +38,7 @@
                 </td>
                 <td ng-if="tabConfig.children.length > 0">
                     <label ng-repeat="fieldConfig in tabConfig.children" style="font-weight: normal">
-                        <input type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)" />
+                        <input id="{{::fieldConfig.key}}" type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)" />
                         {{:: fieldConfig.text}}
                         <span ng-if="fieldConfig.helpText" class="help-block small">
                             <i class="fa fa-info-circle" aria-hidden="true"></i>
