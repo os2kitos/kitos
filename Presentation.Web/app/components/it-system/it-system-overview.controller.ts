@@ -498,7 +498,7 @@
                             return `<a data-ui-sref="it-system.usage.contracts({id: ${dataItem.SourceEntityId}})"><span class="fa ${decorationClass}" aria-hidden="true"></span></a>`;
                         })
                         .withExcelOutput(dataItem => dataItem.MainContractIsActive ? "True" : "")
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
+                        .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
 
                 .withColumn(builder =>
                     builder
@@ -510,7 +510,7 @@
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
+                        .withInclusionCriterion(() => user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.contracts.children.selectContractToDetermineIfItSystemIsActive)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ItSystemRightsHolderName")
@@ -531,7 +531,7 @@
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInclusionCriterion(() => uiState.isBluePrintNodeAvailable(uiBluePrint.children.projects)))
+                        .withInclusionCriterion(() => user.currentConfig.showItProjectModule && user.currentOrganization. uiState.isBluePrintNodeAvailable(uiBluePrint.children.projects)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ObjectOwnerName")
