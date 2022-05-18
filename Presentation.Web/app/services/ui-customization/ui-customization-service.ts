@@ -93,7 +93,7 @@
                                 nodeBluePrint.fullKey,                      //key
                                 nodeBluePrint.text,                         //human readable text
                                 !readOnly && parentAvailable,               //editable
-                                available,                                  //available state
+                                available && parentAvailable,               //available state
                                 readOnly,                                   //readonly
                                 buildChildren(nodeBluePrint, available),    //build children recursively,
                                 nodeBluePrint.helpText                      //help text for the local admin
