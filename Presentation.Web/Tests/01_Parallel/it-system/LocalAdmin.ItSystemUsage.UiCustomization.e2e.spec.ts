@@ -4,7 +4,8 @@ import SystemCatalogHelper = require("../../Helpers/SystemCatalogHelper");
 import OrgHelper = require("../../Helpers/OrgHelper");
 import SystemUsageHelper = require("../../Helpers/SystemUsageHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
-import LocalItSystemNavigationSrefs1 = require("../../Helpers/SideNavigation/LocalItSystemNavigationSrefs");
+import LocalItSystemNavigationSrefs = require("../../Helpers/SideNavigation/LocalItSystemNavigationSrefs");
+import Select2Helper = require("../../Helpers/Select2Helper");
 
 describe("Local admin is able customize the IT-System usage UI", () => {
 
@@ -12,18 +13,8 @@ describe("Local admin is able customize the IT-System usage UI", () => {
     var testFixture = new TestFixtureWrapper();
     var navigation = new NavigationHelper();
 
-    var systemName = createName("SystemName");
-    var orgName = createName("OrgName");
-
     beforeAll(() => {
         testFixture.enableLongRunningTest();
-        return loginHelper.loginAsGlobalAdmin()
-            .then(() => SystemCatalogHelper.createSystem(systemName))
-            .then(() => OrgHelper.createOrg(orgName))
-            .then(() => OrgHelper.activateSystemForOrg(systemName, orgName))
-        //TODO: Make global admin local admin in the new organization
-            .then(() => loginHelper.logout())
-            .then(() => loginHelper.loginAsLocalAdmin());
     });
 
     afterAll(() => {
@@ -32,11 +23,37 @@ describe("Local admin is able customize the IT-System usage UI", () => {
     });
 
     it("Disabling GDPR will hide the GDPR tab", () => {
-        SystemUsageHelper.openLocalSystem(systemName)
-            .then(() => expect(navigation.findSubMenuElement(LocalItSystemNavigationSrefs1.GPDRSref).isPresent()).toBe(true));
+        var systemName = createName("SystemName");
+        var orgName = createName("OrgName");
 
-        //TODO: Extend
+        return loginHelper.loginAsGlobalAdmin()
+            .then(() => SystemCatalogHelper.createSystem(systemName))
+            .then(() => OrgHelper.createOrg(orgName))
+            .then(() => OrgHelper.activateSystemForOrg(systemName, orgName))
+            .then(() => navigation.getPage("/#/global-admin/local-admins"))
+            .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
+            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
+            .then(() => testTabCustomization(systemName, "ItSystemUsages.gdpr", LocalItSystemNavigationSrefs.GPDRSref));
     });
+
+    function testTabCustomization(systemName: string, settingId: string, tabSref: string) {
+        return verifyTabVisibility(systemName, tabSref, true)
+            .then(() => toggleSetting(settingId))
+            .then(() => verifyTabVisibility(systemName, tabSref, false));
+    }
+
+    function verifyTabVisibility(systemName: string, sref: string, expectedToBePresent: boolean) {
+        return SystemUsageHelper.openLocalSystem(systemName)
+            .then(() => expect(navigation.findSubMenuElement(sref).isPresent()).toBe(expectedToBePresent));
+    }
+
+    function toggleSetting(settingId: string) {
+        return navigation.getPage("/#/local-config/system")
+            .then(() => element(by.id("expand_collapse_ItSystemUsages")).click())
+            .then(() => browser.waitForAngular())
+            .then(() => element(by.id(settingId)).click())
+            .then(() => browser.waitForAngular());
+    }
 
     function createName(prefix: string) {
         return `${prefix}_${new Date().getTime()}`;

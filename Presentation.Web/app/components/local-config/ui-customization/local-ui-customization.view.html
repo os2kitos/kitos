@@ -1,6 +1,6 @@
 ﻿<div class="panel panel-default">
     <div class="panel-heading">
-        <a class="task-fold" data-ng-click="ctrl.isOpen = !ctrl.isOpen">
+        <a id="expand_collapse_{{:: ctrl.customizationModel.root.key}}" class="task-fold" data-ng-click="ctrl.isOpen = !ctrl.isOpen">
             <i class="glyphicon small"
                data-ng-class="{'glyphicon-chevron-down': ctrl.isOpen, 'glyphicon-chevron-right': !ctrl.isOpen}"></i>
             {{:: ctrl.customizationModel.root.text}}
