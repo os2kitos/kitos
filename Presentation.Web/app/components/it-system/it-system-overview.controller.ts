@@ -531,7 +531,7 @@
                         .withContentOverflow()
                         .withSourceValueEchoRendering()
                         .withSourceValueEchoExcelOutput()
-                        .withInclusionCriterion(() => user.currentConfig.showItProjectModule && user.currentOrganization. uiState.isBluePrintNodeAvailable(uiBluePrint.children.projects)))
+                        .withInclusionCriterion(() => user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(uiBluePrint.children.projects)))
                 .withColumn(builder =>
                     builder
                         .withDataSourceName("ObjectOwnerName")
