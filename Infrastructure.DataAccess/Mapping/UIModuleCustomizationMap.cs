@@ -16,7 +16,6 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.OrganizationId)
                 .IsRequired();
 
-            //TODO: Change name
             HasIndex(x => new { x.OrganizationId, x.Module })
                 .IsUnique(true)
                 .HasName("UX_OrganizationId_UIModuleCustomization_Module");

@@ -856,13 +856,9 @@
     <Compile Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.designer.cs">
       <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202205170626420_Added_UICustomization.cs" />
-    <Compile Include="Migrations\202205170626420_Added_UICustomization.designer.cs">
-      <DependentUpon>202205170626420_Added_UICustomization.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202205181043141_UIModuleIndex.cs" />
-    <Compile Include="Migrations\202205181043141_UIModuleIndex.designer.cs">
-      <DependentUpon>202205181043141_UIModuleIndex.cs</DependentUpon>
+    <Compile Include="Migrations\202205181142292_Added_UIModuleCustomization.cs" />
+    <Compile Include="Migrations\202205181142292_Added_UIModuleCustomization.designer.cs">
+      <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1421,11 +1417,8 @@
     <EmbeddedResource Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.resx">
       <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205170626420_Added_UICustomization.resx">
-      <DependentUpon>202205170626420_Added_UICustomization.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202205181043141_UIModuleIndex.resx">
-      <DependentUpon>202205181043141_UIModuleIndex.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202205181142292_Added_UIModuleCustomization.resx">
+      <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

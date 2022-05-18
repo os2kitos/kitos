@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class UIModuleIndex : IMigrationMetadata
+    public sealed partial class Added_UIModuleCustomization : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(UIModuleIndex));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(Added_UIModuleCustomization));
         
         string IMigrationMetadata.Id
         {
-            get { return "202205181043141_UIModuleIndex"; }
+            get { return "202205181142292_Added_UIModuleCustomization"; }
         }
         
         string IMigrationMetadata.Source

@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class Added_UICustomization : DbMigration
+    public partial class Added_UIModuleCustomization : DbMigration
     {
         public override void Up()
         {
@@ -13,7 +13,7 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         OrganizationId = c.Int(nullable: false),
-                        Module = c.String(nullable: false),
+                        Module = c.String(nullable: false, maxLength: 200),
                         ObjectOwnerId = c.Int(),
                         LastChanged = c.DateTime(nullable: false, precision: 7, storeType: "datetime2"),
                         LastChangedByUserId = c.Int(),
@@ -22,7 +22,7 @@
                 .ForeignKey("dbo.User", t => t.LastChangedByUserId)
                 .ForeignKey("dbo.User", t => t.ObjectOwnerId)
                 .ForeignKey("dbo.Organization", t => t.OrganizationId, cascadeDelete: true)
-                .Index(t => t.OrganizationId)
+                .Index(t => new { t.OrganizationId, t.Module }, unique: true, name: "UX_OrganizationId_UIModuleCustomization_Module")
                 .Index(t => t.ObjectOwnerId)
                 .Index(t => t.LastChangedByUserId);
             
@@ -61,7 +61,7 @@
             DropIndex("dbo.CustomizedUINodes", new[] { "ModuleId" });
             DropIndex("dbo.UIModuleCustomizations", new[] { "LastChangedByUserId" });
             DropIndex("dbo.UIModuleCustomizations", new[] { "ObjectOwnerId" });
-            DropIndex("dbo.UIModuleCustomizations", new[] { "OrganizationId" });
+            DropIndex("dbo.UIModuleCustomizations", "UX_OrganizationId_UIModuleCustomization_Module");
             DropTable("dbo.CustomizedUINodes");
             DropTable("dbo.UIModuleCustomizations");
         }

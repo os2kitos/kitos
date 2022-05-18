@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.UI_Configuration;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
@@ -43,10 +45,7 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var responseNode = data.Nodes.FirstOrDefault();
             var uiModuleCreateNode = uiModuleCustomization.Nodes.FirstOrDefault();
 
-            Assert.NotNull(responseNode);
-            Assert.NotNull(uiModuleCreateNode);
-            Assert.Equal(responseNode.Key, uiModuleCreateNode.Key);
-            Assert.Equal(responseNode.Enabled, uiModuleCreateNode.Enabled);
+            AssertDtosAreNotNullAndEqual(uiModuleCreateNode, responseNode);
         }
 
         [Fact]
@@ -100,10 +99,7 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var responseNode = response.Nodes.FirstOrDefault();
             var singleUiNode = singleUiCustomization.Nodes.FirstOrDefault();
 
-            Assert.NotNull(responseNode);
-            Assert.NotNull(singleUiNode);
-            Assert.Equal(singleUiNode.Enabled, responseNode.Enabled);
-            Assert.Equal(singleUiNode.Key, responseNode.Key);
+            AssertDtosAreNotNullAndEqual(singleUiNode, responseNode);
         }
 
         [Fact]
@@ -184,7 +180,14 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
                 await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
             return (loginCookie, organization);
         }
-        
+
+        private void AssertDtosAreNotNullAndEqual(CustomizedUINodeDTO dto1, CustomizedUINodeDTO dto2)
+        {
+            Assert.NotNull(dto1);
+            Assert.NotNull(dto2);
+            Assert.Equal(dto1.Enabled, dto2.Enabled);
+            Assert.Equal(dto1.Key, dto2.Key);
+        }
 
         private async Task<OrganizationDTO> CreateOrganizationAsync(OrganizationTypeKeys orgType)
         {
