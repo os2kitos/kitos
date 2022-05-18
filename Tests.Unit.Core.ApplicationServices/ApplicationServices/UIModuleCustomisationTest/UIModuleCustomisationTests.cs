@@ -109,9 +109,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             ExpectTransactionBeginReturns();
             ExpectResolveUuidReturns(uiModule.OrganizationId, orgUuid);
             ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
-
-            Maybe<Organization> test = new Organization();
-
+            
             var result = _uiModuleCustomizationService.UpdateModule(uiModule);
 
             Assert.True(result.HasValue);
@@ -159,8 +157,8 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             var module = A<string>();
             var orgUuid = Guid.NewGuid();
 
-            ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
             ExpectResolveUuidReturns(organizationId, orgUuid);
+            ExpectOrganizationServiceGetReturns(Result<Organization, OperationError>.Failure(OperationFailure.NotFound), orgUuid);
 
             var result = _uiModuleCustomizationService.GetModuleConfigurationForOrganization(organizationId, module);
 
