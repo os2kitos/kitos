@@ -19,7 +19,7 @@
             contracts: {
                 text: "Kontrakter",
                 readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTab,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
                 children: {
                     selectContractToDetermineIfItSystemIsActive: {
                         text: "Hvilken kontrakt skal afgøre om IT systemet er aktivt"
@@ -41,7 +41,7 @@
             projects: {
                 text: "Projekter",
                 readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTab,
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
             },
             advice: {
                 text: "Advis"
