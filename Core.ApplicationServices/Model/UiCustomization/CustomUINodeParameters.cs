@@ -2,8 +2,8 @@
 {
     public class CustomUINodeParameters
     {
-        public string Key { get; set; }
-        public bool Enabled { get; set; }
+        public string Key { get; }
+        public bool Enabled { get; }
 
         public CustomUINodeParameters(string key, bool enabled)
         {

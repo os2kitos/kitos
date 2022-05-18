@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -37,6 +38,9 @@ namespace Core.ApplicationServices.UIConfiguration
 
         public Result<UIModuleCustomization, OperationError> GetModuleConfigurationForOrganization(int organizationId, string module)
         {
+            if (string.IsNullOrEmpty(module))
+                throw new ArgumentNullException("Module parameter is null");
+
             return GetOrganizationById(organizationId)
                 .Bind(organization => organization.GetUiModuleCustomization(module)
                     .Match(
@@ -48,6 +52,9 @@ namespace Core.ApplicationServices.UIConfiguration
 
         public Maybe<OperationError> UpdateModule(UIModuleCustomizationParameters parameters)
         {
+            if(parameters == null)
+                throw new ArgumentNullException("Parameters are null");
+
             using var transaction = _transactionManager.Begin();
             var error = GetOrganizationById(parameters.OrganizationId)
                 .Match(organization =>
@@ -56,20 +63,14 @@ namespace Core.ApplicationServices.UIConfiguration
                             return new OperationError("User is not a local admin in organization",
                                 OperationFailure.Forbidden);
 
-                        var nodesBefore = organization
-                            .GetUiModuleCustomization(parameters.Module)
-                            .Select(x => x.Nodes.ToList())
-                            .GetValueOrFallback(new List<CustomizedUINode>());
+                        var nodesBefore = GetNodesByOrganizationAndModule(organization, parameters.Module);
 
                         var result = organization.ModifyModuleCustomization(parameters.Module, MapNodeParametersToCustomizedUiNodes(parameters.Nodes));
 
                         if (result.Failed)
                             return result.Error;
 
-                        var nodesAfter = organization
-                            .GetUiModuleCustomization(parameters.Module)
-                            .Select(x => x.Nodes.ToList())
-                            .GetValueOrFallback(new List<CustomizedUINode>());
+                        var nodesAfter = GetNodesByOrganizationAndModule(organization, parameters.Module);
 
                         var deletedNodes = nodesBefore.Except(nodesAfter).ToList();
 
@@ -101,7 +102,15 @@ namespace Core.ApplicationServices.UIConfiguration
 
         private static IEnumerable<CustomizedUINode> MapNodeParametersToCustomizedUiNodes(IEnumerable<CustomUINodeParameters> parameters)
         {
-            return parameters.Select(x => new CustomizedUINode { Key = x.Key, Enabled = x.Enabled });
+            return parameters.Select(x => new CustomizedUINode { Key = x.Key, Enabled = x.Enabled }).ToList();
+        }
+
+        private static IEnumerable<CustomizedUINode> GetNodesByOrganizationAndModule(Organization organization, string module)
+        {
+            return organization
+                .GetUiModuleCustomization(module)
+                .Select(x => x.Nodes.ToList())
+                .GetValueOrFallback(new List<CustomizedUINode>());
         }
     }
 }

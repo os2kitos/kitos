@@ -18,8 +18,9 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         public async Task Can_Put()
         {
             var module = A<string>();
+            var (cookie, organization) = await CreatePrerequisitesAsync();
 
-            await UIConfigurationHelper.CreateUIModuleAndSaveAsync(TestEnvironment.DefaultOrganizationId, module);
+            await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
         }
 
         [Fact]
@@ -27,14 +28,25 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
         {
             //Arrange
             var module = A<string>();
-            
+            var (cookie, organization) = await CreatePrerequisitesAsync();
+
             //Act
-            await UIConfigurationHelper.CreateUIModuleAndSaveAsync(TestEnvironment.DefaultOrganizationId, module);
+            var uiModuleCustomization = await UIConfigurationHelper.CreateUIModuleAndSaveAsync(organization.Id, module, cookie);
             
-            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
+            var data = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
 
             //Assert
             Assert.NotNull(data);
+            Assert.Single(data.Nodes);
+            Assert.Single(uiModuleCustomization.Nodes);
+
+            var responseNode = data.Nodes.FirstOrDefault();
+            var uiModuleCreateNode = uiModuleCustomization.Nodes.FirstOrDefault();
+
+            Assert.NotNull(responseNode);
+            Assert.NotNull(uiModuleCreateNode);
+            Assert.Equal(responseNode.Key, uiModuleCreateNode.Key);
+            Assert.Equal(responseNode.Enabled, uiModuleCreateNode.Enabled);
         }
 
         [Fact]
@@ -73,15 +85,49 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var module = A<string>();
             var multipleUiCustomizations= UIConfigurationHelper.PrepareTestUiModuleCustomizationDto(10);
             var singleUiCustomization = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto();
-            
-            using var firstPutResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, multipleUiCustomizations);
+            var (cookie, organization) = await CreatePrerequisitesAsync();
+
+            using var firstPutResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, multipleUiCustomizations, cookie);
             Assert.Equal(HttpStatusCode.NoContent, firstPutResponse.StatusCode);
 
-            using var secondPutResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, singleUiCustomization);
+            using var secondPutResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, singleUiCustomization, cookie);
             Assert.Equal(HttpStatusCode.NoContent, secondPutResponse.StatusCode);
 
-            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(TestEnvironment.DefaultOrganizationId, module);
+            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
             Assert.Equal(singleUiCustomization.Nodes.Count(), response.Nodes.Count());
+            Assert.Single(response.Nodes);
+            
+            var responseNode = response.Nodes.FirstOrDefault();
+            var singleUiNode = singleUiCustomization.Nodes.FirstOrDefault();
+
+            Assert.NotNull(responseNode);
+            Assert.NotNull(singleUiNode);
+            Assert.Equal(singleUiNode.Enabled, responseNode.Enabled);
+            Assert.Equal(singleUiNode.Key, responseNode.Key);
+        }
+
+        [Fact]
+        public async Task Put_Updates_Existing_Nodes()
+        {
+            var module = A<string>();
+            var uiCustomizations= UIConfigurationHelper.PrepareTestUiModuleCustomizationDto(3, "", true);
+            var (cookie, organization) = await CreatePrerequisitesAsync();
+
+            using var firstPutResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, uiCustomizations, cookie);
+            Assert.Equal(HttpStatusCode.NoContent, firstPutResponse.StatusCode);
+
+            foreach (var node in uiCustomizations.Nodes)
+            {
+                node.Enabled = false;
+            }
+
+            using var secondPutResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, uiCustomizations, cookie);
+            Assert.Equal(HttpStatusCode.NoContent, secondPutResponse.StatusCode);
+
+            var response = await UIConfigurationHelper.GetCustomizationByModuleAsync(organization.Id, module);
+            Assert.Equal(uiCustomizations.Nodes.Count(), response.Nodes.Count());
+
+            Assert.True(response.Nodes.All(x => !x.Enabled));
         }
 
         [Fact]
@@ -91,9 +137,10 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var module = A<string>();
             var incorrectKey = "Incorrect_Key123";
             var uiModuleCustomizationDto = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto(1, incorrectKey);
+            var (cookie, organization) = await CreatePrerequisitesAsync();
 
             //Act
-            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, uiModuleCustomizationDto);
+            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, uiModuleCustomizationDto, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.BadRequest, putResponse.StatusCode);
@@ -106,27 +153,28 @@ namespace Tests.Integration.Presentation.Web.UI_Configuration
             var module = A<string>();
             var incorrectOrgId = -1;
             var uiModuleCustomizationDto = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto();
+            var (cookie, _) = await CreatePrerequisitesAsync();
 
             //Act
-            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(incorrectOrgId, module, uiModuleCustomizationDto);
+            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(incorrectOrgId, module, uiModuleCustomizationDto, cookie);
 
             //Assert
             Assert.Equal(HttpStatusCode.NotFound, putResponse.StatusCode);
         }
 
         [Fact]
-        public async Task Put_Returns_Forbidden_If_Unauthorized()
+        public async Task Forbidden_If_User_Is_Not_Local_Admin_In_The_Target_Organization()
         {
-            //Arrange
             var module = A<string>();
             var uiModuleCustomizationDto = UIConfigurationHelper.PrepareTestUiModuleCustomizationDto();
-            var (cookie, _) = await CreatePrerequisitesAsync();
+            var (cookie, organization) = await CreatePrerequisitesAsync();
+            var (_, _, sameOrgCookie) = await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.User, organization.Id);
+            
+            using var otherOrgPutResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, uiModuleCustomizationDto, cookie);
+            Assert.Equal(HttpStatusCode.Forbidden, otherOrgPutResponse.StatusCode);
 
-            //Act
-            using var putResponse = await UIConfigurationHelper.SendPutRequestAsync(TestEnvironment.DefaultOrganizationId, module, uiModuleCustomizationDto, cookie);
-
-            //Assert
-            Assert.Equal(HttpStatusCode.Forbidden, putResponse.StatusCode);
+            using var sameOrgPutResponse = await UIConfigurationHelper.SendPutRequestAsync(organization.Id, module, uiModuleCustomizationDto, sameOrgCookie);
+            Assert.Equal(HttpStatusCode.Forbidden, sameOrgPutResponse.StatusCode);
         }
         
         private async Task<(Cookie loginCookie, OrganizationDTO organization)> CreatePrerequisitesAsync()

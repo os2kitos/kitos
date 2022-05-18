@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
@@ -16,12 +17,11 @@ using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
+namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomizationTest
 {
-    public class UIModuleCustomisationTests : WithAutoFixture
+    public class UIModuleCustomizationTests : WithAutoFixture
     {
         private readonly Mock<ITransactionManager> _transactionManagerMock;
-        private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IOrganizationalUserContext> _userContextMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<IEntityIdentityResolver> _identityResolverMock;
@@ -29,10 +29,9 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
 
         private readonly UIModuleCustomizationService _uiModuleCustomizationService;
 
-        public UIModuleCustomisationTests()
+        public UIModuleCustomizationTests()
         {
             _transactionManagerMock = new Mock<ITransactionManager>();
-            _authorizationContextMock = new Mock<IAuthorizationContext>();
             _userContextMock = new Mock<IOrganizationalUserContext>();
             _organizationServiceMock = new Mock<IOrganizationService>();
             _identityResolverMock = new Mock<IEntityIdentityResolver>();
@@ -54,7 +53,7 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         [InlineData("Test.?")]
         [InlineData("?.?")]
         [InlineData("_")]
-        public void ModuleCustomisation_Returns_BadInput_When_Key_Is_Incorrect(string key)
+        public void ModuleCustomization_Returns_BadInput_When_Key_Is_Incorrect(string key)
         {
             //arrange
             var module = A<string>();
@@ -70,11 +69,11 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
         }
         
         [Fact]
-        public void ModuleCustomisation_Returns_BadInput_When_Nodes_Contain_Duplicates()
+        public void ModuleCustomization_Returns_BadInput_When_Nodes_Contain_Duplicates()
         {
             //arrange
             var module = A<string>();
-            var organization = new Organization(){Id = 1};
+            var organization = new Organization{Id = 1};
             var testKey = "Test.Key";
             var nodes = PrepareTestNodes(2, testKey);
 
@@ -85,9 +84,23 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.BadInput, result.Error.FailureType);
         }
+        
+        [Fact]
+        public void ModuleCustomization_References_Correct_Organization_After_Creating()
+        {
+            //arrange
+            var module = A<string>();
+            var organization = new Organization{Id = 1};
+            var nodes = PrepareTestNodes();
+
+            //act
+            var result = organization.ModifyModuleCustomization(module, nodes);
+            //assert
+            Assert.Equal(organization.Id, result.Value.Organization.Id);
+        }
 
         [Fact]
-        public void ModuleCustomisation_Mirrors_The_Nodes()
+        public void ModuleCustomization_Mirrors_The_Nodes()
         {
             var module = A<string>();
             var organization = new Organization{Id = 1};
@@ -96,8 +109,18 @@ namespace Tests.Unit.Core.ApplicationServices.UIModuleCustomisationTest
             var result = organization.ModifyModuleCustomization(module, nodes);
 
             Assert.True(result.Ok);
-            Assert.Equal(nodes.Count, result.Value.Nodes.Count);
-            Assert.NotNull(organization.UIModuleCustomizations);
+            var resultValue = result.Value;
+            Assert.Equal(nodes.Count, resultValue.Nodes.Count);
+
+            Assert.Single(resultValue.Nodes);
+
+            var resultNode = resultValue.Nodes.FirstOrDefault();
+            var defaultNode = nodes.FirstOrDefault();
+
+            Assert.NotNull(resultNode);
+            Assert.NotNull(defaultNode);
+            Assert.Equal(resultNode.Key, defaultNode.Key);
+            Assert.Equal(resultNode.Enabled, defaultNode.Enabled);
         }
 
         [Fact]

@@ -15,10 +15,9 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
     {
         private static readonly Random _random = new Random(DateTime.Now.Millisecond);
 
-        public static async Task<HttpResponseMessage> SendPutRequestAsync(int organizationId, string module, UIModuleCustomizationDTO body, Cookie optionalLogin = null)
+        public static async Task<HttpResponseMessage> SendPutRequestAsync(int organizationId, string module, UIModuleCustomizationDTO body, Cookie optionalLogin)
         {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
-            return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}"), cookie, body);
+            return await HttpApi.PutWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}"), optionalLogin, body);
         }
 
         public static async Task<UIModuleCustomizationDTO> GetCustomizationByModuleAsync(int organizationId, string module)
@@ -29,7 +28,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
         }
 
         public static async Task<UIModuleCustomizationDTO> CreateUIModuleAndSaveAsync(int organizationId, string module,
-            Cookie optionalLogin = null)
+            Cookie optionalLogin)
         {
             var dto = PrepareTestUiModuleCustomizationDto();
             using var response = await SendPutRequestAsync(organizationId, module, dto, optionalLogin);
@@ -40,7 +39,7 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
 
         public static async Task<HttpResponseMessage> SendGetRequestAsync(int organizationId, string module, Cookie optionalLogin = null)
         {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.LocalAdmin);
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/v1/organizations/{organizationId}/ui-config/modules/{module}"), cookie);
         }
@@ -53,14 +52,18 @@ namespace Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration
             };
         }
         
-        public static List<CustomizedUINodeDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false, params string[] keys)
+        public static List<CustomizedUINodeDTO> PrepareTestNodes(int numberOfElements = 1, string key = "", bool isEnabled = false)
         {
+            if (numberOfElements < 1)
+                throw new ArgumentNullException("NumberOfElements cannot be lower than 1");
+
             var nodes = new List<CustomizedUINodeDTO>();
             for (var i = 1; i <= numberOfElements; i++)
             {
-                key = string.IsNullOrEmpty(key) ? RandomString(i) : key;
-                nodes.Add(new CustomizedUINodeDTO { Key = key, Enabled = isEnabled });
-                key = "";
+                //if the "key" parameter is empty create a random new key, otherwise use the parameter
+                //node key can only contain letters and dots
+                var nodeKey = string.IsNullOrEmpty(key) ? RandomString(numberOfElements) : key;
+                nodes.Add(new CustomizedUINodeDTO { Key = nodeKey, Enabled = isEnabled });
             }
 
             return nodes;

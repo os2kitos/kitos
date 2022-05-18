@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using Core.Abstractions.Types;
-using Core.DomainModel.Events;
 using Core.DomainServices.Extensions;
 
 

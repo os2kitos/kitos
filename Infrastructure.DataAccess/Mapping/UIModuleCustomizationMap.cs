@@ -8,12 +8,19 @@ namespace Infrastructure.DataAccess.Mapping
         public UIModuleCustomizationMap()
         {
             HasKey(x => x.Id);
-
+            
             Property(x => x.Module)
+                .HasMaxLength(UIModuleCustomizationConstraints.MaxModuleLength)
                 .IsRequired();
+
             Property(x => x.OrganizationId)
                 .IsRequired();
-            
+
+            //TODO: Change name
+            HasIndex(x => new { x.OrganizationId, x.Module })
+                .IsUnique(true)
+                .HasName("UX_OrganizationId_UIModuleCustomization_Module");
+
             HasRequired(t => t.Organization)
                 .WithMany(t => t.UIModuleCustomizations)
                 .HasForeignKey(d => d.OrganizationId)

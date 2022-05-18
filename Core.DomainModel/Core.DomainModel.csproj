@@ -277,6 +277,7 @@
     <Compile Include="TrafficLight.cs" />
     <Compile Include="UIConfiguration\CustomizedUINode.cs" />
     <Compile Include="UIConfiguration\UIModuleCustomization.cs" />
+    <Compile Include="UIConfiguration\UIModuleCustomizationConstraints.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>

@@ -14,13 +14,13 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
 {
     [InternalApi]
     [RoutePrefix("api/v1/organizations/{organizationId}/ui-config/modules/{module}")]
-    public class UIModuleCustomisationController : BaseApiController
+    public class UIModuleCustomizationController : BaseApiController
     {
-        private readonly IUIModuleCustomizationService _uiVisibilityConfigurationService;
+        private readonly IUIModuleCustomizationService _uiModuleCustomizationServiceService;
 
-        public UIModuleCustomisationController(IUIModuleCustomizationService uiVisibilityConfigurationService)
+        public UIModuleCustomizationController(IUIModuleCustomizationService uiModuleCustomizationServiceService)
         {
-            _uiVisibilityConfigurationService = uiVisibilityConfigurationService;
+            _uiModuleCustomizationServiceService = uiModuleCustomizationServiceService;
         }
 
         [HttpGet]
@@ -31,7 +31,7 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public HttpResponseMessage Get(int organizationId, string module)
         {
-            return _uiVisibilityConfigurationService
+            return _uiModuleCustomizationServiceService
                 .GetModuleConfigurationForOrganization(organizationId, module)
                 .Select(ToDto)
                 .Match(Ok, FromOperationError);
@@ -46,7 +46,10 @@ namespace Presentation.Web.Controllers.API.V1.UI_Configuration
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         public HttpResponseMessage Put(int organizationId, string module, [FromBody] UIModuleCustomizationDTO dto)
         {
-            return _uiVisibilityConfigurationService
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            return _uiModuleCustomizationServiceService
                 .UpdateModule(PrepareParameters(dto, organizationId, module)
                 )
                 .Match(FromOperationError, NoContent);

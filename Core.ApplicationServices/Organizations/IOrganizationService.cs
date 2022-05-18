@@ -35,7 +35,6 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="organizationUuid"></param>
         /// <returns></returns>
         Result<OrganizationRemovalConflicts, OperationError> ComputeOrganizationRemovalConflicts(Guid organizationUuid);
-
         /// <summary>
         /// Removes an organization
         /// </summary>
