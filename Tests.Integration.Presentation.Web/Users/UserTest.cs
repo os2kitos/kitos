@@ -125,8 +125,14 @@ namespace Tests.Integration.Presentation.Web.Users
         public async Task Delete_User()
         {
             var (cookie, userId, organization) = await CreatePrerequisitesAsync();
+            var name = A<string>();
 
-            await RightsHelper.AddUserRight(userId, organization.Id, RightsType.ItContractRights);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
+            await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
+            await RightsHelper.AddOrganizationRoleToUser(userId, organization.Id);
+
             var res = await UserHelper.SendDeleteUserAsync(userId);
 
             Assert.Equal(HttpStatusCode.OK, res.StatusCode);

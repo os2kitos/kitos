@@ -297,6 +297,8 @@ namespace Core.ApplicationServices
             if (!_authorizationContext.AllowDelete(user))
                 return Maybe<OperationError>.Some(new OperationError(OperationFailure.Forbidden));
 
+            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
+
             Delete(user);
             _domainEvents.Raise(new AccessRightsChanged(user.Id));
             _userRepository.Save();
@@ -319,20 +321,12 @@ namespace Core.ApplicationServices
 
 
             //TODO: Check cascades
-            user.ItContractRights.Clear();
-            /*
-            user.ItProjectRights.Clear();
-            user.DataProcessingRegistrationRights.Clear();
-            user.ItSystemRights.Clear();
-            user.OrganizationRights.Clear();
-            user.OrganizationUnitRights.Clear();
             user.ItProjectStatuses.Clear();
             user.ResponsibleForCommunications.Clear();
             user.HandoverParticipants.Clear();
             user.LifeCycleTrackingEvents.Clear();
             user.ResponsibleForRisks.Clear();
             user.SsoIdentities.Clear();
-            user.PasswordResetRequests.Clear();*/
         }
     }
 }

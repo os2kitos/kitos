@@ -10,9 +10,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
     {
         ItContractRights = 1,
         ItProjectRights = 2,
-        DprRights = 3,
-        ItSystemRights = 4,
-        OrganizationRights = 5,
-        OrganizationUnitRights = 6
+        ItSystemRights = 3,
+        OrganizationUnitRights = 4
     }
 }
