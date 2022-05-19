@@ -10,6 +10,7 @@ namespace Presentation.Web.Models.API.V1.ItSystemUsageMigration
         public IEnumerable<NamedEntityDTO> AffectedItProjects { get; set; }
         public IEnumerable<NamedEntityDTO> AffectedContracts { get; set; }
         public IEnumerable<RelationMigrationDTO> AffectedRelations { get; set; }
+        public IEnumerable<NamedEntityDTO> AffectedDataProcessingRegistrations { get; set; }
 
     }
 }

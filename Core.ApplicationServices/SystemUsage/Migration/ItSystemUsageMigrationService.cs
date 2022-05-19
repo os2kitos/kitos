@@ -13,7 +13,6 @@ using Infrastructure.Services.DataAccess;
 using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.SystemUsage.Relations;
@@ -28,10 +27,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
         private readonly ILogger _logger;
         private readonly IItSystemRepository _systemRepository;
         private readonly IItSystemUsageRepository _systemUsageRepository;
-        private readonly IItSystemUsageService _itSystemUsageService;
         private readonly IItsystemUsageRelationsService _itsystemUsageRelationsService;
         private readonly IDomainEvents _domainEvents;
-
 
         public ItSystemUsageMigrationService(
             IAuthorizationContext authorizationContext,
@@ -39,7 +36,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             ILogger logger,
             IItSystemRepository systemRepository,
             IItSystemUsageRepository systemUsageRepository,
-            IItSystemUsageService itSystemUsageService,
             IItsystemUsageRelationsService itsystemUsageRelationsService,
             IDomainEvents domainEvents)
         {
@@ -48,7 +44,6 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             _logger = logger;
             _systemRepository = systemRepository;
             _systemUsageRepository = systemUsageRepository;
-            _itSystemUsageService = itSystemUsageService;
             _itsystemUsageRelationsService = itsystemUsageRelationsService;
             _domainEvents = domainEvents;
         }
@@ -125,10 +120,13 @@ namespace Core.ApplicationServices.SystemUsage.Migration
             }
 
             // Get contracts
-            var contracts = itSystemUsage.Contracts.Select(x => x.ItContract);
+            var contracts = itSystemUsage.Contracts.Select(x => x.ItContract).ToList();
 
             // Map relations
             var relationMigrations = GetRelationMigrations(itSystemUsage);
+
+            // Data processing registrations
+            var dprs = itSystemUsage.AssociatedDataProcessingRegistrations.ToList();
 
             return new ItSystemUsageMigration(
                 systemUsage: itSystemUsage,
@@ -136,7 +134,8 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 toItSystem: toItSystem,
                 affectedProjects: itSystemUsage.ItProjects,
                 affectedContracts: contracts,
-                affectedRelations: relationMigrations);
+                affectedRelations: relationMigrations,
+                affectedDataProcessingRegistrations: dprs);
         }
 
         public Result<ItSystemUsage, OperationFailure> ExecuteSystemUsageMigration(int usageSystemId, int toSystemId)
@@ -146,69 +145,68 @@ namespace Core.ApplicationServices.SystemUsage.Migration
                 return OperationFailure.Forbidden;
             }
 
-            using (var transaction = _transactionManager.Begin())
+            using var transaction = _transactionManager.Begin();
+
+            try
             {
-                try
+                // **********************************
+                // *** Check migration conditions ***
+                // **********************************
+
+                // If migration description cannot be retrieved, bail out
+                var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
+                if (migrationConsequences.Ok == false)
                 {
-                    // **********************************
-                    // *** Check migration conditions ***
-                    // **********************************
+                    return migrationConsequences.Error;
+                }
+                var migration = migrationConsequences.Value;
+                var systemUsage = migration.SystemUsage;
+                var oldSystem = migration.FromItSystem;
+                var newSystem = migration.ToItSystem;
 
-                    // If migration description cannot be retrieved, bail out
-                    var migrationConsequences = GetSystemUsageMigration(usageSystemId, toSystemId);
-                    if (migrationConsequences.Ok == false)
-                    {
-                        return migrationConsequences.Error;
-                    }
-                    var migration = migrationConsequences.Value;
-                    var systemUsage = migration.SystemUsage;
-                    var oldSystem = migration.FromItSystem;
-                    var newSystem = migration.ToItSystem;
+                //If modification of the target usage is not allowed, bail out
+                if (!_authorizationContext.AllowModify(systemUsage))
+                {
+                    return OperationFailure.Forbidden;
+                }
 
-                    //If modification of the target usage is not allowed, bail out
-                    if (!_authorizationContext.AllowModify(systemUsage))
-                    {
-                        return OperationFailure.Forbidden;
-                    }
-
-                    // If target equals current system, bail out
-                    if (systemUsage.ItSystemId == migration.ToItSystem.Id)
-                    {
-                        return systemUsage;
-                    }
-
-                    // *************************
-                    // *** Perform migration ***
-                    // *************************
-
-                    // Delete UsedByRelation interfaces
-                    var relationsMigrated = PerformRelationMigrations(migration);
-                    if (relationsMigrated == false)
-                    {
-                        transaction.Rollback();
-                        return OperationFailure.UnknownError;
-                    }
-                    //***********************************************
-                    //Perform final switchover of "source IT-System"
-                    //***********************************************
-
-                    // Switch the ID
-                    systemUsage.ItSystemId = toSystemId;
-                    _systemUsageRepository.Update(systemUsage);
-
-                    //Raise events for all affected roots
-                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
-                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem));
-                    _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem));
-                    transaction.Commit();
+                // If target equals current system, bail out
+                if (systemUsage.ItSystemId == migration.ToItSystem.Id)
+                {
                     return systemUsage;
                 }
-                catch (Exception e)
+
+                // *************************
+                // *** Perform migration ***
+                // *************************
+
+                // Delete UsedByRelation interfaces
+                var relationsMigrated = PerformRelationMigrations(migration);
+                if (relationsMigrated == false)
                 {
-                    _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
                     transaction.Rollback();
                     return OperationFailure.UnknownError;
                 }
+                //***********************************************
+                //Perform final switchover of "source IT-System"
+                //***********************************************
+
+                // Switch the ID
+                systemUsage.ItSystemId = toSystemId;
+                _systemUsageRepository.Update(systemUsage);
+
+                //Raise events for all affected roots
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystemUsage>(systemUsage));
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(oldSystem));
+                _domainEvents.Raise(new EntityUpdatedEvent<ItSystem>(newSystem));
+                transaction.Commit();
+                return systemUsage;
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e, $"Migrating usageSystem with id: {usageSystemId}, to system with id: {toSystemId} failed");
+                transaction.Rollback();
+                return OperationFailure.UnknownError;
             }
         }
 
