@@ -65,10 +65,9 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _transactionManager.Object,
                 _repositoryMock.Object,
+                Mock.Of<IOrganizationRightsService>(),
                 _orgUnitServiceMock.Object,
                 _domainEventsMock.Object);
-                _orgUnitServiceMock.Object,
-                Mock.Of<IOrganizationRightsService>());
         }
 
         [Fact]

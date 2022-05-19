@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.External.Rights;
+using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -122,7 +124,20 @@ namespace Tests.Integration.Presentation.Web.Users
         [Fact]
         public async Task Delete_User()
         {
+            var (cookie, userId, organization) = await CreatePrerequisitesAsync();
 
+            await RightsHelper.AddUserRight(userId, organization.Id, RightsType.ItContractRights);
+            var res = await UserHelper.SendDeleteUserAsync(userId);
+
+            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+        }
+
+        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization)> CreatePrerequisitesAsync()
+        {
+            var organization = await CreateOrganizationAsync();
+            var (userId, _, loginCookie) =
+                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+            return (loginCookie, userId, organization);
         }
 
         private async Task<(int userId, string userEmail, string orgName)> CreateStakeHolderUserInNewOrganizationAsync(bool hasApiAccess, bool hasStakeholderAccess)

@@ -43,8 +43,7 @@ namespace Core.ApplicationServices.Organizations
             ILogger logger,
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
-            IOrgUnitService orgUnitService,
-            IOrganizationRightsService organizationRightsService)
+            IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
             IDomainEvents domainEvents)
         {

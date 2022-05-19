@@ -319,8 +319,9 @@ namespace Core.ApplicationServices
 
 
             //TODO: Check cascades
-            user.ItProjectRights.Clear();
             user.ItContractRights.Clear();
+            /*
+            user.ItProjectRights.Clear();
             user.DataProcessingRegistrationRights.Clear();
             user.ItSystemRights.Clear();
             user.OrganizationRights.Clear();
@@ -331,6 +332,7 @@ namespace Core.ApplicationServices
             user.LifeCycleTrackingEvents.Clear();
             user.ResponsibleForRisks.Clear();
             user.SsoIdentities.Clear();
+            user.PasswordResetRequests.Clear();*/
         }
     }
 }

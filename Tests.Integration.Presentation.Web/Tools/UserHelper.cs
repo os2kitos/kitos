@@ -37,5 +37,11 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
         }
+
+        public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
+        }
     }
 }
