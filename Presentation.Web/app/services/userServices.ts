@@ -47,8 +47,13 @@
         _user: Kitos.Services.IUser = null;
         _loadUserDeferred = null;
 
-        static $inject = ["$http", "$window", "$q", "$rootScope", "$uibModal", "_"];
-        constructor(private $http: ng.IHttpService, private $window: ng.IWindowService, private $q: ng.IQService, private $rootScope, private $uibModal: ng.ui.bootstrap.IModalService, private _: _.LoDashStatic) {
+        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly $q: ng.IQService,
+            private readonly $rootScope,
+            private readonly $uibModal: ng.ui.bootstrap.IModalService,
+            private readonly _: _.LoDashStatic) {
         }
 
         saveUser = (user, orgAndDefaultUnit) => {

@@ -7,7 +7,8 @@ class SystemUsageHelper {
         console.log(`open details for local system: ${name}`);
         return SystemUsageHelper.pageObject.getPage()
             .then(() => SystemUsageHelper.waitForKendoGrid())
-            .then(() => SystemUsageHelper.findCatalogColumnsFor(name).first().click());
+            .then(() => SystemUsageHelper.findCatalogColumnsFor(name).first().click())
+            .then(() => browser.waitForAngular());
     }
 
     static findCatalogColumnsFor(name: string) {
