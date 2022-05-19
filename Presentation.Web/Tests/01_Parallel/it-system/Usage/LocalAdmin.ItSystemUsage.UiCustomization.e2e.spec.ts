@@ -24,7 +24,7 @@ describe("Local admin is able customize the IT-System usage UI", () => {
 
     var localSystemPath: string | null = null;
 
-    it("Disabling Tabs will hide the tabs on the IT-System details page", () => {
+    it("Disabling Tabs/fields will hide the tabs/fields on the IT-System details page", () => {
         var systemName = createName("SystemName");
         var orgName = createName("OrgName");
 
@@ -44,7 +44,8 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => testTabCustomization(systemName, "ItSystemUsages.hierarchy", LocalItSystemNavigationSrefs.hierarchySref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.systemRoles", LocalItSystemNavigationSrefs.rolesSref))
             .then(() => testTabCustomization(systemName, "ItSystemUsages.localKle", LocalItSystemNavigationSrefs.kleSref))
-            .then(() => testTabCustomization(systemName, "ItSystemUsages.localReferences", LocalItSystemNavigationSrefs.referencesSref));
+            .then(() => testTabCustomization(systemName, "ItSystemUsages.localReferences", LocalItSystemNavigationSrefs.referencesSref))
+            .then(() => testFieldCustomization(systemName, "ItSystemUsages.contracts.selectContractToDetermineIfItSystemIsActive", LocalItSystemNavigationSrefs.contractsSref, "selectMainContractSection"));
     });
 
     function testTabCustomization(systemName: string, settingId: string, tabSref: string) {
@@ -54,8 +55,14 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             .then(() => verifyTabVisibility(systemName, tabSref, false));   //Verify that the tab has now been hidden
     }
 
-    function verifyTabVisibility(systemName: string, tabSref: string, expectedToBePresent: boolean) {
-        console.log("verifyTabVisibility for ", systemName, " and tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
+    function testFieldCustomization(systemName: string, settingId: string, tabSref: string, settingElementId: string) {
+        console.log("testFieldCustomization for ", systemName, " and tabSref:", tabSref, " settingId:", settingId);
+        return verifySettingVisibility(systemName, tabSref, settingElementId, true)                //Check that the setting is visible before the change
+            .then(() => toggleSetting(settingId))                                                   //Toggle the setting
+            .then(() => verifySettingVisibility(systemName, tabSref, settingElementId, false));     //Verify that the setting has now been hidden
+    }
+
+    function navigateToSystemUsage(systemName: string) {
         let navigationPromise;
 
         if (localSystemPath === null) {
@@ -67,9 +74,24 @@ describe("Local admin is able customize the IT-System usage UI", () => {
             // Save some time going directly to the system in stead of going through kendo
             navigationPromise = navigation.getPage(localSystemPath);
         }
+        return navigationPromise;
+    }
 
-        return navigationPromise
+    function verifyTabVisibility(systemName: string, tabSref: string, expectedToBePresent: boolean) {
+        console.log("verifyTabVisibility for ", systemName, " and tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
+
+        return navigateToSystemUsage(systemName)
             .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(expectedToBePresent, `Failed to validate tab:${tabSref} to be ${expectedToBePresent ? "_present_" : "_removed_"}`));
+    }
+
+    function verifySettingVisibility(systemName: string, tabSref: string, settingElementId: string, expectedToBePresent: boolean) {
+        console.log("verifySettingVisibility for ", systemName, " and field",settingElementId," located on tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
+
+        return navigateToSystemUsage(systemName)
+            .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(true, `Tab ${tabSref} containing setting ${settingElementId} is not present`))
+            .then(() => navigation.findSubMenuElement(tabSref).click())
+            .then(() => browser.waitForAngular())
+            .then(() => expect(element(by.id(settingElementId)).isPresent()).toBe(expectedToBePresent, `Setting: ${settingElementId} failed to meet expected visibility of ${expectedToBePresent}`));
     }
 
     function toggleSetting(settingId: string) {
