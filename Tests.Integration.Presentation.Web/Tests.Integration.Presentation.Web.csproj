@@ -177,6 +177,7 @@
     <Compile Include="Tools\HttpCommandAssertionHelper.cs" />
     <Compile Include="Tools\InterfaceExhibitHelper.cs" />
     <Compile Include="Tools\InterfaceHelper.cs" />
+    <Compile Include="Tools\Internal\UI_Configuration\UIConfigurationHelper.cs" />
     <Compile Include="Tools\ItContractHelper.cs" />
     <Compile Include="Tools\ItProjectHelper.cs" />
     <Compile Include="Tools\ItSystemHelper.cs" />
@@ -201,6 +202,7 @@
     <Compile Include="Tools\External\OrganizationV2Helper.cs" />
     <Compile Include="Tools\UserHelper.cs" />
     <Compile Include="Tools\XUnit\SequentialTestGroup.cs" />
+    <Compile Include="UI_Configuration\UIConfigurationTests.cs" />
     <Compile Include="Users\UserTest.cs" />
   </ItemGroup>
   <ItemGroup>

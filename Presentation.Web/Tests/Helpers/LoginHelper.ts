@@ -35,6 +35,10 @@ class Login {
         return this.getCredentialsMap().localAdmin;
     }
 
+    public getGlobalAdminCredentials() {
+        return this.getCredentialsMap().globalAdmin;
+    }
+
     private getCredentialsMap() {
         return {
             globalAdmin: this.getCredentials(0),

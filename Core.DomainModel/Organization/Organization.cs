@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
+using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
+using Core.DomainModel.Constants;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
 using Core.DomainModel.ItSystem;
@@ -9,6 +12,7 @@ using Core.DomainModel.ItSystemUsage.Read;
 using Core.DomainModel.Notification;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Tracking;
+using Core.DomainModel.UIConfiguration;
 
 
 // ReSharper disable VirtualMemberCallInConstructor
@@ -47,6 +51,7 @@ namespace Core.DomainModel.Organization
             DataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
             SubDataProcessorForDataProcessingRegistrations = new List<DataProcessingRegistration>();
             BelongingSystems = new List<ItSystem.ItSystem>();
+            UIModuleCustomizations = new List<UIModuleCustomization>();
         }
         public string Name { get; set; }
         public string Phone { get; set; }
@@ -125,6 +130,9 @@ namespace Core.DomainModel.Organization
         public virtual ICollection<LifeCycleTrackingEvent> LifeCycleTrackingEventsWhereOrganizationIsRightsHolder { get; set; }
         public virtual ICollection<DataResponsible> DataResponsibles { get; set; }
         public virtual ICollection<DataProtectionAdvisor> DataProtectionAdvisors { get; set; }
+
+        public virtual ICollection<UIModuleCustomization> UIModuleCustomizations { get; set; }
+
         /// <summary>
         /// Determines if this is the "Default" organization in KITOS
         /// </summary>
@@ -144,6 +152,41 @@ namespace Core.DomainModel.Organization
         public Maybe<OrganizationUnit> GetOrganizationUnit(Guid organizationUnitId)
         {
             return OrgUnits.FirstOrDefault(unit => unit.Uuid == organizationUnitId);
+        }
+
+        public Maybe<UIModuleCustomization> GetUiModuleCustomization(string module)
+        {
+            if (module == null)
+                throw new ArgumentNullException(nameof(module));
+            
+            return UIModuleCustomizations
+                .SingleOrDefault(config => config.Module == module)
+                .FromNullable();
+        }
+
+        public Result<UIModuleCustomization, OperationError> ModifyModuleCustomization(string module, IEnumerable<CustomizedUINode> nodes)
+        {
+            if (string.IsNullOrEmpty(module))
+                throw new ArgumentNullException("Module parameter cannot be null");
+            if (nodes == null)
+                throw new ArgumentNullException("Nodes parameter cannot be null");
+            
+            var uiNodes = nodes.ToList();
+            var customizedUiNodes = uiNodes.ToList();
+            
+            var moduleCustomization = GetUiModuleCustomization(module).GetValueOrDefault();
+            if (moduleCustomization == null)
+            {
+                moduleCustomization = new UIModuleCustomization {Organization = this, Module = module};
+                UIModuleCustomizations.Add(moduleCustomization);
+            }
+
+            var nodeUpdateResult = moduleCustomization.UpdateConfigurationNodes(customizedUiNodes);
+
+            if (nodeUpdateResult.HasValue)
+                return nodeUpdateResult.Value;
+
+            return moduleCustomization;
         }
     }
 }
