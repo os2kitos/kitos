@@ -24,7 +24,7 @@ describe("Local admin is able customize the IT-System usage UI", () => {
 
     var localSystemPath: string | null = null;
 
-    it("Disabling Tabs/field will hide the tabs/field on the IT-System details page", () => {
+    it("Disabling Tabs/fields will hide the tabs/fields on the IT-System details page", () => {
         var systemName = createName("SystemName");
         var orgName = createName("OrgName");
 
