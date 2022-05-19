@@ -7,8 +7,8 @@
         });
     }]);
 
-    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "notify", "entityMapper", "uiState",
-        ($scope, $http, itSystemUsage, notify, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
+    app.controller("system.EditContracts", ["$scope", "$http", "itSystemUsage", "entityMapper", "uiState", "apiUseCaseFactory",
+        ($scope, $http, itSystemUsage, entityMapper, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, apiUseCaseFactory: Kitos.Services.Generic.IApiUseCaseFactory) => {
             var usageId = itSystemUsage.id;
 
             $scope.usage = itSystemUsage;
@@ -19,28 +19,20 @@
                 if (itSystemUsage.mainContractId === id || _.isUndefined(id)) {
                     return;
                 }
-                var msg = notify.addInfoMessage("Gemmer... ");
                 if (id) {
-                    $http.post("api/ItContractItSystemUsage/?contractId=" + id + "&usageId=" + usageId)
-                        .then(function onSuccess(result) {
-                            msg.toSuccessMessage("Gemt!");
-                            var contracts = itSystemUsage.contracts;
-                            var match = contracts && contracts.find(x => { return x.id === id });
+                    apiUseCaseFactory
+                        .createAssignmentCreation(() => $http.post(`api/ItContractItSystemUsage/?contractId=${id}&usageId=${usageId}`))
+                        .executeAsync((_) => {
+                            const contracts = itSystemUsage.contracts;
+                            const match = contracts && contracts.find(x => { return x.id === id });
                             itSystemUsage.mainContractIsActive = match && match.isActive;
-                        },
-                            function onError(result) {
-                                msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
-                            });
+                        }
+                        );
                     itSystemUsage.mainContractId = id;
                 } else {
-                    $http.delete("api/ItContractItSystemUsage/?usageId=" + usageId)
-                        .then(function onSuccess(result) {
-                            msg.toSuccessMessage("Gemt!");
-                            itSystemUsage.mainContractIsActive = false;
-                        },
-                            function onError(result) {
-                                msg.toErrorMessage("Fejl! Kunne ikke gemmes!");
-                            });
+                    apiUseCaseFactory
+                        .createAssignmentRemoval(() => $http.delete(`api/ItContractItSystemUsage/?usageId=${usageId}`))
+                        .executeAsync((_) => itSystemUsage.mainContractIsActive = false);
                     itSystemUsage.mainContractId = null;
                 }
             };
