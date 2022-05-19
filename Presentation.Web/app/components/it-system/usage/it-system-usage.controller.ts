@@ -55,7 +55,7 @@
             $scope.isOrganizationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.organization);
             $scope.isLocalKleEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localKle);
             $scope.isAdviceEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.advice);
-            $scope.usLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
+            $scope.isLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
             $scope.isArchivingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.archiving);
             $scope.isGdprEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr);
             $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);

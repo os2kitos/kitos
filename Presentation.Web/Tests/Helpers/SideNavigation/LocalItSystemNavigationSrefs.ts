@@ -5,6 +5,11 @@
     static archivingSref = "it-system.usage.archiving";
     static GPDRSref = "it-system.usage.GDPR";
     static adviceSref = "it-system.usage.advice";
+    static rolesSref = "it-system.usage.roles";
+    static referencesSref = "it-system.usage.references";
+    static kleSref = "it-system.usage.kle";
+    static hierarchySref = "it-system.usage.hierarchy";
+    static organizationSref = "it-system.usage.org";
 }
 
 export = LocalItSystemNavigationSrefs;
