@@ -28,6 +28,7 @@ module Kitos.Utility.KendoGrid {
 
     export interface IExtendedKendoGridColumn<TDataSource> extends IKendoGridColumn<TDataSource> {
         schemaMutation: (map: any) => void;
+        kitosIncluded : boolean;
     }
 
     export interface IKendoParameter {
@@ -42,6 +43,8 @@ module Kitos.Utility.KendoGrid {
         Center
     }
 
+    export type Predicate = () => boolean;
+
     export interface IKendoGridExcelOnlyColumnBuilder<TDataSource> {
         withId(id: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
@@ -49,6 +52,7 @@ module Kitos.Utility.KendoGrid {
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withParentColumnId(parentId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        withInclusionCriterion(criterion: () => boolean): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
@@ -68,6 +72,7 @@ module Kitos.Utility.KendoGrid {
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridColumnBuilder<TDataSource>;
         withSourceValueEchoExcelOutput(): IKendoGridColumnBuilder<TDataSource>;
         withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource>;
+        withInclusionCriterion(Predicate): IKendoGridColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
 
@@ -78,6 +83,13 @@ module Kitos.Utility.KendoGrid {
         private dataSourceName: string = null;
         private parentId: string = null;
         private excelOutput: (source: TDataSource) => string = null;
+        private inclusionCriterion: Predicate = () => true;
+
+        withInclusionCriterion(criterion: Predicate): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (criterion == null) throw "criterion must be defined";
+            this.inclusionCriterion = criterion;
+            return this;
+        }
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
             if (excelOutput == null) throw "excelOutput must be defined";
@@ -139,7 +151,8 @@ module Kitos.Utility.KendoGrid {
                 sortable: false,
                 hidden: true, // Always invisible
                 menu: false, //Never selectable in menu or visible in anything but excel sheets
-                schemaMutation: () => {}
+                schemaMutation: () => { },
+                kitosIncluded: this.inclusionCriterion()
             } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
@@ -160,6 +173,13 @@ module Kitos.Utility.KendoGrid {
         private dataSourceType: KendoGridColumnDataSourceType = null;
         private contentOverflow: boolean | null = null;
         private contentAlignment: KendoColumnAlignment | null = null;
+        private inclusionCriterion: Predicate = () => true;
+
+        withInclusionCriterion(criterion: Predicate): IKendoGridColumnBuilder<TDataSource> {
+            if (criterion == null) throw "criterion must be defined";
+            this.inclusionCriterion = criterion;
+            return this;
+        }
 
         withContentAlignment(alignment: KendoColumnAlignment): IKendoGridColumnBuilder<TDataSource> {
             this.contentAlignment = alignment;
@@ -393,7 +413,8 @@ module Kitos.Utility.KendoGrid {
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
                 filterable: this.getFiltering(),
                 sortable: this.sortingEnabled,
-                schemaMutation: this.getSchemaMutation()
+                schemaMutation: this.getSchemaMutation(),
+                kitosIncluded: this.inclusionCriterion()
             } as IExtendedKendoGridColumn<TDataSource>;
         }
     }
@@ -823,8 +844,10 @@ module Kitos.Utility.KendoGrid {
             this._.forEach(this.columnFactories,
                 factory => {
                     const gridColumn = factory();
-                    gridColumn.schemaMutation(schemaFields);
-                    columns.push(gridColumn);
+                    if (gridColumn.kitosIncluded) {
+                        gridColumn.schemaMutation(schemaFields);
+                        columns.push(gridColumn);
+                    }
                 });
 
             //Build the grid

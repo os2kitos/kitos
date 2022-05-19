@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Advice\AdviceSent.cs" />
     <Compile Include="Advice\AdviceUserRelation.cs" />
+    <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
@@ -274,6 +275,9 @@
     <Compile Include="Tracking\BaseTrackingEvent.cs" />
     <Compile Include="Tracking\TrackedLifeCycleEventType.cs" />
     <Compile Include="TrafficLight.cs" />
+    <Compile Include="UIConfiguration\CustomizedUINode.cs" />
+    <Compile Include="UIConfiguration\UIModuleCustomization.cs" />
+    <Compile Include="UIConfiguration\UIModuleCustomizationConstraints.cs" />
     <Compile Include="User.cs" />
     <Compile Include="Users\UserConstraints.cs" />
   </ItemGroup>

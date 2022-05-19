@@ -160,6 +160,8 @@
     <Compile Include="Model\System\RightsHolderSystemUpdateParameters.cs" />
     <Compile Include="Model\Interface\RightsHolderItInterfaceUpdateParameters.cs" />
     <Compile Include="Model\System\RightsHolderSystemCreationParameters.cs" />
+    <Compile Include="Model\UiCustomization\CustomUINodeParameters.cs" />
+    <Compile Include="Model\UiCustomization\UIModuleCustomizationParameters.cs" />
     <Compile Include="Notification\GlobalAdminNotificationService.cs" />
     <Compile Include="Notification\IGlobalAdminNotificationService.cs" />
     <Compile Include="OptionTypes\IOptionResolver.cs" />
@@ -262,6 +264,8 @@
     <Compile Include="References\ReferenceService.cs" />
     <Compile Include="Tracking\ITrackingService.cs" />
     <Compile Include="Tracking\TrackingService.cs" />
+    <Compile Include="UIConfiguration\IUIModuleCustomizationService.cs" />
+    <Compile Include="UIConfiguration\UIModuleCustomizationService.cs" />
     <Compile Include="UserService.cs" />
   </ItemGroup>
   <ItemGroup>
