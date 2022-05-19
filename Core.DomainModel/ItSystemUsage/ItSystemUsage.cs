@@ -51,6 +51,7 @@ namespace Core.DomainModel.ItSystemUsage
             UserNotifications = new List<UserNotification>();
             Uuid = Guid.NewGuid();
             MarkAsDirty();
+            AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration>();
         }
 
         public bool IsActive
