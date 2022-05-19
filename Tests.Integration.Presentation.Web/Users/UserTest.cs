@@ -119,6 +119,12 @@ namespace Tests.Integration.Presentation.Web.Users
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
         }
 
+        [Fact]
+        public async Task Delete_User()
+        {
+
+        }
+
         private async Task<(int userId, string userEmail, string orgName)> CreateStakeHolderUserInNewOrganizationAsync(bool hasApiAccess, bool hasStakeholderAccess)
         {
             var email = CreateEmail();

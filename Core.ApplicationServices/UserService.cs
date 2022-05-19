@@ -307,7 +307,6 @@ namespace Core.ApplicationServices
 
         private void Delete(User user)
         {
-            //TODO: Disable automatic advice emails sent to user.. set a flag "disabled".. also disable the user for login with the same flag (disabled)
             user.LockedOutDate = DateTime.Now;
             user.EmailBeforeDeletion = user.Email;
             user.Email = $"{Guid.NewGuid()}_deleted_user@kitos.dk";
