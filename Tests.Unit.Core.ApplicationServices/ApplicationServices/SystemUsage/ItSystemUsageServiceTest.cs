@@ -370,7 +370,7 @@ namespace Tests.Unit.Core.ApplicationServices.SystemUsage
             _usageRepository.Verify(x => x.Save(), Times.Once);
             _referenceService.Verify(x => x.DeleteBySystemUsageId(id), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
-            _domainEvents.Verify(x => x.Raise(It.Is<EntityLifeCycleEvent<ItSystemUsage>>(ev => ev.Entity == itSystemUsage && ev.ChangeType == LifeCycleEventType.Deleted)));
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityLifeCycleEvent<ItSystemUsage>>(ev => ev.Entity == itSystemUsage && ev.ChangeType == LifeCycleEventType.Deleting)));
         }
 
         [Fact]

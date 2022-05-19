@@ -43,7 +43,7 @@ namespace Tests.Unit.Core.Model.EventHandlers
             _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
 
             //Act
-            _sut.Handle(new EntityDeletedEvent<ItSystemUsage>(deletedSystemUsage));
+            _sut.Handle(new EntityBeingDeletedEvent<ItSystemUsage>(deletedSystemUsage));
 
             //Assert that model was updated and that deleted relations were marked in repository
             Assert.False(relation1.FromSystemUsage.UsageRelations.Contains(relation1));

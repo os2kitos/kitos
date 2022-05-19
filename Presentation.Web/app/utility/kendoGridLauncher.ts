@@ -5,6 +5,7 @@
      * For that reason, if you find a concept, not previously covered by this class, introduce it and use it :-)
      */
 module Kitos.Utility.KendoGrid {
+    import Helpers = Kitos.Helpers;
     "use strict";
 
     export enum KendoGridColumnFiltering {
@@ -46,6 +47,7 @@ module Kitos.Utility.KendoGrid {
         withDataSourceName(name: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withTitle(title: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withStandardWidth(width: number): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
+        withParentColumnId(parentId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource>;
         build(): IExtendedKendoGridColumn<TDataSource>;
     }
@@ -74,6 +76,7 @@ module Kitos.Utility.KendoGrid {
         private title: string = null;
         private id: string = null;
         private dataSourceName: string = null;
+        private parentId: string = null;
         private excelOutput: (source: TDataSource) => string = null;
 
         withExcelOutput(excelOutput: (source: TDataSource) => string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
@@ -106,6 +109,12 @@ module Kitos.Utility.KendoGrid {
             return this;
         }
 
+        withParentColumnId(parentId: string): IKendoGridExcelOnlyColumnBuilder<TDataSource> {
+            if (parentId == null) throw "parentId must be defined";
+            this.parentId = parentId;
+            return this;
+        }
+
         private checkRequiredField(name: string, value: any) {
             if (value == null) {
                 throw `${name} is a required field and must be provided`;
@@ -122,6 +131,7 @@ module Kitos.Utility.KendoGrid {
                 field: this.dataSourceName,
                 title: this.title,
                 attributes: [],
+                parentId: this.parentId,
                 width: this.standardWidth,
                 persistId: `${this.id}_${new Date().getTime()}`, //Make the persistid random every time the grid is built (an error in the export process should not "stick")this.id,
                 excelTemplate: this.excelOutput ? (dataItem => this.excelOutput(dataItem)) : null,
@@ -404,6 +414,13 @@ module Kitos.Utility.KendoGrid {
         DropDownList
     }
 
+    export enum KendoToolbarMargin {
+        Left,
+        Right,
+        Down,
+        Top
+    }
+
     export interface IKendoToolbarDropDownEntry {
         id: string;
         text: string;
@@ -426,6 +443,7 @@ module Kitos.Utility.KendoGrid {
         implementation: KendoToolbarImplementation,
         color: KendoToolbarButtonColor;
         position: KendoToolbarButtonPosition;
+        margins?: KendoToolbarMargin[];
     }
 
     type UrlFactory = (options: any) => string;
@@ -596,7 +614,6 @@ module Kitos.Utility.KendoGrid {
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            this.gridBinding.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.gridBinding.mainGrid);
         }
 
@@ -663,8 +680,11 @@ module Kitos.Utility.KendoGrid {
             this.$state.go(".", null, { reload: true });
         }
 
+        private excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<TDataSource>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.gridBinding.mainGrid, this.excelConfig);
         }
 
         private checkRequiredField(name: string, value: any) {
@@ -680,30 +700,7 @@ module Kitos.Utility.KendoGrid {
             this.checkRequiredField("urlFactory", this.urlFactory);
             this.checkRequiredField("standardSortingSourceField", this.standardSortingSourceField);
             this.checkRequiredField("gridBinding", this.gridBinding);
-
-            //Build toolbar buttons
-            var getColorClass = (color: KendoToolbarButtonColor): string => {
-                switch (color) {
-                    case KendoToolbarButtonColor.Green:
-                        return "btn btn-success";
-                    case KendoToolbarButtonColor.Grey:
-                        return "k-button k-button-icontext";
-                    default:
-                        throw `Unknown color ${color}`;
-                }
-            };
-
-            var getPositionClass = (position: KendoToolbarButtonPosition): string => {
-                switch (position) {
-                    case KendoToolbarButtonPosition.Left:
-                        return "";
-                    case KendoToolbarButtonPosition.Right:
-                        return "pull-right";
-                    default:
-                        throw `Unknown position ${position}`;
-                }
-            };
-
+            
             this.$scope.kendoVm = {
                 standardToolbar: {
                     //NOTE: Intentional wrapping of the functions to capture the "this" reference and hereby the state (this will otherwise be null inside the function calls)
@@ -758,13 +755,17 @@ module Kitos.Utility.KendoGrid {
                 }
             ];
 
+            //Add the excel export button with multiple options
+            const excelExportDropdownEntry = Helpers.ExcelExportHelper.createExcelExportDropdownEntry(() => this.excelConfig, () => this.gridBinding.mainGrid);
+            this.customToolbarEntries.push(excelExportDropdownEntry);
+
             this._.forEach(this.customToolbarEntries, entry => {
                 switch (entry.implementation) {
                     case KendoToolbarImplementation.Button:
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<button data-element-type='${entry.id}Button' type='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
+                            template: `<button data-element-type='${entry.id}Button' type='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' title='${entry.title}' data-ng-click='kendoVm.${entry.id}.onClick()' data-ng-disabled='!kendoVm.${entry.id}.enabled' ng-show='kendoVm.${entry.id}.show'>#: text #</button>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             onClick: entry.onClick,
@@ -776,7 +777,7 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<a data-element-type='${entry.id}Button' role='button' class='${getColorClass(entry.color)} ${getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
+                            template: `<a data-element-type='${entry.id}Button' role='button' class='${Helpers.KendoToolbarCustomizationHelper.getColorClass(entry.color)} ${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)}' id='gdprExportAnchor' href='${entry.link}' data-ng-disabled='!kendoVm.${entry.id}.enabled'>#: text #</a>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled()
@@ -786,11 +787,15 @@ module Kitos.Utility.KendoGrid {
                         toolbar.push({
                             name: entry.id,
                             text: entry.title,
-                            template: `<select data-element-type='${entry.id}DropDownList' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
+                            template: `<select data-element-type='${entry.id}DropDownList' id='${entry.id}' class='${Helpers.KendoToolbarCustomizationHelper.getPositionClass(entry.position)} ${Helpers.KendoToolbarCustomizationHelper.getMargins(entry.margins)}' kendo-drop-down-list="kendoVm.${entry.id}.list" k-options="kendoVm.${entry.id}.getOptions()"></select>`
                         });
                         this.$scope.kendoVm[entry.id] = {
                             enabled: entry.enabled(),
                             getOptions: () => {
+                                // The excel options are customized and not a generic dropdown
+                                if (entry === excelExportDropdownEntry) {
+                                    return Helpers.ExcelExportHelper.createExportToExcelDropDownOptions(entry);
+                                }
                                 return {
                                     autoBind: false,
                                     dataSource: entry.dropDownConfiguration.availableOptions,

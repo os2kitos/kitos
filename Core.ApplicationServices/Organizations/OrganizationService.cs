@@ -4,7 +4,9 @@ using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
+using Core.ApplicationServices.Model.Organizations;
 using Core.DomainModel;
+using Core.DomainModel.Events;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
@@ -24,6 +26,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IOrganizationRepository _repository;
         private readonly IOrgUnitService _orgUnitService;
         private readonly IOrganizationRightsService _organizationRightsService;
+        private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IAuthorizationContext _authorizationContext;
@@ -42,6 +45,8 @@ namespace Core.ApplicationServices.Organizations
             IOrganizationRepository repository,
             IOrgUnitService orgUnitService,
             IOrganizationRightsService organizationRightsService)
+            IOrgUnitService orgUnitService,
+            IDomainEvents domainEvents)
         {
             _orgRepository = orgRepository;
             _orgRightRepository = orgRightRepository;
@@ -52,6 +57,7 @@ namespace Core.ApplicationServices.Organizations
             _transactionManager = transactionManager;
             _repository = repository;
             _orgUnitService = orgUnitService;
+            _domainEvents = domainEvents;
             _organizationRightsService = organizationRightsService;
         }
 
@@ -242,6 +248,106 @@ namespace Core.ApplicationServices.Organizations
                             ? unit
                             : new OperationError(OperationFailure.Forbidden),
                         () => new OperationError(OperationFailure.NotFound));
+        }
+
+        public Result<OrganizationRemovalConflicts, OperationError> ComputeOrganizationRemovalConflicts(Guid organizationUuid)
+        {
+            return GetOrganization(organizationUuid)
+                .Bind(WithDeletionAccess)
+                .Select(organizationWhichCanBeDeleted =>
+                {
+                    var systemsWithUsagesOutsideTheOrganization = organizationWhichCanBeDeleted
+                        .ItSystems
+                        .Where(x => x.Usages.Any(usage => usage.OrganizationId != organizationWhichCanBeDeleted.Id))
+                        .ToList();
+                    var interfacesExposedOnSystemsOutsideTheOrganization = organizationWhichCanBeDeleted
+                        .ItInterfaces
+                        .Where(x => x.ExhibitedBy != null && x.ExhibitedBy.ItSystem != null && x.ExhibitedBy.ItSystem.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+                    var systemsExposingInterfacesDefinedInOtherOrganizations = organizationWhichCanBeDeleted
+                        .ItSystems
+                        .Where(x => x.ItInterfaceExhibits.Any(ex => ex.ItInterface != null && ex.ItInterface.OrganizationId != organizationWhichCanBeDeleted.Id))
+                        .ToList();
+                    var systemsSetAsParentSystemToSystemsInOtherOrganizations = organizationWhichCanBeDeleted
+                        .ItSystems
+                        .Where(x => x.Children.Any(c => c.OrganizationId != organizationWhichCanBeDeleted.Id))
+                        .ToList();
+                    var dprInOtherOrganizationsWhereOrgIsDataProcessor = organizationWhichCanBeDeleted
+                        .DataProcessorForDataProcessingRegistrations
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+                    var dprInOtherOrganizationsWhereOrgIsSubDataProcessor = organizationWhichCanBeDeleted
+                        .SubDataProcessorForDataProcessingRegistrations
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+                    var contractsInOtherOrganizationsWhereOrgIsSupplier = organizationWhichCanBeDeleted
+                        .Supplier
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+                    var systemsInOtherOrgsWhereOrgIsRightsHolder = organizationWhichCanBeDeleted
+                        .BelongingSystems
+                        .Where(x => x.OrganizationId != organizationWhichCanBeDeleted.Id)
+                        .ToList();
+
+                    return new OrganizationRemovalConflicts(
+                        systemsWithUsagesOutsideTheOrganization,
+                        interfacesExposedOnSystemsOutsideTheOrganization,
+                        systemsExposingInterfacesDefinedInOtherOrganizations,
+                        systemsSetAsParentSystemToSystemsInOtherOrganizations,
+                        dprInOtherOrganizationsWhereOrgIsDataProcessor,
+                        dprInOtherOrganizationsWhereOrgIsSubDataProcessor,
+                        contractsInOtherOrganizationsWhereOrgIsSupplier,
+                        systemsInOtherOrgsWhereOrgIsRightsHolder);
+                });
+        }
+
+        public Maybe<OperationError> RemoveOrganization(Guid uuid, bool enforceDeletion)
+        {
+            using var transaction = _transactionManager.Begin();
+            var organizationWhichCanBeDeleted = GetOrganization(uuid).Bind(WithDeletionAccess);
+
+            if (organizationWhichCanBeDeleted.Failed)
+            {
+                return organizationWhichCanBeDeleted.Error;
+            }
+
+            if (organizationWhichCanBeDeleted.Value.IsDefaultOrganization == true)
+            {
+                return new OperationError("Cannot delete default organization", OperationFailure.BadInput);
+            }
+
+            var conflicts = ComputeOrganizationRemovalConflicts(uuid);
+            if (conflicts.Failed)
+                return conflicts.Error;
+
+            var conflictsToResolve = conflicts.Value;
+            if (conflictsToResolve.Any && !enforceDeletion)
+                return new OperationError("Removal conflicts not resolved", OperationFailure.Conflict);
+
+            try
+            {
+                var organization = organizationWhichCanBeDeleted.Value;
+                _domainEvents.Raise(new EntityBeingDeletedEvent<Organization>(organization));
+                _orgRepository.DeleteWithReferencePreload(organization);
+                _orgRepository.Save();
+                transaction.Commit();
+            }
+            catch (Exception error)
+            {
+                _logger.Error(error, "Failed while deleting organization with uuid: {uuid}", uuid);
+                return new OperationError("Exception during deletion", OperationFailure.UnknownError);
+            }
+            return Maybe<OperationError>.None;
+        }
+
+        private Result<Organization, OperationError> WithDeletionAccess(Organization organization)
+        {
+            if (_authorizationContext.AllowDelete(organization))
+            {
+                return organization;
+            }
+
+            return new OperationError(OperationFailure.Forbidden);
         }
     }
 }

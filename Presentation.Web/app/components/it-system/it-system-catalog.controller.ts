@@ -60,7 +60,7 @@
                 "$uibModal",
                 "exportGridToExcelService",
                 "systemUsageUserAccessRights",
-                "$window",
+                "$window"
             ];
 
         constructor(
@@ -288,7 +288,7 @@
                         name: "createITSystem",
                         text: "Opret IT System",
                         template:
-                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='createITSystemButton' class='btn btn-success pull-right' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
+                            "<button ng-click='systemCatalogVm.createITSystem()' data-element-type='createITSystemButton' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left' data-ng-disabled=\"!systemCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
@@ -348,7 +348,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -725,6 +725,12 @@
                     }
                 ]
             };
+            
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ""
@@ -735,7 +741,7 @@
         public createITSystem() {
             var self = this;
 
-            var modalInstance = this.$uibModal.open({
+            this.$uibModal.open({
                 // fade in instead of slide from top, fixes strange cursor placement in IE
                 // http://stackoverflow.com/questions/25764824/strange-cursor-placement-in-modal-when-using-autofocus-in-internet-explorer
                 windowClass: "modal fade in",
@@ -802,7 +808,6 @@
 
         // loads kendo grid options from localstorage
         private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
             this.gridState.loadGridOptions(this.mainGrid);
         }
 
@@ -968,11 +973,9 @@
             }
         }
 
-        public copyToClipBoard() {
-            window.getSelection().selectAllChildren(document.getElementById("copyPasteConsequence"));
-            document.execCommand("Copy");
-            window.getSelection().removeAllRanges();
-            this.notify.addSuccessMessage("Flytning rapport er blevet kopieret");
+        copyToClipBoard() {
+            Utility.copyPageContentToClipBoard("copyPasteConsequence");
+            this.notify.addSuccessMessage("Overblik er kopieret til udklipsholderen");
 
         }
 
@@ -1014,8 +1017,11 @@
             ],
         };
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItSystem>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         // adds usage at selected system within current context

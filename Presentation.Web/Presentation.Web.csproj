@@ -343,8 +343,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\UserNotificationController.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRoleOptionTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\BaseRegularOptionTypeV2Controller.cs" />
@@ -423,7 +425,13 @@
     <Compile Include="Infrastructure\Model\Request\CurrentRequestStream.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentRequestStream.cs" />
+    <Compile Include="Models\API\V1\EntityWithOrganizationRelationshipDTO.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\InterfaceExposedOnSystemsOutsideTheOrganizationConflictDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\OrganizationRemovalConflictsDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\SystemExposingInterfacesDefinedInOtherOrganizationsConflictDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\SystemSetAsParentSystemToSystemsInOtherOrganizationsConflictDTO.cs" />
+    <Compile Include="Models\API\V1\Organizations\SystemWithUsageOutsideOrganizationConflictDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractAgreementPeriodDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractGeneralDataWriteRequestDTO.cs" />
     <Compile Include="Models\API\V2\Request\Contract\ContractPaymentModelDataWriteRequestDTO.cs" />
@@ -562,6 +570,7 @@
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-oversight-modal.html" />
     <Content Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.view.html" />
     <Content Include="app\components\global-admin\global-admin-data-processing.view.html" />
+    <Content Include="app\components\global-admin\global-admin-organization-modal-delete.view.html" />
     <Content Include="app\components\global-admin\global-admin-organizations-where-user-rights.modal.view.html" />
     <Content Include="app\components\it-contract\tabs\it-contract-tab-data-processing.view.html" />
     <Content Include="app\components\local-config\local-config-dataProcessing.view.html" />
@@ -691,6 +700,7 @@
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-advice.state.ts" />
     <TypeScriptCompile Include="app\components\data-processing\tabs\data-processing-registration-tab-roles.controller.ts" />
     <TypeScriptCompile Include="app\components\global-admin\global-admin-data-processing.controller.ts" />
+    <TypeScriptCompile Include="app\components\global-admin\global-admin-organization-modal-delete.controller.ts" />
     <TypeScriptCompile Include="app\components\it-advice\it-advice-modal-dialog.ts" />
     <TypeScriptCompile Include="app\components\it-contract\tabs\it-contract-tab-data-processing.controller.ts" />
     <TypeScriptCompile Include="app\components\it-project\tabs\it-project-tab-status-project-edit-modal.controller.ts" />
@@ -706,13 +716,18 @@
     <TypeScriptCompile Include="app\components\user-notification\user-notification-modal.controller.ts" />
     <TypeScriptCompile Include="app\Configs\paragraphSizeConfig.ts" />
     <TypeScriptCompile Include="app\Constants\Constants.ts" />
+    <TypeScriptCompile Include="app\helpers\ArrayHelper.ts" />
     <TypeScriptCompile Include="app\helpers\DateStringFormatHelper.ts" />
     <TypeScriptCompile Include="app\helpers\ExcelExportHelper.ts" />
     <TypeScriptCompile Include="app\helpers\SystemNameFormatter.ts" />
     <TypeScriptCompile Include="app\helpers\RenderFieldsHelper.ts" />
     <TypeScriptCompile Include="app\interceptors\csrfRequestInterceptor.ts" />
     <TypeScriptCompile Include="app\mappers\AccessModifierMapper.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\OrganizationDeleteConflicts.ts" />
+    <TypeScriptCompile Include="app\models\Api\organization\organization.ts" />
+    <TypeScriptCompile Include="app\models\generic\ShallowOrganizationDTO.ts" />
     <TypeScriptCompile Include="app\models\it-contract\YearSegmentOption.ts" />
+    <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
@@ -747,6 +762,7 @@
     <TypeScriptCompile Include="app\models\reference\reference.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\GDPR\OversightDateViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Generic\EditTextViewModel.ts" />
+    <TypeScriptCompile Include="app\models\ViewModel\Organization\OrganizationDeletionConflictsViewModel.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\year-month-undecided-interval.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-undecided.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\Shared\yes-no-irrelevant-options.ts" />
@@ -779,6 +795,7 @@
     <TypeScriptCompile Include="app\models\ViewModel\Sso\sso-state-view-model.ts" />
     <TypeScriptCompile Include="app\services\dataProcessingRegistrationService.ts" />
     <TypeScriptCompile Include="app\services\generic\ApiUseCaseFactory.ts" />
+    <TypeScriptCompile Include="app\services\generic\ApiWrapper.ts" />
     <TypeScriptCompile Include="app\services\generic\bindingService.ts" />
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageOptionsService.ts" />
     <TypeScriptCompile Include="app\services\KendoFilterService.ts" />
@@ -787,6 +804,7 @@
     <TypeScriptCompile Include="app\services\ItSystemUsage\ItSystemUsageService.ts" />
     <TypeScriptCompile Include="app\services\kleService.ts" />
     <TypeScriptCompile Include="app\services\exportGridToExcelService.ts" />
+    <TypeScriptCompile Include="app\services\OrganizationApiService.ts" />
     <TypeScriptCompile Include="app\services\referenceService.ts" />
     <TypeScriptCompile Include="app\services\select2LoadingService.ts" />
     <TypeScriptCompile Include="app\services\authorizationService.ts" />
@@ -1047,8 +1065,9 @@
     <TypeScriptCompile Include="app\shared\selectRole\selectRole.directive.ts" />
     <TypeScriptCompile Include="app\shared\selectSimple\selectSimple.directive.ts" />
     <TypeScriptCompile Include="app\shared\singleSelect\singleSelectSelect2.directive.ts" />
-    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
+    <TypeScriptCompile Include="app\utility\ClipBoardHelper.ts" />
     <TypeScriptCompile Include="app\utility\KendoFilterProfileHelper.ts" />
+    <TypeScriptCompile Include="app\utility\kendoGridLauncher.ts" />
     <TypeScriptCompile Include="app\utility\tableManipulation.ts" />
     <TypeScriptCompile Include="app\utility\KendoGridScrollbarHelper.ts" />
     <TypeScriptCompile Include="app\utility\view-data-state.ts" />

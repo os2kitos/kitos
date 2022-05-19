@@ -43,17 +43,17 @@ param(
         Write-Host "Starting E2E test. This might take a while..."
 		switch($testType){
 			"headless" {
-			    gulp "e2eHeadlessParallelGroup" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+			    gulp "e2eHeadlessParallelGroup" --params.login.email="$usrname" --params.login.pwd="$pwd" --params.baseUrl="$url"
                 if($LASTEXITCODE -ne 0)	{ Throw "Parallel tests failed" }
                 
-                gulp "e2eHeadlessSequentialGroup" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+                gulp "e2eHeadlessSequentialGroup" --params.login.email="$usrname" --params.login.pwd="$pwd" --params.baseUrl="$url"
                 if($LASTEXITCODE -ne 0)	{ Throw "Sequential tests failed" }
 			}
 			"local" {
-				gulp "e2eLocal" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url"
+				gulp "e2eLocal" --params.login.email="$usrname" --params.login.pwd="$pwd" --params.baseUrl="$url"
 			}
 			"single" {
-				gulp "e2eSingle" --params.login.email="$usrname" --params.login.pwd="$pwd" --baseUrl="$url" --testToRun="$testToRun"
+				gulp "e2eSingle" --params.login.email="$usrname" --params.login.pwd="$pwd" --params.baseUrl="$url" --testToRun="$testToRun"
 			}
 		}
 		

@@ -37,6 +37,11 @@ namespace Presentation.Web.Models.API.V2.Response.Interface
         public string Description { get; set; }
 
         /// <summary>
+        /// Internal notes regarding the IT-System (usually written by Global Admin)
+        /// </summary>
+        public string Notes { get; set; }
+
+        /// <summary>
         /// Url reference for further information
         /// </summary>
         public string UrlReference { get; set; }

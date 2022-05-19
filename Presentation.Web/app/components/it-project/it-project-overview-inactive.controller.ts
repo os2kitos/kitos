@@ -68,7 +68,6 @@
                 // widgets in this controller, we need to check that the event
                 // is for the one we're interested in.
                 if (widget === this.mainGrid) {
-
                     this.loadGridOptions();
 
                     // show loadingbar when export to excel is clicked
@@ -98,13 +97,7 @@
         private onPaging = () => {
             Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
-
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
-        }
-
+        
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -141,6 +134,11 @@
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
+        }
+
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         private reload() {
@@ -283,7 +281,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -680,6 +678,11 @@
             });
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
         }
 
         private economyTemplate = (dataItem) => {
@@ -774,8 +777,11 @@
             }
         };
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<IItProjectInactiveOverview>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private concatRoles(roles: Array<any>): string {

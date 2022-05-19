@@ -37,7 +37,7 @@ namespace Core.DomainServices.Repositories.GDPR
             var registration = _repository.GetByKey(id);
             if (registration != null)
             {
-                Notify(registration, LifeCycleEventType.Deleted);
+                Notify(registration, LifeCycleEventType.Deleting);
                 registration.Reference.Track();
                 registration.Reference = null;
                 registration.ExternalReferences.Clear();
@@ -131,8 +131,8 @@ namespace Core.DomainServices.Repositories.GDPR
                 case LifeCycleEventType.Updated:
                     _domainEvents.Raise(new EntityUpdatedEvent<DataProcessingRegistration>(dataProcessingRegistration));
                     break;
-                case LifeCycleEventType.Deleted:
-                    _domainEvents.Raise(new EntityDeletedEvent<DataProcessingRegistration>(dataProcessingRegistration));
+                case LifeCycleEventType.Deleting:
+                    _domainEvents.Raise(new EntityBeingDeletedEvent<DataProcessingRegistration>(dataProcessingRegistration));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(changeType), changeType, null);

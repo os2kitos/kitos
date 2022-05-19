@@ -2,7 +2,6 @@
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Extensions;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V2.Request;
 using Presentation.Web.Models.API.V2.Response.Interface;
 using System;
@@ -24,7 +23,6 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
     [Collection(nameof(SequentialTestGroup))]
     public class ItInterfaceApiV2Test : WithAutoFixture
     {
-
         [Fact]
         public async Task Can_Get_Interfaces_As_RightsHolder()
         {
@@ -35,8 +33,8 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var pageNumber = 0; //Always takes the first page;
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
-            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local));
+            var itInterface1 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local, A<string>()));
+            var itInterface2 = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local, A<string>()));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface1.Id).DisposeAsync();
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface2.Id).DisposeAsync();
             await ItSystemHelper.SendSetBelongsToRequestAsync(system.Id, org.Id, TestEnvironment.DefaultOrganizationId).DisposeAsync();
@@ -295,7 +293,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             var (token, org) = await CreateStakeHolderUserInNewOrg();
 
             var system = await ItSystemHelper.CreateItSystemInOrganizationAsync(A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Local);
-            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public));
+            var itInterface = await InterfaceHelper.CreateInterface(InterfaceHelper.CreateInterfaceDto(A<string>(), A<string>(), TestEnvironment.DefaultOrganizationId, AccessModifier.Public, A<string>()));
             await InterfaceExhibitHelper.SendCreateExhibitRequest(system.Id, itInterface.Id).DisposeAsync();
 
             //Act
@@ -1030,6 +1028,7 @@ namespace Tests.Integration.Presentation.Web.Interfaces.V2
             Assert.Equal(system.Uuid, interfaceDTO.ExposedBySystem.Uuid);
             Assert.Equal(itInterface.Uuid, interfaceDTO.Uuid);
             Assert.Equal(itInterface.Description, interfaceDTO.Description);
+            Assert.Equal(itInterface.Note, interfaceDTO.Notes);
             Assert.Equal(itInterface.ItInterfaceId, interfaceDTO.InterfaceId);
             Assert.Equal(itInterface.Url, interfaceDTO.UrlReference);
             Assert.Equal(itInterface.Version, interfaceDTO.Version);

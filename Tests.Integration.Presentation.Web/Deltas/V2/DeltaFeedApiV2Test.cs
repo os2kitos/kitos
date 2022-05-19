@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Tracking;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V2.Request.Contract;
@@ -14,13 +15,28 @@ using Presentation.Web.Models.API.V2.Response.SystemUsage;
 using Presentation.Web.Models.API.V2.Types.Shared;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External;
+using Tests.Integration.Presentation.Web.Tools.XUnit;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
 namespace Tests.Integration.Presentation.Web.Deltas.V2
 {
+    [Collection(nameof(SequentialTestGroup))]
     public class DeltaFeedApiV2Test : WithAutoFixture
     {
+        public DeltaFeedApiV2Test()
+        {
+            //Reset the event stream to control expectations
+            DatabaseAccess.MutateEntitySet<LifeCycleTrackingEvent>(repository =>
+           {
+               var allIds = repository.AsQueryable().Select(x => x.Id).ToList();
+               foreach (var id in allIds)
+               {
+                   repository.DeleteByKey(id);
+               }
+           });
+        }
+
         [Fact]
         public async Task GetDeletedItems_Without_Detailed_Query()
         {

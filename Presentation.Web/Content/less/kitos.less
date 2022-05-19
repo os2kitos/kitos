@@ -13,6 +13,11 @@ body {
     background-color: #f2f2f2;
 }
 
+td, th {
+    font-family: Verdana,Arial,Helvetica,sans-serif;
+    font-size: 11px
+}
+
 div#page-wrapper {
     min-width: 1024px;
     max-width: 1600px;
@@ -151,7 +156,7 @@ div#page-body {
 }
 
 #navbar-top .navbar-right {
-    padding-left:0px;
+    padding-left: 0px;
 
     .dropdown-menu-group {
         height: 80px;
@@ -1516,6 +1521,7 @@ div.referenceLink {
             width: 1em;
         }
     }
+
     text-align: center;
 }
 
@@ -1605,11 +1611,11 @@ tbody.bordered > tr > td {
 }
 
 .sso-error {
-    color :darkred;
+    color: darkred;
 }
 
 .well {
-    .inlineTab{
+    .inlineTab {
         margin-left: 20px;
     }
 }
@@ -1623,7 +1629,6 @@ tbody.bordered > tr > td {
     position: relative;
     transform: translateX(15%);
     font-size: 12px;
-
     padding-top: 2px;
     padding-bottom: 2px;
     margin-bottom: 3px;
@@ -1658,11 +1663,32 @@ tbody.bordered > tr > td {
     text-align: center;
 }
 
-.fixed-grid-left-padding{
+.fixed-grid-left-padding {
     padding-left: 7px !important; //Needs to be forced with !important
 }
 
 .warning-icon-right-of-text {
     margin: 2.7px 0px 0px 5px;
     color: orange;
+}
+
+.checkbox-inline {
+    label {
+        font-weight: 400;
+    }
+}
+
+.kendo-margin-right {
+    margin-right: 0.16em;
+}
+
+.kendo-margin-left {
+    margin-left: 0.16em;
+}
+
+.kendo-btn-sm {
+    padding: 3.5px 10px;
+    font-size: 14px;
+    line-height: 1.5em;
+    border-radius: 3px;
 }

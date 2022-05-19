@@ -842,6 +842,18 @@
     <Compile Include="Migrations\202204200556500_Remove_Access_Types.designer.cs">
       <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.cs" />
+    <Compile Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.designer.cs">
+      <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202204231017335_Remove_References_From_Organization.cs" />
+    <Compile Include="Migrations\202204231017335_Remove_References_From_Organization.designer.cs">
+      <DependentUpon>202204231017335_Remove_References_From_Organization.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.cs" />
+    <Compile Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.designer.cs">
+      <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1390,6 +1402,15 @@
     <EmbeddedResource Include="Migrations\202204200556500_Remove_Access_Types.resx">
       <DependentUpon>202204200556500_Remove_Access_Types.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204201248370_AddMissingOrganizationDependenciesInEfMap.resx">
+      <DependentUpon>202204201248370_AddMissingOrganizationDependenciesInEfMap.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204231017335_Remove_References_From_Organization.resx">
+      <DependentUpon>202204231017335_Remove_References_From_Organization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202204251146313_ExtendOrganizationWithDefaultOrganization.resx">
+      <DependentUpon>202204251146313_ExtendOrganizationWithDefaultOrganization.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Remove_ReadOnly_Role.sql" />
@@ -1462,6 +1483,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Migrations\SQLScripts\RemoveReports.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Set_Default_Organization.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\SQLScripts\Set_OwnerOrgUnitOnAllTaskRefs.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

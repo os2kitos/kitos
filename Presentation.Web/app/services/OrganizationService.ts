@@ -1,33 +1,11 @@
 ﻿module Kitos.Services {
     "use strict";
 
-    interface IOrgUnitRoleModel {
-        Id: number;
-        HasReadAccess: boolean;
-        HasWriteAccess: boolean;
-        Name: string;
-        IsActive: boolean;
-        Description?: any;
-        ObjectOwnerId: number;
-        LastChanged: Date;
-        LastChangedByUserId: number;
-    }
-
-    interface IOrgRightsModel {
-        Id: number;
-        UserId: number;
-        RoleId: number;
-        ObjectId: number;
-        ObjectOwnerId: number;
-        LastChanged: Date;
-        LastChangedByUserId: number;
-    }
-
     export class OrganizationService {
 
-        public static $inject: string[] = ["$http"];
+        static $inject: string[] = ["$http"];
 
-        constructor(private $http: IHttpServiceWithCustomConfig) {
+        constructor(private readonly $http: IHttpServiceWithCustomConfig) {
         }
         
         GetOrganizationUnitDataById = (id: number, orgId: number) => {

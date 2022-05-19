@@ -122,7 +122,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream1), Times.Once);
             _economyStreamRepository.Verify(x => x.DeleteWithReferencePreload(internEconomyStream2), Times.Once);
             _contractRepository.Verify(x => x.DeleteContract(itContract), Times.Once);
-            _domainEvents.Verify(x => x.Raise(It.Is<EntityDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
+            _domainEvents.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<ItContract>>(cd => cd.Entity == itContract)), Times.Once);
             _referenceService.Verify(x => x.DeleteByContractId(contractId), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }

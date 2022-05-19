@@ -169,7 +169,7 @@
                     {
                         name: "createSnitflade",
                         text: "Opret Snitflade",
-                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' data-element-type='createInterfaceButton' class='btn btn-success pull-right' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
+                        template: "<button ng-click='interfaceCatalogVm.createSnitflade()' data-element-type='createInterfaceButton' class='btn kendo-btn-sm btn-success pull-right kendo-margin-left' data-ng-disabled=\"!interfaceCatalogVm.canCreate\">#: text #</button>"
                     },
                     {
                         name: "clearFilter",
@@ -218,7 +218,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: this.exportToExcel,
+                excelExport: (e:any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -480,6 +480,12 @@
                     }
                 ]
             };
+
+            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+                () => this.mainGrid,
+                this.$scope,
+                this.mainGridOptions.toolbar);
+
             function customFilter(args) {
                 args.element.kendoAutoComplete({
                     noDataTemplate: ''
@@ -547,12 +553,6 @@
             Utility.KendoGrid.KendoGridScrollbarHelper.resetScrollbarPosition(this.mainGrid);
         }
 
-        // loads kendo grid options from localstorage
-        private loadGridOptions() {
-            this.mainGrid.options.toolbar.push({ name: "excel", text: "Eksportér til Excel", className: "pull-right" });
-            this.gridState.loadGridOptions(this.mainGrid);
-        }
-
         public saveGridProfile() {
             this.gridState.saveGridProfile(this.mainGrid);
             this.notify.addSuccessMessage("Filtre og sortering gemt");
@@ -583,6 +583,11 @@
             this.notify.addSuccessMessage("Sortering, filtering og kolonnevisning, -bredde og –rækkefølge nulstillet");
             // have to reload entire page, as dataSource.read() + grid.refresh() doesn't work :(
             this.reload();
+        }
+
+        // loads kendo grid options from localstorage
+        private loadGridOptions() {
+            this.gridState.loadGridOptions(this.mainGrid);
         }
 
         private reload() {
@@ -647,8 +652,11 @@
             });
         }
 
+        private readonly excelConfig: Models.IExcelConfig = {
+        };
+
         private exportToExcel = (e: IKendoGridExcelExportEvent<Models.ItSystem.IItInterface>) => {
-            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid);
+            this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
         private showUsedByOrganizationNames(numberOfOrgs: number, interfaceName: string, interfaceId: number): string {

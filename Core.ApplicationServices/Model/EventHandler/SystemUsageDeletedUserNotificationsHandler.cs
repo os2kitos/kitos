@@ -7,7 +7,7 @@ using Core.DomainModel.Events;
 
 namespace Core.ApplicationServices.Model.EventHandler
 {
-    public class SystemUsageDeletedUserNotificationsHandler : IDomainEventHandler<EntityDeletedEvent<ItSystemUsage>>
+    public class SystemUsageDeletedUserNotificationsHandler : IDomainEventHandler<EntityBeingDeletedEvent<ItSystemUsage>>
     {
         private readonly IUserNotificationRepository _userNotificationRepository;
         private readonly IUserNotificationService _userNotificationService;
@@ -18,7 +18,7 @@ namespace Core.ApplicationServices.Model.EventHandler
             _userNotificationService = userNotificationService;
         }
 
-        public void Handle(EntityDeletedEvent<ItSystemUsage> domainEvent)
+        public void Handle(EntityBeingDeletedEvent<ItSystemUsage> domainEvent)
         {
             var systemUsageDeleted = domainEvent.Entity;
             var toBeDeleted = _userNotificationRepository.GetByRelatedEntityIdAndType(systemUsageDeleted.Id, RelatedEntityType.itSystemUsage).ToList();
