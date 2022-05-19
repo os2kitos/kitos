@@ -108,14 +108,14 @@ namespace Core.DomainServices.Repositories.KLE
                             ActiveFrom = mostRecentTaskRef.ActiveFrom,
                         });
                     }
-                    else if (existingTaskRef.Uuid == Guid.Empty)
+                    else if (existingTaskRef.Uuid != mostRecentTaskRef.Uuid)
                     {
                         result.Add(new KLEChange
                         {
                             Uuid = mostRecentTaskRef.Uuid,
                             ChangeType = KLEChangeType.UuidPatched,
                             TaskKey = existingTaskRef.TaskKey,
-                            ChangeDetails = "Opdatering af null uuid",
+                            ChangeDetails = "Opdatering af uuid",
                             ActiveTo = mostRecentTaskRef.ActiveTo,
                             ActiveFrom = mostRecentTaskRef.ActiveFrom,
                         });
@@ -195,7 +195,10 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveProjectTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItProjects).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository
+                .GetWithReferencePreload(t => t.ItProjects)
+                .First(t => t.TaskKey == kleChange.TaskKey);
+
             foreach (var itProject in removedTaskRef.ItProjects.ToList())
             {
                 itProject.TaskRefs.Remove(removedTaskRef);
@@ -205,7 +208,10 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveSystemTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystems).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository
+                .GetWithReferencePreload(t => t.ItSystems)
+                .First(t => t.TaskKey == kleChange.TaskKey);
+
             foreach (var itSystem in removedTaskRef.ItSystems.ToList())
             {
                 itSystem.TaskRefs.Remove(removedTaskRef);
@@ -215,7 +221,10 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveSystemUsageOptOutTaskRefs(KLEChange kleChange)
         {
-            var removedTaskRef = _existingTaskRefRepository.GetWithReferencePreload(t => t.ItSystemUsagesOptOut).First(t => t.TaskKey == kleChange.TaskKey);
+            var removedTaskRef = _existingTaskRefRepository
+                .GetWithReferencePreload(t => t.ItSystemUsagesOptOut)
+                .First(t => t.TaskKey == kleChange.TaskKey);
+
             foreach (var itSystemUsageOptOut in removedTaskRef.ItSystemUsagesOptOut.ToList())
             {
                 itSystemUsageOptOut.TaskRefs.Remove(removedTaskRef);
@@ -225,10 +234,16 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveSystemUsageTaskRefs(List<KLEChange> kleChanges)
         {
-            var systemUsages = _systemUsageRepository.GetWithReferencePreload(s => s.TaskRefs);
-            foreach (var systemUsage in systemUsages.ToList())
+            var removedTaskKeys = kleChanges.Select(x => x.TaskKey).ToHashSet();
+
+            var affectedSystemUsages = _systemUsageRepository
+                .GetWithReferencePreload(s => s.TaskRefs)
+                .Where(system => system.TaskRefs.Any(tr => removedTaskKeys.Contains(tr.TaskKey)))
+                .ToList();
+
+            foreach (var systemUsage in affectedSystemUsages)
             {
-                foreach (var taskRef in systemUsage.TaskRefs.ToList().Where(t => kleChanges.Exists(c => c.TaskKey == t.TaskKey)))
+                foreach (var taskRef in systemUsage.TaskRefs.Where(t => removedTaskKeys.Contains(t.TaskKey)).ToList())
                 {
                     systemUsage.TaskRefs.Remove(taskRef);
                 }
@@ -249,7 +264,14 @@ namespace Core.DomainServices.Repositories.KLE
 
         private void RemoveTaskRef(IEnumerable<KLEChange> kleChanges)
         {
-            var removedTaskRefs = kleChanges.Select(c => _existingTaskRefRepository.Get(t => t.TaskKey == c.TaskKey).First());
+            var removedTaskKeys = kleChanges
+                .Select(x => x.TaskKey)
+                .ToList();
+
+            var removedTaskRefs = _existingTaskRefRepository
+                .AsQueryable()
+                .Where(tr => removedTaskKeys.Contains(tr.TaskKey))
+                .ToList();
 
             _existingTaskRefRepository.RemoveRange(removedTaskRefs);
         }
