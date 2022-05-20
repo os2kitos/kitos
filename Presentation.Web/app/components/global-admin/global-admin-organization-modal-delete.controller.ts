@@ -5,10 +5,11 @@
         static $inject: string[] = ["$scope", "organizationApiService", "notify", "orgToDelete", "conflicts"];
 
         readonly title: string;
-        readonly orgName : string;
+        readonly orgName: string;
         readonly conflictsDetected: boolean;
         readonly consequencesAccepted: boolean;
         readonly conflictsModel: Models.ViewModel.Organization.OrganizationDeletionConflictsViewModel | null;
+        isCopyingConsequencesToClipBoard: boolean = false; //Used to trigger additional spacing in the DOM to support "paste" into word with better spacing.
 
         constructor(
             private readonly $scope,
@@ -70,8 +71,23 @@
         }
 
         copyToClipBoard() {
-            Utility.copyPageContentToClipBoard("consequencesOverview");
-            this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+            //Trigger additional spacing between consequece rows
+            this.isCopyingConsequencesToClipBoard = true;
+
+            //Allow angular to render
+            setTimeout(() => {
+                    try {
+                        Utility.copyPageContentToClipBoard("consequencesOverview");
+                    } catch (e) {
+                        console.log("Failed to copy consequences to clipboard", e);
+
+                    }
+
+                    // Remove spacing
+                    this.isCopyingConsequencesToClipBoard = false;
+                    this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+                },
+                1);
         }
 
         dismiss() {
