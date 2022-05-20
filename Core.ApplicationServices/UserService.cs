@@ -327,7 +327,6 @@ namespace Core.ApplicationServices
             user.HasApiAccess = false;
             user.HasStakeHolderAccess = false;
 
-
             //TODO: Check cascades
             user.ItProjectStatuses.Clear();
             user.ResponsibleForCommunications.Clear();
