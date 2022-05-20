@@ -76,35 +76,37 @@
 
             //Allow angular to render
             setTimeout(() => {
-                    try {
-                        Utility.copyPageContentToClipBoard("consequencesOverview");
-                    } catch (e) {
-                        console.log("Failed to copy consequences to clipboard", e);
+                try {
+                    Utility.copyPageContentToClipBoard("consequencesOverview");
+                } catch (e) {
+                    console.log("Failed to copy consequences to clipboard", e);
 
-                    }
+                }
 
-                    // Remove spacing
-                    this.isCopyingConsequencesToClipBoard = false;
-                    this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
-                },
+                // Remove spacing
+                this.isCopyingConsequencesToClipBoard = false;
+                this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+            },
                 1);
         }
 
         dismiss() {
             this.$scope.$dismiss();
-        };
+        }
 
         submit() {
-            this.organizationApiService.deleteOrganization(this.orgToDelete.uuid, this.consequencesAccepted)
-                .then((success) => {
-                    this.notify.addSuccessMessage("Organisationen blev slettet");
-                    this.$scope.$close(true);
-                },
-                    (error) => {
-                        console.error("Error deleting org:", this.orgToDelete, "Error:", error);
-                        this.notify.addErrorMessage("Fejl ifm. sletning af organisationen!");
-                    });
-        };
+            if (confirm(`Er du sikker på, at du vil slette "${this.orgName}"?`)) {
+                this.organizationApiService.deleteOrganization(this.orgToDelete.uuid, this.consequencesAccepted)
+                    .then((success) => {
+                        this.notify.addSuccessMessage("Organisationen blev slettet");
+                        this.$scope.$close(true);
+                    },
+                        (error) => {
+                            console.error("Error deleting org:", this.orgToDelete, "Error:", error);
+                            this.notify.addErrorMessage("Fejl ifm. sletning af organisationen!");
+                        });
+            }
+        }
     }
 
     angular
