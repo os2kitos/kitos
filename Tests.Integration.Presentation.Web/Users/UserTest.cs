@@ -124,25 +124,41 @@ namespace Tests.Integration.Presentation.Web.Users
         [Fact]
         public async Task Delete_User()
         {
-            var (cookie, userId, organization) = await CreatePrerequisitesAsync();
+            var userRole = OrganizationRole.LocalAdmin;
+
+            var (_, userId, organization) = await CreatePrerequisitesAsync(userRole);
             var name = A<string>();
 
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
             await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
             await RightsHelper.AddOrganizationRoleToUser(userId, organization.Id);
 
-            var res = await UserHelper.SendDeleteUserAsync(userId);
-
-            Assert.Equal(HttpStatusCode.OK, res.StatusCode);
+            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+            
+            var getDeletedUserResponse = await UserHelper.GetUserByIdAsync(userId);
+            Assert.True(getDeletedUserResponse.Deleted);
         }
 
-        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization)> CreatePrerequisitesAsync()
+        [Fact]
+        public async Task Delete_User_Returns_Forbidden_When_User_Tries_To_Delete_Himself()
+        {
+            var userRole = OrganizationRole.GlobalAdmin;
+
+            var (cookie, userId, _) = await CreatePrerequisitesAsync(userRole);
+
+            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
+        }
+
+        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization)> CreatePrerequisitesAsync(OrganizationRole role)
         {
             var organization = await CreateOrganizationAsync();
             var (userId, _, loginCookie) =
-                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), OrganizationRole.LocalAdmin, organization.Id);
+                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), role, organization.Id);
             return (loginCookie, userId, organization);
         }
 

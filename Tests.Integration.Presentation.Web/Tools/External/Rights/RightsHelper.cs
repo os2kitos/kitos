@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
+using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
@@ -75,7 +76,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     return $"api/itSystemUsageRights/{itSystemUsage.Id}?organizationId={orgId}";
                 case RightsType.OrganizationUnitRights:
                     //TODO: Create org unit
-                    return $"api/organizationunitrights/{orgId}?organizationId={orgId}";
+                    var orgUnit = OrganizationUnitHelper.GetOrganizationUnits(orgId);
+                    return $"api/organizationunitright/{orgUnit.Result.Id}?organizationId={orgId}";
                 default: throw new Exception();
             }
         }

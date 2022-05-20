@@ -16,6 +16,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
 using Infrastructure.Services.Cryptography;
 using Core.DomainServices.Authorization;
+using Core.DomainServices.Context;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
@@ -41,6 +42,7 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
+        private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
@@ -58,7 +60,8 @@ namespace Core.ApplicationServices
             IDomainEvents domainEvents,
             IUserRepository repository,
             IOrganizationService organizationService,
-            ITransactionManager transactionManager)
+            ITransactionManager transactionManager, 
+            Maybe<ActiveUserIdContext> activeUserIdContext)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -75,6 +78,7 @@ namespace Core.ApplicationServices
             _repository = repository;
             _organizationService = organizationService;
             _transactionManager = transactionManager;
+            _activeUserIdContext = activeUserIdContext;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -288,11 +292,15 @@ namespace Core.ApplicationServices
 
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
         {
+
             using var transaction = _transactionManager.Begin();
 
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
                 return Maybe<OperationError>.Some(new OperationError(OperationFailure.NotFound));
+            if(_activeUserIdContext.GetValueOrDefault().ActiveUserId == user.Id)
+                return Maybe<OperationError>.Some(new OperationError("You cannot delete an user you are currently logged in as", OperationFailure.Forbidden));
+
 
             if (!_authorizationContext.AllowDelete(user))
                 return Maybe<OperationError>.Some(new OperationError(OperationFailure.Forbidden));
@@ -315,6 +323,7 @@ namespace Core.ApplicationServices
             user.PhoneNumber = null;
             user.LastName = $"{(user.LastName ?? "").TrimEnd()} (SLETTET)";
             user.DeletedDate = DateTime.Now;
+            user.Deleted = true;
             user.IsGlobalAdmin = false;
             user.HasApiAccess = false;
             user.HasStakeHolderAccess = false;

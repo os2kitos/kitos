@@ -59,7 +59,7 @@ namespace Core.ApplicationServices.UIConfiguration.Handlers
             if (roles == null)
                 return;
 
-            roles.ToList().ForEach(x => _dataProcessingRegistrationApplicationService.RemoveRole(x.Id, x.RoleId, user.Id).ThrowOnFailure());
+            roles.ToList().ForEach(x => _dataProcessingRegistrationApplicationService.RemoveRole(x.ObjectId, x.RoleId, user.Id).ThrowOnFailure());
             roles.Clear();
         }
 
