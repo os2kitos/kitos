@@ -8,5 +8,10 @@
         {
             ActiveUserId = activeUserId;
         }
+
+        public ActiveUserIdContext()
+        {
+            
+        }
     }
 }

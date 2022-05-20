@@ -12,6 +12,7 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
+using Core.DomainServices.Context;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
@@ -32,6 +33,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
+        private readonly Mock<ActiveUserIdContext> _activeUserIdContextMock;
 
         public UserServiceTest()
         {
@@ -43,6 +45,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _cryptoServiceMock = new Mock<ICryptoService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _domainEventsMock = new Mock<IDomainEvents>();
+            _activeUserIdContextMock = new Mock<ActiveUserIdContext>();
 
             _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new UserService(
@@ -60,7 +63,8 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEventsMock.Object,
                 _repositoryMock.Object,
                 _organizationServiceMock.Object,
-                Mock.Of<ITransactionManager>());
+                Mock.Of<ITransactionManager>(),
+                _activeUserIdContextMock.Object);
         }
 
         [Fact]
