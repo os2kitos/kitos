@@ -292,19 +292,18 @@ namespace Core.ApplicationServices
 
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
         {
-
             using var transaction = _transactionManager.Begin();
 
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
                 return Maybe<OperationError>.Some(new OperationError(OperationFailure.NotFound));
             if(_activeUserIdContext.GetValueOrDefault().ActiveUserId == user.Id)
-                return Maybe<OperationError>.Some(new OperationError("You cannot delete an user you are currently logged in as", OperationFailure.Forbidden));
+                return Maybe<OperationError>.Some(new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden));
 
 
             if (!_authorizationContext.AllowDelete(user))
                 return Maybe<OperationError>.Some(new OperationError(OperationFailure.Forbidden));
-
+            
             _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
 
             Delete(user);
