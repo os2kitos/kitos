@@ -29,8 +29,9 @@ namespace Core.ApplicationServices
                 User = user,
                 Role = organizationRole,
             });
-            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+            
             _organizationRights.Save();
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
 
             return result;
         }
