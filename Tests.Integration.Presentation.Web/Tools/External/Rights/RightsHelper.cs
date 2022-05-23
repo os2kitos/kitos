@@ -21,7 +21,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
             var roleDto = new RightDTO
             {
                 UserId = userId,
-                RoleId = (int)OrganizationRole.LocalAdmin //role.ToString("G")
+                RoleId = (int)OrganizationRole.LocalAdmin
             };
 
             var url = TestEnvironment.CreateUrl(await PrepareUrl(orgId, name, rightsType));
@@ -43,9 +43,8 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
-        public static async Task AddDprRoleToUser(int userId, int orgId, string name, Cookie optionalLogin = null)
+        public static async Task AddDprRoleToUser(int userId, int orgId, string name)
         {
-            //var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var dpr= await DataProcessingRegistrationHelper.CreateAsync(orgId, name);
 
             var roles = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(dpr.Id);
@@ -75,10 +74,9 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var itSystemUsage = await ItSystemUsageHelper.CreateItSystemUsage(orgId, itSystem.Id);
                     return $"api/itSystemUsageRights/{itSystemUsage.Id}?organizationId={orgId}";
                 case RightsType.OrganizationUnitRights:
-                    //TODO: Create org unit
                     var orgUnit = OrganizationUnitHelper.GetOrganizationUnits(orgId);
                     return $"api/organizationunitright/{orgUnit.Result.Id}?organizationId={orgId}";
-                default: throw new Exception();
+                default: throw new Exception("Incorrect Rights Type");
             }
         }
     }

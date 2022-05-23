@@ -289,7 +289,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedOrg1 = new Organization() { Id = A<int>() };
             var expectedOrg2 = new Organization() { Id = A<int>() };
             var expectedOrg3 = new Organization() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization> { expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act

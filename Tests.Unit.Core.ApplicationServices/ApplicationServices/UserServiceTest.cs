@@ -45,7 +45,9 @@ namespace Tests.Unit.Core.ApplicationServices
             _cryptoServiceMock = new Mock<ICryptoService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _domainEventsMock = new Mock<IDomainEvents>();
-            _activeUserIdContextMock = new Mock<ActiveUserIdContext>();
+
+            var activeUserId = A<int>();
+            _activeUserIdContextMock = new Mock<ActiveUserIdContext>(activeUserId);
 
             _organizationServiceMock = new Mock<IOrganizationService>();
             _sut = new UserService(
