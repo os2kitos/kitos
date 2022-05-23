@@ -226,20 +226,5 @@ namespace Tests.Integration.Presentation.Web.Tools
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
             return response;
         }
-
-        public static async Task<ItSystemUsageDTO> CreateItSystemUsage(int orgId, int itSystemId, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            var url = TestEnvironment.CreateUrl($"api/itSystemUsage");
-            var body = new
-            {
-                OrganizationId = orgId,
-                ItSystemId = itSystemId
-            };
-
-            using var response = await HttpApi.PostWithCookieAsync(url, cookie, body);
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-            return await response.ReadResponseBodyAsKitosApiResponseAsync<ItSystemUsageDTO>();
-        }
     }
 }

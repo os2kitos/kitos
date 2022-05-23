@@ -4,7 +4,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 

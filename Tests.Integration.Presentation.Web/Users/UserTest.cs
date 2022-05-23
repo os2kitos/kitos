@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.Users
         {
             //Arrange
             var (userId, userEmail, organization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-
+            
             //Act
             var result = await UserHelper.GetUsersWithRightsholderAccessAsync();
 
@@ -129,12 +129,20 @@ namespace Tests.Integration.Presentation.Web.Users
             var (_, userId, organization) = await CreatePrerequisitesAsync(userRole);
             var name = A<string>();
 
+            var project = await ItProjectHelper.CreateProject(name, organization.Id);
+
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
             await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
             await RightsHelper.AddOrganizationRoleToUser(userId, organization.Id);
+
+            await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddRiskAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddHandoverResponsibleAsync(project.Id, userId);
+            await RightsHelper.AddSsoIdentityToUser(userId);
 
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);

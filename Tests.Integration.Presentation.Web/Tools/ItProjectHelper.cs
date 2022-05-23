@@ -229,6 +229,27 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
+        public static async Task<AssignmentDTO> AddRiskAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            using var response = await SendAddRiskRequestAsync(orgId, userId, projectId, optionalLogin);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<AssignmentDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAddRiskRequestAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var communication = new RiskDTO()
+            {
+                ItProjectId = projectId,
+                ResponsibleUserId = userId
+            };
+
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/risk?organizationId={orgId}"), cookie, communication);
+        }
+
         public static async Task<CommunicationDTO> AddCommunicationAsync(int organizationId, int projectId, string media, string message, string purpose, int responsibleUserId, string targetAudience, DateTime dueDate, Cookie optionalLogin = null)
         {
             using (var response = await SendAddCommunicationRequestAsync(organizationId, projectId, media, message, purpose, responsibleUserId, targetAudience, dueDate, optionalLogin))
@@ -257,6 +278,27 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
         }
 
+        public static async Task<AssignmentDTO> AddCommunicationAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            using var response = await SendAddCommunicationRequestAsync(orgId, userId, projectId, optionalLogin);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<AssignmentDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAddCommunicationRequestAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var communication = new CommunicationDTO
+            {
+                ItProjectId = projectId,
+                ResponsibleUserId = userId
+            };
+
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/communication?organizationId={orgId}"), cookie, communication);
+        }
+
         public static async Task<HandoverDTO> AddHandoverResponsibleAsync(int handoverId, int responsibleUserId, Cookie optionalLogin = null)
         {
             using (var response = await SendAddHandoverResponsibleRequestAsync(handoverId, responsibleUserId, optionalLogin))
@@ -275,6 +317,27 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.PostWithCookieAsync(url, cookie, new object());
         }
 
+        public static async Task<AssignmentDTO> AddAssignmentAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            using var response = await SendAddAssignmentRequestAsync(orgId, userId, projectId, optionalLogin);
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<AssignmentDTO>();
+        }
+
+        public static async Task<HttpResponseMessage> SendAddAssignmentRequestAsync(int orgId, int userId, int projectId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var assignment = new AssignmentDTO
+            {
+                AssociatedItProjectId = projectId,
+                AssociatedUserId = userId
+            };
+
+            return await HttpApi.PostWithCookieAsync(TestEnvironment.CreateUrl($"api/assignment?organizationId={orgId}"), cookie, assignment);
+        }
+        
         public static async Task DeleteProjectAsync(int projectId)
         {
             using var response = await SendDeleteProjectAsync(projectId);

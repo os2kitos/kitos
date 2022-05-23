@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 using Core.DomainModel;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models.API.V1;
+using Core.DomainModel.SSO;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
@@ -14,7 +12,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
 {
     public class RightsHelper
     {
-        public static async Task AddUserRole(int userId, int orgId, RightsType rightsType, string name, Cookie optionalLogin = null)
+        public static async Task AddUserRole(int userId, int orgId, RightsType rightsType, string name, int projectId = 0, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             
@@ -24,7 +22,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                 RoleId = (int)OrganizationRole.LocalAdmin
             };
 
-            var url = TestEnvironment.CreateUrl(await PrepareUrl(orgId, name, rightsType));
+            var url = TestEnvironment.CreateUrl(await PrepareUrl(orgId, name, rightsType, projectId));
             var response = await HttpApi.PostWithCookieAsync(url, cookie, roleDto);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -59,7 +57,22 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
-        private static async Task<string> PrepareUrl(int orgId, string name, RightsType rightsType)
+        public static async Task AddSsoIdentityToUser(int userId)
+        {
+            var user = await UserHelper.GetUserByIdAsync(userId);
+            var ssoIdentity = new SsoUserIdentity
+            {
+                ExternalUuid = user.Uuid
+            };
+
+            DatabaseAccess.MutateDatabase(x =>
+            {
+                x.SsoUserIdentities.Add(ssoIdentity);
+                x.SaveChanges();
+            });
+        }
+
+        private static async Task<string> PrepareUrl(int orgId, string name, RightsType rightsType, int projectId = 0)
         {
             switch (rightsType)
             {
@@ -67,11 +80,10 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     var contract = await ItContractHelper.CreateContract(name, orgId);
                     return $"api/itcontractright/{contract.Id}?organizationId={orgId}";
                 case RightsType.ItProjectRights:
-                    var project= await ItProjectHelper.CreateProject(name, orgId);
-                    return $"api/itprojectright/{project.Id}?organizationId={orgId}";
+                    return $"api/itprojectright/{projectId}?organizationId={orgId}";
                 case RightsType.ItSystemRights:
                     var itSystem = await ItSystemHelper.CreateItSystemInOrganizationAsync(name, orgId, AccessModifier.Local);
-                    var itSystemUsage = await ItSystemUsageHelper.CreateItSystemUsage(orgId, itSystem.Id);
+                    var itSystemUsage = await ItSystemHelper.TakeIntoUseAsync(itSystem.Id, orgId);
                     return $"api/itSystemUsageRights/{itSystemUsage.Id}?organizationId={orgId}";
                 case RightsType.OrganizationUnitRights:
                     var orgUnit = OrganizationUnitHelper.GetOrganizationUnits(orgId);

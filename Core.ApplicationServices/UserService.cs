@@ -296,13 +296,13 @@ namespace Core.ApplicationServices
 
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
-                return Maybe<OperationError>.Some(new OperationError(OperationFailure.NotFound));
+                return new OperationError(OperationFailure.NotFound);
             if(_activeUserIdContext.GetValueOrDefault().ActiveUserId == user.Id)
-                return Maybe<OperationError>.Some(new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden));
+                return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
 
 
             if (!_authorizationContext.AllowDelete(user))
-                return Maybe<OperationError>.Some(new OperationError(OperationFailure.Forbidden));
+                return new OperationError(OperationFailure.Forbidden);
             
             _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
 
@@ -314,7 +314,7 @@ namespace Core.ApplicationServices
             return Maybe<OperationError>.None;
         }
 
-        private void Delete(User user)
+        private static void Delete(User user)
         {
             user.LockedOutDate = DateTime.Now;
             user.EmailBeforeDeletion = user.Email;
@@ -326,12 +326,10 @@ namespace Core.ApplicationServices
             user.IsGlobalAdmin = false;
             user.HasApiAccess = false;
             user.HasStakeHolderAccess = false;
-
-            //TODO: Check cascades
+            
             user.ItProjectStatuses.Clear();
             user.ResponsibleForCommunications.Clear();
             user.HandoverParticipants.Clear();
-            user.LifeCycleTrackingEvents.Clear();
             user.ResponsibleForRisks.Clear();
             user.SsoIdentities.Clear();
         }

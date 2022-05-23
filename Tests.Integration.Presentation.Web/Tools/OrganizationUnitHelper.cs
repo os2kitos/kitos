@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
+﻿using System.Net;
 using System.Threading.Tasks;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
@@ -17,15 +13,8 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitDto = new OrgUnitDTO()
             {
-                Id = 0,
                 Name = name,
-                OrganizationId = orgId,
-                LocalId = "test",
-                ObjectOwnerName = "test",
-                ObjectOwnerLastName = "last name",
-                LastChangedByUserId = 1,
-                LastChanged = DateTime.Now,
-                Uuid = Guid.NewGuid()
+                OrganizationId = orgId
             };
             var orgUnitUrl = TestEnvironment.CreateUrl($"odata/OrganizationUnit");
 
