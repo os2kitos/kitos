@@ -234,7 +234,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
         }
 
         [Fact]
-        public async Task GetMigration_When_System_Is_Not_Used_In_Contracts_Or_Projects()
+        public async Task GetMigration_When_System_Migration_Has_No_Horizontal_Consequences()
         {
             //Arrange
             var usage = _oldSystemUsage;
@@ -248,6 +248,7 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedRelations);
                 Assert.Empty(result.AffectedContracts);
                 Assert.Empty(result.AffectedItProjects);
+                Assert.Empty(result.AffectedDataProcessingRegistrations);
                 AssertFromToSystemInfo(usage, result, _oldSystemInUse, newSystem);
             }
         }
@@ -287,6 +288,23 @@ namespace Tests.Integration.Presentation.Web.ItSystem
                 Assert.Empty(result.AffectedItProjects);
                 var resultContract = Assert.Single(result.AffectedContracts);
                 Assert.Equal(contract.Id, resultContract.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetMigration_When_System_Is_Associated_In_DataProcessingRegistration()
+        {
+            //Arrange
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(TestEnvironment.DefaultOrganizationId,CreateName());
+            await DataProcessingRegistrationHelper.SendAssignSystemRequestAsync(dpr.Id, _oldSystemUsage.Id);
+
+            //Act
+            using (var response = await GetMigration(_oldSystemUsage, _newSystem))
+            {
+                //Assert
+                var result = await AssertMigrationReturned(response);
+                var resultDpr = Assert.Single(result.AffectedDataProcessingRegistrations);
+                Assert.Equal(dpr.Id, resultDpr.Id);
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -15,14 +16,15 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
         public IReadOnlyList<ItProject> AffectedProjects { get; }
         public IReadOnlyList<ItContract> AffectedContracts { get; }
         public IReadOnlyList<SystemRelation> AffectedSystemRelations { get; }
-
+        public IReadOnlyList<DataProcessingRegistration> AffectedDataProcessingRegistrations { get; }
         public ItSystemUsageMigration(
             ItSystemUsage systemUsage,
             ItSystem fromItSystem,
             ItSystem toItSystem,
             IEnumerable<ItProject> affectedProjects, 
             IEnumerable<ItContract> affectedContracts,
-            IEnumerable<SystemRelation> affectedRelations)
+            IEnumerable<SystemRelation> affectedRelations,
+            IEnumerable<DataProcessingRegistration> affectedDataProcessingRegistrations)
         {
             SystemUsage = systemUsage;
             FromItSystem = fromItSystem;
@@ -30,6 +32,7 @@ namespace Core.ApplicationServices.Model.SystemUsage.Migration
             AffectedProjects = affectedProjects.ToList().AsReadOnly();
             AffectedContracts = affectedContracts.ToList().AsReadOnly();
             AffectedSystemRelations = affectedRelations.ToList().AsReadOnly();
+            AffectedDataProcessingRegistrations = affectedDataProcessingRegistrations.ToList().AsReadOnly();
         }
     }
 }

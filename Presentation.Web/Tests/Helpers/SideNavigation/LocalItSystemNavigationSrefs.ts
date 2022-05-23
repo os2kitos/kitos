@@ -10,6 +10,7 @@
     static kleSref = "it-system.usage.kle";
     static hierarchySref = "it-system.usage.hierarchy";
     static organizationSref = "it-system.usage.org";
+    static contractsSref = "it-system.usage.contracts";
 }
 
 export = LocalItSystemNavigationSrefs;

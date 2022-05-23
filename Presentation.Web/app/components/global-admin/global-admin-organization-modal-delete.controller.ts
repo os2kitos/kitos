@@ -5,10 +5,11 @@
         static $inject: string[] = ["$scope", "organizationApiService", "notify", "orgToDelete", "conflicts"];
 
         readonly title: string;
-        readonly orgName : string;
+        readonly orgName: string;
         readonly conflictsDetected: boolean;
         readonly consequencesAccepted: boolean;
         readonly conflictsModel: Models.ViewModel.Organization.OrganizationDeletionConflictsViewModel | null;
+        isCopyingConsequencesToClipBoard: boolean = false; //Used to trigger additional spacing in the DOM to support "paste" into word with better spacing.
 
         constructor(
             private readonly $scope,
@@ -70,25 +71,42 @@
         }
 
         copyToClipBoard() {
-            Utility.copyPageContentToClipBoard("consequencesOverview");
-            this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+            //Trigger additional spacing between consequece rows
+            this.isCopyingConsequencesToClipBoard = true;
+
+            //Allow angular to render
+            setTimeout(() => {
+                try {
+                    Utility.copyPageContentToClipBoard("consequencesOverview");
+                } catch (e) {
+                    console.log("Failed to copy consequences to clipboard", e);
+
+                }
+
+                // Remove spacing
+                this.isCopyingConsequencesToClipBoard = false;
+                this.notify.addSuccessMessage("Konsekvenser er kopieret til udklipsholderen");
+            },
+                1);
         }
 
         dismiss() {
             this.$scope.$dismiss();
-        };
+        }
 
         submit() {
-            this.organizationApiService.deleteOrganization(this.orgToDelete.uuid, this.consequencesAccepted)
-                .then((success) => {
-                    this.notify.addSuccessMessage("Organisationen blev slettet");
-                    this.$scope.$close(true);
-                },
-                    (error) => {
-                        console.error("Error deleting org:", this.orgToDelete, "Error:", error);
-                        this.notify.addErrorMessage("Fejl ifm. sletning af organisationen!");
-                    });
-        };
+            if (confirm(`Er du sikker på, at du vil slette "${this.orgName}"?`)) {
+                this.organizationApiService.deleteOrganization(this.orgToDelete.uuid, this.consequencesAccepted)
+                    .then((success) => {
+                        this.notify.addSuccessMessage("Organisationen blev slettet");
+                        this.$scope.$close(true);
+                    },
+                        (error) => {
+                            console.error("Error deleting org:", this.orgToDelete, "Error:", error);
+                            this.notify.addErrorMessage("Fejl ifm. sletning af organisationen!");
+                        });
+            }
+        }
     }
 
     angular

@@ -22,8 +22,6 @@
         }
 
         executeAsync(optionalSuccessCallback?: (successValue: T) => T, optionalErrorCallback?: (errorValue: Models.Api.ApiResponseErrorCategory) => void): angular.IPromise<T> {
-
-
             var messages = {
                 start: "",
                 success: "",

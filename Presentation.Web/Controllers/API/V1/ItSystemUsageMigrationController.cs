@@ -29,7 +29,7 @@ namespace Presentation.Web.Controllers.API.V1
         [HttpGet]
         [Route("")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<ItSystemUsageMigrationDTO>))]
-        public HttpResponseMessage GetMigration([FromUri]int usageId, [FromUri]int toSystemId)
+        public HttpResponseMessage GetMigration([FromUri] int usageId, [FromUri] int toSystemId)
         {
             var res = _itSystemUsageMigrationService.GetSystemUsageMigration(usageId, toSystemId);
             if (res.Ok)
@@ -42,11 +42,11 @@ namespace Presentation.Web.Controllers.API.V1
 
         [HttpPost]
         [Route("")]
-        [SwaggerResponse(HttpStatusCode.NoContent,"Migration completed")]
+        [SwaggerResponse(HttpStatusCode.NoContent, "Migration completed")]
         [SwaggerResponse(HttpStatusCode.BadRequest)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public HttpResponseMessage ExecuteMigration([FromUri]int usageId, [FromUri]int toSystemId)
+        public HttpResponseMessage ExecuteMigration([FromUri] int usageId, [FromUri] int toSystemId)
         {
             var result = _itSystemUsageMigrationService.ExecuteSystemUsageMigration(usageId, toSystemId);
             if (result.Ok)
@@ -72,10 +72,10 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("UnusedItSystems")]
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<NamedEntityWithEnabledStatusDTO>>))]
         public HttpResponseMessage GetUnusedItSystemsBySearchAndOrganization(
-            [FromUri]int organizationId,
-            [FromUri]string nameContent,
-            [FromUri]int numberOfItSystems,
-            [FromUri]bool getPublicFromOtherOrganizations)
+            [FromUri] int organizationId,
+            [FromUri] string nameContent,
+            [FromUri] int numberOfItSystems,
+            [FromUri] bool getPublicFromOtherOrganizations)
         {
             if (GetOrganizationReadAccessLevel(organizationId) < OrganizationDataReadAccessLevel.Public)
             {
@@ -110,7 +110,8 @@ namespace Presentation.Web.Controllers.API.V1
                 ToSystem = input.ToItSystem.MapToNamedEntityWithEnabledStatusDTO(),
                 AffectedItProjects = input.AffectedProjects.MapToNamedEntityDTOs().ToList(),
                 AffectedContracts = input.AffectedContracts.MapToNamedEntityDTOs().ToList(),
-                AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList()
+                AffectedRelations = input.AffectedSystemRelations.Select(Map).ToList(),
+                AffectedDataProcessingRegistrations = input.AffectedDataProcessingRegistrations.MapToNamedEntityDTOs().ToList()
             };
         }
 
