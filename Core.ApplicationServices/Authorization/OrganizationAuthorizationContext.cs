@@ -236,7 +236,7 @@ namespace Core.ApplicationServices.Authorization
             {
                 result = entity switch
                 {
-                    User _ => IsGlobalAdmin(),
+                    User user => IsGlobalAdmin() && EntityEqualsActiveUser(user) == false,
                     ItInterface itInterface =>
                         //Even rightsholders are not allowed to delete interfaces
                         IsGlobalAdmin() || IsLocalAdmin(itInterface.OrganizationId),

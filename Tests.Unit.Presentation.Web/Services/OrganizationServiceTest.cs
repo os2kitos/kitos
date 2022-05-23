@@ -269,16 +269,17 @@ namespace Tests.Unit.Presentation.Web.Services
             var unmatchedRight1 = CreateRight(A<int>(), userId);
             var unmatchedRight2 = CreateRight(organizationId, A<int>());
             _orgRightRepository.Setup(x => x.AsQueryable()).Returns(new[] { matchedRight1, unmatchedRight1, matchedRight2, unmatchedRight2 }.AsQueryable());
+            ExpectOrganizationRightsRemoveRoleReturnsSuccess();
 
             //Act
             var result = _sut.RemoveUser(organizationId, userId);
 
             //Assert that only the right entities were removed
             Assert.True(result.Ok);
-            _orgRightRepository.Verify(x => x.DeleteByKey(matchedRight1.Id), Times.Once);
-            _orgRightRepository.Verify(x => x.DeleteByKey(matchedRight2.Id), Times.Once);
-            _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight1.Id), Times.Never);
-            _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight2.Id), Times.Never);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(matchedRight1.Id), Times.Once);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(matchedRight2.Id), Times.Once);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight1.Id), Times.Never);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight2.Id), Times.Never);
         }
 
         [Fact]
@@ -805,9 +806,9 @@ namespace Tests.Unit.Presentation.Web.Services
         }
         
 
-        private void ExpectOrganizationRightsRemoveRoleReturns(int rightId, Result<OrganizationRight, OperationFailure> expectedResult)
+        private void ExpectOrganizationRightsRemoveRoleReturnsSuccess()
         {
-            _organizationRightsServiceMock.Setup(x => x.RemoveRole(rightId)).Returns(expectedResult);
+            _organizationRightsServiceMock.Setup(x => x.RemoveRole(It.IsAny<int>())).Returns(It.IsAny<OrganizationRight>());
         }
 
         private void ExpectAllowDeleteReturns(Organization organization, bool value)
