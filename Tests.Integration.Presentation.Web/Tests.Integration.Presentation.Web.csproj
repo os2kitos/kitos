@@ -198,6 +198,7 @@
     <Compile Include="Tools\OrganizationUnitHelper.cs" />
     <Compile Include="Tools\ReferencesHelper.cs" />
     <Compile Include="Tools\External\Rights\RightsHelper.cs" />
+    <Compile Include="Tools\SsoIdentityHelper.cs" />
     <Compile Include="Tools\SystemRelationHelper.cs" />
     <Compile Include="Tools\TaskUsageHelper.cs" />
     <Compile Include="Tools\TestEnvironment.cs" />

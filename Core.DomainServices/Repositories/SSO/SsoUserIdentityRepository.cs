@@ -42,20 +42,13 @@ namespace Core.DomainServices.Repositories.SSO
             return identity;
         }
 
-        public void DeleteIdentitiesForUser(IEnumerable<SsoUserIdentity> identities)
+        public void DeleteIdentitiesForUser(User user)
         {
+            var identities = user.SsoIdentities;
             if (identities == null)
-            {
-                throw new ArgumentNullException(nameof(identities));
-            }
+                return;
 
-            var identityList = identities.ToList();
-
-            foreach (var identity in identityList)
-            {
-                _repository.Delete(identity);
-            }
-
+            _repository.RemoveRange(identities);
             _repository.Save();
         }
     }

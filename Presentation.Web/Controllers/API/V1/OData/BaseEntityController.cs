@@ -77,6 +77,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             {
                 return Forbidden();
             }
+
             
             return Ok(SingleResult.Create(result));
         }

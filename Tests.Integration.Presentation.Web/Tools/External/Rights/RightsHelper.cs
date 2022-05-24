@@ -7,6 +7,7 @@ using Core.DomainModel;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.SSO;
+using Core.DomainServices.Extensions;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 
@@ -27,33 +28,25 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
             };
 
             var url = TestEnvironment.CreateUrl(await PrepareUrl(orgId, name, rightsType, objectId));
-            if (rightsType != RightsType.DprRights)
-            {
-                var createResponse = await HttpApi.PostWithCookieAsync(url, cookie, roleDto);
-                Assert.Equal(HttpStatusCode.Created, createResponse.StatusCode);
-                return;
-            }
+            using var response = await HttpApi.PostWithCookieAsync(url, cookie, roleDto);
 
-            var patchResponse = await HttpApi.PatchWithCookieAsync(url, cookie, roleDto);
-            Assert.Equal(HttpStatusCode.OK, patchResponse.StatusCode);
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
 
-        public static void AddSsoIdentityToUser(int userId)
+        public static async Task AddDprRoleToUser(int userId, int orgId, string name)
         {
-            var ssoIdentity = new SsoUserIdentity
-            {
-                ExternalUuid = Guid.NewGuid()
-            };
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(orgId, name);
 
-            DatabaseAccess.MutateDatabase(x =>
-            {
-                var user = x.Users.FirstOrDefault(x => x.Id == userId);
-                if (user == null)
-                    return;
+            var roles = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(dpr.Id);
+            var roleDtos = roles.ToList();
+            Assert.True(roleDtos.Any());
 
-                user.SsoIdentities.Add(ssoIdentity);
-                x.SaveChanges();
-            });
+            var singleRole = roleDtos.FirstOrDefault();
+            Assert.NotNull(singleRole);
+
+            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(dpr.Id, singleRole.Id, userId);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         private static async Task<string> PrepareUrl(int orgId, string name, RightsType rightsType, int objectId = 0)
@@ -72,8 +65,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                 case RightsType.OrganizationUnitRights:
                     var orgUnit = await OrganizationUnitHelper.GetOrganizationUnitsAsync(orgId);
                     return $"api/organizationunitright/{orgUnit.Id}?organizationId={orgId}";
-                case RightsType.DprRights:
-                    return $"api/v1/data-processing-registration/{objectId}/roles/assign";
                 default: throw new Exception("Incorrect Rights Type");
             }
         }
@@ -114,15 +105,6 @@ namespace Tests.Integration.Presentation.Web.Tools.External.Rights
                     Assert.NotNull(singleOrganizationUnit);
 
                     return singleOrganizationUnit.Id;
-                case RightsType.DprRights:
-                    var roles = await DataProcessingRegistrationHelper.GetAvailableRolesAsync(objectId);
-                    var roleDtos = roles.ToList();
-                    Assert.True(roleDtos.Any());
-
-                    var singleRole = roleDtos.FirstOrDefault();
-                    Assert.NotNull(singleRole);
-
-                    return singleRole.Id;
                 default: throw new Exception("Incorrect Rights Type");
             }
         }

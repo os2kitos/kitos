@@ -11,6 +11,6 @@ namespace Core.DomainServices.Repositories.SSO
     {
         Maybe<SsoUserIdentity> GetByExternalUuid(Guid externalId);
         Result<SsoUserIdentity, OperationError> AddNew(User user, Guid externalId);
-        void DeleteIdentitiesForUser(IEnumerable<SsoUserIdentity> users);
+        void DeleteIdentitiesForUser(User user);
     }
 }

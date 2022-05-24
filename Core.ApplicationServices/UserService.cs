@@ -42,7 +42,7 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
-        private readonly Maybe<ActiveUserIdContext> _activeUserIdContext;
+        private readonly IOrganizationalUserContext _activeUserIdContext;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
@@ -60,8 +60,8 @@ namespace Core.ApplicationServices
             IDomainEvents domainEvents,
             IUserRepository repository,
             IOrganizationService organizationService,
-            ITransactionManager transactionManager, 
-            Maybe<ActiveUserIdContext> activeUserIdContext)
+            ITransactionManager transactionManager,
+            IOrganizationalUserContext activeUserIdContext)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -297,7 +297,7 @@ namespace Core.ApplicationServices
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
                 return new OperationError(OperationFailure.NotFound);
-            if(_activeUserIdContext.GetValueOrDefault().ActiveUserId == user.Id)
+            if(_activeUserIdContext.UserId.Select(context => context.ActiveUserId == user.Id).GetValueOrDefault())
                 return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
 
 

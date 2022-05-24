@@ -121,7 +121,7 @@ namespace Core.ApplicationServices.UIConfiguration.Handlers
             if (roles == null)
                 return;
 
-            _ssoUserIdentityRepository.DeleteIdentitiesForUser(roles);
+            _ssoUserIdentityRepository.DeleteIdentitiesForUser(user);
             roles.Clear();
         }
 

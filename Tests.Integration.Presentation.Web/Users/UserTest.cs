@@ -126,40 +126,52 @@ namespace Tests.Integration.Presentation.Web.Users
         {
             var userRole = OrganizationRole.LocalAdmin;
 
-            var (_, userId, organization) = await CreatePrerequisitesAsync(userRole);
+            var (_, userId, organization, originalEmail) = await CreatePrerequisitesAsync(userRole);
             var name = A<string>();
 
             var project = await ItProjectHelper.CreateProject(name, organization.Id);
-            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, name);
 
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.DprRights, name, dpr.Id);
+            await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
 
             await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddRiskAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddHandoverResponsibleAsync(project.Id, userId);
-            RightsHelper.AddSsoIdentityToUser(userId);
 
+            SsoIdentityHelper.AddSsoIdentityToUser(userId);
+            
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
             
-            var getDeletedUserResponse = await UserHelper.GetUserByIdAsync(userId);
+            var deletedUser = await UserHelper.GetUserByIdAsync(userId);
 
-            Assert.True(getDeletedUserResponse.Deleted);
-            Assert.False(getDeletedUserResponse.IsGlobalAdmin);
-            Assert.False(getDeletedUserResponse.HasApiAccess);
-            Assert.False(getDeletedUserResponse.HasStakeHolderAccess);
+            Assert.True(deletedUser.Deleted);
+            Assert.False(deletedUser.IsGlobalAdmin);
+            Assert.False(deletedUser.HasApiAccess);
+            Assert.False(deletedUser.HasStakeHolderAccess);
 
-            Assert.Contains("_deleted_user@kitos.dk", getDeletedUserResponse.Email);
-            Assert.Contains("(SLETTET)", getDeletedUserResponse.LastName);
-            Assert.NotNull(getDeletedUserResponse.EmailBeforeDeletion);
-            Assert.NotNull(getDeletedUserResponse.LockedOutDate);
-            Assert.NotNull(getDeletedUserResponse.DeletedDate);
-            Assert.Null(getDeletedUserResponse.PhoneNumber);
+            Assert.Contains("_deleted_user@kitos.dk", deletedUser.Email);
+            Assert.Contains("(SLETTET)", deletedUser.LastName);
+            Assert.Equal(originalEmail, deletedUser.EmailBeforeDeletion);
+            Assert.NotNull(deletedUser.LockedOutDate);
+            Assert.NotNull(deletedUser.DeletedDate);
+            Assert.Null(deletedUser.PhoneNumber);
+
+            Assert.Empty(deletedUser.DataProcessingRegistrationRights);
+            Assert.Empty(deletedUser.OrganizationRights);
+            Assert.Empty(deletedUser.ItContractRights);
+            Assert.Empty(deletedUser.ItSystemRights);
+            Assert.Empty(deletedUser.ItProjectRights);
+            Assert.Empty(deletedUser.OrganizationUnitRights);
+            Assert.Empty(deletedUser.SsoIdentities);
+            Assert.Empty(deletedUser.ItProjectStatuses);
+            Assert.Empty(deletedUser.ResponsibleForCommunications);
+            Assert.Empty(deletedUser.HandoverParticipants);
+            Assert.Empty(deletedUser.ResponsibleForRisks);
         }
 
         [Fact]
@@ -167,18 +179,19 @@ namespace Tests.Integration.Presentation.Web.Users
         {
             var userRole = OrganizationRole.GlobalAdmin;
 
-            var (cookie, userId, _) = await CreatePrerequisitesAsync(userRole);
+            var (cookie, userId, _, _) = await CreatePrerequisitesAsync(userRole);
 
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
             Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
         }
 
-        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization)> CreatePrerequisitesAsync(OrganizationRole role)
+        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role)
         {
             var organization = await CreateOrganizationAsync();
+            var email = UIConfigurationHelper.CreateEmail();
             var (userId, _, loginCookie) =
-                await HttpApi.CreateUserAndLogin(UIConfigurationHelper.CreateEmail(), role, organization.Id);
-            return (loginCookie, userId, organization);
+                await HttpApi.CreateUserAndLogin(email, role, organization.Id);
+            return (loginCookie, userId, organization, email);
         }
 
         private async Task<(int userId, string userEmail, string orgName)> CreateStakeHolderUserInNewOrganizationAsync(bool hasApiAccess, bool hasStakeholderAccess)
