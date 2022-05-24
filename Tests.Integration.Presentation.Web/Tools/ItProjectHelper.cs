@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.Organization;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Xunit;
 
