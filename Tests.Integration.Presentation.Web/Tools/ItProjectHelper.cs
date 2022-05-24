@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract;
+using Core.DomainModel.ItProject;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
@@ -342,6 +345,16 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             using var response = await SendDeleteProjectAsync(projectId);
             Assert.Equal(HttpStatusCode.OK,response.StatusCode);
+        }
+
+        public static async Task<List<ItProjectRole>> GetRolesAsync(Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItProjectRoles"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItProjectRole>();
         }
     }
 }

@@ -131,24 +131,34 @@ namespace Tests.Integration.Presentation.Web.Users
 
             var project = await ItProjectHelper.CreateProject(name, organization.Id);
 
-            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
             await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
-            await RightsHelper.AddOrganizationRoleToUser(userId, organization.Id);
 
             await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddRiskAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddHandoverResponsibleAsync(project.Id, userId);
-            await RightsHelper.AddSsoIdentityToUser(userId);
+            RightsHelper.AddSsoIdentityToUser(userId);
 
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
             
             var getDeletedUserResponse = await UserHelper.GetUserByIdAsync(userId);
+
             Assert.True(getDeletedUserResponse.Deleted);
+            Assert.False(getDeletedUserResponse.IsGlobalAdmin);
+            Assert.False(getDeletedUserResponse.HasApiAccess);
+            Assert.False(getDeletedUserResponse.HasStakeHolderAccess);
+
+            Assert.Contains("_deleted_user@kitos.dk", getDeletedUserResponse.Email);
+            Assert.Contains("(SLETTET)", getDeletedUserResponse.LastName);
+            Assert.NotNull(getDeletedUserResponse.EmailBeforeDeletion);
+            Assert.NotNull(getDeletedUserResponse.LockedOutDate);
+            Assert.NotNull(getDeletedUserResponse.DeletedDate);
+            Assert.Null(getDeletedUserResponse.PhoneNumber);
         }
 
         [Fact]

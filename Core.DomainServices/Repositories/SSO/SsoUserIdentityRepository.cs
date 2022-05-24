@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -39,6 +40,23 @@ namespace Core.DomainServices.Repositories.SSO
             identity = _repository.Insert(identity);
             _repository.Save();
             return identity;
+        }
+
+        public void DeleteIdentitiesForUser(IEnumerable<SsoUserIdentity> identities)
+        {
+            if (identities == null)
+            {
+                throw new ArgumentNullException(nameof(identities));
+            }
+
+            var identities2 = identities.ToList();
+
+            foreach (var identity in identities2)
+            {
+                _repository.Delete(identity);
+            }
+
+            _repository.Save();
         }
     }
 }

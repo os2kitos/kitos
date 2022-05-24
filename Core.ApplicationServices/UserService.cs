@@ -326,12 +326,11 @@ namespace Core.ApplicationServices
             user.IsGlobalAdmin = false;
             user.HasApiAccess = false;
             user.HasStakeHolderAccess = false;
-            
+
             user.ItProjectStatuses.Clear();
             user.ResponsibleForCommunications.Clear();
             user.HandoverParticipants.Clear();
             user.ResponsibleForRisks.Clear();
-            user.SsoIdentities.Clear();
         }
     }
 }

@@ -12,8 +12,11 @@ using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices.Context;
+using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
+using FluentAssertions;
 using Infrastructure.Services.DataAccess;
 using Tests.Toolkit.Patterns;
 using Xunit;
@@ -32,6 +35,7 @@ namespace Tests.Unit.Core.ApplicationServices
         private readonly Mock<ICryptoService> _cryptoServiceMock;
         private readonly Mock<IAuthorizationContext> _authorizationContextMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<ITransactionManager> _transactionManagerMock;
         private readonly Mock<IOrganizationService> _organizationServiceMock;
         private readonly Mock<ActiveUserIdContext> _activeUserIdContextMock;
 
@@ -45,6 +49,7 @@ namespace Tests.Unit.Core.ApplicationServices
             _cryptoServiceMock = new Mock<ICryptoService>();
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _domainEventsMock = new Mock<IDomainEvents>();
+            _transactionManagerMock = new Mock<ITransactionManager>();
 
             var activeUserId = A<int>();
             _activeUserIdContextMock = new Mock<ActiveUserIdContext>(activeUserId);
@@ -65,7 +70,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 _domainEventsMock.Object,
                 _repositoryMock.Object,
                 _organizationServiceMock.Object,
-                Mock.Of<ITransactionManager>(),
+                _transactionManagerMock.Object,
                 _activeUserIdContextMock.Object);
         }
 
@@ -246,6 +251,27 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
+        
+
+        [Fact]
+        public void DeleteUserFromKitos_Raises_EntityBeingDeletedEvent_And_AccessRights_Changed()
+        {
+            //Arrange
+            var userUuid = A<Guid>();
+            var isDeleteAllowed = true;
+
+            ExpectTransactionBeginReturns();
+            ExpectUserRepositoryByUuidReturns(userUuid);
+            ExpectAuthorizationAllowDeleteReturns(isDeleteAllowed);
+
+            //Act
+            var result = _sut.DeleteUserFromKitos(userUuid);
+
+            //Assert
+            Assert.True(result.IsNone);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<EntityBeingDeletedEvent<User>>()), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.IsAny<AccessRightsChanged>()), Times.Once);
+        }
 
         private void ExpectGetOrganizationAccessReturns(int organizationId, OrganizationDataReadAccessLevel organizationDataReadAccessLevel)
         {
@@ -256,6 +282,22 @@ namespace Tests.Unit.Core.ApplicationServices
         private void ExpectGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
             _organizationServiceMock.Setup(x => x.GetOrganization(organizationId,OrganizationDataReadAccessLevel.All)).Returns(organization);
+        }
+
+        private void ExpectTransactionBeginReturns()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManagerMock.Setup(x => x.Begin()).Returns(transaction.Object);
+        }
+
+        private void ExpectUserRepositoryByUuidReturns(Guid uuid)
+        {
+            _userRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<User>{new() {Uuid = uuid}}.AsQueryable);
+        }
+
+        private void ExpectAuthorizationAllowDeleteReturns(bool result)
+        {
+            _authorizationContextMock.Setup(x => x.AllowDelete(It.IsAny<User>())).Returns(result);
         }
     }
 }

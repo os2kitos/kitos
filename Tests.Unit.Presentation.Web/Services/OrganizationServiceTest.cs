@@ -14,6 +14,7 @@ using Core.DomainModel.ItContract;
 using Core.DomainModel.ItSystem;
 using Core.DomainModel.ItSystemUsage;
 using Core.DomainModel.Organization;
+using Core.DomainModel.Organization.DomainEvents;
 using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Queries;
@@ -58,6 +59,7 @@ namespace Tests.Unit.Presentation.Web.Services
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _domainEventsMock = new Mock<IDomainEvents>();
             _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -280,6 +282,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _organizationRightsServiceMock.Verify(x => x.RemoveRole(matchedRight2.Id), Times.Once);
             _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight1.Id), Times.Never);
             _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight2.Id), Times.Never);
+            //_domainEventsMock.Verify(x => x.Raise(It.Is<AccessRightsChanged>(rightsChanged => rightsChanged.UserId == userId)), Times.AtLeastOnce);
+            //_domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<Organization>>(org => org.Entity == organization)), Times.Never());
         }
 
         [Fact]
