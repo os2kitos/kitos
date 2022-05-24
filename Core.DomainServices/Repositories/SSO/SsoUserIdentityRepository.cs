@@ -49,9 +49,9 @@ namespace Core.DomainServices.Repositories.SSO
                 throw new ArgumentNullException(nameof(identities));
             }
 
-            var identities2 = identities.ToList();
+            var identityList = identities.ToList();
 
-            foreach (var identity in identities2)
+            foreach (var identity in identityList)
             {
                 _repository.Delete(identity);
             }

@@ -130,12 +130,13 @@ namespace Tests.Integration.Presentation.Web.Users
             var name = A<string>();
 
             var project = await ItProjectHelper.CreateProject(name, organization.Id);
+            var dpr = await DataProcessingRegistrationHelper.CreateAsync(organization.Id, name);
 
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
             await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
-            await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.DprRights, name, dpr.Id);
 
             await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
             await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
