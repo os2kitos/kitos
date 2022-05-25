@@ -117,7 +117,12 @@ namespace Core.ApplicationServices.UIConfiguration.Handlers
 
         private void ClearSsoIdentities(User user)
         {
+            var roles = user.SsoIdentities;
+            if (roles == null)
+                return;
+
             _ssoUserIdentityRepository.DeleteIdentitiesForUser(user);
+            roles.Clear();
         }
 
     }

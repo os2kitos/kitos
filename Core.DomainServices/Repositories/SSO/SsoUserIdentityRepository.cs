@@ -46,7 +46,7 @@ namespace Core.DomainServices.Repositories.SSO
         {
             var identities = user.SsoIdentities;
             if (identities == null)
-                return;
+                throw new ArgumentNullException($"User with id: {user.Id} has no Sso Identities");
 
             _repository.RemoveRange(identities);
             _repository.Save();
