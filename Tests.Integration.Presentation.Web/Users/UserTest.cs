@@ -1,9 +1,12 @@
-﻿using Core.DomainModel;
+﻿using System;
+using Core.DomainModel;
 using Core.DomainModel.Organization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using System.Xml.Schema;
+using Core.Abstractions.Extensions;
+using Core.DomainServices.Extensions;
+using Infrastructure.DataAccess.Extensions;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External.Rights;
@@ -15,6 +18,7 @@ namespace Tests.Integration.Presentation.Web.Users
 {
     public class UserTest : WithAutoFixture
     {
+        private static readonly EntityPropertyProxyValueLoader<User> ProxyLoader = new();
 
         [Fact]
         public async Task Can_Get_Users_And_Organizations_Where_User_Has_RightsholderAccess()
@@ -147,32 +151,43 @@ namespace Tests.Integration.Presentation.Web.Users
             
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
-            
-            var deletedUser = UserHelper.GetUserByIdWithRightsAsync(userId);
 
-            Assert.True(deletedUser.Deleted);
-            Assert.False(deletedUser.IsGlobalAdmin);
-            Assert.False(deletedUser.HasApiAccess);
-            Assert.False(deletedUser.HasStakeHolderAccess);
+            DatabaseAccess.MapFromEntitySet<User, User>(repository =>
+            {
+                var user = repository.AsQueryable().ById(userId);
+                if (user == null)
+                {
+                    throw new ArgumentException("Failed to find user with id", nameof(userId));
+                }
 
-            Assert.Contains("_deleted_user@kitos.dk", deletedUser.Email);
-            Assert.Contains("(SLETTET)", deletedUser.LastName);
-            Assert.Equal(originalEmail, deletedUser.EmailBeforeDeletion);
-            Assert.NotNull(deletedUser.LockedOutDate);
-            Assert.NotNull(deletedUser.DeletedDate);
-            Assert.Null(deletedUser.PhoneNumber);
+                user.Transform(ProxyLoader.LoadReferencedEntities);
 
-            Assert.Empty(deletedUser.DataProcessingRegistrationRights);
-            Assert.Empty(deletedUser.OrganizationRights);
-            Assert.Empty(deletedUser.ItContractRights);
-            Assert.Empty(deletedUser.ItSystemRights);
-            Assert.Empty(deletedUser.ItProjectRights);
-            Assert.Empty(deletedUser.OrganizationUnitRights);
-            Assert.Empty(deletedUser.SsoIdentities);
-            Assert.Empty(deletedUser.ItProjectStatuses);
-            Assert.Empty(deletedUser.ResponsibleForCommunications);
-            Assert.Empty(deletedUser.HandoverParticipants);
-            Assert.Empty(deletedUser.ResponsibleForRisks);
+                Assert.True(user.Deleted);
+                Assert.False(user.IsGlobalAdmin);
+                Assert.False(user.HasApiAccess);
+                Assert.False(user.HasStakeHolderAccess);
+
+                Assert.Contains("_deleted_user@kitos.dk", user.Email);
+                Assert.Contains("(SLETTET)", user.LastName);
+                Assert.Equal(originalEmail, user.EmailBeforeDeletion);
+                Assert.NotNull(user.LockedOutDate);
+                Assert.NotNull(user.DeletedDate);
+                Assert.Null(user.PhoneNumber);
+
+                Assert.Empty(user.DataProcessingRegistrationRights);
+                Assert.Empty(user.OrganizationRights);
+                Assert.Empty(user.ItContractRights);
+                Assert.Empty(user.ItSystemRights);
+                Assert.Empty(user.ItProjectRights);
+                Assert.Empty(user.OrganizationUnitRights);
+                Assert.Empty(user.SsoIdentities);
+                Assert.Empty(user.ItProjectStatuses);
+                Assert.Empty(user.ResponsibleForCommunications);
+                Assert.Empty(user.HandoverParticipants);
+                Assert.Empty(user.ResponsibleForRisks);
+
+                return user;
+            });
         }
 
         [Fact]

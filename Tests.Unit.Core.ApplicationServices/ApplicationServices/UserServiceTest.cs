@@ -196,7 +196,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var organizationUuid = A<Guid>();
             var userUuid = A<Guid>();
             var organization = new Organization { Id = A<int>(), Uuid = organizationUuid };
-            var expectedUser = new User(){Uuid = userUuid};
+            var expectedUser = new User() { Uuid = userUuid };
             var allUsers = new[] { new User(), expectedUser, new User() }.AsQueryable();
             ExpectGetOrganizationReturns(organizationUuid, organization);
             ExpectGetOrganizationAccessReturns(organization.Id, OrganizationDataReadAccessLevel.All);
@@ -234,7 +234,7 @@ namespace Tests.Unit.Core.ApplicationServices
             var organizationUuid = A<Guid>();
             var userUuid = A<Guid>();
             var organization = new Organization { Id = A<int>(), Uuid = organizationUuid };
-            var allUsers = new[] { new User(),  new User() }.AsQueryable();
+            var allUsers = new[] { new User(), new User() }.AsQueryable();
             ExpectGetOrganizationReturns(organizationUuid, organization);
             ExpectGetOrganizationAccessReturns(organization.Id, OrganizationDataReadAccessLevel.All);
             _repositoryMock.Setup(x => x.GetUsersInOrganization(organization.Id)).Returns(allUsers);
@@ -246,7 +246,7 @@ namespace Tests.Unit.Core.ApplicationServices
             Assert.True(result.Failed);
             Assert.Equal(OperationFailure.NotFound, result.Error.FailureType);
         }
-        
+
 
         [Fact]
         public void DeleteUserFromKitos_Raises_EntityBeingDeletedEvent_And_AccessRights_Changed()
@@ -266,7 +266,7 @@ namespace Tests.Unit.Core.ApplicationServices
             //Assert
             Assert.True(result.IsNone);
             _domainEventsMock.Verify(x => x.Raise(It.Is<EntityBeingDeletedEvent<User>>(deleteEvent => deleteEvent.Entity.Id == user.Id)), Times.Once);
-            _domainEventsMock.Verify(x => x.Raise(It.IsAny<AccessRightsChanged>()), Times.Once);
+            _domainEventsMock.Verify(x => x.Raise(It.Is<AccessRightsChanged>(changedEvent => changedEvent.UserId == user.Id)), Times.Once);
             transaction.Verify(x => x.Commit(), Times.Once);
         }
 
@@ -278,7 +278,7 @@ namespace Tests.Unit.Core.ApplicationServices
 
         private void ExpectGetOrganizationReturns(Guid organizationId, Result<Organization, OperationError> organization)
         {
-            _organizationServiceMock.Setup(x => x.GetOrganization(organizationId,OrganizationDataReadAccessLevel.All)).Returns(organization);
+            _organizationServiceMock.Setup(x => x.GetOrganization(organizationId, OrganizationDataReadAccessLevel.All)).Returns(organization);
         }
 
         private Mock<IDatabaseTransaction> ExpectTransactionBeginReturns()
@@ -295,7 +295,7 @@ namespace Tests.Unit.Core.ApplicationServices
                 Id = userId,
                 Uuid = uuid
             };
-            _userRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<User>{ user }.AsQueryable);
+            _userRepositoryMock.Setup(x => x.AsQueryable()).Returns(new List<User> { user }.AsQueryable);
             return user;
         }
 

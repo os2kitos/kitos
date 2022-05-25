@@ -59,6 +59,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\EntityPropertyProxyValueLoader.cs" />
     <Compile Include="GenericRepository.cs" />
     <Compile Include="Interceptors\EFEntityInterceptor.cs" />
     <Compile Include="KitosContext.cs" />
