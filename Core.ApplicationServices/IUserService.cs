@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -18,5 +19,6 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
+        Result<IQueryable<User>, OperationError> SearchUsers(params IDomainQuery<User>[] queries);
     }
 }

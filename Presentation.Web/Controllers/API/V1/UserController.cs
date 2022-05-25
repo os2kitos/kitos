@@ -13,10 +13,14 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
+using Presentation.Web.Models.API.V2.Request.Generic.Queries;
 
 namespace Presentation.Web.Controllers.API.V1
 {
@@ -207,6 +211,28 @@ namespace Presentation.Web.Controllers.API.V1
                 .Select(users => users.OrderBy(user => user.Id))
                 .Select(users => users.ToList())
                 .Select(ToUserWithCrossRightsDTOs)
+                .Match(Ok, FromOperationError);
+        }
+
+        /// <summary>
+        /// Returns the users with matching name or email
+        /// </summary>
+        /// <param name="nameOrEmailQuery">Name or email of the user</param>
+        /// <returns>A list of users</returns>
+        [HttpGet]
+        [Route("api/users/{nameOrEmailQuery}")]
+        public HttpResponseMessage GetUsersWithCrossAccess(string nameOrEmailQuery, [FromUri] BoundedPaginationQuery paginationQuery = null)
+        {
+            if (string.IsNullOrEmpty(nameOrEmailQuery))
+                return BadRequest("Query needs a value");
+
+            var queries = new List<IDomainQuery<User>> {new QueryUserByNameOrEmail(nameOrEmailQuery)};
+            
+            return _userService
+                .SearchUsers(queries.ToArray())                                            
+                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList()/*.Select(user => (organizationUuid, user)).Select(ToUserResponseDTO)*/)
                 .Match(Ok, FromOperationError);
         }
 
