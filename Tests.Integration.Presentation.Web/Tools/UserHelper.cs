@@ -60,12 +60,6 @@ namespace Tests.Integration.Presentation.Web.Tools
             return user;
         }
 
-        public static async Task<HttpResponseMessage> SendGetUserByIdAsync(int id, Cookie optionalLogin = null)
-        {
-            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"odata/users({id})"), cookie);
-        }
-
         public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
