@@ -1,9 +1,11 @@
 ﻿using Core.DomainModel.Organization;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
@@ -39,12 +41,23 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
         }
 
-        public static async Task<User> GetUserByIdAsync(int id, Cookie optionalLogin = null)
+        public static User GetUserByIdWithRightsAsync(int id)
         {
-            using var response = await SendGetUserByIdAsync(id, optionalLogin);
-            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-            return await response.ReadResponseBodyAsAsync<User>();
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable()
+                .Include(user => user.DataProcessingRegistrationRights)
+                .Include(user => user.OrganizationRights)
+                .Include(user => user.ItContractRights)
+                .Include(user => user.ItProjectRights)
+                .Include(user => user.ItSystemRights)
+                .Include(user => user.OrganizationUnitRights)
+                .Include(user => user.SsoIdentities)
+                .Include(user => user.ItProjectStatuses)
+                .Include(user => user.ResponsibleForCommunications)
+                .Include(user => user.HandoverParticipants)
+                .Include(user => user.ResponsibleForRisks)
+                .ById(id));
+            
+            return user;
         }
 
         public static async Task<HttpResponseMessage> SendGetUserByIdAsync(int id, Cookie optionalLogin = null)

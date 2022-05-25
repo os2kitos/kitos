@@ -29,7 +29,7 @@ namespace Core.DomainModel
             OrganizationUnitRights = new List<OrganizationUnitRight>();
             ItProjectRights = new List<ItProjectRight>();
             ItSystemRights = new List<ItSystemRight>();
-            ItContractRights = new List<ItContractRight>();
+            //ItContractRights = new List<ItContractRight>();
             ItProjectStatuses = new List<ItProjectStatus>();
             ResponsibleForRisks = new List<Risk>();
             ResponsibleForCommunications = new List<Communication>();

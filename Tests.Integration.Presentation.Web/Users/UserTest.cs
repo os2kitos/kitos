@@ -147,7 +147,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
             
-            var deletedUser = await UserHelper.GetUserByIdAsync(userId);
+            var deletedUser = UserHelper.GetUserByIdWithRightsAsync(userId);
 
             Assert.True(deletedUser.Deleted);
             Assert.False(deletedUser.IsGlobalAdmin);
