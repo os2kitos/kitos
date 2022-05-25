@@ -206,6 +206,7 @@ namespace Tests.Integration.Presentation.Web.Users
 
             Assert.Contains(userId1, users.Select(x => x.Id));
             Assert.Contains(userId2, users.Select(x => x.Id));
+            Assert.DoesNotContain(userId3, users.Select(x => x.Id));
         }
 
         private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role, string email = "", string name = "", bool hasApiAccess = false)

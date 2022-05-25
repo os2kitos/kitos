@@ -290,6 +290,22 @@ namespace Core.ApplicationServices
                 );
         }
 
+        public Result<IQueryable<User>, OperationError> SearchUsers(params IDomainQuery<User>[] queries)
+        {
+            var currentUser = _userRepository.AsQueryable().ById(_organizationalUserContext.UserId);
+            if (!currentUser.IsGlobalAdmin)
+            {
+                return Result<IQueryable<User>, OperationError>.Failure(OperationFailure.Forbidden);
+            }
+
+            var query = new IntersectionQuery<User>(queries);
+
+            return _repository
+                .GetUsers()
+                .Transform(query.Apply)
+                .Transform(Result<IQueryable<User>, OperationError>.Success);
+        }
+
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
         {
             using var transaction = _transactionManager.Begin();
@@ -331,16 +347,6 @@ namespace Core.ApplicationServices
             user.ResponsibleForCommunications.Clear();
             user.HandoverParticipants.Clear();
             user.ResponsibleForRisks.Clear();
-        }
-
-        public Result<IQueryable<User>, OperationError> SearchUsers(params IDomainQuery<User>[] queries)
-        {
-            var query = new IntersectionQuery<User>(queries);
-
-            return _repository
-                   .GetUsers()
-                   .Transform(query.Apply)
-                   .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
     }
 }

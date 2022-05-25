@@ -227,8 +227,6 @@ namespace Presentation.Web.Controllers.API.V1
         [Route("api/users/search/{nameOrEmailQuery}")]
         public HttpResponseMessage SearchUsers(string nameOrEmailQuery, [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
-            try
-            {
                 if (string.IsNullOrEmpty(nameOrEmailQuery))
                     return BadRequest("Query needs a value");
 
@@ -238,13 +236,9 @@ namespace Presentation.Web.Controllers.API.V1
                     .SearchUsers(queries.ToArray())
                     .Select(x => x.OrderBy(user => user.Id))
                     .Select(x => x.Page(paginationQuery))
-                    .Select(x => x.ToList()/*.Select(user => (organizationUuid, user)).Select(ToUserResponseDTO)*/)
+                    .Select(x => x.ToList())
+                    .Select(ToUserWithEmailDtos)
                     .Match(Ok, FromOperationError);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.Message);
-            }
         }
 
         private static IEnumerable<UserWithOrganizationDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)
@@ -255,6 +249,16 @@ namespace Presentation.Web.Controllers.API.V1
         private static UserWithOrganizationDTO ToUserWithOrgDTO(UserRoleAssociationDTO dto)
         {
             return new(dto.User.Id, dto.User.GetFullName(), dto.User.Email, dto.Organization.Name, dto.User.HasApiAccess.GetValueOrDefault(false));
+        }
+
+        private static IEnumerable<UserWithEmailDTO> ToUserWithEmailDtos(List<User> users)
+        {
+            return users.Select(ToUserWithEmailDto).ToList();
+        }
+
+        private static UserWithEmailDTO ToUserWithEmailDto(User user)
+        {
+            return new(user.Id, user.Name, user.Email);
         }
 
         private static IEnumerable<UserWithCrossOrganizationalRightsDTO> ToUserWithCrossRightsDTOs(IEnumerable<User> users)
