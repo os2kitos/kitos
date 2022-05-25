@@ -224,20 +224,27 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="nameOrEmailQuery">Name or email of the user</param>
         /// <returns>A list of users</returns>
         [HttpGet]
-        [Route("api/users/{nameOrEmailQuery}")]
-        public HttpResponseMessage GetUsersWithCrossAccess(string nameOrEmailQuery, [FromUri] BoundedPaginationQuery paginationQuery = null)
+        [Route("api/users/search/{nameOrEmailQuery}")]
+        public HttpResponseMessage SearchUsers(string nameOrEmailQuery, [FromUri] BoundedPaginationQuery paginationQuery = null)
         {
-            if (string.IsNullOrEmpty(nameOrEmailQuery))
-                return BadRequest("Query needs a value");
+            try
+            {
+                if (string.IsNullOrEmpty(nameOrEmailQuery))
+                    return BadRequest("Query needs a value");
 
-            var queries = new List<IDomainQuery<User>> {new QueryUserByNameOrEmail(nameOrEmailQuery)};
-            
-            return _userService
-                .SearchUsers(queries.ToArray())                                            
-                .Select(x => x.OrderBy(user => user.Id))
-                .Select(x => x.Page(paginationQuery))
-                .Select(x => x.ToList()/*.Select(user => (organizationUuid, user)).Select(ToUserResponseDTO)*/)
-                .Match(Ok, FromOperationError);
+                var queries = new List<IDomainQuery<User>> { new QueryUserByNameOrEmail(nameOrEmailQuery) };
+
+                return _userService
+                    .SearchUsers(queries.ToArray())
+                    .Select(x => x.OrderBy(user => user.Id))
+                    .Select(x => x.Page(paginationQuery))
+                    .Select(x => x.ToList()/*.Select(user => (organizationUuid, user)).Select(ToUserResponseDTO)*/)
+                    .Match(Ok, FromOperationError);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         private static IEnumerable<UserWithOrganizationDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)

@@ -65,5 +65,19 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
         }
+
+        public static async Task<List<User>> SearchUsersAsync(string query, Cookie optionalLogin = null)
+        {
+            using var response = await SendSearchUsersAsync(query, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<User>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendSearchUsersAsync(string query, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/users/search/{query}"), cookie);
+        }
     }
 }

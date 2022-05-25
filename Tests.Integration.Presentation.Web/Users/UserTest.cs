@@ -3,6 +3,7 @@ using Core.DomainModel.Organization;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
 using Tests.Integration.Presentation.Web.Tools.External.Rights;
@@ -185,13 +186,35 @@ namespace Tests.Integration.Presentation.Web.Users
             Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
         }
 
-        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role)
+        [Fact]
+        public async Task Search_User_Returns_Users_With_Matching_Name_Or_Email()
+        {
+            var userRole = OrganizationRole.User;
+            var testPhrase = "testPhrase";
+
+            var email1 = CreateEmailContainingPhrase(testPhrase);
+            var email2 = CreateEmail();
+            var email3 = CreateEmail();
+            var name1 = CreateName();
+            var name3 = CreateName();
+
+            var (_, userId1, _, _) = await CreatePrerequisitesAsync(userRole, email1, name1);
+            var (_, userId2, _, _) = await CreatePrerequisitesAsync(userRole, email2, testPhrase);
+            var (_, userId3, _, _) = await CreatePrerequisitesAsync(userRole, email3, name3);
+
+            var users = await UserHelper.SearchUsersAsync(testPhrase);
+
+            Assert.Contains(userId1, users.Select(x => x.Id));
+            Assert.Contains(userId2, users.Select(x => x.Id));
+        }
+
+        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role, string email = "", string name = "", bool hasApiAccess = false)
         {
             var organization = await CreateOrganizationAsync();
-            var email = UIConfigurationHelper.CreateEmail();
+            var userEmail = string.IsNullOrEmpty(email) ? UIConfigurationHelper.CreateEmail() : email;
             var (userId, _, loginCookie) =
-                await HttpApi.CreateUserAndLogin(email, role, organization.Id);
-            return (loginCookie, userId, organization, email);
+                await HttpApi.CreateUserAndLogin(userEmail, role, organization.Id, hasApiAccess, name);
+            return (loginCookie, userId, organization, userEmail);
         }
 
         private async Task<(int userId, string userEmail, string orgName)> CreateStakeHolderUserInNewOrganizationAsync(bool hasApiAccess, bool hasStakeholderAccess)
@@ -227,6 +250,11 @@ namespace Tests.Integration.Presentation.Web.Users
         private string CreateEmail()
         {
             return $"{CreateName()}@kitos.dk";
+        }
+
+        private string CreateEmailContainingPhrase(string phrase)
+        {
+            return $"{CreateName()}{phrase}@kitos.dk";
         }
     }
 }
