@@ -152,9 +152,9 @@ namespace Tests.Integration.Presentation.Web.Users
             var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
 
-            DatabaseAccess.MutateDatabase(db =>
+            DatabaseAccess.MapFromEntitySet<User, User>(repository =>
             {
-                var user = db.Users.AsQueryable().ById(userId);
+                var user = repository.AsQueryable().ById(userId);
                 if (user == null)
                 {
                     throw new ArgumentException("Failed to find user with id", nameof(userId));
@@ -185,6 +185,8 @@ namespace Tests.Integration.Presentation.Web.Users
                 Assert.Empty(user.ResponsibleForCommunications);
                 Assert.Empty(user.HandoverParticipants);
                 Assert.Empty(user.ResponsibleForRisks);
+
+                return user;
             });
         }
 
