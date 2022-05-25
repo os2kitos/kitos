@@ -16,7 +16,6 @@ namespace Tests.Integration.Presentation.Web.Tools
     public static class UserHelper
     {
 
-        private static readonly EntityPropertyProxyValueLoader<User> ProxyLoader = new();
 
         public static async Task<List<UserWithOrganizationDTO>> GetUsersWithRightsholderAccessAsync(Cookie optionalLogin = null)
         {
@@ -44,17 +43,6 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
-        }
-
-        public static User GetUserByIdWithRightsAsync(int id)
-        {
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(id));
-            if (user == null)
-            {
-                throw new ArgumentException("Failed to find user with id", nameof(id));
-            }
-
-            return user.Transform(ProxyLoader.LoadReferencedEntities);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
