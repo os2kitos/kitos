@@ -20,7 +20,7 @@ namespace Tests.Integration.Presentation.Web.Users
         {
             //Arrange
             var (userId, userEmail, organization) = await CreateRightsHolderAccessUserInNewOrganizationAsync();
-            
+
             //Act
             var result = await UserHelper.GetUsersWithRightsholderAccessAsync();
 

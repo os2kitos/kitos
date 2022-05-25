@@ -50,6 +50,7 @@ namespace Core.DomainServices.Repositories.SSO
 
             _repository.RemoveRange(identities);
             _repository.Save();
+            identities.Clear();
         }
     }
 }
