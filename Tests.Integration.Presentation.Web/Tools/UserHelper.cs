@@ -1,11 +1,13 @@
-﻿using Core.DomainModel.Organization;
+﻿using System;
+using Core.DomainModel.Organization;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
 using Core.DomainModel;
 using Core.DomainServices.Extensions;
+using Infrastructure.DataAccess.Extensions;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
@@ -13,6 +15,9 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class UserHelper
     {
+
+        private static readonly EntityPropertyProxyValueLoader<User> ProxyLoader = new();
+
         public static async Task<List<UserWithOrganizationDTO>> GetUsersWithRightsholderAccessAsync(Cookie optionalLogin = null)
         {
             using var response = await SendGetUsersWithRightsholderAccessAsync(optionalLogin);
@@ -43,21 +48,13 @@ namespace Tests.Integration.Presentation.Web.Tools
 
         public static User GetUserByIdWithRightsAsync(int id)
         {
-            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable()
-                .Include(user => user.DataProcessingRegistrationRights)
-                .Include(user => user.OrganizationRights)
-                .Include(user => user.ItContractRights)
-                .Include(user => user.ItProjectRights)
-                .Include(user => user.ItSystemRights)
-                .Include(user => user.OrganizationUnitRights)
-                .Include(user => user.SsoIdentities)
-                .Include(user => user.ItProjectStatuses)
-                .Include(user => user.ResponsibleForCommunications)
-                .Include(user => user.HandoverParticipants)
-                .Include(user => user.ResponsibleForRisks)
-                .ById(id));
-            
-            return user;
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(id));
+            if (user == null)
+            {
+                throw new ArgumentException("Failed to find user with id", nameof(id));
+            }
+
+            return user.Transform(ProxyLoader.LoadReferencedEntities);
         }
 
         public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)

@@ -306,10 +306,11 @@ namespace Core.ApplicationServices
             _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
 
             Delete(user);
-            _domainEvents.Raise(new AccessRightsChanged(user.Id));
             _userRepository.Save();
-
             transaction.Commit();
+            
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+
             return Maybe<OperationError>.None;
         }
 
