@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
-using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
-using Core.DomainModel.SSO;
-using Core.DomainServices.Extensions;
 using Tests.Integration.Presentation.Web.Tools.Model;
 using Xunit;
 

@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.GDPR;
 using Core.ApplicationServices.Organizations;
@@ -57,6 +57,14 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             var roleId = A<int>();
             var organizationRole = A<OrganizationRole>();
             var user = SetupUser(roleId, organizationRole);
+
+            var dprRight = user.DataProcessingRegistrationRights.FirstOrDefault();
+            var organizationRight = user.OrganizationRights.FirstOrDefault();
+            var itContractRight = user.ItContractRights.FirstOrDefault();
+            var itSystemRight = user.ItSystemRights.FirstOrDefault();
+            var itProjectRight = user.ItProjectRights.FirstOrDefault();
+            var organizationUnitRight = user.OrganizationUnitRights.FirstOrDefault();
+            
             var isSuccessExpected = true;
             SetupUserDprMocking(user, roleId, isSuccessExpected);
             SetupUserOrganizationRightsMocking(user, organizationRole, isSuccessExpected);
@@ -67,26 +75,26 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             SetupSsoIdentitiesMocking(user);
 
             _sut.Handle(new EntityBeingDeletedEvent<User>(user));
-
-            _dprApplicationServiceMock.Verify(x => x.RemoveRole(It.IsAny<int>(), roleId, user.Id), Times.AtLeastOnce);
+            
+            _dprApplicationServiceMock.Verify(x => x.RemoveRole(dprRight.ObjectId, roleId, user.Id), Times.AtLeastOnce);
             Assert.Empty(user.DataProcessingRegistrationRights);
 
-            _organizationRightsServiceMock.Verify(x => x.RemoveRole(It.IsAny<int>(), user.Id, organizationRole), Times.AtLeastOnce);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(organizationRight.OrganizationId, user.Id, organizationRole), Times.AtLeastOnce);
             Assert.Empty(user.OrganizationRights);
-
-            _itContractRightServiceMock.Verify(x => x.RemoveRole(It.IsAny<ItContract>(), roleId, user.Id), Times.AtLeastOnce);
+            
+            _itContractRightServiceMock.Verify(x => x.RemoveRole(itContractRight.Object, roleId, user.Id), Times.AtLeastOnce);
             Assert.Empty(user.ItContractRights);
-
-            _itSystemRightServiceMock.Verify(x => x.RemoveRole(It.IsAny<ItSystemUsage>(), roleId, user.Id), Times.AtLeastOnce);
+            
+            _itSystemRightServiceMock.Verify(x => x.RemoveRole(itSystemRight.Object, roleId, user.Id), Times.AtLeastOnce);
             Assert.Empty(user.ItSystemRights);
-
-            _itProjectRightServiceMock.Verify(x => x.RemoveRole(It.IsAny<ItProject>(), roleId, user.Id), Times.AtLeastOnce);
+            
+            _itProjectRightServiceMock.Verify(x => x.RemoveRole(itProjectRight.Object, roleId, user.Id), Times.AtLeastOnce);
             Assert.Empty(user.ItProjectRights);
 
-            _organizationUnitRightServiceMock.Verify(x => x.RemoveRole(It.IsAny<OrganizationUnit>(), roleId, user.Id), Times.AtLeastOnce);
+            _organizationUnitRightServiceMock.Verify(x => x.RemoveRole(organizationUnitRight.Object, roleId, user.Id), Times.AtLeastOnce);
             Assert.Empty(user.OrganizationUnitRights);
-
-            _ssoUserIdentityRepository.Verify(x => x.DeleteIdentitiesForUser(user.SsoIdentities), Times.AtLeastOnce);
+            
+            _ssoUserIdentityRepository.Verify(x => x.DeleteIdentitiesForUser(user), Times.AtLeastOnce);
             Assert.Empty(user.SsoIdentities);
         }
 
@@ -120,9 +128,9 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             _organizationUnitRightServiceMock.Setup(x => x.RemoveRole(roleObject, roleId, userId)).Returns(result);
         }
 
-        private void ExpectDeleteIdentitiesForUserReturns(IEnumerable<SsoUserIdentity> identities)
+        private void ExpectDeleteIdentitiesForUserReturns(User user)
         {
-            _ssoUserIdentityRepository.Setup(x => x.DeleteIdentitiesForUser(identities));
+            _ssoUserIdentityRepository.Setup(x => x.DeleteIdentitiesForUser(user));
         }
 
         private User SetupUser(int roleId, OrganizationRole organizationRole)
@@ -186,75 +194,75 @@ namespace Tests.Unit.Core.ApplicationServices.Handlers
             return user;
         }
 
-        private void SetupUserDprMocking(User user, int roleId, bool isSuccessExpected)
+        private void SetupUserDprMocking(User user, int roleId, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var dprRight in user.DataProcessingRegistrationRights)
             {
                 var result = isSuccessExpected
                     ? Result<DataProcessingRegistrationRight, OperationError>.Success(dprRight)
-                    : Result<DataProcessingRegistrationRight, OperationError>.Failure(It.IsAny<OperationError>());
+                    : Result<DataProcessingRegistrationRight, OperationError>.Failure(operationFailure);
                 ExpectDprApplicationRemoveRoleReturns(dprRight.ObjectId, roleId, user.Id, result);
             }
         }
 
-        private void SetupUserOrganizationRightsMocking(User user, OrganizationRole organizationRole, bool isSuccessExpected)
+        private void SetupUserOrganizationRightsMocking(User user, OrganizationRole organizationRole, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var organizationRight in user.OrganizationRights)
             {
                 var result = isSuccessExpected
                     ? Result<OrganizationRight, OperationFailure>.Success(organizationRight)
-                    : Result<OrganizationRight, OperationFailure>.Failure(It.IsAny<OperationFailure>());
+                    : Result<OrganizationRight, OperationFailure>.Failure(operationFailure);
                 ExpectOrganizationRemoveRoleReturns(organizationRight.OrganizationId, organizationRole, user.Id, result);
             }
         }
 
-        private void SetupUserItContractRightsMocking(User user, int roleId, bool isSuccessExpected)
+        private void SetupUserItContractRightsMocking(User user, int roleId, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var itContractRight in user.ItContractRights)
             {
                 var result = isSuccessExpected
                     ? Result<ItContractRight, OperationError>.Success(itContractRight)
-                    : Result<ItContractRight, OperationError>.Failure(It.IsAny<OperationFailure>());
+                    : Result<ItContractRight, OperationError>.Failure(operationFailure);
                 ExpectItContractRemoveRoleReturns(itContractRight.Object, roleId, user.Id, result);
             }
         }
 
-        private void SetupUserItSystemRightsMocking(User user, int roleId, bool isSuccessExpected)
+        private void SetupUserItSystemRightsMocking(User user, int roleId, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var itSystemRight in user.ItSystemRights)
             {
                 var result = isSuccessExpected
                     ? Result<ItSystemRight, OperationError>.Success(itSystemRight)
-                    : Result<ItSystemRight, OperationError>.Failure(It.IsAny<OperationFailure>());
+                    : Result<ItSystemRight, OperationError>.Failure(operationFailure);
                 ExpectItSystemRemoveRoleReturns(itSystemRight.Object, roleId, user.Id, result);
             }
         }
 
-        private void SetupUserItProjectRightsMocking(User user, int roleId, bool isSuccessExpected)
+        private void SetupUserItProjectRightsMocking(User user, int roleId, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var itProjectRight in user.ItProjectRights)
             {
                 var result = isSuccessExpected
                     ? Result<ItProjectRight, OperationError>.Success(itProjectRight)
-                    : Result<ItProjectRight, OperationError>.Failure(It.IsAny<OperationFailure>());
+                    : Result<ItProjectRight, OperationError>.Failure(operationFailure);
                 ExpectItProjectRemoveRoleReturns(itProjectRight.Object, roleId, user.Id, result);
             }
         }
 
-        private void SetupUserOrganizationUnitRightsMocking(User user, int roleId, bool isSuccessExpected)
+        private void SetupUserOrganizationUnitRightsMocking(User user, int roleId, bool isSuccessExpected, OperationFailure operationFailure = OperationFailure.UnknownError)
         {
             foreach (var organizationUnitRight in user.OrganizationUnitRights)
             {
                 var result = isSuccessExpected
                     ? Result<OrganizationUnitRight, OperationError>.Success(organizationUnitRight)
-                    : Result<OrganizationUnitRight, OperationError>.Failure(It.IsAny<OperationFailure>());
+                    : Result<OrganizationUnitRight, OperationError>.Failure(operationFailure);
                 ExpectOrganizationUnitRemoveRoleReturns(organizationUnitRight.Object, roleId, user.Id, result);
             }
         }
 
         private void SetupSsoIdentitiesMocking(User user)
         {
-            ExpectDeleteIdentitiesForUserReturns(user.SsoIdentities);
+            ExpectDeleteIdentitiesForUserReturns(user);
         }
     }
 }

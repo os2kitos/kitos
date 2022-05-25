@@ -191,7 +191,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItContractRoles"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItContractRoles"), cookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItContractRole>();

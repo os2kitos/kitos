@@ -16,7 +16,6 @@ using Core.DomainModel.Events;
 using Core.DomainModel.Organization.DomainEvents;
 using Infrastructure.Services.Cryptography;
 using Core.DomainServices.Authorization;
-using Core.DomainServices.Context;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
 using Infrastructure.Services.DataAccess;
@@ -42,7 +41,7 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
-        private readonly IOrganizationalUserContext _activeUserIdContext;
+        private readonly IOrganizationalUserContext _organizationalUserContext;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
@@ -61,7 +60,7 @@ namespace Core.ApplicationServices
             IUserRepository repository,
             IOrganizationService organizationService,
             ITransactionManager transactionManager,
-            IOrganizationalUserContext activeUserIdContext)
+            IOrganizationalUserContext organizationalUserContext)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -78,7 +77,7 @@ namespace Core.ApplicationServices
             _repository = repository;
             _organizationService = organizationService;
             _transactionManager = transactionManager;
-            _activeUserIdContext = activeUserIdContext;
+            _organizationalUserContext = organizationalUserContext;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -297,7 +296,7 @@ namespace Core.ApplicationServices
             var user = _userRepository.AsQueryable().ByUuid(userUuid);
             if (user == null)
                 return new OperationError(OperationFailure.NotFound);
-            if(_activeUserIdContext.UserId.Select(context => context.ActiveUserId == user.Id).GetValueOrDefault())
+            if(_organizationalUserContext.UserId == user.Id)
                 return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
 
 

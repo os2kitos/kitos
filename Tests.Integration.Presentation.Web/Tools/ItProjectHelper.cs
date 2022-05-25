@@ -349,7 +349,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
-            var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItProjectRoles"), cookie);
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItProjectRoles"), cookie);
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadOdataListResponseBodyAsAsync<ItProjectRole>();

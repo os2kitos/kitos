@@ -14,7 +14,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"api/OrganizationUnit?organization={orgId}");
 
-            var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
+            using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadResponseBodyAsKitosApiResponseAsync<OrgUnitDTO>();
@@ -25,7 +25,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             var orgUnitUrl = TestEnvironment.CreateUrl($"odata/OrganizationUnitRoles");
 
-            var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
+            using var response = await HttpApi.GetWithCookieAsync(orgUnitUrl, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             return await response.ReadOdataListResponseBodyAsAsync<OrganizationUnitRole>();

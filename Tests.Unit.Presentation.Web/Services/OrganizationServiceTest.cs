@@ -269,8 +269,9 @@ namespace Tests.Unit.Presentation.Web.Services
             var matchedRight2 = CreateRight(organizationId, userId);
             var unmatchedRight1 = CreateRight(A<int>(), userId);
             var unmatchedRight2 = CreateRight(organizationId, A<int>());
-            _orgRightRepository.Setup(x => x.AsQueryable()).Returns(new[] { matchedRight1, unmatchedRight1, matchedRight2, unmatchedRight2 }.AsQueryable());
-            ExpectOrganizationRightsRemoveRoleReturnsSuccess();
+            var rightsArray = new[] {matchedRight1, unmatchedRight1, matchedRight2, unmatchedRight2};
+            _orgRightRepository.Setup(x => x.AsQueryable()).Returns(rightsArray.AsQueryable());
+            ExpectOrganizationRightsRemoveRoleReturnsSuccess(rightsArray);
 
             //Act
             var result = _sut.RemoveUser(organizationId, userId);
@@ -807,9 +808,12 @@ namespace Tests.Unit.Presentation.Web.Services
         }
         
 
-        private void ExpectOrganizationRightsRemoveRoleReturnsSuccess()
+        private void ExpectOrganizationRightsRemoveRoleReturnsSuccess(OrganizationRight[] rights)
         {
-            _organizationRightsServiceMock.Setup(x => x.RemoveRole(It.IsAny<int>())).Returns(It.IsAny<OrganizationRight>());
+            foreach (var right in rights)
+            {
+                _organizationRightsServiceMock.Setup(x => x.RemoveRole(right.Id)).Returns(right);
+            }
         }
 
         private void ExpectAllowDeleteReturns(Organization organization, bool value)
