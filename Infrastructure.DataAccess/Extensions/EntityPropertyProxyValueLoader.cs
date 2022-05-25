@@ -26,7 +26,7 @@ namespace Infrastructure.DataAccess.Extensions
                 .Value
                 .Select(methodInfo => methodInfo.Invoke(entity, new object[0]))
                 .ToList();
-            return T;
+            return entity;
         }
     }
 }
