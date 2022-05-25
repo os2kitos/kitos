@@ -1,8 +1,11 @@
 ﻿using Core.DomainModel.Organization;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel;
+using Core.DomainServices.Extensions;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
@@ -36,6 +39,31 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
+        }
+
+        public static User GetUserByIdWithRightsAsync(int id)
+        {
+            var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable()
+                .Include(user => user.DataProcessingRegistrationRights)
+                .Include(user => user.OrganizationRights)
+                .Include(user => user.ItContractRights)
+                .Include(user => user.ItProjectRights)
+                .Include(user => user.ItSystemRights)
+                .Include(user => user.OrganizationUnitRights)
+                .Include(user => user.SsoIdentities)
+                .Include(user => user.ItProjectStatuses)
+                .Include(user => user.ResponsibleForCommunications)
+                .Include(user => user.HandoverParticipants)
+                .Include(user => user.ResponsibleForRisks)
+                .ById(id));
+            
+            return user;
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
         }
     }
 }

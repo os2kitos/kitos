@@ -5,6 +5,8 @@ using System.Net;
 using System.Threading.Tasks;
 using Presentation.Web.Models.API.V1;
 using Tests.Integration.Presentation.Web.Tools;
+using Tests.Integration.Presentation.Web.Tools.External.Rights;
+using Tests.Integration.Presentation.Web.Tools.Internal.UI_Configuration;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
@@ -117,6 +119,79 @@ namespace Tests.Integration.Presentation.Web.Users
 
             //Assert
             Assert.Equal(HttpStatusCode.Forbidden, result.StatusCode);
+        }
+
+        [Fact]
+        public async Task Delete_User()
+        {
+            var userRole = OrganizationRole.LocalAdmin;
+
+            var (_, userId, organization, originalEmail) = await CreatePrerequisitesAsync(userRole);
+            var name = A<string>();
+
+            var project = await ItProjectHelper.CreateProject(name, organization.Id);
+
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItContractRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.OrganizationUnitRights, name);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItProjectRights, name, project.Id);
+            await RightsHelper.AddUserRole(userId, organization.Id, RightsType.ItSystemRights, name);
+            await RightsHelper.AddDprRoleToUser(userId, organization.Id, name);
+
+            await ItProjectHelper.AddAssignmentAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddCommunicationAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddRiskAsync(organization.Id, userId, project.Id);
+            await ItProjectHelper.AddHandoverResponsibleAsync(project.Id, userId);
+
+            SsoIdentityHelper.AddSsoIdentityToUser(userId);
+            
+            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId);
+            Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
+            
+            var deletedUser = UserHelper.GetUserByIdWithRightsAsync(userId);
+
+            Assert.True(deletedUser.Deleted);
+            Assert.False(deletedUser.IsGlobalAdmin);
+            Assert.False(deletedUser.HasApiAccess);
+            Assert.False(deletedUser.HasStakeHolderAccess);
+
+            Assert.Contains("_deleted_user@kitos.dk", deletedUser.Email);
+            Assert.Contains("(SLETTET)", deletedUser.LastName);
+            Assert.Equal(originalEmail, deletedUser.EmailBeforeDeletion);
+            Assert.NotNull(deletedUser.LockedOutDate);
+            Assert.NotNull(deletedUser.DeletedDate);
+            Assert.Null(deletedUser.PhoneNumber);
+
+            Assert.Empty(deletedUser.DataProcessingRegistrationRights);
+            Assert.Empty(deletedUser.OrganizationRights);
+            Assert.Empty(deletedUser.ItContractRights);
+            Assert.Empty(deletedUser.ItSystemRights);
+            Assert.Empty(deletedUser.ItProjectRights);
+            Assert.Empty(deletedUser.OrganizationUnitRights);
+            Assert.Empty(deletedUser.SsoIdentities);
+            Assert.Empty(deletedUser.ItProjectStatuses);
+            Assert.Empty(deletedUser.ResponsibleForCommunications);
+            Assert.Empty(deletedUser.HandoverParticipants);
+            Assert.Empty(deletedUser.ResponsibleForRisks);
+        }
+
+        [Fact]
+        public async Task Delete_User_Returns_Forbidden_When_User_Tries_To_Delete_Himself()
+        {
+            var userRole = OrganizationRole.GlobalAdmin;
+
+            var (cookie, userId, _, _) = await CreatePrerequisitesAsync(userRole);
+
+            var deleteResponse = await UserHelper.SendDeleteUserAsync(userId, cookie);
+            Assert.Equal(HttpStatusCode.Forbidden, deleteResponse.StatusCode);
+        }
+
+        private async Task<(Cookie loginCookie, int userId, OrganizationDTO organization, string email)> CreatePrerequisitesAsync(OrganizationRole role)
+        {
+            var organization = await CreateOrganizationAsync();
+            var email = UIConfigurationHelper.CreateEmail();
+            var (userId, _, loginCookie) =
+                await HttpApi.CreateUserAndLogin(email, role, organization.Id);
+            return (loginCookie, userId, organization, email);
         }
 
         private async Task<(int userId, string userEmail, string orgName)> CreateStakeHolderUserInNewOrganizationAsync(bool hasApiAccess, bool hasStakeholderAccess)

@@ -860,6 +860,10 @@
     <Compile Include="Migrations\202205181142292_Added_UIModuleCustomization.designer.cs">
       <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202205190801320_UserDelete.cs" />
+    <Compile Include="Migrations\202205190801320_UserDelete.designer.cs">
+      <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1419,6 +1423,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202205181142292_Added_UIModuleCustomization.resx">
       <DependentUpon>202205181142292_Added_UIModuleCustomization.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202205190801320_UserDelete.resx">
+      <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

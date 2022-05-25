@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Web.Http;
 using Core.ApplicationServices;
-using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.ApplicationServices.Model.RightsHolder;
 using Core.ApplicationServices.Organizations;
@@ -13,6 +12,7 @@ using Core.DomainModel;
 using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
@@ -29,21 +29,21 @@ namespace Presentation.Web.Controllers.API.V1
     {
         private readonly IUserService _userService;
         private readonly IOrganizationService _organizationService;
-        private readonly IOrganizationalUserContext _userContext;
         private readonly IUserRightsService _userRightsService;
+        private readonly IEntityIdentityResolver _identityResolver;
 
         public UserController(
             IGenericRepository<User> repository,
             IUserService userService,
             IOrganizationService organizationService,
-            IOrganizationalUserContext userContext,
-            IUserRightsService userRightsService)
+            IUserRightsService userRightsService,
+            IEntityIdentityResolver identityResolver)
             : base(repository)
         {
             _userService = userService;
             _organizationService = organizationService;
-            _userContext = userContext;
             _userRightsService = userRightsService;
+            _identityResolver = identityResolver;
         }
 
         [NonAction]
@@ -187,8 +187,12 @@ namespace Presentation.Web.Controllers.API.V1
         public override HttpResponseMessage Delete(int id, int organizationId = 0)
         {
             // NOTE: Only exists to apply optional param for org id
-            return base.Delete(id, organizationId);
+            var uuid = _identityResolver.ResolveUuid<User>(id);
+            return uuid.IsNone
+                ? NotFound()
+                : _userService.DeleteUserFromKitos(uuid.Value).Match(FromOperationError, Ok);
         }
+        
 
         [HttpGet]
         [Route("api/user/with-rightsholder-access")]

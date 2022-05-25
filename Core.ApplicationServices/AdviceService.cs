@@ -239,6 +239,7 @@ namespace Core.ApplicationServices
                         && I.Role.Name == r.Name);
                     foreach (var t in itContractRoles)
                     {
+                        if(t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -248,6 +249,7 @@ namespace Core.ApplicationServices
                         && I.Role.Name == r.Name);
                     foreach (var t in projectRoles)
                     {
+                        if(t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -258,6 +260,7 @@ namespace Core.ApplicationServices
                                                                               && I.Role.Name == r.Name);
                     foreach (var t in systemRoles)
                     {
+                        if(t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
@@ -269,6 +272,7 @@ namespace Core.ApplicationServices
                         && I.Role.Name == r.Name);
                     foreach (var t in dpaRoles)
                     {
+                        if(t.User.Deleted) continue;
                         mailAddressCollection.Add(t.User.Email);
                     }
 
