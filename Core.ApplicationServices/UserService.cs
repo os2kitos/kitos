@@ -290,10 +290,9 @@ namespace Core.ApplicationServices
                 );
         }
 
-        public Result<IQueryable<User>, OperationError> SearchUsers(params IDomainQuery<User>[] queries)
+        public Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries)
         {
-            var currentUser = _userRepository.AsQueryable().ById(_organizationalUserContext.UserId);
-            if (!currentUser.IsGlobalAdmin)
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
             {
                 return Result<IQueryable<User>, OperationError>.Failure(OperationFailure.Forbidden);
             }
