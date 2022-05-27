@@ -18,6 +18,7 @@
             }
         });
     }]);
+    
     app.controller("globalAdminMisc", [
         "$rootScope",
         "$scope",
@@ -29,6 +30,7 @@
         "brokenLinkStatus",
         "usersWithRightsholderAccess",
         "usersWithCrossAccess",
+        "userService",
         (
             $rootScope,
             $scope,
@@ -39,13 +41,14 @@
             $uibModal: ng.ui.bootstrap.IModalService,
             brokenLinkStatus: Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO,
             usersWithRightsholderAccess: Kitos.Models.Api.IUserWithOrganizationName[],
-            usersWithCrossAccess: Kitos.Models.Api.IUserWithCrossAccess[]) => {
-
-
+            usersWithCrossAccess: Kitos.Models.Api.IUserWithCrossAccess[],
+            userService: Kitos.Services.UserService) => {
+            
             $rootScope.page.title = "Andet";
             $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
             $scope.usersWithRightsholderAccess = usersWithRightsholderAccess;
             $scope.usersWithCrossAccess = usersWithCrossAccess;
+            $scope.kitosUsers = [];
 
             $scope.showOrgsWhereUserActive = (activeOrgNames: string[]) => {
                 $uibModal.open({
@@ -61,7 +64,9 @@
                 }, function onError(error) {
                     // Swallow unhandled rejection errors.
                 });
-            }
+            };
+
+            $scope.userOptions = selectLazyLoading('api/users/search/', formatUser, null);
 
             getKleStatus();
             function getKleStatus() {
@@ -110,7 +115,7 @@
                         toggleKleButtonsClickAbility(true, false);
                         notify.addErrorMessage("Der skete en fejl under henting af ændringer");
                     });
-            }
+            };
 
             $scope.UpdateKLE = () => {
                 toggleKleButtonsClickAbility(false, false);
@@ -135,12 +140,73 @@
                 } else {
                     notify.addInfoMessage("KLE opdatering stoppet!");
                 }
+            };
 
+            $scope.$watch("selectedUser", function (newVal, oldVal) {
+                if (newVal === oldVal || !newVal) return;
+
+                $scope.kitosUsers.push(newVal);
+                $scope.selectedUser = null;
+            });
+
+            $scope.removeUser = (id: number) => {
+                userService.deleteUser(id)
+                    .then(() => {
+                            var user = $scope.kitosUsers.find(x => x.user.Id === id)[0];
+                            var index = $scope.kitosUsers.indexOf(user);
+                            $scope.kitosUsers.splice(index, 1);
+                        }
+                    ).catch(ex => console.log(ex));
             }
 
             function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
                 $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
                 $scope.KleApplyUpdateButtonInteraction = updateButton;
+            }
+            
+            function formatUser(user) {
+                var result = '<div>' + user.text + '</div>';
+                if (user.email) {
+                    result += '<div class="small">' + user.email + '</div>';
+                }
+                return result;
+            }
+
+            function selectLazyLoading(url, format, paramAry) {
+                return {
+                    minimumInputLength: 1,
+                    allowClear: true,
+                    placeholder: ' ',
+                    formatResult: format,
+                    ajax: {
+                        data: function (term, page) {
+                            return { query: term };
+                        },
+                        quietMillis: 500,
+                        transport: function (queryParams) {
+                            var res = $http.get(url + queryParams.data.query).then(queryParams.success);
+                            res.abort = function () {
+                                return null;
+                            };
+
+                            return res;
+                        },
+
+                        results: function (data, page) {
+                            var results = [];
+
+                            _.each(data.data.response, function (obj: { id: any; name: any; email: any }) {
+                                results.push({
+                                    id: obj.id,
+                                    text: obj.name ? obj.name : 'Unavngiven',
+                                    email: obj.email
+                                });
+                            });
+
+                            return { results: results };
+                        }
+                    }
+                };
             }
         }]);
 })(angular, app);

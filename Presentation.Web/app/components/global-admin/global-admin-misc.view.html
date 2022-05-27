@@ -14,9 +14,56 @@
         <p><strong>Antal registrerede fejl:</strong> {{brokenLinksVm.brokenLinksCount}}</p>
         <a class="btn btn-default" id="brokenLinksReportAnchor" href="{{brokenLinksVm.linkToCurrentReport}}">Hent rapporten</a>
     </div>
-    <div class="well" ng-if="!brokenLinksVm.available">
-        <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
-    </div>
+     <div class="well" ng-if="!brokenLinksVm.available">
+         <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
+     </div>
+
+    <!--TODO: Change text-->
+    <h3>*INSERT TEXT IN DANISH*</h3>
+     <div class="well">
+         <table class="full-width table org-role-table">
+             <thead>
+                 <tr>
+                     <th>
+                         <button class="btn btn-link btn-header">Navn</button>
+                     </th>
+                     <th>
+                         <button class="btn btn-link btn-header">Email</button>
+                     </th>
+                 </tr>
+             </thead>
+             
+             <!-- for each right -->
+             <tbody data-ng-repeat="kitosUser in kitosUsers" id="table-of-kitos-users">
+                 <!-- show -->
+                 <tr>
+                     <td>{{ kitosUser.user.Name }}</td>
+                     <td>
+                         {{ kitosUser.user.Email }}
+                         <div class="pull-right">
+                             <a class="btn btn-danger btn-xs"
+                                data-confirmed-click="removeUser(kitosUser.user.Id)"
+                                data-confirm-click="Er du sikker på at du vil slette?">
+                                 <i class="glyphicon glyphicon-trash"></i>
+                             </a>
+                         </div>
+                     </td>
+                 </tr>
+             </tbody>
+
+             <!-- add-new-right row -->
+             <tbody>
+                 <tr>
+                     <td colspan="2" class="form-group">
+                         <input id="add-new-user-for-delete"
+                                data-placeholder="Vælg bruger"
+                                data-select-user="foo"
+                                data-user-model="selectedUser">
+                     </td>
+                 </tr>
+             </tbody>
+         </table>
+     </div>
 
     <h3>Oversigt over brugere med API relaterede rettigheder</h3>
     <div class="panel panel-default">
