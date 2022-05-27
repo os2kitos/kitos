@@ -16,6 +16,7 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
@@ -232,7 +233,7 @@ namespace Presentation.Web.Controllers.API.V1
                 var queries = new List<IDomainQuery<User>> { new QueryUserByNameOrEmail(nameOrEmailQuery) };
 
                 return _userService
-                    .SearchUsers(queries.ToArray())
+                    .SearchAllKitosUsers(queries.ToArray())
                     .Select(x => x.OrderBy(user => user.Id))
                     .Select(x => x.Page(paginationQuery))
                     .Select(x => x.ToList())
