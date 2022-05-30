@@ -621,10 +621,10 @@
                     {
                         field: "LastChangedByUser", title: "Sidst redigeret: Bruger", width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
-                        template: dataItem => dataItem?.LastChangedByUser ? dataItem.LastChangedByUser.toString() : "",
+                        template: dataItem => dataItem && dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : "",
                         hidden: true,
-                        sortable: true,
-                        filterable: true
+                        sortable: false,
+                        filterable: false
                     },
                     {
                         field: "LastChanged", title: "Sidste redigeret: Dato", width: 150,

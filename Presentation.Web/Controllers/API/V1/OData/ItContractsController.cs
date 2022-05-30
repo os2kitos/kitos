@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -59,8 +60,9 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable().ByOrganizationId(key);
-
+            var result = Repository.AsQueryable()
+                .Include(x => x.LastChangedByUser)
+                .ByOrganizationId(key);
             return Ok(result);
         }
 
