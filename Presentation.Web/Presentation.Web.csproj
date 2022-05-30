@@ -740,6 +740,7 @@
     <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\ui-customization.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
+    <TypeScriptCompile Include="app\models\users\userDTO.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />

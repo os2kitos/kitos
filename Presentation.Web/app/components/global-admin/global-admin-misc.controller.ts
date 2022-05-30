@@ -31,6 +31,7 @@
         "usersWithRightsholderAccess",
         "usersWithCrossAccess",
         "userService",
+        "select2LoadingService",
         (
             $rootScope,
             $scope,
@@ -42,7 +43,8 @@
             brokenLinkStatus: Kitos.Models.Api.BrokenLinksReport.IBrokenLinksReportDTO,
             usersWithRightsholderAccess: Kitos.Models.Api.IUserWithOrganizationName[],
             usersWithCrossAccess: Kitos.Models.Api.IUserWithCrossAccess[],
-            userService: Kitos.Services.UserService) => {
+            userService: Kitos.Services.IUserService,
+            select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
             
             $rootScope.page.title = "Andet";
             $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
@@ -66,7 +68,7 @@
                 });
             };
 
-            $scope.userOptions = selectLazyLoading('api/users/search/', formatUser, null);
+            $scope.userOptions = getAvailableUsers();
 
             getKleStatus();
             function getKleStatus() {
@@ -144,20 +146,17 @@
 
             $scope.$watch("selectedUser", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
-
-                $scope.kitosUsers.push(newVal);
-                $scope.selectedUser = null;
+                
+                $scope.userSelected = true;
             });
 
             $scope.removeUser = (id: number) => {
                 userService.deleteUser(id)
                     .then(() => {
-                            var user = $scope.kitosUsers.find(x => x.user.Id === id)[0];
-                            var index = $scope.kitosUsers.indexOf(user);
-                            $scope.kitosUsers.splice(index, 1);
+                            $scope.userSelected = false;
                         }
                     ).catch(ex => console.log(ex));
-            }
+            };
 
             function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
                 $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
@@ -170,6 +169,25 @@
                     result += '<div class="small">' + user.email + '</div>';
                 }
                 return result;
+            }
+
+            function getAvailableUsers() {
+                return select2LoadingService.loadSelect2WithDataSource(
+                    (query: string) =>
+                        userService.searchUsers(query)
+                        .then(
+                            results =>
+                                results.map(result =>
+                                    <Kitos.Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.Users.IUserWithEmailDTO>>
+                                {
+                                    id: result.id,
+                                    text: result.name,
+                                    email: result.email,
+                                    optionalObjectContext: result
+                                })
+                        )
+                    , false
+                    , formatUser);
             }
 
             function selectLazyLoading(url, format, paramAry) {
