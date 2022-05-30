@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -19,5 +20,6 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
         Maybe<OperationError> DeleteUserFromKitos(Guid userUuid);
+        Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries);
     }
 }

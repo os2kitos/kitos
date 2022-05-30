@@ -1,13 +1,9 @@
-﻿using System;
-using Core.DomainModel.Organization;
+﻿using Core.DomainModel.Organization;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Core.Abstractions.Extensions;
-using Core.DomainModel;
-using Core.DomainServices.Extensions;
-using Infrastructure.DataAccess.Extensions;
+using Presentation.Web.Models.API.V1;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
@@ -49,6 +45,20 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
+        }
+
+        public static async Task<List<UserWithEmailDTO>> SearchUsersAsync(string query, Cookie optionalLogin = null)
+        {
+            using var response = await SendSearchUsersAsync(query, optionalLogin);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            return await response.ReadResponseBodyAsKitosApiResponseAsync<List<UserWithEmailDTO>>();
+        }
+
+        public static async Task<HttpResponseMessage> SendSearchUsersAsync(string query, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/users/search?query={query}"), cookie);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -337,6 +338,17 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId)
+        {
+            var user = _userRepository.GetByKey(userId);
+            if(user == null)
+                return Result<IEnumerable<Organization>, OperationError>.Failure(new OperationError($"User with id: {userId} was not found", OperationFailure.NotFound));
+
+            var userOrganizationsIds = user.GetOrganizationIds();
+
+            return Result<IEnumerable<Organization>, OperationError>.Success(_orgRepository.AsQueryable().ByIds(userOrganizationsIds.ToList()));
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)

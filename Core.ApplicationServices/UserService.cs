@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mail;
 using System.Security;
@@ -287,6 +288,22 @@ namespace Core.ApplicationServices
                         () => new OperationError("User is not member of the organization", OperationFailure.NotFound)
                     )
                 );
+        }
+
+        public Result<IQueryable<User>, OperationError> SearchAllKitosUsers(params IDomainQuery<User>[] queries)
+        {
+            if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)
+            {
+                return Result<IQueryable<User>, OperationError>.Failure(OperationFailure.Forbidden);
+            }
+
+            var query = new IntersectionQuery<User>(queries);
+
+            return _repository
+                .GetUsers()
+                .Where(x => !x.Deleted)
+                .Transform(query.Apply)
+                .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
 
         public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)

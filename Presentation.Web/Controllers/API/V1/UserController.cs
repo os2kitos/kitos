@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -13,11 +15,15 @@ using Core.DomainModel.Organization;
 using Core.DomainServices;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Generic;
+using Core.DomainServices.Queries;
+using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Controllers.API.V1.Mapping;
+using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Generic.Queries;
 using Presentation.Web.Models.API.V1.Users;
-
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
@@ -214,6 +220,31 @@ namespace Presentation.Web.Controllers.API.V1
                 .Match(Ok, FromOperationError);
         }
 
+        /// <summary>
+        /// Returns the users with matching name or email
+        /// </summary>
+        /// <param name="nameOrEmailQuery">Name or email of the user</param>
+        /// <returns>A list of users</returns>
+        [HttpGet]
+        [Route("api/users/search")]
+        public HttpResponseMessage SearchUsers(string query, [FromUri] V1BoundedPaginationQuery paginationQuery = null)
+        {
+            if (string.IsNullOrEmpty(query))
+                return BadRequest("Query needs a value");
+
+            var decodedQuery = HttpUtility.UrlDecode(query);
+
+            var queries = new List<IDomainQuery<User>> { new QueryUserByNameOrEmail(decodedQuery) };
+
+            return _userService
+                .SearchAllKitosUsers(queries.ToArray())
+                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList())
+                .Select(ToUserWithEmailDtos)
+                .Match(Ok, FromOperationError);
+        }
+
         private static IEnumerable<UserWithOrganizationDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)
         {
             return dtos.Select(ToUserWithOrgDTO).ToList();
@@ -222,6 +253,11 @@ namespace Presentation.Web.Controllers.API.V1
         private static UserWithOrganizationDTO ToUserWithOrgDTO(UserRoleAssociationDTO dto)
         {
             return new(dto.User.Id, dto.User.GetFullName(), dto.User.Email, dto.Organization.Name, dto.User.HasApiAccess.GetValueOrDefault(false));
+        }
+
+        private static IEnumerable<UserWithEmailDTO> ToUserWithEmailDtos(List<User> users)
+        {
+            return users.Select(user => user.MapToUserWithEmailDTO()).ToList();
         }
 
         private static IEnumerable<UserWithCrossOrganizationalRightsDTO> ToUserWithCrossRightsDTOs(IEnumerable<User> users)
