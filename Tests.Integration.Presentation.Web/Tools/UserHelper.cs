@@ -1,8 +1,13 @@
-﻿using Core.DomainModel.Organization;
+﻿using System;
+using Core.DomainModel.Organization;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.Abstractions.Extensions;
+using Core.DomainModel;
+using Core.DomainServices.Extensions;
+using Infrastructure.DataAccess.Extensions;
 using Presentation.Web.Models.API.V1.Users;
 using Xunit;
 
@@ -10,6 +15,8 @@ namespace Tests.Integration.Presentation.Web.Tools
 {
     public static class UserHelper
     {
+
+
         public static async Task<List<UserWithOrganizationDTO>> GetUsersWithRightsholderAccessAsync(Cookie optionalLogin = null)
         {
             using var response = await SendGetUsersWithRightsholderAccessAsync(optionalLogin);
@@ -36,6 +43,12 @@ namespace Tests.Integration.Presentation.Web.Tools
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
             return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("api/user/with-cross-organization-permissions"), cookie);
+        }
+
+        public static async Task<HttpResponseMessage> SendDeleteUserAsync(int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            return await HttpApi.DeleteWithCookieAsync(TestEnvironment.CreateUrl($"api/user/{userId}"), cookie);
         }
     }
 }

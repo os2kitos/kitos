@@ -46,6 +46,9 @@ namespace Core.DomainModel
         public string Password { get; set; }
         public string Salt { get; set; }
         public DateTime? LastAdvisDate { get; set; }
+        public string EmailBeforeDeletion { get; set; }
+        public DateTime? DeletedDate { get; set; }
+        public bool Deleted { get; set; }
 
         public string DefaultUserStartPreference { get; set; }
         /// <summary>
@@ -59,7 +62,7 @@ namespace Core.DomainModel
 
         public bool CanAuthenticate()
         {
-            return IsGlobalAdmin || OrganizationRights.Any();
+            return !Deleted && (IsGlobalAdmin || OrganizationRights.Any());
         }
 
         /// <summary>

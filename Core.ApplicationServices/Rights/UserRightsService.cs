@@ -1,6 +1,5 @@
 ﻿using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
-using Core.DomainServices;
 using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
@@ -24,8 +23,7 @@ namespace Core.ApplicationServices.Rights
             _organizationService = organizationService;
             _authorizationContext = authorizationContext;
         }
-
-
+        
         public Result<IEnumerable<UserRoleAssociationDTO>, OperationError> GetUsersWithRoleAssignment(OrganizationRole role)
         {
             if (_authorizationContext.GetCrossOrganizationReadAccess() < CrossOrganizationDataReadAccessLevel.All)

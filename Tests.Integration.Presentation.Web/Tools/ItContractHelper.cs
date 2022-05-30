@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Xunit;
@@ -184,6 +185,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
 
             return await HttpApi.PatchWithCookieAsync(TestEnvironment.CreateUrl($"api/itcontract/{contractId}?organizationId={organizationId}"), cookie, new { supplierId = supplierId });
+        }
+
+        public static async Task<List<ItContractRole>> GetRolesAsync(Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItContractRoles"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItContractRole>();
         }
     }
 }

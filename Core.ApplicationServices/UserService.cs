@@ -13,10 +13,12 @@ using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Organizations;
 using Core.DomainModel.Events;
+using Core.DomainModel.Organization.DomainEvents;
 using Infrastructure.Services.Cryptography;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Queries;
+using Infrastructure.Services.DataAccess;
 
 
 namespace Core.ApplicationServices
@@ -30,6 +32,7 @@ namespace Core.ApplicationServices
         private readonly bool _useDefaultUserPassword;
         private readonly IUserRepository _repository;
         private readonly IOrganizationService _organizationService;
+        private readonly ITransactionManager _transactionManager;
         private readonly IGenericRepository<User> _userRepository;
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IGenericRepository<PasswordResetRequest> _passwordResetRequestRepository;
@@ -38,6 +41,7 @@ namespace Core.ApplicationServices
         private readonly IAuthorizationContext _authorizationContext;
         private readonly IDomainEvents _domainEvents;
         private readonly SHA256Managed _crypt;
+        private readonly IOrganizationalUserContext _organizationalUserContext;
         private static readonly RNGCryptoServiceProvider rngCsp = new();
         private const string KitosManualsLink = "https://os2.eu/Kitosvejledning";
 
@@ -54,7 +58,9 @@ namespace Core.ApplicationServices
             IAuthorizationContext authorizationContext,
             IDomainEvents domainEvents,
             IUserRepository repository,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            ITransactionManager transactionManager,
+            IOrganizationalUserContext organizationalUserContext)
         {
             _ttl = ttl;
             _baseUrl = baseUrl;
@@ -70,6 +76,8 @@ namespace Core.ApplicationServices
             _domainEvents = domainEvents;
             _repository = repository;
             _organizationService = organizationService;
+            _transactionManager = transactionManager;
+            _organizationalUserContext = organizationalUserContext;
             _crypt = new SHA256Managed();
             if (useDefaultUserPassword && string.IsNullOrWhiteSpace(defaultUserPassword))
             {
@@ -124,7 +132,7 @@ namespace Core.ApplicationServices
                           "'>her</a>, hvor du første gang bliver bedt om at indtaste et nyt password for din KITOS profil.</p>" +
                           "<p>Linket udløber om " + _ttl.TotalDays + " dage. <a href='" + resetLink + "'>Klik her</a>, " +
                           "hvis dit link er udløbet og du vil blive ledt til 'Glemt password' proceduren.</p>" +
-                          "<p><a href='"+ KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                          "<p><a href='" + KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
                           "<p>Bemærk at denne mail ikke kan besvares.</p>";
 
             IssuePasswordReset(user, subject, content);
@@ -149,7 +157,7 @@ namespace Core.ApplicationServices
                               "<p><a href='" + resetLink +
                               "'>Klik her for at nulstille passwordet for din KITOS profil</a>.</p>" +
                               "<p>Linket udløber om " + _ttl.TotalDays + " dage.</p>" +
-                              "<p><a href='"+ KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
+                              "<p><a href='" + KitosManualsLink + "'>Klik her for at få Hjælp til log ind og brugerkonto</a></p>" +
                               "<p>Bemærk at denne mail ikke kan besvares.</p>";
             }
             var mailSubject = "Nulstilning af dit KITOS password" + _mailSuffix;
@@ -279,6 +287,50 @@ namespace Core.ApplicationServices
                         () => new OperationError("User is not member of the organization", OperationFailure.NotFound)
                     )
                 );
+        }
+
+        public Maybe<OperationError> DeleteUserFromKitos(Guid userUuid)
+        {
+            using var transaction = _transactionManager.Begin();
+
+            var user = _userRepository.AsQueryable().ByUuid(userUuid);
+            if (user == null)
+                return new OperationError(OperationFailure.NotFound);
+            if(_organizationalUserContext.UserId == user.Id)
+                return new OperationError("You cannot delete a user you are currently logged in as", OperationFailure.Forbidden);
+
+
+            if (!_authorizationContext.AllowDelete(user))
+                return new OperationError(OperationFailure.Forbidden);
+            
+            _domainEvents.Raise(new EntityBeingDeletedEvent<User>(user));
+
+            Delete(user);
+            _userRepository.Save();
+            transaction.Commit();
+            
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+
+            return Maybe<OperationError>.None;
+        }
+
+        private static void Delete(User user)
+        {
+            user.LockedOutDate = DateTime.Now;
+            user.EmailBeforeDeletion = user.Email;
+            user.Email = $"{Guid.NewGuid()}_deleted_user@kitos.dk";
+            user.PhoneNumber = null;
+            user.LastName = $"{(user.LastName ?? "").TrimEnd()} (SLETTET)";
+            user.DeletedDate = DateTime.Now;
+            user.Deleted = true;
+            user.IsGlobalAdmin = false;
+            user.HasApiAccess = false;
+            user.HasStakeHolderAccess = false;
+
+            user.ItProjectStatuses.Clear();
+            user.ResponsibleForCommunications.Clear();
+            user.HandoverParticipants.Clear();
+            user.ResponsibleForRisks.Clear();
         }
     }
 }

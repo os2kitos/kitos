@@ -41,11 +41,6 @@ namespace Core.ApplicationServices
             return AddOrganizationRoleToUser(user, organization, OrganizationRole.User);
         }
 
-        public OrganizationRight MakeLocalAdmin(User user, Organization organization)
-        {
-            return AddOrganizationRoleToUser(user, organization, OrganizationRole.LocalAdmin);
-        }
-
         public IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> GetOrganizationRoles(User user)
         {
             var rolesByRights = user.OrganizationRights

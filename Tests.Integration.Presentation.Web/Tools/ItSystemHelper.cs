@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Core.DomainModel;
+using Core.DomainModel.ItSystem;
 using Core.DomainModel.Organization;
 using Presentation.Web.Models.API.V1;
 using Xunit;
@@ -261,6 +262,16 @@ namespace Tests.Integration.Presentation.Web.Tools
             {
             };
             return await HttpApi.PostWithCookieAsync(url, cookie, body);
+        }
+
+        public static async Task<List<ItSystemRole>> GetRolesAsync(Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+
+            using var response = await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl("odata/ItSystemRoles"), cookie);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            return await response.ReadOdataListResponseBodyAsAsync<ItSystemRole>();
         }
     }
 }

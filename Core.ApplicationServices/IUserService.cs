@@ -18,5 +18,6 @@ namespace Core.ApplicationServices
         Result<IQueryable<User>, OperationError> GetUsersWithRoleAssignedInAnyOrganization(OrganizationRole role);
         Result<IQueryable<User>, OperationError> GetUsersInOrganization(Guid organizationUuid, params IDomainQuery<User>[] queries);
         Result<User, OperationError> GetUserInOrganization(Guid organizationUuid, Guid userUuid);
+        Maybe<OperationError> DeleteUserFromKitos(Guid userUuid);
     }
 }

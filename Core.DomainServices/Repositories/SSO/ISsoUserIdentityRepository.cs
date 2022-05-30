@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainModel.SSO;
@@ -10,5 +11,6 @@ namespace Core.DomainServices.Repositories.SSO
     {
         Maybe<SsoUserIdentity> GetByExternalUuid(Guid externalId);
         Result<SsoUserIdentity, OperationError> AddNew(User user, Guid externalId);
+        void DeleteIdentitiesForUser(User user);
     }
 }
