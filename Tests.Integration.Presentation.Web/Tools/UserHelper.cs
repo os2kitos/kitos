@@ -58,7 +58,7 @@ namespace Tests.Integration.Presentation.Web.Tools
         public static async Task<HttpResponseMessage> SendSearchUsersAsync(string query, Cookie optionalLogin = null)
         {
             var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
-            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/users/search/{query}"), cookie);
+            return await HttpApi.GetWithCookieAsync(TestEnvironment.CreateUrl($"api/users/search?query={query}"), cookie);
         }
     }
 }

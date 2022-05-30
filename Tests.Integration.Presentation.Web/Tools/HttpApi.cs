@@ -416,7 +416,7 @@ namespace Tests.Integration.Presentation.Web.Tools
             return await GetCookieAsync(userCredentials, acceptUnAuthorized);
         }
 
-        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, string name = "")
+        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, string name = "", string lastName = "")
         {
             var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
             var password = Guid.NewGuid().ToString("N");
@@ -426,6 +426,7 @@ namespace Tests.Integration.Presentation.Web.Tools
                 var user = x.AsQueryable().ById(userId);
                 user.Password = crypto.Encrypt(password + user.Salt);
                 user.Name = name;
+                user.LastName = lastName;
             });
 
             var cookie = await GetCookieAsync(new KitosCredentials(email, password));

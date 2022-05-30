@@ -156,5 +156,12 @@ namespace Tests.Integration.Presentation.Web.Tools
             var url = TestEnvironment.CreateUrl($"api/organization?q={search}");
             return await HttpApi.GetWithCookieAsync(url, cookie);
         }
+
+        public static async Task<HttpResponseMessage> SendGetUserOrganizationsRequestAsync(int userId, Cookie optionalLogin = null)
+        {
+            var cookie = optionalLogin ?? await HttpApi.GetCookieAsync(OrganizationRole.GlobalAdmin);
+            var url = TestEnvironment.CreateUrl($"api/authorize/GetOrganizations/{userId}");
+            return await HttpApi.GetWithCookieAsync(url, cookie);
+        }
     }
 }

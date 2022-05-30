@@ -36,7 +36,12 @@ namespace Presentation.Web.Controllers.API.V1.Mapping
 
         public static NamedEntityDTO MapToNamedEntityDTO(this User source)
         {
-            return new NamedEntityDTO(source.Id, $"{source.Name} {source.LastName}".TrimEnd());
+            return new NamedEntityDTO(source.Id, source.GetFullName().TrimEnd());
+        }
+
+        public static UserWithEmailDTO MapToUserWithEmailDTO(this User source)
+        {
+            return new UserWithEmailDTO(source.Id, source.GetFullName(), source.Email);
         }
 
         public static NamedEntityWithEnabledStatusDTO MapToNamedEntityWithEnabledStatusDTO(this ItSystem source)

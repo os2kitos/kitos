@@ -431,6 +431,8 @@
     <Compile Include="Infrastructure\Model\Request\ICurrentHttpRequest.cs" />
     <Compile Include="Infrastructure\Model\Request\ICurrentRequestStream.cs" />
     <Compile Include="Models\API\V1\EntityWithOrganizationRelationshipDTO.cs" />
+    <Compile Include="Models\API\V1\Generic\Queries\V1BoundedPaginationQuery.cs" />
+    <Compile Include="Models\API\V1\Generic\Queries\IV1StandardPaginationQueryParameters.cs" />
     <Compile Include="Models\API\V1\KendoColumnConfigurationDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\InterfaceExposedOnSystemsOutsideTheOrganizationConflictDTO.cs" />
     <Compile Include="Models\API\V1\Organizations\OrganizationRemovalConflictsDTO.cs" />

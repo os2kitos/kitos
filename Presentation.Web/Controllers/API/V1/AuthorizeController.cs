@@ -20,6 +20,7 @@ using Core.ApplicationServices.Organizations;
 using Core.DomainServices.Extensions;
 using Infrastructure.Services.Cryptography;
 using Newtonsoft.Json;
+using Presentation.Web.Extensions;
 using Presentation.Web.Helpers;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
@@ -76,6 +77,18 @@ namespace Presentation.Web.Controllers.API.V1
 
             var dtos = Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>(orgs.ToList());
             return Ok(dtos);
+        }
+
+        [InternalApi]
+        [Route("api/authorize/GetOrganizations/{userId}")]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
+        public HttpResponseMessage GetUserOrganizations(int userId)
+        {
+            return _organizationService.GetUserOrganizations(userId)
+                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.ToList())
+                .Select(Map<IEnumerable<Organization>, IEnumerable<OrganizationSimpleDTO>>)
+                .Match(Ok, FromOperationError);
         }
 
         private IQueryable<Organization> GetOrganizationsWithMembershipAccess()

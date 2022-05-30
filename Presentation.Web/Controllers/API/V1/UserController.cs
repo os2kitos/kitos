@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using Core.ApplicationServices;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -16,12 +18,12 @@ using Core.DomainServices.Generic;
 using Core.DomainServices.Queries;
 using Core.DomainServices.Queries.User;
 using Newtonsoft.Json.Linq;
+using Presentation.Web.Controllers.API.V1.Mapping;
 using Presentation.Web.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V1;
+using Presentation.Web.Models.API.V1.Generic.Queries;
 using Presentation.Web.Models.API.V1.Users;
-using Presentation.Web.Models.API.V2.Request.Generic.Queries;
-
 namespace Presentation.Web.Controllers.API.V1
 {
     [InternalApi]
@@ -224,21 +226,23 @@ namespace Presentation.Web.Controllers.API.V1
         /// <param name="nameOrEmailQuery">Name or email of the user</param>
         /// <returns>A list of users</returns>
         [HttpGet]
-        [Route("api/users/search/{nameOrEmailQuery}")]
-        public HttpResponseMessage SearchUsers(string nameOrEmailQuery, [FromUri] BoundedPaginationQuery paginationQuery = null)
+        [Route("api/users/search")]
+        public HttpResponseMessage SearchUsers(string query, [FromUri] V1BoundedPaginationQuery paginationQuery = null)
         {
-                if (string.IsNullOrEmpty(nameOrEmailQuery))
-                    return BadRequest("Query needs a value");
+            if (string.IsNullOrEmpty(query))
+                return BadRequest("Query needs a value");
 
-                var queries = new List<IDomainQuery<User>> { new QueryUserByNameOrEmail(nameOrEmailQuery) };
+            var decodedQuery = HttpUtility.UrlDecode(query);
 
-                return _userService
-                    .SearchAllKitosUsers(queries.ToArray())
-                    .Select(x => x.OrderBy(user => user.Id))
-                    .Select(x => x.Page(paginationQuery))
-                    .Select(x => x.ToList())
-                    .Select(ToUserWithEmailDtos)
-                    .Match(Ok, FromOperationError);
+            var queries = new List<IDomainQuery<User>> { new QueryUserByNameOrEmail(decodedQuery) };
+
+            return _userService
+                .SearchAllKitosUsers(queries.ToArray())
+                .Select(x => x.OrderBy(user => user.Id))
+                .Select(x => x.Page(paginationQuery))
+                .Select(x => x.ToList())
+                .Select(ToUserWithEmailDtos)
+                .Match(Ok, FromOperationError);
         }
 
         private static IEnumerable<UserWithOrganizationDTO> ToUserWithOrgDTOs(List<UserRoleAssociationDTO> dtos)
@@ -253,12 +257,7 @@ namespace Presentation.Web.Controllers.API.V1
 
         private static IEnumerable<UserWithEmailDTO> ToUserWithEmailDtos(List<User> users)
         {
-            return users.Select(ToUserWithEmailDto).ToList();
-        }
-
-        private static UserWithEmailDTO ToUserWithEmailDto(User user)
-        {
-            return new(user.Id, user.Name, user.Email);
+            return users.Select(user => user.MapToUserWithEmailDTO()).ToList();
         }
 
         private static IEnumerable<UserWithCrossOrganizationalRightsDTO> ToUserWithCrossRightsDTOs(IEnumerable<User> users)
