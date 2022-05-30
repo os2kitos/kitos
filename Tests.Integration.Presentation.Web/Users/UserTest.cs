@@ -258,7 +258,7 @@ namespace Tests.Integration.Presentation.Web.Users
             var organization = await CreateOrganizationAsync();
             var userEmail = string.IsNullOrEmpty(email) ? UIConfigurationHelper.CreateEmail() : email;
             var (userId, _, loginCookie) =
-                await HttpApi.CreateUserAndLogin(userEmail, role, organization.Id, hasApiAccess, name, lastName);
+                await HttpApi.CreateUserAndLogin(userEmail, role, name, lastName, organization.Id, hasApiAccess);
             return (loginCookie, userId, organization, userEmail);
         }
 
