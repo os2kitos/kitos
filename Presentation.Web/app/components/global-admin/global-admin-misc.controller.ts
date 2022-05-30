@@ -51,6 +51,7 @@
             $scope.usersWithRightsholderAccess = usersWithRightsholderAccess;
             $scope.usersWithCrossAccess = usersWithCrossAccess;
             $scope.kitosUsers = [];
+            $scope.userOrganizations = [];
 
             $scope.showOrgsWhereUserActive = (activeOrgNames: string[]) => {
                 $uibModal.open({
@@ -146,14 +147,19 @@
 
             $scope.$watch("selectedUser", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
-                
-                $scope.userSelected = true;
+
+                $scope.userOrganizations = [];
+                userService.getUserOrganizations(newVal).then(res => {
+                    $scope.userOrganizations.pushArray(res);
+                    $scope.userSelected = true;
+                });
             });
 
             $scope.removeUser = (id: number) => {
                 userService.deleteUser(id)
                     .then(() => {
                             $scope.userSelected = false;
+                            $scope.selectedUser = null;
                         }
                     ).catch(ex => console.log(ex));
             };

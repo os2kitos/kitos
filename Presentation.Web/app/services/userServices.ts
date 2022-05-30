@@ -43,6 +43,7 @@
         getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
         deleteUser(id: number);
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
+        getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
     }
 
     export class UserService implements IUserService {
@@ -518,7 +519,13 @@
 
         searchUsers(query: string) {
             return this.$http
-                .get<API.Models.IApiWrapper<Models.Api.IUserWithEmail[]>>(`api/users/search/${query}`)
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithEmail[]>>(`api/users/search?query=${query}`)
+                .then(result => result.data.response);
+        }
+
+        getUserOrganizations(userId: number) {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.IOrganization[]>>(`api/authorize/GetOrganizations/${userId}`)
                 .then(result => result.data.response);
         }
     }
