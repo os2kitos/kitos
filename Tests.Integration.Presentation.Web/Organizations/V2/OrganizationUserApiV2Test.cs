@@ -229,7 +229,7 @@ namespace Tests.Integration.Presentation.Web.Organizations.V2
 
         private async Task<User> CreateUser(OrganizationDTO organization)
         {
-            var userAndGetToken = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, organization.Id, false);
+            var userAndGetToken = await HttpApi.CreateUserAndLogin(CreateEmail(), OrganizationRole.User, organization.Id, false, name: A<string>(), lastName: A<string>());
             var user = DatabaseAccess.MapFromEntitySet<User, User>(x => x.AsQueryable().ById(userAndGetToken.userId));
             return user;
         }
