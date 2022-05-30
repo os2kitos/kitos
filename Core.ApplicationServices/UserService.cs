@@ -301,6 +301,7 @@ namespace Core.ApplicationServices
 
             return _repository
                 .GetUsers()
+                .Where(x => !x.Deleted)
                 .Transform(query.Apply)
                 .Transform(Result<IQueryable<User>, OperationError>.Success);
         }
