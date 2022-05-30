@@ -619,6 +619,22 @@
                         filterable: false
                     },
                     {
+                        field: "LastChangedByUser", title: "Sidst redigeret: Bruger", width: 150,
+                        persistId: "lastchangedname", // DON'T YOU DARE RENAME!
+                        template: dataItem => dataItem?.LastChangedByUser ? dataItem.LastChangedByUser.toString() : "",
+                        hidden: true,
+                        sortable: true,
+                        filterable: true
+                    },
+                    {
+                        field: "LastChanged", title: "Sidste redigeret: Dato", width: 150,
+                        persistId: "lastchanged", // DON'T YOU DARE RENAME!
+                        template: dataItem => dataItem?.LastChanged ? dataItem.LastChanged.toString() : "",
+                        hidden: true,
+                        sortable: true,
+                        filterable: false
+                    },
+                    {
                         field: "DataProcessingRegistrationsConcluded", title: "Databehandleraftale", width: 150,
                         persistId: "dataProcessingRegistrationsConcluded",
                         template: dataItem => {
