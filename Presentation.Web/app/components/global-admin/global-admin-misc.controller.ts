@@ -195,42 +195,5 @@
                     , false
                     , formatUser);
             }
-
-            function selectLazyLoading(url, format, paramAry) {
-                return {
-                    minimumInputLength: 1,
-                    allowClear: true,
-                    placeholder: ' ',
-                    formatResult: format,
-                    ajax: {
-                        data: function (term, page) {
-                            return { query: term };
-                        },
-                        quietMillis: 500,
-                        transport: function (queryParams) {
-                            var res = $http.get(url + queryParams.data.query).then(queryParams.success);
-                            res.abort = function () {
-                                return null;
-                            };
-
-                            return res;
-                        },
-
-                        results: function (data, page) {
-                            var results = [];
-
-                            _.each(data.data.response, function (obj: { id: any; name: any; email: any }) {
-                                results.push({
-                                    id: obj.id,
-                                    text: obj.name ? obj.name : 'Unavngiven',
-                                    email: obj.email
-                                });
-                            });
-
-                            return { results: results };
-                        }
-                    }
-                };
-            }
         }]);
 })(angular, app);
