@@ -19,6 +19,15 @@
                 </label>
             </div>
         </div>
+        <div class="margin-top col-xs-12">&nbsp;</div>
+        <label class="col-xs-2 control-label noMargin" ng-if="config.showItContractModule">
+            Faneblade og felter:
+        </label>
+
+        <!-- Local UI config for IT-contract usages module -->
+        <div class="col-xs-10" ng-if="config.showItContractModule">
+            <data-local-ui-customization data-customized-module-id="ItContracts" />
+        </div>
     </div>
 
     <div data-local-option-role-list="" title="Roller" dir-id="localItContractRoleId" state="local-config.contract.edit-contract-roles" option-type="{{localOptionType.ItContractRoles}}" current-org-id="{{currentOrganizationId}}"></div>
