@@ -255,7 +255,8 @@
                                         "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
-                                        "DataProcessingRegistrations($select=IsAgreementConcluded)";
+                                        "DataProcessingRegistrations($select=IsAgreementConcluded)," +
+                                        "LastChangedByUser($select=Name,LastName)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -298,6 +299,7 @@
                             fields: {
                                 OperationRemunerationBegun: { type: "date" },
                                 LastChanged: { type: "date" },
+                                LastChangedName: { type: "string" },
                                 Concluded: { type: "date" },
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
@@ -359,8 +361,8 @@
                                     if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
                                     if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
-                                    if (!contract.PaymentFreqency) { contract.PaymentFreqency = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
                                 });
                             return response;
                         }
@@ -619,7 +621,7 @@
                         filterable: false
                     },
                     {
-                        field: "LastChangedByUser", title: "Sidst redigeret: Bruger", width: 150,
+                        field: "LastChangedName", title: "Sidst redigeret: Bruger", width: 150,
                         persistId: "lastchangedname", // DON'T YOU DARE RENAME!
                         template: dataItem => dataItem && dataItem.LastChangedByUser ? `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}` : "",
                         hidden: true,
