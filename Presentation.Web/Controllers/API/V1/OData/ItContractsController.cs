@@ -60,6 +60,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
             }
 
             var result = Repository.AsQueryable().ByOrganizationId(key);
+
             return Ok(result);
         }
 
