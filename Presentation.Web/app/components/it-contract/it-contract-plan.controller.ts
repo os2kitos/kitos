@@ -806,13 +806,13 @@
                     },
                     {
                         field: "ProcurementPlanYear",
-                        title: "Udbuds plan",
+                        title: "Genanskaffelses plan",
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: dataItem =>
-                            dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear
-                                ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
+                            dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
+                                ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                                 : "",
                         filterable: {
                             cell: {
