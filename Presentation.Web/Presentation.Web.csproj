@@ -1733,6 +1733,10 @@
       <Project>{0326cae6-87a1-4d66-84ae-eb8ce0340e9f}</Project>
       <Name>Infrastructure.Services</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Infrastructure.STS.Organization\Infrastructure.STS.Organization.csproj">
+      <Project>{3DC91665-93BB-442D-B186-7E90C7CD6E32}</Project>
+      <Name>Infrastructure.STS.Organization</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
