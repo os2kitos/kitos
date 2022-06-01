@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3DC91665-93BB-442D-B186-7E90C7CD6E32}</ProjectGuid>
+    <ProjectGuid>{09A799FA-3781-419B-AB54-3C76219FD2DE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Infrastructure.STS.Organization</RootNamespace>
-    <AssemblyName>Infrastructure.STS.Organization</AssemblyName>
+    <RootNamespace>Infrastructure.STS.Company</RootNamespace>
+    <AssemblyName>Infrastructure.STS.Company</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -32,9 +32,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -52,7 +49,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
-    <Compile Include="DomainServices\StsOrganizationService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,69 +59,59 @@
     <None Include="Connected Services\ServiceReference\CallContext_1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.importerResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.ImporterResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.laesResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.LaesResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.listResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.ListResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.opretResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.OpretResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.passiverResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.PassiverResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.RequestHeaderType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.retResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.RetResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.sletResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.SletResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.soegResponse.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Organization.ServiceReference.SoegResponseType.datasource">
-      <DependentUpon>Reference.svcmap</DependentUpon>
-    </None>
-    <None Include="Connected Services\ServiceReference\Organisation.xsd">
+    <None Include="Connected Services\ServiceReference\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Connected Services\ServiceReference\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.importerResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\ServiceReference\OrganisationOperationer.xsd">
-      <SubType>Designer</SubType>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.ImporterResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Connected Services\ServiceReference\OrganisationService.wsdl" />
-    <None Include="Connected Services\ServiceReference\OrganisationServiceMsg.xsd">
-      <SubType>Designer</SubType>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.laesResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.LaesResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.listResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.ListResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.opretResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.OpretResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.passiverResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.PassiverResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.RequestHeaderType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.retResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.RetResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.sletResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.SletResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.soegResponse.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Connected Services\ServiceReference\Infrastructure.STS.Company.ServiceReference.SoegResponseType.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
     <None Include="Connected Services\ServiceReference\Part.xsd">
       <SubType>Designer</SubType>
@@ -141,33 +127,39 @@
     <None Include="Connected Services\ServiceReference\ServiceplatformFault_1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="Connected Services\ServiceReference\Virksomhed.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ServiceReference\VirksomhedOperationer.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Connected Services\ServiceReference\VirksomhedService.wsdl" />
+    <None Include="Connected Services\ServiceReference\VirksomhedServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Readme.md" />
-    <None Include="ServiceContract\OrganisationServiceMsg.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\OrganisationFaelles.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\Organisation.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\Part.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationBesked.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\Virksomhed.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationFaelles.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedBesked.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\OrganisationOperationer.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedOperationer.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\1.1.STS-3\Part.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\common\RequestHeader.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS8\xsd\common\SagDokObjekt.xsd">
+    <None Include="ServiceContract\SF1500_EP_FS11\xsd\common\SagDokObjekt.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="ServiceContract\sp\AuthorityContext_1.xsd">
@@ -184,10 +176,13 @@
     <None Include="ServiceContract\sp\ServiceplatformFault_1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ServiceContract\wsdl\context\OrganisationService.wsdl" />
+    <None Include="ServiceContract\VirksomhedServiceMsg.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ServiceContract\wsdl\context\policies.wsdl" />
-    <None Include="ServiceContract\wsdl\token\OrganisationService.wsdl" />
+    <None Include="ServiceContract\wsdl\context\VirksomhedService.wsdl" />
     <None Include="ServiceContract\wsdl\token\policies.wsdl" />
+    <None Include="ServiceContract\wsdl\token\VirksomhedService.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />
@@ -206,24 +201,6 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Core.Abstractions\Core.Abstractions.csproj">
-      <Project>{bd8c90e7-52c7-4ad0-935d-98a2aa89e449}</Project>
-      <Name>Core.Abstractions</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainModel\Core.DomainModel.csproj">
-      <Project>{a76a8e41-74f7-4443-a5f3-059b5414d83b}</Project>
-      <Name>Core.DomainModel</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.DomainServices\Core.DomainServices.csproj">
-      <Project>{adcacc1d-f538-464c-9102-f4c1d6fa35d3}</Project>
-      <Name>Core.DomainServices</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Infrastructure.STS.Common\Infrastructure.STS.Common.csproj">
-      <Project>{423D7522-4882-4438-94F4-7B3F5778C83F}</Project>
-      <Name>Infrastructure.STS.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
