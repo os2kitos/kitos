@@ -60,9 +60,7 @@ namespace Presentation.Web.Controllers.API.V1.OData
                 return Forbidden();
             }
 
-            var result = Repository.AsQueryable()
-                .Include(x => x.LastChangedByUser)
-                .ByOrganizationId(key);
+            var result = Repository.AsQueryable().ByOrganizationId(key);
             return Ok(result);
         }
 

@@ -233,7 +233,8 @@
                                     "ProcurementStrategy($select=Name)," +
                                     "AssociatedSystemUsages($select=ItSystemUsageId)," +    //Only using the length, so select 1 field
                                     "AssociatedSystemRelations($select=Id)," +              //Only using the length, so select 1 field
-                                    "Reference($select=URL,Title,ExternalReferenceId)";
+                                    "Reference($select=URL,Title,ExternalReferenceId)," +
+                                    "LastChangedByUser($select=Name,LastName)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -319,6 +320,7 @@
                                     if (!contract.PurchaseForm) { contract.PurchaseForm = { Name: "" }; }
                                     if (!contract.TerminationDeadline) { contract.TerminationDeadline = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
                                 });
                             return response;
                         }
@@ -822,7 +824,23 @@
                                 operator: "contains"
                             }
                         }
-                    }
+                    },
+                    {
+                        field: "LastChangedName", title: "Sidst redigeret: Bruger", width: 150,
+                        persistId: "lastchangedname",
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
+                        hidden: true,
+                        sortable: false,
+                        filterable: false
+                    },
+                    {
+                        field: "LastChanged", title: "Sidste redigeret: Dato", width: 150,
+                        persistId: "lastchanged",
+                        template: dataItem => dataItem?.LastChanged ? dataItem.LastChanged.toLocaleDateString() : "",
+                        hidden: true,
+                        sortable: true,
+                        filterable: false
+                    },
                 ]
             };
 
