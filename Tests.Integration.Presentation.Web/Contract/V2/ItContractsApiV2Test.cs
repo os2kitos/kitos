@@ -2288,7 +2288,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             }
             else
             {
-                Assert.Equal(expected.ProcurementPlan.HalfOfYear, actual.ProcurementPlan.HalfOfYear);
+                Assert.Equal(expected.ProcurementPlan.QuarterOfYear, actual.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(expected.ProcurementPlan.Year, actual.ProcurementPlan.Year);
             }
         }
@@ -2303,7 +2303,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 PurchaseTypeUuid = purchaseType.Uuid,
                 ProcurementPlan = new ProcurementPlanDTO()
                 {
-                    HalfOfYear = Convert.ToByte((A<int>() % 1) + 1),
+                    QuarterOfYear = Convert.ToByte((A<int>() % 1) + 1),
                     Year = A<int>()
                 }
             };
