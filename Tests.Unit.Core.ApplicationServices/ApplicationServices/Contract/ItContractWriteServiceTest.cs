@@ -1670,7 +1670,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             if (expected.ProcurementPlan.HasChange && expected.ProcurementPlan.NewValue.HasValue)
             {
-                Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, Convert.ToInt32(actual.ProcurementPlanQuarter));
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, actual.ProcurementPlanQuarter);
                 Assert.Equal(expected.ProcurementPlan.NewValue.Value.year, actual.ProcurementPlanYear);
             }
             else
