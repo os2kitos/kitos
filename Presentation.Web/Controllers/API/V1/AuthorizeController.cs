@@ -84,7 +84,6 @@ namespace Presentation.Web.Controllers.API.V1
         [SwaggerResponse(HttpStatusCode.OK, Type = typeof(ApiReturnDTO<IEnumerable<OrganizationSimpleDTO>>))]
         public HttpResponseMessage GetUserOrganizations(int userId)
         {
-            var test = _organizationService.GetUserOrganizations(userId).Value.ToList();
             return _organizationService.GetUserOrganizations(userId)
                 .Select(x => x.OrderBy(user => user.Id))
                 .Select(x => x.ToList())

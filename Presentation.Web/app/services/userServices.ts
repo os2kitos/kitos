@@ -41,7 +41,7 @@
         updateDefaultOrgUnit(newDefaultOrgUnitId: number): ng.IPromise<any>;
         getUsersWithRightsholderAccess(): ng.IPromise<Kitos.Models.Api.IUserWithOrganizationName[]>;
         getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
-        deleteUser(id: number);
+        deleteUser(id: number): ng.IPromise<any>;
         searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
         getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
     }

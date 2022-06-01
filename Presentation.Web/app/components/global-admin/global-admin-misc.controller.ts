@@ -32,6 +32,7 @@
         "usersWithCrossAccess",
         "userService",
         "select2LoadingService",
+        "$state",
         (
             $rootScope,
             $scope,
@@ -44,7 +45,8 @@
             usersWithRightsholderAccess: Kitos.Models.Api.IUserWithOrganizationName[],
             usersWithCrossAccess: Kitos.Models.Api.IUserWithCrossAccess[],
             userService: Kitos.Services.IUserService,
-            select2LoadingService: Kitos.Services.ISelect2LoadingService) => {
+            select2LoadingService: Kitos.Services.ISelect2LoadingService,
+            $state) => {
             
             $rootScope.page.title = "Andet";
             $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
@@ -148,6 +150,8 @@
             $scope.$watch("selectedUser", function (newVal, oldVal) {
                 if (newVal === oldVal || !newVal) return;
 
+                if (typeof newVal === "object")
+                    return;
                 $scope.userOrganizations = [];
                 userService.getUserOrganizations(newVal).then(res => {
                     $scope.userOrganizations.pushArray(res);
@@ -156,25 +160,31 @@
             });
 
             $scope.removeUser = (id: number) => {
-                userService.deleteUser(id)
-                    .then(() => {
-                            $scope.userSelected = false;
-                            $scope.selectedUser = null;
-                        }
-                    ).catch(ex => console.log(ex));
+                const name = $scope.selectedUser.text;
+                const email = $scope.selectedUser.email;
+
+                //$state.go("global-admin-misc-user-delete", { id: id});
+                const nameAndEmail = `${$scope.selectedUser.text}, ${$scope.selectedUser.email}`;
+                if (confirm(`Er du sikker på, at du vil slette ${nameAndEmail}`)) {
+                    notify.addInfoMessage(`Sletter ${nameAndEmail}`);
+                    userService.deleteUser(id)
+                        .then(() => {
+                                notify.addSuccessMessage(`Sletter ${nameAndEmail}`);
+                                $scope.userSelected = false;
+                                $scope.selectedUser = null;
+                            }
+                        ).catch(ex => {
+                            console.log(ex);
+                            notify.addErrorMessage(`Fejl ifm. sletning af brugeren Sletter ${nameAndEmail}`);
+                            $scope.reload();
+                        });
+                    $state.reload();
+                }
             };
 
             function toggleKleButtonsClickAbility(updateAvailButton: boolean, updateButton: boolean) {
                 $scope.KleUpdateAvailableButtonInteraction = updateAvailButton;
                 $scope.KleApplyUpdateButtonInteraction = updateButton;
-            }
-            
-            function formatUser(user) {
-                var result = '<div>' + user.text + '</div>';
-                if (user.email) {
-                    result += '<div class="small">' + user.email + '</div>';
-                }
-                return result;
             }
 
             function getAvailableUsers() {
@@ -193,7 +203,7 @@
                                 })
                         )
                     , false
-                    , formatUser);
+                    , Kitos.Helpers.FormatHelper.formatUserWithEmail);
             }
         }]);
 })(angular, app);

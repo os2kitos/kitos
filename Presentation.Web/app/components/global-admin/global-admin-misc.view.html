@@ -17,40 +17,40 @@
      <div class="well" ng-if="!brokenLinksVm.available">
          <p>Rapporten over brudte links er endnu ikke tilgængelig. Forventet tilgængelighed er "Mandag i næste uge".</p>
      </div>
-
-    <!--TODO: Change text-->
-    <h3>*INSERT TEXT IN DANISH*</h3>
+    
+    <h3>Nedlæg bruger</h3>
     <div class="well">
-        <div class="row">
+        <div class="row" style="margin-bottom: 15px">
             <input id="add-new-user-for-delete"
                    class="col-xs-11"
                    ui-select2="::userOptions"
                    placeholder="Vælg bruger"
                    ng-model="selectedUser">
             <button class="btn btn-danger btn-sm col-xs-1"
-                    ng-if="userSelected"
-                    data-confirmed-click="removeUser(selectedUser.id)"
-                    data-confirm-click="Er du sikker på at du vil slette?">
-                <!--TODO: Change text-->
-                Delete
+                    ng-disabled="!userSelected"
+                    ng-click="removeUser(selectedUser.id)">
+                Slette
             </button>
         </div>
-        <table class="full-width table table-striped"
-               ng-if="userSelected">
-            <thead>
-            <tr>
-                <!--TODO: Change text-->
-                <th>Organization name</th>
-            </tr>
-            </thead>
-            <!-- for each right -->
-            <tbody>
-            <tr data-ng-repeat="org in userOrganizations">
-                <td>{{ org.name }}</td>
-            </tr>
-            </tbody>
+        <div ng-if="userOrganizations && userOrganizations.length > 0">
+            <span>{{selectedUser.text}} {{selectedUser.email}}</span>
+            <span><strong>Brugeren er stadig medlem af følgende organisationer</strong></span>
+            <table class="full-width table table-striped"
+                   ng-if="userSelected">
+                <thead>
+                <tr>
+                    <th>Organisation</th>
+                </tr>
+                </thead>
+                <!-- for each organization -->
+                <tbody>
+                <tr data-ng-repeat="org in userOrganizations">
+                    <td>{{ org.name }}</td>
+                </tr>
+                </tbody>
 
-        </table>
+            </table>
+        </div>
     </div>
 
     <h3>Oversigt over brugere med API relaterede rettigheder</h3>
