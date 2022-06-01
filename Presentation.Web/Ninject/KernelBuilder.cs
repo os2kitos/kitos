@@ -329,6 +329,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
@@ -356,6 +357,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
