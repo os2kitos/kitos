@@ -20,6 +20,16 @@
 
         public override void Down()
         {
+            Sql(@"UPDATE dbo.ItContract
+                  SET ProcurementPlanQuarter = 
+                        CASE ProcurementPlanQuarter
+							WHEN 1 THEN 1
+							WHEN 2 THEN 1
+							WHEN 3 THEN 2
+							WHEN 4 THEN 2
+							ELSE ProcurementPlanQuarter
+						END;"
+            );
             RenameColumn("dbo.ItContract", "ProcurementPlanQuarter", "ProcurementPlanHalf");
         }
     }
