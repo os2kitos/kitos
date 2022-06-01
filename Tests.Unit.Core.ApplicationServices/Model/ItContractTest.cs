@@ -326,15 +326,15 @@ namespace Tests.Unit.Core.Model
             //Assert
             Assert.True(result.IsNone);
             Assert.NotNull(sut.ProcurementPlanQuarter);
-            Assert.Equal(quarterValue, Convert.ToInt32(sut.ProcurementPlanQuarter));
+            Assert.Equal(quarterValue, sut.ProcurementPlanQuarter);
             Assert.NotNull(sut.ProcurementPlanYear);
             Assert.Equal(year, sut.ProcurementPlanYear);
         }
 
         [Theory]
         [InlineData(0)]
-        [InlineData(3)]
-        public void Cannot_UpdateProcurementPlan_If_Half_Not_1_Or_2(int halfValue)
+        [InlineData(5)]
+        public void Cannot_UpdateProcurementPlan_If_Quarter_Not_Between_1_And_4(int halfValue)
         {
             //Arrange
             var sut = new ItContract();
@@ -346,7 +346,7 @@ namespace Tests.Unit.Core.Model
 
             //Assert
             Assert.True(result.HasValue);
-            Assert.Contains("Half Of Year has to be either 1 or 2", result.Value.Message.GetValueOrEmptyString());
+            Assert.Contains("Quarter Of Year has to be either 1, 2, 3 or 4", result.Value.Message.GetValueOrEmptyString());
             Assert.Equal(OperationFailure.BadInput, result.Value.FailureType);
         }
 

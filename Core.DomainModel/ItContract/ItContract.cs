@@ -667,7 +667,7 @@ namespace Core.DomainModel.ItContract
         public Maybe<OperationError> UpdateProcurementPlan((byte quarter, int year) plan)
         {
             var (quarter, year) = plan;
-            if (quarter is < 1 or > 2)
+            if (quarter is < 1 or > 4)
             {
                 return new OperationError("Quarter Of Year has to be either 1, 2, 3 or 4", OperationFailure.BadInput);
             }
