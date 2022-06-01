@@ -4,7 +4,7 @@ import ContractHelper = require("../../Helpers/ContractHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import ContractNavigationSrefs = require("../../Helpers/SideNavigation/ContractNavigationSrefs");
 
-describe("Local admin is able customize the IT-System usage UI", () => {
+describe("Local admin is able customize the IT-Contract usage UI", () => {
 
     var loginHelper = new Login();
     var testFixture = new TestFixtureWrapper();
@@ -19,9 +19,9 @@ describe("Local admin is able customize the IT-System usage UI", () => {
         testFixture.disableLongRunningTest();
     });
 
-    var localSystemPath: string | null = null;
+    var localContractPath: string | null = null;
 
-    it("Disabling Tabs/fields will hide the tabs/fields on the IT-System details page", () => {
+    it("Disabling Tabs/fields will hide the tabs/fields on the IT-Contract details page", () => {
         var contractName = createName("contractName");
 
         return loginHelper.loginAsGlobalAdmin()
@@ -42,14 +42,14 @@ describe("Local admin is able customize the IT-System usage UI", () => {
     function navigateToContract(contractName: string) {
         let navigationPromise;
 
-        if (localSystemPath === null) {
+        if (localContractPath === null) {
             navigationPromise = ContractHelper
                 .openContract(contractName)
                 .then(() => browser.getCurrentUrl())
-                .then(url => localSystemPath = url.substr(browser.params.baseUrl.length));
+                .then(url => localContractPath = url.substr(browser.params.baseUrl.length));
         } else {
-            // Save some time going directly to the system in stead of going through kendo
-            navigationPromise = navigation.getPage(localSystemPath);
+            // Save some time going directly to the contract in stead of going through kendo
+            navigationPromise = navigation.getPage(localContractPath);
         }
         return navigationPromise;
     }
