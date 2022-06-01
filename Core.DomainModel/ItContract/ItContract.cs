@@ -234,21 +234,21 @@ namespace Core.DomainModel.ItContract
         public virtual ProcurementStrategyType ProcurementStrategy { get; set; }
 
         /// <summary>
-        ///     Gets or sets the procurement plan half. (udbudsplan)
+        ///     Gets or sets the procurement plan half. (genanskaffelsesplan)
         /// </summary>
         /// <remarks>
         ///     The other part of this option is <see cref="ProcurementPlanYear" />
         /// </remarks>
         /// <value>
-        ///     Can be either 1 for the 1st and 2nd quarter or 2 for the 3rd and 4th quarter.
+        ///     Can have a value between 1 and 4 for each of the quarters.
         /// </value>
-        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanQuarter { get; set; }
 
         /// <summary>
-        ///     Gets or sets the procurement plan year. (udbudsplan)
+        ///     Gets or sets the procurement plan year. (genanskaffelsesplan)
         /// </summary>
         /// <remarks>
-        ///     the other part of this option is <see cref="ProcurementPlanHalf" />
+        ///     the other part of this option is <see cref="ProcurementPlanQuarter" />
         /// </remarks>
         /// <value>
         ///     The procurement plan year.
@@ -660,19 +660,19 @@ namespace Core.DomainModel.ItContract
 
         public void ResetProcurementPlan()
         {
-            ProcurementPlanHalf = null;
+            ProcurementPlanQuarter = null;
             ProcurementPlanYear = null;
         }
 
-        public Maybe<OperationError> UpdateProcurementPlan((byte half, int year) plan)
+        public Maybe<OperationError> UpdateProcurementPlan((byte quarter, int year) plan)
         {
-            var (half, year) = plan;
-            if (half is < 1 or > 2)
+            var (quarter, year) = plan;
+            if (quarter is < 1 or > 2)
             {
-                return new OperationError("Half Of Year has to be either 1 or 2", OperationFailure.BadInput);
+                return new OperationError("Quarter Of Year has to be either 1, 2, 3 or 4", OperationFailure.BadInput);
             }
 
-            ProcurementPlanHalf = half;
+            ProcurementPlanQuarter = quarter;
             ProcurementPlanYear = year;
             return Maybe<OperationError>.None;
         }

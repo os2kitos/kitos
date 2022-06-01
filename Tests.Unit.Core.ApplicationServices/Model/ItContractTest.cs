@@ -296,7 +296,7 @@ namespace Tests.Unit.Core.Model
             //Arrange
             var sut = new ItContract()
             {
-                ProcurementPlanHalf = A<int>(),
+                ProcurementPlanQuarter = A<int>(),
                 ProcurementPlanYear = A<int>()
             };
 
@@ -304,27 +304,29 @@ namespace Tests.Unit.Core.Model
             sut.ResetProcurementPlan();
 
             //Assert
-            Assert.Null(sut.ProcurementPlanHalf);
+            Assert.Null(sut.ProcurementPlanQuarter);
             Assert.Null(sut.ProcurementPlanYear);
         }
 
         [Theory]
         [InlineData(1)]
         [InlineData(2)]
-        public void Can_UpdateProcurementPlan(int halfValue)
+        [InlineData(3)]
+        [InlineData(4)]
+        public void Can_UpdateProcurementPlan(int quarterValue)
         {
             //Arrange
             var sut = new ItContract();
-            var half = Convert.ToByte(halfValue);
+            var quarter = Convert.ToByte(quarterValue);
             var year = A<int>();
 
             //Act
-            var result = sut.UpdateProcurementPlan((half, year));
+            var result = sut.UpdateProcurementPlan((quarter, year));
 
             //Assert
             Assert.True(result.IsNone);
-            Assert.NotNull(sut.ProcurementPlanHalf);
-            Assert.Equal(halfValue, sut.ProcurementPlanHalf);
+            Assert.NotNull(sut.ProcurementPlanQuarter);
+            Assert.Equal(quarterValue, Convert.ToInt32(sut.ProcurementPlanQuarter));
             Assert.NotNull(sut.ProcurementPlanYear);
             Assert.Equal(year, sut.ProcurementPlanYear);
         }
