@@ -29,7 +29,8 @@ describe("Local admin is able customize the IT-Contract usage UI", () => {
             .then(() => loginHelper.logout())
             .then(() => loginHelper.loginAsLocalAdmin())
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
-            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref));
+            .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.replacementPlan", ContractNavigationSrefs.frontPageSref, /*"replacementPlans"*/ "s2id_contract-plan"));
     });
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {
@@ -37,6 +38,13 @@ describe("Local admin is able customize the IT-Contract usage UI", () => {
         return verifyTabVisibility(name, tabSref, true)               //Check that the tab is visible before the change
             .then(() => toggleSetting(settingId))                           //Toggle the setting
             .then(() => verifyTabVisibility(name, tabSref, false));   //Verify that the tab has now been hidden
+    }
+
+    function testFieldCustomization(contractName: string, settingId: string, tabSref: string, settingElementId: string) {
+        console.log("testFieldCustomization for ", contractName, " and tabSref:", tabSref, " settingId:", settingId);
+        return verifySettingVisibility(contractName, tabSref, settingElementId, true)                //Check that the setting is visible before the change
+            .then(() => toggleSetting(settingId))                                                   //Toggle the setting
+            .then(() => verifySettingVisibility(contractName, tabSref, settingElementId, false));     //Verify that the setting has now been hidden
     }
 
     function navigateToContract(contractName: string) {
@@ -59,6 +67,16 @@ describe("Local admin is able customize the IT-Contract usage UI", () => {
 
         return navigateToContract(contractName)
             .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(expectedToBePresent, `Failed to validate tab:${tabSref} to be ${expectedToBePresent ? "_present_" : "_removed_"}`));
+    }
+
+    function verifySettingVisibility(contractName: string, tabSref: string, settingElementId: string, expectedToBePresent: boolean) {
+        console.log("verifySettingVisibility for ", contractName, " and field", settingElementId, " located on tabSref:", tabSref, " expectedPresence:", expectedToBePresent);
+
+        return navigateToContract(contractName)
+            .then(() => expect(navigation.findSubMenuElement(tabSref).isPresent()).toBe(true, `Tab ${tabSref} containing setting ${settingElementId} is not present`))
+            .then(() => navigation.findSubMenuElement(tabSref).click())
+            .then(() => browser.waitForAngular())
+            .then(() => expect(element(by.id(settingElementId)).isPresent()).toBe(expectedToBePresent, `Setting: ${settingElementId} failed to meet expected visibility of ${expectedToBePresent}`));
     }
 
     function toggleSetting(settingId: string) {
