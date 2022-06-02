@@ -45,6 +45,8 @@
             switch (module) {
                 case Models.UICustomization.CustomizableKitosModule.ItSystemUsage:
                     return Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+                case Models.UICustomization.CustomizableKitosModule.ItContract:
+                    return Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
                 default:
                     throw `Unknown module blueprint:${module}`;
             }
@@ -118,6 +120,12 @@
                         bluePrint = this.loadBluePrint(module);
                         break;
                     }
+                case Models.UICustomization.CustomizableKitosModule.ItContract:
+                {
+                    persisted = this.loadPersistedPreferences(module);
+                    bluePrint = this.loadBluePrint(module);
+                    break;
+                }
                 default:
                     throw `Unknown module:${module}`;
             }
