@@ -831,14 +831,7 @@
                 ]
             };
 
-            //TODO: use helper method
-            mainGridOptions.columns.forEach(column => {
-                if (column.isAvailable === undefined || column.isAvailable)
-                    return;
-
-                const index = mainGridOptions.columns.indexOf(column);
-                mainGridOptions.columns.splice(index);
-            });
+            Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
