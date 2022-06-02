@@ -750,49 +750,49 @@
 
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
-            if (this.uiState.isBluePrintNodeAvailable(uiBluePrint.children.contractRoles)) {
+            this._.forEachRight(this.itContractRoles, role => {
+                var roleColumn: IKendoGridColumn<IItContractOverview> = {
+                    field: `role${role.Id}`,
+                    title: role.Name,
+                    persistId: `role${role.Id}`,
+                    isAvailable: this.uiState.isBluePrintNodeAvailable(uiBluePrint.children.contractRoles),
+                    template: dataItem => {
+                        var roles = "";
 
-                this._.forEachRight(this.itContractRoles, role => {
-                    var roleColumn: IKendoGridColumn<IItContractOverview> = {
-                        field: `role${role.Id}`,
-                        title: role.Name,
-                        persistId: `role${role.Id}`,
-                        template: dataItem => {
-                            var roles = "";
+                        if (dataItem.roles[role.Id] === undefined)
+                            return roles;
 
-                            if (dataItem.roles[role.Id] === undefined)
-                                return roles;
+                        roles = self.concatRoles(dataItem.roles[role.Id]);
 
-                            roles = self.concatRoles(dataItem.roles[role.Id]);
+                        var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
 
-                            var link = `<a data-ui-sref='it-contract.edit.roles({id: ${dataItem.Id}})'>${roles}</a>`;
+                        return link;
+                    },
+                    excelTemplate: dataItem => {
+                        var roles = "";
 
-                            return link;
-                        },
-                        excelTemplate: dataItem => {
-                            var roles = "";
+                        if (!dataItem || dataItem.roles[role.Id] === undefined)
+                            return roles;
 
-                            if (!dataItem || dataItem.roles[role.Id] === undefined)
-                                return roles;
-
-                            return self.concatRoles(dataItem.roles[role.Id]);
-                        },
-                        width: 200,
-                        hidden: !(role.Name === "Kontraktejer"), // hardcoded role name :(
-                        sortable: false,
-                        filterable: {
-                            cell: {
-                                dataSource: [],
-                                showOperators: false,
-                                operator: "contains"
-                            }
+                        return self.concatRoles(dataItem.roles[role.Id]);
+                    },
+                    width: 200,
+                    hidden: !(role.Name === "Kontraktejer"), // hardcoded role name :(
+                    sortable: false,
+                    filterable: {
+                        cell: {
+                            dataSource: [],
+                            showOperators: false,
+                            operator: "contains"
                         }
-                    };
+                    }
+                };
 
-                    // insert the generated column at the correct location
-                    mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
-                });
-            }
+                // insert the generated column at the correct location
+                mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
+            });
+
+            Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
