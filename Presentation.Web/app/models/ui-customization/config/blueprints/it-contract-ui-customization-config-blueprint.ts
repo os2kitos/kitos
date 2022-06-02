@@ -2,14 +2,18 @@
     export const ItContractUiCustomizationBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItContract,
         readOnly: false,
-        //TODO: Replace the text
         helpText: "INSERT TEXT",
         text: "Kontraktoverblik - Økonomi",
         children: {
             frontPage: {
                 text: "Kontraktforside",
                 readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTab
+                helpText: Configs.helpTexts.cannotChangeTab,
+                children: {
+                    replacementPlan: {
+                        text: "Genanskaffelsesplan"
+                    }
+                }
             },
             itSystems: {
                 text: "IT Systemer",

@@ -44,7 +44,8 @@
             "$uibModal",
             "needsWidthFixService",
             "exportGridToExcelService",
-            "userAccessRights"
+            "userAccessRights",
+            "uiState"
         ];
 
         constructor(
@@ -65,8 +66,10 @@
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
-            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
+
 
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
@@ -204,6 +207,7 @@
         }
 
         private activate() {
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
@@ -810,6 +814,7 @@
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.replacementPlan),
                         template: dataItem =>
                             dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                                 ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
@@ -825,6 +830,15 @@
                     }
                 ]
             };
+
+            //TODO: use helper method
+            mainGridOptions.columns.forEach(column => {
+                if (column.isAvailable === undefined || column.isAvailable)
+                    return;
+
+                const index = mainGridOptions.columns.indexOf(column);
+                mainGridOptions.columns.splice(index);
+            });
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
@@ -1036,6 +1050,9 @@
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                    ],
+                    uiState: [
+                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                     ]
                 }
             });
