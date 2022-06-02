@@ -6,6 +6,7 @@
     export interface IKendoGridColumn<TDataSource> extends kendo.ui.GridColumn {
         persistId: string;
         tempVisual?: boolean;
+        isAvailable?: boolean;
         excelTemplate?(dataItem: TDataSource): string;
         template?: ((dataItem: TDataSource) => string)|string;
     }
