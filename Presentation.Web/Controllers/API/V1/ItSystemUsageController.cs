@@ -14,7 +14,6 @@ using Core.DomainServices;
 using Core.DomainServices.Authorization;
 using Core.DomainServices.Extensions;
 using Presentation.Web.Infrastructure.Attributes;
-using Presentation.Web.Models;
 using Presentation.Web.Models.API.V1;
 using Swashbuckle.Swagger.Annotations;
 
@@ -90,6 +89,7 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 var dto = Map(item);
+                dto.ItSystem.LastChangedByName = item.LastChangedByUser.GetFullName();
 
                 if (GetOrganizationReadAccessLevel(item.OrganizationId) < OrganizationDataReadAccessLevel.All)
                 {

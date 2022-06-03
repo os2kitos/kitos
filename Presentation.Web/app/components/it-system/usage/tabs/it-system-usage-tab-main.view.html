@@ -115,6 +115,22 @@
                     </label>
                     <i ng-show="usage.isActive || usage.active" class="fa fa-check" aria-hidden="true"></i>
                 </div>
+                <div class="form-group">
+                    <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
+                    <input type="text" id="last-changed-by-name" class="form-control input-sm" required
+                           data-ng-disabled="true"
+                           data-autosave="{{ ::autosaveUrl }}"
+                           data-field="lastChangedbyName"
+                           data-ng-model="system.lastChangedByName">
+                </div>
+                <div class="form-group">
+                    <label for="last-changed" class="control-label small">Sidst redigeret: Dato</label>
+                    <input type="text" id="last-changed" class="form-control input-sm" required
+                           data-ng-disabled="true"
+                           data-autosave="{{ ::autosaveUrl }}"
+                           data-field="lastChanged"
+                           data-ng-model="system.lastChanged">
+                </div>
             </div>
         </div>
     </div>

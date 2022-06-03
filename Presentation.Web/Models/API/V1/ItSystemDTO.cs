@@ -65,6 +65,7 @@ namespace Presentation.Web.Models.API.V1
         public int? InterfaceId { get; set; }
 
         public DateTime LastChanged { get; set; }
+        public string LastChangedByName { get; set; }
         public int LastChangedByUserId { get; set; }
 
         /// <summary>

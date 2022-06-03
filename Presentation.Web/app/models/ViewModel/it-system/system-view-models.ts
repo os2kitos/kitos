@@ -19,6 +19,8 @@
         readonly businessTypeName: string,
         readonly archiveDuty: IArchiveDuty,
         readonly uuid: string,
+        readonly lastChanged: string,
+        readonly lastChangedByName: string,
     }
 
     export class SystemViewModel implements ISystemViewModel {
@@ -34,6 +36,8 @@
         readonly businessTypeName: string;
         readonly archiveDuty: IArchiveDuty;
         readonly uuid: string;
+        readonly lastChanged: string;
+        readonly lastChangedByName: string;
 
         constructor(itSystem: any) {
             this.name = Helpers.SystemNameFormat.apply(itSystem.name, itSystem.disabled);
@@ -50,6 +54,8 @@
             this.disabled = itSystem.disabled;
             this.archiveDuty = this.mapArchiveDuty(itSystem);
             this.accessModifier = Mappers.AccessModifierMapper.mapAccessModifier(itSystem.accessModifier);
+            this.lastChanged = itSystem.lastChanged;
+            this.lastChangedByName = itSystem.lastChangedByName;
         }
 
         private mapArchiveDuty(system): IArchiveDuty {
