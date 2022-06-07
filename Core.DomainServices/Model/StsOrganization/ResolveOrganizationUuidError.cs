@@ -1,4 +1,4 @@
-﻿namespace Core.DomainServices.Organizations
+﻿namespace Core.DomainServices.Model.StsOrganization
 {
     public enum ResolveOrganizationUuidError
     {

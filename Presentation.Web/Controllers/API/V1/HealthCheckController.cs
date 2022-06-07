@@ -12,11 +12,11 @@ namespace Presentation.Web.Controllers.API.V1
     public class HealthCheckController : ApiController
     {
         private readonly IOrganizationRepository _organizationRepository;
-        private readonly IStsOrganizationService _stsOrganizationService;
+        private readonly IStsOrganizationUnitService _stsOrganizationService;
         private static readonly string DeploymentVersion = Settings.Default.DeploymentVersion;
 
         //TODO: Revert changes in this file
-        public HealthCheckController(IOrganizationRepository organizationRepository, IStsOrganizationService stsOrganizationService)
+        public HealthCheckController(IOrganizationRepository organizationRepository, IStsOrganizationUnitService stsOrganizationService)
         {
             _organizationRepository = organizationRepository;
             _stsOrganizationService = stsOrganizationService;
@@ -27,7 +27,7 @@ namespace Presentation.Web.Controllers.API.V1
         {
             var organization = _organizationRepository.GetAll().First();
             organization.Cvr = "58271713"; //ballerup
-            var result = _stsOrganizationService.ResolveStsOrganizationUuid(organization);
+            var result = _stsOrganizationService.ResolveOrganizationTree(organization);
             return Ok(DeploymentVersion);
         }
     }

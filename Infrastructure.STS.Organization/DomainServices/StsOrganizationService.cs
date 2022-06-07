@@ -4,6 +4,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.ServiceModel;
 using Core.Abstractions.Types;
 using Core.DomainServices.Extensions;
+using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;

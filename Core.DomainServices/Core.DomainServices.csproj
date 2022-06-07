@@ -88,12 +88,14 @@
     <Compile Include="IGenericRepository.cs" />
     <Compile Include="IMailClient.cs" />
     <Compile Include="IOrgUnitService.cs" />
+    <Compile Include="Model\StsOrganization\StsOrganizationUnit.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
     <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />
     <Compile Include="Organizations\IStsOrganizationService.cs" />
+    <Compile Include="Organizations\IStsOrganizationUnitService.cs" />
     <Compile Include="Organizations\OrgUnitService.cs" />
-    <Compile Include="Organizations\ResolveOrganizationUuidError.cs" />
+    <Compile Include="Model\StsOrganization\ResolveOrganizationUuidError.cs" />
     <Compile Include="Queries\Contract\QueryBySupplierUuid.cs" />
     <Compile Include="Queries\Contract\QueryByResponsibleOrganizationUnitUuid.cs" />
     <Compile Include="Queries\Contract\QueryByDataProcessingRegistrationUuid.cs" />
