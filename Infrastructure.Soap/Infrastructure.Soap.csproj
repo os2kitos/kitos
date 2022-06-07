@@ -13,7 +13,7 @@
     <ProjectTypeGuids>{3D9AD99F-2412-4246-B90B-4EAA41C64699};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <StartArguments>/client:"WcfTestClient.exe"</StartArguments>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-	<LangVersion>latest</LangVersion>
+    <LangVersion>latest</LangVersion>
     <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
     <XsdCodeGenEnabled>False</XsdCodeGenEnabled>
     <XsdCodeGenSerializerMode>XmlSerializer</XsdCodeGenSerializerMode>
@@ -75,97 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Adresse\AdresseServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\Adresse.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\AdresseBesked.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\AdresseOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\1.1.STS-3\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\SF1500_EP_FS1\xsd\common\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\sp\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\sp\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\sp\InvocationContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\sp\service.properties" />
-    <None Include="Adresse\sp\ServiceplatformFaultMessage_1.wsdl" />
-    <None Include="Adresse\sp\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Adresse\wsdl\context\AdresseService.wsdl" />
-    <None Include="Adresse\wsdl\context\policies.wsdl" />
-    <None Include="Adresse\wsdl\token\AdresseService.wsdl" />
-    <None Include="Adresse\wsdl\token\policies.wsdl" />
     <None Include="app.config" />
-    <None Include="Bruger\BrugerServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\Bruger.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\BrugerBesked.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\BrugerOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\1.1.STS-3\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\SF1500_EP_FS2\xsd\common\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\sp\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\sp\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\sp\InvocationContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\sp\service.properties" />
-    <None Include="Bruger\sp\ServiceplatformFaultMessage_1.wsdl" />
-    <None Include="Bruger\sp\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Bruger\wsdl\context\BrugerService.wsdl" />
-    <None Include="Bruger\wsdl\context\policies.wsdl" />
-    <None Include="Bruger\wsdl\token\BrugerService.wsdl" />
-    <None Include="Bruger\wsdl\token\policies.wsdl" />
     <None Include="Connected Services\STSAdresse\Adresse.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -415,51 +325,6 @@
     <None Include="Connected Services\STSPerson\ServiceplatformFault_1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Person\PersonServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\Person.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\PersonBesked.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\1.1.STS-3\PersonOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\SF1500_EP_FS10\xsd\common\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\sp\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\sp\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\sp\InvocationContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\sp\service.properties" />
-    <None Include="Person\sp\ServiceplatformFaultMessage_1.wsdl" />
-    <None Include="Person\sp\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Person\wsdl\context\PersonService.wsdl" />
-    <None Include="Person\wsdl\context\policies.wsdl" />
-    <None Include="Person\wsdl\token\PersonService.wsdl" />
-    <None Include="Person\wsdl\token\policies.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

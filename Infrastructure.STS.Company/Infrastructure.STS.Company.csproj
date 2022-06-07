@@ -139,51 +139,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Readme.md" />
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\Virksomhed.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedBesked.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\1.1.STS-3\VirksomhedOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS11\xsd\common\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\InvocationContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\service.properties" />
-    <None Include="ServiceContract\sp\ServiceplatformFaultMessage_1.wsdl" />
-    <None Include="ServiceContract\sp\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\VirksomhedServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\wsdl\context\policies.wsdl" />
-    <None Include="ServiceContract\wsdl\context\VirksomhedService.wsdl" />
-    <None Include="ServiceContract\wsdl\token\policies.wsdl" />
-    <None Include="ServiceContract\wsdl\token\VirksomhedService.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Connected Services\" />

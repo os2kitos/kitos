@@ -141,51 +141,6 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Readme.md" />
-    <None Include="ServiceContract\OrganisationEnhedServiceMsg.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\GenerelleDefinitioner.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\OrganisationEnhed.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\OrganisationEnhedBesked.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\OrganisationEnhedOperationer.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\OrganisationFaelles.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\1.1.STS-3\Part.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\common\RequestHeader.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\SF1500_EP_FS6\xsd\common\SagDokObjekt.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\AuthorityContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\CallContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\InvocationContext_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\sp\service.properties" />
-    <None Include="ServiceContract\sp\ServiceplatformFaultMessage_1.wsdl" />
-    <None Include="ServiceContract\sp\ServiceplatformFault_1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ServiceContract\wsdl\context\OrganisationEnhedService.wsdl" />
-    <None Include="ServiceContract\wsdl\context\policies.wsdl" />
-    <None Include="ServiceContract\wsdl\token\OrganisationEnhedService.wsdl" />
-    <None Include="ServiceContract\wsdl\token\policies.wsdl" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadataStorage Include="Connected Services\ServiceReference\" />
