@@ -26,8 +26,8 @@
         }
     ]);
 
-    app.controller("contract.EditCtrl", ["$scope", "$rootScope", "contract", "hasWriteAccess","userAccessRights", "uiState",
-        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
+    app.controller("contract.EditCtrl", ["$scope", "$rootScope", "contract", "hasWriteAccess", "userAccessRights", "user", "uiState",
+        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO, user, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.allowClearOption = {
                 allowClear: true
@@ -41,8 +41,8 @@
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
-            $scope.isItSystemsEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
-            $scope.isDataProcessingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
+            $scope.isItSystemsEnabled = user.currentConfig.ShowItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
+            $scope.isDataProcessingEnabled = user.currentConfig.ShowDataProcessing && uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
             $scope.isDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines);
             $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.paymentModel);
             $scope.isEconomyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy);

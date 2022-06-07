@@ -4,7 +4,7 @@ import ContractHelper = require("../../Helpers/ContractHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import ContractNavigationSrefs = require("../../Helpers/SideNavigation/ContractNavigationSrefs");
 
-describe("Local admin is able customize the IT-Contract usage UI", () => {
+describe("Local admin is able customize the IT-Contract UI", () => {
 
     var loginHelper = new Login();
     var testFixture = new TestFixtureWrapper();

@@ -110,25 +110,9 @@
         }
 
         loadActiveConfiguration(module: Models.UICustomization.CustomizableKitosModule): ng.IPromise<Models.UICustomization.ICustomizedModuleUI> {
-            let persisted: angular.IPromise<Models.Api.UICustomization.IUIModuleCustomizationDTO>;
-            let bluePrint: Models.UICustomization.Configs.ICustomizableUIModuleConfigBluePrint;
+            const persisted = this.loadPersistedPreferences(module);
+            const bluePrint = this.loadBluePrint(module);
 
-            switch (module) {
-                case Models.UICustomization.CustomizableKitosModule.ItSystemUsage:
-                    {
-                        persisted = this.loadPersistedPreferences(module);
-                        bluePrint = this.loadBluePrint(module);
-                        break;
-                    }
-                case Models.UICustomization.CustomizableKitosModule.ItContract:
-                {
-                    persisted = this.loadPersistedPreferences(module);
-                    bluePrint = this.loadBluePrint(module);
-                    break;
-                }
-                default:
-                    throw `Unknown module:${module}`;
-            }
             return persisted
                 .then(config => this.buildActiveConfiguration(bluePrint, config))
                 .then(activeConfig => {

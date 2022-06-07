@@ -11,6 +11,15 @@
                 columns.splice(index);
             });
         }
+
+        public static removeItemFromToolbarByName(name: string, items: IKendoGridToolbarItem[]) {
+            const item = items.filter(x => x.name === name)[0];
+            if (item === undefined)
+                return;
+
+            const index = items.indexOf(item);
+            items.splice(index);
+        }
     }
 }
 

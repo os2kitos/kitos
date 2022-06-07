@@ -33,6 +33,7 @@
         private orgUnitStorageKey = "it-contract-overview-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
+        private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
         public mainGrid: IKendoGrid<IItContractOverview>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
@@ -82,7 +83,7 @@
             private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
             private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Økonomi";
-
+            
             this.$scope.$on("kendoWidgetCreated", (event, widget) => {
                 // the event is emitted for every widget; if we have multiple
                 // widgets in this controller, we need to check that the event
@@ -232,8 +233,8 @@
         }
 
         private activate() {
-            const uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
             var self = this;
+            const selectRoleFilterName = "selectRoleFilter";
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
@@ -401,6 +402,7 @@
                             "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewVm.clearGridProfile()' data-ng-disabled='!contractOverviewVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
+                        name: selectRoleFilterName,
                         template: kendo.template(self.$("#role-selector").html())
                     }
                 ],
@@ -755,9 +757,9 @@
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
-                    isAvailable: this.uiState.isBluePrintNodeAvailable(uiBluePrint.children.contractRoles),
+                    isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.contractRoles),
                     template: dataItem => {
-                        var roles = "";
+                            var roles = "";
 
                         if (dataItem.roles[role.Id] === undefined)
                             return roles;
@@ -793,6 +795,9 @@
             });
 
             Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
+            if (!this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.contractRoles)) {
+                Helpers.UiCustomizationHelper.removeItemFromToolbarByName(selectRoleFilterName, mainGridOptions.toolbar);
+            }
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
