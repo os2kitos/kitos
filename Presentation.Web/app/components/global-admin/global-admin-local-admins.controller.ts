@@ -99,7 +99,7 @@
                 });
             };
 
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization', Kitos.Helpers.FormatHelper.formatOrganizationWithCvr, null);
+            $scope.organizationSelectOptions = selectLazyLoading('api/organization', Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, null);
 
             function selectLazyLoading(url, format, paramAry) {
                 return {

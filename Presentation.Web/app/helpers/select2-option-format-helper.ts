@@ -1,5 +1,5 @@
 ﻿module Kitos.Helpers {
-    export class FormatHelper {
+    export class Select2OptionsFormatHelper {
         public static formatUserWithEmail(user: any): string {
             var result = '<div>' + user.text + '</div>';
             if (user.email) {
@@ -12,6 +12,9 @@
             var result = '<div>' + org.text + '</div>';
             if (org.cvr) {
                 result += '<div class="small">' + org.cvr + '</div>';
+            }
+            if (org.optionalObjectContext?.cvrNumber) {
+                result += '<div class="small">' + org.optionalObjectContext.cvrNumber + '</div>';
             }
             return result;
         }

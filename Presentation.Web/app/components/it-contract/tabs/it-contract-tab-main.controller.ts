@@ -207,7 +207,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, Kitos.Helpers.FormatHelper.formatOrganizationWithCvr, ['take=100','orgId=' + user.currentOrganizationId]);
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, ['take=100','orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {

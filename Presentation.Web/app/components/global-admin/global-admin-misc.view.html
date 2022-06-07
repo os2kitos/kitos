@@ -27,7 +27,7 @@
                    placeholder="Vælg bruger"
                    ng-model="selectedUser">
             <button class="btn btn-danger btn-sm col-xs-1"
-                    ng-disabled="!userSelected"
+                    ng-disabled="!selectedUser"
                     ng-click="removeUser(selectedUser.id)">
                 Slette
             </button>
@@ -36,7 +36,7 @@
             <span>{{selectedUser.text}} {{selectedUser.email}}</span>
             <span><strong>Brugeren er stadig medlem af følgende organisationer</strong></span>
             <table class="full-width table table-striped"
-                   ng-if="userSelected">
+                   ng-if="selectedUser">
                 <thead>
                 <tr>
                     <th>Organisation</th>
@@ -44,7 +44,7 @@
                 </thead>
                 <!-- for each organization -->
                 <tbody>
-                <tr data-ng-repeat="org in userOrganizations">
+                <tr ng-repeat="org in userOrganizations">
                     <td>{{ org.name }}</td>
                 </tr>
                 </tbody>

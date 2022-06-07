@@ -170,7 +170,7 @@
                     text: item.name ? item.name : 'Unavngiven',
                     cvr: item.cvr
                 });
-            }, "q", Kitos.Helpers.FormatHelper.formatOrganizationWithCvr);
+            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
             $scope.patchDatePeriode = (field, value, id) => {
                 var formatDateString = "YYYY-MM-DD";

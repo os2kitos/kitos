@@ -219,16 +219,6 @@
             );
         }
 
-        private formatDataProcessorChoice(choice: Models.ViewModel.Generic.Select2OptionViewModel<Models.DataProcessing.IDataProcessorDTO>) {
-            let result = `<div>${choice.text}</div>`;
-
-            if (choice.optionalObjectContext?.cvrNumber) {
-                result += `<div class="small">${choice.optionalObjectContext.cvrNumber}</div>`;
-            }
-
-            return result;
-        }
-
         private bindDataProcessors() {
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
@@ -241,9 +231,10 @@
                 (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                this.formatDataProcessorChoice
+                Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr
             );
         }
+
         private bindSubDataProcessors() {
             const pageSize = 100;
             this.bindingService.bindMultiSelectConfiguration<Models.DataProcessing.IDataProcessorDTO>(
@@ -258,7 +249,7 @@
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                this.formatDataProcessorChoice
+                Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr
             );
         }
 

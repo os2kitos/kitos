@@ -71,7 +71,7 @@
                 });
             };
 
-            $scope.userOptions = getAvailableUsers();
+            $scope.userOptions = getAvailableUserOptions();
 
             getKleStatus();
             function getKleStatus() {
@@ -160,11 +160,8 @@
             });
 
             $scope.removeUser = (id: number) => {
-                const name = $scope.selectedUser.text;
-                const email = $scope.selectedUser.email;
-
-                //$state.go("global-admin-misc-user-delete", { id: id});
                 const nameAndEmail = `${$scope.selectedUser.text}, ${$scope.selectedUser.email}`;
+
                 if (confirm(`Er du sikker på, at du vil slette ${nameAndEmail}`)) {
                     notify.addInfoMessage(`Sletter ${nameAndEmail}`);
                     userService.deleteUser(id)
@@ -176,7 +173,6 @@
                         ).catch(ex => {
                             console.log(ex);
                             notify.addErrorMessage(`Fejl ifm. sletning af brugeren Sletter ${nameAndEmail}`);
-                            $scope.reload();
                         });
                     $state.reload();
                 }
@@ -187,7 +183,7 @@
                 $scope.KleApplyUpdateButtonInteraction = updateButton;
             }
 
-            function getAvailableUsers() {
+            function getAvailableUserOptions() {
                 return select2LoadingService.loadSelect2WithDataSource(
                     (query: string) =>
                         userService.searchUsers(query)
@@ -203,7 +199,7 @@
                                 })
                         )
                     , false
-                    , Kitos.Helpers.FormatHelper.formatUserWithEmail);
+                    , Kitos.Helpers.Select2OptionsFormatHelper.formatUserWithEmail);
             }
         }]);
 })(angular, app);
