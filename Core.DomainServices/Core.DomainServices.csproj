@@ -90,8 +90,10 @@
     <Compile Include="IOrgUnitService.cs" />
     <Compile Include="Notifications\IUserNotificationService.cs" />
     <Compile Include="Notifications\UserNotificationService.cs" />
+    <Compile Include="Organizations\IStsOrganizationCompanyLookupService.cs" />
     <Compile Include="Organizations\IStsOrganizationService.cs" />
     <Compile Include="Organizations\OrgUnitService.cs" />
+    <Compile Include="Organizations\ResolveOrganizationUuidError.cs" />
     <Compile Include="Queries\Contract\QueryBySupplierUuid.cs" />
     <Compile Include="Queries\Contract\QueryByResponsibleOrganizationUnitUuid.cs" />
     <Compile Include="Queries\Contract\QueryByDataProcessingRegistrationUuid.cs" />

@@ -5,6 +5,7 @@ using Core.Abstractions.Types;
 
 using Infrastructure.Soap.STSBruger;
 using Infrastructure.STS.Common.Factories;
+using Infrastructure.STS.Common.Model;
 using Serilog;
 
 namespace Core.DomainServices.SSO
@@ -13,7 +14,6 @@ namespace Core.DomainServices.SSO
     {
         private readonly ILogger _logger;
         private const string EmailTypeIdentifier = StsOrganisationConstants.UserProperties.Email;
-        private const string StsStandardNotFoundResultCode = "44";
 
         private readonly string _urlServicePlatformBrugerService;
         private readonly string _urlServicePlatformAdresseService;
@@ -78,8 +78,8 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponseResult.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested user '{uuid}' from cvr '{cvrNumber}' was not found. STS Bruger endpoint returned '{returnCode}:{errorCode}'";
 
                 var registrations =
@@ -179,8 +179,8 @@ namespace Core.DomainServices.SSO
                 var stdOutput = laesResponse.LaesResponse1?.LaesOutput?.StandardRetur;
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
-
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested email address '{emailAdresseUuid}' from cvr '{cvrNumber}' was not found. STS Adresse endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =
@@ -237,7 +237,8 @@ namespace Core.DomainServices.SSO
                 var returnCode = stdOutput?.StatusKode ?? "unknown";
                 var errorCode = stdOutput?.FejlbeskedTekst ?? string.Empty;
 
-                if (returnCode == StsStandardNotFoundResultCode)
+                var stsError = stdOutput?.StatusKode.ParseStsError() ?? Maybe<StsError>.None;
+                if (stsError.Select(error => error == StsError.NotFound).GetValueOrDefault())
                     return $"Requested person '{personUuid}' from cvr '{cvrNumber}' was not found. STS Person endpoint returned '{returnCode}:{errorCode}'";
 
                 var registreringType1s =

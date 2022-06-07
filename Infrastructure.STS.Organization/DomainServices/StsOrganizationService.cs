@@ -5,25 +5,37 @@ using System.ServiceModel;
 using Core.Abstractions.Types;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
+using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.Organization.ServiceReference;
-using Newtonsoft.Json;
+using Serilog;
 
 namespace Infrastructure.STS.Organization.DomainServices
 {
     public class StsOrganizationService : IStsOrganizationService
     {
+        private readonly IStsOrganizationCompanyLookupService _companyLookupService;
+        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
 
-        public StsOrganizationService(StsOrganisationIntegrationConfiguration configuration)
+        public StsOrganizationService(
+            StsOrganisationIntegrationConfiguration configuration,
+            IStsOrganizationCompanyLookupService companyLookupService,
+            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
+            ILogger logger)
         {
+            _companyLookupService = companyLookupService;
+            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
+            _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
         }
 
-        public Result<Guid, OperationError> ResolveStsOrganizationUuid(Core.DomainModel.Organization.Organization organization)
+        public Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveStsOrganizationUuid(Core.DomainModel.Organization.Organization organization)
         {
             if (organization == null)
             {
@@ -38,33 +50,50 @@ namespace Infrastructure.STS.Organization.DomainServices
 
             if (organization.IsCvrInvalid())
             {
-                return new OperationError("Organization is missing CVR or has an invalid CVR", OperationFailure.BadInput);
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.BadState, ResolveOrganizationUuidError.InvalidCvrOnOrganization);
             }
 
-            //TODO: Get the company by cvr first and then filter by virksomhed uuid
+            var companyUuid = _companyLookupService.ResolveStsOrganizationCompanyUuid(organization);
+            if (companyUuid.Failed)
+            {
+                _logger.Error("Error {error} while resolving company uuid for organization with id {id}", companyUuid.Error.ToString(), organization.Id);
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToLookupOrganizationCompany);
+            }
+
 
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
             using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
-            var searchRequest = CreateSearchForOrganizationRequest(organization, new Guid("7302f1a5-bbec-4439-a1ec-ea605bdf5ab3")); //TODO: Get the company uuid from a different service "Virksomhed"
+            var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
 
 
             var response = channel.soeg(searchRequest);
             var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
-            if (statusResult.StatusKode != "20") //TODO: Create helper
+            var stsError = statusResult.StatusKode.ParseStsError();
+            if (stsError.HasValue)
             {
-                return new OperationError($"Error resolving the organization from STS:{statusResult.StatusKode}:{statusResult.FejlbeskedTekst}", OperationFailure.UnknownError);
+                _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Failed with {stsError} {code} and {message}", organization.Id, companyUuid.Value, stsError.Value, statusResult.StatusKode, statusResult.FejlbeskedTekst);
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToSearchForOrganizationByCompanyUuid);
             }
 
             var ids = response.SoegResponse1.SoegOutput.IdListe;
             if (ids.Length != 1)
             {
-                return new OperationError($"Error resolving the organization from STS. Expected a single UUID but got:{string.Join(",", ids)}", OperationFailure.UnknownError);
+                _logger.Error("Failed to search for organization ({id}) by company uuid {uuid}. Expected 1 result but got {resultsCsv}", organization.Id, companyUuid.Value, string.Join(",", ids));
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.DuplicateOrganizationResults);
             }
 
-            //TODO: Remember to save the uuid on the organization!-> need a databasecontrol thing for that
-            return new Guid(ids.Single());
+            var uuid = new Guid(ids.Single());
+
+            var result = _ssoOrganizationIdentityRepository.AddNew(organization, uuid);
+            if (result.Failed)
+            {
+                _logger.Error("Failed save uuid for organization ({id}) with uuid {uuid}. Repository responded with {error}", organization.Id, companyUuid.Value, result.Error.ToString());
+                return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToSaveUuidOnKitosOrganization);
+            }
+
+            return uuid;
         }
 
         private static soegRequest CreateSearchForOrganizationRequest(Core.DomainModel.Organization.Organization organization, Guid companyUuid)

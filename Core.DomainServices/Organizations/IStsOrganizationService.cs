@@ -6,7 +6,6 @@ namespace Core.DomainServices.Organizations
 {
     public interface IStsOrganizationService
     {
-        //TODO: Consider specific enum for this error 
-        Result<Guid, OperationError> ResolveStsOrganizationUuid(Organization organization);
+        Result<Guid, DetailedOperationError<ResolveOrganizationUuidError>> ResolveStsOrganizationUuid(Organization organization);
     }
 }

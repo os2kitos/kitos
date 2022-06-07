@@ -5,6 +5,7 @@ using Core.DomainModel.SSO;
 
 namespace Core.DomainServices.Repositories.SSO
 {
+    //TODO: Renaming - it's the FK/STS UUID
     public interface ISsoOrganizationIdentityRepository
     {
         Maybe<SsoOrganizationIdentity> GetByExternalUuid(Guid externalId);
