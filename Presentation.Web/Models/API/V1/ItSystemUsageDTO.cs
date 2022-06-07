@@ -11,6 +11,7 @@ namespace Presentation.Web.Models.API.V1
         public Guid Uuid { get; set; }
         public int Id { get; set; }
         public DateTime LastChanged { get; set; }
+        public string LastChangedByName { get; set; }
         public string Note { get; set; }
         public string LocalSystemId { get; set; }
         public string Version { get; set; }
@@ -69,7 +70,6 @@ namespace Presentation.Web.Models.API.V1
         public int? ArchiveFreq { get; set; }
         public bool? Registertype { get; set; }
         public bool? ArchiveFromSystem { get; set; }
-
         #region GDPR
         public string GeneralPurpose { get; set; }
         public DataOptions? IsBusinessCritical { get; set; }

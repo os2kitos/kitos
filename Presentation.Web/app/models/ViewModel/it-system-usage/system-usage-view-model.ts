@@ -119,6 +119,8 @@
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
         hostedAt: HostedAt;
+        lastChanged: string,
+        lastChangedByName: string,
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
@@ -142,6 +144,8 @@
         answeringDataDPIA: DataOption;
         hostedAt: HostedAt;
         userCount: string;
+        lastChanged: string;
+        lastChangedByName: string;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -151,6 +155,8 @@
             this.expirationDate = itSystemUsage.expirationDate;
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
+            this.lastChangedByName = itSystemUsage.LastChangedByName;
+            this.lastChanged = itSystemUsage.LastChanged;
 
             const sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
             this.noDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.none.value);
@@ -167,7 +173,6 @@
             this.answeringDataDPIA = this.mapDataOption(itSystemUsage.answeringDataDPIA);
             this.hostedAt = this.mapHostedAtOption(itSystemUsage.hostedAt);
             this.userCount = itSystemUsage.userCount.toString();
-
         }
 
         mapHostedAtOption(hostedAtOption: number) {
