@@ -41,8 +41,8 @@
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
-            $scope.isItSystemsEnabled = user.currentConfig.ShowItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
-            $scope.isDataProcessingEnabled = user.currentConfig.ShowDataProcessing && uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
+            $scope.isItSystemsEnabled = user.currentConfig.showItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
+            $scope.isDataProcessingEnabled = user.currentConfig.showDataProcessing && uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
             $scope.isDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines);
             $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.paymentModel);
             $scope.isEconomyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy);
