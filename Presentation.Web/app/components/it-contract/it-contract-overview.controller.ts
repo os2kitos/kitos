@@ -162,13 +162,18 @@
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
-            var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
+            const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
         }
 
         private fixSystemFilter(filterUrl, column) {
-            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
+        }
+
+        private fixUserFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
         }
 
         // loads kendo grid options from localstorage
@@ -281,6 +286,9 @@
 
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+
+                                parameterMap.$filter = self
+                                    .fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
                             }
 
                             return parameterMap;
@@ -621,20 +629,54 @@
                         filterable: false
                     },
                     {
-                        field: "LastChangedName", title: "Sidst redigeret: Bruger", width: 150,
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
                         persistId: "lastchangedname",
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
-                        sortable: false,
-                        filterable: false
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "LastChanged", title: "Sidste redigeret: Dato", width: 150,
-                        persistId: "lastchanged",
-                        template: dataItem => dataItem?.LastChanged ? dataItem.LastChanged.toLocaleDateString() : "",
-                        hidden: true,
+                        field: "LastChanged",
+                        title: "Sidste redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
+                        persistId: "lastchangeddate",
+                        template: dataItem => {
+                            // handles null cases
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
+                                return "";
+                            }
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
+                        },
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
+                                return "";
+                            }
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
+                        },
+                        attributes: { "class": "text-center" },
                         sortable: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
                     },
                     {
                         field: "DataProcessingRegistrationsConcluded", title: "Databehandleraftale", width: 150,
@@ -738,7 +780,7 @@
             
             function customFilter(args) {
                 args.element.kendoAutoComplete({
-                    noDataTemplate: ''
+                    noDataTemplate: ""
                 });
             }
             // find the index of column where the role columns should be inserted

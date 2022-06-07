@@ -155,6 +155,11 @@
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
+
+        private fixUserFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
+        }
         
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
@@ -269,6 +274,8 @@
                                     });
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
+
+                                parameterMap.$filter = this.fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
                             }
 
                             return parameterMap;
@@ -826,20 +833,54 @@
                         }
                     },
                     {
-                        field: "LastChangedName", title: "Sidst redigeret: Bruger", width: 150,
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
                         persistId: "lastchangedname",
                         template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
                         hidden: true,
-                        sortable: false,
-                        filterable: false
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     },
                     {
-                        field: "LastChanged", title: "Sidste redigeret: Dato", width: 150,
-                        persistId: "lastchanged",
-                        template: dataItem => dataItem?.LastChanged ? dataItem.LastChanged.toLocaleDateString() : "",
-                        hidden: true,
+                        field: "LastChanged",
+                        title: "Sidste redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
+                        persistId: "lastchangeddate",
+                        template: dataItem => {
+                            // handles null cases
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
+                                return "";
+                            }
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
+                        },
+                        excelTemplate: dataItem => {
+                            // handles null cases
+                            if (!dataItem ||
+                                !dataItem.LastChanged ||
+                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
+                                return "";
+                            }
+                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
+                        },
+                        attributes: { "class": "text-center" },
                         sortable: true,
-                        filterable: false
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
                     },
                 ]
             };
