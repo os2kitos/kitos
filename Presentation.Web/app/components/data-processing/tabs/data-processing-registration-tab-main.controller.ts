@@ -231,7 +231,7 @@
                 (query) => this.dataProcessingRegistrationService.getApplicableDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr
+                Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
             );
         }
 
@@ -249,7 +249,7 @@
                     .getApplicableSubDataProcessors(this.dataProcessingRegistrationId, query, pageSize)
                     .then(results => this.mapDataProcessingSearchResults(results)),
                 null,
-                Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr
+                Helpers.Select2OptionsFormatHelper.formatOrganizationWithOptionalObjectContext
             );
         }
 
