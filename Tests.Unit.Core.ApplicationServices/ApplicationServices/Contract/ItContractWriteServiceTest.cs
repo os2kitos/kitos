@@ -545,7 +545,6 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         [Theory]
         [InlineData(0)]
         [InlineData(5)]
-        [InlineData(10)]
         public void Cannot_Create_With_Procurement_If_Quarter_Of_Year_Is_Other_Than_1_To_4(int halfOfYear)
         {
             //Arrange

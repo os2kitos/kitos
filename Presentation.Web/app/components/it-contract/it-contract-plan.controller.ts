@@ -806,7 +806,7 @@
                     },
                     {
                         field: "ProcurementPlanYear",
-                        title: "Genanskaffelses plan",
+                        title: "Genanskaffelsesplan",
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
