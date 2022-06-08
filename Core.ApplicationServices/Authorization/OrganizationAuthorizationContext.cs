@@ -458,6 +458,14 @@ namespace Core.ApplicationServices.Authorization
             };
         }
 
+        public bool Visit(ImportHierarchyFromStsOrganizationPermission permission)
+        {
+            var organizationId = permission.Organization.Id;
+            return IsGlobalAdmin() ||
+                   IsLocalAdmin(organizationId) ||
+                   IsOrganizationModuleAdmin(organizationId);
+        }
+
         #endregion PERMISSIONS
     }
 }

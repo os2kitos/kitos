@@ -282,6 +282,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IStsOrganizationService>().To<StsOrganizationService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
             kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)
@@ -403,8 +404,6 @@ namespace Presentation.Web.Ninject
 
             //Organization
             RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationBeingDeleted>(kernel);
-            //TODO: Read models where it is involved must be scheduled for rebuild.. do it in a different handler (one of the read model handlers)
-
             RegisterDomainEvent<EntityBeingDeletedEvent<User>, HandleUserBeingDeleted>(kernel);
         }
 
