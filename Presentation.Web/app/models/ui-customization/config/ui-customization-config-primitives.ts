@@ -36,6 +36,6 @@
 
     export const helpTexts = {
         cannotChangeTab: "Det er ikke muligt at slå dette faneblad fra",
-        cannotChangeTabOnlyThroughModuleConfig: "Det er kun muligt at fjerne dette faneblad ved at slå det relaterede module fra"
+        cannotChangeTabOnlyThroughModuleConfig: "Det er kun muligt at fjerne dette faneblad ved at slå det relaterede modul fra"
     }
 }
