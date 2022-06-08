@@ -2,7 +2,7 @@
     export const ItSystemUsageUiCustomizationBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItSystemUsage,
         readOnly: false,
-        helpText: "Bemærk: Skjules faneblad/felt fjernes relaterede felt(er) også fra overbliksbillederne.",
+        helpText: Configs.helpTexts.generalUiCustomizationHelpText,
         text: "IT-Systemer i anvendelse",
         children: {
             frontPage: {

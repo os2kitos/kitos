@@ -3,8 +3,10 @@ import TestFixtureWrapper = require("../../Utility/TestFixtureWrapper");
 import ContractHelper = require("../../Helpers/ContractHelper");
 import NavigationHelper = require("../../Utility/NavigationHelper");
 import ContractNavigationSrefs = require("../../Helpers/SideNavigation/ContractNavigationSrefs");
+import OrgHelper = require("../../Helpers/OrgHelper");
+import Select2Helper = require("../../Helpers/Select2Helper");
 
-describe("Local admin is able customize the IT-Contract usage UI", () => {
+describe("Local admin is able customize the IT-Contract UI", () => {
 
     var loginHelper = new Login();
     var testFixture = new TestFixtureWrapper();
@@ -23,11 +25,15 @@ describe("Local admin is able customize the IT-Contract usage UI", () => {
 
     it("Disabling Tabs/fields will hide the tabs/fields on the IT-Contract details page", () => {
         var contractName = createName("contractName");
+        var orgName = createName("orgName");
 
         return loginHelper.loginAsGlobalAdmin()
+            .then(() => OrgHelper.createOrg(orgName))
+            .then(() => OrgHelper.changeOrg(orgName))
             .then(() => ContractHelper.createContract(contractName))
-            .then(() => loginHelper.logout())
-            .then(() => loginHelper.loginAsLocalAdmin())
+            .then(() => navigation.getPage("/#/global-admin/local-admins"))
+            .then(() => Select2Helper.select(orgName, "s2id_selectOrg"))
+            .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
             .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
             .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.replacementPlan", ContractNavigationSrefs.frontPageSref, "selectReplacementPlan"));
