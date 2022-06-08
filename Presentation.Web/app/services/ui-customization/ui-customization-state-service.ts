@@ -13,7 +13,8 @@
 
     const cache: UiCustomizationStateCache =
     {
-        ItSystemUsages: null
+        ItSystemUsages: null,
+        ItContracts: null
     }
 
     /**

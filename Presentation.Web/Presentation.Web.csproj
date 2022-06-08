@@ -346,9 +346,11 @@
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
-    <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
+    <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\helpers\KendoToolbarCustomizationHelper.ts" />
+    <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
@@ -1099,6 +1101,7 @@
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.reference.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\data-processing\tabs\data-processing-registration.roles.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\it-contract\contract.main.e2e.spec.ts" />
+    <TypeScriptCompile Include="Tests\01_Parallel\it-contract\LocalAdmin.ItContract.UiCustomization.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\Migration.System.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\It-System\Catalog\System.Main.e2e.spec.ts" />
     <TypeScriptCompile Include="Tests\01_Parallel\Organization\CreateUser.e2e.spec.ts" />
@@ -1116,6 +1119,7 @@
     <TypeScriptCompile Include="Tests\Helpers\Select2Helper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SelectHelper.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigation.ts" />
+    <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ContractNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\ItSystemNavigation.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigationSrefs.ts" />
     <TypeScriptCompile Include="Tests\Helpers\SideNavigation\LocalItSystemNavigation.ts" />

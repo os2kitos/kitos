@@ -22,6 +22,7 @@
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
+        private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
@@ -44,7 +45,8 @@
             "$uibModal",
             "needsWidthFixService",
             "exportGridToExcelService",
-            "userAccessRights"
+            "userAccessRights",
+            "uiState"
         ];
 
         constructor(
@@ -65,7 +67,8 @@
             private $modal,
             private needsWidthFixService,
             private exportGridToExcelService,
-            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO) {
+            private userAccessRights: Models.Api.Authorization.EntitiesAccessRightsDTO,
+            private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
             $scope.$on("kendoWidgetCreated",
@@ -210,6 +213,7 @@
 
         private activate() {
 
+            const selectRoleFilterName = "selectRoleFilter";
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
@@ -364,6 +368,7 @@
                             "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
+                        name: selectRoleFilterName,
                         template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
@@ -940,6 +945,11 @@
                     mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
                 });
 
+            Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
+            if (!this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.contractRoles)) {
+                Helpers.UiCustomizationHelper.removeItemFromToolbarByName(selectRoleFilterName, mainGridOptions.toolbar);
+            }
+
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
 
@@ -1079,6 +1089,9 @@
                     ],
                     orgUnits: [
                         "$http", "user", "_", ($http, user, _) => $http.get(`/odata/Organizations(${user.currentOrganizationId})/OrganizationUnits`).then(result => _.addHierarchyLevelOnFlatAndSort(result.data.value, "Id", "ParentId"))
+                    ],
+                    uiState: [
+                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
                     ]
                 }
             });

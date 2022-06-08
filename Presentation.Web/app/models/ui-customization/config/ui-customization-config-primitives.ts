@@ -36,6 +36,7 @@
 
     export const helpTexts = {
         cannotChangeTab: "Det er ikke muligt at slå dette faneblad fra",
-        cannotChangeTabOnlyThroughModuleConfig: "Det er kun muligt at fjerne dette faneblad ved at slå det relaterede modul fra"
+        cannotChangeTabOnlyThroughModuleConfig: "Det er kun muligt at fjerne dette faneblad ved at slå det relaterede module fra",
+        generalUiCustomizationHelpText: "Bemærk: Skjules faneblad/felt fjernes relaterede felt(er) også fra overbliksbillederne."
     }
 }
