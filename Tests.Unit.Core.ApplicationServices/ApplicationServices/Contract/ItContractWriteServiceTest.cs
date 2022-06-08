@@ -544,9 +544,8 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
 
         [Theory]
         [InlineData(0)]
-        [InlineData(3)]
-        [InlineData(10)]
-        public void Cannot_Create_With_Procurement_If_Half_Of_Year_Is_Other_Than_1_Or_2(int halfOfYear)
+        [InlineData(5)]
+        public void Cannot_Create_With_Procurement_If_Quarter_Of_Year_Is_Other_Than_1_To_4(int halfOfYear)
         {
             //Arrange
             var procurement = new ItContractProcurementModificationParameters()
@@ -559,7 +558,7 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
             var result = _sut.Create(organizationUuid, parameters);
 
             //Assert
-            AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Half Of Year has to be either 1 or 2", OperationFailure.BadInput, transaction);
+            AssertFailureWithKnownErrorDetails(result, "Failed to update procurement plan with error message: Quarter Of Year has to be either 1, 2, 3 or 4", OperationFailure.BadInput, transaction);
         }
 
         [Fact]
@@ -1670,12 +1669,12 @@ namespace Tests.Unit.Core.ApplicationServices.Contract
         {
             if (expected.ProcurementPlan.HasChange && expected.ProcurementPlan.NewValue.HasValue)
             {
-                Assert.Equal(expected.ProcurementPlan.NewValue.Value.half, actual.ProcurementPlanHalf);
+                Assert.Equal(expected.ProcurementPlan.NewValue.Value.quarter, actual.ProcurementPlanQuarter);
                 Assert.Equal(expected.ProcurementPlan.NewValue.Value.year, actual.ProcurementPlanYear);
             }
             else
             {
-                Assert.Null(actual.ProcurementPlanHalf);
+                Assert.Null(actual.ProcurementPlanQuarter);
                 Assert.Null(actual.ProcurementPlanYear);
             }
         }
