@@ -231,6 +231,8 @@
             }
         }
 
-
+        getLastChangedByUserFullName() {
+            return `${this.lastChangedByUserName} ${this.lastChangedByUserLastName}`;
+        }
     }
 }
