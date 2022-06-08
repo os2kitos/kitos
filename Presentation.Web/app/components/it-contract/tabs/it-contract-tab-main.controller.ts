@@ -214,15 +214,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['take=100','orgId=' + user.currentOrganizationId]);
-
-                function formatSupplier(supplier) {
-                    var result = '<div>' + supplier.text + '</div>';
-                    if (supplier.cvr) {
-                        result += '<div class="small">' + supplier.cvr + '</div>';
-                    }
-                    return result;
-                }
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, ['take=100','orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {

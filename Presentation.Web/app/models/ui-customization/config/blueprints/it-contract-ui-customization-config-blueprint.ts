@@ -2,8 +2,8 @@
     export const ItContractUiCustomizationBluePrint = {
         module: UICustomization.CustomizableKitosModule.ItContract,
         readOnly: false,
-        helpText: "INSERT TEXT",
-        text: "Kontraktoverblik - Økonomi",
+        helpText: Configs.helpTexts.generalUiCustomizationHelpText,
+        text: "IT Kontrakt",
         children: {
             frontPage: {
                 text: "Kontraktforside",
@@ -17,22 +17,27 @@
             },
             itSystems: {
                 text: "IT Systemer",
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
                 readOnly: true
             },
             dataProcessing: {
                 text: "Databehandling",
+                helpText: Configs.helpTexts.cannotChangeTabOnlyThroughModuleConfig,
                 readOnly: true
             },
             deadlines: {
                 text: "Aftalefrister",
+                helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             },
             paymentModel: {
                 text: "Betalingsmodel",
+                helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             },
             economy: {
                 text: "Økonomi",
+                helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             },
             contractRoles: {
@@ -40,6 +45,7 @@
             },
             hierarchy: {
                 text: "Hierarki",
+                helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             },
             advice: {
@@ -47,6 +53,7 @@
             },
             references: {
                 text: "Referencer",
+                helpText: Configs.helpTexts.cannotChangeTab,
                 readOnly: true
             }
         }

@@ -22,6 +22,7 @@
         private orgUnitStorageKey = "it-contract-plan-orgunit";
         private gridState = this.gridStateService.getService(this.storageKey, this.user);
         private roleSelectorDataSource;
+        private uiBluePrint = Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
         public mainGrid: Kitos.IKendoGrid<IItContractPlan>;
         public mainGridOptions: kendo.ui.GridOptions;
         public canCreate: boolean;
@@ -158,6 +159,11 @@
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
+
+        private fixUserFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
+        }
         
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
@@ -209,6 +215,7 @@
         private activate() {
             const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
+            const selectRoleFilterName = "selectRoleFilter";
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
             this._.forEach(clonedItContractRoles, n => n.Id = `role${n.Id}`);
             clonedItContractRoles.push({ Id: "ContractSigner", Name: "Kontraktunderskriver" });
@@ -237,7 +244,8 @@
                                     "ProcurementStrategy($select=Name)," +
                                     "AssociatedSystemUsages($select=ItSystemUsageId)," +    //Only using the length, so select 1 field
                                     "AssociatedSystemRelations($select=Id)," +              //Only using the length, so select 1 field
-                                    "Reference($select=URL,Title,ExternalReferenceId)";
+                                    "Reference($select=URL,Title,ExternalReferenceId)," +
+                                    "LastChangedByUser($select=Name,LastName)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -272,6 +280,8 @@
                                     });
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
+
+                                parameterMap.$filter = this.fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
                             }
 
                             return parameterMap;
@@ -323,6 +333,7 @@
                                     if (!contract.PurchaseForm) { contract.PurchaseForm = { Name: "" }; }
                                     if (!contract.TerminationDeadline) { contract.TerminationDeadline = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
                                 });
                             return response;
                         }
@@ -359,6 +370,7 @@
                             "<button type='button' data-element-type='removeFilterButton' class='k-button k-button-icontext' title='Slet filtre og sortering' data-ng-click='contractOverviewPlanVm.clearGridProfile()' data-ng-disabled='!contractOverviewPlanVm.doesGridProfileExist()'>#: text #</button>"
                     },
                     {
+                        name: selectRoleFilterName,
                         template: kendo.template(this.$("#role-selector").html())
                     }
                 ],
@@ -810,7 +822,7 @@
                     },
                     {
                         field: "ProcurementPlanYear",
-                        title: "Genanskaffelses plan",
+                        title: "Genanskaffelsesplan",
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
@@ -827,7 +839,41 @@
                                 operator: "contains"
                             }
                         }
-                    }
+                    },
+                    {
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
+                        persistId: "lastchangedname",
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
+                        hidden: true,
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChanged",
+                        title: "Sidste redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
+                        persistId: "lastchangeddate",
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        attributes: { "class": "text-center" },
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
+                    },
                 ]
             };
 
@@ -903,6 +949,11 @@
                     // insert the generated column at the correct location
                     mainGridOptions.columns.splice(insertIndex, 0, roleColumn);
                 });
+
+            Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
+            if (!this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.contractRoles)) {
+                Helpers.UiCustomizationHelper.removeItemFromToolbarByName(selectRoleFilterName, mainGridOptions.toolbar);
+            }
 
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;

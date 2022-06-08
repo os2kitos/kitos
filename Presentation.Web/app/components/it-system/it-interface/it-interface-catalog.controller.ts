@@ -430,14 +430,7 @@
                     {
                         field: "LastChanged", title: "Sidst redigeret: Dato", format: "{0:dd-MM-yyyy}", width: 130,
                         persistId: "lastchangeddate", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => {
-                            // handles null cases
-                            if (!dataItem || !dataItem.LastChanged) {
-                                return "";
-                            }
-
-                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
-                        },
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         attributes: { "class": "text-center" },
                         filterable: {
                             cell: {

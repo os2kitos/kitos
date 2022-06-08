@@ -2303,7 +2303,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 PurchaseTypeUuid = purchaseType.Uuid,
                 ProcurementPlan = new ProcurementPlanDTO()
                 {
-                    QuarterOfYear = Convert.ToByte((A<int>() % 1) + 1),
+                    QuarterOfYear = Convert.ToByte((A<int>() % 4) + 1),
                     Year = A<int>()
                 }
             };
