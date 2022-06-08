@@ -865,10 +865,6 @@
     <Compile Include="Migrations\202205190801320_UserDelete.designer.cs">
       <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202206031302349_AddDPRReadModelLastChanged.cs" />
-    <Compile Include="Migrations\202206031302349_AddDPRReadModelLastChanged.designer.cs">
-      <DependentUpon>202206031302349_AddDPRReadModelLastChanged.cs</DependentUpon>
-    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1431,9 +1427,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202205190801320_UserDelete.resx">
       <DependentUpon>202205190801320_UserDelete.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202206031302349_AddDPRReadModelLastChanged.resx">
-      <DependentUpon>202206031302349_AddDPRReadModelLastChanged.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />
