@@ -158,6 +158,11 @@
         private fixProcurmentFilter(filterUrl) {
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
+
+        private fixUserFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
+        }
         
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
@@ -237,7 +242,8 @@
                                     "ProcurementStrategy($select=Name)," +
                                     "AssociatedSystemUsages($select=ItSystemUsageId)," +    //Only using the length, so select 1 field
                                     "AssociatedSystemRelations($select=Id)," +              //Only using the length, so select 1 field
-                                    "Reference($select=URL,Title,ExternalReferenceId)";
+                                    "Reference($select=URL,Title,ExternalReferenceId)," +
+                                    "LastChangedByUser($select=Name,LastName)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = this.$window.sessionStorage.getItem(this.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -272,6 +278,8 @@
                                     });
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
+
+                                parameterMap.$filter = this.fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
                             }
 
                             return parameterMap;
@@ -323,6 +331,7 @@
                                     if (!contract.PurchaseForm) { contract.PurchaseForm = { Name: "" }; }
                                     if (!contract.TerminationDeadline) { contract.TerminationDeadline = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
                                 });
                             return response;
                         }
@@ -811,13 +820,13 @@
                     },
                     {
                         field: "ProcurementPlanYear",
-                        title: "Udbuds plan",
+                        title: "Genanskaffelsesplan",
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
                         template: dataItem =>
-                            dataItem.ProcurementPlanHalf && dataItem.ProcurementPlanYear
-                                ? `${dataItem.ProcurementPlanYear} | ${dataItem.ProcurementPlanHalf}`
+                            dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
+                                ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
                                 : "",
                         filterable: {
                             cell: {
@@ -827,7 +836,41 @@
                                 operator: "contains"
                             }
                         }
-                    }
+                    },
+                    {
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
+                        persistId: "lastchangedname",
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
+                        hidden: true,
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChanged",
+                        title: "Sidste redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
+                        persistId: "lastchangeddate",
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        attributes: { "class": "text-center" },
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
+                    },
                 ]
             };
 

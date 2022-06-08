@@ -344,6 +344,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app\components\local-config\ui-customization\local-ui-customization.directive.ts" />
+    <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
@@ -744,6 +745,7 @@
     <TypeScriptCompile Include="app\models\services\excel\excel-config.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\ui-customization.ts" />
     <TypeScriptCompile Include="app\models\user-notification\user-notification.ts" />
+    <TypeScriptCompile Include="app\models\users\user-dto.ts" />
     <TypeScriptCompile Include="app\models\ViewModel\advice\advice-models.ts" />
     <TypeScriptCompile Include="app\models\Api\api-response-error-category.ts" />
     <TypeScriptCompile Include="app\models\Api\authorization\EntityAccessRightsDTO.ts" />

@@ -44,7 +44,7 @@ namespace Presentation.Web.Models.API.V1
         public Guid? SupplierUuid { get; set; }
         public int? ProcurementStrategyId { get; set; }
         public string ProcurementStrategyName { get; set; }
-        public int? ProcurementPlanHalf { get; set; }
+        public int? ProcurementPlanQuarter { get; set; }
         public int? ProcurementPlanYear { get; set; }
         public int? ContractTemplateId { get; set; }
         public string ContractTemplateName { get; set; }

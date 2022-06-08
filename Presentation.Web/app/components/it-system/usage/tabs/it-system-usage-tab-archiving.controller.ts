@@ -170,15 +170,7 @@
                     text: item.name ? item.name : 'Unavngiven',
                     cvr: item.cvr
                 });
-            }, "q", formatSupplier);
-
-            function formatSupplier(supplier) {
-                var result = '<div>' + supplier.text + '</div>';
-                if (supplier.cvr) {
-                    result += '<div class="small">' + supplier.cvr + '</div>';
-                }
-                return result;
-            }
+            }, "q", Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr);
 
             $scope.patchDatePeriode = (field, value, id) => {
                 var formatDateString = "YYYY-MM-DD";

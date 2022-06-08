@@ -19,6 +19,7 @@ namespace Core.DomainServices.GDPR
         IDomainEventHandler<EntityCreatedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityUpdatedEvent<DataProcessingRegistration>>,
         IDomainEventHandler<EntityUpdatedEvent<User>>,
+        IDomainEventHandler<EntityBeingDeletedEvent<User>>,
         IDomainEventHandler<EntityBeingDeletedEvent<ExternalReference>>,
         IDomainEventHandler<EntityCreatedEvent<ExternalReference>>,
         IDomainEventHandler<EntityUpdatedEvent<ExternalReference>>,
@@ -155,6 +156,11 @@ namespace Core.DomainServices.GDPR
                 .Select(x => PendingReadModelUpdate.Create(x.Id, PendingReadModelUpdateSourceCategory.DataProcessingRegistration))
                 .ToList()
                 .ForEach(_pendingReadModelUpdateRepository.Add);
+        }
+
+        public void Handle(EntityBeingDeletedEvent<User> domainEvent)
+        {
+            _pendingReadModelUpdateRepository.Add(PendingReadModelUpdate.Create(domainEvent.Entity, PendingReadModelUpdateSourceCategory.DataProcessingRegistration_User));
         }
     }
 }

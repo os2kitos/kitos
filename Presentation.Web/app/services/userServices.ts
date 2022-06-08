@@ -41,19 +41,23 @@
         updateDefaultOrgUnit(newDefaultOrgUnitId: number): ng.IPromise<any>;
         getUsersWithRightsholderAccess(): ng.IPromise<Kitos.Models.Api.IUserWithOrganizationName[]>;
         getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
+        deleteUser(id: number): ng.IPromise<any>;
+        searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
+        getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
     }
 
     export class UserService implements IUserService {
         _user: Kitos.Services.IUser = null;
         _loadUserDeferred = null;
 
-        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_"];
+        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache"];
         constructor(
             private readonly $http: ng.IHttpService,
             private readonly $q: ng.IQService,
             private readonly $rootScope,
             private readonly $uibModal: ng.ui.bootstrap.IModalService,
-            private readonly _: _.LoDashStatic) {
+            private readonly _: _.LoDashStatic,
+            private readonly uiCustomizationStateService: Services.UICustomization.UiCustomizationStateCache) {
         }
 
         saveUser = (user, orgAndDefaultUnit) => {
@@ -215,6 +219,7 @@
         };
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
+            Services.UICustomization.purgeCache(this.uiCustomizationStateService); //Purge cache when a new user is authenticated or changes org
             this.saveUser(user, orgAndDefaultUnit);
         };
 
@@ -299,13 +304,13 @@
                 } else {
                     this.getCurrentUserIfAuthorized()
                         .then(
-                        result => {
-                            if (result.data.response) {
-                                this.successfulUserAuth(result.data.response);
-                            } else {
-                                this.failedUserAuth(result);
-                            }
-                        }, result => this.failedUserAuth(result));
+                            result => {
+                                if (result.data.response) {
+                                    this.successfulUserAuth(result.data.response);
+                                } else {
+                                    this.failedUserAuth(result);
+                                }
+                            }, result => this.failedUserAuth(result));
                 }
             }
 
@@ -386,7 +391,7 @@
             const orderByPropertyName = "Name";
             const orderByAsc = true;
             var organizations: angular.IHttpPromise<API.Models.IApiWrapper<any>>;
-                organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
+            organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
 
             var deferred = this.$q.defer();
             organizations.then((data) => {
@@ -506,6 +511,23 @@
         getUsersWithCrossAccess() {
             return this.$http
                 .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
+                .then(result => result.data.response);
+        }
+
+        deleteUser(id: number) {
+            return this.$http
+                .delete(`api/user/${id}`);
+        }
+
+        searchUsers(query: string) {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithEmail[]>>(`api/users/search?query=${query}`)
+                .then(result => result.data.response);
+        }
+
+        getUserOrganizations(userId: number) {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.IOrganization[]>>(`api/authorize/GetOrganizations/${userId}`)
                 .then(result => result.data.response);
         }
     }

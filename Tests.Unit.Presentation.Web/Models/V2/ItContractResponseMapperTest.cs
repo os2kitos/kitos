@@ -179,7 +179,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             AssertOptionalIdentity(contract.PurchaseForm, dto.Procurement.PurchaseType);
             if (withOptionalCrossReferences)
             {
-                Assert.Equal(Convert.ToByte(contract.ProcurementPlanHalf.Value), dto.Procurement.ProcurementPlan.HalfOfYear);
+                Assert.Equal(Convert.ToByte(contract.ProcurementPlanQuarter.Value), dto.Procurement.ProcurementPlan.QuarterOfYear);
                 Assert.Equal(contract.ProcurementPlanYear.Value, dto.Procurement.ProcurementPlan.Year);
             }
             else
@@ -695,7 +695,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             contract.PurchaseForm = withOptionalCrossReferences
                 ? new PurchaseFormType() { Uuid = A<Guid>(), Name = A<string>() }
                 : null;
-            contract.ProcurementPlanHalf = withOptionalCrossReferences 
+            contract.ProcurementPlanQuarter = withOptionalCrossReferences 
                 ? A<int>() % 2 
                 : null;
             contract.ProcurementPlanYear = withOptionalCrossReferences 
