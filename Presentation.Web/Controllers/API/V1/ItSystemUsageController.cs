@@ -89,7 +89,6 @@ namespace Presentation.Web.Controllers.API.V1
                 }
 
                 var dto = Map(item);
-                dto.LastChangedByName = item.LastChangedByUser.GetFullName();
 
                 if (GetOrganizationReadAccessLevel(item.OrganizationId) < OrganizationDataReadAccessLevel.All)
                 {
