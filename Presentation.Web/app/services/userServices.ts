@@ -47,8 +47,14 @@
         _user: Kitos.Services.IUser = null;
         _loadUserDeferred = null;
 
-        static $inject = ["$http", "$window", "$q", "$rootScope", "$uibModal", "_"];
-        constructor(private $http: ng.IHttpService, private $window: ng.IWindowService, private $q: ng.IQService, private $rootScope, private $uibModal: ng.ui.bootstrap.IModalService, private _: _.LoDashStatic) {
+        static $inject = ["$http", "$q", "$rootScope", "$uibModal", "_", "uiCustomizationStateCache"];
+        constructor(
+            private readonly $http: ng.IHttpService,
+            private readonly $q: ng.IQService,
+            private readonly $rootScope,
+            private readonly $uibModal: ng.ui.bootstrap.IModalService,
+            private readonly _: _.LoDashStatic,
+            private readonly uiCustomizationStateService: Services.UICustomization.UiCustomizationStateCache) {
         }
 
         saveUser = (user, orgAndDefaultUnit) => {
@@ -210,6 +216,7 @@
         };
 
         saveUserInfo = (user, orgAndDefaultUnit) => {
+            Services.UICustomization.purgeCache(this.uiCustomizationStateService); //Purge cache when a new user is authenticated or changes org
             this.saveUser(user, orgAndDefaultUnit);
         };
 
@@ -294,13 +301,13 @@
                 } else {
                     this.getCurrentUserIfAuthorized()
                         .then(
-                        result => {
-                            if (result.data.response) {
-                                this.successfulUserAuth(result.data.response);
-                            } else {
-                                this.failedUserAuth(result);
-                            }
-                        }, result => this.failedUserAuth(result));
+                            result => {
+                                if (result.data.response) {
+                                    this.successfulUserAuth(result.data.response);
+                                } else {
+                                    this.failedUserAuth(result);
+                                }
+                            }, result => this.failedUserAuth(result));
                 }
             }
 
@@ -381,7 +388,7 @@
             const orderByPropertyName = "Name";
             const orderByAsc = true;
             var organizations: angular.IHttpPromise<API.Models.IApiWrapper<any>>;
-                organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
+            organizations = this.getOrganizationsOrderedByProperty(orderByPropertyName, orderByAsc);
 
             var deferred = this.$q.defer();
             organizations.then((data) => {

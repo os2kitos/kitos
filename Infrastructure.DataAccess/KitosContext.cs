@@ -21,6 +21,7 @@ using Core.DomainModel.Qa.References;
 using Core.DomainModel.SSO;
 using Core.DomainModel.Notification;
 using Core.DomainModel.Tracking;
+using Core.DomainModel.UIConfiguration;
 
 namespace Infrastructure.DataAccess
 {
@@ -171,6 +172,8 @@ namespace Infrastructure.DataAccess
         public DbSet<UserNotification> UserNotifications { get; set; }
         public DbSet<ItInterface> ItInterfaces { get; set; }
         public DbSet<LifeCycleTrackingEvent> LifeCycleTrackingEvents { get; set; }
+        public DbSet<UIModuleCustomization> UIModuleCustomizations { get; set; }
+        public DbSet<CustomizedUINode> CustomizedUiNodes{ get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -278,6 +281,8 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new UserNotificationMap());
             modelBuilder.Configurations.Add(new AttachedOptionMap());
             modelBuilder.Configurations.Add(new LifeCycleTrackingEventMap());
+            modelBuilder.Configurations.Add(new UIModuleCustomizationMap());
+            modelBuilder.Configurations.Add(new CustomizedUINodeMap());
         }
     }
 }

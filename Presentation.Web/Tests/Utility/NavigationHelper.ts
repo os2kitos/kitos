@@ -1,9 +1,9 @@
 ﻿class NavigationHelper {
 
-    public getPage(destUrl: string): webdriver.promise.Promise<void> {
+    getPage(destUrl: string): webdriver.promise.Promise<void> {
         return browser.getCurrentUrl()
             .then(url => {
-                const navigateToUrl = browser.baseUrl + destUrl;
+                const navigateToUrl = browser.params.baseUrl + destUrl;
                 if (navigateToUrl !== url) {
                     console.log("Not at " + navigateToUrl + " but at:" + url + ". Navigating to:" + navigateToUrl);
                     return browser.get(navigateToUrl)
@@ -14,18 +14,25 @@
             });
     }
 
-    public refreshPage(): webdriver.promise.Promise<void> {
+    refreshPage(): webdriver.promise.Promise<void> {
         return browser.refresh()
             .then(() => browser.waitForAngular());
     }
 
-    public acceptAlertBox(): webdriver.promise.Promise<void> {
+    acceptAlertBox(): webdriver.promise.Promise<void> {
         return browser.switchTo().alert().accept();
     }
 
-    public goToSubMenuElement(srefName: string) {
+    findSubMenuElement(srefName: string) {
+        console.log("find sub menu ", srefName);
+        return element(by.css(`[data-ui-sref="${srefName}"`));
+    }
+
+    goToSubMenuElement(srefName: string) {
         console.log("Navigating to sub menu ", srefName);
-        return element(by.css(`[data-ui-sref="${srefName}"`)).click()
+        return this
+            .findSubMenuElement(srefName)
+            .click()
             .then(() => browser.waitForAngular());
     }
 }

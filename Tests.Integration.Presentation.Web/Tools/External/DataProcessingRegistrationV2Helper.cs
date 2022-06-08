@@ -53,7 +53,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
                 queryParameters.Add(new KeyValuePair<string, string>("changedSinceGtEq", changedSinceGtEq.Value.ToString("O")));
 
             var query = string.Join("&", queryParameters.Select(x => $"{x.Key}={x.Value}"));
-
+            
             return await HttpApi.GetWithTokenAsync(TestEnvironment.CreateUrl($"api/v2/data-processing-registrations?{query}"), token);
         }
 

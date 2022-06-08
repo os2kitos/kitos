@@ -10,25 +10,27 @@
                 ],
                 userAccessRights: ["authorizationServiceFactory", "$stateParams",
                     (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory, $stateParams) =>
-                    authorizationServiceFactory
-                    .createSystemUsageAuthorization()
-                    .getAuthorizationForItem($stateParams.id)
+                        authorizationServiceFactory
+                            .createSystemUsageAuthorization()
+                            .getAuthorizationForItem($stateParams.id)
                 ],
                 hasWriteAccess: [
                     "userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit
                 ],
                 itSystemUsage: [
                     "$http", "$stateParams", ($http, $stateParams) => $http.get("api/itSystemUsage/" + $stateParams.id)
-                    .then(result => result.data.response)
+                        .then(result => result.data.response)
+                ],
+                uiState: [
+                    "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItSystemUsage)
                 ]
             }
         });
     }]);
 
-    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess", "user",
-        ($rootScope, $scope, itSystemUsage, hasWriteAccess, user) => {
+    app.controller("system.UsageCtrl", ["$rootScope", "$scope", "itSystemUsage", "hasWriteAccess", "user", "uiState",
+        ($rootScope, $scope, itSystemUsage, hasWriteAccess, user, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.hasWriteAccess = hasWriteAccess;
-            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule;
             $scope.usage = itSystemUsage;
 
             $scope.usageViewModel = new Kitos.Models.ViewModel.ItSystemUsage.SystemUsageViewModel(itSystemUsage);
@@ -39,8 +41,24 @@
             };
 
             if (!$scope.hasWriteAccess) {
-                _.remove($rootScope.page.subnav.buttons, (o:any) => o.text === "Fjern anvendelse");
+                _.remove($rootScope.page.subnav.buttons, (o: any) => o.text === "Fjern anvendelse");
             }
+
+            // Setup available tabs
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItSystemUsageUiCustomizationBluePrint;
+            $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
+            $scope.isInterfacesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.interfaces);
+            $scope.isRelationsEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRelations);
+            $scope.isContractsEnabled = user.currentConfig.showItContractModule && uiState.isBluePrintNodeAvailable(blueprint.children.contracts);
+            $scope.isHierarchyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.hierarchy);
+            $scope.isSystemRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.systemRoles);
+            $scope.isOrganizationEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.organization);
+            $scope.isLocalKleEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localKle);
+            $scope.isAdviceEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.advice);
+            $scope.isLocalReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.localReferences);
+            $scope.isArchivingEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.archiving);
+            $scope.isGdprEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.gdpr);
+            $scope.isProjectModuleEnabled = user.currentConfig.showItProjectModule && uiState.isBluePrintNodeAvailable(blueprint.children.projects);
         }
     ]);
 })(angular, app);

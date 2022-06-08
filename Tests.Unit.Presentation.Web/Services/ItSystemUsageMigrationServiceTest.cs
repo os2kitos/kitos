@@ -9,6 +9,7 @@ using Core.ApplicationServices.SystemUsage.Migration;
 using Core.ApplicationServices.SystemUsage.Relations;
 using Core.DomainModel;
 using Core.DomainModel.Events;
+using Core.DomainModel.GDPR;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.ItProject;
 using Core.DomainModel.ItSystem;
@@ -32,7 +33,6 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IItSystemRepository> _systemRepository;
         private readonly Mock<IItSystemUsageRepository> _systemUsageRepository;
         private readonly Mock<ITransactionManager> _transactionManager;
-        private readonly Mock<IItSystemUsageService> _itSystemUsageService;
         private readonly Mock<IDomainEvents> _domainEventsMock;
         private readonly Mock<IItsystemUsageRelationsService> _itSystemUsageRelationService;
 
@@ -43,7 +43,6 @@ namespace Tests.Unit.Presentation.Web.Services
 
             _systemUsageRepository = new Mock<IItSystemUsageRepository>();
             _transactionManager = new Mock<ITransactionManager>();
-            _itSystemUsageService = new Mock<IItSystemUsageService>();
 
             _domainEventsMock = new Mock<IDomainEvents>();
             _itSystemUsageRelationService = new Mock<IItsystemUsageRelationsService>();
@@ -53,7 +52,6 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _systemRepository.Object,
                 _systemUsageRepository.Object,
-                _itSystemUsageService.Object,
                 _itSystemUsageRelationService.Object,
                 _domainEventsMock.Object);
         }
@@ -257,9 +255,29 @@ namespace Tests.Unit.Presentation.Web.Services
             Assert.Empty(migration.AffectedContracts);
             Assert.Empty(migration.AffectedProjects);
             Assert.Empty(migration.AffectedSystemRelations);
+            Assert.Empty(migration.AffectedDataProcessingRegistrations);
             Assert.Equal(systemUsage, migration.SystemUsage);
             Assert.Equal(systemUsage.ItSystem, migration.FromItSystem);
             Assert.Equal(newSystem, migration.ToItSystem);
+        }
+
+        [Fact]
+        public void GetSystemUsageMigration_Returns_Ok_With_Affected_DataProcessingRegistrations()
+        {
+            //Arrange
+            var systemUsage = CreateSystemUsage();
+            var system = CreateSystem();
+            ExpectAllowedGetMigration(systemUsage.Id, systemUsage, system);
+            systemUsage.AssociatedDataProcessingRegistrations = new List<DataProcessingRegistration> { new(), new() };
+
+            //Act
+            var result = _sut.GetSystemUsageMigration(systemUsage.Id, system.Id);
+
+            //Assert
+            Assert.True(result.Ok);
+            var migration = result.Value;
+            Assert.Equal(2, migration.AffectedDataProcessingRegistrations.Count);
+            Assert.True(systemUsage.ItProjects.SequenceEqual(migration.AffectedProjects));
         }
 
         [Fact]

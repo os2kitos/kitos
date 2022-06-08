@@ -22,8 +22,6 @@
         }
 
         executeAsync(optionalSuccessCallback?: (successValue: T) => T, optionalErrorCallback?: (errorValue: Models.Api.ApiResponseErrorCategory) => void): angular.IPromise<T> {
-
-
             var messages = {
                 start: "",
                 success: "",
@@ -98,14 +96,23 @@
 
     export interface IApiUseCaseFactory {
         createUpdate<T>(fieldName: string, change: ApiCall<T>): AsyncApiChangeUseCase<T>;
+        createDeletion<T>(objectName: string, change: ApiCall<T>): AsyncApiChangeUseCase<T>;
         createAssignmentRemoval<T>(apiCall: ApiCall<T>): AsyncApiChangeUseCase<T>;
         createAssignmentCreation<T>(apiCall: ApiCall<T>): AsyncApiChangeUseCase<T>;
     }
 
     export class ApiUseCaseFactory implements IApiUseCaseFactory {
+
         static $inject = ["notify"];
         constructor(private readonly notify) {
 
+        }
+
+        createDeletion<T>(objectName: string, change: () => angular.IPromise<T>): AsyncApiChangeUseCase<T> {
+            if (!change) {
+                throw new Error("apiCall must be defined");
+            }
+            return new AsyncApiChangeUseCase<T>(this.notify, change, objectName, ChangeType.Removal);
         }
 
         createUpdate<T>(fieldName: string, apiCall: ApiCall<T>): AsyncApiChangeUseCase<T> {

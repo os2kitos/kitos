@@ -5,7 +5,5 @@
         NotFound,
         ServerError,
         UnknownError,
-
-
     }
 }

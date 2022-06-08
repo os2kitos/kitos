@@ -9,7 +9,7 @@ class OrgHelper {
     private static homePage = new HomePage();
     private static navigationHelper = new NavigationBarHelper();
 
-    public static createOrg(name: string) {
+    static createOrg(name: string) {
         return this.orgPage.getPage()
             .then(() => this.orgPage.getCreateOrgButton().click())
             .then(() => browser.waitForAngular())
@@ -21,7 +21,7 @@ class OrgHelper {
             .then(() => browser.waitForAngular());
     }
 
-    public static createOrgWithCvr(name: string, cvr: string) {
+    static createOrgWithCvr(name: string, cvr: string) {
         return this.orgPage.getPage()
             .then(() => this.orgPage.getCreateOrgButton().click())
             .then(() => browser.waitForAngular())
@@ -35,7 +35,7 @@ class OrgHelper {
             .then(() => browser.waitForAngular());
     }
     
-    public static activateSystemForOrg(system: string, org: string) {
+    static activateSystemForOrg(system: string, org: string) {
         console.log("Activating " + system + " for org " + org);
         return this.navigationHelper.dropDownExpand()
             .then(() => console.log("Dropdown clicked"))
@@ -51,14 +51,14 @@ class OrgHelper {
             .then(() => SystemCatalogHelper.createLocalSystem(system));
     }
 
-    public static changeOrg(org: string) {
+    static changeOrg(org: string) {
         console.log(`Changing org ${org}`);
         return this.navigationHelper.dropDownExpand()
             .then(() => browser.waitForAngular())
             .then(() => this.navigationHelper.changeOrg())
             .then(() => this.homePage.selectSpecificOrganizationAsWorkingOrg(org))
             .then(() => this.homePage.selectWorkingOrganizationButton.click())
-            .then(() => browser.waitForAngular())
+            .then(() => browser.waitForAngular());
     }
 
 }
