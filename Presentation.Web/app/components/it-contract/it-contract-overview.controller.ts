@@ -688,13 +688,7 @@
                     {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "opremun", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => {
-                            if (!dataItem || !dataItem.OperationRemunerationBegun) {
-                                return "";
-                            }
-
-                            return self.moment(dataItem.OperationRemunerationBegun).format(Kitos.Constants.DateFormat.DanishDateFormat);
-                        },
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.OperationRemunerationBegun),
                         hidden: true,
                         filterable: {
                             cell: {
@@ -734,13 +728,7 @@
                     {
                         field: "AuditDate", title: "Audit dato", width: 90,
                         persistId: "auditdate", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem.AuditDate) {
-                                return "";
-                            }
-
-                            return self.moment(dataItem.AuditDate).format(Kitos.Constants.DateFormat.DanishDateFormat);
-                        },
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.AuditDate),
                         sortable: false,
                         filterable: false
                     },
