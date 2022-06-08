@@ -2,24 +2,23 @@
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel.Organization;
-using Core.DomainModel.SSO;
 using Core.DomainServices;
-using Core.DomainServices.Repositories.SSO;
+using Core.DomainServices.Repositories.Organization;
 using Moq;
 using Tests.Toolkit.Patterns;
 using Xunit;
 
-namespace Tests.Unit.Core.DomainServices.SSO
+namespace Tests.Unit.Core.DomainServices.Organizations
 {
-    public class SsoOrganizationIdentityRepositoryTest : WithAutoFixture
+    public class StsOrganizationIdentityRepositoryTest : WithAutoFixture
     {
-        private readonly Mock<IGenericRepository<SsoOrganizationIdentity>> _repository;
-        private readonly SsoOrganizationIdentityRepository _sut;
+        private readonly Mock<IGenericRepository<StsOrganizationIdentity>> _repository;
+        private readonly StsOrganizationIdentityRepository _sut;
 
-        public SsoOrganizationIdentityRepositoryTest()
+        public StsOrganizationIdentityRepositoryTest()
         {
-            _repository = new Mock<IGenericRepository<SsoOrganizationIdentity>>();
-            _sut = new SsoOrganizationIdentityRepository(_repository.Object);
+            _repository = new Mock<IGenericRepository<StsOrganizationIdentity>>();
+            _sut = new StsOrganizationIdentityRepository(_repository.Object);
         }
 
         [Fact]
@@ -59,9 +58,9 @@ namespace Tests.Unit.Core.DomainServices.SSO
         {
             //Arrange
             var externalId = A<Guid>();
-            var organization = new Organization();
+            var organization = new global::Core.DomainModel.Organization.Organization();
             ExpectRepositoryContent(CreateSsoOrganizationIdentity(), CreateSsoOrganizationIdentity());
-            _repository.Setup(x => x.Insert(It.IsAny<SsoOrganizationIdentity>())).Returns((SsoOrganizationIdentity input) => input);
+            _repository.Setup(x => x.Insert(It.IsAny<StsOrganizationIdentity>())).Returns((StsOrganizationIdentity input) => input);
 
             //Act
             var identityResult = _sut.AddNew(organization, externalId);
@@ -79,7 +78,7 @@ namespace Tests.Unit.Core.DomainServices.SSO
         {
             //Arrange
             var externalId = A<Guid>();
-            var organization = new Organization();
+            var organization = new global::Core.DomainModel.Organization.Organization();
             ExpectRepositoryContent(CreateSsoOrganizationIdentity(externalId), CreateSsoOrganizationIdentity());
 
             //Act
@@ -90,14 +89,14 @@ namespace Tests.Unit.Core.DomainServices.SSO
             Assert.Equal(OperationFailure.Conflict, identityResult.Error.FailureType);
         }
 
-        private void ExpectRepositoryContent(params SsoOrganizationIdentity[] response)
+        private void ExpectRepositoryContent(params StsOrganizationIdentity[] response)
         {
             _repository.Setup(x => x.AsQueryable()).Returns(response.AsQueryable());
         }
 
-        private SsoOrganizationIdentity CreateSsoOrganizationIdentity(Guid? id = null)
+        private StsOrganizationIdentity CreateSsoOrganizationIdentity(Guid? id = null)
         {
-            return new SsoOrganizationIdentity
+            return new StsOrganizationIdentity
             {
                 ExternalUuid = id.GetValueOrDefault(A<Guid>())
             };

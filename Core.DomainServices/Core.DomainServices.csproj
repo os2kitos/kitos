@@ -199,8 +199,8 @@
     <Compile Include="Repositories\Organization\OrganizationRepository.cs" />
     <Compile Include="Repositories\Organization\OrganizationUnitRepository.cs" />
     <Compile Include="Repositories\SSO\ISsoUserIdentityRepository.cs" />
-    <Compile Include="Repositories\SSO\ISsoOrganizationIdentityRepository.cs" />
-    <Compile Include="Repositories\SSO\SsoOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\Organization\IStsOrganizationIdentityRepository.cs" />
+    <Compile Include="Repositories\Organization\StsOrganizationIdentityRepository.cs" />
     <Compile Include="Repositories\SSO\SsoUserIdentityRepository.cs" />
     <Compile Include="Repositories\SystemUsage\IItSystemUsageOverviewReadModelRepository.cs" />
     <Compile Include="Repositories\SystemUsage\ItSystemUsageOverviewReadModelRepository.cs" />

@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Linq;
 using Core.Abstractions.Types;
-using Core.DomainModel.SSO;
+using Core.DomainModel.Organization;
 
-
-namespace Core.DomainServices.Repositories.SSO
+namespace Core.DomainServices.Repositories.Organization
 {
-    public class SsoOrganizationIdentityRepository : ISsoOrganizationIdentityRepository
+    public class StsOrganizationIdentityRepository : IStsOrganizationIdentityRepository
     {
-        private readonly IGenericRepository<SsoOrganizationIdentity> _repository;
+        private readonly IGenericRepository<StsOrganizationIdentity> _repository;
 
-        public SsoOrganizationIdentityRepository(IGenericRepository<SsoOrganizationIdentity> repository)
+        public StsOrganizationIdentityRepository(IGenericRepository<StsOrganizationIdentity> repository)
         {
             _repository = repository;
         }
 
-        public Maybe<SsoOrganizationIdentity> GetByExternalUuid(Guid externalId)
+        public Maybe<StsOrganizationIdentity> GetByExternalUuid(Guid externalId)
         {
             return
                 _repository
@@ -24,7 +23,7 @@ namespace Core.DomainServices.Repositories.SSO
                     .FirstOrDefault();
         }
 
-        public Result<SsoOrganizationIdentity, OperationError> AddNew(DomainModel.Organization.Organization organization, Guid externalId)
+        public Result<StsOrganizationIdentity, OperationError> AddNew(DomainModel.Organization.Organization organization, Guid externalId)
         {
             if (organization == null)
             {
@@ -35,7 +34,7 @@ namespace Core.DomainServices.Repositories.SSO
             {
                 return new OperationError("Existing mapping already exists for UUID:{externalId}", OperationFailure.Conflict);
             }
-            var identity = new SsoOrganizationIdentity(externalId, organization);
+            var identity = new StsOrganizationIdentity(externalId, organization);
             identity = _repository.Insert(identity);
             _repository.Save();
             return identity;

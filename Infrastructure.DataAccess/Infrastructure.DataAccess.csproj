@@ -89,8 +89,8 @@
     <Compile Include="Mapping\KendoOrganizationalConfigurationMap.cs" />
     <Compile Include="Mapping\LifeCycleTrackingEventMap.cs" />
     <Compile Include="Mapping\PendingReadModelUpdateMap.cs" />
+    <Compile Include="Mapping\StsOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\SsoUserIdentityMap.cs" />
-    <Compile Include="Mapping\SsoOrganizationIdentityMap.cs" />
     <Compile Include="Mapping\BrokenLinkInExternalReferenceMap.cs" />
     <Compile Include="Mapping\BrokenLinkInInterfaceMap.cs" />
     <Compile Include="Mapping\DataResponsibleMap.cs" />

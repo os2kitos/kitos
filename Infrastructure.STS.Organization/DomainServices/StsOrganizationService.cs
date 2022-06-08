@@ -6,6 +6,7 @@ using Core.Abstractions.Types;
 using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Core.DomainServices.Repositories.Organization;
 using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
@@ -18,7 +19,7 @@ namespace Infrastructure.STS.Organization.DomainServices
     public class StsOrganizationService : IStsOrganizationService
     {
         private readonly IStsOrganizationCompanyLookupService _companyLookupService;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
@@ -26,11 +27,11 @@ namespace Infrastructure.STS.Organization.DomainServices
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
             IStsOrganizationCompanyLookupService companyLookupService,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
+            IStsOrganizationIdentityRepository stsOrganizationIdentityRepository,
             ILogger logger)
         {
             _companyLookupService = companyLookupService;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
+            _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
             _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/Organisation/5";
@@ -87,7 +88,7 @@ namespace Infrastructure.STS.Organization.DomainServices
 
             var uuid = new Guid(ids.Single());
 
-            var result = _ssoOrganizationIdentityRepository.AddNew(organization, uuid);
+            var result = _stsOrganizationIdentityRepository.AddNew(organization, uuid);
             if (result.Failed)
             {
                 _logger.Error("Failed save uuid for organization ({id}) with uuid {uuid}. Repository responded with {error}", organization.Id, companyUuid.Value, result.Error.ToString());

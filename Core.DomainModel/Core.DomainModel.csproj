@@ -267,7 +267,7 @@
     <Compile Include="GDPR\YearMonthIntervalOption.cs" />
     <Compile Include="Shared\YesNoUndecidedOption.cs" />
     <Compile Include="Shared\YesNoIrrelevantOption.cs" />
-    <Compile Include="SSO\SsoOrganizationIdentity.cs" />
+    <Compile Include="Organization\StsOrganizationIdentity.cs" />
     <Compile Include="SSO\SsoUserIdentity.cs" />
     <Compile Include="Text.cs" />
     <Compile Include="Tracking\LifeCycleTrackingEvent.cs" />

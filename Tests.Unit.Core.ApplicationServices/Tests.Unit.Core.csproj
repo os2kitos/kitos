@@ -220,7 +220,7 @@
     <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
-    <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
+    <Compile Include="DomainServices\Organizations\StsOrganizationIdentityRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />

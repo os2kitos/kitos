@@ -3,12 +3,12 @@ using Core.DomainModel.SSO;
 
 namespace Infrastructure.DataAccess.Mapping
 {
-    public class SsoOrganizationIdentityMap : EntityTypeConfiguration<SsoOrganizationIdentity>
+    public class SsoUserIdentityMap : EntityTypeConfiguration<SsoUserIdentity>
     {
-        public SsoOrganizationIdentityMap()
+        public SsoUserIdentityMap()
         {
-            Property(x => x.ExternalUuid).HasUniqueIndexAnnotation("UX_" + nameof(SsoOrganizationIdentity.ExternalUuid), 0);
-            HasRequired(x => x.Organization)
+            Property(x => x.ExternalUuid).HasUniqueIndexAnnotation("UX_" + nameof(SsoUserIdentity.ExternalUuid), 0);
+            HasRequired(x => x.User)
                 .WithMany(x => x.SsoIdentities)
                 .WillCascadeOnDelete(true);
         }
