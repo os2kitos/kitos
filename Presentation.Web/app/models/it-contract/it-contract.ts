@@ -35,9 +35,9 @@
         ProcurementStrategyId: number;
         /** Gets or sets the chosen procurement strategy option. (udbudsstrategi) */
         ProcurementStrategy: IProcurementStrategy;
-        /** Gets or sets the procurement plan half. (udbudsplan) */
-        ProcurementPlanHalf: number;
-        /** Gets or sets the procurement plan year. (udbudsplan) */
+        /** Gets or sets the procurement plan quarter. (genanskaffelsesplan) */
+        ProcurementPlanQuarter: number;
+        /** Gets or sets the procurement plan year. (genanskaffelsesplan) */
         ProcurementPlanYear: number;
         /** Gets or sets the chosen contract template identifier. */
         ContractTemplateId: number;

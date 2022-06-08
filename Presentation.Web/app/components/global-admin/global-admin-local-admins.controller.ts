@@ -99,15 +99,7 @@
                 });
             };
 
-            $scope.organizationSelectOptions = selectLazyLoading('api/organization', formatOrganization, null);
-
-            function formatOrganization(org) {
-                var result = '<div>' + org.text + '</div>';
-                if (org.cvr) {
-                    result += '<div class="small">' + org.cvr + '</div>';
-                }
-                return result;
-            }
+            $scope.organizationSelectOptions = selectLazyLoading('api/organization', Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, null);
 
             function selectLazyLoading(url, format, paramAry) {
                 return {
