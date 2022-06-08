@@ -553,7 +553,8 @@
                         },
                     },
                     {
-                        field: "Usages.length",
+                        field: "Usages",
+                        parentId: "usages", // depends on presence of parent when rendered in excel
                         persistId: `numberOfUsages_ExcelOnly${new Date().getTime()}`,
                         title: "Antal anvendere",
                         width: 95,
