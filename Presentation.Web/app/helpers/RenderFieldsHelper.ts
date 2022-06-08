@@ -65,7 +65,8 @@
         }
 
         static renderDate(date: Date | undefined | null) {
-            if (!!date) {
+            if (!!date ||
+                moment(date).format(Constants.DateFormat.DanishDateFormat) !== "01-01-0001") {
                 return moment(date).format(Constants.DateFormat.DanishDateFormat);
             }
             return RenderFieldsHelper.noValueFallback;

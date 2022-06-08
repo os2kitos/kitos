@@ -855,24 +855,8 @@
                         format: "{0:dd-MM-yyyy}",
                         width: 130,
                         persistId: "lastchangeddate",
-                        template: dataItem => {
-                            // handles null cases
-                            if (!dataItem ||
-                                !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
-                                return "";
-                            }
-                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
-                        },
-                        excelTemplate: dataItem => {
-                            // handles null cases
-                            if (!dataItem ||
-                                !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
-                                return "";
-                            }
-                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
-                        },
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         attributes: { "class": "text-center" },
                         sortable: true,
                         filterable: {

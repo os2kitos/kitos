@@ -651,24 +651,8 @@
                         format: "{0:dd-MM-yyyy}",
                         width: 130,
                         persistId: "lastchangeddate",
-                        template: dataItem => {
-                            // handles null cases
-                            if (!dataItem ||
-                                !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
-                                return "";
-                            }
-                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
-                        },
-                        excelTemplate: dataItem => {
-                            // handles null cases
-                            if (!dataItem ||
-                                !dataItem.LastChanged ||
-                                this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat) === "01-01-0001") {
-                                return "";
-                            }
-                            return this.moment(dataItem.LastChanged).format(Constants.DateFormat.DanishDateFormat);
-                        },
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
                         attributes: { "class": "text-center" },
                         sortable: true,
                         filterable: {
@@ -709,7 +693,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.OperationRemunerationBegun).format(Constants.DateFormat.DanishDateFormat);
+                            return self.moment(dataItem.OperationRemunerationBegun).format(Kitos.Constants.DateFormat.DanishDateFormat);
                         },
                         hidden: true,
                         filterable: {
@@ -755,7 +739,7 @@
                                 return "";
                             }
 
-                            return self.moment(dataItem.AuditDate).format(Constants.DateFormat.DanishDateFormat);
+                            return self.moment(dataItem.AuditDate).format(Kitos.Constants.DateFormat.DanishDateFormat);
                         },
                         sortable: false,
                         filterable: false
@@ -808,7 +792,7 @@
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
-                var roleColumn: IKendoGridColumn<IItContractOverview> = {
+                var roleColumn: Kitos.IKendoGridColumn<Kitos.ItContract.Overview.IItContractOverview> = {
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
@@ -851,16 +835,16 @@
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
 
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+            Kitos.Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
                 () => this.mainGrid,
                 this.$scope,
                 this.mainGridOptions.toolbar);
         }
         
-        private readonly excelConfig: Models.IExcelConfig = {
+        private readonly excelConfig: Kitos.Models.IExcelConfig = {
         };
 
-        private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractOverview>) => {
+        private exportToExcel = (e: Kitos.IKendoGridExcelExportEvent<Kitos.ItContract.Overview.IItContractOverview>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
@@ -980,7 +964,7 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
                                 .createContractAuthorization()
                                 .getOverviewAuthorization()
