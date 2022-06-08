@@ -93,7 +93,7 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 $scope.allowClear = true;
-                $scope.isReplacementPlanEnabled =
+                $scope.showReplacementPlanSelection =
                     uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.replacementPlan);
                 var today = new Date();
 

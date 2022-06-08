@@ -213,7 +213,6 @@
         }
 
         private activate() {
-            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
             const selectRoleFilterName = "selectRoleFilter";
             var clonedItContractRoles = this._.cloneDeep(this.itContractRoles);
@@ -826,7 +825,7 @@
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        isAvailable: this.uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.replacementPlan),
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.replacementPlan),
                         template: dataItem =>
                             dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                                 ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
@@ -876,8 +875,6 @@
                     },
                 ]
             };
-
-            Helpers.UiCustomizationHelper.removeUnavailableColumns(mainGridOptions.columns);
 
             function customFilter(args) {
                 args.element.kendoAutoComplete({
