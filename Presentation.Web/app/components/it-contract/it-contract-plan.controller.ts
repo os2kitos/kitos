@@ -71,6 +71,7 @@
             private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
+
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
                     // the event is emitted for every widget; if we have multiple
