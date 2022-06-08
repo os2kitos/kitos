@@ -17,14 +17,17 @@
                                 .createContractAuthorization()
                                 .getAuthorizationForItem($stateParams.id)
                     ],
-                    hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit]
+                    hasWriteAccess: ["userAccessRights", (userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => userAccessRights.canEdit],
+                    uiState: [
+                        "uiCustomizationStateService", (uiCustomizationStateService: Kitos.Services.UICustomization.IUICustomizationStateService) => uiCustomizationStateService.getCurrentState(Kitos.Models.UICustomization.CustomizableKitosModule.ItContract)
+                    ]
                 }
             });
         }
     ]);
 
-    app.controller("contract.EditCtrl", ["$scope", "$rootScope", "contract", "hasWriteAccess","userAccessRights",
-        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO) => {
+    app.controller("contract.EditCtrl", ["$scope", "$rootScope", "contract", "hasWriteAccess", "userAccessRights", "user", "uiState",
+        ($scope, $rootScope, contract, hasWriteAccess, userAccessRights: Kitos.Models.Api.Authorization.EntityAccessRightsDTO, user, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) => {
             $scope.hasWriteAccess = hasWriteAccess;
             $scope.allowClearOption = {
                 allowClear: true
@@ -34,5 +37,18 @@
             if (!userAccessRights.canDelete) {
                 _.remove($rootScope.page.subnav.buttons, (o: any) => o.text === "Slet IT Kontrakt");
             }
+
+            const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+
+            $scope.isFrontPageEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage);
+            $scope.isItSystemsEnabled = user.currentConfig.showItSystemModule && uiState.isBluePrintNodeAvailable(blueprint.children.itSystems);
+            $scope.isDataProcessingEnabled = user.currentConfig.showDataProcessing && uiState.isBluePrintNodeAvailable(blueprint.children.dataProcessing);
+            $scope.isDeadlinesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.deadlines);
+            $scope.isPaymentModelEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.paymentModel);
+            $scope.isEconomyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.economy);
+            $scope.isContractRolesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.contractRoles);
+            $scope.isHierarchyEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.hierarchy);
+            $scope.isAdviceEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.advice);
+            $scope.isReferencesEnabled = uiState.isBluePrintNodeAvailable(blueprint.children.references);
         }]);
 })(angular, app);

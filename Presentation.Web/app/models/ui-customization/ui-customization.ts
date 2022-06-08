@@ -4,7 +4,8 @@
      * Defines the valid customization modules for kitos
      */
     export enum CustomizableKitosModule {
-        ItSystemUsage = "ItSystemUsages"
+        ItSystemUsage = "ItSystemUsages",
+        ItContract = "ItContracts"
     }
 
     export interface IUICustomizationTreeVisitor {

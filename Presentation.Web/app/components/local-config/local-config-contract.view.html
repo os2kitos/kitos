@@ -2,6 +2,9 @@
 
     <!-- show/hide-module -->
     <div class="form-group">
+        <div class="col-xs-12">
+            <inline-help-text data-key="local_config_it-contract_ui_customization" data-default-title="Tilpasning af UI" />
+        </div>
         <label class="col-xs-2 control-label">
             Generelt
         </label>
@@ -18,6 +21,15 @@
                     Brug 'IT' prefix
                 </label>
             </div>
+        </div>
+        <div class="margin-top col-xs-12">&nbsp;</div>
+        <label class="col-xs-2 control-label noMargin" ng-if="config.showItContractModule">
+            Faneblade og felter:
+        </label>
+
+        <!-- Local UI config for IT-contract usages module -->
+        <div class="col-xs-10" ng-if="config.showItContractModule">
+            <data-local-ui-customization data-customized-module-id="ItContracts" />
         </div>
     </div>
 
