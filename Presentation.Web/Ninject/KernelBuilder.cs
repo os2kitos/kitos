@@ -111,6 +111,7 @@ using Core.ApplicationServices.Generic.Write;
 using Core.ApplicationServices.Organizations.Handlers;
 using Core.ApplicationServices.Tracking;
 using Core.ApplicationServices.UIConfiguration;
+using Core.ApplicationServices.UIConfiguration.Handlers;
 using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
@@ -250,6 +251,8 @@ namespace Presentation.Web.Ninject
             RegisterRoleAssignmentService<ItSystemRight, ItSystemRole, ItSystemUsage>(kernel);
             RegisterRoleAssignmentService<DataProcessingRegistrationRight, DataProcessingRegistrationRole, DataProcessingRegistration>(kernel);
             RegisterRoleAssignmentService<ItContractRight, ItContractRole, ItContract>(kernel);
+            RegisterRoleAssignmentService<ItProjectRight, ItProjectRole, ItProject>(kernel);
+            RegisterRoleAssignmentService<OrganizationUnitRight, OrganizationUnitRole, OrganizationUnit>(kernel);
 
             //MembershipProvider & Roleprovider injection - see ProviderInitializationHttpModule.cs
             kernel.Bind<MembershipProvider>().ToMethod(ctx => Membership.Provider);
@@ -326,6 +329,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityCreatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<ExternalReference>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EnabledStatusChanged<ItSystem>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<DataProcessingBasisForTransferOption>, BuildDataProcessingRegistrationReadModelOnChangesHandler>(kernel);
@@ -353,6 +357,7 @@ namespace Presentation.Web.Ninject
             RegisterDomainEvent<EntityUpdatedEvent<ItSystem>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<ItSystemUsage>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
+            RegisterDomainEvent<EntityBeingDeletedEvent<User>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityBeingDeletedEvent<OrganizationUnit>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
             RegisterDomainEvent<EntityUpdatedEvent<Organization>, BuildItSystemUsageOverviewReadModelOnChangesHandler>(kernel);
@@ -391,6 +396,8 @@ namespace Presentation.Web.Ninject
             //Organization
             RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationBeingDeleted>(kernel);
             //TODO: Read models where it is involved must be scheduled for rebuild.. do it in a different handler (one of the read model handlers)
+
+            RegisterDomainEvent<EntityBeingDeletedEvent<User>, HandleUserBeingDeleted>(kernel);
         }
 
         private void RegisterDomainEvent<TDomainEvent, THandler>(IKernel kernel)
@@ -457,6 +464,12 @@ namespace Presentation.Web.Ninject
             RegisterOptionsService<ItContract, TerminationDeadlineType, LocalTerminationDeadlineType>(kernel);
 
             RegisterOptionsService<HandoverTrial, HandoverTrialType, LocalHandoverTrialType>(kernel);
+
+            //IT-Project
+            RegisterOptionsService<ItProjectRight, ItProjectRole, LocalItProjectRole>(kernel);
+
+            //OrganizationUnit
+            RegisterOptionsService<OrganizationUnitRight, OrganizationUnitRole, LocalOrganizationUnitRole>(kernel);
 
             //Attached options services
             kernel.Bind<IAttachedOptionsAssignmentService<RegisterType, ItSystemUsage>>().ToMethod(ctx =>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Types;
 using Core.DomainModel;
@@ -39,6 +40,17 @@ namespace Core.DomainServices.Repositories.SSO
             identity = _repository.Insert(identity);
             _repository.Save();
             return identity;
+        }
+
+        public void DeleteIdentitiesForUser(User user)
+        {
+            var identities = user.SsoIdentities;
+            if (identities == null)
+                throw new ArgumentNullException($"User with id: {user.Id} has no Sso Identities");
+
+            _repository.RemoveRange(identities);
+            _repository.Save();
+            identities.Clear();
         }
     }
 }

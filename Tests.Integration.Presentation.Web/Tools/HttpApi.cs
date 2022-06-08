@@ -432,6 +432,24 @@ namespace Tests.Integration.Presentation.Web.Tools
             return (userId, new KitosCredentials(email, password), cookie);
         }
 
+        public static async Task<(int userId, KitosCredentials credentials, Cookie loginCookie)> CreateUserAndLogin(string email, OrganizationRole role, string name, string lastName, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false)
+        {
+            var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess), role, organizationId);
+            var password = Guid.NewGuid().ToString("N");
+            DatabaseAccess.MutateEntitySet<User>(x =>
+            {
+                using var crypto = new CryptoService();
+                var user = x.AsQueryable().ById(userId);
+                user.Password = crypto.Encrypt(password + user.Salt);
+                user.Name = name;
+                user.LastName = lastName;
+            });
+
+            var cookie = await GetCookieAsync(new KitosCredentials(email, password));
+
+            return (userId, new KitosCredentials(email, password), cookie);
+        }
+
         public static async Task<(int userId, KitosCredentials credentials, string token)> CreateUserAndGetToken(string email, OrganizationRole role, int organizationId = TestEnvironment.DefaultOrganizationId, bool apiAccess = false, bool stakeHolderAccess = false)
         {
             var userId = await CreateOdataUserAsync(ObjectCreateHelper.MakeSimpleApiUserDto(email, apiAccess, stakeHolderAccess), role, organizationId);

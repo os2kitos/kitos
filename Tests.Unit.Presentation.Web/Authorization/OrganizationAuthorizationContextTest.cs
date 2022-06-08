@@ -544,7 +544,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
         [Theory]
         //Checks not bound to context condition
         [InlineData(true, false, false, false, false, false, true)]
-        [InlineData(false, true, false, false, false, false, true)]
+        [InlineData(false, true, false, false, false, false, false)]
         [InlineData(false, false, true, true, false, false, true)]
 
         //Same organization - positive matches
@@ -581,7 +581,7 @@ namespace Tests.Unit.Presentation.Web.Authorization
 
         [Theory]
         [InlineData(true, false, false, true)]
-        [InlineData(false, true, false, true)]
+        [InlineData(false, true, false, false)]
         [InlineData(false, false, true, true)]
         [InlineData(false, false, false, false)]
         public void AllowDelete_For_Context_Independent_Object_Returns(

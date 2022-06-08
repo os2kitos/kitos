@@ -41,6 +41,7 @@ namespace Tests.Unit.Presentation.Web.Services
         private readonly Mock<IOrganizationalUserContext> _userContext;
         private readonly Mock<IOrgUnitService> _orgUnitServiceMock;
         private readonly Mock<IDomainEvents> _domainEventsMock;
+        private readonly Mock<IOrganizationRightsService> _organizationRightsServiceMock;
 
         public OrganizationServiceTest()
         {
@@ -56,6 +57,8 @@ namespace Tests.Unit.Presentation.Web.Services
             _repositoryMock = new Mock<IOrganizationRepository>();
             _orgUnitServiceMock = new Mock<IOrgUnitService>();
             _domainEventsMock = new Mock<IDomainEvents>();
+            _organizationRightsServiceMock = new Mock<IOrganizationRightsService>();
+
             _sut = new OrganizationService(
                 _organizationRepository.Object,
                 _orgRightRepository.Object,
@@ -65,6 +68,7 @@ namespace Tests.Unit.Presentation.Web.Services
                 Mock.Of<ILogger>(),
                 _transactionManager.Object,
                 _repositoryMock.Object,
+                _organizationRightsServiceMock.Object,
                 _orgUnitServiceMock.Object,
                 _domainEventsMock.Object);
         }
@@ -260,21 +264,24 @@ namespace Tests.Unit.Presentation.Web.Services
             var organization = new Organization();
             ExpectGetOrganizationByKeyReturns(organizationId, organization);
             ExpectAllowModifyReturns(organization, true);
+            ExpectTransactionBeginReturns();
             var matchedRight1 = CreateRight(organizationId, userId);
             var matchedRight2 = CreateRight(organizationId, userId);
             var unmatchedRight1 = CreateRight(A<int>(), userId);
             var unmatchedRight2 = CreateRight(organizationId, A<int>());
-            _orgRightRepository.Setup(x => x.AsQueryable()).Returns(new[] { matchedRight1, unmatchedRight1, matchedRight2, unmatchedRight2 }.AsQueryable());
+            var rightsArray = new[] {matchedRight1, unmatchedRight1, matchedRight2, unmatchedRight2};
+            _orgRightRepository.Setup(x => x.AsQueryable()).Returns(rightsArray.AsQueryable());
+            ExpectOrganizationRightsRemoveRoleReturnsSuccess(rightsArray);
 
             //Act
             var result = _sut.RemoveUser(organizationId, userId);
 
             //Assert that only the right entities were removed
             Assert.True(result.Ok);
-            _orgRightRepository.Verify(x => x.DeleteByKey(matchedRight1.Id), Times.Once);
-            _orgRightRepository.Verify(x => x.DeleteByKey(matchedRight2.Id), Times.Once);
-            _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight1.Id), Times.Never);
-            _orgRightRepository.Verify(x => x.DeleteByKey(unmatchedRight2.Id), Times.Never);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(matchedRight1.Id), Times.Once);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(matchedRight2.Id), Times.Once);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight1.Id), Times.Never);
+            _organizationRightsServiceMock.Verify(x => x.RemoveRole(unmatchedRight2.Id), Times.Never);
         }
 
         [Fact]
@@ -284,7 +291,7 @@ namespace Tests.Unit.Presentation.Web.Services
             var expectedOrg1 = new Organization() { Id = A<int>() };
             var expectedOrg2 = new Organization() { Id = A<int>() };
             var expectedOrg3 = new Organization() { Id = A<int>() };
-            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization>() { expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
+            _repositoryMock.Setup(x => x.GetAll()).Returns(new List<Organization> { expectedOrg1, expectedOrg2, expectedOrg3 }.AsQueryable());
             _authorizationContext.Setup(x => x.GetCrossOrganizationReadAccess()).Returns(CrossOrganizationDataReadAccessLevel.All);
 
             //Act
@@ -792,6 +799,21 @@ namespace Tests.Unit.Presentation.Web.Services
             var organizationId = A<Guid>();
             var organization = new Organization() { Uuid = organizationId, Id = A<int>() };
             return organization;
+        }
+
+        private void ExpectTransactionBeginReturns()
+        {
+            var transaction = new Mock<IDatabaseTransaction>();
+            _transactionManager.Setup(x => x.Begin()).Returns(transaction.Object);
+        }
+        
+
+        private void ExpectOrganizationRightsRemoveRoleReturnsSuccess(OrganizationRight[] rights)
+        {
+            foreach (var right in rights)
+            {
+                _organizationRightsServiceMock.Setup(x => x.RemoveRole(right.Id)).Returns(right);
+            }
         }
 
         private void ExpectAllowDeleteReturns(Organization organization, bool value)

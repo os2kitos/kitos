@@ -329,9 +329,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
             return BaseMapReferences(dtos);
         }
 
-        private static Maybe<(byte half, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
+        private static Maybe<(byte quarter, int year)> MapProcurementPlan(ProcurementPlanDTO plan)
         {
-            return plan == null ? Maybe<(byte half, int year)>.None : (plan.HalfOfYear, plan.Year);
+            return plan == null ? Maybe<(byte quarter, int year)>.None : (plan.QuarterOfYear, plan.Year);
         }
     }
 }

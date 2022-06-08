@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Core.Abstractions.Extensions;
 using Core.Abstractions.Types;
@@ -25,6 +26,7 @@ namespace Core.ApplicationServices.Organizations
         private readonly IGenericRepository<Organization> _orgRepository;
         private readonly IOrganizationRepository _repository;
         private readonly IOrgUnitService _orgUnitService;
+        private readonly IOrganizationRightsService _organizationRightsService;
         private readonly IDomainEvents _domainEvents;
         private readonly IGenericRepository<OrganizationRight> _orgRightRepository;
         private readonly IGenericRepository<User> _userRepository;
@@ -42,6 +44,7 @@ namespace Core.ApplicationServices.Organizations
             ILogger logger,
             ITransactionManager transactionManager,
             IOrganizationRepository repository,
+            IOrganizationRightsService organizationRightsService,
             IOrgUnitService orgUnitService,
             IDomainEvents domainEvents)
         {
@@ -55,6 +58,7 @@ namespace Core.ApplicationServices.Organizations
             _repository = repository;
             _orgUnitService = orgUnitService;
             _domainEvents = domainEvents;
+            _organizationRightsService = organizationRightsService;
         }
 
         //returns the default org unit for that user inside that organization
@@ -83,6 +87,7 @@ namespace Core.ApplicationServices.Organizations
         /// <param name="userId">The user to be removed.</param>
         public Result<Organization, OperationFailure> RemoveUser(int organizationId, int userId)
         {
+            using var transaction = _transactionManager.Begin();
             var organization = _orgRepository.GetByKey(organizationId);
             if (organization == null)
             {
@@ -101,9 +106,15 @@ namespace Core.ApplicationServices.Organizations
 
             foreach (var right in rights)
             {
-                _orgRightRepository.DeleteByKey(right.Id);
+                var result = _organizationRightsService.RemoveRole(right.Id);
+                if (result.Failed)
+                {
+                    _logger.Error("Failed to delete right with id {rightId} due to error: {errorCode}", right.Id, result.Error);
+                    transaction.Rollback();
+                    return Result<Organization, OperationFailure>.Failure(OperationFailure.UnknownError);
+                }
             }
-            _orgRightRepository.Save();
+            transaction.Commit();
 
             return organization;
         }
@@ -327,6 +338,17 @@ namespace Core.ApplicationServices.Organizations
                 return new OperationError("Exception during deletion", OperationFailure.UnknownError);
             }
             return Maybe<OperationError>.None;
+        }
+
+        public Result<IEnumerable<Organization>, OperationError> GetUserOrganizations(int userId)
+        {
+            var user = _userRepository.GetByKey(userId);
+            if(user == null)
+                return Result<IEnumerable<Organization>, OperationError>.Failure(new OperationError($"User with id: {userId} was not found", OperationFailure.NotFound));
+
+            var userOrganizationsIds = user.GetOrganizationIds();
+
+            return Result<IEnumerable<Organization>, OperationError>.Success(_orgRepository.AsQueryable().ByIds(userOrganizationsIds.ToList()));
         }
 
         private Result<Organization, OperationError> WithDeletionAccess(Organization organization)

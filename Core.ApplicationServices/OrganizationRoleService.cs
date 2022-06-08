@@ -29,8 +29,9 @@ namespace Core.ApplicationServices
                 User = user,
                 Role = organizationRole,
             });
-            _domainEvents.Raise(new AccessRightsChanged(user.Id));
+            
             _organizationRights.Save();
+            _domainEvents.Raise(new AccessRightsChanged(user.Id));
 
             return result;
         }
@@ -38,11 +39,6 @@ namespace Core.ApplicationServices
         public OrganizationRight MakeUser(User user, Organization organization)
         {
             return AddOrganizationRoleToUser(user, organization, OrganizationRole.User);
-        }
-
-        public OrganizationRight MakeLocalAdmin(User user, Organization organization)
-        {
-            return AddOrganizationRoleToUser(user, organization, OrganizationRole.LocalAdmin);
         }
 
         public IReadOnlyDictionary<int, IEnumerable<OrganizationRole>> GetOrganizationRoles(User user)

@@ -179,15 +179,15 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
         private static ProcurementPlanDTO MapProcurementPlan(ItContract contract)
         {
-            if (!contract.ProcurementPlanHalf.HasValue)
+            if (!contract.ProcurementPlanQuarter.HasValue)
                 return null;
 
             if (!contract.ProcurementPlanYear.HasValue)
                 return null;
 
-            return new ProcurementPlanDTO()
+            return new ProcurementPlanDTO
             {
-                HalfOfYear = Convert.ToByte(contract.ProcurementPlanHalf.Value),
+                QuarterOfYear = Convert.ToByte(contract.ProcurementPlanQuarter.Value),
                 Year = contract.ProcurementPlanYear.Value
             };
         }

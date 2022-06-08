@@ -1525,7 +1525,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
             if (hasValues)
             {
                 var (half, year) = AssertPropertyContainsDataChange(actual.ProcurementPlan);
-                Assert.Equal(expected.ProcurementPlan.HalfOfYear, half);
+                Assert.Equal(expected.ProcurementPlan.QuarterOfYear, half);
                 Assert.Equal(expected.ProcurementPlan.Year, year);
             }
             else
@@ -1543,7 +1543,7 @@ namespace Tests.Unit.Presentation.Web.Models.V2
                 ProcurementPlan = hasValues
                     ? new ProcurementPlanDTO()
                     {
-                        HalfOfYear = Convert.ToByte(A<int>() % 1 + 1),
+                        QuarterOfYear = Convert.ToByte(A<int>() % 1 + 1),
                         Year = A<int>()
                     }
                     : null
