@@ -155,7 +155,6 @@
                 $scope.userOrganizations = [];
                 userService.getUserOrganizations(newVal).then(res => {
                     $scope.userOrganizations.pushArray(res);
-                    $scope.userSelected = true;
                 });
             });
 
@@ -167,7 +166,6 @@
                     userService.deleteUser(id)
                         .then(() => {
                                 notify.addSuccessMessage(`Sletter ${nameAndEmail}`);
-                                $scope.userSelected = false;
                                 $scope.selectedUser = null;
                             }
                         ).catch(ex => {
