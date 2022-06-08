@@ -41,6 +41,9 @@
         updateDefaultOrgUnit(newDefaultOrgUnitId: number): ng.IPromise<any>;
         getUsersWithRightsholderAccess(): ng.IPromise<Kitos.Models.Api.IUserWithOrganizationName[]>;
         getUsersWithCrossAccess(): ng.IPromise<Kitos.Models.Api.IUserWithCrossAccess[]>;
+        deleteUser(id: number): ng.IPromise<any>;
+        searchUsers(query: string): ng.IPromise<Kitos.Models.Api.IUserWithEmail[]>;
+        getUserOrganizations(userId: number): ng.IPromise<Kitos.Models.IOrganization[]>;
     }
 
     export class UserService implements IUserService {
@@ -506,6 +509,23 @@
         getUsersWithCrossAccess() {
             return this.$http
                 .get<API.Models.IApiWrapper<Kitos.Models.Api.IUserWithCrossAccess[]>>("api/user/with-cross-organization-permissions")
+                .then(result => result.data.response);
+        }
+
+        deleteUser(id: number) {
+            return this.$http
+                .delete(`api/user/${id}`);
+        }
+
+        searchUsers(query: string) {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.Api.IUserWithEmail[]>>(`api/users/search?query=${query}`)
+                .then(result => result.data.response);
+        }
+
+        getUserOrganizations(userId: number) {
+            return this.$http
+                .get<API.Models.IApiWrapper<Models.IOrganization[]>>(`api/authorize/GetOrganizations/${userId}`)
                 .then(result => result.data.response);
         }
     }

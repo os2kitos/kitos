@@ -107,18 +107,18 @@
 
                 $scope.procurementPlans = [];
                 var currentDate = moment();
-                for (var i = 0; i < 20; i++) {
-                    var half = currentDate.quarter() <= 2 ? 1 : 2; // 1 for the first 6 months, 2 for the rest
+                for (var i = 0; i < 40; i++) {
+                    var quarter = currentDate.quarter();
                     var year = currentDate.year();
-                    var obj = { id: String(i), text: half + " | " + year, half: half, year: year };
+                    var obj = { id: String(i), text: `Q${quarter} | ${year}`, quarter: quarter, year: year };
                     $scope.procurementPlans.push(obj);
 
-                    // add 6 months for next iter
-                    currentDate.add(6, 'months');
+                    // add 3 months for next iter
+                    currentDate.add(3, 'months');
                 }
 
-                var foundPlan: { id } = _.find($scope.procurementPlans, function (plan: { half; year; id; }) {
-                    return plan.half == contract.procurementPlanHalf && plan.year == contract.procurementPlanYear;
+                var foundPlan: { id } = _.find($scope.procurementPlans, function (plan: { quarter; year; id; }) {
+                    return plan.quarter == contract.procurementPlanQuarter && plan.year == contract.procurementPlanYear;
                 });
                 if (foundPlan) {
                     // plan is found in the list, replace it to get object equality
@@ -126,8 +126,8 @@
                 } else {
                     // plan is not found, add missing plan to begining of list
                     // if not null
-                    if (contract.procurementPlanHalf != null) {
-                        var plan = { id: String($scope.procurementPlans.length), text: contract.procurementPlanHalf + " | " + contract.procurementPlanYear, half: contract.procurementPlanHalf, year: contract.procurementPlanYear };
+                    if (contract.procurementPlanQuarter != null) {
+                        var plan = { id: String($scope.procurementPlans.length), text: contract.procurementPlanQuarter + " | " + contract.procurementPlanYear, quarter: contract.procurementPlanQuarter, year: contract.procurementPlanYear };
                         $scope.procurementPlans.unshift(plan); // add to list
                         $scope.procurementPlanId = plan; // select it
                     }
@@ -152,7 +152,7 @@
                 }
 
                 $scope.saveProcurement = function (id) {
-                    if (id === null && contract.procurementPlanHalf !== null && contract.procurementPlanYear !== null) {
+                    if (id === null && contract.procurementPlanQuarter !== null && contract.procurementPlanYear !== null) {
                         updateProcurement(null, null);
                     }
                     else {
@@ -161,18 +161,18 @@
                         }
 
                         var result = _.find($scope.procurementPlans, (plan) => plan.id === id);
-                        if (result.half === contract.procurementPlanHalf && result.year === contract.procurementPlanYear) {
+                        if (result.quarter === contract.procurementPlanQuarter && result.year === contract.procurementPlanYear) {
                             return;
                         }
-                        updateProcurement(result.half, result.year);
+                        updateProcurement(result.quarter, result.year);
                     }
                 };
 
-                function updateProcurement(procurementPlanHalf, procurementPlanYear) {
+                function updateProcurement(procurementPlanQuarter, procurementPlanYear) {
                     contract = $scope.contract;
 
-                    var payload = { procurementPlanHalf: procurementPlanHalf, procurementPlanYear: procurementPlanYear };
-                    $scope.contract.procurementPlanHalf = payload.procurementPlanHalf;
+                    var payload = { procurementPlanQuarter: procurementPlanQuarter, procurementPlanYear: procurementPlanYear };
+                    $scope.contract.procurementPlanQuarter = payload.procurementPlanQuarter;
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 }
@@ -207,15 +207,7 @@
                     };
                 }
 
-                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, formatSupplier, ['take=100','orgId=' + user.currentOrganizationId]);
-
-                function formatSupplier(supplier) {
-                    var result = '<div>' + supplier.text + '</div>';
-                    if (supplier.cvr) {
-                        result += '<div class="small">' + supplier.cvr + '</div>';
-                    }
-                    return result;
-                }
+                $scope.suppliersSelectOptions = selectLazyLoading('api/organization', false, Kitos.Helpers.Select2OptionsFormatHelper.formatOrganizationWithCvr, ['take=100','orgId=' + user.currentOrganizationId]);
 
                 function selectLazyLoading(url, excludeSelf, format, paramAry) {
                     return {
