@@ -71,6 +71,7 @@
             private uiState: Models.UICustomization.ICustomizedModuleUI) {
             this.$rootScope.page.title = "IT Kontrakt - Tid";
 
+
             $scope.$on("kendoWidgetCreated",
                 (event, widget) => {
                     // the event is emitted for every widget; if we have multiple
@@ -824,6 +825,7 @@
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.replacementPlan),
                         template: dataItem =>
                             dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                                 ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`

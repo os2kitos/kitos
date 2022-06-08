@@ -8,7 +8,12 @@
             frontPage: {
                 text: "Kontraktforside",
                 readOnly: true,
-                helpText: Configs.helpTexts.cannotChangeTab
+                helpText: Configs.helpTexts.cannotChangeTab,
+                children: {
+                    replacementPlan: {
+                        text: "Genanskaffelsesplan"
+                    }
+                }
             },
             itSystems: {
                 text: "IT Systemer",
