@@ -13,10 +13,12 @@
         }
 
         public static removeItemFromToolbarByName(name: string, items: IKendoGridToolbarItem[]) {
-            const item = items.filter(x => x.name === name)[0];
-            if (item === undefined)
+
+            const itemsWithMatchingName = items.filter(x => x.name === name);
+            if (itemsWithMatchingName.length < 1)
                 return;
 
+            const item = itemsWithMatchingName[0];
             const index = items.indexOf(item);
             items.splice(index);
         }
