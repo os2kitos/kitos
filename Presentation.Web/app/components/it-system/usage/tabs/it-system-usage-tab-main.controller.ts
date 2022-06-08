@@ -22,6 +22,7 @@
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
+            $scope.LastChangedBy = `${itSystemUsage.lastChangedByUserName} ${itSystemUsage.lastChangedByUserLastName}`;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
