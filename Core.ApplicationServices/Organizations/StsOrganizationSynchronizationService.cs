@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
@@ -62,17 +63,17 @@ namespace Core.ApplicationServices.Organizations
 
         private StsOrganizationUnit CopyStsOrganizationUnitWithFiltering(StsOrganizationUnit unit, uint levels)
         {
-            return new StsOrganizationUnit(unit.Uuid, unit.Name, unit.UserFacingKey, GetChildren(unit.Children, levels));
+            return new StsOrganizationUnit(unit.Uuid, unit.Name, unit.UserFacingKey, GetChildren(unit.Children, levels).ToList());
         }
 
         private IEnumerable<StsOrganizationUnit> GetChildren(IEnumerable<StsOrganizationUnit> currentChildren, uint levelsLeft)
         {
-            if (levelsLeft <= 0) yield break;
+            if (levelsLeft < 1) yield break;
 
             levelsLeft--;
             foreach (var currentChild in currentChildren)
             {
-                CopyStsOrganizationUnitWithFiltering(currentChild, levelsLeft);
+                yield return CopyStsOrganizationUnitWithFiltering(currentChild, levelsLeft);
             }
         }
     }
