@@ -96,8 +96,7 @@
                     .withStorageKey("data-processing-registration-overview-options")
                     .withFixedSourceUrl(
                         `/odata/Organizations(${user.currentOrganizationId
-                        })/DataProcessingRegistrationReadModels?$expand=RoleAssignments,
-                        LastChangedByUser($select=Name,LastName)`)
+                        })/DataProcessingRegistrationReadModels?$expand=RoleAssignments`)
                     .withParameterMapping((options, type) => {
                         // get kendo to map parameters to an odata url
                         var parameterMap = kendo.data.transports["odata-v4"].parameterMap(options, type);

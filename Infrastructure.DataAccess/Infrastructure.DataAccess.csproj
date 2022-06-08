@@ -869,9 +869,9 @@
     <Compile Include="Migrations\202206010716273_ChangedProcurementPlanHalfToQuarter.designer.cs">
       <DependentUpon>202206010716273_ChangedProcurementPlanHalfToQuarter.cs</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202206080944563_AddDprLastChangedByUser.cs" />
-    <Compile Include="Migrations\202206080944563_AddDprLastChangedByUser.designer.cs">
-      <DependentUpon>202206080944563_AddDprLastChangedByUser.cs</DependentUpon>
+    <Compile Include="Migrations\202206081236312_AddDprLastChangedByUser.cs" />
+    <Compile Include="Migrations\202206081236312_AddDprLastChangedByUser.designer.cs">
+      <DependentUpon>202206081236312_AddDprLastChangedByUser.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
@@ -1439,8 +1439,8 @@
     <EmbeddedResource Include="Migrations\202206010716273_ChangedProcurementPlanHalfToQuarter.resx">
       <DependentUpon>202206010716273_ChangedProcurementPlanHalfToQuarter.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202206080944563_AddDprLastChangedByUser.resx">
-      <DependentUpon>202206080944563_AddDprLastChangedByUser.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202206081236312_AddDprLastChangedByUser.resx">
+      <DependentUpon>202206081236312_AddDprLastChangedByUser.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

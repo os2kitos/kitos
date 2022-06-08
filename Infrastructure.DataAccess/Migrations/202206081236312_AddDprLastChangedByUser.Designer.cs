@@ -13,7 +13,7 @@ namespace Infrastructure.DataAccess.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202206080944563_AddDprLastChangedByUser"; }
+            get { return "202206081236312_AddDprLastChangedByUser"; }
         }
         
         string IMigrationMetadata.Source
