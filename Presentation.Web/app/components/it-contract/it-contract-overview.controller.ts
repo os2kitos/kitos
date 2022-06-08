@@ -162,13 +162,18 @@
 
         // replaces "anything({roleName},'foo')" with "Rights/any(c: anything(concat(concat(c/User/Name, ' '), c/User/LastName),'foo') and c/RoleId eq {roleId})"
         private fixRoleFilter(filterUrl, roleName, roleId) {
-            var pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
+            const pattern = new RegExp(`(\\w+\\()${roleName}(.*?\\))`, "i");
             return filterUrl.replace(pattern, `Rights/any(c: $1concat(concat(c/User/Name, ' '), c/User/LastName)$2 and c/RoleId eq ${roleId})`);
         }
 
         private fixSystemFilter(filterUrl, column) {
-            var pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
+        }
+
+        private fixUserFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
         }
 
         // loads kendo grid options from localstorage
@@ -255,7 +260,8 @@
                                         "Rights($select=Id,RoleId,UserId;$expand=User($select=Id,Name,LastName),Role($select=Name,Id))," +
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
-                                        "DataProcessingRegistrations($select=IsAgreementConcluded)";
+                                        "DataProcessingRegistrations($select=IsAgreementConcluded)," +
+                                        "LastChangedByUser($select=Name,LastName)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -280,6 +286,9 @@
 
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+
+                                parameterMap.$filter = self
+                                    .fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
                             }
 
                             return parameterMap;
@@ -298,6 +307,7 @@
                             fields: {
                                 OperationRemunerationBegun: { type: "date" },
                                 LastChanged: { type: "date" },
+                                LastChangedName: { type: "string" },
                                 Concluded: { type: "date" },
                                 ExpirationDate: { type: "date" },
                                 IrrevocableTo: { type: "date" },
@@ -359,8 +369,8 @@
                                     if (!contract.Supplier) { contract.Supplier = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
                                     if (!contract.PaymentModel) { contract.PaymentModel = { Name: "" }; }
-                                    if (!contract.PaymentFreqency) { contract.PaymentFreqency = { Name: "" }; }
                                     if (!contract.Reference) { contract.Reference = { Title: "", ExternalReferenceId: "" }; }
+                                    if (!contract.LastChangedByUser) { contract.LastChangedByUser = { Name: "", LastName: "" }; }
                                 });
                             return response;
                         }
@@ -619,6 +629,40 @@
                         filterable: false
                     },
                     {
+                        field: "LastChangedByUser.Name",
+                        title: "Sidst redigeret: Bruger",
+                        width: 150,
+                        persistId: "lastchangedname",
+                        template: dataItem => `${dataItem.LastChangedByUser.Name} ${dataItem.LastChangedByUser.LastName}`,
+                        hidden: true,
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
+                        field: "LastChanged",
+                        title: "Sidste redigeret: Dato",
+                        format: "{0:dd-MM-yyyy}",
+                        width: 130,
+                        persistId: "lastchangeddate",
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.LastChanged),
+                        attributes: { "class": "text-center" },
+                        sortable: true,
+                        filterable: {
+                            cell: {
+                                showOperators: false,
+                                operator: "gte"
+                            }
+                        }
+                    },
+                    {
                         field: "DataProcessingRegistrationsConcluded", title: "Databehandleraftale", width: 150,
                         persistId: "dataProcessingRegistrationsConcluded",
                         template: dataItem => {
@@ -644,13 +688,7 @@
                     {
                         field: "OperationRemunerationBegun", title: "Driftsvederlag påbegyndt", format: "{0:dd-MM-yyyy}", width: 150,
                         persistId: "opremun", // DON'T YOU DARE RENAME!
-                        excelTemplate: dataItem => {
-                            if (!dataItem || !dataItem.OperationRemunerationBegun) {
-                                return "";
-                            }
-
-                            return self.moment(dataItem.OperationRemunerationBegun).format(Constants.DateFormat.DanishDateFormat);
-                        },
+                        excelTemplate: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.OperationRemunerationBegun),
                         hidden: true,
                         filterable: {
                             cell: {
@@ -690,13 +728,7 @@
                     {
                         field: "AuditDate", title: "Audit dato", width: 90,
                         persistId: "auditdate", // DON'T YOU DARE RENAME!
-                        template: dataItem => {
-                            if (!dataItem.AuditDate) {
-                                return "";
-                            }
-
-                            return self.moment(dataItem.AuditDate).format(Constants.DateFormat.DanishDateFormat);
-                        },
+                        template: dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem?.AuditDate),
                         sortable: false,
                         filterable: false
                     },
@@ -720,7 +752,7 @@
             
             function customFilter(args) {
                 args.element.kendoAutoComplete({
-                    noDataTemplate: ''
+                    noDataTemplate: ""
                 });
             }
             // find the index of column where the role columns should be inserted
@@ -748,7 +780,7 @@
             // add a role column for each of the roles
             // note iterating in reverse so we don't have to update the insert index
             this._.forEachRight(this.itContractRoles, role => {
-                var roleColumn: IKendoGridColumn<IItContractOverview> = {
+                var roleColumn: Kitos.IKendoGridColumn<Kitos.ItContract.Overview.IItContractOverview> = {
                     field: `role${role.Id}`,
                     title: role.Name,
                     persistId: `role${role.Id}`,
@@ -791,16 +823,16 @@
             // assign the generated grid options to the scope value, kendo will do the rest
             this.mainGridOptions = mainGridOptions;
 
-            Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
+            Kitos.Helpers.ExcelExportHelper.setupExcelExportDropdown(() => this.excelConfig,
                 () => this.mainGrid,
                 this.$scope,
                 this.mainGridOptions.toolbar);
         }
         
-        private readonly excelConfig: Models.IExcelConfig = {
+        private readonly excelConfig: Kitos.Models.IExcelConfig = {
         };
 
-        private exportToExcel = (e: IKendoGridExcelExportEvent<IItContractOverview>) => {
+        private exportToExcel = (e: Kitos.IKendoGridExcelExportEvent<Kitos.ItContract.Overview.IItContractOverview>) => {
             this.exportGridToExcelService.getExcel(e, this._, this.$timeout, this.mainGrid, this.excelConfig);
         }
 
@@ -920,7 +952,7 @@
                         user: [
                             "userService", userService => userService.getUser()
                         ],
-                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Services.Authorization.IAuthorizationServiceFactory) =>
+                        userAccessRights: ["authorizationServiceFactory", (authorizationServiceFactory: Kitos.Services.Authorization.IAuthorizationServiceFactory) =>
                             authorizationServiceFactory
                                 .createContractAuthorization()
                                 .getOverviewAuthorization()
