@@ -23,6 +23,7 @@
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
             $scope.lastChangedBy = itSystemUsage.getLastChangedByUserFullName();
+            $scope.lastChanged = moment(itSystemUsage.lastChanged).format(Kitos.Constants.DateFormat.DanishDateFormat);
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
