@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="6329968d-e9b5-4e28-85da-15c385ada09a" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <GenerateTaskBasedAsynchronousMethod>true</GenerateTaskBasedAsynchronousMethod>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings />
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>true</ReferenceAllAssemblies>
+    <ReferencedAssemblies />
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="C:\work\saw\kitos\Infrastructure.STS.OrganizationUnit\ServiceContract\wsdl\context\OrganisationEnhedService.wsdl" Protocol="file" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="AuthorityContext_1.xsd" MetadataType="Schema" ID="f73c3e43-1e3a-45e6-be78-21270a7d08a6" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/sp/AuthorityContext_1.xsd" />
+    <MetadataFile FileName="CallContext_1.xsd" MetadataType="Schema" ID="3ddb3684-b1c8-4aaa-94a8-7eeb5b7b8db8" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/sp/CallContext_1.xsd" />
+    <MetadataFile FileName="OrganisationEnhedServiceMsg.xsd" MetadataType="Schema" ID="60db46e7-5c90-48d5-a1a3-89e7222807f2" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/OrganisationEnhedServiceMsg.xsd" />
+    <MetadataFile FileName="SagDokObjekt.xsd" MetadataType="Schema" ID="f9d2427c-8dc0-4c63-8a0a-dc03a9c14e74" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/common/SagDokObjekt.xsd" />
+    <MetadataFile FileName="policies.wsdl" MetadataType="Wsdl" ID="2f2cf7b0-b735-4339-8c9c-7d07ecf2739b" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/wsdl/context/policies.wsdl" />
+    <MetadataFile FileName="OrganisationEnhedService.wsdl" MetadataType="Wsdl" ID="6c3d4b95-abfb-47dd-a371-f3c09d32270a" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/wsdl/context/OrganisationEnhedService.wsdl" />
+    <MetadataFile FileName="OrganisationFaelles.xsd" MetadataType="Schema" ID="2846454f-4a27-41b6-9fad-75afe485fed7" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/1.1.STS-3/OrganisationFaelles.xsd" />
+    <MetadataFile FileName="OrganisationEnhed.xsd" MetadataType="Schema" ID="a7e053f4-6dcd-45ec-9a8b-5fa1f12bdf81" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/1.1.STS-3/OrganisationEnhed.xsd" />
+    <MetadataFile FileName="ServiceplatformFaultMessage.wsdl" MetadataType="Wsdl" ID="9ccfba1a-f8a3-4a48-bc99-d7746ce4df2f" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/sp/ServiceplatformFaultMessage_1.wsdl" />
+    <MetadataFile FileName="ServiceplatformFault_1.xsd" MetadataType="Schema" ID="44d397c7-6805-4ade-ba62-e499fa0a43ce" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/sp/ServiceplatformFault_1.xsd" />
+    <MetadataFile FileName="Part.xsd" MetadataType="Schema" ID="c041980e-9740-43f9-8fef-8201fd735b0e" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/1.1.STS-3/Part.xsd" />
+    <MetadataFile FileName="OrganisationEnhedOperationer.xsd" MetadataType="Schema" ID="58847083-c180-40f5-bd5e-0d69dfd2c4ce" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/1.1.STS-3/OrganisationEnhedOperationer.xsd" />
+    <MetadataFile FileName="RequestHeader.xsd" MetadataType="Schema" ID="f83a9570-3412-4e71-9a47-4366b0622821" SourceId="1" SourceUrl="file:///C:/work/saw/kitos/Infrastructure.STS.OrganizationUnit/ServiceContract/SF1500_EP_FS6/xsd/common/RequestHeader.xsd" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

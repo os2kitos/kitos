@@ -83,6 +83,7 @@
     <Compile Include="Authorization\IUserContextFactory.cs" />
     <Compile Include="Authorization\Permissions\AdministerGlobalPermission.cs" />
     <Compile Include="Authorization\Permissions\GlobalPermission.cs" />
+    <Compile Include="Authorization\Permissions\ImportHierarchyFromStsOrganizationPermission.cs" />
     <Compile Include="Authorization\Permissions\TriggerBrokenReferencesReportPermission.cs" />
     <Compile Include="Authorization\Permissions\ViewBrokenExternalReferencesReportPermission.cs" />
     <Compile Include="Authorization\Policies\IGlobalReadAccessPolicy.cs" />
@@ -174,6 +175,8 @@
     <Compile Include="Notification\IUserNotificationApplicationService.cs" />
     <Compile Include="Notification\UserNotificationApplicationService.cs" />
     <Compile Include="Organizations\Handlers\HandleOrganizationBeingDeleted.cs" />
+    <Compile Include="Organizations\IStsOrganizationSynchronizationService.cs" />
+    <Compile Include="Organizations\StsOrganizationSynchronizationService.cs" />
     <Compile Include="RightsHolders\BaseRightsHolderService.cs" />
     <Compile Include="RightsHolders\IItInterfaceRightsHolderService.cs" />
     <Compile Include="RightsHolders\IRightsHolderSystemService.cs" />

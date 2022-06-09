@@ -141,7 +141,7 @@ namespace Infrastructure.DataAccess
         public DbSet<BrokenExternalReferencesReport> BrokenExternalReferencesReports { get; set; }
         public DbSet<ItSystemUsageSensitiveDataLevel> ItSystemUsageSensitiveDataLevels { get; set; }
         public DbSet<SsoUserIdentity> SsoUserIdentities { get; set; }
-        public DbSet<SsoOrganizationIdentity> SsoOrganizationIdentities { get; set; }
+        public DbSet<StsOrganizationIdentity> SsoOrganizationIdentities { get; set; }
         public DbSet<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
         public DbSet<DataProcessingRegistrationRole> DataProcessingRegistrationRoles { get; set; }
         public DbSet<LocalDataProcessingRegistrationRole> LocalDataProcessingRegistrationRoles { get; set; }
@@ -255,7 +255,7 @@ namespace Infrastructure.DataAccess
             modelBuilder.Configurations.Add(new BrokenLinkInInterfaceMap());
             modelBuilder.Configurations.Add(new ItSystemUsageSensitiveDataLevelMap());
             modelBuilder.Configurations.Add(new SsoUserIdentityMap());
-            modelBuilder.Configurations.Add(new SsoOrganizationIdentityMap());
+            modelBuilder.Configurations.Add(new StsOrganizationIdentityMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationRightMap());
             modelBuilder.Configurations.Add(new DataProcessingRegistrationRoleMap());
