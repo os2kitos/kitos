@@ -207,7 +207,7 @@ namespace Core.DomainServices.GDPR
         private static void PatchLastUpdateBy(DataProcessingRegistration source, DataProcessingRegistrationReadModel destination)
         {
             destination.LastChangedById = source.LastChangedByUserId;
-            destination.LastChangedByName = source.LastChangedByUser.GetFullName();
+            destination.LastChangedByName = source.LastChangedByUser != null ? source.LastChangedByUser.GetFullName() : "";
             destination.LastChangedAt = source.LastChanged;
         }
     }
