@@ -18,5 +18,21 @@ namespace Core.DomainServices.Model.StsOrganization
             UserFacingKey = userFacingKey;
             Children = children.ToList().AsReadOnly();
         }
+
+        public StsOrganizationUnit Copy(uint? childLevelsToInclude = null)
+        {
+            var children = new List<StsOrganizationUnit>();
+            var includeChildren = childLevelsToInclude is > 0 or null;
+            if (includeChildren)
+            {
+                if (childLevelsToInclude.HasValue)
+                {
+                    childLevelsToInclude--;
+                }
+                children = Children.Select(child => child.Copy(childLevelsToInclude)).ToList();
+            }
+
+            return new StsOrganizationUnit(Uuid, Name, UserFacingKey, children);
+        }
     }
 }

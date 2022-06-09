@@ -58,23 +58,7 @@ namespace Core.ApplicationServices.Organizations
             }
 
             levels--;
-            return CopyStsOrganizationUnitWithFiltering(root, levels);
-        }
-
-        private StsOrganizationUnit CopyStsOrganizationUnitWithFiltering(StsOrganizationUnit unit, uint levels)
-        {
-            return new StsOrganizationUnit(unit.Uuid, unit.Name, unit.UserFacingKey, GetChildren(unit.Children, levels).ToList());
-        }
-
-        private IEnumerable<StsOrganizationUnit> GetChildren(IEnumerable<StsOrganizationUnit> currentChildren, uint levelsLeft)
-        {
-            if (levelsLeft < 1) yield break;
-
-            levelsLeft--;
-            foreach (var currentChild in currentChildren)
-            {
-                yield return CopyStsOrganizationUnitWithFiltering(currentChild, levelsLeft);
-            }
+            return root.Copy(levels);
         }
     }
 }
