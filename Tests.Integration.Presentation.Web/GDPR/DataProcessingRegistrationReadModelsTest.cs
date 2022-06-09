@@ -274,12 +274,12 @@ namespace Tests.Integration.Presentation.Web.GDPR
             var name = A<string>();
             var newName = A<string>();
             var email = A<string>();
-            var orgRole = OrganizationRole.LocalAdmin;
+            var orgRole = OrganizationRole.GlobalAdmin;
             var organizationId = TestEnvironment.DefaultOrganizationId;
 
             var registration = await DataProcessingRegistrationHelper.CreateAsync(organizationId, name);
             var (userId, _, cookie)= await HttpApi.CreateUserAndLogin(email, orgRole);
-            using var response = await DataProcessingRegistrationHelper.SendAssignRoleRequestAsync(registration.Id, 1, userId);
+            using var response = await DataProcessingRegistrationHelper.SendChangeNameRequestAsync(registration.Id, newName, cookie);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             await WaitForReadModelQueueDepletion();
