@@ -117,6 +117,7 @@
     <Compile Include="Contract\ItContractTest.cs" />
     <Compile Include="Deltas\V2\DeltaFeedApiV2Test.cs" />
     <Compile Include="Organizations\OrganizationSequentialTests.cs" />
+    <Compile Include="Organizations\StsOrganizationSynchronizationApiTest.cs" />
     <Compile Include="SystemUsage\V2\ItSystemUsageApiV2Test.cs" />
     <Compile Include="GDPR\V2\DataProcessingRegistrationApiV2Test.cs" />
     <Compile Include="Tools\External\DeltaFeedV2Helper.cs" />

@@ -6,7 +6,6 @@ namespace Core.ApplicationServices.Organizations
 {
     public interface IStsOrganizationSynchronizationService
     {
-        //TODO: Levels to import (under the root)
         /// <summary>
         /// Retrieves a view of the organization as it exists in STS Organization
         /// </summary>
