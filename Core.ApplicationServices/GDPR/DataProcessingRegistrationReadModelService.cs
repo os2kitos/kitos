@@ -22,7 +22,7 @@ namespace Core.ApplicationServices.GDPR
         {
             if (_authorizationContext.GetOrganizationReadAccessLevel(organizationId) != OrganizationDataReadAccessLevel.All)
                 return new OperationError(OperationFailure.Forbidden);
-
+            
             return Result<IQueryable<DataProcessingRegistrationReadModel>, OperationError>.Success(_repository.GetByOrganizationId(organizationId));
         }
     }

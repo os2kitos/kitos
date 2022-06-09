@@ -26,7 +26,7 @@
         OversightOptionNamesAsCsv: string;
         IsOversightCompleted?: Models.Api.Shared.YesNoUndecidedOption;
         ContractNamesAsCsv: string;
-        LastChanged: Date;
+        LastChangedAt: Date;
         LastChangedByName: string;
     }
 }
