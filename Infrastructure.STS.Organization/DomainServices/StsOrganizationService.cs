@@ -7,7 +7,6 @@ using Core.DomainServices.Extensions;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.Repositories.Organization;
-using Core.DomainServices.Repositories.SSO;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
 using Infrastructure.STS.Common.Model;

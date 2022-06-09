@@ -10,6 +10,7 @@ using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Moq;
+using Serilog;
 using Tests.Toolkit.Patterns;
 using Xunit;
 using Xunit.Abstractions;
@@ -30,7 +31,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             _authorizationContextMock = new Mock<IAuthorizationContext>();
             _stsOrganizationUnitService = new Mock<IStsOrganizationUnitService>();
             _organizationServiceMock = new Mock<IOrganizationService>();
-            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object);
+            _sut = new StsOrganizationSynchronizationService(_authorizationContextMock.Object, _stsOrganizationUnitService.Object, _organizationServiceMock.Object, Mock.Of<ILogger>());
         }
 
         protected override void OnFixtureCreated(Fixture fixture)
@@ -145,7 +146,7 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
             //Arrange
             var organizationId = A<Guid>();
             var organization = new Organization();
-            var operationError = A<OperationError>();
+            var operationError = A<DetailedOperationError<ResolveOrganizationTreeError>>();
             SetupGetOrganizationReturns(organizationId, organization);
             SetupHasPermissionReturns(organization, true);
             SetupResolveOrganizationTreeReturns(organization, operationError);
@@ -155,10 +156,10 @@ namespace Tests.Unit.Core.ApplicationServices.Organizations
 
             //Assert
             Assert.True(result.Failed);
-            Assert.Equal(operationError, result.Error);
+            Assert.Equal(operationError.FailureType, result.Error.FailureType);
         }
 
-        private void SetupResolveOrganizationTreeReturns(Organization organization, Result<StsOrganizationUnit, OperationError> root)
+        private void SetupResolveOrganizationTreeReturns(Organization organization, Result<StsOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> root)
         {
             _stsOrganizationUnitService.Setup(x => x.ResolveOrganizationTree(organization)).Returns(root);
         }

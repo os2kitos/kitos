@@ -6,7 +6,6 @@ namespace Core.DomainServices.Organizations
 {
     public interface IStsOrganizationUnitService
     {
-        //TODO: Detailed error
-        Result<StsOrganizationUnit, OperationError> ResolveOrganizationTree(Organization organization);
+        Result<StsOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization);
     }
 }

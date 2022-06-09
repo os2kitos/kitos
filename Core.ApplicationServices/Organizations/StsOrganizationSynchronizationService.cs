@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Authorization;
 using Core.ApplicationServices.Authorization.Permissions;
 using Core.DomainModel.Organization;
 using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
+using Serilog;
 
 namespace Core.ApplicationServices.Organizations
 {
@@ -14,25 +13,39 @@ namespace Core.ApplicationServices.Organizations
     {
         private readonly IStsOrganizationUnitService _stsOrganizationUnitService;
         private readonly IOrganizationService _organizationService;
+        private readonly ILogger _logger;
         private readonly IAuthorizationContext _authorizationContext;
 
         public StsOrganizationSynchronizationService(
             IAuthorizationContext authorizationContext,
             IStsOrganizationUnitService stsOrganizationUnitService,
-            IOrganizationService organizationService)
+            IOrganizationService organizationService,
+            ILogger logger)
         {
             _stsOrganizationUnitService = stsOrganizationUnitService;
             _organizationService = organizationService;
+            _logger = logger;
             _authorizationContext = authorizationContext;
         }
 
         public Result<StsOrganizationUnit, OperationError> GetStsOrganizationalHierarchy(Guid organizationId, Maybe<uint> levelsToInclude)
         {
-            return _organizationService
+            var orgWithPermission = _organizationService
                 .GetOrganization(organizationId)
-                .Bind(WithImportPermission)
-                .Bind(_stsOrganizationUnitService.ResolveOrganizationTree)
-                .Bind(root => FilterByRequestedLevels(root, levelsToInclude));
+                .Bind(WithImportPermission);
+
+            if (orgWithPermission.Failed)
+                return orgWithPermission.Error;
+
+            var organization = orgWithPermission.Value;
+            var orgTreeResult = _stsOrganizationUnitService.ResolveOrganizationTree(organization);
+            if (orgTreeResult.Failed)
+            {
+                var detailedOperationError = orgTreeResult.Error;
+                return new OperationError($"Failed to load organization tree:{detailedOperationError.Detail:G}:{detailedOperationError.FailureType:G}:{detailedOperationError.Message}", detailedOperationError.FailureType);
+            }
+
+            return FilterByRequestedLevels(orgTreeResult.Value, levelsToInclude);
         }
 
         private Result<Organization, OperationError> WithImportPermission(Organization organization)
@@ -44,7 +57,7 @@ namespace Core.ApplicationServices.Organizations
             return new OperationError($"The user does not have permission to use the STS Organization Sync functionality for the organization with uuid:{organization.Uuid}", OperationFailure.Forbidden);
         }
 
-        private Result<StsOrganizationUnit, OperationError> FilterByRequestedLevels(StsOrganizationUnit root, Maybe<uint> levelsToInclude)
+        private static Result<StsOrganizationUnit, OperationError> FilterByRequestedLevels(StsOrganizationUnit root, Maybe<uint> levelsToInclude)
         {
             if (levelsToInclude.IsNone)
             {

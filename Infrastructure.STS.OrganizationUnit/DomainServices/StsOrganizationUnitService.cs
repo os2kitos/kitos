@@ -9,38 +9,41 @@ using Core.DomainServices.Model.StsOrganization;
 using Core.DomainServices.Organizations;
 using Core.DomainServices.SSO;
 using Infrastructure.STS.Common.Factories;
+using Infrastructure.STS.Common.Model;
 using Infrastructure.STS.OrganizationUnit.ServiceReference;
+using Serilog;
 
 namespace Infrastructure.STS.OrganizationUnit.DomainServices
 {
-
     public class StsOrganizationUnitService : IStsOrganizationUnitService
     {
         private readonly IStsOrganizationService _organizationService;
+        private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
 
-        public StsOrganizationUnitService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration)
+        public StsOrganizationUnitService(IStsOrganizationService organizationService, StsOrganisationIntegrationConfiguration configuration, ILogger logger)
         {
             _organizationService = organizationService;
+            _logger = logger;
             _certificateThumbprint = configuration.CertificateThumbprint;
             _serviceRoot = $"https://{configuration.EndpointHost}/service/Organisation/OrganisationEnhed/5";
         }
 
-        public Result<StsOrganizationUnit, OperationError> ResolveOrganizationTree(Organization organization)
+        public Result<StsOrganizationUnit, DetailedOperationError<ResolveOrganizationTreeError>> ResolveOrganizationTree(Organization organization)
         {
             //Resolve the org uuid
             var uuid = _organizationService.ResolveStsOrganizationUuid(organization);
             if (uuid.Failed)
             {
-                //TODO: Correct error and logging
-                return uuid.Error;
+                var error = uuid.Error;
+                _logger.Error("Loading sts organization uuid from org with id: {id} failed with {detailedError} {errorCode} {errorMessage}", organization.Id, error.Detail, error.FailureType, error.Message);
+                return new DetailedOperationError<ResolveOrganizationTreeError>(error.FailureType, ResolveOrganizationTreeError.FailedResolvingUuid, $"{error.Detail}:{error.Message}");
             }
 
             //Search for org units by org uuid
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
             using var client = CreateClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
-
 
             var channel = client.ChannelFactory.CreateChannel();
 
@@ -48,13 +51,21 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
             var totalIds = new List<string>();
             var totalResults = new List<(Guid, RegistreringType1)>();
             var currentPage = new List<string>();
+            var organizationStsUuid = uuid.Value;
             do
             {
                 currentPage.Clear();
-                var searchRequest = CreateSearchOrgUnitsByOrgUuidRequest(organization.Cvr, uuid.Value, pageSize, totalIds.Count);
+                var searchRequest = CreateSearchOrgUnitsByOrgUuidRequest(organization.Cvr, organizationStsUuid, pageSize, totalIds.Count);
                 var searchResponse = channel.soeg(searchRequest);
 
-                //TODO: check errors
+                var searchStatusResult = searchResponse.SoegResponse1.SoegOutput.StandardRetur;
+                var stsError = searchStatusResult.StatusKode.ParseStsError();
+                if (stsError.HasValue)
+                {
+                    _logger.Error("Failed to search for org units for org with sts uuid: {stsuuid} failed with {code} {message}", organizationStsUuid, searchStatusResult.StatusKode, searchStatusResult.FejlbeskedTekst);
+                    return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedSearchingForOrgUnits);
+
+                }
 
                 currentPage = searchResponse.SoegResponse1.SoegOutput.IdListe.ToList();
                 totalIds.AddRange(currentPage);
@@ -62,7 +73,15 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 var listRequest = CreateListOrgUnitsRequest(organization.Cvr, currentPage.ToArray());
                 var listResponse = channel.list(listRequest);
 
-                //TODO: check errors
+
+                var listStatusResult = listResponse.ListResponse1.ListOutput.StandardRetur;
+                var listStsError = listStatusResult.StatusKode.ParseStsError();
+                if (listStsError.HasValue)
+                {
+                    _logger.Error("Failed to list units for org units for org with sts uuid: {stsuuid} and unit uuids: {uuids} failed with {code} {message}", organizationStsUuid, string.Join(",", currentPage), listStatusResult.StatusKode, listStatusResult.FejlbeskedTekst);
+                    return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.FailedLoadingOrgUnits);
+
+                }
 
                 var units = listResponse
                     .ListResponse1
@@ -84,7 +103,8 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
             var roots = totalResults.Where(x => x.Item2.RelationListe.Overordnet == null).ToList();
             if (roots.Count != 1)
             {
-                //TODO: error
+                _logger.Error("Failed validating units for org with sts uuid: {stsuuid}. Expected one root but found: {roots}", organizationStsUuid, string.Join(",", roots.Select(x => x.Item1.ToString("D")).ToList()));
+                return new DetailedOperationError<ResolveOrganizationTreeError>(OperationFailure.UnknownError, ResolveOrganizationTreeError.OrgTreeHasMultipleRoots);
             }
 
             // Process the tree info from sts org in order to generate the import tree
@@ -99,7 +119,7 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 var currentUnitUuid = processingStack.Pop();
                 (Guid, RegistreringType1) unit = unitsByUuid[currentUnitUuid];
 
-                var egenskabType = unit.Item2.AttributListe.Egenskab[0];//TODO: Check if we can always depend on this to be there
+                var egenskabType = unit.Item2.AttributListe.Egenskab.First(x => string.IsNullOrEmpty(x.EnhedNavn) == false);
                 var unitUuid = unit.Item1;
                 var organizationUnit = new StsOrganizationUnit(unitUuid, egenskabType.EnhedNavn, egenskabType.BrugervendtNoegleTekst, parentIdToConvertedChildren.ContainsKey(unitUuid) ? parentIdToConvertedChildren[unitUuid] : new List<StsOrganizationUnit>(0));
                 idToConvertedChildren[organizationUnit.Uuid] = organizationUnit;
@@ -158,7 +178,6 @@ namespace Infrastructure.STS.OrganizationUnit.DomainServices
                 }
             }
         }
-
 
         public static listRequest CreateListOrgUnitsRequest(string municipalityCvr, params string[] currentUnitUuids)
         {
