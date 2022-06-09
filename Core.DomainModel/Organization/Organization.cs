@@ -114,7 +114,7 @@ namespace Core.DomainModel.Organization
 
         public virtual ICollection<OrganizationRight> Rights { get; set; }
 
-        public virtual ICollection<StsOrganizationIdentity> SsoIdentities { get; set; }
+        public virtual ICollection<StsOrganizationIdentity> StsOrganizationIdentities { get; set; }
 
         public virtual ICollection<DataProcessingRegistration> DataProcessingRegistrations { get; set; }
 

@@ -22,7 +22,7 @@ namespace Infrastructure.STS.Organization.DomainServices
         private readonly ILogger _logger;
         private readonly string _certificateThumbprint;
         private readonly string _serviceRoot;
-
+        
         public StsOrganizationService(
             StsOrganisationIntegrationConfiguration configuration,
             IStsOrganizationCompanyLookupService companyLookupService,
@@ -43,7 +43,8 @@ namespace Infrastructure.STS.Organization.DomainServices
                 throw new ArgumentNullException(nameof(organization));
             }
 
-            var fkOrgIdentity = organization.SsoIdentities.FirstOrDefault();
+            //If an FK identity already exists, reuse it
+            var fkOrgIdentity = organization.StsOrganizationIdentities.FirstOrDefault();
             if (fkOrgIdentity != null)
             {
                 return fkOrgIdentity.ExternalUuid;
@@ -54,6 +55,7 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.BadState, ResolveOrganizationUuidError.InvalidCvrOnOrganization);
             }
 
+            //Resolve the associated company uuid
             var companyUuid = _companyLookupService.ResolveStsOrganizationCompanyUuid(organization);
             if (companyUuid.Failed)
             {
@@ -61,14 +63,12 @@ namespace Infrastructure.STS.Organization.DomainServices
                 return new DetailedOperationError<ResolveOrganizationUuidError>(OperationFailure.UnknownError, ResolveOrganizationUuidError.FailedToLookupOrganizationCompany);
             }
 
-
+            //Search for the organization based on the resolved company (all organizations are tied to a company)
             using var clientCertificate = X509CertificateClientCertificateFactory.GetClientCertificate(_certificateThumbprint);
             using var organizationPortTypeClient = CreateOrganizationPortTypeClient(BasicHttpBindingFactory.CreateHttpBinding(), _serviceRoot, clientCertificate);
 
             var searchRequest = CreateSearchForOrganizationRequest(organization, companyUuid.Value);
             var channel = organizationPortTypeClient.ChannelFactory.CreateChannel();
-
-
             var response = channel.soeg(searchRequest);
             var statusResult = response.SoegResponse1.SoegOutput.StandardRetur;
             var stsError = statusResult.StatusKode.ParseStsError();

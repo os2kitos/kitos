@@ -9,7 +9,7 @@ namespace Infrastructure.DataAccess.Mapping
         {
             Property(x => x.ExternalUuid).HasUniqueIndexAnnotation("UX_" + nameof(StsOrganizationIdentity.ExternalUuid), 0);
             HasRequired(x => x.Organization)
-                .WithMany(x => x.SsoIdentities)
+                .WithMany(x => x.StsOrganizationIdentities)
                 .WillCascadeOnDelete(true);
         }
     }

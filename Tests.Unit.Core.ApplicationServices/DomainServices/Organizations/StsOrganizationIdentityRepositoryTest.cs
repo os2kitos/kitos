@@ -58,7 +58,7 @@ namespace Tests.Unit.Core.DomainServices.Organizations
         {
             //Arrange
             var externalId = A<Guid>();
-            var organization = new global::Core.DomainModel.Organization.Organization();
+            var organization = new Organization();
             ExpectRepositoryContent(CreateSsoOrganizationIdentity(), CreateSsoOrganizationIdentity());
             _repository.Setup(x => x.Insert(It.IsAny<StsOrganizationIdentity>())).Returns((StsOrganizationIdentity input) => input);
 
@@ -78,7 +78,7 @@ namespace Tests.Unit.Core.DomainServices.Organizations
         {
             //Arrange
             var externalId = A<Guid>();
-            var organization = new global::Core.DomainModel.Organization.Organization();
+            var organization = new Organization();
             ExpectRepositoryContent(CreateSsoOrganizationIdentity(externalId), CreateSsoOrganizationIdentity());
 
             //Act
