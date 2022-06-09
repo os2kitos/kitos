@@ -157,7 +157,7 @@
             this.expirationDate = itSystemUsage.expirationDate;
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
-            this.lastChanged = itSystemUsage.LastChanged;
+            this.lastChanged = itSystemUsage.lastChanged;
             this.lastChangedByUserName = itSystemUsage.lastChangedByUserName;
             this.lastChangedByUserLastName = itSystemUsage.lastChangedByUserLastName;
 
