@@ -13,5 +13,6 @@ namespace Core.ApplicationServices.Authorization
         bool Visit(ViewBrokenExternalReferencesReportPermission permission);
         bool Visit(TriggerBrokenReferencesReportPermission permission);
         bool Visit(AdministerGlobalPermission permission);
+        bool Visit(ImportHierarchyFromStsOrganizationPermission permission);
     }
 }

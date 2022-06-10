@@ -179,6 +179,7 @@
     <Compile Include="ApplicationServices\Generic\Write\AssignmentUpdateServiceTest.cs" />
     <Compile Include="ApplicationServices\Handlers\HandleUserBeingDeletedTests.cs" />
     <Compile Include="ApplicationServices\ItInterfaceServiceTest.cs" />
+    <Compile Include="ApplicationServices\Organizations\StsOrganizationSynchronizationServiceTest.cs" />
     <Compile Include="ApplicationServices\SystemUsage\ItSystemUsageServiceTest.cs" />
     <Compile Include="ApplicationServices\Kendo\KendoOrganizationalConfigurationServiceTest.cs" />
     <Compile Include="ApplicationServices\KLE\GenericRepositoryTaskRefStub.cs" />
@@ -220,7 +221,7 @@
     <Compile Include="DomainServices\Repositories\UserNotificationRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityNavigatorTest.cs" />
     <Compile Include="DomainServices\SSO\Saml20IdentityParserTest.cs" />
-    <Compile Include="DomainServices\SSO\SsoOrganizationIdentityRepositoryTest.cs" />
+    <Compile Include="DomainServices\Organizations\StsOrganizationIdentityRepositoryTest.cs" />
     <Compile Include="DomainServices\SSO\SsoUserIdentityRepositoryTest.cs" />
     <Compile Include="BackgroundJobs\CheckExternalLinksBackgroundJobTest.cs" />
     <Compile Include="DomainServices\ReferenceRepositoryTest.cs" />

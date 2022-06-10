@@ -20,7 +20,7 @@ namespace Core.ApplicationServices.SSO.Factories
     {
         private readonly IStsBrugerInfoService _infoService;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
         private readonly Maybe<ISaml20Identity> _samlState;
         private readonly IUserRepository _userRepository;
         private readonly SsoFlowConfiguration _configuration;
@@ -33,7 +33,7 @@ namespace Core.ApplicationServices.SSO.Factories
         public SsoStateFactory(
             IStsBrugerInfoService infoService,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
+            IStsOrganizationIdentityRepository stsOrganizationIdentityRepository,
             Maybe<ISaml20Identity> samlState,
             IUserRepository userRepository,
             SsoFlowConfiguration configuration,
@@ -44,7 +44,7 @@ namespace Core.ApplicationServices.SSO.Factories
         {
             _infoService = infoService;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
+            _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
             _samlState = samlState;
             _userRepository = userRepository;
             _configuration = configuration;
@@ -76,7 +76,7 @@ namespace Core.ApplicationServices.SSO.Factories
 
         public AbstractState CreateUserIdentifiedState(User user, StsBrugerInfo stsBrugerInfo)
         {
-            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _ssoOrganizationIdentityRepository, _organizationRepository, this, _logger);
+            return new UserIdentifiedState(user, stsBrugerInfo, _ssoUserIdentityRepository, _stsOrganizationIdentityRepository, _organizationRepository, this, _logger);
         }
 
         public AbstractState CreateAuthorizingUserState(User user, Organization organization)

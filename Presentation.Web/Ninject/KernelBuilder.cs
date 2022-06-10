@@ -114,6 +114,9 @@ using Core.ApplicationServices.UIConfiguration;
 using Core.ApplicationServices.UIConfiguration.Handlers;
 using Core.DomainServices.Repositories.UICustomization;
 using Core.DomainServices.Tracking;
+using Infrastructure.STS.Company.DomainServices;
+using Infrastructure.STS.Organization.DomainServices;
+using Infrastructure.STS.OrganizationUnit.DomainServices;
 using Presentation.Web.Controllers.API.V2.External.ItSystems.Mapping;
 using Presentation.Web.Controllers.API.V2.External.ItInterfaces.Mapping;
 
@@ -274,6 +277,12 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IRightsHolderSystemService>().To<RightsHolderSystemService>().InCommandScope(Mode);
             kernel.Bind<IItInterfaceRightsHolderService>().To<ItInterfaceRightsHolderService>().InCommandScope(Mode);
             kernel.Bind<IUserRightsService>().To<UserRightsService>().InCommandScope(Mode);
+
+            //STS Organization
+            kernel.Bind<IStsOrganizationService>().To<StsOrganizationService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationCompanyLookupService>().To<StsOrganizationCompanyLookupService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationUnitService>().To<StsOrganizationUnitService>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationSynchronizationService>().To<StsOrganizationSynchronizationService>().InCommandScope(Mode);
         }
 
         private void RegisterMappers(IKernel kernel)
@@ -395,8 +404,6 @@ namespace Presentation.Web.Ninject
 
             //Organization
             RegisterDomainEvent<EntityBeingDeletedEvent<Organization>, HandleOrganizationBeingDeleted>(kernel);
-            //TODO: Read models where it is involved must be scheduled for rebuild.. do it in a different handler (one of the read model handlers)
-
             RegisterDomainEvent<EntityBeingDeletedEvent<User>, HandleUserBeingDeleted>(kernel);
         }
 
@@ -534,7 +541,7 @@ namespace Presentation.Web.Ninject
             kernel.Bind<IEntityTypeResolver>().To<PocoTypeFromProxyResolver>().InCommandScope(Mode);
             kernel.Bind<IOrganizationRepository>().To<OrganizationRepository>().InCommandScope(Mode);
             kernel.Bind<IOrganizationUnitRepository>().To<OrganizationUnitRepository>().InCommandScope(Mode);
-            kernel.Bind<ISsoOrganizationIdentityRepository>().To<SsoOrganizationIdentityRepository>().InCommandScope(Mode);
+            kernel.Bind<IStsOrganizationIdentityRepository>().To<StsOrganizationIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<ISsoUserIdentityRepository>().To<SsoUserIdentityRepository>().InCommandScope(Mode);
             kernel.Bind<IItSystemUsageAttachedOptionRepository>().To<ItSystemUsageAttachedOptionRepository>().InCommandScope(Mode);
             kernel.Bind<ISensitivePersonalDataTypeRepository>().To<SensitivePersonalDataTypeRepository>().InCommandScope(Mode);

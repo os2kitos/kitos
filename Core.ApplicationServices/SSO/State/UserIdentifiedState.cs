@@ -12,7 +12,7 @@ namespace Core.ApplicationServices.SSO.State
         private readonly User _user;
         private readonly StsBrugerInfo _externalUser;
         private readonly ISsoUserIdentityRepository _ssoUserIdentityRepository;
-        private readonly ISsoOrganizationIdentityRepository _ssoOrganizationIdentityRepository;
+        private readonly IStsOrganizationIdentityRepository _stsOrganizationIdentityRepository;
         private readonly IOrganizationRepository _organizationRepository;
         private readonly ISsoStateFactory _ssoStateFactory;
         private readonly ILogger _logger;
@@ -21,7 +21,7 @@ namespace Core.ApplicationServices.SSO.State
             User user,
             StsBrugerInfo externalUser,
             ISsoUserIdentityRepository ssoUserIdentityRepository,
-            ISsoOrganizationIdentityRepository ssoOrganizationIdentityRepository,
+            IStsOrganizationIdentityRepository stsOrganizationIdentityRepository,
             IOrganizationRepository organizationRepository,
             ISsoStateFactory ssoStateFactory,
             ILogger logger)
@@ -29,7 +29,7 @@ namespace Core.ApplicationServices.SSO.State
             _user = user;
             _externalUser = externalUser;
             _ssoUserIdentityRepository = ssoUserIdentityRepository;
-            _ssoOrganizationIdentityRepository = ssoOrganizationIdentityRepository;
+            _stsOrganizationIdentityRepository = stsOrganizationIdentityRepository;
             _organizationRepository = organizationRepository;
             _ssoStateFactory = ssoStateFactory;
             _logger = logger;
@@ -64,7 +64,7 @@ namespace Core.ApplicationServices.SSO.State
         private void HandleUserWithSsoIdentity(FlowContext context)
         {
             //Transition to authorizing state if organization sso binding already exists
-            var organizationByExternalIdResult = _ssoOrganizationIdentityRepository.GetByExternalUuid(_externalUser.BelongsToOrganizationUuid);
+            var organizationByExternalIdResult = _stsOrganizationIdentityRepository.GetByExternalUuid(_externalUser.BelongsToOrganizationUuid);
             if (organizationByExternalIdResult.HasValue)
             {
                 context.TransitionTo(_ssoStateFactory.CreateAuthorizingUserState(_user, organizationByExternalIdResult.Value.Organization),
@@ -77,7 +77,7 @@ namespace Core.ApplicationServices.SSO.State
                 if (organizationByCvrResult.HasValue)
                 {
                     var organization = organizationByCvrResult.Value;
-                    var addOrganizationIdentityResult = _ssoOrganizationIdentityRepository.AddNew(organization, _externalUser.BelongsToOrganizationUuid);
+                    var addOrganizationIdentityResult = _stsOrganizationIdentityRepository.AddNew(organization, _externalUser.BelongsToOrganizationUuid);
                     if (addOrganizationIdentityResult.Failed)
                     {
                         //NOTE: This is not a blocker! - concurrency might be to blame but we log the error.. authentication is still allowed to proceed - it just failed to save the relation between org id and external uuid.
