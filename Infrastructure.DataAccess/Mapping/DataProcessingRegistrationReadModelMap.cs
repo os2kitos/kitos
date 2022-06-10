@@ -34,6 +34,7 @@ namespace Infrastructure.DataAccess.Mapping
                 .WithMany(x => x.ReadModels)
                 .HasForeignKey(x => x.SourceEntityId)
                 .WillCascadeOnDelete(false);
+
             //No index bc we don't know how long it might be
             Property(x => x.DataProcessorNamesAsCsv).IsOptional();
             Property(x => x.SubDataProcessorNamesAsCsv).IsOptional();
