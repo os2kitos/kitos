@@ -85,8 +85,8 @@ namespace Infrastructure.DataAccess.Interceptors
             var updates = new List<(string propertyName, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)>
             {
                 new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName) && MatchNull(clause), userId)), //Some EF updates end up in this e.g. changing an owned child on a parent
-                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
-                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
+                new(LastChangedByUserIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
+                new(LastChangedColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
             };
 
             var updateConditions = updates.Select(x => x.condition).ToList();
@@ -137,7 +137,7 @@ namespace Infrastructure.DataAccess.Interceptors
             //Only check for updates until pending updates has been depleted
             if (pendingUpdates.Any())
             {
-                foreach (var pendingUpdate in pendingUpdates.ToList())
+                foreach (var pendingUpdate in pendingUpdates)
                 {
                     if (pendingUpdate.Key((DbSetClause)clause))
                     {
