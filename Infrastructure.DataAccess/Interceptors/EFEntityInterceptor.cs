@@ -5,10 +5,12 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
+using EntityType = System.Data.Entity.Core.Metadata.Edm.EntityType;
 
 
 namespace Infrastructure.DataAccess.Interceptors
@@ -93,6 +95,15 @@ namespace Infrastructure.DataAccess.Interceptors
                 .Select(clause => ApplyUpdates(clause, updates))
                 .ToList();
 
+            var edmType = updateCommand.Target.VariableType.EdmType;
+            if (edmType is EntityType entityType)
+            {
+                if (entityType.Properties.Contains(LastChangedByUserIdColumnName))
+                {
+                    setClauses.Add(GetUpdateSetClause(LastChangedByUserIdColumnName, userId, updateCommand));
+                }
+            }
+
             return new DbUpdateCommandTree(
                 updateCommand.MetadataWorkspace,
                 updateCommand.DataSpace,
@@ -145,6 +156,19 @@ namespace Infrastructure.DataAccess.Interceptors
 
             //Return original
             return clause;
+        }
+
+        private static DbSetClause GetUpdateSetClause(string column, DbExpression newValueToSetToDb, DbUpdateCommandTree updateCommand)
+        {
+            // Create the variable reference in order to create the property
+            var variableReference = updateCommand.Target.VariableType.Variable(updateCommand.Target.VariableName);
+            
+            // Create the property to which will assign the correct value
+            var tenantProperty = variableReference.Property(column);
+
+            // Create the set clause, object representation of sql insert command
+            var newSetClause = DbExpressionBuilder.SetClause(tenantProperty, newValueToSetToDb);
+            return newSetClause;
         }
     }
 }
