@@ -51,6 +51,7 @@ namespace Core.DomainServices.Repositories.GDPR
 
         public void Update(DataProcessingRegistration dataProcessingRegistration)
         {
+            _repository.Update(dataProcessingRegistration);
             Notify(dataProcessingRegistration, LifeCycleEventType.Updated);
             _repository.Save();
         }

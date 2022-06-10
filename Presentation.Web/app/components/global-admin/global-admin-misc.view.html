@@ -29,12 +29,16 @@
             <button class="btn btn-danger btn-sm col-xs-1"
                     ng-disabled="!selectedUser"
                     ng-click="removeUser(selectedUser.id)">
-                Slette
+                Slet
             </button>
         </div>
         <div ng-if="userOrganizations && userOrganizations.length > 0">
-            <span>{{selectedUser.text}} {{selectedUser.email}}</span>
-            <span><strong>Brugeren er stadig medlem af følgende organisationer</strong></span>
+            <div>
+                {{selectedUser.text}} ({{selectedUser.email}})
+            </div>
+            <div>
+                <strong>Brugeren er stadig medlem af følgende organisationer</strong>
+            </div>
             <table class="full-width table table-striped"
                    ng-if="selectedUser">
                 <thead>

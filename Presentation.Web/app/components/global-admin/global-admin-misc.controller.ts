@@ -18,11 +18,10 @@
             }
         });
     }]);
-    
+
     app.controller("globalAdminMisc", [
         "$rootScope",
         "$scope",
-        "$http",
         "_",
         "notify",
         "kleService",
@@ -36,7 +35,6 @@
         (
             $rootScope,
             $scope,
-            $http,
             _,
             notify,
             kleService,
@@ -47,7 +45,7 @@
             userService: Kitos.Services.IUserService,
             select2LoadingService: Kitos.Services.ISelect2LoadingService,
             $state) => {
-            
+
             $rootScope.page.title = "Andet";
             $scope.brokenLinksVm = Kitos.Models.ViewModel.GlobalAdmin.BrokenLinks.BrokenLinksViewModelMapper.mapFromApiResponse(brokenLinkStatus);
             $scope.usersWithRightsholderAccess = usersWithRightsholderAccess;
@@ -162,17 +160,17 @@
                 const nameAndEmail = `${$scope.selectedUser.text}, ${$scope.selectedUser.email}`;
 
                 if (confirm(`Er du sikker på, at du vil slette ${nameAndEmail}`)) {
-                    notify.addInfoMessage(`Sletter ${nameAndEmail}`);
+                    const message = notify.addInfoMessage(`Sletter ${nameAndEmail}`);
                     userService.deleteUser(id)
                         .then(() => {
-                                notify.addSuccessMessage(`Sletter ${nameAndEmail}`);
-                                $scope.selectedUser = null;
-                            }
+                            message.toSuccessMessage(`Sletter ${nameAndEmail}`);
+                            $scope.selectedUser = null;
+                            $state.reload();
+                        }
                         ).catch(ex => {
                             console.log(ex);
-                            notify.addErrorMessage(`Fejl ifm. sletning af brugeren Sletter ${nameAndEmail}`);
+                            message.toErrorMessage(`Fejl ifm. sletning af brugeren Sletter ${nameAndEmail}`);
                         });
-                    $state.reload();
                 }
             };
 
@@ -185,17 +183,17 @@
                 return select2LoadingService.loadSelect2WithDataSource(
                     (query: string) =>
                         userService.searchUsers(query)
-                        .then(
-                            results =>
-                                results.map(result =>
-                                    <Kitos.Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.Users.IUserWithEmailDTO>>
-                                {
-                                    id: result.id,
-                                    text: result.name,
-                                    email: result.email,
-                                    optionalObjectContext: result
-                                })
-                        )
+                            .then(
+                                results =>
+                                    results.map(result =>
+                                        <Kitos.Models.ViewModel.Generic.Select2OptionViewModel<Kitos.Models.Users.IUserWithEmailDTO>>
+                                        {
+                                            id: result.id,
+                                            text: result.name,
+                                            email: result.email,
+                                            optionalObjectContext: result
+                                        })
+                            )
                     , false
                     , Kitos.Helpers.Select2OptionsFormatHelper.formatUserWithEmail);
             }
