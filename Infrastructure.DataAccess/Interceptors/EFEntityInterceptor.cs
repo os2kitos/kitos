@@ -5,12 +5,10 @@ using System.Data.Entity.Core.Common.CommandTrees.ExpressionBuilder;
 using System.Data.Entity.Core.Metadata.Edm;
 using System.Data.Entity.Infrastructure.Interception;
 using System.Linq;
-using System.Runtime.InteropServices;
 using Core.Abstractions.Types;
 using Core.DomainModel;
 using Core.DomainServices.Context;
 using Core.DomainServices.Time;
-using EntityType = System.Data.Entity.Core.Metadata.Edm.EntityType;
 
 
 namespace Infrastructure.DataAccess.Interceptors
@@ -84,25 +82,23 @@ namespace Infrastructure.DataAccess.Interceptors
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
-            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            var updates = new List<(string propertyName, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)>
             {
-                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName) && MatchNull(clause), userId), //Some EF updates end up in this e.g. changing an owned child on a parent
-                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName) && MatchNull(clause), userId)), //Some EF updates end up in this e.g. changing an owned child on a parent
+                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
+                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
             };
 
+            var updateConditions = updates.Select(x => x.condition).ToList();
             var setClauses = updateCommand.SetClauses
-                .Select(clause => ApplyUpdates(clause, updates))
+                .Select(clause => ApplyUpdates(clause, updateConditions))
                 .ToList();
-
-            var edmType = updateCommand.Target.VariableType.EdmType;
-            if (edmType is EntityType entityType)
+            
+            foreach (var updateDescriptor in updates)
             {
-                if (entityType.Properties.Contains(LastChangedByUserIdColumnName))
-                {
-                    setClauses.Add(GetUpdateSetClause(LastChangedByUserIdColumnName, userId, updateCommand));
-                }
+                ApplyUnusedUpdates(updateCommand, updateDescriptor, setClauses);
             }
+
 
             return new DbUpdateCommandTree(
                 updateCommand.MetadataWorkspace,
@@ -169,6 +165,17 @@ namespace Infrastructure.DataAccess.Interceptors
             // Create the set clause, object representation of sql insert command
             var newSetClause = DbExpressionBuilder.SetClause(tenantProperty, newValueToSetToDb);
             return newSetClause;
+        }
+
+        private static void ApplyUnusedUpdates(DbUpdateCommandTree updateCommand, (string propertyName, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition) updateDescriptor, ICollection<DbModificationClause> setClauses)
+        {
+            var edmType = updateCommand.Target.VariableType.EdmType;
+            if (edmType is not System.Data.Entity.Core.Metadata.Edm.EntityType entityType) 
+                return;
+
+            var propertyName = updateDescriptor.propertyName;
+            if (entityType.Properties.Contains(propertyName))
+                setClauses.Add(GetUpdateSetClause(propertyName, updateDescriptor.condition.Value, updateCommand));
         }
     }
 }
