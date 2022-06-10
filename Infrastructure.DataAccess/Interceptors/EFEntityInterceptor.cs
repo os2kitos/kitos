@@ -58,11 +58,11 @@ namespace Infrastructure.DataAccess.Interceptors
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
-            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            var updates = new List<(string parameterName, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)>
             {
-                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+                new(ObjectOwnerIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName), userId)),
+                new(LastChangedByUserIdColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
+                new(LastChangedColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
             };
 
             var setClauses = insertCommand.SetClauses
@@ -89,9 +89,8 @@ namespace Infrastructure.DataAccess.Interceptors
                 new(LastChangedColumnName, new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
             };
 
-            var updateConditions = updates.Select(x => x.condition).ToList();
             var setClauses = updateCommand.SetClauses
-                .Select(clause => ApplyUpdates(clause, updateConditions))
+                .Select(clause => ApplyUpdates(clause, updates))
                 .ToList();
             
             foreach (var updateDescriptor in updates)
@@ -132,20 +131,20 @@ namespace Infrastructure.DataAccess.Interceptors
             return propertyExpression.Property.Name == propertyName;
         }
 
-        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<KeyValuePair<Predicate<DbSetClause>, DbExpression>> pendingUpdates)
+        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<(string parameterName, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)> pendingUpdates)
         {
             //Only check for updates until pending updates has been depleted
             if (pendingUpdates.Any())
             {
                 foreach (var pendingUpdate in pendingUpdates)
                 {
-                    if (pendingUpdate.Key((DbSetClause)clause))
+                    if (pendingUpdate.condition.Key((DbSetClause)clause))
                     {
                         var propertyExpression = (DbPropertyExpression)((DbSetClause)clause).Property;
 
                         //Pending update matched - apply the update and break off
                         pendingUpdates.Remove(pendingUpdate);
-                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.Value);
+                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.condition.Value);
                     }
                 }
             }
