@@ -97,8 +97,7 @@ namespace Infrastructure.DataAccess.Interceptors
             {
                 ApplyUnusedUpdates(updateCommand, updateDescriptor, setClauses);
             }
-
-
+            
             return new DbUpdateCommandTree(
                 updateCommand.MetadataWorkspace,
                 updateCommand.DataSpace,
