@@ -93,8 +93,8 @@
                 $scope.procurementStrategies = procurementStrategies;
                 $scope.orgUnits = orgUnits;
                 $scope.allowClear = true;
-                $scope.showReplacementPlanSelection =
-                    uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.replacementPlan);
+                $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);
+                $scope.showProcurementStrategySelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementStrategy);
                 var today = new Date();
 
                 if (!contract.active) {

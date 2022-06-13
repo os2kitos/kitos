@@ -403,7 +403,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: (e:any) => this.exportToExcel(e),
+                excelExport: (e: any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -812,7 +812,8 @@
                                 showOperators: false,
                                 operator: "contains"
                             }
-                        }
+                        },
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.procurementStrategy)
                     },
                     {
                         field: "ProcurementPlanYear",
@@ -820,7 +821,7 @@
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.replacementPlan),
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.procurementPlan),
                         template: dataItem =>
                             dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                                 ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`
