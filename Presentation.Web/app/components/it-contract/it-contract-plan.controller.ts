@@ -805,7 +805,7 @@
                     },
                     {
                         field: "ProcurementStrategy",
-                        title: "Udbudsstrategi",
+                        title: "Genanskaffelsesstrategi",
                         width: 150,
                         persistId: "procurementStrategy", // DON'T YOU DARE RENAME!
                         hidden: true,
