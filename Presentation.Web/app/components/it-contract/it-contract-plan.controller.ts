@@ -160,11 +160,6 @@
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
 
-        private fixUserFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
-        }
-
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -280,7 +275,7 @@
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
 
-                                parameterMap.$filter = this.fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
+                                parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
                             return parameterMap;

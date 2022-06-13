@@ -228,6 +228,9 @@
                                 // replaces "contains(Uuid,'11')" with "contains(CAST(Uuid, 'Edm.String'),'11')"
                                 parameterMap.$filter = parameterMap.$filter.replace(/contains\(Uuid,/,
                                     "contains(CAST(Uuid, 'Edm.String'),");
+
+                                //Fix filter on users to include both the first and last name properties
+                                parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
                             const existing = parameterMap.$filter;
@@ -236,7 +239,6 @@
                             if (hadExisting) {
                                 parameterMap.$filter = `(${parameterMap.$filter})`;
                             }
-
 
                             return parameterMap;
                         }
