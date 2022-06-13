@@ -7,13 +7,13 @@ namespace Infrastructure.DataAccess.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.4.4")]
-    public sealed partial class AddedDrpReadModelLastChangedBy : IMigrationMetadata
+    public sealed partial class AddDprReadModelLastUpdatedBy : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(AddedDrpReadModelLastChangedBy));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(AddDprReadModelLastUpdatedBy));
         
         string IMigrationMetadata.Id
         {
-            get { return "202206101212019_AddedDrpReadModelLastChangedBy"; }
+            get { return "202206130953204_AddDprReadModelLastUpdatedBy"; }
         }
         
         string IMigrationMetadata.Source
