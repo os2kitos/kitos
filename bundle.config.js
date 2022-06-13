@@ -10,7 +10,7 @@ module.exports = {
         npm("/select2/select2_locale_da.js"),
         npm("/moment/min/moment.min.js"),
         npm("/json-fn/jsonfn.min.js"),
-        npm("/tinymce.js"),
+        npm("/tinymce/tinymce.js"),
         npm("/plugins/image/plugin.min.js"),
         npm("/plugins/code/plugin.min.js"),
         npm("/plugins/link/plugin.min.js"),
