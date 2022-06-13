@@ -65,7 +65,7 @@ namespace Core.DomainServices.Repositories.GDPR
             //Gets all read models that have dependencies on the user
             return _repository
                 .AsQueryable()
-                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId))
+                .Where(x => x.RoleAssignments.Any(assignment => assignment.UserId == userId || x.LastChangedById == userId))
                 .Distinct();
         }
     }
