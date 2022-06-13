@@ -72,14 +72,14 @@ namespace Infrastructure.DataAccess.Mapping
             Property(x => x.ContractNamesAsCsv).IsOptional();
 
             Property(x => x.LastChangedById)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedById", 0);
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedById", 0);
 
             Property(x => x.LastChangedByName)
                 .HasMaxLength(UserConstraints.MaxNameLength)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedByName", 0);
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedByName", 0);
 
             Property(x => x.LastChangedAt)
-                .HasIndexAnnotation("ItSystemUsageOverviewReadModel_Index_LastChangedAt", 0);
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedAt", 0);
         }
     }
 }
