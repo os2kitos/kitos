@@ -22,7 +22,7 @@
             <!--Tabs-->
             <tr ng-repeat="tabConfig in ctrl.customizationModel.root.children">
                 <td>
-                    <label style="font-weight: normal">
+                    <label class="local-ui-customization-option">
                         <input id="{{::tabConfig.key}}" type="checkbox" ng-checked="tabConfig.available" ng-disabled="!tabConfig.editable" ng-click="ctrl.toggleSetting(tabConfig.key)" />
                         {{:: tabConfig.text}}
                         <span ng-if="tabConfig.helpText" class="help-block small">
@@ -37,14 +37,16 @@
                     </span>
                 </td>
                 <td ng-if="tabConfig.children.length > 0">
-                    <label ng-repeat="fieldConfig in tabConfig.children" style="font-weight: normal">
-                        <input id="{{::fieldConfig.key}}" type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)" />
-                        {{:: fieldConfig.text}}
-                        <span ng-if="fieldConfig.helpText" class="help-block small">
-                            <i class="fa fa-info-circle" aria-hidden="true"></i>
-                            {{:: fieldConfig.helpText}}
-                        </span>
-                    </label>
+                    <div ng-repeat="fieldConfig in tabConfig.children">
+                        <label class="local-ui-customization-option">
+                            <input id="{{::fieldConfig.key}}" type="checkbox" ng-checked="fieldConfig.available" ng-disabled="!fieldConfig.editable" ng-click="ctrl.toggleSetting(fieldConfig.key)" />
+                            {{:: fieldConfig.text}}
+                            <span ng-if="fieldConfig.helpText" class="help-block small">
+                                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                                {{:: fieldConfig.helpText}}
+                            </span>
+                        </label>
+                    </div>
                 </td>
             </tr>
         </tbody>
