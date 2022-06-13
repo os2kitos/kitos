@@ -112,9 +112,11 @@ const tinyMCEFonts = function (callBack) {
 
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"))
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"));
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
+        .pipe(rename("content.min.css"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"));
 };
 
 const tinyMCEFixLang = function (callBack) {

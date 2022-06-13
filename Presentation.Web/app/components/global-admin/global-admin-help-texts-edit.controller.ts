@@ -15,8 +15,8 @@
             $rootScope.page.title = "Hjælpetekter";
             this.tinymceOptions = {
                 plugins: "link image code",
-                skin: "lightgray",
-                theme: "modern",
+                //skin: "lightgray",
+                theme: "silver",
                 convert_urls: false,
                 height: "400px"
             };

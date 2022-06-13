@@ -48,8 +48,8 @@
 
             $scope.tinymceOptions = {
                 plugins: 'link image code',
-                skin: 'lightgray',
-                theme: 'modern',
+                //skin: 'lightgray',
+                theme: 'silver',
                 convert_urls: false
             };
 
