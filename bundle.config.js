@@ -10,11 +10,11 @@ module.exports = {
         npm("/select2/select2_locale_da.js"),
         npm("/moment/min/moment.min.js"),
         npm("/json-fn/jsonfn.min.js"),
-        npm("/tinymce/tinymce.js"),
-        npm("/tinymce/plugins/image/plugin.min.js"),
-        npm("/tinymce/plugins/code/plugin.min.js"),
-        npm("/tinymce/plugins/link/plugin.min.js"),
-        npm("/tinymce/themes/modern/theme.min.js"),
+        npm("/tinymce.js"),
+        npm("/plugins/image/plugin.min.js"),
+        npm("/plugins/code/plugin.min.js"),
+        npm("/plugins/link/plugin.min.js"),
+        npm("/themes/modern/theme.min.js"),
         npm("/js-sha256/src/sha256.js")
     ],
     libraryBundle: "library-bundle.min.js",
@@ -24,8 +24,8 @@ module.exports = {
         npm("/select2-bootstrap-css/select2-bootstrap.min.css"),
         npm("/angular-loading-bar/build/loading-bar.min.css"),
         npm("/angular-ui-tree/dist/angular-ui-tree.min.css"),
-        npm("/tinymce/skins/lightgray/skin.min.css"),
-        npm("/tinymce/skins/lightgray/content.min.css")
+        npm("/skins/lightgray/skin.min.css"),
+        npm("/skins/lightgray/content.min.css")
     ],
 
     // angular script bundle
