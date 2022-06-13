@@ -36,7 +36,8 @@ describe("Local admin is able customize the IT-Contract UI", () => {
             .then(() => Select2Helper.select(loginHelper.getGlobalAdminCredentials().username, "selectUser"))
             .then(() => testTabCustomization(contractName, "ItContracts.contractRoles", ContractNavigationSrefs.contractRolesSref))
             .then(() => testTabCustomization(contractName, "ItContracts.advice", ContractNavigationSrefs.adviceSref))
-            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.replacementPlan", ContractNavigationSrefs.frontPageSref, "selectReplacementPlan"));
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementPlan", ContractNavigationSrefs.frontPageSref, "selectProcurementPlan"))
+            .then(() => testFieldCustomization(contractName, "ItContracts.frontPage.procurementStrategy", ContractNavigationSrefs.frontPageSref, "selectProcurementStrategy"));
     });
 
     function testTabCustomization(name: string, settingId: string, tabSref: string) {

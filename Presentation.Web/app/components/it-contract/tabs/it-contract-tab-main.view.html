@@ -82,7 +82,7 @@
                         </div>
 
                         <!-- Procurement strategy -->
-                        <div class="form-group">
+                        <div id="selectProcurementStrategy" class="form-group" ng-if="showProcurementStrategySelection">
                             <select2-option data-id="contract-strat"
                                            data-label="Genanskaffelsesstrategi"
                                            data-placeholder="Vælg genanskaffelsesstrategi"
@@ -96,7 +96,7 @@
                         </div>
 
                         <!-- Procurement plan -->
-                        <div id="selectReplacementPlan" class="form-group" ng-if="showReplacementPlanSelection">
+                        <div id="selectProcurementPlan" class="form-group" ng-if="showprocurementPlanSelection">
                             <select-simple data-id="contract-plan"
                                            data-label="Genanskaffelsesplan"
                                            data-placeholder="Vælg genanskaffelsesplan"

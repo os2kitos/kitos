@@ -10,7 +10,10 @@
                 readOnly: true,
                 helpText: Configs.helpTexts.cannotChangeTab,
                 children: {
-                    replacementPlan: {
+                    procurementStrategy: {
+                        text: "Genanskaffelsesstrategi"
+                    },
+                    procurementPlan: {
                         text: "Genanskaffelsesplan"
                     }
                 }
