@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Core.DomainModel.ItContract
 {
     /// <summary>
-    /// It contract procurment strategy option. (udbudsstrategi)
+    /// It contract procurment strategy option. (Genanskaffelsesstrategi)
     /// </summary>
     public class ProcurementStrategyType : OptionEntity<ItContract>, IOptionReference<ItContract>
     {

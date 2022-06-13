@@ -31,9 +31,9 @@
         SupplierId: number;
         /** Gets or sets the organization marked as supplier for this contract. */
         Supplier: IOrganization;
-        /** Gets or sets the chosen procurement strategy option identifier. (udbudsstrategi) */
+        /** Gets or sets the chosen procurement strategy option identifier. (Genanskaffelsesstrategi) */
         ProcurementStrategyId: number;
-        /** Gets or sets the chosen procurement strategy option. (udbudsstrategi) */
+        /** Gets or sets the chosen procurement strategy option. (Genanskaffelsesstrategi) */
         ProcurementStrategy: IProcurementStrategy;
         /** Gets or sets the procurement plan quarter. (genanskaffelsesplan) */
         ProcurementPlanQuarter: number;
