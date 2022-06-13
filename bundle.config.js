@@ -24,8 +24,8 @@ module.exports = {
         npm("/select2-bootstrap-css/select2-bootstrap.min.css"),
         npm("/angular-loading-bar/build/loading-bar.min.css"),
         npm("/angular-ui-tree/dist/angular-ui-tree.min.css"),
-        npm("/skins/lightgray/skin.min.css"),
-        npm("/skins/lightgray/content.min.css")
+        npm("/tinymce/skins/lightgray/skin.min.css"),
+        npm("/tinymce/skins/lightgray/content.min.css")
     ],
 
     // angular script bundle
