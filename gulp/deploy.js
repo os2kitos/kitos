@@ -106,18 +106,18 @@ const fonts = function (callBack) {
 
 // copy tinyMCE fonts
 const tinyMCEFonts = function (callBack) {
-    return src(config.tinyMCEFontSrc)
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce-small.eot"));
+    return src(config.tinyMCEFontSrc);
 };
 
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"));
-    //.pipe(rename("content.min.css"))
-    //.pipe(dest(paths.sourceScript + "/skins/content/default"));
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
+        .pipe(rename("content.min.css"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"))
+        .pipe(rename("tinymce-small.eot"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"));
 };
 
 const tinyMCEFixLang = function (callBack) {
