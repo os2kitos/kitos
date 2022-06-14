@@ -115,8 +115,8 @@ const tinyMCEFixCss = function (callBack) {
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("skin.min.css"))
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
-        .pipe(rename("content.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/content/default"));
+        //.pipe(rename("content.min.css"))
+        //.pipe(dest(paths.sourceScript + "/skins/content/default"));
 };
 
 const tinyMCEFixLang = function (callBack) {
