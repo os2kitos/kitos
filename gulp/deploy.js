@@ -122,6 +122,8 @@ const tinyMCEFixFonts = function (callBack) {
     return file("tinymce-small.eot", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceContent + "/css/fonts"))
         .pipe(rename("tinymce-small.svg"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce-small.ttf"))
         .pipe(dest(paths.sourceContent + "/css/fonts"));
 };
 
