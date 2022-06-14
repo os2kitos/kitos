@@ -107,16 +107,17 @@ const fonts = function (callBack) {
 // copy tinyMCE fonts
 const tinyMCEFonts = function (callBack) {
     return src(config.tinyMCEFontSrc)
-        .pipe(dest(config.tinyMCEFontDest));
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce-small.eot"));
 };
 
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
-        //.pipe(rename("content.min.css"))
-        //.pipe(dest(paths.sourceScript + "/skins/content/default"));
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"));
+    //.pipe(rename("content.min.css"))
+    //.pipe(dest(paths.sourceScript + "/skins/content/default"));
 };
 
 const tinyMCEFixLang = function (callBack) {
