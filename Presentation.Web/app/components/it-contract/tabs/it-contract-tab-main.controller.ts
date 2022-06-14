@@ -79,10 +79,13 @@
             function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) {
 
                 const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
+                const yesNoUndecided = new Kitos.Models.ViewModel.Shared.YesNoUndecidedOptions();
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
+                $scope.dataOptions = yesNoUndecided.options;
                 $scope.contract = contract;
+                $scope.contract.repurchaseInitiated = yesNoUndecided.getById(contract.repurchaseInitiated);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
@@ -183,6 +186,14 @@
                     $scope.contract.procurementPlanYear = payload.procurementPlanYear;
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 }
+
+                $scope.saveRepurchaseInitiated = repurchaseInitiated => {
+                    if (repurchaseInitiated === null)
+                        return;
+
+                    var payload = { repurchaseInitiated: repurchaseInitiated };
+                    patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
+                };
 
                 function patch(payload, url) {
                     var msg = notify.addInfoMessage("Gemmer...", false);

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Core.DomainModel.ItContract;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Models.API.V1
 {
@@ -65,10 +66,9 @@ namespace Presentation.Web.Models.API.V1
 
         public string ObjectOwnerName { get; set; }
         public string ObjectOwnerLastName { get; set; }
-        public string ObjectOwnerFullName
-        {
-            get { return ObjectOwnerName + " " + ObjectOwnerLastName; }
-        }
+
+        public string ObjectOwnerFullName => ObjectOwnerName + " " + ObjectOwnerLastName;
+
         public int? ObjectOwnerId { get; set; }
 
         public YearSegmentOption? Running { get; set; }
@@ -82,5 +82,7 @@ namespace Presentation.Web.Models.API.V1
         public IEnumerable<NamedEntityDTO> DataProcessingRegistrations { get; set; }
 
         public Guid Uuid { get; set; }
+
+        public YesNoUndecidedOption? RepurchaseInitiated { get; set; }
     }
 }
