@@ -286,7 +286,6 @@
 
                     $scope.tinymceOptions = {
                         plugins: "link image code",
-                        //skin: "lightgray",
                         theme: "silver",
                         toolbar: "bold italic | example | code | preview | link | searchreplace",
                         convert_urls: false
