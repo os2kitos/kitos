@@ -31,7 +31,7 @@ module.exports = {
     sourceApp: sourceApp,
     appMaps: appMaps,
     sourceScript: sourceScript,
-    sourceContent: sourceScript,
+    sourceContent: sourceContent,
     allJavaScript: allJavaScript,
     allJavaScriptNoTests: allJavaScriptNoTests,
     typescriptOutput: typescriptOutput,

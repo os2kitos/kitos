@@ -115,8 +115,11 @@ const tinyMCEFixCss = function (callBack) {
         .pipe(rename("skin.min.css"))
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("content.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/content/default"))
-        .pipe(rename("tinymce-small.eot"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"));
+};
+
+const tinyMCEFixFonts = function (callBack) {
+    return file("tinymce-small.eot", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceContent + "/css/fonts"));
 };
 
@@ -126,7 +129,7 @@ const tinyMCEFixLang = function (callBack) {
 };
 
 // bundle, minify and copy styles, fonts and assets
-const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang));
+const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang, tinyMCEFixFonts));
 
 // run bundle tasks
 const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
