@@ -174,11 +174,6 @@
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
         }
 
-        private fixUserFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
-        }
-
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             this.gridState.loadGridOptions(this.mainGrid);
@@ -291,8 +286,7 @@
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
-                                parameterMap.$filter = self
-                                    .fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
+                                parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
                             return parameterMap;

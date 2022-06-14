@@ -218,7 +218,7 @@ namespace Core.DomainModel.ItContract
         public virtual Organization.Organization Supplier { get; set; }
 
         /// <summary>
-        ///     Gets or sets the chosen procurement strategy option identifier. (udbudsstrategi)
+        ///     Gets or sets the chosen procurement strategy option identifier. (Genanskaffelsesstrategi)
         /// </summary>
         /// <value>
         ///     Chosen procurement strategy identifier.
@@ -226,7 +226,7 @@ namespace Core.DomainModel.ItContract
         public int? ProcurementStrategyId { get; set; }
 
         /// <summary>
-        ///     Gets or sets the chosen procurement strategy option. (udbudsstrategi)
+        ///     Gets or sets the chosen procurement strategy option. (Genanskaffelsesstrategi)
         /// </summary>
         /// <value>
         ///     Chosen procurement strategy.

@@ -160,11 +160,6 @@
             return filterUrl.replace(/ProcurementPlanYear/i, "cast($&, Edm.String)");
         }
 
-        private fixUserFilter(filterUrl, column) {
-            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, "contains(LastChangedByUser/Name$2 or contains(LastChangedByUser/LastName$2");
-        }
-        
         public saveGridProfile() {
             Utility.KendoFilterProfileHelper.saveProfileLocalStorageData(this.$window, this.orgUnitStorageKey);
 
@@ -280,7 +275,7 @@
 
                                 parameterMap.$filter = this.fixProcurmentFilter(parameterMap.$filter);
 
-                                parameterMap.$filter = this.fixUserFilter(parameterMap.$filter, "LastChangedByUser/Name");
+                                parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
 
                             return parameterMap;
@@ -408,7 +403,7 @@
                 columnHide: this.saveGridOptions,
                 columnShow: this.saveGridOptions,
                 columnReorder: this.saveGridOptions,
-                excelExport: (e:any) => this.exportToExcel(e),
+                excelExport: (e: any) => this.exportToExcel(e),
                 page: this.onPaging,
                 columns: [
                     {
@@ -805,7 +800,7 @@
                     },
                     {
                         field: "ProcurementStrategy",
-                        title: "Udbudsstrategi",
+                        title: "Genanskaffelsesstrategi",
                         width: 150,
                         persistId: "procurementStrategy", // DON'T YOU DARE RENAME!
                         hidden: true,
@@ -817,7 +812,8 @@
                                 showOperators: false,
                                 operator: "contains"
                             }
-                        }
+                        },
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.procurementStrategy)
                     },
                     {
                         field: "ProcurementPlanYear",
@@ -825,7 +821,7 @@
                         width: 90,
                         persistId: "procurementPlan", // DON'T YOU DARE RENAME!
                         attributes: { "class": "text-center" },
-                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.replacementPlan),
+                        isAvailable: this.uiState.isBluePrintNodeAvailable(this.uiBluePrint.children.frontPage.children.procurementPlan),
                         template: dataItem =>
                             dataItem.ProcurementPlanQuarter && dataItem.ProcurementPlanYear
                                 ? `${dataItem.ProcurementPlanYear} | Q${dataItem.ProcurementPlanQuarter}`

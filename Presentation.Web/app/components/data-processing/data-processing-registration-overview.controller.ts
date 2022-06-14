@@ -452,8 +452,26 @@
                             .withStandardWidth(160)
                             .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
                             .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LatestOversightDate))
-                            .withExcelOutput(
-                                dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LatestOversightDate)))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LatestOversightDate)))
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("LastChangedByName")
+                            .withTitle("Sidst redigeret: Bruger")
+                            .withId("lastchangedname")
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Contains)
+                            .withInitialVisibility(false)
+                            .withSourceValueEchoRendering()
+                            .withSourceValueEchoExcelOutput())
+                    .withColumn(builder =>
+                        builder
+                            .withDataSourceName("LastChanged")
+                            .withTitle("Sidste redigeret: Dato")
+                            .withId("changed")
+                            .withFilteringOperation(Utility.KendoGrid.KendoGridColumnFiltering.Date)
+                            .withDataSourceType(Utility.KendoGrid.KendoGridColumnDataSourceType.Date)
+                            .withInitialVisibility(false)
+                            .withRendering(dataItem => Helpers.RenderFieldsHelper.renderDate(dataItem.LastChangedAt))
+                            .withExcelOutput(dataItem => Helpers.ExcelExportHelper.renderDate(dataItem.LastChangedAt)))
                     .withStandardSorting("Name");
 
             dataProcessingRegistrationOptions.roles.forEach(role =>

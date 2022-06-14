@@ -59,11 +59,13 @@ namespace Infrastructure.DataAccess.Interceptors
             var now = _operationClock().Now;
 
             var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
-            {
-                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
-            };
+                {
+                    new(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName), userId),
+                    new(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId),
+                    new(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now))
+                }
+                .Select(update => ("", false, update))//First two fields are only used during an update scenario, so we insert dummies here
+                .ToList();
 
             var setClauses = insertCommand.SetClauses
                 .Select(clause => ApplyUpdates(clause, updates))
@@ -82,16 +84,22 @@ namespace Infrastructure.DataAccess.Interceptors
             var userId = GetActiveUserId();
             var now = _operationClock().Now;
 
-            var updates = new List<KeyValuePair<Predicate<DbSetClause>, DbExpression>>
+            var pendingUpdates = new List<(string propertyName, bool addIfNotUpdated, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)>
             {
-                new(clause=>MatchPropertyName(clause,ObjectOwnerIdColumnName) && MatchNull(clause), userId), //Some EF updates end up in this e.g. changing an owned child on a parent
-                new(clause=>MatchPropertyName(clause,LastChangedByUserIdColumnName), userId),
-                new(clause=>MatchPropertyName(clause,LastChangedColumnName), DbExpression.FromDateTime(now))
+                new(ObjectOwnerIdColumnName, false,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, ObjectOwnerIdColumnName) && MatchNull(clause), userId)), //Some EF updates end up in this e.g. changing an owned child on a parent
+                new(LastChangedByUserIdColumnName, true,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedByUserIdColumnName), userId)),
+                new(LastChangedColumnName, true,new KeyValuePair<Predicate<DbSetClause>, DbExpression>(clause => MatchPropertyName(clause, LastChangedColumnName), DbExpression.FromDateTime(now)))
             };
 
             var setClauses = updateCommand.SetClauses
-                .Select(clause => ApplyUpdates(clause, updates))
+                .Select(clause => ApplyUpdates(clause, pendingUpdates))
                 .ToList();
+
+            //Add updates which did not hit an existing change set (but only the ones which MUST be updated on each update)
+            foreach (var updateDescriptor in pendingUpdates.Where(x => x.addIfNotUpdated).ToList())
+            {
+                ApplyUnusedUpdates(updateCommand, updateDescriptor.propertyName, updateDescriptor.condition.Value, setClauses);
+            }
 
             return new DbUpdateCommandTree(
                 updateCommand.MetadataWorkspace,
@@ -125,26 +133,49 @@ namespace Infrastructure.DataAccess.Interceptors
             return propertyExpression.Property.Name == propertyName;
         }
 
-        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<KeyValuePair<Predicate<DbSetClause>, DbExpression>> pendingUpdates)
+        public static DbModificationClause ApplyUpdates(DbModificationClause clause, List<(string propertyName, bool addIfNotUpdated, KeyValuePair<Predicate<DbSetClause>, DbExpression> condition)> pendingUpdates)
         {
             //Only check for updates until pending updates has been depleted
             if (pendingUpdates.Any())
             {
-                foreach (var pendingUpdate in pendingUpdates.ToList())
+                foreach (var pendingUpdate in pendingUpdates)
                 {
-                    if (pendingUpdate.Key((DbSetClause)clause))
+                    if (pendingUpdate.condition.Key((DbSetClause)clause))
                     {
                         var propertyExpression = (DbPropertyExpression)((DbSetClause)clause).Property;
 
                         //Pending update matched - apply the update and break off
                         pendingUpdates.Remove(pendingUpdate);
-                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.Value);
+                        return DbExpressionBuilder.SetClause(propertyExpression, pendingUpdate.condition.Value);
                     }
                 }
             }
 
             //Return original
             return clause;
+        }
+
+        private static DbSetClause GetUpdateSetClause(string column, DbExpression newValueToSetToDb, DbUpdateCommandTree updateCommand)
+        {
+            // Create the variable reference in order to create the property
+            var variableReference = updateCommand.Target.VariableType.Variable(updateCommand.Target.VariableName);
+
+            // Create the property to which will assign the correct value
+            var tenantProperty = variableReference.Property(column);
+
+            // Create the set clause, object representation of sql insert command
+            var newSetClause = DbExpressionBuilder.SetClause(tenantProperty, newValueToSetToDb);
+            return newSetClause;
+        }
+
+        private static void ApplyUnusedUpdates(DbUpdateCommandTree updateCommand, string propertyName, DbExpression updateExpression, ICollection<DbModificationClause> setClauses)
+        {
+            var edmType = updateCommand.Target.VariableType.EdmType;
+            if (edmType is not System.Data.Entity.Core.Metadata.Edm.EntityType entityType)
+                return;
+
+            if (entityType.Properties.Contains(propertyName))
+                setClauses.Add(GetUpdateSetClause(propertyName, updateExpression, updateCommand));
         }
     }
 }

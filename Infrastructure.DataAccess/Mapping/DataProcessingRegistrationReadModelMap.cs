@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity.ModelConfiguration;
 using Core.DomainModel.GDPR;
 using Core.DomainModel.GDPR.Read;
+using Core.DomainModel.Users;
 
 namespace Infrastructure.DataAccess.Mapping
 {
@@ -69,6 +70,16 @@ namespace Infrastructure.DataAccess.Mapping
                 .HasIndexAnnotation("IX_DPR_IsOversightCompleted", 0);
 
             Property(x => x.ContractNamesAsCsv).IsOptional();
+
+            Property(x => x.LastChangedById)
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedById", 0);
+
+            Property(x => x.LastChangedByName)
+                .HasMaxLength(UserConstraints.MaxNameLength)
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedByName", 0);
+
+            Property(x => x.LastChangedAt)
+                .HasIndexAnnotation("DataProcessingRegistrationReadModel_Index_LastChangedAt", 0);
         }
     }
 }

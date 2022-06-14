@@ -873,6 +873,10 @@
     <Compile Include="Migrations\202206081008542_Rename_SsoOrgIdentity.designer.cs">
       <DependentUpon>202206081008542_Rename_SsoOrgIdentity.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.cs" />
+    <Compile Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.designer.cs">
+      <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Mapping\TerminationDeadlineTypeMap.cs" />
     <Compile Include="Services\DatabaseTransaction.cs" />
@@ -1441,6 +1445,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202206081008542_Rename_SsoOrgIdentity.resx">
       <DependentUpon>202206081008542_Rename_SsoOrgIdentity.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202206131047556_AddDprReadModelLastUpdatedBy.resx">
+      <DependentUpon>202206131047556_AddDprReadModelLastUpdatedBy.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_Contract_Relations.sql" />
     <EmbeddedResource Include="Migrations\SQLScripts\Migrate_System_Url.sql" />

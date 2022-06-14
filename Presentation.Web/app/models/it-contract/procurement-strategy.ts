@@ -1,5 +1,5 @@
 ﻿module Kitos.Models.ItContract {
-    /** It contract procurment strategy option. (udbudsstrategi) */
+    /** It contract procurment strategy option. (Genanskaffelsesstrategi) */
     export interface IProcurementStrategy extends IEntity {
         Name: string;
         IsActive: boolean;
