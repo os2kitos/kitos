@@ -128,6 +128,16 @@ const tinyMCEFixFonts = function (callBack) {
         .pipe(rename("tinymce-small.wof"))
         .pipe(dest(paths.sourceContent + "/css/fonts"))
         .pipe(rename("tinymce-small.woff"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce.eot"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce.svg"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce.ttf"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce.wof"))
+        .pipe(dest(paths.sourceContent + "/css/fonts"))
+        .pipe(rename("tinymce.woff"))
         .pipe(dest(paths.sourceContent + "/css/fonts"));
 };
 
