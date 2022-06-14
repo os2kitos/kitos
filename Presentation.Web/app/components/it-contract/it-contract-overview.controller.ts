@@ -745,6 +745,20 @@
                             dataItem && dataItem.status && `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow}, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` || "",
                         sortable: false,
                         filterable: false
+                    },
+                    {
+                        field: "RepurchaseInitiated", title: "Genanskaffelse igangsat", width: 150,
+                        persistId: "genanskaffelse_igangsat",
+                        template: dataItem => dataItem.RepurchaseInitiated ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.RepurchaseInitiated) : "",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };
