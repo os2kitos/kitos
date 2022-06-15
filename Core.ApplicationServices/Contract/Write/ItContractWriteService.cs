@@ -19,6 +19,7 @@ using Core.DomainModel.Events;
 using Core.DomainModel.ItContract;
 using Core.DomainModel.Organization;
 using Core.DomainModel.References;
+using Core.DomainModel.Shared;
 using Core.DomainServices;
 using Core.DomainServices.Generic;
 using Core.DomainServices.Role;
@@ -466,6 +467,7 @@ namespace Core.ApplicationServices.Contract.Write
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTypeUuid, UpdateContractType))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.ContractTemplateUuid, UpdateContractTemplate))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.Notes, (c, newValue) => c.Note = newValue))
+                .Bind(itContract => itContract.WithOptionalUpdate(generalData.RepurchaseInitiated, (c, newValue) => c.RepurchaseInitiated = newValue.GetValueOrFallback(YesNoUndecidedOption.Undecided)))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.EnforceValid, (c, newValue) => c.Active = newValue.GetValueOrFallback(false)))
                 .Bind(itContract => UpdateValidityPeriod(itContract, generalData).Match<Result<ItContract, OperationError>>(error => error, () => itContract))
                 .Bind(itContract => itContract.WithOptionalUpdate(generalData.AgreementElementUuids, UpdateAgreementElements));
@@ -611,7 +613,7 @@ namespace Core.ApplicationServices.Contract.Write
             contract.Name = newName;
             return Maybe<OperationError>.None;
         }
-
+        
         public Maybe<OperationError> Delete(Guid itContractUuid)
         {
             var dbId = _entityIdentityResolver.ResolveDbId<ItContract>(itContractUuid);

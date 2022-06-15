@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Core.Abstractions.Types;
 using Core.ApplicationServices.Model.Shared;
+using Core.DomainModel.Shared;
 
 namespace Core.ApplicationServices.Model.Contracts.Write
 {
@@ -15,5 +16,6 @@ namespace Core.ApplicationServices.Model.Contracts.Write
         public OptionalValueChange<Maybe<bool>> EnforceValid { get; set; } = OptionalValueChange<Maybe<bool>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidFrom { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
         public OptionalValueChange<Maybe<DateTime>> ValidTo { get; set; } = OptionalValueChange<Maybe<DateTime>>.None;
+        public OptionalValueChange<Maybe<YesNoUndecidedOption>> RepurchaseInitiated { get; set; } = OptionalValueChange<Maybe<YesNoUndecidedOption>>.None;
     }
 }

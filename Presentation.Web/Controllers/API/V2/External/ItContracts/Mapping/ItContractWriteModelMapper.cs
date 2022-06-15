@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using Core.DomainModel.Shared;
 
 namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 {
@@ -302,7 +303,11 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
 
                 EnforceValid = rule.MustUpdate(x => x.General.Validity.EnforcedValid)
                     ? (dto.Validity?.EnforcedValid ?? Maybe<bool>.None).AsChangedValue()
-                    : OptionalValueChange<Maybe<bool>>.None
+                    : OptionalValueChange<Maybe<bool>>.None,
+
+                RepurchaseInitiated = rule.MustUpdate(x => x.General.RepurchaseInitiated)
+                    ? (dto.RepurchaseInitiated ?? Maybe<YesNoUndecidedOption>.None).AsChangedValue()
+                    : OptionalValueChange<Maybe<YesNoUndecidedOption>>.None
             };
         }
 

@@ -257,10 +257,10 @@ namespace Core.DomainModel.ItContract
         public int? ProcurementPlanYear { get; set; }
 
         /// <summary>
-        ///     Gets or sets the chosen contract template identifier.
+        ///     Gets or sets the repurchase initiated. (Genanskaffelse igangsat)
         /// </summary>
         /// <value>
-        ///     Chosen contract template identifier.
+        ///     Yes/No/Undecided repurchase initiated.
         /// </value>
         public YesNoUndecidedOption? RepurchaseInitiated{ get; set; }
 

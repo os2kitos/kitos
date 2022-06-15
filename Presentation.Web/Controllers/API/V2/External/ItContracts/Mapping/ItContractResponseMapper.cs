@@ -17,7 +17,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
     {
         public ItContractResponseDTO MapContractDTO(ItContract contract)
         {
-            return new ItContractResponseDTO()
+            return new ItContractResponseDTO
             {
                 Uuid = contract.Uuid,
                 Name = contract.Name,
@@ -196,6 +196,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new()
             {
+                RepurchaseInitiated = contract.RepurchaseInitiated,
                 ContractId = contract.ItContractId,
                 Notes = contract.Note,
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),

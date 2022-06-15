@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Core.DomainModel.Shared;
 using Presentation.Web.Infrastructure.Attributes;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Generic.Validity;
@@ -30,5 +31,9 @@ namespace Presentation.Web.Models.API.V2.Response.Contract
         /// Validity of the it-contract
         /// </summary>
         public ValidityResponseDTO Validity { get; set; }
+        /// <summary>
+        ///     Repurchase Initiated for IT-Contract. (Genanskaffelse igangsat)
+        /// </summary>
+        public YesNoUndecidedOption? RepurchaseInitiated { get; set; }
     }
 }
