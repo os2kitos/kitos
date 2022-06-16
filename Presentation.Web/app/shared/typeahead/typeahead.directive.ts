@@ -45,12 +45,10 @@
                 };
 
                 scope.onBlur = function () {
-                    if (angular.isUndefined(scope.model) || scope.model.length) {
-                        scope.model = scope.searchInput;
-                        $timeout(function () {
-                            scope.showItems = false;
-                        }, 200);
-                    }
+                    scope.model = scope.searchInput;
+                    $timeout(function () {
+                        scope.showItems = false;
+                    }, 200);
                 };
 
                 scope.onKeypress = function (keyEvent) {
