@@ -148,6 +148,11 @@ namespace Presentation.Web
                 .ForMember(dest => dest.References, opt => opt.Ignore())
                 .IgnoreDestinationEntityFields();
 
+            CreateMap<CriticalityType, OptionDTO>()
+                .ReverseMap()
+                .ForMember(dest => dest.References, opt => opt.Ignore())
+                .IgnoreDestinationEntityFields();
+
             CreateMap<ItProjectRole, RoleDTO>()
                   .ReverseMap()
                   .ForMember(dest => dest.References, opt => opt.Ignore())

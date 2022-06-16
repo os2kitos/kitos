@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Presentation.Web.Models.API.V2.Response.Generic.Identity;
 using Presentation.Web.Models.API.V2.Response.Options;
 using Xunit;
@@ -35,6 +36,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
             public const string ItContractNoticePeriodMonthTypes = "it-contract-notice-period-month-types";
             public const string ItContractHandoverTrialTypes = "it-contract-handover-trial-types";
             public const string ItContractRoles = "it-contract-role-types";
+            public const string CriticalityTypes = "it-contract-criticality-types";
 
             public const string DataProcessingRegistrationDataResponsible = "data-processing-registration-data-responsible-types";
             public const string DataProcessingRegistrationBasisForTransfer = "data-processing-registration-basis-for-transfer-types";
@@ -47,7 +49,7 @@ namespace Tests.Integration.Presentation.Web.Tools.External
         {
             var token = await HttpApi.GetTokenAsync(OrganizationRole.GlobalAdmin);
             var url = TestEnvironment.CreateUrl($"api/v2/{resource}?organizationUuid={orgUuid}&pageSize={pageSize}&page={pageNumber}");
-            
+
             using var response = await HttpApi.GetWithTokenAsync(url, token.Token);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             return await response.ReadResponseBodyAsAsync<IEnumerable<IdentityNamePairResponseDTO>>();
