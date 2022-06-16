@@ -78,7 +78,7 @@
                     return this.$q.resolve(cachedValue);
                 }
             }
-            return this.$http.get<Models.IODataResult<IHelpTextOdataModel>>(`odata/HelpTexts?$filter=Key eq '${key}'`)
+            return this.getHelpTextFromApi(key)
                 .then((result) => {
                     let text: IHelpText | null = null;
                     if (result.data.value.length > 0) {
@@ -92,7 +92,10 @@
                     helpTextCache[cacheKey] = text;
                     return text;
                 });
+        }
 
+        getHelpTextFromApi(key: string): angular.IHttpPromise<Models.IODataResult<IHelpTextOdataModel>> {
+            return this.$http.get<Models.IODataResult<IHelpTextOdataModel>>(`odata/HelpTexts?$filter=Key eq '${key}'`);
         }
 
         static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory"];
