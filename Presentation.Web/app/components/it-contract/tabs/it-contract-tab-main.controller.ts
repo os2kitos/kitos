@@ -22,6 +22,10 @@
                         "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
                         localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.ProcurementStrategyTypes).getAll()
                     ],
+                    criticalities: [
+                        "localOptionServiceFactory", (localOptionServiceFactory: Kitos.Services.LocalOptions.ILocalOptionServiceFactory) =>
+                        localOptionServiceFactory.create(Kitos.Services.LocalOptions.LocalOptionType.CriticalityTypes).getAll()
+                    ],
                     orgUnits: [
                         '$http', 'contract', function ($http, contract) {
                             return $http.get('api/organizationUnit?organization=' + contract.organizationId).then(function (result) {
@@ -75,8 +79,8 @@
 
     app.controller('contract.EditMainCtrl',
         [
-            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers', "uiState",
-            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI) {
+            '$scope', '$http', '_', '$stateParams', 'notify', 'contract', 'contractTypes', 'contractTemplates', 'purchaseForms', 'procurementStrategies', 'orgUnits', 'hasWriteAccess', 'user', 'autofocus', 'kitosUsers', "uiState", "criticalities",
+            function ($scope, $http, _, $stateParams, notify, contract, contractTypes, contractTemplates, purchaseForms, procurementStrategies, orgUnits: Kitos.Models.ViewModel.Generic.Select2OptionViewModelWithIndentation<number>[], hasWriteAccess, user: Kitos.Services.IUser, autofocus, kitosUsers, uiState: Kitos.Models.UICustomization.ICustomizedModuleUI, criticalities) {
 
                 const blueprint = Kitos.Models.UICustomization.Configs.BluePrints.ItContractUiCustomizationBluePrint;
 
@@ -91,6 +95,7 @@
                 $scope.contractTemplates = contractTemplates;
                 $scope.purchaseForms = purchaseForms;
                 $scope.procurementStrategies = procurementStrategies;
+                $scope.criticalities = criticalities;
                 $scope.orgUnits = orgUnits;
                 $scope.allowClear = true;
                 $scope.showprocurementPlanSelection = uiState.isBluePrintNodeAvailable(blueprint.children.frontPage.children.procurementPlan);

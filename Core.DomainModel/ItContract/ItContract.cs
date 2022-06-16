@@ -327,6 +327,23 @@ namespace Core.DomainModel.ItContract
         /// </value>
         public virtual ICollection<ItContract> Children { get; set; }
 
+
+        /// <summary>
+        ///     Id of criticality type ItContract
+        /// </summary>
+        /// <value>
+        ///     The criticality type identifier.
+        /// </value>
+        public int? CriticalityId { get; set; }
+
+        /// <summary>
+        ///     The parent ItContract
+        /// </summary>
+        /// <value>
+        ///     The parent.
+        /// </value>
+        public virtual CriticalityType CriticalityType { get; set; }
+
         #endregion
 
         #region Deadlines (aftalefrister)

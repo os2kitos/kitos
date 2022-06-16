@@ -355,6 +355,7 @@ namespace Presentation.Web
             CreateMap<ItContract, ItContractDTO>()
                   .ForMember(dest => dest.AssociatedSystemUsages, opt => opt.MapFrom(src => src.AssociatedSystemUsages.Select(x => x.ItSystemUsage)))
                   .ForMember(dest => dest.AgreementElements, opt => opt.MapFrom(src => src.AssociatedAgreementElementTypes.Select(x => x.AgreementElementType)))
+                  .ForMember(dest => dest.CriticalityName, opt => opt.MapFrom(src => src.CriticalityType.Name))
                   .ReverseMap()
                   .ForMember(contract => contract.AssociatedSystemUsages, opt => opt.Ignore())
                   .ForMember(contract => contract.AssociatedAgreementElementTypes, opt => opt.Ignore())

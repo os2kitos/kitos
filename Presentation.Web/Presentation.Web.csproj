@@ -347,6 +347,7 @@
     <TypeScriptCompile Include="app\helpers\kendo-field-filter-helpers.ts" />
     <TypeScriptCompile Include="app\helpers\select2-option-format-helper.ts" />
     <TypeScriptCompile Include="app\models\Api\ui-customization\ui-module-customization-dto.ts" />
+    <TypeScriptCompile Include="app\models\it-contract\criticality-type.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-system-usage-ui-customization-config-blueprint.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\ui-customization-config-primitives.ts" />
     <TypeScriptCompile Include="app\models\ui-customization\config\blueprints\it-contract-ui-customization-config-blueprint.ts" />
@@ -354,6 +355,8 @@
     <TypeScriptCompile Include="app\helpers\UiCustomizationHelper.ts" />
     <Compile Include="Controllers\API\V1\KendoOrganizationalConfigurationController.cs" />
     <Compile Include="Controllers\API\V1\Mapping\DTOMappingExtensions.cs" />
+    <Compile Include="Controllers\API\V1\OData\LocalOptionControllers\LocalCriticalityTypesController.cs" />
+    <Compile Include="Controllers\API\V1\OData\OptionControllers\CriticalityTypesController.cs" />
     <Compile Include="Controllers\API\V1\OrganizationLifeCycleController.cs" />
     <Compile Include="Controllers\API\V1\StsOrganizationSynchronizationController.cs" />
     <Compile Include="Controllers\API\V1\UI_Configuration\UIModuleCustomizationController.cs" />
@@ -379,6 +382,7 @@
     <Compile Include="Controllers\API\V2\External\Generic\IPropertyUpdateRule.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\MustUpdateIfDefinedOrEnforcedChangeRule.cs" />
     <Compile Include="Controllers\API\V2\External\Generic\WriteModelMapperBase.cs" />
+    <Compile Include="Controllers\API\V2\External\ItContracts\ItContractCriticalityTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentFrequencyTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractPaymentModelTypeV2Controller.cs" />
     <Compile Include="Controllers\API\V2\External\ItContracts\ItContractAgreementElementTypeV2Controller.cs" />

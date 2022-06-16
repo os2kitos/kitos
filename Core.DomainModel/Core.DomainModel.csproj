@@ -54,6 +54,7 @@
     <Compile Include="Advice\AdviceUserRelation.cs" />
     <Compile Include="Constants\UIModuleConfigurationConstants.cs" />
     <Compile Include="IHasDirtyMarking.cs" />
+    <Compile Include="ItContract\CriticalityType.cs" />
     <Compile Include="ItContract\YearSegmentOption.cs" />
     <Compile Include="Events\EntityCreatedEvent.cs" />
     <Compile Include="Events\EntityBeingDeletedEvent.cs" />
@@ -66,6 +67,7 @@
     <Compile Include="Extensions\OrmTrackingExtensions.cs" />
     <Compile Include="ItSystemUsage\TechnicalPrecaution.cs" />
     <Compile Include="KendoConfig\KendoColumnConfiguration.cs" />
+    <Compile Include="LocalOptions\LocalCriticalityType.cs" />
     <Compile Include="Notification\IEntityWithUserNotification.cs" />
     <Compile Include="Notification\NotificationType.cs" />
     <Compile Include="KendoConfig\OverviewType.cs" />

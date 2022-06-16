@@ -174,6 +174,11 @@
             return filterUrl.replace(pattern, "AssociatedSystemUsages/any(c: $1c/ItSystemUsage/ItSystem/Name$2)");
         }
 
+        private fixCriticalityFilter(filterUrl, column) {
+            const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
+            return filterUrl.replace(pattern, "CriticalityTypes/any(c: $1c/CriticalityType/Name$2)");
+        }
+
         // loads kendo grid options from localstorage
         private loadGridOptions() {
             this.gridState.loadGridOptions(this.mainGrid);
@@ -260,7 +265,8 @@
                                         "Supplier($select=Name)," +
                                         "AssociatedSystemUsages($expand=ItSystemUsage($select=Id;$expand=ItSystem($select=Name,Disabled)))," +
                                         "DataProcessingRegistrations($select=IsAgreementConcluded)," +
-                                        "LastChangedByUser($select=Name,LastName)";
+                                        "LastChangedByUser($select=Name,LastName)," +
+                                        "CriticalityType($select=Name)";
                                 // if orgunit is set then the org unit filter is active
                                 var orgUnitId = self.$window.sessionStorage.getItem(self.orgUnitStorageKey);
                                 if (orgUnitId === null) {
@@ -285,6 +291,9 @@
 
                                 parameterMap.$filter = self
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
+
+                                parameterMap.$filter =
+                                    self.fixCriticalityFilter(parameterMap.$filter, "CriticalityType");
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
@@ -745,6 +754,22 @@
                             dataItem && dataItem.status && `Hvid: ${dataItem.status.white}, Rød: ${dataItem.status.red}, Gul: ${dataItem.status.yellow}, Grøn: ${dataItem.status.green}, Max: ${dataItem.status.max}` || "",
                         sortable: false,
                         filterable: false
+                    },
+                    {
+                        field: "Criticality", title: "Kritikalitet", width: 90,
+                        persistId: "kritikalitet",
+                        template: dataItem => dataItem.CriticalityType ? dataItem.CriticalityType.Name : "",
+                        excelTemplate: dataItem =>
+                            dataItem.CriticalityType ? dataItem.CriticalityType.Name : "",
+                        sortable: false,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
                     }
                 ]
             };
