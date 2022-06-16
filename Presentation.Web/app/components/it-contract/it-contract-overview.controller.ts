@@ -176,7 +176,7 @@
 
         private fixCriticalityFilter(filterUrl, column) {
             const pattern = new RegExp(`(\\w+\\()${column}(.*?\\))`, "i");
-            return filterUrl.replace(pattern, "CriticalityTypes/any(c: $1c/CriticalityType/Name$2)");
+            return filterUrl.replace(pattern, `contains(CriticalityType/Name$2`);
         }
 
         // loads kendo grid options from localstorage
@@ -293,7 +293,7 @@
                                     .fixSystemFilter(parameterMap.$filter, "AssociatedSystemUsages");
 
                                 parameterMap.$filter =
-                                    self.fixCriticalityFilter(parameterMap.$filter, "CriticalityType");
+                                    self.fixCriticalityFilter(parameterMap.$filter, "Criticality");
 
                                 parameterMap.$filter = Helpers.fixODataUserByNameFilter(parameterMap.$filter, "LastChangedByUser/Name", "LastChangedByUser");
                             }
