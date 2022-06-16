@@ -337,10 +337,10 @@ namespace Core.DomainModel.ItContract
         public int? CriticalityId { get; set; }
 
         /// <summary>
-        ///     The parent ItContract
+        ///     The criticality of ItContract
         /// </summary>
         /// <value>
-        ///     The parent.
+        ///     The criticality.
         /// </value>
         public virtual CriticalityType CriticalityType { get; set; }
 
