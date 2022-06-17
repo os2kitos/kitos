@@ -22,8 +22,8 @@
             $scope.systemCategories = systemCategories;
             $scope.shouldShowCategories = systemCategories.length > 0;
             $scope.system = itSystemUsage.itSystem;
-            $scope.lastChangedBy = itSystemUsage.getLastChangedByUserFullName();
-            $scope.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate(itSystemUsage.lastChanged);
+            $scope.lastChangedBy = itSystemUsage.lastChangedBy;
+            $scope.lastChanged = itSystemUsage.lastChanged;
             autofocus();
             $scope.isValidUrl = (url: string) => Kitos.Utility.Validation.isValidExternalReference(url);
 
