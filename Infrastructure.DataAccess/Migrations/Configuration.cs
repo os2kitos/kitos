@@ -90,7 +90,7 @@ namespace Infrastructure.DataAccess.Migrations
 
                 AddOptions<PurchaseFormType, ItContract>(context.PurchaseFormTypes, globalAdmin, "SKI", "SKI 02.18", "SKI 02.19", "Udbud", "EU udbud", "Direkte tildeling", "Annoncering");
 
-                AddOptions<CriticalityType, ItContract>(context.CriticalityTypes, globalAdmin, "1", "2", "3", "4", "5", "6", "7");
+                AddOptions<CriticalityType, ItContract>(context.CriticalityTypes, globalAdmin, "Kritikalitet 1", "Kritikalitet 2");
 
                 AddOptions<PaymentModelType, ItContract>(context.PaymentModelTypes, globalAdmin, "Licens", "icens - flatrate", "Licens - forbrug", "Licens - indbyggere", "Licens - pr. sag", "Gebyr", "Engangsydelse");
 

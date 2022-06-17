@@ -49,9 +49,9 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts
         [SwaggerResponse(HttpStatusCode.Unauthorized)]
         [SwaggerResponse(HttpStatusCode.Forbidden)]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        public IHttpActionResult Get([NonEmptyGuid] Guid purchaseTypeUuid, [NonEmptyGuid] Guid organizationUuid)
+        public IHttpActionResult Get([NonEmptyGuid] Guid criticalityTypeUuid, [NonEmptyGuid] Guid organizationUuid)
         {
-            return GetSingle(purchaseTypeUuid, organizationUuid);
+            return GetSingle(criticalityTypeUuid, organizationUuid);
         }
     }
 }
