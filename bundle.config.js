@@ -64,10 +64,6 @@ module.exports = {
         npm("/font-awesome/fonts/*.*")
     ],
 
-    tinyMCEFontSrc: [
-        npm("/tinymce/ui/oxide/fonts/*.*")
-    ],
-
     // assets
     assetsSrc: [
         npm("/select2/*.png"),
@@ -82,7 +78,6 @@ module.exports = {
     cssBundleMin: "app.min.css",
 
     fontDest: content("/fonts"),
-    tinyMCEFontDest: content("/css/fonts"),
     cssDest: content("/css"),
     maps: "maps",
 

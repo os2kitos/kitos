@@ -104,11 +104,6 @@ const fonts = function (callBack) {
         .pipe(dest(config.fontDest));
 };
 
-// copy tinyMCE fonts
-const tinyMCEFonts = function (callBack) {
-    return src(config.tinyMCEFontSrc);
-};
-
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
@@ -122,36 +117,13 @@ const tinyMCEFixCss = function (callBack) {
         .pipe(dest(paths.sourceScript + "/skins/content/default"));
 };
 
-const tinyMCEFixFonts = function (callBack) {
-    return file("tinymce-small.eot", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce-small.svg"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce-small.ttf"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce-small.wof"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce-small.woff"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce.eot"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce.svg"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce.ttf"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce.wof"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"))
-        .pipe(rename("tinymce.woff"))
-        .pipe(dest(paths.sourceContent + "/css/fonts"));
-};
-
 const tinyMCEFixLang = function (callBack) {
     return file("da.js", "//Dummy file from gulp", { src: true })
         .pipe(dest(paths.sourceScript + "/langs"));
 };
 
 // bundle, minify and copy styles, fonts and assets
-const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang, tinyMCEFixFonts));
+const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFixCss, tinyMCEFixLang));
 
 // run bundle tasks
 const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
