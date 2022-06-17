@@ -119,7 +119,9 @@ const tinyMCEFixCss = function (callBack) {
         .pipe(rename("skin.min.css"))
         .pipe(dest(paths.sourceScript + "/skins/lightgray"))
         .pipe(rename("content.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/content/default"));
+        .pipe(dest(paths.sourceScript + "/skins/content/default"))
+        .pipe(rename("content.css"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"));;
 };
 
 // bundle, minify and copy styles, fonts and assets
