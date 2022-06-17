@@ -83,6 +83,7 @@
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.contract = contract;
+                $scope.contract.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate($scope.contract.lastChanged);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
