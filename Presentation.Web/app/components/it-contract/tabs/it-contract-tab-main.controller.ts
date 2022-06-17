@@ -85,7 +85,7 @@
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
                 $scope.yesNoUndecidedValues = yesNoUndecided.options;
                 $scope.contract = contract;
-                $scope.contract.procurementInitiated = yesNoUndecided.getById(contract.procurementInitiated);
+                $scope.contract.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate($scope.contract.lastChanged);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
