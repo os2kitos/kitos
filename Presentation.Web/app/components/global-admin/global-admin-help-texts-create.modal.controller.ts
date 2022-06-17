@@ -10,16 +10,15 @@
         public busy: boolean;
         public vm: ICreateViewModel;
 
-        public static $inject: string[] = ["$uibModalInstance", "$http", "$q", "notify", "autofocus", "user", "_", "helpTexts"];
+        public static $inject: string[] = ["$uibModalInstance", "notify", "autofocus", "user", "_", "helpTexts", "helpTextService"];
 
         constructor(private $uibModalInstance: ng.ui.bootstrap.IModalServiceInstance,
-            private $http: IHttpServiceWithCustomConfig,
-            private $q: ng.IQService,
             private notify,
             private autofocus,
-            private user: Kitos.Services.IUser,
+            private user: Services.IUser,
             private _: _.LoDashStatic,
-            private helpTexts) {
+            private helpTexts,
+            private helpTextService: Services.IHelpTextService) {
             if (!user.currentOrganizationId) {
                 notify.addErrorMessage("Fejl! Kunne ikke oprette hjælpetekst.", true);
                 return;
@@ -42,15 +41,10 @@
             }
 
             this.busy = true;
-            var payload = {
-                Title: this.vm.title,
-                Key: this.vm.key
-            };
-
             var msg = this.notify.addInfoMessage("Opretter hjælpetekst", false);
 
-            this.$http.post(`odata/HelpTexts?organizationId=${this.user.currentOrganizationId}`, payload, { handleBusy: true })
-                .then((response) => {
+            this.helpTextService.createHelpText(this.vm.key, this.vm.title)
+                .then(() => {
                     msg.toSuccessMessage(`${this.vm.title} er oprettet i KITOS`);
                     this.cancel();
                 }, () => {

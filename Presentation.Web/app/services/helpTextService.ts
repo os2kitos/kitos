@@ -6,6 +6,7 @@
     }
 
     interface IHelpTextOdataModel {
+        Id?: number;
         Title?: string;
         Description?: string;
     }
@@ -32,6 +33,8 @@
         loadHelpText(key: string, ignoreCache?: boolean): ng.IPromise<IHelpText | null>;
         deleteHelpText(id: number, key: string): ng.IPromise<unknown>;
         updateHelpText(id: number, key: string, title: string, text: string): ng.IPromise<unknown>;
+        createHelpText(key: string, title: string): angular.IPromise<unknown>;
+        getHelpTextFromApi(key: string): angular.IHttpPromise<Models.IODataResult<IHelpTextOdataModel>>;
     }
 
     class HelpTextService implements IHelpTextService {
@@ -94,17 +97,28 @@
                 });
         }
 
+        createHelpText(key: string, title: string): angular.IPromise<unknown> {
+            const user = this.userService.getUser();
+            const payload = {
+                Title: title,
+                Key: key
+            };
+
+            return this.$http.post(`odata/HelpTexts?organizationId=${user.$$state.value.currentOrganizationId}`, payload, { handleBusy: true });
+        }
+
         getHelpTextFromApi(key: string): angular.IHttpPromise<Models.IODataResult<IHelpTextOdataModel>> {
             return this.$http.get<Models.IODataResult<IHelpTextOdataModel>>(`odata/HelpTexts?$filter=Key eq '${key}'`);
         }
 
-        static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory"];
+        static $inject = ["$http", "$sce", "$q", "apiUseCaseFactory", "userService"];
 
         constructor(
-            private readonly $http: ng.IHttpService,
+            private readonly $http: IHttpServiceWithCustomConfig,
             private readonly $sce: ng.ISCEService,
             private readonly $q: ng.IQService,
-            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory) { }
+            private readonly apiUseCaseFactory: Services.Generic.IApiUseCaseFactory,
+            private readonly userService: Services.IUserService) { }
     }
 
     app.service("helpTextService", HelpTextService);
