@@ -122,38 +122,6 @@ const tinyMCEFixCss = function (callBack) {
         .pipe(dest(paths.sourceScript + "/skins/content/default"));
 };
 
-///**
-// * Create dummy files which are referenced when TinyMCE is loaded but where the content is actually part of the main bundle
-// * @param {any} callBack
-// */
-//const tinyMCEFixFonts = function (callBack) {
-//    return file("tinymce-small.eot", "//Dummy file from gulp", { src: true })
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce-small.svg"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce-small.ttf"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce-small.wof"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce-small.woff"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce.eot"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce.svg"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce.ttf"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce.wof"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"))
-//        .pipe(rename("tinymce.woff"))
-//        .pipe(dest(paths.sourceContent + "/css/fonts"));
-//};
-
-//const tinyMCEFixLang = function (callBack) {
-//    return file("da.js", "//Dummy file from gulp", { src: true })
-//        .pipe(dest(paths.sourceScript + "/langs"));
-//};
-
 // bundle, minify and copy styles, fonts and assets
 const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFixCss));
 
