@@ -119,9 +119,8 @@
         DPIA: DataOption;
         answeringDataDPIA: DataOption;
         hostedAt: HostedAt;
-        lastChanged: string,
-        lastChangedByUserName: string,
-        lastChangedByUserLastName: string,
+        lastChanged: string;
+        lastChangedBy: string;
     }
 
     export class SystemUsageViewModel implements ISystemUsageViewModel {
@@ -146,8 +145,7 @@
         hostedAt: HostedAt;
         userCount: string;
         lastChanged: string;
-        lastChangedByUserName: string;
-        lastChangedByUserLastName: string;
+        lastChangedBy: string;
 
         constructor(itSystemUsage: any) {
             this.id = itSystemUsage.id;
@@ -157,10 +155,8 @@
             this.expirationDate = itSystemUsage.expirationDate;
             this.isActive = itSystemUsage.isActive;
             this.active = itSystemUsage.active;
-            this.lastChanged = itSystemUsage.lastChanged;
-            this.lastChangedByUserName = itSystemUsage.lastChangedByUserName;
-            this.lastChangedByUserLastName = itSystemUsage.lastChangedByUserLastName;
-
+            this.lastChanged = Helpers.RenderFieldsHelper.renderDate(itSystemUsage.lastChanged);
+            this.lastChangedBy = `${itSystemUsage.lastChangedByUserName} ${itSystemUsage.lastChangedByUserLastName}`;
             const sensitiveDataLevels = _.map(itSystemUsage.sensitiveDataLevels, this.mapDataLevels);
             this.noDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.none.value);
             this.personalDataSelected = _.some(sensitiveDataLevels, x => x === SensitiveDataLevelViewModel.levels.personal.value);
@@ -229,10 +225,6 @@
                 default:
                     throw new RangeError(`${dataOption} is not a valid RiskLevel`);
             }
-        }
-
-        getLastChangedByUserFullName() {
-            return `${this.lastChangedByUserName} ${this.lastChangedByUserLastName}`;
         }
     }
 }
