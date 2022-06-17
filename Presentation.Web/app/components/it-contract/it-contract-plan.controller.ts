@@ -799,6 +799,20 @@
                         }
                     },
                     {
+                        field: "ProcurementInitiated", title: "Genanskaffelse igangsat", width: 150,
+                        persistId: "procurement_initiated",
+                        template: dataItem => dataItem.ProcurementInitiated ? Models.ViewModel.Shared.YesNoUndecidedOptions.getText(dataItem.ProcurementInitiated) : "",
+                        hidden: true,
+                        filterable: {
+                            cell: {
+                                template: customFilter,
+                                dataSource: [],
+                                showOperators: false,
+                                operator: "contains"
+                            }
+                        }
+                    },
+                    {
                         field: "ProcurementStrategy",
                         title: "Genanskaffelsesstrategi",
                         width: 150,
@@ -868,7 +882,7 @@
                                 operator: "gte"
                             }
                         }
-                    },
+                    }
                 ]
             };
 

@@ -196,7 +196,7 @@ namespace Presentation.Web.Controllers.API.V2.External.ItContracts.Mapping
         {
             return new()
             {
-                RepurchaseInitiated = contract.RepurchaseInitiated,
+                ProcurementInitiated = contract.ProcurementInitiated,
                 ContractId = contract.ItContractId,
                 Notes = contract.Note,
                 ContractTemplate = contract.ContractTemplate?.MapIdentityNamePairDTO(),

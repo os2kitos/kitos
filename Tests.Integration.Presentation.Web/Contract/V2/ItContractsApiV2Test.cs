@@ -693,11 +693,11 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
         [InlineData(false, true, true, true)]
         [InlineData(true, true, true, false)]
         [InlineData(false, false, false, false)]
-        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withRepurchaseInitiated)
+        public async Task Can_POST_With_GeneralData(bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withProcurementInitiated)
         {
             //Arrange
             var (token, user, organization) = await CreatePrerequisitesAsync();
-            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements, withRepurchaseInitiated);
+            var (contractType, contractTemplateType, agreementElements, generalDataWriteRequestDto) = await CreateGeneralDataRequestDTO(organization, withContractType, withContractTemplate, withAgreementElements, withProcurementInitiated);
             var request = new CreateNewContractRequestDTO
             {
                 OrganizationUuid = organization.Uuid,
@@ -2111,7 +2111,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             return contractResponsibleDataWriteRequestDto;
         }
 
-        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withRepurchaseInitiated)
+        private async Task<(IdentityNamePairResponseDTO contractType, IdentityNamePairResponseDTO contractTemplateType, List<IdentityNamePairResponseDTO> agreementElements, ContractGeneralDataWriteRequestDTO generalDataWriteRequestDto)> CreateGeneralDataRequestDTO(OrganizationDTO organization, bool withContractType, bool withContractTemplate, bool withAgreementElements, bool withProcurementInitiated)
         {
             var contractType = withContractType
                 ? (await OptionV2ApiHelper.GetOptionsAsync(OptionV2ApiHelper.ResourceName.ItContractContractTypes,
@@ -2132,7 +2132,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
                 ContractTypeUuid = contractType?.Uuid,
                 ContractTemplateUuid = contractTemplateType?.Uuid,
                 AgreementElementUuids = agreementElements?.Select(x => x.Uuid).ToList(),
-                RepurchaseInitiated = A<YesNoUndecidedOption>(),
+                ProcurementInitiated = A<YesNoUndecidedOption>(),
                 Validity = new ValidityWriteRequestDTO()
                 {
                     ValidFrom = DateTime.Now,
@@ -2158,6 +2158,7 @@ namespace Tests.Integration.Presentation.Web.Contract.V2
             Assert.Equal(request?.Validity?.ValidTo?.Date, freshDTO.General.Validity?.ValidTo);
             Assert.Equal(request?.Validity?.ValidFrom?.Date, freshDTO.General.Validity?.ValidFrom);
             Assert.Equal(request?.Validity?.EnforcedValid == true, freshDTO.General.Validity?.EnforcedValid == true);
+            Assert.Equal(request?.ProcurementInitiated, freshDTO.General.ProcurementInitiated);
 
             if (expectedAgreementElements == null)
                 Assert.Empty(freshDTO.General.AgreementElements);

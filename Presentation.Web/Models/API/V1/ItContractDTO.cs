@@ -63,11 +63,8 @@ namespace Presentation.Web.Models.API.V1
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
         public int LastChangedByUserId { get; set; }
-
-        public string ObjectOwnerName { get; set; }
-        public string ObjectOwnerLastName { get; set; }
-
-        public string ObjectOwnerFullName => ObjectOwnerName + " " + ObjectOwnerLastName;
+        
+        public string ObjectOwnerFullName { get; set; }
 
         public int? ObjectOwnerId { get; set; }
 
@@ -83,6 +80,6 @@ namespace Presentation.Web.Models.API.V1
 
         public Guid Uuid { get; set; }
 
-        public YesNoUndecidedOption? RepurchaseInitiated { get; set; }
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
     }
 }

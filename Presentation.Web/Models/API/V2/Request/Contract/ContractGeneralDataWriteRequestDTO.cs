@@ -41,6 +41,6 @@ namespace Presentation.Web.Models.API.V2.Request.Contract
         /// <summary>
         ///     Repurchase Initiated for IT-Contract. (Genanskaffelse igangsat)
         /// </summary>
-        public YesNoUndecidedOption? RepurchaseInitiated { get; set; }
+        public YesNoUndecidedOption? ProcurementInitiated { get; set; }
     }
 }

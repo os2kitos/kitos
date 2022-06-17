@@ -83,9 +83,9 @@
 
                 $scope.autoSaveUrl = 'api/itcontract/' + $stateParams.id;
                 $scope.autosaveUrl2 = 'api/itcontract/' + contract.id;
-                $scope.dataOptions = yesNoUndecided.options;
+                $scope.yesNoUndecidedValues = yesNoUndecided.options;
                 $scope.contract = contract;
-                $scope.contract.repurchaseInitiated = yesNoUndecided.getById(contract.repurchaseInitiated);
+                $scope.contract.procurementInitiated = yesNoUndecided.getById(contract.procurementInitiated);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;
@@ -187,11 +187,11 @@
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 }
 
-                $scope.saveRepurchaseInitiated = repurchaseInitiated => {
-                    if (repurchaseInitiated === null)
+                $scope.saveProcurementInitiated = procurementInitiated => {
+                    if (procurementInitiated === null)
                         return;
 
-                    var payload = { repurchaseInitiated: repurchaseInitiated };
+                    var payload = { procurementInitiated: procurementInitiated };
                     patch(payload, $scope.autoSaveUrl + '?organizationId=' + user.currentOrganizationId);
                 };
 

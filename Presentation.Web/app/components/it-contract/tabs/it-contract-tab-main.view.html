@@ -112,9 +112,9 @@
                         <div class="form-group">
                             <label for="repurchase-initiated" class="control-label small">Genanskaffelse igangsat</label>
                             <select-simple id="repurchase-initiated" 
-                                           data-options="dataOptions"
-                                           data-ng-model="contract.repurchaseInitiated"
-                                           data-function="saveRepurchaseInitiated"
+                                           data-options="yesNoUndecidedValues"
+                                           data-ng-model="contract.procurementInitiated"
+                                           data-function="saveProcurementInitiated"
                                            data-ng-disabled="!hasWriteAccess"/>
                         </div>
                     </div>
