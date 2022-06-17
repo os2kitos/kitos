@@ -34,11 +34,13 @@
                                     });
 
                                 $scope.navigateToHelpTextEdit = () => {
-                                    var msg = notify.addInfoMessage("CHANGE TO DANISH: Navigating to edit page", false);
+                                    //TODO: Change text to danish
+                                    var msg = notify.addInfoMessage("CHANGE TO DANISH: Navigating to edit page", true);
 
                                     helpTextService.getHelpTextFromApi(helpTextKey)
                                         .then((response) => {
                                             if (response.data.value.length < 1) {
+                                                //TODO: Change text to danish
                                                 msg.toErrorMessage(`CHANGE TO DANISH: Failed to find "${helpTextKey}" help text`);
                                             }
 
