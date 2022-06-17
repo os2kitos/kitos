@@ -7,8 +7,6 @@ var del = require("del");
 var minifyCss = require("gulp-clean-css");
 var sourceMaps = require("gulp-sourcemaps");
 var ts = require("gulp-typescript");
-var rename = require("gulp-rename");
-var file = file = require("gulp-file");
 var less = require("gulp-less");
 var paths = require("../paths.config.js");
 var config = require("../bundle.config.js");
@@ -104,26 +102,8 @@ const fonts = function (callBack) {
         .pipe(dest(config.fontDest));
 };
 
-const tinyMCEFixCss = function (callBack) {
-    return file("content.min.css", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
-        .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
-        .pipe(rename("content.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"))
-        .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"))
-        .pipe(rename("content.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/content/default"));
-};
-
-const tinyMCEFixLang = function (callBack) {
-    return file("da.js", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceScript + "/langs"));
-};
-
 // bundle, minify and copy styles, fonts and assets
-const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFixCss, tinyMCEFixLang));
+const styles = series(cleanStyles, parallel(css, assets, fonts));
 
 // run bundle tasks
 const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
