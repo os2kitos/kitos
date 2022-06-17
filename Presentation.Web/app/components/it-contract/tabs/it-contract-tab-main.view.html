@@ -186,15 +186,15 @@
                     <div class="col-xs-6">
                         <!-- Responsible org unit -->
                         <div class="form-group">
-                            <select2-org-unit  data-id="contract-orgunit"
-                                               data-label="Ansvarlig enhed"
-                                               data-placeholder="Vælg ansvarlig enhed"
-                                               data-options="orgUnits"
-                                               data-ng-model="contract.responsibleOrganizationUnitId"
-                                               data-auto-save-url="{{ autoSaveUrl }}"
-                                               data-field="responsibleOrganizationUnitId"
-                                               data-ng-disabled="!hasWriteAccess"
-                                               data-allow-clear="allowClear">
+                            <select2-org-unit data-id="contract-orgunit"
+                                              data-label="Ansvarlig enhed"
+                                              data-placeholder="Vælg ansvarlig enhed"
+                                              data-options="orgUnits"
+                                              data-ng-model="contract.responsibleOrganizationUnitId"
+                                              data-auto-save-url="{{ autoSaveUrl }}"
+                                              data-field="responsibleOrganizationUnitId"
+                                              data-ng-disabled="!hasWriteAccess"
+                                              data-allow-clear="allowClear">
                             </select2-org-unit>
                         </div>
 
@@ -274,6 +274,25 @@
                             <span class='label-content'>Gyldig: </span>
                         </label>
                         <i ng-show="contract.isActive" class="fa fa-check" aria-hidden="true"></i>
+                    </div>
+
+                    <div class="col-xs-12">
+                        <div class="form-group">
+                            <label for="last-changed-by-name" class="control-label small">Sidst redigeret: Bruger</label>
+                            <input type="text"
+                                   id="last-changed-by-name"
+                                   value="{{contract.lastChangedByName}}"
+                                   class="form-control input-sm"
+                                   disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="last-changed" class="control-label small">Sidst redigeret: Dato</label>
+                            <input type="text"
+                                   id="last-changed"
+                                   value="{{ ::lastChanged }}"
+                                   class="form-control input-sm"
+                                   disabled>
+                        </div>
                     </div>
                 </div>
             </div>

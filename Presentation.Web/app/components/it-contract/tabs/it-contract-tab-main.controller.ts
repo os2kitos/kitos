@@ -86,6 +86,7 @@
                 $scope.yesNoUndecidedValues = yesNoUndecided.options;
                 $scope.contract = contract;
                 $scope.contract.procurementInitiated = yesNoUndecided.getById(contract.procurementInitiated);
+                $scope.lastChanged = Kitos.Helpers.RenderFieldsHelper.renderDate(contract.lastChanged);
                 $scope.hasWriteAccess = hasWriteAccess;
                 $scope.hasViewAccess = user.currentOrganizationId == contract.organizationId;
                 $scope.kitosUsers = kitosUsers;

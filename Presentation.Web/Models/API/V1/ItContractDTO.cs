@@ -62,6 +62,7 @@ namespace Presentation.Web.Models.API.V1
 
         public IEnumerable<AdviceDTO> Advices { get; set; }
         public DateTime LastChanged { get; set; }
+        public string LastChangedByName { get; set; }
         public int LastChangedByUserId { get; set; }
         
         public string ObjectOwnerFullName { get; set; }
