@@ -104,26 +104,24 @@ const fonts = function (callBack) {
         .pipe(dest(config.fontDest));
 };
 
-// copy tinyMCE fonts
-const tinyMCEFonts = function (callBack) {
-    return src(config.tinyMCEFontSrc)
-        .pipe(dest(config.tinyMCEFontDest));
-};
 
+/**
+ * Create dummy files which are referenced when TinyMCE is loaded but where the content is actually part of the main bundle
+ * @param {any} callBack
+ */
 const tinyMCEFixCss = function (callBack) {
     return file("content.min.css", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"))
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
         .pipe(rename("skin.min.css"))
-        .pipe(dest(paths.sourceScript + "/skins/lightgray"));
-};
-
-const tinyMCEFixLang = function (callBack) {
-    return file("da.js", "//Dummy file from gulp", { src: true })
-        .pipe(dest(paths.sourceScript + "/langs"));
+        .pipe(dest(paths.sourceScript + "/skins/ui/oxide"))
+        .pipe(rename("content.min.css"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"))
+        .pipe(rename("content.css"))
+        .pipe(dest(paths.sourceScript + "/skins/content/default"));;
 };
 
 // bundle, minify and copy styles, fonts and assets
-const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFonts, tinyMCEFixCss, tinyMCEFixLang));
+const styles = series(cleanStyles, parallel(css, assets, fonts), parallel(tinyMCEFixCss));
 
 // run bundle tasks
 const scripts = series(cleanScriptBundles, parallel(appBundle, libraryBundle, angularBundle));
